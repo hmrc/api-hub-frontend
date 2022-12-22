@@ -35,9 +35,6 @@ class IndexController @Inject()(
                                )(implicit override val ec: ExecutionContext) extends FrontendBaseController with I18nSupport with AuthorisationHelper with LdapAuthorisationActions {
 
   def onPageLoad: Action[AnyContent] = anyAuthenticatedUserAction { implicit loggedInRequest =>
-    println("LAURA")
-    val loggedInUser = implicitly[LoggedInUser]
-    println(loggedInUser)
     Future.apply(Ok(view()))
   }
 }
