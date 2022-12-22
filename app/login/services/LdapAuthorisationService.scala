@@ -17,7 +17,7 @@
 package login.services
 
 import login.common.services.ApplicationLogger
-import login.domain.models.{GatekeeperRoles, LoggedInRequest}
+import login.domain.models.LoggedInRequest
 import play.api.mvc._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.internalauth.client._
@@ -41,13 +41,10 @@ class LdapAuthorisationService @Inject()(auth: FrontendAuthComponents
       logger.debug("No Header Carrier Authoriation")
       successful(notAuthenticatedOrAuthorized)
     })(authorization => {
-      auth.authConnector.authenticate(predicate = None, Retrieval.username ~ Retrieval.hasPredicate(LdapAuthorisationPredicate.gatekeeperReadPermission))
+      auth.authConnector.authenticate(predicate = None, Retrieval.username)
         .map {
-          case (name ~ true)  =>
-            Right(new LoggedInRequest(Some(name.value), GatekeeperRoles.READ_ONLY, msgRequest))
-          case (name ~ false) =>
-            logger.debug("No LDAP predicate matched")
-            notAuthenticatedOrAuthorized
+          case (name)  =>
+            Right(new LoggedInRequest(Some(name.value), msgRequest))
           case _              =>
             logger.debug("LDAP Authenticate failed to find user")
             notAuthenticatedOrAuthorized

@@ -16,7 +16,6 @@
 
 package controllers.ldap
 
-import login.services.LdapAuthorisationPredicate
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.internalauth.client.FrontendAuthComponents
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -31,10 +30,8 @@ class LdapController @Inject()(
   ) extends FrontendController(mcc) {
 
   def signIn = Action.async { implicit initialRequest =>
-    auth.authorizedAction(
-      continueUrl = controllers.routes.IndexController.onPageLoad,
-      predicate = LdapAuthorisationPredicate.gatekeeperReadPermission // todo the need for this predicate complete
-    ).async { _ =>
+    auth.authenticatedAction(
+      continueUrl = controllers.routes.IndexController.onPageLoad).async { _ =>
       successful(Redirect(controllers.routes.IndexController.onPageLoad))
     }(initialRequest)
   }

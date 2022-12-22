@@ -18,4 +18,4 @@ package login.domain.models
 
 import play.api.mvc.MessagesRequest
 
-class LoggedInRequest[A](val name: Option[String], val role: GatekeeperRole, request: MessagesRequest[A]) extends MessagesRequest[A](request, request.messagesApi)
+class LoggedInRequest[A](val name: Option[String], request: MessagesRequest[A]) extends MessagesRequest[A](request, request.messagesApi)
