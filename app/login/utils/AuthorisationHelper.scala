@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,26 +12,12 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import login.domain.models.LoggedInUser
+package login.utils
 
-@this(
-    layout: templates.Layout
-)
+import login.domain.models.{LoggedInRequest, LoggedInUser}
 
-@()(implicit loggedInUser: LoggedInUser, request: Request[_], messages: Messages)
-
-@layout(
-    pageTitle    = titleNoForm(messages("index.title")),
-    showBackLink = false
-) {
-
-    <div align="right">
-        <a href="/api-hub">Sign In</a>
-    </div>
-
-    <h1 class="govuk-heading-xl">@messages("index.heading")</h1>
-
-    <p class="govuk-body">@messages("index.guidance")</p>
+trait AuthorisationHelper {
+  implicit def loggedIn(implicit request: LoggedInRequest[_]): LoggedInUser = LoggedInUser(request.name)
 }
