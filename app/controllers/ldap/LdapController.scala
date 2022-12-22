@@ -16,7 +16,7 @@
 
 package controllers.ldap
 
-import auth.services.LdapAuthorisationPredicate
+import login.services.LdapAuthorisationPredicate
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.internalauth.client.FrontendAuthComponents
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController

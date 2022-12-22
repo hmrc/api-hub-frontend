@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package auth.services
+package login.services
 
 import uk.gov.hmrc.internalauth.client._
 
