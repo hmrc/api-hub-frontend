@@ -39,6 +39,9 @@ index.title = api-hub-frontend
 index.heading = api-hub-frontend
 index.guidance = Welcome to your new frontend. Please see the README file for a guide to getting started.
 
+login.title = login
+login.heading = login to LDAP
+
 checkYourAnswers.title = Check Your Answers
 checkYourAnswers.heading = Check Your Answers
 

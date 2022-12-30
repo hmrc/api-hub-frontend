@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,26 +12,20 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import views.html.templates.Layout
+package services.auth.connectors
 
-@this(
-    layout: Layout
-)
+import javax.inject.{Inject, Singleton}
 
-@()(implicit request: Request[_], messages: Messages)
+import uk.gov.hmrc.auth.core._
+import uk.gov.hmrc.http.HttpClient
 
-@layout(
-    pageTitle    = titleNoForm(messages("index.title")),
-    showBackLink = false
-) {
+object StrideAuthConnector {
+  case class Config(baseUrl: String)
+}
 
-    <div align="right">
-        <a href="/api-hub/ldap/sign-in">Sign In</a>
-    </div>
-
-    <h1 class="govuk-heading-xl">@messages("index.heading")</h1>
-
-    <p class="govuk-body">@messages("index.guidance")</p>
+@Singleton
+class StrideAuthConnector @Inject()(val http: HttpClient, config: StrideAuthConnector.Config) extends PlayAuthConnector {
+  lazy val serviceUrl = config.baseUrl
 }

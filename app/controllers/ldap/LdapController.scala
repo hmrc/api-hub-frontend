@@ -16,27 +16,41 @@
 
 package controllers.ldap
 
-import auth.services.LdapAuthorisationPredicate
+import models.LdapLogin
+import models.LdapLogin.loginForm
 import play.api.mvc.MessagesControllerComponents
+import services.auth.LdapAuthorisationPredicate
 import uk.gov.hmrc.internalauth.client.FrontendAuthComponents
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
+import views.html.LdapUserLoginView
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future.successful
 
 @Singleton
 class LdapController @Inject()(
-    auth: FrontendAuthComponents,
-    mcc: MessagesControllerComponents
-  ) extends FrontendController(mcc) {
+                      auth: FrontendAuthComponents,
+                      mcc: MessagesControllerComponents,
+                      ldapLoginView: LdapUserLoginView,
+                   ) extends FrontendController(mcc) {
 
-  def signIn = Action.async { implicit initialRequest =>
-    auth.authorizedAction(
-      continueUrl = controllers.routes.IndexController.onPageLoad,
-      predicate = LdapAuthorisationPredicate.gatekeeperReadPermission // todo the need for this predicate complete
-    ).async { _ =>
-      successful(Redirect(controllers.routes.IndexController.onPageLoad))
-    }(initialRequest)
+
+  def showLogin = Action{ implicit initialRequest =>
+    Ok(ldapLoginView(LdapLogin.loginForm))
   }
+
+
+  def signIn = Action{ implicit request =>
+    loginForm.bindFromRequest.fold(
+      formWithErrors => {
+        Ok(ldapLoginView(formWithErrors))
+        //Ok("")
+      },
+      userData => {
+        //binding success, you get the actual value.
+        val ldapUser = models.LdapLogin(userData.username, userData.userPassword, userData.userEmail)
+        Redirect("ldap auth api")
+      }
+    )}
 
 }

@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,26 +12,22 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import views.html.templates.Layout
+package config.gkauth
 
-@this(
-    layout: Layout
-)
+import com.typesafe.config.Config
 
-@()(implicit request: Request[_], messages: Messages)
 
-@layout(
-    pageTitle    = titleNoForm(messages("index.title")),
-    showBackLink = false
-) {
+trait BaseUrlExtractor {
+  def config: Config
 
-    <div align="right">
-        <a href="/api-hub/ldap/sign-in">Sign In</a>
-    </div>
+  protected lazy val rootServices = "microservice.services"
 
-    <h1 class="govuk-heading-xl">@messages("index.heading")</h1>
-
-    <p class="govuk-body">@messages("index.guidance")</p>
+  def extractBaseUrl(serviceName: String) = {
+    val protocol = config.getString(s"${rootServices}.$serviceName.protocol")
+    val host     = config.getString(s"${rootServices}.$serviceName.host")
+    val port     = config.getString(s"${rootServices}.$serviceName.port")
+    s"$protocol://$host:$port"
+  }
 }

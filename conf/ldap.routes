@@ -1,3 +1,5 @@
 # Routes for internal auth using ldap
 
-GET         /sign-in        controllers.ldap.LdapController.signIn
+GET         /sign-in        controllers.ldap.LdapController.showLogin
+
+POST        /sign-in        controllers.ldap.LdapController.signIn

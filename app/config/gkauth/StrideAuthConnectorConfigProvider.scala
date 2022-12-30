@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 
-package auth.services
+package config.gkauth
 
-import uk.gov.hmrc.internalauth.client._
+import play.api.Configuration
+import services.auth.connectors.StrideAuthConnector
 
-object LdapAuthorisationPredicate {
+import javax.inject.{Inject, Provider, Singleton}
 
-  val gatekeeperReadPermission = Predicate.Permission(
-    Resource(
-      ResourceType("api-gatekeeper-frontend"),
-      ResourceLocation("*")
-    ),
-    IAAction("READ")
-  )
+@Singleton
+class StrideAuthConnectorConfigProvider @Inject()(configuration: Configuration) extends Provider[StrideAuthConnector.Config] with BaseUrlExtractor {
+  val config = configuration.underlying
+
+  override def get(): StrideAuthConnector.Config = {
+    val baseUrl = extractBaseUrl("services/auth")
+    
+    StrideAuthConnector.Config(baseUrl)
+  }
 }
