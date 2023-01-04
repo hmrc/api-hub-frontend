@@ -56,8 +56,9 @@ signedOut.guidance = We did not save your answers.
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
 
-applicationName.title = applicationName
-applicationName.heading = applicationName
+applicationName.title = Application Name
+applicationName.heading = What is the name of your application?
+applicationName.hint = This name will be used to identify your application to you and your team
 applicationName.checkYourAnswersLabel = applicationName
 applicationName.error.required = Enter applicationName
 applicationName.error.length = ApplicationName must be 100 characters or less
