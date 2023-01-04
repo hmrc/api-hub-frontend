@@ -20,6 +20,7 @@ To run the application use `sbt run` to start the service. All local dependencie
 
 Once everything is up and running you can access the application at
 
+
 ```
 http://localhost:9000/api-hub
 ```
