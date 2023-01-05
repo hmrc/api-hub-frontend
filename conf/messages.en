@@ -35,8 +35,8 @@ error.number = Please enter a valid number
 error.required = Please enter a value
 error.summary.title = There is a problem
 
-index.title = The API Hub
-index.heading = Your HIP Dashboard
+index.title = Applications
+index.heading = Applications
 index.registerApplication = Register an application
 
 checkYourAnswers.title = Check Your Answers
