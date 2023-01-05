@@ -1,4 +1,4 @@
-service.name = api-hub-frontend
+service.name = The API Hub
 
 site.back = Back
 site.remove = Remove
@@ -35,9 +35,9 @@ error.number = Please enter a valid number
 error.required = Please enter a value
 error.summary.title = There is a problem
 
-index.title = api-hub-frontend
-index.heading = api-hub-frontend
-index.guidance = Welcome to your new frontend. Please see the README file for a guide to getting started.
+index.title = The API Hub
+index.heading = Your HIP Dashboard
+index.registerApplication = Register an application
 
 checkYourAnswers.title = Check Your Answers
 checkYourAnswers.heading = Check Your Answers
@@ -59,7 +59,7 @@ unauthorised.heading = You can’t access this service with this account
 applicationName.title = Application Name
 applicationName.heading = What is the name of your application?
 applicationName.hint = This name will be used to identify your application to you and your team
-applicationName.checkYourAnswersLabel = applicationName
-applicationName.error.required = Enter applicationName
-applicationName.error.length = ApplicationName must be 100 characters or less
+applicationName.checkYourAnswersLabel = Application name
+applicationName.error.required = Enter an application name
+applicationName.error.length = Application name must be 100 characters or less
 applicationName.change.hidden = ApplicationName

@@ -15,7 +15,9 @@
  *@
 
 @this(
-    layout: templates.Layout
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukButton: GovukButton
 )
 
 @()(implicit request: Request[_], messages: Messages)
@@ -25,11 +27,12 @@
     showBackLink = false
 ) {
 
-    <div align="right">
-        <a href="/api-hub">Sign In</a>
-    </div>
-
     <h1 class="govuk-heading-xl">@messages("index.heading")</h1>
 
-    <p class="govuk-body">@messages("index.guidance")</p>
+    @formHelper(action = routes.IndexController.onSubmit) {
+        @govukButton(
+            ButtonViewModel(messages("index.registerApplication"))
+        )
+    }
+
 }

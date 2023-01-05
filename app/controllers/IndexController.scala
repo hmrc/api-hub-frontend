@@ -17,7 +17,7 @@
 package controllers
 
 import controllers.actions.IdentifierAction
-import models.UserAnswers
+import models.{NormalMode, UserAnswers}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -34,7 +34,14 @@ class IndexController @Inject()(
                                  view: IndexView
                                )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = identify.async { implicit request =>
-    sessionRepository.set(UserAnswers(request.userId)).map(_ => Ok(view()))
+  def onPageLoad: Action[AnyContent] = identify { implicit request =>
+    Ok(view())
   }
+
+  def onSubmit: Action[AnyContent] = identify.async { implicit request =>
+    sessionRepository.set(UserAnswers(request.userId)).map(
+      _ => Redirect(routes.ApplicationNameController.onPageLoad(NormalMode))
+    )
+  }
+
 }
