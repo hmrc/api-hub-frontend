@@ -1,5 +1,5 @@
 @*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,23 +34,23 @@
         <div class="govuk-form-group">
             <fieldset class="govuk-fieldset govuk-!-margin-bottom-2">
                 <label class="govuk-label--s" for="username">
-                    Username
+                    @*Username
+                    <input type="text" id="username" name="username" class="govuk-input"/> *@
                     @inputText(ldapLoginForm("username"))
-                    <input type="text" id="username" name="username" class="govuk-input"/>
                 </label>
             </fieldset>
             <fieldset class="govuk-fieldset govuk-!-margin-bottom-2">
                 <label class="govuk-label--s" for="userPassword">
-                    Password
+                    @*Password
+                    <input type="text" id="userPassword" name="userPassword" class="govuk-input"/>*@
                     @inputText(ldapLoginForm("userPassword"))
-                    <input type="text" id="userPassword" name="userPassword" class="govuk-input"/>
                 </label>
             </fieldset>
             <fieldset class="govuk-fieldset govuk-!-margin-bottom-2">
                 <label class="govuk-label--s" for="userSurname">
-                    email
-                    @inputText(ldapLoginForm("userEmail"))
-                    <input type="text" id="userEmail" name="userEmail" class="govuk-input"/>
+                    @*email
+                   <input type="text" id="userEmail" name="userEmail" class="govuk-input"/>*@
+                        @inputText(ldapLoginForm("userEmail"))
                 </label>
             </fieldset>
 

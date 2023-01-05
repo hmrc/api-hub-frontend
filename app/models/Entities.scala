@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,16 +12,22 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@this(
-    layout: templates.Layout
-)
+package models
 
-@(pageTitle: String, heading: String, message: String)(implicit request: Request[_], messages: Messages)
+import play.api.data.Form
+import play.api.data.Forms.{email, mapping, text}
+import play.api.data.validation.Constraints.nonEmpty
 
-@layout(pageTitle = titleNoForm(pageTitle)) {
-    <h1 class="govuk-heading-xl">@messages(heading)</h1>
+case class LdapLogin(username: String, userPassword: String, userEmail:String)
 
-    <p class="govuk-body">@messages(message)</p>
+object LdapLogin{
+  val loginForm = Form(
+    mapping(
+      "username" -> text.verifying(nonEmpty),
+      "userPassword"  -> text.verifying(nonEmpty),
+      "userEmail"  -> email.verifying(nonEmpty)
+    )(LdapLogin.apply)(LdapLogin.unapply)
+  )
 }
