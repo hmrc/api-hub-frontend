@@ -75,7 +75,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar {
         verify(mockSessionRepository).set(userAnswersCaptor.capture())
 
         val actualUserAnswers = userAnswersCaptor.getValue
-        actualUserAnswers.id mustBe "id"
+        actualUserAnswers.id mustBe userAnswersId
         actualUserAnswers.data mustBe Json.obj()
       }
     }
