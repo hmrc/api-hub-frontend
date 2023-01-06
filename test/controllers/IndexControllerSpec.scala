@@ -17,11 +17,19 @@
 package controllers
 
 import base.SpecBase
+import models.{NormalMode, UserAnswers}
+import org.mockito.{ArgumentCaptor, MockitoSugar}
+import org.mockito.ArgumentMatchers.any
+import play.api.inject.bind
+import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import repositories.SessionRepository
 import views.html.IndexView
 
-class IndexControllerSpec extends SpecBase {
+import scala.concurrent.Future
+
+class IndexControllerSpec extends SpecBase with MockitoSugar {
 
   "Index Controller" - {
 
@@ -41,5 +49,37 @@ class IndexControllerSpec extends SpecBase {
         contentAsString(result) mustEqual view()(request, messages(application)).toString
       }
     }
+
+    "must initiate User Answers and redirect to the Application Name page for a POST" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = None)
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(POST, routes.IndexController.onSubmit.url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.ApplicationNameController.onPageLoad(NormalMode).url
+
+        val userAnswersCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+        verify(mockSessionRepository).set(userAnswersCaptor.capture())
+
+        val actualUserAnswers = userAnswersCaptor.getValue
+        actualUserAnswers.id mustBe userAnswersId
+        actualUserAnswers.data mustBe Json.obj()
+      }
+    }
+
   }
+
 }

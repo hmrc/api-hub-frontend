@@ -1,4 +1,4 @@
-service.name = api-hub-frontend
+service.name = The API Hub
 
 site.back = Back
 site.remove = Remove
@@ -35,9 +35,9 @@ error.number = Please enter a valid number
 error.required = Please enter a value
 error.summary.title = There is a problem
 
-index.title = api-hub-frontend
-index.heading = api-hub-frontend
-index.guidance = Welcome to your new frontend. Please see the README file for a guide to getting started.
+index.title = Applications
+index.heading = Applications
+index.registerApplication = Register an application
 
 checkYourAnswers.title = Check Your Answers
 checkYourAnswers.heading = Check Your Answers
@@ -55,3 +55,11 @@ signedOut.guidance = We did not save your answers.
 
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
+
+applicationName.title = Application Name
+applicationName.heading = What is the name of your application?
+applicationName.hint = This name will be used to identify your application to you and your team
+applicationName.checkYourAnswersLabel = Application name
+applicationName.error.required = Enter an application name
+applicationName.error.length = Application name must be 100 characters or less
+applicationName.change.hidden = ApplicationName
