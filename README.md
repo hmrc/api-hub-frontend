@@ -17,6 +17,11 @@ This service is written in [Scala](http://www.scala-lang.org/) and [Play](http:/
 To run the application use `sbt run` to start the service. All local dependencies should be running first:
 * MongoDb
 * The API_HUB_ALL Service Manager group
+* STRIDE_IDP_STUB
+* STRIDE_AUTH_FRONTEND
+* STRIDE_AUTH
+* THIRD_PARTY_APPLICATION
+* API_DEFINITION
 
 Once everything is up and running you can access the application at
 
@@ -37,3 +42,7 @@ sbt it:test
 ## License
 
 This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html").
+
+sm --ports | grep 9604
+
+sm --logs USER_DETAILS
