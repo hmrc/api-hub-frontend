@@ -49,8 +49,8 @@ class AuthenticatedIdentifierAction @Inject()(
 
     authorised().retrieve(Retrievals.credentials) {
       _.map {
-        credentials => block(IdentifierRequest(request, credentials.providerId))
-      }.getOrElse(throw new UnauthorizedException("Unable to retrieve internal Id"))
+        credentials => block(IdentifierRequest(request, s"${credentials.providerType}-${credentials.providerId}"))
+      }.getOrElse(throw new UnauthorizedException("Unable to retrieve user credentials"))
     } recover {
       case _: NoActiveSession =>
         toStrideLogin(configuration.loginContinueUrl)
