@@ -17,16 +17,23 @@
 package controllers
 
 import base.SpecBase
+import controllers.CheckYourAnswersControllerSpec.buildSummaryList
+import generators.Generators
+import models.UserAnswers
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
+import viewmodels.checkAnswers.ApplicationNameSummary
 import viewmodels.govuk.SummaryListFluency
 import views.html.CheckYourAnswersView
 
-class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency {
+class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency with ScalaCheckPropertyChecks with Generators {
 
   "Check Your Answers Controller" - {
 
-    "must return OK and the correct view for a GET" in {
+    "must return OK and the correct view for a GET with empty user answers" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
@@ -36,11 +43,31 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency {
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[CheckYourAnswersView]
-        val list = SummaryListViewModel(Seq.empty)
+        val list = buildSummaryList(emptyUserAnswers, messages(application))
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(list)(request, messages(application)).toString
       }
+    }
+
+    "must return OK and the correct view for a GET with complete user answers" in {
+
+      forAll((userAnswers: UserAnswers) => {
+        val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad.url)
+
+          val result = route(application, request).value
+
+          val view = application.injector.instanceOf[CheckYourAnswersView]
+          val list = buildSummaryList(userAnswers, messages(application))
+
+          status(result) mustEqual OK
+          contentAsString(result) mustEqual view(list)(request, messages(application)).toString
+        }
+      })
+
     }
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
@@ -57,4 +84,16 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency {
       }
     }
   }
+}
+
+object CheckYourAnswersControllerSpec extends SummaryListFluency {
+
+  def buildSummaryList(userAnswers: UserAnswers, messages: Messages): SummaryList = {
+    SummaryListViewModel(
+      Seq(
+        ApplicationNameSummary.row(userAnswers)(messages)
+      ).flatten
+    )
+  }
+
 }
