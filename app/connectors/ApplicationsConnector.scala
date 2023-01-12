@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,27 +12,21 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@this(
-    layout: templates.Layout,
-    govukSummaryList: GovukSummaryList,
-    formHelper: FormWithCSRF,
-    govukButton: GovukButton
-)
+package connectors
 
-@(list: SummaryList)(implicit request: Request[_], messages: Messages)
+import com.google.inject.Singleton
+import models.Application
 
-@layout(pageTitle = titleNoForm(messages("checkYourAnswers.title"))) {
+import scala.concurrent.Future
 
-    <h1 class="govuk-heading-xl">@messages("checkYourAnswers.heading")</h1>
+@Singleton
+class ApplicationsConnector {
 
-    @govukSummaryList(list)
-
-    @formHelper(action = routes.CreateApplicationController.create) {
-        @govukButton(
-            ButtonViewModel(messages("checkYourAnswers.createApplication"))
-        )
-    }
+  def createApplication(application: Application): Future[Application] = {
+    // TODO: implement
+    Future.successful(application.copy(id = Some("id")))
+  }
 
 }
