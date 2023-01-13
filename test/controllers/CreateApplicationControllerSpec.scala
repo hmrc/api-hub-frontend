@@ -27,7 +27,7 @@ import play.api.{Application => PlayApplication}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import services.ApplicationsService
+import services.ApiHubService
 
 import scala.concurrent.Future
 
@@ -43,7 +43,7 @@ class CreateApplicationControllerSpec extends SpecBase with MockitoSugar {
 
       val fixture = buildFixture(userAnswers)
 
-      when(fixture.applicationsService.create(ArgumentMatchers.eq(application))(any()))
+      when(fixture.apiHubService.createApplication(ArgumentMatchers.eq(application))(any()))
         .thenReturn(Future.successful(application.copy(id = Some("test-app-id"))))
 
       running(fixture.application) {
@@ -53,11 +53,11 @@ class CreateApplicationControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.IndexController.onPageLoad.url)
 
-        verify(fixture.applicationsService).create(ArgumentMatchers.eq(application))(any())
+        verify(fixture.apiHubService).createApplication(ArgumentMatchers.eq(application))(any())
       }
     }
 
-    "must redirect to the application name page when there is no user answer" in {
+    "must redirect to the journey recovery page when there is no application name user answer" in {
       val fixture = buildFixture(emptyUserAnswers)
 
       running(fixture.application) {
@@ -65,9 +65,9 @@ class CreateApplicationControllerSpec extends SpecBase with MockitoSugar {
         val result = route(fixture.application, request).value
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.ApplicationNameController.onPageLoad(CheckMode).url)
+        redirectLocation(result) mustBe Some(routes.JourneyRecoveryController.onPageLoad().url)
 
-        verifyZeroInteractions(fixture.applicationsService)
+        verifyZeroInteractions(fixture.apiHubService)
       }
     }
   }
@@ -78,19 +78,19 @@ object CreateApplicationControllerSpec extends SpecBase with MockitoSugar {
 
   case class Fixture(
     application: PlayApplication,
-    applicationsService: ApplicationsService
+    apiHubService: ApiHubService
   )
 
   def buildFixture(userAnswers: UserAnswers): Fixture = {
-    val applicationsService = mock[ApplicationsService]
+    val apiHubService = mock[ApiHubService]
 
     val application = applicationBuilder(userAnswers = Some(userAnswers))
       .overrides(
-        bind[ApplicationsService].toInstance(applicationsService)
+        bind[ApiHubService].toInstance(apiHubService)
       )
       .build()
 
-    Fixture(application, applicationsService)
+    Fixture(application, apiHubService)
   }
 
 }

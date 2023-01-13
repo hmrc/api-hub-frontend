@@ -22,7 +22,7 @@ import models.{Application, UserAnswers}
 import pages.ApplicationNamePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
-import services.ApplicationsService
+import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,7 +33,7 @@ class CreateApplicationController @Inject()(
     identify: IdentifierAction,
     getData: DataRetrievalAction,
     requireData: DataRequiredAction,
-    applicationsService: ApplicationsService
+    apiHubService: ApiHubService
   )(implicit ec: ExecutionContext)
   extends FrontendBaseController
   with I18nSupport {
@@ -42,7 +42,7 @@ class CreateApplicationController @Inject()(
     implicit request =>
       validateAndBuildApplication(request.userAnswers).fold(
         call => Future.successful(Redirect(call)),
-        application => applicationsService.create(application)
+        application => apiHubService.createApplication(application)
           .map(_ => Redirect(routes.IndexController.onPageLoad))
       )
   }

@@ -28,9 +28,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ApplicationsConnector @Inject()(
-  httpClient: HttpClientV2,
-  servicesConfig: ServicesConfig
-)(implicit ec: ExecutionContext) {
+    httpClient: HttpClientV2,
+    servicesConfig: ServicesConfig
+  )(implicit ec: ExecutionContext) {
 
   private val applicationsBaseUrl = servicesConfig.baseUrl("api-hub-applications")
 

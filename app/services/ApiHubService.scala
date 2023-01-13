@@ -25,12 +25,10 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.Future
 
 @Singleton
-class ApplicationsService @Inject()(applicationsConnector: ApplicationsConnector)
+class ApiHubService @Inject()(applicationsConnector: ApplicationsConnector)
   extends Logging {
 
-  // TODO: does this class add value?
-
-  def create(application: Application)(implicit hc: HeaderCarrier): Future[Application] = {
+  def createApplication(application: Application)(implicit hc: HeaderCarrier): Future[Application] = {
     logger.debug(s"Creating application named ${application.name}")
     applicationsConnector.createApplication(application)
   }
