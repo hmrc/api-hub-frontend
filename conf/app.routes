@@ -26,4 +26,4 @@ POST       /applicationName                        controllers.ApplicationNameCo
 GET        /changeApplicationName                  controllers.ApplicationNameController.onPageLoad(mode: Mode = CheckMode)
 POST       /changeApplicationName                  controllers.ApplicationNameController.onSubmit(mode: Mode = CheckMode)
 
-POST       /createApplication                      controllers.CreateApplicationController.create
+POST       /create-application                     controllers.CreateApplicationController.create

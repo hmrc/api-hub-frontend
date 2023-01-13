@@ -20,6 +20,7 @@ import com.google.inject.{Inject, Singleton}
 import connectors.ApplicationsConnector
 import models.Application
 import play.api.Logging
+import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 
@@ -29,7 +30,7 @@ class ApplicationsService @Inject()(applicationsConnector: ApplicationsConnector
 
   // TODO: does this class add value?
 
-  def create(application: Application): Future[Application] = {
+  def create(application: Application)(implicit hc: HeaderCarrier): Future[Application] = {
     logger.debug(s"Creating application named ${application.name}")
     applicationsConnector.createApplication(application)
   }

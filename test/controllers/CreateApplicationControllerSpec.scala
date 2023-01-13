@@ -20,6 +20,7 @@ import base.SpecBase
 import controllers.CreateApplicationControllerSpec.buildFixture
 import models.{Application, CheckMode, UserAnswers}
 import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar
 import pages.ApplicationNamePage
 import play.api.{Application => PlayApplication}
@@ -42,7 +43,7 @@ class CreateApplicationControllerSpec extends SpecBase with MockitoSugar {
 
       val fixture = buildFixture(userAnswers)
 
-      when(fixture.applicationsService.create(ArgumentMatchers.eq(application)))
+      when(fixture.applicationsService.create(ArgumentMatchers.eq(application))(any()))
         .thenReturn(Future.successful(application.copy(id = Some("test-app-id"))))
 
       running(fixture.application) {
@@ -52,7 +53,7 @@ class CreateApplicationControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.IndexController.onPageLoad.url)
 
-        verify(fixture.applicationsService).create(ArgumentMatchers.eq(application))
+        verify(fixture.applicationsService).create(ArgumentMatchers.eq(application))(any())
       }
     }
 
