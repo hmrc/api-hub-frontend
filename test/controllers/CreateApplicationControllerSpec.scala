@@ -65,7 +65,7 @@ class CreateApplicationControllerSpec extends SpecBase with MockitoSugar {
         val result = route(fixture.application, request).value
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.JourneyRecoveryController.onPageLoad().url)
+        redirectLocation(result) mustBe Some(routes.ApplicationNameController.onPageLoad(CheckMode).url)
 
         verifyZeroInteractions(fixture.apiHubService)
       }

@@ -18,7 +18,7 @@ package controllers
 
 import com.google.inject.Inject
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import models.{Application, UserAnswers}
+import models.{Application, CheckMode, UserAnswers}
 import pages.ApplicationNamePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
@@ -48,11 +48,15 @@ class CreateApplicationController @Inject()(
   }
 
   private def validateAndBuildApplication(userAnswers: UserAnswers): Either[Call, Application] = {
-    (for {
-      name <- userAnswers.get(ApplicationNamePage)
-    } yield Application(None, name)) match {
-      case Some(application) => Right(application)
-      case _ => Left(routes.JourneyRecoveryController.onPageLoad())
+    for {
+      applicationName <- validateApplicationName(userAnswers)
+    } yield Application(None, applicationName)
+  }
+
+  private def validateApplicationName(userAnswers: UserAnswers): Either[Call, String] = {
+    userAnswers.get(ApplicationNamePage) match {
+      case Some(applicationName) => Right(applicationName)
+      case _ => Left(routes.ApplicationNameController.onPageLoad(CheckMode))
     }
   }
 
