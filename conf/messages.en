@@ -41,6 +41,7 @@ index.registerApplication = Register an application
 
 checkYourAnswers.title = Check Your Answers
 checkYourAnswers.heading = Check Your Answers
+checkYourAnswers.createApplication = Create application
 
 journeyRecovery.continue.title = Sorry, there is a problem with the service
 journeyRecovery.continue.heading = Sorry, there is a problem with the service

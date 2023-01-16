@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,27 +12,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@this(
-    layout: templates.Layout,
-    govukSummaryList: GovukSummaryList,
-    formHelper: FormWithCSRF,
-    govukButton: GovukButton
-)
+package models
 
-@(list: SummaryList)(implicit request: Request[_], messages: Messages)
+import play.api.libs.json.{Format, Json}
 
-@layout(pageTitle = titleNoForm(messages("checkYourAnswers.title"))) {
+case class Application (id: Option[String], name: String)
 
-    <h1 class="govuk-heading-xl">@messages("checkYourAnswers.heading")</h1>
+object Application {
 
-    @govukSummaryList(list)
-
-    @formHelper(action = routes.CreateApplicationController.create) {
-        @govukButton(
-            ButtonViewModel(messages("checkYourAnswers.createApplication"))
-        )
-    }
+  implicit val applicationFormat: Format[Application] = Json.format[Application]
 
 }
