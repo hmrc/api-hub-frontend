@@ -21,9 +21,9 @@ GET         /account/signed-out                          controllers.auth.Signed
 
 GET         /unauthorised                                controllers.UnauthorisedController.onPageLoad
 
-GET        /applicationName                        controllers.ApplicationNameController.onPageLoad(mode: Mode = NormalMode)
-POST       /applicationName                        controllers.ApplicationNameController.onSubmit(mode: Mode = NormalMode)
-GET        /changeApplicationName                  controllers.ApplicationNameController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeApplicationName                  controllers.ApplicationNameController.onSubmit(mode: Mode = CheckMode)
+GET         /application-name                            controllers.ApplicationNameController.onPageLoad(mode: Mode = NormalMode)
+POST        /application-name                            controllers.ApplicationNameController.onSubmit(mode: Mode = NormalMode)
+GET         /change-application-name                     controllers.ApplicationNameController.onPageLoad(mode: Mode = CheckMode)
+POST        /change-application-name                     controllers.ApplicationNameController.onSubmit(mode: Mode = CheckMode)
 
-POST       /create-application                     controllers.CreateApplicationController.create
+POST        /create-application                          controllers.CreateApplicationController.create
