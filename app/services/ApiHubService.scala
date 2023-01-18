@@ -33,4 +33,8 @@ class ApiHubService @Inject()(applicationsConnector: ApplicationsConnector)
     applicationsConnector.createApplication(application)
   }
 
+  def getApplications()(implicit hc: HeaderCarrier): Future[Seq[Application]] = {
+    applicationsConnector.getApplications()
+  }
+
 }

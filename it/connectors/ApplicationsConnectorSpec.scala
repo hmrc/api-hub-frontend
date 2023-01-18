@@ -42,6 +42,27 @@ class ApplicationsConnectorSpec
     }
   }
 
+  "ApplicationsConnector.getApplications" - {
+    "must place the correct request and return the array of applications" in {
+      val application1 = Application(Some("id-1"), "test-name-1")
+      val application2 = Application(Some("id-2"), "test-name-2")
+      val expected = Seq(application1, application2)
+
+      stubFor(
+        get(urlEqualTo("/api-hub-applications/applications"))
+          .withHeader("Accept", equalTo("application/json"))
+          .willReturn(
+            aResponse()
+              .withBody(toJsonString(expected))
+          )
+      )
+
+      buildConnector(this).getApplications()(HeaderCarrier()) map {
+        actual =>
+          actual mustBe expected
+      }
+    }
+  }
 }
 
 object ApplicationsConnectorSpec extends HttpClientV2Support {
@@ -59,6 +80,10 @@ object ApplicationsConnectorSpec extends HttpClientV2Support {
 
   def toJsonString(application: Application): String = {
     Json.toJson(application).toString()
+  }
+
+  def toJsonString(applications: Seq[Application]): String = {
+    Json.toJson(applications).toString()
   }
 
 }

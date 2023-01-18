@@ -18,6 +18,8 @@ package connectors
 
 import com.google.inject.{Inject, Singleton}
 import models.Application
+import play.api.http.HeaderNames.ACCEPT
+import play.api.http.MimeTypes.JSON
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import uk.gov.hmrc.http.HttpReads.Implicits._
@@ -39,6 +41,13 @@ class ApplicationsConnector @Inject()(
       .post(url"$applicationsBaseUrl/api-hub-applications/applications")
       .withBody(Json.toJson(application))
       .execute[Application]
+  }
+
+  def getApplications()(implicit hc: HeaderCarrier): Future[Seq[Application]] = {
+    httpClient
+      .get(url"$applicationsBaseUrl/api-hub-applications/applications")
+      .setHeader((ACCEPT, JSON))
+      .execute[Seq[Application]]
   }
 
 }
