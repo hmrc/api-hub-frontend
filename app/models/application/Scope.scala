@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package models
+package models.application
 
 import play.api.libs.json.{Format, Json}
 
-case class Application (id: Option[String], name: String)
+case class Scope(name: String, status: String)
 
-object Application {
+object Scope {
 
-  implicit val applicationFormat: Format[Application] = Json.format[Application]
+  implicit val scopeFormat: Format[Scope] = Json.format[Scope]
 
 }

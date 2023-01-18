@@ -18,7 +18,8 @@ package controllers
 
 import base.SpecBase
 import controllers.CreateApplicationControllerSpec.buildFixture
-import models.{Application, CheckMode, UserAnswers}
+import models.application.Application
+import models.{CheckMode, UserAnswers}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar

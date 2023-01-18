@@ -17,7 +17,7 @@
 package connectors
 
 import com.google.inject.{Inject, Singleton}
-import models.Application
+import models.application.Application
 import play.api.http.HeaderNames.ACCEPT
 import play.api.http.MimeTypes.JSON
 import play.api.libs.json.Json

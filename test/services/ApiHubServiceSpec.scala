@@ -17,7 +17,7 @@
 package services
 
 import connectors.ApplicationsConnector
-import models.Application
+import models.application.Application
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
 import org.scalatest.freespec.AsyncFreeSpec

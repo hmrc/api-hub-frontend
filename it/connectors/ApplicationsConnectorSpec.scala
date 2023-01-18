@@ -2,7 +2,7 @@ package connectors
 
 import com.github.tomakehurst.wiremock.client.WireMock._
 import connectors.ApplicationsConnectorSpec.{buildConnector, toJsonString}
-import models.Application
+import models.application.Application
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.Configuration
