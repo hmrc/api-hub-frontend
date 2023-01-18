@@ -18,7 +18,7 @@ package gkauth.controllers.actions
 
 import gkauth.domain.models.GatekeeperRoles.USER
 import gkauth.domain.models.{GatekeeperRoles, GatekeeperStrideRole, LoggedInRequest}
-import gkauth.services.{LdapAuthorisationService, StrideAuthorisationService}
+import gkauth.services.StrideAuthorisationService
 import GatekeeperRoles.USER
 import play.api.mvc.{Action, AnyContent, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -68,7 +68,6 @@ trait GatekeeperStrideAuthorisationActions {
 trait GatekeeperAuthorisationActions {
   self: FrontendBaseController with GatekeeperStrideAuthorisationActions =>
 
-  def ldapAuthorisationService: LdapAuthorisationService
 
   val anyAuthenticatedUserRefiner = new ActionRefiner[MessagesRequest, LoggedInRequest] {
 
@@ -77,11 +76,6 @@ trait GatekeeperAuthorisationActions {
     override protected def refine[A](msgRequest: MessagesRequest[A]): Future[Either[Result, LoggedInRequest[A]]] = {
       type FERLIR = Future[Either[Result, LoggedInRequest[A]]]
 
-      def refineLdap =
-        ldapAuthorisationService.refineLdap(msgRequest)
-          .recover {
-            case NonFatal(_) => Left(())
-          }
 
       def refineStride: FERLIR =
         strideAuthorisationService.refineStride(USER)(msgRequest)

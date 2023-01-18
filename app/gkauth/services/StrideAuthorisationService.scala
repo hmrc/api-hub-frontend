@@ -84,7 +84,7 @@ class StrideAuthorisationService @Inject() (
   private def authorise(strideRoleRequired: GatekeeperStrideRole)(implicit hc: HeaderCarrier): Future[~[Option[Name], Enrolments]] = {
     val predicate = StrideAuthorisationPredicateForGatekeeperRole(strideAuthConfig.roles)(strideRoleRequired)
     val retrieval = Retrievals.name and Retrievals.authorisedEnrolments
-
     strideAuthConnector.authorise(predicate, retrieval)
+
   }
 }

@@ -18,7 +18,7 @@ package controllers
 
 import gkauth.controllers.GatekeeperBaseController
 import gkauth.controllers.actions.{GatekeeperAuthorisationActions, GatekeeperStrideAuthorisationActions}
-import gkauth.services.{LdapAuthorisationService, StrideAuthorisationService}
+import gkauth.services.StrideAuthorisationService
 import gkauth.utils.GatekeeperAuthorisationHelper
 import uk.gov.hmrc.play.bootstrap.controller.WithUnsafeDefaultFormBinding
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -35,8 +35,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class StrideHippBaseController @Inject()(
   strideAuthorisationService: StrideAuthorisationService,
   mcc: MessagesControllerComponents,
-  view: IndexView,
-  val ldapAuthorisationService: LdapAuthorisationService
+  view: IndexView
 )(override val ec: ExecutionContext) extends GatekeeperBaseController(strideAuthorisationService, mcc)
                                       with GatekeeperStrideAuthorisationActions
                                       with GatekeeperAuthorisationActions
