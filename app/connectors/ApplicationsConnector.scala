@@ -21,7 +21,7 @@ import models.Application
 import play.api.http.HeaderNames.ACCEPT
 import play.api.http.MimeTypes.JSON
 import play.api.libs.json.Json
-import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
@@ -48,6 +48,17 @@ class ApplicationsConnector @Inject()(
       .get(url"$applicationsBaseUrl/api-hub-applications/applications")
       .setHeader((ACCEPT, JSON))
       .execute[Seq[Application]]
+  }
+  def getApplication(id:String)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
+    httpClient
+      .get(url"$applicationsBaseUrl/api-hub-applications/applications/$id")
+      .setHeader((ACCEPT, JSON))
+      .execute[Either[UpstreamErrorResponse, Application]]
+      .flatMap {
+        case Right(application) => Future.successful(Some(application))
+        case Left(e) if e.statusCode==404 => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
   }
 
 }

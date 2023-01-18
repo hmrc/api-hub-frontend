@@ -65,5 +65,5 @@ applicationName.error.required = Enter an application name
 applicationName.error.length = Application name must be 100 characters or less
 applicationName.change.hidden = ApplicationName
 
-createApplicationSuccess.title = createApplicationSuccess
+createApplicationSuccess.title = Create Application Success
 createApplicationSuccess.heading = createApplicationSuccess

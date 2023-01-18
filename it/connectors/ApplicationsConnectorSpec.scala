@@ -63,6 +63,46 @@ class ApplicationsConnectorSpec
       }
     }
   }
+"ApplicationsConnector.getApplication" - {
+    "must place the correct request and return the application" in {
+      val application1 = Application(Some("id-1"), "test-name-1")
+      val expected = application1
+
+      stubFor(
+        get(urlEqualTo("/api-hub-applications/applications/id-1"))
+          .withHeader("Accept", equalTo("application/json"))
+          .willReturn(
+            aResponse()
+              .withBody(toJsonString(expected))
+          )
+      )
+
+      buildConnector(this).getApplication("id-1")(HeaderCarrier()) map {
+        actual =>
+          actual mustBe expected
+      }
+    }
+  }
+
+  "ApplicationsConnector.getApplication" - {
+    "must return the none when application is not found" in {
+
+      stubFor(
+        get(urlEqualTo("/api-hub-applications/applications/id-1"))
+          .withHeader("Accept", equalTo("application/json"))
+          .willReturn(
+            aResponse().withStatus(404)
+          )
+      )
+
+      buildConnector(this).getApplication("id-1")(HeaderCarrier()) map {
+        actual =>
+          actual mustBe None
+      }
+    }
+  }
+
+
 }
 
 object ApplicationsConnectorSpec extends HttpClientV2Support {
