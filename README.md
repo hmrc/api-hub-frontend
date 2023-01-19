@@ -15,7 +15,7 @@ This service is written in [Scala](http://www.scala-lang.org/) and [Play](http:/
 ## Run the application
 
 To run the application use `sbt run` to start the service. All local dependencies should be running first:
-* MongoDb
+* MongoDb (v4.2 or 4.4; will not run on 6.0)
 * The API_HUB_ALL Service Manager group
 
 Once everything is up and running you can access the application at
