@@ -18,7 +18,7 @@ package services
 
 import com.google.inject.{Inject, Singleton}
 import connectors.ApplicationsConnector
-import models.application.Application
+import models.application.{Application, NewApplication}
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -28,7 +28,7 @@ import scala.concurrent.Future
 class ApiHubService @Inject()(applicationsConnector: ApplicationsConnector)
   extends Logging {
 
-  def createApplication(application: Application)(implicit hc: HeaderCarrier): Future[Application] = {
+  def createApplication(application: NewApplication)(implicit hc: HeaderCarrier): Future[Application] = {
     logger.debug(s"Creating application named ${application.name}")
     applicationsConnector.createApplication(application)
   }

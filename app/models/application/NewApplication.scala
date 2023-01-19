@@ -18,32 +18,10 @@ package models.application
 
 import play.api.libs.json.{Format, Json}
 
-import java.time.LocalDateTime
+case class NewApplication(name: String)
 
-case class Application (
-  id: Option[String],
-  name: String,
-  created: LocalDateTime,
-  lastUpdated: LocalDateTime,
-  teamMembers: Seq[TeamMember],
-  environments: Environments
-)
+object NewApplication {
 
-object Application {
-
-  def apply(id: Option[String], name: String): Application = {
-    val now = LocalDateTime.now()
-    Application(id, name, now, now, Seq.empty, Environments())
-  }
-
-  def apply(name: String): Application = {
-    apply(None, name)
-  }
-
-  def apply(newApplication: NewApplication): Application = {
-    apply(newApplication.name)
-  }
-
-  implicit val applicationFormat: Format[Application] = Json.format[Application]
+  implicit val newApplicationFormat: Format[NewApplication] = Json.format[NewApplication]
 
 }

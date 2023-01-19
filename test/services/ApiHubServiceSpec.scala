@@ -17,7 +17,7 @@
 package services
 
 import connectors.ApplicationsConnector
-import models.application.Application
+import models.application.{Application, NewApplication}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
 import org.scalatest.freespec.AsyncFreeSpec
@@ -30,19 +30,19 @@ class ApiHubServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar {
 
   "createApplication" - {
     "must call the applications connector and return the saved application" in {
-      val application = Application(None, "test-app-name")
-      val expected = application.copy(id = Some("id"))
+      val newApplication = NewApplication("test-app-name")
+      val expected = Application(newApplication).copy(id = Some("id"))
 
       val applicationsConnector = mock[ApplicationsConnector]
-      when(applicationsConnector.createApplication(ArgumentMatchers.eq(application))(any()))
+      when(applicationsConnector.createApplication(ArgumentMatchers.eq(newApplication))(any()))
         .thenReturn(Future.successful(expected))
 
       val service = new ApiHubService(applicationsConnector)
 
-      service.createApplication(application)(HeaderCarrier()) map {
+      service.createApplication(newApplication)(HeaderCarrier()) map {
         actual =>
           actual mustBe expected
-          verify(applicationsConnector).createApplication(ArgumentMatchers.eq(application))(any())
+          verify(applicationsConnector).createApplication(ArgumentMatchers.eq(newApplication))(any())
           succeed
       }
     }

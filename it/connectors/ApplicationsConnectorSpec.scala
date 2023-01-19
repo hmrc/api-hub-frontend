@@ -2,7 +2,7 @@ package connectors
 
 import com.github.tomakehurst.wiremock.client.WireMock._
 import connectors.ApplicationsConnectorSpec.{buildConnector, toJsonString}
-import models.application.Application
+import models.application.{Application, NewApplication}
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.Configuration
@@ -20,14 +20,14 @@ class ApplicationsConnectorSpec
 
   "ApplicationsConnector.createApplication" - {
     "must place the correct request and return the stored application" in {
-      val application = Application(None, "test-name")
-      val expected = application.copy(id = Some("test-id"))
+      val newApplication = NewApplication("test-name")
+      val expected = Application(newApplication).copy(id = Some("test-id"))
 
       stubFor(
         post(urlEqualTo("/api-hub-applications/applications"))
           .withHeader("Content-Type", equalTo("application/json"))
           .withRequestBody(
-            equalToJson(toJsonString(application))
+            equalToJson(toJsonString(newApplication))
           )
           .willReturn(
             aResponse()
@@ -35,7 +35,7 @@ class ApplicationsConnectorSpec
           )
       )
 
-      buildConnector(this).createApplication(application)(HeaderCarrier()) map {
+      buildConnector(this).createApplication(newApplication)(HeaderCarrier()) map {
         actual =>
           actual mustBe expected
       }
@@ -76,6 +76,10 @@ object ApplicationsConnectorSpec extends HttpClientV2Support {
     )
 
     new ApplicationsConnector(httpClientV2, servicesConfig)
+  }
+
+  def toJsonString(application: NewApplication): String = {
+    Json.toJson(application).toString()
   }
 
   def toJsonString(application: Application): String = {

@@ -18,7 +18,7 @@ package controllers
 
 import base.SpecBase
 import controllers.CreateApplicationControllerSpec.buildFixture
-import models.application.Application
+import models.application.{Application, NewApplication}
 import models.{CheckMode, UserAnswers}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
@@ -36,16 +36,16 @@ class CreateApplicationControllerSpec extends SpecBase with MockitoSugar {
 
   "CreateApplicationController" - {
     "must create the application and redirect to the Index page when valid" in {
-      val application = Application(None, "test-app-name")
+      val newApplication = NewApplication("test-app-name")
 
       val userAnswers = UserAnswers(userAnswersId)
-        .set(ApplicationNamePage, application.name)
+        .set(ApplicationNamePage, newApplication.name)
         .get
 
       val fixture = buildFixture(userAnswers)
 
-      when(fixture.apiHubService.createApplication(ArgumentMatchers.eq(application))(any()))
-        .thenReturn(Future.successful(application.copy(id = Some("test-app-id"))))
+      when(fixture.apiHubService.createApplication(ArgumentMatchers.eq(newApplication))(any()))
+        .thenReturn(Future.successful(Application(newApplication).copy(id = Some("test-app-id"))))
 
       running(fixture.application) {
         val request = FakeRequest(POST, routes.CreateApplicationController.create.url)
@@ -54,7 +54,7 @@ class CreateApplicationControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.IndexController.onPageLoad.url)
 
-        verify(fixture.apiHubService).createApplication(ArgumentMatchers.eq(application))(any())
+        verify(fixture.apiHubService).createApplication(ArgumentMatchers.eq(newApplication))(any())
       }
     }
 
