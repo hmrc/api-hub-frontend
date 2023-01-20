@@ -17,14 +17,17 @@
 package controllers
 
 import base.SpecBase
-import models.{NormalMode, UserAnswers}
+import controllers.IndexControllerSpec.buildFixture
+import models.{Application, NormalMode, UserAnswers}
 import org.mockito.{ArgumentCaptor, MockitoSugar}
 import org.mockito.ArgumentMatchers.any
+import play.api.{Application => PlayApplication}
 import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
+import services.ApiHubService
 import views.html.IndexView
 
 import scala.concurrent.Future
@@ -34,45 +37,44 @@ class IndexControllerSpec extends SpecBase with MockitoSugar {
   "Index Controller" - {
 
     "must return OK and the correct view for a GET" in {
+      val applications = Seq(
+        Application(Some("id-1"), "app-name-1"),
+        Application(Some("id-2"), "app-name-2")
+      )
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val fixture = buildFixture()
 
-      running(application) {
+      running(fixture.application) {
+        when(fixture.mockApiHubService.getApplications()(any()))
+          .thenReturn(Future.successful(applications))
+
         val request = FakeRequest(GET, routes.IndexController.onPageLoad.url)
 
-        val result = route(application, request).value
+        val result = route(fixture.application, request).value
 
-        val view = application.injector.instanceOf[IndexView]
+        val view = fixture.application.injector.instanceOf[IndexView]
 
         status(result) mustEqual OK
 
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        contentAsString(result) mustEqual view(applications)(request, messages(fixture.application)).toString
       }
     }
 
     "must initiate User Answers and redirect to the Application Name page for a POST" in {
+      val fixture = buildFixture()
 
-      val mockSessionRepository = mock[SessionRepository]
+      when(fixture.mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-      val application =
-        applicationBuilder(userAnswers = None)
-          .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
-          .build()
-
-      running(application) {
+      running(fixture.application) {
         val request = FakeRequest(POST, routes.IndexController.onSubmit.url)
 
-        val result = route(application, request).value
+        val result = route(fixture.application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.ApplicationNameController.onPageLoad(NormalMode).url
 
         val userAnswersCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
-        verify(mockSessionRepository).set(userAnswersCaptor.capture())
+        verify(fixture.mockSessionRepository).set(userAnswersCaptor.capture())
 
         val actualUserAnswers = userAnswersCaptor.getValue
         actualUserAnswers.id mustBe userAnswersId
@@ -80,6 +82,29 @@ class IndexControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+  }
+
+}
+
+object IndexControllerSpec extends SpecBase with MockitoSugar {
+
+  case class Fixture(
+    application: PlayApplication,
+    mockSessionRepository: SessionRepository,
+    mockApiHubService: ApiHubService
+  )
+
+  def buildFixture(): Fixture = {
+    val mockSessionRepository = mock[SessionRepository]
+    val mockApiHubService = mock[ApiHubService]
+    val application =
+      applicationBuilder(userAnswers = None)
+        .overrides(
+          bind[SessionRepository].toInstance(mockSessionRepository),
+          bind[ApiHubService].toInstance(mockApiHubService)
+        )
+        .build()
+    Fixture(application, mockSessionRepository, mockApiHubService)
   }
 
 }

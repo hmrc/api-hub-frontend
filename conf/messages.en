@@ -38,6 +38,8 @@ error.summary.title = There is a problem
 index.title = Applications
 index.heading = Applications
 index.registerApplication = Register an application
+index.applications.name = Name
+index.applications.id = Id
 
 checkYourAnswers.title = Check Your Answers
 checkYourAnswers.heading = Check Your Answers
