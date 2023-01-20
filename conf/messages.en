@@ -72,3 +72,6 @@ createApplicationSuccess.heading = Application created successfully
 createApplicationSuccess.h2 = What you can do now
 createApplicationSuccess.text.line1 = Your application has now been registered you can view and manage your {0}.
 createApplicationSuccess.text.line2 = Your Application ID will be available on your applications page.
+
+applicationDetails.title = applicationDetails
+applicationDetails.heading = applicationDetails

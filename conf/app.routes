@@ -29,3 +29,5 @@ POST        /change-application-name                     controllers.Application
 POST        /create-application                          controllers.CreateApplicationController.create
 
 GET        /create-application-success/:id               controllers.CreateApplicationSuccessController.onPageLoad(id:String)
+
+GET         /application-details                         controllers.ApplicationDetailsController.onPageLoad()
