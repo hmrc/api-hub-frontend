@@ -17,6 +17,8 @@
 package controllers
 
 import controllers.actions._
+import models.Application
+
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -26,14 +28,14 @@ import views.html.ApplicationDetailsView
 class ApplicationDetailsController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        identify: IdentifierAction,
-                                       getData: DataRetrievalAction,
-                                       requireData: DataRequiredAction,
                                        val controllerComponents: MessagesControllerComponents,
                                        view: ApplicationDetailsView
                                      ) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) {
+  def onPageLoad(id: String): Action[AnyContent] = (identify) {
     implicit request =>
-      Ok(view())
+      val application = Application(Some("id"), "app-name")
+      Ok(view(application))
   }
+
 }

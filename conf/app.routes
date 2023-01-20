@@ -30,4 +30,4 @@ POST        /create-application                          controllers.CreateAppli
 
 GET        /create-application-success/:id               controllers.CreateApplicationSuccessController.onPageLoad(id:String)
 
-GET         /application-details                         controllers.ApplicationDetailsController.onPageLoad()
+GET         /application-details/:id                     controllers.ApplicationDetailsController.onPageLoad(id: String)

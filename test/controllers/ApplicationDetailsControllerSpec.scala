@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import models.Application
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import views.html.ApplicationDetailsView
@@ -27,17 +28,18 @@ class ApplicationDetailsControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val playApplication = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = Application(Some("id"), "app-name")
 
-      running(application) {
-        val request = FakeRequest(GET, routes.ApplicationDetailsController.onPageLoad().url)
+      running(playApplication) {
+        val request = FakeRequest(GET, routes.ApplicationDetailsController.onPageLoad("id").url)
 
-        val result = route(application, request).value
+        val result = route(playApplication, request).value
 
-        val view = application.injector.instanceOf[ApplicationDetailsView]
+        val view = playApplication.injector.instanceOf[ApplicationDetailsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        contentAsString(result) mustEqual view(application)(request, messages(playApplication)).toString
       }
     }
   }
