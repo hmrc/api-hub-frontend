@@ -17,22 +17,48 @@
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
-    govukButton: GovukButton
+    govukButton: GovukButton,
+    govukTable: GovukTable
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(applications: Seq[Application])(implicit request: Request[_], messages: Messages)
 
 @layout(
     pageTitle    = titleNoForm(messages("index.title")),
     showBackLink = false
 ) {
 
-    <h1 class="govuk-heading-xl">@messages("index.heading")</h1>
-
-    @formHelper(action = routes.IndexController.onSubmit) {
-        @govukButton(
-            ButtonViewModel(messages("index.registerApplication"))
-        )
-    }
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-half">
+            <h1 class="govuk-heading-xl">@messages("index.heading")</h1>
+        </div>
+        <div class="govuk-grid-column-one-half govuk-!-text-align-right">
+            @formHelper(action = routes.IndexController.onSubmit) {
+                @govukButton(
+                    ButtonViewModel(messages("index.registerApplication"))
+                )
+            }
+        </div>
+        <div class="govuk-grid-column-full">
+            @govukTable(
+                Table(
+                    caption = None,
+                    head = Some(
+                        Seq(
+                            HeadCell(messages("index.applications.name")),
+                            HeadCell(messages("index.applications.id"))
+                        )
+                    ),
+                    rows = applications.map(
+                        application =>
+                            Seq(
+                                TableRow(Text(application.name)),
+                                TableRow(Text(application.id.getOrElse("")))
+                            )
+                    )
+                )
+            )
+        </div>
+    </div>
 
 }
