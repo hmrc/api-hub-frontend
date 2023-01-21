@@ -24,20 +24,21 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.CreateApplicationSuccessView
-
 import scala.concurrent.ExecutionContext
-
 class CreateApplicationSuccessController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        identify: IdentifierAction,
                                        service:ApiHubService,
                                        val controllerComponents: MessagesControllerComponents,
-                                       view: CreateApplicationSuccessView
+                                       view: views.html.CreateApplicationSuccessView
                                      )(implicit ec:ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(id:String): Action[AnyContent] = identify.async {
     implicit request => service.getApplication(id).map {
-      case Some(application) => Ok(view())
+      case Some(app) => {
+        println(app.toString)
+        Ok(view(app))
+      }
       case None => NotFound
     }
   }

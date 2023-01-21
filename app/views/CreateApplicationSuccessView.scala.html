@@ -14,14 +14,23 @@
  * limitations under the License.
  *@
 
-@this(
-        layout: templates.Layout,
-        govukButton: GovukButton
-)
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.footer.Meta
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.footer.FooterItem
+@import uk.gov.hmrc.govukfrontend.views.html.components.{Footer=>Footie}
 
-@()(implicit request: Request[_], messages: Messages)
+@this(
+layout: templates.Layout,
+govukPanel: GovukPanel
+)
+@(app:Application)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("createApplicationSuccess.title"))) {
-
-    <h1 class="govuk-heading-xl">@messages("createApplicationSuccess.heading")</h1>
+  @govukPanel(Panel(
+                  title = Text(messages("createApplicationSuccess.heading")
+  )))
+ <h2 class="govuk-heading-m">@messages("createApplicationSuccess.h2")</h2>
+ <p class="govuk-body">
+  @Html(messages("createApplicationSuccess.text.line1","<a href=@routes.IndexController.onPageLoad.url class='govuk-link govuk-link--no-visited-state'>"+app.name+" application</a>" ))
+ </p>
+ <p class="govuk-body">@messages("createApplicationSuccess.text.line2")</p>
 }

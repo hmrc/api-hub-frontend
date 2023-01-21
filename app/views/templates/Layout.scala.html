@@ -17,6 +17,7 @@
 @import config.FrontendAppConfig
 @import uk.gov.hmrc.hmrcfrontend.views.config.StandardAlphaBanner
 @import views.html.helper.CSPNonce
+@import views.html.templates.UpperPanel
 
 @this(
     appConfig: FrontendAppConfig,
@@ -24,6 +25,7 @@
     govukBackLink: GovukBackLink,
     hmrcHead: HmrcHead,
     hmrcStandardHeader: HmrcStandardHeader,
+    upperPanel: UpperPanel,
     hmrcStandardFooter: HmrcStandardFooter,
     hmrcTrackingConsentSnippet: HmrcTrackingConsentSnippet,
     hmrcLanguageSelect: HmrcLanguageSelect,
@@ -70,9 +72,19 @@
         ))
     }
 
-    @if(showBackLink) {
-        @govukBackLink(BackLinkViewModel(href = "#").withCssClass("js-visible"))
+
+    @upperPanel(){
+        @if(showBackLink) {
+            <a href="javascript:history.back()" class="govuk-back-link custom-back-link">Back</a>
+        }
+        <ul style="float: right">
+            <li style="display: inline;margin-right: 30px" ><a class="govuk-link govuk-link--no-visited-state" href="/version4/tech-mvp/home-default">Applications</a></li>
+            <li style="display: inline;margin-right: 30px"><a class="govuk-link govuk-link--no-visited-state" href="#">Documentation</a></li>
+            <li style="display: inline;margin-right: 30px"><a class="govuk-link govuk-link--no-visited-state" href="/version4/tech-mvp/admin">Admin <i class="fa-solid fa-circle-exclamation"></i></a></li>
+            <ul>
+        </ul></ul>
     }
+
 }
 
 @content = {
