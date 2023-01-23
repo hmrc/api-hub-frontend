@@ -79,7 +79,7 @@ class ApplicationsConnectorSpec
 
       buildConnector(this).getApplication("id-1")(HeaderCarrier()) map {
         actual =>
-          actual mustBe expected
+          actual mustBe Some(expected)
       }
     }
   }
