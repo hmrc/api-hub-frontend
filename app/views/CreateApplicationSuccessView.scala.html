@@ -19,18 +19,22 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.{Footer=>Footie}
 
 @this(
-layout: templates.Layout,
-govukPanel: GovukPanel
+  layout: templates.Layout,
+  govukPanel: GovukPanel
 )
+
 @(app:Application)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("createApplicationSuccess.title"))) {
   @govukPanel(Panel(
-                  title = Text(messages("createApplicationSuccess.heading")
+    title = Text(messages("createApplicationSuccess.heading")
   )))
  <h2 class="govuk-heading-m">@messages("createApplicationSuccess.h2")</h2>
  <p class="govuk-body">
-  @Html(messages("createApplicationSuccess.text.line1","<a href=@routes.IndexController.onPageLoad.url class='govuk-link govuk-link--no-visited-state'>"+app.name+" application</a>" ))
+    @messages("createApplicationSuccess.text.line1a")
+    <a href='@routes.ApplicationDetailsController.onPageLoad(app.id.getOrElse("")).url' class='govuk-link govuk-link--no-visited-state'>
+      @(app.name) @messages("createApplicationSuccess.text.line1b")
+    </a>
  </p>
  <p class="govuk-body">@messages("createApplicationSuccess.text.line2")</p>
 }
