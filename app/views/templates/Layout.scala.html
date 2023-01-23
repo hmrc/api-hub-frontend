@@ -25,7 +25,6 @@
     govukBackLink: GovukBackLink,
     hmrcHead: HmrcHead,
     hmrcStandardHeader: HmrcStandardHeader,
-    upperPanel: UpperPanel,
     hmrcStandardFooter: HmrcStandardFooter,
     hmrcTrackingConsentSnippet: HmrcTrackingConsentSnippet,
     hmrcLanguageSelect: HmrcLanguageSelect,
@@ -73,17 +72,8 @@
     }
 
 
-    @upperPanel(){
-        @if(showBackLink) {
-            <a href="javascript:history.back()" class="govuk-back-link custom-back-link">Back</a>
-        }
-        <ul style="float: right">
-            <li style="display: inline;margin-right: 30px" ><a class="govuk-link govuk-link--no-visited-state" href="/version4/tech-mvp/home-default">Applications</a></li>
-            <li style="display: inline;margin-right: 30px"><a class="govuk-link govuk-link--no-visited-state" href="#">Documentation</a></li>
-            <li style="display: inline;margin-right: 30px"><a class="govuk-link govuk-link--no-visited-state" href="/version4/tech-mvp/admin">Admin <i class="fa-solid fa-circle-exclamation"></i></a></li>
-            <ul>
-        </ul></ul>
-    }
+    @if(showBackLink) {<a href="javascript:history.back()" class="govuk-back-link custom-back-link">Back</a>}
+
 
 }
 
