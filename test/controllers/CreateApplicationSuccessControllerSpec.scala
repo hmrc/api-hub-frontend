@@ -48,7 +48,7 @@ class CreateApplicationSuccessControllerSpec extends SpecBase with MockitoSugar{
         val view = fixture.application.injector.instanceOf[CreateApplicationSuccessView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(app)(request, messages(fixture.application)).toString
       }
     }
   }
