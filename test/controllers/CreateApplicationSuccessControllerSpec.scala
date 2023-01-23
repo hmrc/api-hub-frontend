@@ -17,7 +17,7 @@
 package controllers
 
 import base.SpecBase
-import models.{Application, UserAnswers}
+import models.Application
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
 import play.api.inject.bind
@@ -48,7 +48,10 @@ class CreateApplicationSuccessControllerSpec extends SpecBase with MockitoSugar{
         val view = fixture.application.injector.instanceOf[CreateApplicationSuccessView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(app.copy(id=None))(request, messages(fixture.application)).toString
+
+        val expected = view(Application(None, "test"))(request, messages(fixture.application)).toString
+        val actual = contentAsString(result)
+        actual mustEqual expected
       }
     }
   }
