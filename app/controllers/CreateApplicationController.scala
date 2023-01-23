@@ -43,7 +43,7 @@ class CreateApplicationController @Inject()(
       validateAndBuildApplication(request.userAnswers).fold(
         call => Future.successful(Redirect(call)),
         application => apiHubService.createApplication(application)
-          .map(_ => Redirect(routes.IndexController.onPageLoad))
+          .map(app => Redirect(routes.CreateApplicationSuccessController.onPageLoad(app.id.getOrElse(application.name))))
       )
   }
 

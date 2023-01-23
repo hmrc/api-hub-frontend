@@ -66,3 +66,9 @@ applicationName.checkYourAnswersLabel = Application name
 applicationName.error.required = Enter an application name
 applicationName.error.length = Application name must be 100 characters or less
 applicationName.change.hidden = ApplicationName
+
+createApplicationSuccess.title = Create Application Success
+createApplicationSuccess.heading = Application created successfully
+createApplicationSuccess.h2 = What you can do now
+createApplicationSuccess.text.line1 = Your application has now been registered you can view and manage your {0}.
+createApplicationSuccess.text.line2 = Your Application ID will be available on your applications page.

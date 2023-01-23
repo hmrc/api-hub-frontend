@@ -36,7 +36,7 @@ class CreateApplicationControllerSpec extends SpecBase with MockitoSugar {
   "CreateApplicationController" - {
     "must create the application and redirect to the Index page when valid" in {
       val application = Application(None, "test-app-name")
-
+      val testId = "test-app-id"
       val userAnswers = UserAnswers(userAnswersId)
         .set(ApplicationNamePage, application.name)
         .get
@@ -44,14 +44,14 @@ class CreateApplicationControllerSpec extends SpecBase with MockitoSugar {
       val fixture = buildFixture(userAnswers)
 
       when(fixture.apiHubService.createApplication(ArgumentMatchers.eq(application))(any()))
-        .thenReturn(Future.successful(application.copy(id = Some("test-app-id"))))
+        .thenReturn(Future.successful(application.copy(id = Some(testId))))
 
       running(fixture.application) {
         val request = FakeRequest(POST, routes.CreateApplicationController.create.url)
         val result = route(fixture.application, request).value
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.IndexController.onPageLoad.url)
+        redirectLocation(result) mustBe Some(routes.CreateApplicationSuccessController.onPageLoad(testId).url)
 
         verify(fixture.apiHubService).createApplication(ArgumentMatchers.eq(application))(any())
       }
