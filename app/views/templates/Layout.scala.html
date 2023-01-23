@@ -71,10 +71,9 @@
         ))
     }
 
-
-    @if(showBackLink) {<a href="javascript:history.back()" class="govuk-back-link custom-back-link">Back</a>}
-
-
+    @if(showBackLink) {
+        @govukBackLink(BackLinkViewModel(href = "#").withCssClass("js-visible"))
+    }
 }
 
 @content = {
