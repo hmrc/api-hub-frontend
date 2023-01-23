@@ -75,9 +75,14 @@ createApplicationSuccess.text.line2 = Your Application ID will be available on y
 
 applicationDetails.title = Application Details
 applicationDetails.heading = Application details
+applicationDetails.application.name = Name
+applicationDetails.application.id = Id
 applicationDetails.addScope = Add scope
 applicationDetails.credentials = Credentials
+applicationDetails.scopes = Scopes
 applicationDetails.dev = dev
 applicationDetails.test = test
 applicationDetails.preProd = pre-prod
 applicationDetails.prod = prod
+applicationDetails.noScopes = You have no scopes
+applicationDetails.noCredentials = You have no credentials

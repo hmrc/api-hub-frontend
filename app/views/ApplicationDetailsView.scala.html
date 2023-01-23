@@ -22,6 +22,48 @@
 
 @(application: Application)(implicit request: Request[_], messages: Messages)
 
+@applicationDetail(descriptionKey: String, value: String) = {
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-quarter">
+            <span class="govuk-body govuk-!-font-weight-bold">
+                @(messages(descriptionKey)):
+            </span>
+        </div>
+        <div class="govuk-grid-column-three-quarters">
+            <span class="govuk-body">
+                @value
+            </span>
+        </div>
+    </div>
+}
+
+@environmentTab(name: String) = @{
+    TabItem(
+        id = Some(name),
+        label = messages(s"applicationDetails.$name"),
+        panel = TabPanel(
+            content = HtmlContent(environmentTabContent())
+        )
+    )
+}
+
+@environmentTabContent() = {
+    <div class = "govuk-grid-row">
+        <div class = "govuk-grid-column-one-half">
+            <h2 class="govuk-heading-m">@messages("applicationDetails.scopes")</h2>
+            <span class="govuk-body">
+                @messages("applicationDetails.noScopes")
+            </span>
+        </div>
+        <div class = "govuk-grid-column-one-half">
+            <h2 class="govuk-heading-m">@messages("applicationDetails.credentials")</h2>
+            <span class="govuk-body">
+                @messages("applicationDetails.noCredentials")
+            </span>
+        </div>
+    </div>
+}
+
 @layout(pageTitle = titleNoForm(messages("applicationDetails.title"))) {
 
     <div class="govuk-grid-row">
@@ -31,51 +73,22 @@
         <div class="govuk-grid-column-one-third govuk-!-text-align-right">
             @govukButton(
                 ButtonViewModel(messages("applicationDetails.addScope"))
-                    .asLink(routes.IndexController.onPageLoad.url)
+                    .asLink(
+                        application.id match {
+                            case Some(id) => routes.ApplicationDetailsController.onPageLoad(id).url
+                            case _ => routes.IndexController.onPageLoad.url
+                        }
+                    )
             )
         </div>
     </div>
 
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-one-quarter">
-            <span class="govuk-body govuk-!-font-weight-bold">
-                Name:
-            </span>
-        </div>
-        <div class="govuk-grid-column-three-quarters">
-            <span class="govuk-body">
-                @(application.name)
-            </span>
-        </div>
-    </div>
+    @applicationDetail("applicationDetails.application.name", application.name)
+    @applicationDetail("applicationDetails.application.id", application.id.getOrElse(""))
 
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-one-quarter">
-            <span class="govuk-body govuk-!-font-weight-bold">
-                Created:
-            </span>
-        </div>
-        <div class="govuk-grid-column-three-quarters">
-            <span class="govuk-body">
-                tbd
-            </span>
-        </div>
+        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
     </div>
-
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-one-quarter">
-            <span class="govuk-body govuk-!-font-weight-bold">
-                Id:
-            </span>
-        </div>
-        <div class="govuk-grid-column-three-quarters">
-            <span class="govuk-body">
-                @(application.id.getOrElse(""))
-            </span>
-        </div>
-    </div>
-
-    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
@@ -86,18 +99,10 @@
     @govukTabs(
         Tabs(
             items = Seq(
-                TabItem(
-                    label = messages("applicationDetails.dev")
-                ),
-                TabItem(
-                    label = messages("applicationDetails.test")
-                ),
-                TabItem(
-                    label = messages("applicationDetails.preProd")
-                ),
-                TabItem(
-                    label = messages("applicationDetails.prod")
-                )
+                environmentTab("dev"),
+                environmentTab("test"),
+                environmentTab("preProd"),
+                environmentTab("prod")
             )
         )
     )
