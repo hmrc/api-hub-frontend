@@ -17,30 +17,77 @@
 package controllers
 
 import base.SpecBase
+import controllers.ApplicationDetailsControllerSpec.buildFixture
 import models.Application
+import org.mockito.ArgumentMatchers.any
+import org.mockito.{ArgumentMatchers, MockitoSugar}
+import play.api.{Application => PlayApplication}
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import services.ApiHubService
 import views.html.ApplicationDetailsView
 
-class ApplicationDetailsControllerSpec extends SpecBase {
+import scala.concurrent.Future
+
+class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar {
 
   "ApplicationDetails Controller" - {
 
     "must return OK and the correct view for a GET" in {
+      val fixture = buildFixture()
 
-      val playApplication = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val application = Application(Some("id"), "app-name")
+      val id = "test-id"
+      val application = Application(Some(id), "app-name")
 
-      running(playApplication) {
-        val request = FakeRequest(GET, routes.ApplicationDetailsController.onPageLoad("id").url)
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(id))(any()))
+        .thenReturn(Future.successful(Some(application)))
 
-        val result = route(playApplication, request).value
+      running(fixture.playApplication) {
+        val request = FakeRequest(GET, routes.ApplicationDetailsController.onPageLoad(id).url)
 
-        val view = playApplication.injector.instanceOf[ApplicationDetailsView]
+        val result = route(fixture.playApplication, request).value
+
+        val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(application)(request, messages(playApplication)).toString
+        contentAsString(result) mustEqual view(application)(request, messages(fixture.playApplication)).toString
       }
     }
   }
+
+  "must return 404 Not Found when the application does not exist" in {
+    val fixture = buildFixture()
+
+    val id = "test-id"
+
+    when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(id))(any()))
+      .thenReturn(Future.successful(None))
+
+    running(fixture.playApplication) {
+      val request = FakeRequest(GET, routes.ApplicationDetailsController.onPageLoad(id).url)
+
+      val result = route(fixture.playApplication, request).value
+      status(result) mustBe NOT_FOUND
+    }
+  }
+
+}
+
+object ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar {
+
+  case class Fixture(playApplication: PlayApplication, apiHubService: ApiHubService)
+
+  def buildFixture(): Fixture = {
+    val apiHubService = mock[ApiHubService]
+
+    val playApplication = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      .overrides(
+        bind[ApiHubService].toInstance(apiHubService)
+      )
+      .build()
+
+    Fixture(playApplication, apiHubService)
+  }
+
 }
