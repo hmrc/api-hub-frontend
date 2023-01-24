@@ -14,7 +14,10 @@
  * limitations under the License.
  *@
 
+@import java.time.LocalDateTime
+@import java.time.format.DateTimeFormatter
 @import models.application.Application
+@import views.ViewUtils
 
 @this(
         layout: templates.Layout,
@@ -82,6 +85,8 @@
 
     @applicationDetail("applicationDetails.application.name", application.name)
     @applicationDetail("applicationDetails.application.id", application.id)
+    @applicationDetail("applicationDetails.application.created", ViewUtils.formatLocalDateTime(application.created))
+    @applicationDetail("applicationDetails.application.createdBy", application.createdBy.email)
 
     <div class="govuk-grid-row">
         <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
