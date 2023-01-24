@@ -17,7 +17,7 @@
 package connectors
 
 import com.google.inject.{Inject, Singleton}
-import models.application.Application
+import models.application.{Application, NewApplication}
 import play.api.http.HeaderNames.ACCEPT
 import play.api.http.MimeTypes.JSON
 import play.api.libs.json.Json
@@ -36,10 +36,10 @@ class ApplicationsConnector @Inject()(
 
   private val applicationsBaseUrl = servicesConfig.baseUrl("api-hub-applications")
 
-  def createApplication(application: Application)(implicit hc: HeaderCarrier): Future[Application] = {
+  def createApplication(newApplication: NewApplication)(implicit hc: HeaderCarrier): Future[Application] = {
     httpClient
       .post(url"$applicationsBaseUrl/api-hub-applications/applications")
-      .withBody(Json.toJson(application))
+      .withBody(Json.toJson(newApplication))
       .execute[Application]
   }
 
