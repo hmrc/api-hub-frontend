@@ -1,0 +1,110 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@this(
+        layout: templates.Layout,
+        govukButton: GovukButton,
+        govukTabs: GovukTabs
+)
+
+@(application: Application)(implicit request: Request[_], messages: Messages)
+
+@applicationDetail(descriptionKey: String, value: String) = {
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-quarter">
+            <span class="govuk-body govuk-!-font-weight-bold">
+                @(messages(descriptionKey)):
+            </span>
+        </div>
+        <div class="govuk-grid-column-three-quarters">
+            <span class="govuk-body">
+                @value
+            </span>
+        </div>
+    </div>
+}
+
+@environmentTab(name: String) = @{
+    TabItem(
+        id = Some(name),
+        label = messages(s"applicationDetails.$name"),
+        panel = TabPanel(
+            content = HtmlContent(environmentTabContent())
+        )
+    )
+}
+
+@environmentTabContent() = {
+    <div class = "govuk-grid-row">
+        <div class = "govuk-grid-column-one-half">
+            <h2 class="govuk-heading-m">@messages("applicationDetails.scopes")</h2>
+            <span class="govuk-body">
+                @messages("applicationDetails.noScopes")
+            </span>
+        </div>
+        <div class = "govuk-grid-column-one-half">
+            <h2 class="govuk-heading-m">@messages("applicationDetails.credentials")</h2>
+            <span class="govuk-body">
+                @messages("applicationDetails.noCredentials")
+            </span>
+        </div>
+    </div>
+}
+
+@layout(pageTitle = titleNoForm(messages("applicationDetails.title"))) {
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h2 class="govuk-heading-l">@messages("applicationDetails.heading")</h2>
+        </div>
+        <div class="govuk-grid-column-one-third govuk-!-text-align-right">
+            @govukButton(
+                ButtonViewModel(messages("applicationDetails.addScope"))
+                    .asLink(
+                        application.id match {
+                            case Some(id) => routes.ApplicationDetailsController.onPageLoad(id).url
+                            case _ => routes.IndexController.onPageLoad.url
+                        }
+                    )
+            )
+        </div>
+    </div>
+
+    @applicationDetail("applicationDetails.application.name", application.name)
+    @applicationDetail("applicationDetails.application.id", application.id.getOrElse(""))
+
+    <div class="govuk-grid-row">
+        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+    </div>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h2 class="govuk-heading-m">@messages("applicationDetails.credentials")</h2>
+        </div>
+    </div>
+
+    @govukTabs(
+        Tabs(
+            items = Seq(
+                environmentTab("dev"),
+                environmentTab("test"),
+                environmentTab("preProd"),
+                environmentTab("prod")
+            )
+        )
+    )
+
+}

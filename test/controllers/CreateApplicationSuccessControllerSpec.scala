@@ -49,7 +49,7 @@ class CreateApplicationSuccessControllerSpec extends SpecBase with MockitoSugar{
 
         status(result) mustEqual OK
 
-        val expected = view(Application(None, "test"))(request, messages(fixture.application)).toString
+        val expected = view(app)(request, messages(fixture.application)).toString
         val actual = contentAsString(result)
         actual mustEqual expected
       }
