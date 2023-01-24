@@ -17,7 +17,7 @@
 package connectors
 
 import com.google.inject.{Inject, Singleton}
-import models.Application
+import models.application.Application
 import play.api.http.HeaderNames.ACCEPT
 import play.api.http.MimeTypes.JSON
 import play.api.libs.json.Json
@@ -49,6 +49,7 @@ class ApplicationsConnector @Inject()(
       .setHeader((ACCEPT, JSON))
       .execute[Seq[Application]]
   }
+
   def getApplication(id:String)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
     httpClient
       .get(url"$applicationsBaseUrl/api-hub-applications/applications/$id")

@@ -18,7 +18,8 @@ package controllers
 
 import com.google.inject.Inject
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import models.{Application, CheckMode, UserAnswers}
+import models.{CheckMode, UserAnswers}
+import models.application.{Application, Creator}
 import pages.ApplicationNamePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
@@ -50,7 +51,7 @@ class CreateApplicationController @Inject()(
   private def validateAndBuildApplication(userAnswers: UserAnswers): Either[Call, Application] = {
     for {
       applicationName <- validateApplicationName(userAnswers)
-    } yield Application(None, applicationName)
+    } yield Application(None, applicationName, Creator(email = ""))
   }
 
   private def validateApplicationName(userAnswers: UserAnswers): Either[Call, String] = {

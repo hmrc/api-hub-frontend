@@ -18,7 +18,7 @@ package services
 
 import com.google.inject.{Inject, Singleton}
 import connectors.ApplicationsConnector
-import models.Application
+import models.application.Application
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
