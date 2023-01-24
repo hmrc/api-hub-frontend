@@ -70,8 +70,7 @@ applicationName.change.hidden = ApplicationName
 createApplicationSuccess.title = Create Application Success
 createApplicationSuccess.heading = Application created successfully
 createApplicationSuccess.h2 = What you can do now
-createApplicationSuccess.text.line1a = Your application has now been registered you can view and manage your
-createApplicationSuccess.text.line1b = application.
+createApplicationSuccess.text.line1 = Your application has now been registered you can view and manage your {0} application.
 createApplicationSuccess.text.line2 = Your Application ID will be available on your applications page.
 
 applicationDetails.title = Application Details
