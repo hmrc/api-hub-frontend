@@ -44,14 +44,14 @@ class CreateApplicationController @Inject()(
       validateAndBuildApplication(request.userAnswers).fold(
         call => Future.successful(Redirect(call)),
         application => apiHubService.createApplication(application)
-          .map(app => Redirect(routes.CreateApplicationSuccessController.onPageLoad(app.id.getOrElse(application.name))))
+          .map(app => Redirect(routes.CreateApplicationSuccessController.onPageLoad(app.id)))
       )
   }
 
   private def validateAndBuildApplication(userAnswers: UserAnswers): Either[Call, Application] = {
     for {
       applicationName <- validateApplicationName(userAnswers)
-    } yield Application(None, applicationName, Creator(email = ""))
+    } yield Application("change-me", applicationName, Creator(email = ""))
   }
 
   private def validateApplicationName(userAnswers: UserAnswers): Either[Call, String] = {

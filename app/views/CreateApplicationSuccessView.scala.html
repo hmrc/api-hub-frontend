@@ -33,10 +33,7 @@
 }
 
 @applicationLinkUrl(application: Application) = @{
-    application.id match {
-        case Some(id) => routes.ApplicationDetailsController.onPageLoad(id).url
-        case _ => routes.IndexController.onPageLoad.url
-    }
+    routes.ApplicationDetailsController.onPageLoad(application.id).url
 }
 
 @layout(pageTitle = titleNoForm(messages("createApplicationSuccess.title"))) {

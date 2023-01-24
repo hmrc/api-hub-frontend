@@ -21,7 +21,7 @@ import play.api.libs.json.{Format, Json}
 import java.time.LocalDateTime
 
 case class Application (
-  id: Option[String],
+  id: String,
   name: String,
   created: LocalDateTime,
   createdBy: Creator,
@@ -32,17 +32,13 @@ case class Application (
 
 object Application {
 
-  def apply(id: Option[String], name: String, createdBy: Creator): Application = {
+  def apply(id: String, name: String, createdBy: Creator): Application = {
     val now = LocalDateTime.now()
     Application(id, name, now, createdBy, now, Seq.empty, Environments())
   }
 
-  def apply(name: String, createdBy: Creator): Application = {
-    apply(None, name, createdBy)
-  }
-
-  def apply(newApplication: NewApplication): Application = {
-    apply(newApplication.name, newApplication.createdBy)
+  def apply(id: String, newApplication: NewApplication): Application = {
+    apply(id, newApplication.name, newApplication.createdBy)
   }
 
   implicit val applicationFormat: Format[Application] = Json.format[Application]
