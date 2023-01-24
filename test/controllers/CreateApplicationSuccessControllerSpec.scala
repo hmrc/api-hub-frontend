@@ -17,7 +17,7 @@
 package controllers
 
 import base.SpecBase
-import models.Application
+import models.application.{Application, Creator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
 import play.api.inject.bind
@@ -35,7 +35,7 @@ class CreateApplicationSuccessControllerSpec extends SpecBase with MockitoSugar{
 
     "must return OK and the correct view for a GET" in {
       val fixture = CreateApplicationSuccessControllerSpec.buildFixture()
-      val app = Application(Some("id-1"), "test")
+      val app = Application("id-1", "test", Creator("creator-email"))
 
       when(fixture.apiHubService.getApplication(ArgumentMatchers.eq("id-1"))(any()))
         .thenReturn(Future.successful(Some(app)))
