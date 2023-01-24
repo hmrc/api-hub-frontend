@@ -37,7 +37,7 @@ object ViewUtils {
     if (form.hasErrors || form.hasGlobalErrors) messages("error.browser.title.prefix") else ""
   }
 
-  private val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy MM dd")
+  private val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy HH:mm")
 
   def formatLocalDateTime(value: LocalDateTime): String = {
     value.format(dateTimeFormatter)
