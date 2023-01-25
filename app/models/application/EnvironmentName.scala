@@ -16,12 +16,20 @@
 
 package models.application
 
-import play.api.libs.json.{Format, Json}
+import models.{Enumerable, WithName}
 
-case class NewScope(name: String, environments: Seq[EnvironmentName])
+sealed trait EnvironmentName
 
-object NewScope {
+case object Dev extends WithName("dev") with EnvironmentName
+case object Test extends WithName("test") with EnvironmentName
+case object PreProd extends WithName("pre-prod") with EnvironmentName
+case object Prod extends WithName("prod") with EnvironmentName
 
-  implicit val newScopeFormat: Format[NewScope] = Json.format[NewScope]
+object EnvironmentName extends Enumerable.Implicits {
+
+  val values: Seq[EnvironmentName] = Seq(Dev, Test, PreProd, Prod)
+
+  implicit val enumerable: Enumerable[EnvironmentName] =
+    Enumerable(values.map(value => value.toString -> value): _*)
 
 }

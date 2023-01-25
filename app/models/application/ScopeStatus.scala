@@ -16,19 +16,19 @@
 
 package models.application
 
-import models.Enumerable
+import models.{Enumerable, WithName}
 
 sealed trait ScopeStatus
 
-case object Pending extends ScopeStatus
-case object Approved extends ScopeStatus
-case object Denied extends ScopeStatus
+case object Pending extends WithName("PENDING") with ScopeStatus
+case object Approved extends WithName("APPROVED") with ScopeStatus
+case object Denied extends WithName("DENIED") with ScopeStatus
 
 object ScopeStatus extends Enumerable.Implicits {
 
   val values: Seq[ScopeStatus] = Seq(Pending, Approved, Denied)
 
   implicit val enumerable: Enumerable[ScopeStatus] =
-    Enumerable(values.map(v => v.toString.toUpperCase -> v): _*)
+    Enumerable(values.map(value => value.toString -> value): _*)
 
 }
