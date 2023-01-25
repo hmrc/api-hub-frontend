@@ -18,7 +18,8 @@ package controllers
 
 import base.SpecBase
 import controllers.IndexControllerSpec.buildFixture
-import models.{Application, NormalMode, UserAnswers}
+import models.application.{Application, Creator}
+import models.{NormalMode, UserAnswers}
 import org.mockito.{ArgumentCaptor, MockitoSugar}
 import org.mockito.ArgumentMatchers.any
 import play.api.{Application => PlayApplication}
@@ -38,8 +39,8 @@ class IndexControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
       val applications = Seq(
-        Application(Some("id-1"), "app-name-1"),
-        Application(Some("id-2"), "app-name-2")
+        Application("id-1", "app-name-1", Creator("creator-email-1")),
+        Application("id-2", "app-name-2", Creator("creator-email-2"))
       )
 
       val fixture = buildFixture()

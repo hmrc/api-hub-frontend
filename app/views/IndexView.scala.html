@@ -14,6 +14,8 @@
  * limitations under the License.
  *@
 
+@import models.application.Application
+
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
@@ -53,7 +55,7 @@
                         application =>
                             Seq(
                                 TableRow(Text(application.name)),
-                                TableRow(Text(application.id.getOrElse("")))
+                                TableRow(Text(application.id))
                             )
                     )
                 )

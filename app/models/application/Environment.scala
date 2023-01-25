@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package models
+package models.application
 
 import play.api.libs.json.{Format, Json}
 
-case class Application (id: Option[String], name: String)
+case class Environment(scopes: Seq[Scope], credentials: Seq[Credential])
 
-object Application {
+object Environment {
 
-  implicit val applicationFormat: Format[Application] = Json.format[Application]
+  def apply(): Environment = {
+    Environment(Seq.empty, Seq.empty)
+  }
+
+  implicit val environmentFormat: Format[Environment] = Json.format[Environment]
 
 }

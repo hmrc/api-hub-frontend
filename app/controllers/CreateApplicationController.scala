@@ -18,7 +18,8 @@ package controllers
 
 import com.google.inject.Inject
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import models.{Application, CheckMode, UserAnswers}
+import models.{CheckMode, UserAnswers}
+import models.application.{Creator, NewApplication}
 import pages.ApplicationNamePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
@@ -42,15 +43,15 @@ class CreateApplicationController @Inject()(
     implicit request =>
       validateAndBuildApplication(request.userAnswers).fold(
         call => Future.successful(Redirect(call)),
-        application => apiHubService.createApplication(application)
-          .map(app => Redirect(routes.CreateApplicationSuccessController.onPageLoad(app.id.getOrElse(application.name))))
+        newApplication => apiHubService.createApplication(newApplication)
+          .map(app => Redirect(routes.CreateApplicationSuccessController.onPageLoad(app.id)))
       )
   }
 
-  private def validateAndBuildApplication(userAnswers: UserAnswers): Either[Call, Application] = {
+  private def validateAndBuildApplication(userAnswers: UserAnswers): Either[Call, NewApplication] = {
     for {
       applicationName <- validateApplicationName(userAnswers)
-    } yield Application(None, applicationName)
+    } yield NewApplication(applicationName, Creator(email = ""))
   }
 
   private def validateApplicationName(userAnswers: UserAnswers): Either[Call, String] = {

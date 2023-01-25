@@ -2,10 +2,11 @@ package connectors
 
 import com.github.tomakehurst.wiremock.client.WireMock._
 import connectors.ApplicationsConnectorSpec.{buildConnector, toJsonString}
-import models.Application
+import models.application.{Application, Creator, NewApplication}
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.Configuration
+import play.api.http.Status.NOT_FOUND
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
@@ -20,14 +21,14 @@ class ApplicationsConnectorSpec
 
   "ApplicationsConnector.createApplication" - {
     "must place the correct request and return the stored application" in {
-      val application = Application(None, "test-name")
-      val expected = application.copy(id = Some("test-id"))
+      val newApplication = NewApplication("test-name", Creator("test-creator-email"))
+      val expected = Application("test-id", newApplication)
 
       stubFor(
         post(urlEqualTo("/api-hub-applications/applications"))
           .withHeader("Content-Type", equalTo("application/json"))
           .withRequestBody(
-            equalToJson(toJsonString(application))
+            equalToJson(toJsonString(newApplication))
           )
           .willReturn(
             aResponse()
@@ -35,7 +36,7 @@ class ApplicationsConnectorSpec
           )
       )
 
-      buildConnector(this).createApplication(application)(HeaderCarrier()) map {
+      buildConnector(this).createApplication(newApplication)(HeaderCarrier()) map {
         actual =>
           actual mustBe expected
       }
@@ -44,8 +45,8 @@ class ApplicationsConnectorSpec
 
   "ApplicationsConnector.getApplications" - {
     "must place the correct request and return the array of applications" in {
-      val application1 = Application(Some("id-1"), "test-name-1")
-      val application2 = Application(Some("id-2"), "test-name-2")
+      val application1 = Application("id-1", "test-name-1", Creator("test-creator-email-1"))
+      val application2 = Application("id-2", "test-name-2", Creator("test-creator-email-2"))
       val expected = Seq(application1, application2)
 
       stubFor(
@@ -65,7 +66,7 @@ class ApplicationsConnectorSpec
   }
 "ApplicationsConnector.getApplication" - {
     "must place the correct request and return the application" in {
-      val application1 = Application(Some("id-1"), "test-name-1")
+      val application1 = Application("id-1", "test-name-1", Creator("test-creator-email-1"))
       val expected = application1
 
       stubFor(
@@ -91,7 +92,7 @@ class ApplicationsConnectorSpec
         get(urlEqualTo("/api-hub-applications/applications/id-1"))
           .withHeader("Accept", equalTo("application/json"))
           .willReturn(
-            aResponse().withStatus(404)
+            aResponse().withStatus(NOT_FOUND)
           )
       )
 
@@ -116,6 +117,10 @@ object ApplicationsConnectorSpec extends HttpClientV2Support {
     )
 
     new ApplicationsConnector(httpClientV2, servicesConfig)
+  }
+
+  def toJsonString(newApplication: NewApplication): String = {
+    Json.toJson(newApplication).toString()
   }
 
   def toJsonString(application: Application): String = {
