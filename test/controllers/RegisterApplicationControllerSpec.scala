@@ -20,14 +20,13 @@ import base.SpecBase
 import controllers.RegisterApplicationControllerSpec.buildFixture
 import models.application.{Application, Creator, NewApplication}
 import models.{CheckMode, UserAnswers}
-import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
-import org.mockito.MockitoSugar
+import org.mockito.{ArgumentMatchers, MockitoSugar}
 import pages.ApplicationNamePage
-import play.api.{Application => PlayApplication}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import play.api.{Application => PlayApplication}
 import services.ApiHubService
 
 import scala.concurrent.Future
@@ -52,7 +51,7 @@ class RegisterApplicationControllerSpec$ extends SpecBase with MockitoSugar {
         val result = route(fixture.application, request).value
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.CreateApplicationSuccessController.onPageLoad(testId).url)
+        redirectLocation(result) mustBe Some(routes.RegisterApplicationSuccessController.onPageLoad(testId).url)
 
         verify(fixture.apiHubService).registerApplication(ArgumentMatchers.eq(newApplication))(any())
       }
