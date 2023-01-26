@@ -19,7 +19,7 @@ class ApplicationsConnectorSpec
   with Matchers
   with WireMockSupport {
 
-  "ApplicationsConnector.createApplication" - {
+  "ApplicationsConnector.registerApplication" - {
     "must place the correct request and return the stored application" in {
       val newApplication = NewApplication("test-name", Creator("test-creator-email"))
       val expected = Application("test-id", newApplication)

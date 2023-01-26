@@ -28,7 +28,7 @@ import scala.concurrent.Future
 
 class ApiHubServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar {
 
-  "createApplication" - {
+  "registerApplication" - {
     "must call the applications connector and return the saved application" in {
       val newApplication = NewApplication("test-app-name", Creator("test-creator-email"))
       val expected = Application("id", newApplication)

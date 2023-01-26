@@ -31,10 +31,10 @@ import services.ApiHubService
 
 import scala.concurrent.Future
 
-class RegisterApplicationControllerSpec$ extends SpecBase with MockitoSugar {
+class RegisterApplicationControllerSpec extends SpecBase with MockitoSugar {
 
-  "CreateApplicationController" - {
-    "must create the application and redirect to the Index page when valid" in {
+  "RegisterApplicationController" - {
+    "must register the application and redirect to the Index page when valid" in {
       val newApplication = NewApplication("test-app-name", Creator(""))
       val testId = "test-app-id"
       val userAnswers = UserAnswers(userAnswersId)

@@ -29,9 +29,9 @@ import views.html.RegisterApplicationSuccessView
 
 import scala.concurrent.Future
 
-class RegisterApplicationSuccessControllerSpec$ extends SpecBase with MockitoSugar{
+class RegisterApplicationSuccessControllerSpec extends SpecBase with MockitoSugar{
 
-  "CreateApplicationSuccess Controller" - {
+  "RegisterApplicationSuccess Controller" - {
 
     "must return OK and the correct view for a GET" in {
       val fixture = RegisterApplicationSuccessControllerSpec.buildFixture()
