@@ -28,9 +28,9 @@ import scala.concurrent.Future
 class ApiHubService @Inject()(applicationsConnector: ApplicationsConnector)
   extends Logging {
 
-  def createApplication(newApplication: NewApplication)(implicit hc: HeaderCarrier): Future[Application] = {
-    logger.debug(s"Creating application named ${newApplication.name}")
-    applicationsConnector.createApplication(newApplication)
+  def registerApplication(newApplication: NewApplication)(implicit hc: HeaderCarrier): Future[Application] = {
+    logger.debug(s"Registering application named ${newApplication.name}")
+    applicationsConnector.registerApplication(newApplication)
   }
 
   def getApplications()(implicit hc: HeaderCarrier): Future[Seq[Application]] = {

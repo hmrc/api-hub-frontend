@@ -36,7 +36,7 @@ class ApplicationsConnectorSpec
           )
       )
 
-      buildConnector(this).createApplication(newApplication)(HeaderCarrier()) map {
+      buildConnector(this).registerApplication(newApplication)(HeaderCarrier()) map {
         actual =>
           actual mustBe expected
       }

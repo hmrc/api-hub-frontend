@@ -36,7 +36,7 @@ class ApplicationsConnector @Inject()(
 
   private val applicationsBaseUrl = servicesConfig.baseUrl("api-hub-applications")
 
-  def createApplication(newApplication: NewApplication)(implicit hc: HeaderCarrier): Future[Application] = {
+  def registerApplication(newApplication: NewApplication)(implicit hc: HeaderCarrier): Future[Application] = {
     httpClient
       .post(url"$applicationsBaseUrl/api-hub-applications/applications")
       .withBody(Json.toJson(newApplication))

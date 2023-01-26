@@ -43,7 +43,7 @@ index.applications.id = Id
 
 checkYourAnswers.title = Check Your Answers
 checkYourAnswers.heading = Check Your Answers
-checkYourAnswers.createApplication = Create application
+checkYourAnswers.registerApplication = Register application
 
 journeyRecovery.continue.title = Sorry, there is a problem with the service
 journeyRecovery.continue.heading = Sorry, there is a problem with the service
@@ -67,11 +67,11 @@ applicationName.error.required = Enter an application name
 applicationName.error.length = Application name must be 100 characters or less
 applicationName.change.hidden = ApplicationName
 
-createApplicationSuccess.title = Create Application Success
-createApplicationSuccess.heading = Application created successfully
-createApplicationSuccess.h2 = What you can do now
-createApplicationSuccess.text.line1 = Your application has now been registered you can view and manage your {0} application.
-createApplicationSuccess.text.line2 = Your Application ID will be available on your applications page.
+registerApplicationSuccess.title = Register Application Success
+registerApplicationSuccess.heading = Application registered successfully
+registerApplicationSuccess.h2 = What you can do now
+registerApplicationSuccess.text.line1 = Your application has now been registered you can view and manage your {0} application.
+registerApplicationSuccess.text.line2 = Your Application ID will be available on your applications page.
 
 applicationDetails.title = Application Details
 applicationDetails.heading = Application details

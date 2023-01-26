@@ -17,7 +17,7 @@
 package controllers
 
 import base.SpecBase
-import controllers.CreateApplicationControllerSpec.buildFixture
+import controllers.RegisterApplicationControllerSpec.buildFixture
 import models.application.{Application, Creator, NewApplication}
 import models.{CheckMode, UserAnswers}
 import org.mockito.ArgumentMatchers
@@ -32,7 +32,7 @@ import services.ApiHubService
 
 import scala.concurrent.Future
 
-class CreateApplicationControllerSpec extends SpecBase with MockitoSugar {
+class RegisterApplicationControllerSpec$ extends SpecBase with MockitoSugar {
 
   "CreateApplicationController" - {
     "must create the application and redirect to the Index page when valid" in {
@@ -44,17 +44,17 @@ class CreateApplicationControllerSpec extends SpecBase with MockitoSugar {
 
       val fixture = buildFixture(userAnswers)
 
-      when(fixture.apiHubService.createApplication(ArgumentMatchers.eq(newApplication))(any()))
+      when(fixture.apiHubService.registerApplication(ArgumentMatchers.eq(newApplication))(any()))
         .thenReturn(Future.successful(Application(testId, newApplication)))
 
       running(fixture.application) {
-        val request = FakeRequest(POST, routes.CreateApplicationController.create.url)
+        val request = FakeRequest(POST, routes.RegisterApplicationController.create.url)
         val result = route(fixture.application, request).value
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.CreateApplicationSuccessController.onPageLoad(testId).url)
 
-        verify(fixture.apiHubService).createApplication(ArgumentMatchers.eq(newApplication))(any())
+        verify(fixture.apiHubService).registerApplication(ArgumentMatchers.eq(newApplication))(any())
       }
     }
 
@@ -62,7 +62,7 @@ class CreateApplicationControllerSpec extends SpecBase with MockitoSugar {
       val fixture = buildFixture(emptyUserAnswers)
 
       running(fixture.application) {
-        val request = FakeRequest(POST, routes.CreateApplicationController.create.url)
+        val request = FakeRequest(POST, routes.RegisterApplicationController.create.url)
         val result = route(fixture.application, request).value
 
         status(result) mustBe SEE_OTHER
@@ -75,7 +75,7 @@ class CreateApplicationControllerSpec extends SpecBase with MockitoSugar {
 
 }
 
-object CreateApplicationControllerSpec extends SpecBase with MockitoSugar {
+object RegisterApplicationControllerSpec extends SpecBase with MockitoSugar {
 
   case class Fixture(
     application: PlayApplication,

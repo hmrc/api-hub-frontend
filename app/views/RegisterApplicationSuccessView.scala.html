@@ -36,18 +36,18 @@
     routes.ApplicationDetailsController.onPageLoad(application.id).url
 }
 
-@layout(pageTitle = titleNoForm(messages("createApplicationSuccess.title"))) {
+@layout(pageTitle = titleNoForm(messages("registerApplicationSuccess.title"))) {
   @govukPanel(Panel(
-    title = Text(messages("createApplicationSuccess.heading")
+    title = Text(messages("registerApplicationSuccess.heading")
   )))
- <h2 class="govuk-heading-m">@messages("createApplicationSuccess.h2")</h2>
+ <h2 class="govuk-heading-m">@messages("registerApplicationSuccess.h2")</h2>
  <p class="govuk-body">
     @Html(
         messages(
-            "createApplicationSuccess.text.line1",
+            "registerApplicationSuccess.text.line1",
             applicationLink(app)
         )
     )
  </p>
- <p class="govuk-body">@messages("createApplicationSuccess.text.line2")</p>
+ <p class="govuk-body">@messages("registerApplicationSuccess.text.line2")</p>
 }

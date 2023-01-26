@@ -29,12 +29,12 @@ import play.api.{Application => PlayApplication}
 
 import scala.concurrent.Future
 
-class CreateApplicationSuccessControllerSpec extends SpecBase with MockitoSugar{
+class RegisterApplicationSuccessControllerSpec$ extends SpecBase with MockitoSugar{
 
   "CreateApplicationSuccess Controller" - {
 
     "must return OK and the correct view for a GET" in {
-      val fixture = CreateApplicationSuccessControllerSpec.buildFixture()
+      val fixture = RegisterApplicationSuccessControllerSpec.buildFixture()
       val app = Application("id-1", "test", Creator("creator-email"))
 
       when(fixture.apiHubService.getApplication(ArgumentMatchers.eq("id-1"))(any()))
@@ -56,7 +56,7 @@ class CreateApplicationSuccessControllerSpec extends SpecBase with MockitoSugar{
     }
   }
 }
-object CreateApplicationSuccessControllerSpec extends SpecBase with MockitoSugar {
+object RegisterApplicationSuccessControllerSpec extends SpecBase with MockitoSugar {
 
   case class Fixture(
                       application: PlayApplication,
