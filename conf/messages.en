@@ -88,3 +88,6 @@ applicationDetails.preProd = pre-prod
 applicationDetails.prod = prod
 applicationDetails.noScopes = You have no scopes
 applicationDetails.noCredentials = You have no credentials
+
+requestScopeSuccess.title = requestScopeSuccess
+requestScopeSuccess.heading = requestScopeSuccess

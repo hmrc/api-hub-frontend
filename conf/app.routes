@@ -31,3 +31,5 @@ POST        /create-application                          controllers.CreateAppli
 GET        /create-application-success/:id               controllers.CreateApplicationSuccessController.onPageLoad(id:String)
 
 GET         /application-details/:id                     controllers.ApplicationDetailsController.onPageLoad(id: String)
+
+GET         /request-scope-success                       controllers.RequestScopeSuccessController.onPageLoad()
