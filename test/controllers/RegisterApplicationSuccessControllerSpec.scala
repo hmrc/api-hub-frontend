@@ -23,29 +23,29 @@ import org.mockito.{ArgumentMatchers, MockitoSugar}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import services.ApiHubService
-import views.html.CreateApplicationSuccessView
 import play.api.{Application => PlayApplication}
+import services.ApiHubService
+import views.html.RegisterApplicationSuccessView
 
 import scala.concurrent.Future
 
-class CreateApplicationSuccessControllerSpec extends SpecBase with MockitoSugar{
+class RegisterApplicationSuccessControllerSpec extends SpecBase with MockitoSugar{
 
-  "CreateApplicationSuccess Controller" - {
+  "RegisterApplicationSuccess Controller" - {
 
     "must return OK and the correct view for a GET" in {
-      val fixture = CreateApplicationSuccessControllerSpec.buildFixture()
+      val fixture = RegisterApplicationSuccessControllerSpec.buildFixture()
       val app = Application("id-1", "test", Creator("creator-email"))
 
       when(fixture.apiHubService.getApplication(ArgumentMatchers.eq("id-1"))(any()))
         .thenReturn(Future.successful(Some(app)))
 
       running(fixture.application) {
-        val request = FakeRequest(GET, routes.CreateApplicationSuccessController.onPageLoad("id-1").url)
+        val request = FakeRequest(GET, routes.RegisterApplicationSuccessController.onPageLoad("id-1").url)
 
         val result = route(fixture.application, request).value
 
-        val view = fixture.application.injector.instanceOf[CreateApplicationSuccessView]
+        val view = fixture.application.injector.instanceOf[RegisterApplicationSuccessView]
 
         status(result) mustEqual OK
 
@@ -56,7 +56,7 @@ class CreateApplicationSuccessControllerSpec extends SpecBase with MockitoSugar{
     }
   }
 }
-object CreateApplicationSuccessControllerSpec extends SpecBase with MockitoSugar {
+object RegisterApplicationSuccessControllerSpec extends SpecBase with MockitoSugar {
 
   case class Fixture(
                       application: PlayApplication,
