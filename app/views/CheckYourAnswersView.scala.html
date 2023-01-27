@@ -29,9 +29,9 @@
 
     @govukSummaryList(list)
 
-    @formHelper(action = routes.CreateApplicationController.create) {
+    @formHelper(action = routes.RegisterApplicationController.create) {
         @govukButton(
-            ButtonViewModel(messages("checkYourAnswers.createApplication"))
+            ButtonViewModel(messages("checkYourAnswers.registerApplication"))
         )
     }
 

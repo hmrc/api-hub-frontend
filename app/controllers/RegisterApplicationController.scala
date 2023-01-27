@@ -28,7 +28,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class CreateApplicationController @Inject()(
+class RegisterApplicationController @Inject()(
     override val messagesApi: MessagesApi,
     override val controllerComponents: MessagesControllerComponents,
     identify: IdentifierAction,
@@ -43,8 +43,8 @@ class CreateApplicationController @Inject()(
     implicit request =>
       validateAndBuildApplication(request.userAnswers).fold(
         call => Future.successful(Redirect(call)),
-        newApplication => apiHubService.createApplication(newApplication)
-          .map(app => Redirect(routes.CreateApplicationSuccessController.onPageLoad(app.id)))
+        newApplication => apiHubService.registerApplication(newApplication)
+          .map(app => Redirect(routes.RegisterApplicationSuccessController.onPageLoad(app.id)))
       )
   }
 
