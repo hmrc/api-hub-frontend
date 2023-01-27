@@ -17,21 +17,30 @@
 package controllers
 
 import controllers.actions._
+
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.RequestScopeSuccessView
 
-class RequestScopeSuccessController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       identify: IdentifierAction,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       view: RequestScopeSuccessView
-                                     ) extends FrontendBaseController with I18nSupport {
+import scala.concurrent.ExecutionContext
 
-  def onPageLoad(id: String): Action[AnyContent] = identify {
+class RequestScopeSuccessController @Inject()(
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  val controllerComponents: MessagesControllerComponents,
+  view: RequestScopeSuccessView,
+  apiHubService: ApiHubService
+) (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+
+  def onPageLoad(id: String): Action[AnyContent] = identify.async {
     implicit request =>
-      Ok(view(id))
+      apiHubService.getApplication(id) map {
+        case Some(application) => Ok(view(application))
+        case _ => NotFound
+      }
   }
+
 }

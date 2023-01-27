@@ -14,14 +14,38 @@
  * limitations under the License.
  *@
 
+@import models.application.Application
+
 @this(
         layout: templates.Layout,
         govukButton: GovukButton
 )
 
-@(id: String)(implicit request: Request[_], messages: Messages)
+@(application: Application)(implicit request: Request[_], messages: Messages)
+
+@applicationLink(application: Application) = {
+    <a href="@routes.ApplicationDetailsController.onPageLoad(application.id)" class="govuk-link govuk-link--no-visited-state">
+        @(application.name)
+    </a>
+}
 
 @layout(pageTitle = titleNoForm(messages("requestScopeSuccess.title"))) {
 
-    <h1 class="govuk-heading-xl">@messages("requestScopeSuccess.heading")</h1>
+    <div class="govuk-panel govuk-panel--confirmation">
+        <h1 class="govuk-panel__title">
+            @messages("requestScopeSuccess.heading")
+        </h1>
+    </div>
+
+    <h2 class="govuk-heading-m">@messages("requestScopeSuccess.guidance.heading")</h2>
+
+    <p class="govuk-body">
+        @Html(
+            messages(
+                "requestScopeSuccess.guidance.content",
+                applicationLink(application)
+            )
+        )
+    </p>
+
 }
