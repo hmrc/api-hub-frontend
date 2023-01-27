@@ -89,5 +89,5 @@ applicationDetails.prod = prod
 applicationDetails.noScopes = You have no scopes
 applicationDetails.noCredentials = You have no credentials
 
-requestScopeSuccess.title = requestScopeSuccess
-requestScopeSuccess.heading = requestScopeSuccess
+requestScopeSuccess.title = Scope requested successfully
+requestScopeSuccess.heading = Scope requested successfully
