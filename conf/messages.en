@@ -10,6 +10,8 @@ site.start = Start now
 site.startAgain = Start again
 site.signIn = Sign in
 site.govuk = GOV.UK
+site.applications = Applications
+site.approvals = Approvals
 
 date.day = Day
 date.month = Month
