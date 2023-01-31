@@ -83,7 +83,7 @@
     </div>
 }
 
-@apiHubLinksPanel = {
+@apiHubBanner = {
     <div class="govuk-width-container">
         <div class="govuk-!-padding-bottom-3 govuk-!-padding-top-3 govuk-!-text-align-right">
             <a class="govuk-link govuk-link--no-visited-state" href="@routes.IndexController.onPageLoad.url">
@@ -104,7 +104,7 @@
         serviceUrl  = Some(routes.IndexController.onPageLoad.url),
         signOutUrl  = if(showSignOut) Some(controllers.auth.routes.AuthController.signOut.url) else None,
         phaseBanner = Some(alphaBanner(appConfig.feedbackUrl)),
-        additionalBannersBlock = Some(apiHubLinksPanel)
+        additionalBannersBlock = Some(apiHubBanner)
     )),
     beforeContentBlock = Some(beforeContent),
     footerBlock        = Some(hmrcStandardFooter()),
