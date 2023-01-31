@@ -93,3 +93,6 @@ requestScopeSuccess.title = Scope requested successfully
 requestScopeSuccess.heading = Scope requested successfully
 requestScopeSuccess.guidance.heading = What you can do now
 requestScopeSuccess.guidance.content = View your {0} application and manage credentials for your scopes.
+
+apiHubLinks.applications = Applications
+apiHubLinks.approvals = Approvals

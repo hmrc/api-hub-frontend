@@ -53,7 +53,7 @@
         } else None
     )
 
-    <link href="@routes.Assets.versioned("stylesheets/application.css")" media="all" rel="stylesheet" type="text/css"@CSPNonce.get.map {n=> nonce="@n"} />
+    <link href='@routes.Assets.versioned("stylesheets/application.css")' media="all" rel="stylesheet" type="text/css"@CSPNonce.get.map {n=> nonce="@n"} />
 }
 
 @additionalScripts = {
@@ -83,13 +83,28 @@
     </div>
 }
 
+@apiHubLinksPanel = {
+    <div class="govuk-width-container">
+        <div class="govuk-!-padding-bottom-3 govuk-!-padding-top-3 govuk-!-text-align-right">
+            <a class="govuk-link govuk-link--no-visited-state" href="@routes.IndexController.onPageLoad.url">
+                @messages("apiHubLinks.applications")
+            </a>
+            <a class="govuk-link govuk-link--no-visited-state govuk-!-margin-left-6" href="@routes.IndexController.onPageLoad.url">
+                @messages("apiHubLinks.approvals")
+            </a>
+        </div>
+        <hr class="govuk-section-break govuk-section-break--visible">
+    </div>
+}
+
 @govukLayout(
     pageTitle   = Some(pageTitle),
     headBlock   = Some(head),
     headerBlock = Some(hmrcStandardHeader(
         serviceUrl  = Some(routes.IndexController.onPageLoad.url),
         signOutUrl  = if(showSignOut) Some(controllers.auth.routes.AuthController.signOut.url) else None,
-        phaseBanner = Some(alphaBanner(appConfig.feedbackUrl))
+        phaseBanner = Some(alphaBanner(appConfig.feedbackUrl)),
+        additionalBannersBlock = Some(apiHubLinksPanel)
     )),
     beforeContentBlock = Some(beforeContent),
     footerBlock        = Some(hmrcStandardFooter()),
