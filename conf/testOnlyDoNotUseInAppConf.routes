@@ -11,3 +11,6 @@
 
 # Add all the application routes to the prod.routes file
 ->         /                          prod.Routes
+
+GET        /test-only/sign-in         testonly.TestOnlySignInController.showSignIn
+POST       /test-only/sign-in         testonly.TestOnlySignInController.submit
