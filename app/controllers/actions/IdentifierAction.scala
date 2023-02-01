@@ -23,40 +23,55 @@ import models.requests.IdentifierRequest
 import play.api.{Configuration, Environment}
 import play.api.mvc.Results._
 import play.api.mvc._
-import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
+import uk.gov.hmrc.internalauth.client.Retrieval
+//import uk.gov.hmrc.auth.core._
+//import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.http.{HeaderCarrier, UnauthorizedException}
 import uk.gov.hmrc.play.bootstrap.config.AuthRedirects
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
+import uk.gov.hmrc.internalauth.client.FrontendAuthComponents
 
 import scala.concurrent.{ExecutionContext, Future}
 
 trait IdentifierAction extends ActionBuilder[IdentifierRequest, AnyContent] with ActionFunction[Request, IdentifierRequest]
 
 class AuthenticatedIdentifierAction @Inject()(
-                                               override val authConnector: AuthConnector,
+//                                               override val authConnector: AuthConnector,
+                                               auth: FrontendAuthComponents,
                                                configuration: FrontendAppConfig,
                                                val parser: BodyParsers.Default,
                                                override val config: Configuration,
                                                override val env: Environment
                                              )
                                              (implicit val executionContext: ExecutionContext)
-  extends IdentifierAction with AuthorisedFunctions with AuthRedirects {
+  extends IdentifierAction
+//    with AuthorisedFunctions
+    with AuthRedirects {
 
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    authorised().retrieve(Retrievals.credentials) {
-      _.map {
-        credentials => block(IdentifierRequest(request, s"${credentials.providerType}-${credentials.providerId}"))
-      }.getOrElse(throw new UnauthorizedException("Unable to retrieve user credentials"))
-    } recover {
-      case _: NoActiveSession =>
-        toStrideLogin(configuration.loginContinueUrl)
-      case _: AuthorisationException =>
-        Redirect(routes.UnauthorisedController.onPageLoad)
+    auth.authenticatedAction(routes.IndexController.onPageLoad, Retrieval.username) {
+      implicit request => {
+        val eventualResult = block(IdentifierRequest(request, request.retrieval.value))
+
+//        eventualResult.value.getOrElse(throw new UnauthorizedException("Unable to retrieve user credentials")).get
+        eventualResult;
+      }.
     }
+
+
+//    authorised().retrieve(Retrievals.credentials) {
+//      _.map {
+//        credentials => block(IdentifierRequest(request, s"${credentials.providerType}-${credentials.providerId}"))
+//      }.getOrElse(throw new UnauthorizedException("Unable to retrieve user credentials"))
+//    } recover {
+//      case _: NoActiveSession =>
+//        toStrideLogin(configuration.loginContinueUrl)
+//      case _: AuthorisationException =>
+//        Redirect(routes.UnauthorisedController.onPageLoad)
+//    }
   }
 }
 
