@@ -22,8 +22,8 @@ import controllers.routes
 import models.requests.IdentifierRequest
 import play.api.mvc.Results._
 import play.api.mvc._
-import uk.gov.hmrc.internalauth.client.{AuthFunctions, FrontendAuthComponents, Retrieval}
-import uk.gov.hmrc.http.{HeaderCarrier, UnauthorizedException}
+import uk.gov.hmrc.internalauth.client.{AuthFunctions, Retrieval}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import scala.concurrent.{ExecutionContext, Future}
