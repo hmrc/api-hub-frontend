@@ -22,7 +22,7 @@ import controllers.routes
 import models.requests.IdentifierRequest
 import play.api.mvc.Results._
 import play.api.mvc._
-import uk.gov.hmrc.internalauth.client.{AuthFunctions, Retrieval}
+import uk.gov.hmrc.internalauth.client.{FrontendAuthComponents, Retrieval}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
@@ -31,7 +31,7 @@ import scala.concurrent.{ExecutionContext, Future}
 trait IdentifierAction extends ActionBuilder[IdentifierRequest, AnyContent] with ActionFunction[Request, IdentifierRequest]
 
 class AuthenticatedIdentifierAction @Inject()(val parser: BodyParsers.Default,
-                                              auth: AuthFunctions,
+                                              auth: FrontendAuthComponents,
                                               config: FrontendAppConfig
                                              )(implicit val executionContext: ExecutionContext) extends IdentifierAction {
 

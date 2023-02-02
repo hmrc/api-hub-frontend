@@ -24,7 +24,7 @@ import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.mvc.{Action, AnyContent, BodyParsers, Results}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.internalauth.client.AuthFunctions
+import uk.gov.hmrc.internalauth.client.FrontendAuthComponents
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -45,9 +45,9 @@ class AuthActionSpec extends SpecBase {
         running(application) {
           val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
           val appConfig = application.injector.instanceOf[FrontendAppConfig]
-          val mockAuthFunctions = mock[AuthFunctions]
-          when(mockAuthFunctions.verify(any())(any(), any())).thenReturn(Future.successful(None))
-          val authAction = new AuthenticatedIdentifierAction(bodyParsers, mockAuthFunctions, appConfig)
+          val mockAuth = mock[FrontendAuthComponents]
+          when(mockAuth.verify(any())(any(), any())).thenReturn(Future.successful(None))
+          val authAction = new AuthenticatedIdentifierAction(bodyParsers, mockAuth, appConfig)
           val controller = new Harness(authAction)
           val result = controller.onPageLoad()(FakeRequest())
 
