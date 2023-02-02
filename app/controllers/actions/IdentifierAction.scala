@@ -22,18 +22,17 @@ import controllers.routes
 import models.requests.IdentifierRequest
 import play.api.mvc.Results._
 import play.api.mvc._
-import uk.gov.hmrc.internalauth.client.Retrieval
+import uk.gov.hmrc.internalauth.client.{AuthFunctions, FrontendAuthComponents, Retrieval}
 import uk.gov.hmrc.http.{HeaderCarrier, UnauthorizedException}
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
-import uk.gov.hmrc.internalauth.client.FrontendAuthComponents
 
 import scala.concurrent.{ExecutionContext, Future}
 
 trait IdentifierAction extends ActionBuilder[IdentifierRequest, AnyContent] with ActionFunction[Request, IdentifierRequest]
 
-class AuthenticatedIdentifierAction @Inject()( val parser: BodyParsers.Default,
-                                               auth: FrontendAuthComponents,
-                                               config: FrontendAppConfig
+class AuthenticatedIdentifierAction @Inject()(val parser: BodyParsers.Default,
+                                              auth: AuthFunctions,
+                                              config: FrontendAppConfig
                                              )(implicit val executionContext: ExecutionContext) extends IdentifierAction {
 
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
