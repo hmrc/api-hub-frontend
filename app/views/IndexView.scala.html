@@ -25,6 +25,13 @@
 
 @(applications: Seq[Application])(implicit request: Request[_], messages: Messages)
 
+@appDetailsLink(app:Application) = {
+    <a href="@routes.ApplicationDetailsController.onPageLoad(app.id).url">
+        @app.name
+    </a>
+
+}
+
 @layout(
     pageTitle    = titleNoForm(messages("index.title")),
     showBackLink = false
@@ -54,8 +61,8 @@
                     rows = applications.map(
                         application =>
                             Seq(
-                                TableRow(Text(application.name)),
-                                TableRow(Text(application.id))
+                                TableRow(content=HtmlContent(appDetailsLink(application))),
+                                TableRow(content=application.id)
                             )
                     )
                 )
