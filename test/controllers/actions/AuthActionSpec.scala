@@ -55,144 +55,125 @@ class AuthActionSpec extends SpecBase {
           val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
           val appConfig = application.injector.instanceOf[FrontendAppConfig]
           val mockAuthFunctions = mock[AuthFunctions]
-          when(mockAuthFunctions.verify(any())(any(), any())).thenThrow(UpstreamErrorResponse.apply("bad thing", 401))
+          when(mockAuthFunctions.verify(any())(any(), any())).thenReturn(Future.successful(None))
           val authAction = new AuthenticatedIdentifierAction(bodyParsers, mockAuthFunctions, appConfig)
           val controller = new Harness(authAction)
           val result = controller.onPageLoad()(FakeRequest())
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result).value must startWith("/stride/sign-in")
+          redirectLocation(result).value must include("/sign-in")
         }
       }
     }
 
-    //    "the user's session has expired" - {
+    // Not Applicable for LDAP authentication..?
+
+    //        "the user's session has expired" - {
     //
-    //      "must redirect the user to log in " in {
+    //          "must redirect the user to log in " in {
     //
-    //        val application = applicationBuilder(userAnswers = None).build()
+    //            val application = applicationBuilder(userAnswers = None).build()
     //
-    //        running(application) {
-    //          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
-    //          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
-    //          val configuration = application.injector.instanceOf[Configuration]
-    //          val env = application.injector.instanceOf[Environment]
+    //            running(application) {
+    //              val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
+    //              val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+    //              val mockAuthFunctions = mock[AuthFunctions]
+    //              when(mockAuthFunctions.verify(any())(any(), any())).thenReturn(Future.successful(None))
+    //              val authAction = new AuthenticatedIdentifierAction(bodyParsers, mockAuthFunctions, appConfig)
+    //              val controller = new Harness(authAction)
+    //              val result = controller.onPageLoad()(FakeRequest())
     //
-    //          val authAction = new AuthenticatedIdentifierAction(new FakeFailingAuthConnector(new BearerTokenExpired), appConfig, bodyParsers, configuration, env)
-    //          val controller = new Harness(authAction)
-    //          val result = controller.onPageLoad()(FakeRequest())
+    //              status(result) mustBe SEE_OTHER
+    //              redirectLocation(result).value must startWith("/stride/sign-in")
+    //            }
+    //          }
+    //        }
     //
-    //          status(result) mustBe SEE_OTHER
-    //          redirectLocation(result).value must startWith("/stride/sign-in")
+    //        "the user doesn't have sufficient enrolments" - {
+    //
+    //          "must redirect the user to the unauthorised page" in {
+    //
+    //            val application = applicationBuilder(userAnswers = None).build()
+    //
+    //            running(application) {
+    //              val authAction = buildAuthenticatedIdentifierAction(application)
+    //              val controller = new Harness(authAction)
+    //              val result = controller.onPageLoad()(FakeRequest())
+    //
+    //              status(result) mustBe SEE_OTHER
+    //              redirectLocation(result).value mustBe routes.UnauthorisedController.onPageLoad.url
+    //            }
+    //          }
+    //        }
+    //
+    //        "the user doesn't have sufficient confidence level" - {
+    //
+    //          "must redirect the user to the unauthorised page" in {
+    //
+    //            val application = applicationBuilder(userAnswers = None).build()
+    //
+    //            running(application) {
+    //              val authAction = buildAuthenticatedIdentifierAction(application)
+    //              val controller = new Harness(authAction)
+    //              val result = controller.onPageLoad()(FakeRequest())
+    //
+    //              status(result) mustBe SEE_OTHER
+    //              redirectLocation(result).value mustBe routes.UnauthorisedController.onPageLoad.url
+    //            }
+    //          }
+    //        }
+    //
+    //        "the user used an unaccepted auth provider" - {
+    //
+    //          "must redirect the user to the unauthorised page" in {
+    //
+    //            val application = applicationBuilder(userAnswers = None).build()
+    //
+    //            running(application) {
+    //              val authAction = buildAuthenticatedIdentifierAction(application)
+    //              val controller = new Harness(authAction)
+    //              val result = controller.onPageLoad()(FakeRequest())
+    //
+    //              status(result) mustBe SEE_OTHER
+    //              redirectLocation(result).value mustBe routes.UnauthorisedController.onPageLoad.url
+    //            }
+    //          }
+    //        }
+    //
+    //        "the user has an unsupported affinity group" - {
+    //
+    //          "must redirect the user to the unauthorised page" in {
+    //
+    //            val application = applicationBuilder(userAnswers = None).build()
+    //
+    //            running(application) {
+    //              val authAction = buildAuthenticatedIdentifierAction(application)
+    //              val controller = new Harness(authAction)
+    //              val result = controller.onPageLoad()(FakeRequest())
+    //
+    //              status(result) mustBe SEE_OTHER
+    //              redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad.url)
+    //            }
+    //          }
+    //        }
+    //
+    //        "the user has an unsupported credential role" - {
+    //
+    //          "must redirect the user to the unauthorised page" in {
+    //
+    //            val application = applicationBuilder(userAnswers = None).build()
+    //
+    //            running(application) {
+    //              val authAction = buildAuthenticatedIdentifierAction(application)
+    //              val controller = new Harness(authAction)
+    //              val result = controller.onPageLoad()(FakeRequest())
+    //
+    //              status(result) mustBe SEE_OTHER
+    //              redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad.url)
+    //            }
+    //          }
     //        }
     //      }
     //    }
-    //
-    //    "the user doesn't have sufficient enrolments" - {
-    //
-    //      "must redirect the user to the unauthorised page" in {
-    //
-    //        val application = applicationBuilder(userAnswers = None).build()
-    //
-    //        running(application) {
-    //          val authAction = buildAuthenticatedIdentifierAction(application)
-    //          val controller = new Harness(authAction)
-    //          val result = controller.onPageLoad()(FakeRequest())
-    //
-    //          status(result) mustBe SEE_OTHER
-    //          redirectLocation(result).value mustBe routes.UnauthorisedController.onPageLoad.url
-    //        }
-    //      }
-    //    }
-    //
-    //    "the user doesn't have sufficient confidence level" - {
-    //
-    //      "must redirect the user to the unauthorised page" in {
-    //
-    //        val application = applicationBuilder(userAnswers = None).build()
-    //
-    //        running(application) {
-    //          val authAction = buildAuthenticatedIdentifierAction(application)
-    //          val controller = new Harness(authAction)
-    //          val result = controller.onPageLoad()(FakeRequest())
-    //
-    //          status(result) mustBe SEE_OTHER
-    //          redirectLocation(result).value mustBe routes.UnauthorisedController.onPageLoad.url
-    //        }
-    //      }
-    //    }
-    //
-    //    "the user used an unaccepted auth provider" - {
-    //
-    //      "must redirect the user to the unauthorised page" in {
-    //
-    //        val application = applicationBuilder(userAnswers = None).build()
-    //
-    //        running(application) {
-    //          val authAction = buildAuthenticatedIdentifierAction(application)
-    //          val controller = new Harness(authAction)
-    //          val result = controller.onPageLoad()(FakeRequest())
-    //
-    //          status(result) mustBe SEE_OTHER
-    //          redirectLocation(result).value mustBe routes.UnauthorisedController.onPageLoad.url
-    //        }
-    //      }
-    //    }
-    //
-    //    "the user has an unsupported affinity group" - {
-    //
-    //      "must redirect the user to the unauthorised page" in {
-    //
-    //        val application = applicationBuilder(userAnswers = None).build()
-    //
-    //        running(application) {
-    //          val authAction = buildAuthenticatedIdentifierAction(application)
-    //          val controller = new Harness(authAction)
-    //          val result = controller.onPageLoad()(FakeRequest())
-    //
-    //          status(result) mustBe SEE_OTHER
-    //          redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad.url)
-    //        }
-    //      }
-    //    }
-    //
-    //    "the user has an unsupported credential role" - {
-    //
-    //      "must redirect the user to the unauthorised page" in {
-    //
-    //        val application = applicationBuilder(userAnswers = None).build()
-    //
-    //        running(application) {
-    //          val authAction = buildAuthenticatedIdentifierAction(application)
-    //          val controller = new Harness(authAction)
-    //          val result = controller.onPageLoad()(FakeRequest())
-    //
-    //          status(result) mustBe SEE_OTHER
-    //          redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad.url)
-    //        }
-    //      }
-    //    }
-    //  }
-    //}
-    //
-    //object AuthActionSpec {
-    //
-    //  def buildAuthenticatedIdentifierAction(application: Application): AuthenticatedIdentifierAction = {
-    //    val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
-    //    val appConfig   = application.injector.instanceOf[FrontendAppConfig]
-    //    val configuration = application.injector.instanceOf[Configuration]
-    //    val env = application.injector.instanceOf[Environment]
-    //
-    //    new AuthenticatedIdentifierAction(new FakeFailingAuthConnector(new UnsupportedCredentialRole), appConfig, bodyParsers, configuration, env)
-    //  }
-    //
-    //}
-    //
-    //class FakeFailingAuthConnector @Inject()(exceptionToReturn: Throwable) extends AuthConnector {
-    //  val serviceUrl: String = ""
-    //
-    //  override def authorise[A](predicate: Predicate, retrieval: Retrieval[A])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[A] =
-    //    Future.failed(exceptionToReturn)
-    //}
   }
 }
