@@ -10,4 +10,7 @@
 # Failing to follow this rule may result in test routes deployed in production.
 
 # Add all the application routes to the prod.routes file
-->         /                          prod.Routes
+->         /                                    prod.Routes
+
+GET        /api-hub/test-only/sign-in           testonly.TestOnlySignInController.showSignIn
+POST       /api-hub/test-only/sign-in           testonly.TestOnlySignInController.submit

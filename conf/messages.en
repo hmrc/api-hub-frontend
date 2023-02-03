@@ -95,3 +95,15 @@ requestScopeSuccess.title = Scope requested successfully
 requestScopeSuccess.heading = Scope requested successfully
 requestScopeSuccess.guidance.heading = What you can do now
 requestScopeSuccess.guidance.content = View your {0} application and manage credentials for your scopes.
+
+fake-sign-in.username.error.required = Enter a principal
+fake-sign-in.title.lbl = Create test sign in
+fake-sign-in.header.lbl = Create test sign in
+fake-sign-in.principal.lbl = Principal (e.g. my-service, or jo.bloggs)
+fake-sign-in.email.lbl = Email (optional)
+fake-sign-in.redirectUrl.lbl = Redirect Url
+fake-sign-in.redirectUrl.error.required = Enter an absolute redirect URL
+fake-sign-in.redirectUrl.error.absolute = Redirect URL must be absolute e.g. http://host:port/page
+fake-sign-in.token.lbl = Token (optional)
+fake-sign-in.permissions.lbl = Permissions
+fake-sign-in.button = Sign in
