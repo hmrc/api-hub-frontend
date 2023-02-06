@@ -44,7 +44,7 @@ class IndexController @Inject()(
   }
 
   def onSubmit: Action[AnyContent] = identify.async { implicit request =>
-    sessionRepository.set(UserAnswers(request.userId)).map(
+    sessionRepository.set(UserAnswers(request.user.userId)).map(
       _ => Redirect(routes.ApplicationNameController.onPageLoad(NormalMode))
     )
   }

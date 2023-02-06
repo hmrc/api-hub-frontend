@@ -29,7 +29,7 @@ class ApiHubService @Inject()(applicationsConnector: ApplicationsConnector)
   extends Logging {
 
   def registerApplication(newApplication: NewApplication)(implicit hc: HeaderCarrier): Future[Application] = {
-    logger.debug(s"Registering application named ${newApplication.name}")
+    logger.debug(s"Registering application named '${newApplication.name}', created by user with email '${newApplication.createdBy.email}''")
     applicationsConnector.registerApplication(newApplication)
   }
 

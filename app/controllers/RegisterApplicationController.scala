@@ -20,6 +20,7 @@ import com.google.inject.Inject
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import models.{CheckMode, UserAnswers}
 import models.application.{Creator, NewApplication}
+import models.user.UserModel
 import pages.ApplicationNamePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
@@ -41,17 +42,17 @@ class RegisterApplicationController @Inject()(
 
   def create(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      validateAndBuildApplication(request.userAnswers).fold(
+      validateAndBuildApplication(request.userAnswers, request.user).fold(
         call => Future.successful(Redirect(call)),
         newApplication => apiHubService.registerApplication(newApplication)
           .map(app => Redirect(routes.RegisterApplicationSuccessController.onPageLoad(app.id)))
       )
   }
 
-  private def validateAndBuildApplication(userAnswers: UserAnswers): Either[Call, NewApplication] = {
+  private def validateAndBuildApplication(userAnswers: UserAnswers, user: UserModel): Either[Call, NewApplication] = {
     for {
       applicationName <- validateApplicationName(userAnswers)
-    } yield NewApplication(applicationName, Creator(email = ""))
+    } yield NewApplication(applicationName, Creator(email = user.email.getOrElse("")))
   }
 
   private def validateApplicationName(userAnswers: UserAnswers): Either[Call, String] = {
