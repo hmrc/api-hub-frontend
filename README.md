@@ -25,6 +25,21 @@ Once everything is up and running you can access the application at
 http://localhost:9000/api-hub
 ```
 
+## Authentication
+The service uses internal-auth LDAP authentication. This is stubbed at various
+times depending on the environment. We have two possible stubbings:
+* internal-auth-frontend has a stub that will run locally only
+* our own stub hosted on api-hub-frontend which can run locally and in all deployed non-production environments
+
+Locally the service is configured to use:
+* our own stub when running in dev mode
+* the internal-auth-frontend stub otherwise
+
+The configuration for local internal-auth-frontend is in `application.conf`.
+
+The configuration for our own stub in dev mode is in the `PlayKeys.devSettings`
+section of `build.sbt`.
+
 ## Unit tests
 ```
 sbt test

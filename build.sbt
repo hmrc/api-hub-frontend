@@ -34,7 +34,11 @@ lazy val root = (project in file("."))
       "viewmodels.govuk.all._"
     ),
     PlayKeys.playDefaultPort := 9000,
-    PlayKeys.devSettings += "play.http.router" -> "testOnlyDoNotUseInAppConf.Routes",
+    PlayKeys.devSettings ++= Seq(
+      "play.http.router" -> "testOnlyDoNotUseInAppConf.Routes",
+      "microservice.services.internal-auth.url" -> "http://localhost:9000/api-hub/test-only",
+      "urls.login" -> "http://localhost:9000/api-hub/test-only/sign-in"
+    ),
     ScoverageKeys.coverageExcludedFiles := "<empty>;Reverse.*;.*handlers.*;.*components.*;" +
       ".*Routes.*;.*viewmodels.govuk.*;",
     ScoverageKeys.coverageMinimumStmtTotal := 78,
