@@ -15,6 +15,7 @@
  *@
 
 @import models.application.Application
+@import models.user.UserModel
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.footer.Meta
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.footer.FooterItem
 @import uk.gov.hmrc.govukfrontend.views.html.components.{Footer=>Footie}
@@ -24,7 +25,7 @@
   govukPanel: GovukPanel
 )
 
-@(app:Application)(implicit request: Request[_], messages: Messages)
+@(app:Application, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
 @applicationLink(application: Application) = {
     <a href='@applicationLinkUrl(application)' class='govuk-link govuk-link--no-visited-state'>
@@ -36,7 +37,7 @@
     routes.ApplicationDetailsController.onPageLoad(application.id).url
 }
 
-@layout(pageTitle = titleNoForm(messages("registerApplicationSuccess.title"))) {
+@layout(pageTitle = titleNoForm(messages("registerApplicationSuccess.title")), user = user) {
   @govukPanel(Panel(
     title = Text(messages("registerApplicationSuccess.heading")
   )))

@@ -18,10 +18,12 @@ package controllers
 
 import controllers.actions._
 import forms.ApplicationNameFormProvider
+
 import javax.inject.Inject
 import models.Mode
 import navigation.Navigator
 import pages.ApplicationNamePage
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -42,7 +44,7 @@ class ApplicationNameController @Inject()(
                                         view: ApplicationNameView
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form = formProvider()
+  val form: Form[String] = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
@@ -52,7 +54,7 @@ class ApplicationNameController @Inject()(
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode))
+      Ok(view(preparedForm, mode, Some(request.user)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
@@ -60,7 +62,7 @@ class ApplicationNameController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+          Future.successful(BadRequest(view(formWithErrors, mode, Some(request.user)))),
 
         value =>
           for {

@@ -18,6 +18,7 @@ package controllers
 
 import base.SpecBase
 import controllers.IndexControllerSpec.buildFixture
+import controllers.actions.FakeUser
 import models.application.{Application, Creator}
 import models.{NormalMode, UserAnswers}
 import org.mockito.{ArgumentCaptor, MockitoSugar}
@@ -57,7 +58,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
 
-        contentAsString(result) mustEqual view(applications)(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(applications, Some(FakeUser))(request, messages(fixture.application)).toString
       }
     }
 

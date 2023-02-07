@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import controllers.actions.FakeUser
 import models.application.{Application, Creator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
@@ -49,7 +50,7 @@ class RegisterApplicationSuccessControllerSpec extends SpecBase with MockitoSuga
 
         status(result) mustEqual OK
 
-        val expected = view(app)(request, messages(fixture.application)).toString
+        val expected = view(app, Some(FakeUser))(request, messages(fixture.application)).toString
         val actual = contentAsString(result)
         actual mustEqual expected
       }

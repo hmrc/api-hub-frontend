@@ -15,6 +15,7 @@
  *@
 
 @import models.application.Application
+@import models.user.UserModel
 
 @this(
     layout: templates.Layout,
@@ -23,7 +24,7 @@
     govukTable: GovukTable
 )
 
-@(applications: Seq[Application])(implicit request: Request[_], messages: Messages)
+@(applications: Seq[Application], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
 @appDetailsLink(app:Application) = {
     <a href="@routes.ApplicationDetailsController.onPageLoad(app.id).url">
@@ -34,7 +35,8 @@
 
 @layout(
     pageTitle    = titleNoForm(messages("index.title")),
-    showBackLink = false
+    showBackLink = false,
+    user = user
 ) {
 
     <div class="govuk-grid-row">

@@ -20,7 +20,7 @@ import com.google.inject.Inject
 import config.FrontendAppConfig
 import controllers.routes
 import models.requests.IdentifierRequest
-import models.user.UserModel
+import models.user.{LdapUser, UserModel}
 import play.api.mvc.Results._
 import play.api.mvc._
 import uk.gov.hmrc.http.HeaderCarrier
@@ -41,7 +41,7 @@ class AuthenticatedIdentifierAction @Inject()(val parser: BodyParsers.Default,
 
     auth.verify(Retrieval.username ~ Retrieval.email) flatMap {
       case Some(~(username,maybeEmail)) =>
-        block(IdentifierRequest(request, UserModel(s"LDAP-${username.value}", maybeEmail.map(email => email.value))))
+        block(IdentifierRequest(request, UserModel(s"LDAP-${username.value}", LdapUser, maybeEmail.map(email => email.value))))
       case None => Future.successful(
         Redirect(config.loginUrl, Map("continue_url" -> Seq(config.loginContinueUrl)))
       )
@@ -60,7 +60,7 @@ class SessionIdentifierAction @Inject()(
 
     hc.sessionId match {
       case Some(session) =>
-        block(IdentifierRequest(request, UserModel(session.value)))
+        block(IdentifierRequest(request, UserModel(session.value, LdapUser)))
       case None =>
         Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
     }

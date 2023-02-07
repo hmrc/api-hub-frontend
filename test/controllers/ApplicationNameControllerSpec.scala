@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import controllers.actions.FakeUser
 import forms.ApplicationNameFormProvider
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
@@ -56,7 +57,7 @@ class ApplicationNameControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[ApplicationNameView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, Some(FakeUser))(request, messages(application)).toString
       }
     }
 
@@ -74,7 +75,7 @@ class ApplicationNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, Some(FakeUser))(request, messages(application)).toString
       }
     }
 
@@ -120,7 +121,7 @@ class ApplicationNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, Some(FakeUser))(request, messages(application)).toString
       }
     }
 

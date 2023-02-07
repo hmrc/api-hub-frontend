@@ -16,4 +16,10 @@
 
 package models.user
 
-case class UserModel(userId: String, email: Option[String] = Option.empty)
+import viewmodels.WithName
+
+sealed trait UserType
+
+case object LdapUser extends WithName("LDAP") with UserType
+
+case class UserModel(userId: String, userType: UserType, email: Option[String] = Option.empty)

@@ -38,7 +38,7 @@ class RequestScopeSuccessController @Inject()(
   def onPageLoad(id: String): Action[AnyContent] = identify.async {
     implicit request =>
       apiHubService.getApplication(id) map {
-        case Some(application) => Ok(view(application))
+        case Some(application) => Ok(view(application, Some(request.user)))
         case _ => NotFound
       }
   }
