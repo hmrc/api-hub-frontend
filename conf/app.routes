@@ -34,4 +34,4 @@ GET         /application-details/:id                 controllers.ApplicationDeta
 
 GET         /request-scope-success/:id               controllers.RequestScopeSuccessController.onPageLoad(id: String)
 
-GET         /add-scope                               controllers.AddScopeController.onPageLoad(mode: Mode = NormalMode)
+GET         /add-scope/:id                           controllers.AddScopeController.onPageLoad(id: String)
