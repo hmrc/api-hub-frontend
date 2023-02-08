@@ -16,62 +16,70 @@
 
 package testonly
 
-import TestOnlyInternalAuthConnector.Token
 import com.google.inject.{Inject, Singleton}
 import config.FrontendAppConfig
 import play.api.data.Form
 import play.api.data.Forms.{email, list, mapping, optional, text}
 import play.api.libs.functional.syntax.unlift
+import play.api.libs.json.{JsSuccess, Json}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import testonly.TestOnlySignInController._
-import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
+import uk.gov.hmrc.http.{HeaderNames, SessionKeys}
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.TestOnlySignIn
 
 import java.net.URL
-import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
 @Singleton
 class TestOnlySignInController @Inject()(
   override val controllerComponents: MessagesControllerComponents,
   testOnlySignInView: TestOnlySignIn,
-  config: FrontendAppConfig,
-  internalAuthConnector: TestOnlyInternalAuthConnector
-)(implicit ec: ExecutionContext) extends FrontendBaseController {
+  config: FrontendAppConfig
+) extends FrontendBaseController {
 
   def showSignIn: Action[AnyContent] = Action {
     implicit request =>
       Ok(testOnlySignInView(signInFormWithRedirectUrl(config.loginContinueUrl)))
   }
 
-  def submit(): Action[AnyContent] = Action.async {
+  def submit(): Action[AnyContent] = Action {
     implicit request =>
       signInForm.bindFromRequest().fold(
-        formWithErrors => Future.successful(BadRequest(testOnlySignInView(formWithErrors))),
-        data =>
-          createToken(data).map { token =>
-            Redirect(data.redirectUrl)
-              .withSession(SessionKeys.authToken -> token.value)
-          }
+        formWithErrors => BadRequest(testOnlySignInView(formWithErrors)),
+        data => {
+          val retrievals = Json.stringify(
+            Json.toJson(
+              Retrievals(data.principal, data.email)
+            )
+          )
+          Redirect(data.redirectUrl).withSession(
+            SessionKeys.authToken -> s"$AUTHORISED_TOKEN$retrievals"
+          )
+        }
       )
   }
 
-  private def createToken(data: TestOnlySignInData)(implicit hc: HeaderCarrier) = {
-    data.token
-      .map(internalAuthConnector.testOnlyDeleteToken(_).recover {
-        case _ => ()
-      })
-      .getOrElse(Future.successful(()))
-      .flatMap { _ =>
-        internalAuthConnector.testOnlyCreateToken(convert(data))
-      }
+  def auth: Action[AnyContent] = Action { implicit request =>
+    request.headers.get(HeaderNames.authorisation) match {
+      case Some(authorisation) if authorisation.startsWith(AUTHORISED_TOKEN) =>
+        val json = authorisation.drop(AUTHORISED_TOKEN.length)
+        Json.parse(json).validate[Retrievals] match {
+          case JsSuccess(_, _) => Ok(json)
+          case _ => Unauthorized
+        }
+      case _ => Unauthorized
+    }
   }
 
 }
 
+case class Token(value: String) extends AnyVal
+
 object TestOnlySignInController {
+
+  val AUTHORISED_TOKEN: String = "AUTHORISED"
 
   val signInForm: Form[TestOnlySignInData] = Form(
     mapping(

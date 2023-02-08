@@ -14,12 +14,18 @@
  * limitations under the License.
  */
 
-package models.user
+package testonly
 
-import viewmodels.WithName
+import play.api.libs.json.{Format, Json}
 
-sealed trait UserType
+case class Retrievals(retrievals: Seq[String])
 
-case object LdapUser extends WithName("LDAP") with UserType
+object Retrievals {
 
-case class UserModel(userId: String, userName: String, userType: UserType, email: Option[String] = Option.empty)
+  def apply(principal: String, email: Option[String]): Retrievals = {
+    Retrievals(Seq(principal, email.getOrElse(s"$principal@digital.hmrc.gov.uk")))
+  }
+
+  implicit val formatRetrievals: Format[Retrievals] = Json.format[Retrievals]
+
+}

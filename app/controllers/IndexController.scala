@@ -39,7 +39,7 @@ class IndexController @Inject()(
   def onPageLoad: Action[AnyContent] = identify.async { implicit request =>
     apiHubService.getApplications() map {
       applications =>
-        Ok(view(applications))
+        Ok(view(applications, Some(request.user)))
     }
   }
 

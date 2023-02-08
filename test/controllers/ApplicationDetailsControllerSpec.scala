@@ -18,6 +18,7 @@ package controllers
 
 import base.SpecBase
 import controllers.ApplicationDetailsControllerSpec.buildFixture
+import controllers.actions.FakeUser
 import models.application.{Application, Creator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
@@ -51,7 +52,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar {
         val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(application)(request, messages(fixture.playApplication)).toString
+        contentAsString(result) mustEqual view(application, Some(FakeUser))(request, messages(fixture.playApplication)).toString
       }
     }
   }

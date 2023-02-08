@@ -18,6 +18,7 @@ package controllers
 
 import base.SpecBase
 import controllers.CheckYourAnswersControllerSpec.buildSummaryList
+import controllers.actions.FakeUser
 import generators.Generators
 import models.UserAnswers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
@@ -46,7 +47,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
         val list = buildSummaryList(emptyUserAnswers, messages(application))
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(list)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(list, Some(FakeUser))(request, messages(application)).toString
       }
     }
 
@@ -64,7 +65,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
           val list = buildSummaryList(userAnswers, messages(application))
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(list)(request, messages(application)).toString
+          contentAsString(result) mustEqual view(list, Some(FakeUser))(request, messages(application)).toString
         }
       })
 
