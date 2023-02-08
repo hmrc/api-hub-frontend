@@ -86,7 +86,7 @@
 
 @apiHubUserDetail = {
     @user.map(aUser =>
-        <div class="govuk-body">Signed in as {aUser.email.getOrElse(aUser.userId)} via {aUser.userType}</div>
+        <div class="govuk-body">Signed in as {aUser.email.getOrElse(aUser.userName)} via {aUser.userType}</div>
     )
 }
 
