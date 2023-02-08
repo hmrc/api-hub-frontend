@@ -32,8 +32,8 @@ times depending on the environment. We have two possible stubbings:
 * our own stub hosted on api-hub-frontend which can run locally and in all deployed non-production environments
 
 Locally the service is configured to use:
-* our own stub when running in dev mode
-* the internal-auth-frontend stub otherwise
+* our own stub when running in dev mode (`sbt run`)
+* the internal-auth-frontend stub otherwise (`sbt start` or running within Service Manager)
 
 The configuration for local internal-auth-frontend is in `application.conf`.
 
