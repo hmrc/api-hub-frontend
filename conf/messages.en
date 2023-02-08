@@ -117,3 +117,7 @@ addScope.environments.dev = dev
 addScope.environments.test = test
 addScope.environments.preProd = pre-prod
 addScope.environments.prod = prod
+
+addScope.error.required = Enter a scope name
+addScope.error.length = Scope name must be 100 characters or less
+

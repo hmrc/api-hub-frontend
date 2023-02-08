@@ -35,3 +35,4 @@ GET         /application-details/:id                 controllers.ApplicationDeta
 GET         /request-scope-success/:id               controllers.RequestScopeSuccessController.onPageLoad(id: String)
 
 GET         /add-scope/:id                           controllers.AddScopeController.onPageLoad(id: String)
+POST        /add-scope/:id                           controllers.AddScopeController.onSubmit(id: String)

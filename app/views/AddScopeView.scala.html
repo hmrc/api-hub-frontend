@@ -20,59 +20,67 @@
 
 @this(govukCheckboxes: GovukCheckboxes,
         layout: templates.Layout,
+        formHelper: FormWithCSRF,
+        govukErrorSummary: GovukErrorSummary,
         govukButton: GovukButton,
         govukInput: GovukInput)
 
-@(application: Application)(implicit request: Request[_], messages: Messages)
+@(id: String, form: Form[_])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("addScope.title"))) {
+@layout(pageTitle = title(form, messages("addScope.title"))) {
 
     <h2 class="govuk-heading-l">@messages("addScope.heading")</h2>
 
-    @govukInput(Input(
-        id = "scope-name",
-        name = "scope-name",
-        label = Label(
-            isPageHeading = true,
-            classes = "govuk-label--m",
-            content = Text(messages("addScope.scopeName.heading"))
-        ),
-        hint = Some(Hint(
-            content = Text(messages("addScope.scopeName.hint"))
-        )),
-    ))
+    @formHelper(action = routes.AddScopeController.onSubmit(id)) {
 
-    @govukCheckboxes(Checkboxes(
-        fieldset = Some(Fieldset(
-            legend = Some(Legend(
-                content = Text(messages("addScope.environments.heading")),
-                classes = "govuk-fieldset__legend--m",
-                isPageHeading = true
-            ))
-        )),
-        name = "environments",
-        items = Seq(
-            CheckboxItem(
-                content = Text(messages("addScope.environments.dev")),
-                value = "dev"
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form))
+        }
+        @govukInput(Input(
+            id = "scope-name",
+            name = "scope-name",
+            label = Label(
+                isPageHeading = true,
+                classes = "govuk-label--m",
+                content = Text(messages("addScope.scopeName.heading"))
             ),
-            CheckboxItem(
-                content = Text(messages("addScope.environments.test")),
-                value = "test"
-            ),
-            CheckboxItem(
-                content = Text(messages("addScope.environments.preProd")),
-                value = "preProd"
-            ),
-            CheckboxItem(
-                content = Text(messages("addScope.environments.prod")),
-                value = "prod"
+            hint = Some(Hint(
+                content = Text(messages("addScope.scopeName.hint"))
+            )),
+        ))
+
+        @govukCheckboxes(Checkboxes(
+            fieldset = Some(Fieldset(
+                legend = Some(Legend(
+                    content = Text(messages("addScope.environments.heading")),
+                    classes = "govuk-fieldset__legend--m",
+                    isPageHeading = true
+                ))
+            )),
+            name = "scope-environments",
+            items = Seq(
+                CheckboxItem(
+                    content = Text(messages("addScope.environments.dev")),
+                    value = "dev"
+                ),
+                CheckboxItem(
+                    content = Text(messages("addScope.environments.test")),
+                    value = "test"
+                ),
+                CheckboxItem(
+                    content = Text(messages("addScope.environments.preProd")),
+                    value = "preProd"
+                ),
+                CheckboxItem(
+                    content = Text(messages("addScope.environments.prod")),
+                    value = "prod"
+                )
             )
-        )
-    ))
+        ))
 
-    @govukButton(
-        ButtonViewModel(messages("site.continue"))
-    )
+        @govukButton(
+            ButtonViewModel(messages("site.continue"))
+        )
+    }
 
 }
