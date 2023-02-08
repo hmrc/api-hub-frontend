@@ -22,4 +22,4 @@ sealed trait UserType
 
 case object LdapUser extends WithName("LDAP") with UserType
 
-case class UserModel(userId: String, userType: UserType, email: Option[String] = Option.empty)
+case class UserModel(userId: String, userName: String, userType: UserType, email: Option[String] = Option.empty)

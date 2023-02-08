@@ -18,4 +18,4 @@ package controllers.actions
 
 import models.user.{LdapUser, UserModel}
 
-object FakeUser extends UserModel("id", LdapUser)
+object FakeUser extends UserModel("id", "test-name", LdapUser, Some("test-email"))
