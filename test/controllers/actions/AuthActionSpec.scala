@@ -18,17 +18,23 @@ package controllers.actions
 
 import base.SpecBase
 import config.FrontendAppConfig
+import models.requests.IdentifierRequest
+import models.user.{LdapUser, Permissions, UserModel}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.MockitoSugar.when
-import org.scalatestplus.mockito.MockitoSugar.mock
-import play.api.mvc.{Action, AnyContent, BodyParsers, Results}
+import org.mockito.{ArgumentMatchers, MockitoSugar}
+import play.api.inject.bind
+import play.api.mvc.Results.Ok
+import play.api.mvc._
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.internalauth.client.FrontendAuthComponents
+import uk.gov.hmrc.http.SessionKeys
+import uk.gov.hmrc.internalauth.client.test.{FrontendAuthComponentsStub, StubBehaviour}
+import uk.gov.hmrc.internalauth.client._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-class AuthActionSpec extends SpecBase {
+
+class AuthActionSpec extends SpecBase with MockitoSugar {
 
   class Harness(authAction: IdentifierAction) {
     def onPageLoad(): Action[AnyContent] = authAction { _ => Results.Ok }
@@ -56,5 +62,66 @@ class AuthActionSpec extends SpecBase {
         }
       }
     }
+
+    "when the user has logged in" - {
+      "must setup the user when they can approve" in {
+
+        implicit val cc: ControllerComponents = stubMessagesControllerComponents()
+
+        val mockStubBehaviour = mock[StubBehaviour]
+        val stubAuth = FrontendAuthComponentsStub(mockStubBehaviour)
+
+        val application = applicationBuilder(userAnswers = None)
+          .bindings(
+            bind[FrontendAuthComponents].toInstance(stubAuth)
+          )
+          .build()
+
+        running(application) {
+
+          val authAction = application.injector.instanceOf[AuthenticatedIdentifierAction]
+
+          val canApprovePredicate = Predicate.Permission(
+            Resource(
+              ResourceType("api-hub-frontend"),
+              ResourceLocation("approvals")
+            ),
+            IAAction("WRITE")
+          )
+
+          val expectedRetrieval = Retrieval.username ~ Retrieval.email ~ Retrieval.hasPredicate(canApprovePredicate)
+
+          val testUser = UserModel(
+            userId = "LDAP-jo.bloggs",
+            userName = "jo.bloggs",
+            userType = LdapUser,
+            email = Some("jo.bloggs@email.com"),
+            permissions = Permissions(canApprove = true)
+          )
+          when(mockStubBehaviour.stubAuth(ArgumentMatchers.eq(None), ArgumentMatchers.eq(expectedRetrieval)))
+            .thenReturn(Future.successful(
+              uk.gov.hmrc.internalauth.client.~(
+                uk.gov.hmrc.internalauth.client.~(
+                  Retrieval.Username(testUser.userName),
+                  testUser.email.map(Retrieval.Email)
+                ),
+                true
+              )
+            ))
+
+          val result = authAction.invokeBlock(
+            FakeRequest().withSession(SessionKeys.authToken -> "Open sesame"),
+            (identifierRequest: IdentifierRequest[AnyContent]) => {
+              identifierRequest.user mustBe testUser
+              Future.successful(Ok)
+            }
+          )
+
+          status(result) mustBe OK
+        }
+
+      }
+    }
   }
+
 }

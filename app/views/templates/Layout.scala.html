@@ -97,9 +97,11 @@
             <a class="govuk-link govuk-link--no-visited-state" href="@routes.IndexController.onPageLoad.url">
                 @messages("site.applications")
             </a>
-            <a class="govuk-link govuk-link--no-visited-state govuk-!-margin-left-6" href="@routes.IndexController.onPageLoad.url">
-                @messages("site.approvals")
-            </a>
+            @if(user.map(_.permissions.canApprove).getOrElse(false)) {
+                <a class="govuk-link govuk-link--no-visited-state govuk-!-margin-left-6" href="@routes.IndexController.onPageLoad.url">
+                    @messages("site.approvals")
+                </a>
+            }
         </div>
         <hr class="govuk-section-break govuk-section-break--visible">
     </div>

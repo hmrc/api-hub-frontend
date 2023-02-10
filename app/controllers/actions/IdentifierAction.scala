@@ -18,12 +18,13 @@ package controllers.actions
 
 import com.google.inject.Inject
 import config.FrontendAppConfig
+import controllers.actions.AuthenticatedIdentifierAction.canApprovePredicate
 import models.requests.IdentifierRequest
-import models.user.{LdapUser, UserModel}
+import models.user.{LdapUser, Permissions, UserModel}
 import play.api.mvc.Results._
 import play.api.mvc._
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.internalauth.client.{FrontendAuthComponents, Retrieval, ~}
+import uk.gov.hmrc.internalauth.client.{FrontendAuthComponents, IAAction, Predicate, Resource, Retrieval, ~}
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -38,12 +39,33 @@ class AuthenticatedIdentifierAction @Inject()(val parser: BodyParsers.Default,
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    auth.verify(Retrieval.username ~ Retrieval.email) flatMap {
-      case Some(~(username,maybeEmail)) =>
-        block(IdentifierRequest(request, UserModel(s"LDAP-${username.value}", username.value, LdapUser, maybeEmail.map(email => email.value))))
+    auth.verify(Retrieval.username ~ Retrieval.email ~ Retrieval.hasPredicate(canApprovePredicate)) flatMap {
+      case Some(username ~ maybeEmail ~ canApprove) =>
+        block(
+          IdentifierRequest(
+            request,
+            UserModel(
+              s"LDAP-${username.value}",
+              username.value,
+              LdapUser,
+              maybeEmail.map(email => email.value),
+              Permissions(canApprove = canApprove)
+            )
+          )
+        )
       case None => Future.successful(
         Redirect(config.loginUrl, Map("continue_url" -> Seq(config.loginContinueUrl)))
       )
     }
   }
+
+}
+
+object AuthenticatedIdentifierAction {
+
+  private val canApprovePredicate: Predicate = Predicate.Permission(
+    resource = Resource.from(resourceType = "api-hub-frontend", resourceLocation = "approvals"),
+    action = IAAction("WRITE")
+  )
+
 }

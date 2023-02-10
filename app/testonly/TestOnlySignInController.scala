@@ -18,6 +18,7 @@ package testonly
 
 import com.google.inject.{Inject, Singleton}
 import config.FrontendAppConfig
+import play.api.Logging
 import play.api.data.Form
 import play.api.data.Forms.{email, list, mapping, optional, text}
 import play.api.libs.functional.syntax.unlift
@@ -37,7 +38,7 @@ class TestOnlySignInController @Inject()(
   override val controllerComponents: MessagesControllerComponents,
   testOnlySignInView: TestOnlySignIn,
   config: FrontendAppConfig
-) extends FrontendBaseController {
+) extends FrontendBaseController with Logging {
 
   def showSignIn: Action[AnyContent] = Action {
     implicit request =>
@@ -51,9 +52,10 @@ class TestOnlySignInController @Inject()(
         data => {
           val retrievals = Json.stringify(
             Json.toJson(
-              Retrievals(data.principal, data.email)
+              retrievalsFor(data)
             )
           )
+          logger.debug(s"Retrievals JSON from login data: $retrievals")
           Redirect(data.redirectUrl).withSession(
             SessionKeys.authToken -> s"$AUTHORISED_TOKEN$retrievals"
           )
@@ -66,7 +68,9 @@ class TestOnlySignInController @Inject()(
       case Some(authorisation) if authorisation.startsWith(AUTHORISED_TOKEN) =>
         val json = authorisation.drop(AUTHORISED_TOKEN.length)
         Json.parse(json).validate[Retrievals] match {
-          case JsSuccess(_, _) => Ok(json)
+          case JsSuccess(retrievals, _) =>
+            logger.debug(s"Parsed retrievals from request body: $retrievals")
+            Ok(json)
           case _ => Unauthorized
         }
       case _ => Unauthorized
@@ -134,5 +138,19 @@ object TestOnlySignInController {
       data.email,
       data.permissions.toSet
     )
+
+  private val approverPermission: Permission = Permission(
+    resourceType = "api-hub-frontend",
+    resourceLocation = "approvals",
+    actions = List("WRITE")
+  )
+
+  def retrievalsFor(data: TestOnlySignInData): Retrievals = {
+    Retrievals(
+      principal = data.principal,
+      email = data.email,
+      canApprove = data.permissions.contains(approverPermission)
+    )
+  }
 
 }

@@ -22,4 +22,18 @@ sealed trait UserType
 
 case object LdapUser extends WithName("LDAP") with UserType
 
-case class UserModel(userId: String, userName: String, userType: UserType, email: Option[String] = Option.empty)
+case class Permissions(canApprove: Boolean)
+
+object Permissions {
+
+  def apply(): Permissions = Permissions(canApprove = false)
+
+}
+
+case class UserModel(
+  userId: String,
+  userName: String,
+  userType: UserType,
+  email: Option[String] = Option.empty,
+  permissions: Permissions = Permissions()
+)

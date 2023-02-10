@@ -18,7 +18,6 @@ package controllers.actions
 
 import javax.inject.Inject
 import models.requests.IdentifierRequest
-import models.user.{LdapUser, UserModel}
 import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
