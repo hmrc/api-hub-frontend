@@ -40,7 +40,7 @@ class AddScopeController @Inject()(
                                   )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form = formProvider()
-  def scopeForm(): Form[ScopeData] = Form(
+  def scopeForm: Form[ScopeData] = Form(
       mapping(
         "scope-name" -> text,
         "dev" -> optional(text),
@@ -61,7 +61,7 @@ class AddScopeController @Inject()(
 
   def onSubmit(id: String): Action[AnyContent] = identify.async {
     implicit request =>
-      val scopeData = scopeForm().bindFromRequest.value.getOrElse(ScopeData(null, None, None, None, None))
+      val scopeData = scopeForm.bindFromRequest.value.getOrElse(ScopeData(null, None, None, None, None))
       val envs = Seq(scopeData.dev, scopeData.test, scopeData.preProd, scopeData.prod).flatten[String].flatMap(s => EnvironmentName.enumerable.withName(s))
 
       form.bindFromRequest().fold(

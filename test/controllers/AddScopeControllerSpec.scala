@@ -86,7 +86,7 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustBe OK
 
-        contentAsString(result) mustEqual view(testId, controller.scopeForm())(request, messages(application)).toString
+        contentAsString(result) mustEqual view(testId, controller.scopeForm)(request, messages(application)).toString
       }
     }
   }
