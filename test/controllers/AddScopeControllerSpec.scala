@@ -18,13 +18,13 @@ package controllers
 
 import base.SpecBase
 import controllers.AddScopeControllerSpec.buildFixture
-import forms.ScopeNameFormProvider
+import forms.NewScopeFormProvider
 import models.application._
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{contentAsString, _}
+import play.api.test.Helpers._
 import play.api.{Application => PlayApplication}
 import services.ApiHubService
 import views.html.AddScopeView
@@ -33,7 +33,7 @@ import scala.concurrent.Future
 
 class AddScopeControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider = new ScopeNameFormProvider()
+  val formProvider = new NewScopeFormProvider()
   val form = formProvider()
 
   "AddScopeController" - {

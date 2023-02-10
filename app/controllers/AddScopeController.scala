@@ -17,7 +17,7 @@
 package controllers
 
 import controllers.actions._
-import forms.ScopeNameFormProvider
+import forms.NewScopeFormProvider
 import models.application.{EnvironmentName, NewScope}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -34,7 +34,7 @@ class AddScopeController @Inject()(
                                     val controllerComponents: MessagesControllerComponents,
                                     view: AddScopeView,
                                     apiHubService: ApiHubService,
-                                    formProvider: ScopeNameFormProvider
+                                    formProvider: NewScopeFormProvider
                                   )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form = formProvider()

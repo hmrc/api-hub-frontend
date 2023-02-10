@@ -23,7 +23,7 @@ import play.api.data.Forms.{mapping, optional, text => play_text}
 
 import javax.inject.Inject
 
-class ScopeNameFormProvider @Inject() extends Mappings {
+class NewScopeFormProvider @Inject() extends Mappings {
 
   def apply(): Form[ScopeData] = Form(
     mapping(
