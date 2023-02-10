@@ -57,12 +57,42 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must show same page with errors when there is no scope name" in {
+    "must show same page with errors when there is no scope name or environments" in {
       val testId = "test-app-id"
       val fixture = buildFixture()
 
       running(fixture.application) {
         val request = FakeRequest(POST, routes.AddScopeController.onSubmit(testId).url)
+        val result = route(fixture.application, request).value
+
+        status(result) mustBe BAD_REQUEST
+        contentAsString(result) must include("Error: Add a Scope - The API Hub - GOV.UK")
+
+        verifyZeroInteractions(fixture.apiHubService)
+      }
+    }
+
+    "must show same page with errors when there is no scope name and at least one environment" in {
+      val testId = "test-app-id"
+      val fixture = buildFixture()
+
+      running(fixture.application) {
+        val request = FakeRequest(POST, routes.AddScopeController.onSubmit(testId).url).withFormUrlEncodedBody(("dev","dev"))
+        val result = route(fixture.application, request).value
+
+        status(result) mustBe BAD_REQUEST
+        contentAsString(result) must include("Error: Add a Scope - The API Hub - GOV.UK")
+
+        verifyZeroInteractions(fixture.apiHubService)
+      }
+    }
+
+    "must show same page with errors when there is a scope name but no environment" in {
+      val testId = "test-app-id"
+      val fixture = buildFixture()
+
+      running(fixture.application) {
+        val request = FakeRequest(POST, routes.AddScopeController.onSubmit(testId).url).withFormUrlEncodedBody(("scope-name", "a scope"))
         val result = route(fixture.application, request).value
 
         status(result) mustBe BAD_REQUEST
