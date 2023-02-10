@@ -24,7 +24,6 @@ import play.api.data.Forms.{mapping, optional, text}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
-import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.AddScopeView
 
@@ -37,12 +36,20 @@ class AddScopeController @Inject()(
                                     val controllerComponents: MessagesControllerComponents,
                                     view: AddScopeView,
                                     apiHubService: ApiHubService,
-                                    getData: DataRetrievalAction,
-                                    formProvider: ScopeNameFormProvider,
-                                    formWithCSRF: FormWithCSRF
+                                    formProvider: ScopeNameFormProvider
                                   )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form = formProvider()
+  def scopeForm(): Form[ScopeData] = Form(
+      mapping(
+        "scope-name" -> text,
+        "dev" -> optional(text),
+        "test" -> optional(text),
+        "preProd" -> optional(text),
+        "prod" -> optional(text)
+      )(ScopeData.apply)(ScopeData.unapply)
+    )
+
 
   def onPageLoad(id: String): Action[AnyContent] = identify.async {
     implicit request =>
@@ -52,21 +59,9 @@ class AddScopeController @Inject()(
       }
   }
 
-  case class ScopeData(scopeName: String, dev: Option[String], test: Option[String], preProd: Option[String], prod: Option[String])
-
-  val scopeForm = Form(
-    mapping(
-      "scope-name" -> text,
-      "dev" -> optional(text),
-      "test" -> optional(text),
-      "preProd" -> optional(text),
-      "prod" -> optional(text)
-    )(ScopeData.apply)(ScopeData.unapply)
-  )
-
   def onSubmit(id: String): Action[AnyContent] = identify.async {
     implicit request =>
-      val scopeData = scopeForm.bindFromRequest.get
+      val scopeData = scopeForm().bindFromRequest.value.getOrElse(ScopeData(null, None, None, None, None))
       val envs = Seq(scopeData.dev, scopeData.test, scopeData.preProd, scopeData.prod).flatten[String].flatMap(s => EnvironmentName.enumerable.withName(s))
 
       form.bindFromRequest().fold(
@@ -74,9 +69,10 @@ class AddScopeController @Inject()(
           Future.successful(BadRequest(view(id, formWithErrors))),
 
         value => {
-          val value1 = NewScope(value, envs)
-          apiHubService.requestAdditionalScope(id, value1).map(
+          apiHubService.requestAdditionalScope(id, NewScope(value, envs)).map(
             application => Redirect(routes.RequestScopeSuccessController.onPageLoad(id)))
         })
   }
 }
+
+case class ScopeData(scopeName: String, dev: Option[String], test: Option[String], preProd: Option[String], prod: Option[String])
