@@ -34,4 +34,4 @@ GET         /application-details/:id                 controllers.ApplicationDeta
 
 GET         /request-scope-success/:id               controllers.RequestScopeSuccessController.onPageLoad(id: String)
 
-GET        /pendingApprovals                       controllers.PendingApprovalsController.onPageLoad()
+GET         /pending-approvals                       controllers.PendingApprovalsController.onPageLoad()

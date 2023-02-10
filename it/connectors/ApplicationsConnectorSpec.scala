@@ -64,7 +64,8 @@ class ApplicationsConnectorSpec
       }
     }
   }
-"ApplicationsConnector.getApplication" - {
+
+  "ApplicationsConnector.getApplication" - {
     "must place the correct request and return the application" in {
       val application1 = Application("id-1", "test-name-1", Creator("test-creator-email-1"))
       val expected = application1
@@ -83,9 +84,7 @@ class ApplicationsConnectorSpec
           actual mustBe Some(expected)
       }
     }
-  }
 
-  "ApplicationsConnector.getApplication" - {
     "must return the none when application is not found" in {
 
       stubFor(
@@ -103,6 +102,27 @@ class ApplicationsConnectorSpec
     }
   }
 
+  "ApplicationsConnector.pendingScopes" - {
+    "must place the correct request and return the array of applications" in {
+      val application1 = Application("id-1", "test-name-1", Creator("test-creator-email-1"))
+      val application2 = Application("id-2", "test-name-2", Creator("test-creator-email-2"))
+      val expected = Seq(application1, application2)
+
+      stubFor(
+        get(urlEqualTo("/api-hub-applications/applications/pending-scopes"))
+          .withHeader("Accept", equalTo("application/json"))
+          .willReturn(
+            aResponse()
+              .withBody(toJsonString(expected))
+          )
+      )
+
+      buildConnector(this).pendingScopes()(HeaderCarrier()) map {
+        actual =>
+          actual mustBe expected
+      }
+    }
+  }
 
 }
 

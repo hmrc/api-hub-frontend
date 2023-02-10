@@ -108,5 +108,5 @@ fake-sign-in.token.lbl = Token (optional)
 fake-sign-in.permissions.lbl = Permissions
 fake-sign-in.button = Sign in
 
-pendingApprovals.title = pendingApprovals
-pendingApprovals.heading = pendingApprovals
+pendingApprovals.title = Pending production approvals
+pendingApprovals.heading = Pending production approvals

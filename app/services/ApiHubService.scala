@@ -41,4 +41,8 @@ class ApiHubService @Inject()(applicationsConnector: ApplicationsConnector)
     applicationsConnector.getApplication(id)
   }
 
+  def pendingScopes()(implicit hc: HeaderCarrier): Future[Seq[Application]] = {
+    applicationsConnector.pendingScopes()
+  }
+
 }
