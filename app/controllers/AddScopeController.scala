@@ -41,12 +41,7 @@ class AddScopeController @Inject()(
 
   def onPageLoad(id: String): Action[AnyContent] = identify.async {
     implicit request =>
-
-      Console.println(s"REQ:${request}")
-      val eventualMaybeApplication = apiHubService.getApplication(id)
-
-      Console.println(s"MAYBE APP:${eventualMaybeApplication}")
-      eventualMaybeApplication map {
+      apiHubService.getApplication(id) map {
         case Some(application) => Ok(view(application.id, form))
         case _ => NotFound
       }
