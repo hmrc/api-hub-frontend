@@ -22,7 +22,7 @@ sealed trait EnvironmentName
 
 case object Dev extends WithName("dev") with EnvironmentName
 case object Test extends WithName("test") with EnvironmentName
-case object PreProd extends WithName("pre-prod") with EnvironmentName
+case object PreProd extends WithName("preProd") with EnvironmentName
 case object Prod extends WithName("prod") with EnvironmentName
 
 object EnvironmentName extends Enumerable.Implicits {

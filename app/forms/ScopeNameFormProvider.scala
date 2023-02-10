@@ -25,7 +25,6 @@ class ScopeNameFormProvider @Inject() extends Mappings {
 
   def apply(): Form[String] =
     Form(
-      "scope-name" -> text("addScope.error.required")
-        .verifying(maxLength(100, "addScope.error.length"))
+      "scope-name" -> text("addScope.error.required").verifying(maxLength(100, "addScope.error.length"))
     )
 }

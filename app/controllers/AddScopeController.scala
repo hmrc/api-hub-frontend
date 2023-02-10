@@ -18,13 +18,15 @@ package controllers
 
 import controllers.actions._
 import forms.ScopeNameFormProvider
-import models.Mode
-import navigation.Navigator
+import models.application.{EnvironmentName, NewScope}
+import play.api.data.Form
+import play.api.data.Forms.{mapping, optional, text}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
+import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.{AddScopeView, ApplicationDetailsView}
+import views.html.AddScopeView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -37,6 +39,7 @@ class AddScopeController @Inject()(
                                     apiHubService: ApiHubService,
                                     getData: DataRetrievalAction,
                                     formProvider: ScopeNameFormProvider,
+                                    formWithCSRF: FormWithCSRF
                                   )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form = formProvider()
@@ -49,20 +52,31 @@ class AddScopeController @Inject()(
       }
   }
 
-  def onSubmit(id: String): Action[AnyContent] = (identify andThen getData).async {
+  case class ScopeData(scopeName: String, dev: Option[String], test: Option[String], preProd: Option[String], prod: Option[String])
+
+  val scopeForm = Form(
+    mapping(
+      "scope-name" -> text,
+      "dev" -> optional(text),
+      "test" -> optional(text),
+      "preProd" -> optional(text),
+      "prod" -> optional(text)
+    )(ScopeData.apply)(ScopeData.unapply)
+  )
+
+  def onSubmit(id: String): Action[AnyContent] = identify.async {
     implicit request =>
+      val scopeData = scopeForm.bindFromRequest.get
+      val envs = Seq(scopeData.dev, scopeData.test, scopeData.preProd, scopeData.prod).flatten[String].flatMap(s => EnvironmentName.enumerable.withName(s))
 
       form.bindFromRequest().fold(
         formWithErrors =>
           Future.successful(BadRequest(view(id, formWithErrors))),
 
         value => {
-          // Call add scope api, and then
-          Future.successful(Redirect(routes.RequestScopeSuccessController.onPageLoad(id)))
-
-        }
-      )
-
+          val value1 = NewScope(value, envs)
+          apiHubService.requestAdditionalScope(id, value1).map(
+            application => Redirect(routes.RequestScopeSuccessController.onPageLoad(id)))
+        })
   }
-
 }

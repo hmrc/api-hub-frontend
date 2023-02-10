@@ -14,8 +14,6 @@
  * limitations under the License.
  *@
 
-@import models.application.Application
-@import views.ViewUtils
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 
 @this(govukCheckboxes: GovukCheckboxes,
@@ -61,19 +59,23 @@
             items = Seq(
                 CheckboxItem(
                     content = Text(messages("addScope.environments.dev")),
-                    value = "dev"
+                    value = "dev",
+                    name = Some("dev")
                 ),
                 CheckboxItem(
                     content = Text(messages("addScope.environments.test")),
-                    value = "test"
+                    value = "test",
+                    name = Some("test")
                 ),
                 CheckboxItem(
                     content = Text(messages("addScope.environments.preProd")),
-                    value = "preProd"
+                    value = "preProd",
+                    name = Some("preProd")
                 ),
                 CheckboxItem(
                     content = Text(messages("addScope.environments.prod")),
-                    value = "prod"
+                    value = "prod",
+                    name = Some("prod")
                 )
             )
         ))
@@ -82,5 +84,4 @@
             ButtonViewModel(messages("site.continue"))
         )
     }
-
 }

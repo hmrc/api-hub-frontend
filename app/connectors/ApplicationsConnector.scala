@@ -17,13 +17,13 @@
 package connectors
 
 import com.google.inject.{Inject, Singleton}
-import models.application.{Application, NewApplication}
+import models.application.{Application, NewApplication, NewScope}
 import play.api.http.HeaderNames.ACCEPT
 import play.api.http.MimeTypes.JSON
 import play.api.libs.json.Json
-import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -58,6 +58,17 @@ class ApplicationsConnector @Inject()(
       .flatMap {
         case Right(application) => Future.successful(Some(application))
         case Left(e) if e.statusCode==404 => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
+  }
+
+  def requestAdditionalScope(id: String, newScope: NewScope)(implicit hc: HeaderCarrier): Future[Unit] = {
+    httpClient
+      .post(url"$applicationsBaseUrl/api-hub-applications/applications/$id/environments/scopes")
+      .withBody(Json.toJson(Seq(newScope)))
+      .execute[Either[UpstreamErrorResponse, Unit]]
+      .flatMap {
+        case Right(response) => Future.successful(response)
         case Left(e) => Future.failed(e)
       }
   }
