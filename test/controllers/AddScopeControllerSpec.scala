@@ -17,8 +17,7 @@
 package controllers
 
 import base.SpecBase
-import controllers.RegisterApplicationControllerSpec.buildFixture
-import models.UserAnswers
+import controllers.AddScopeControllerSpec.buildFixture
 import models.application._
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
@@ -37,7 +36,7 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar {
     "must register the scope and redirect to the Index page when valid" in {
       val testId = "test-app-id"
       val newScope = NewScope("my_scope", Seq(Dev,Test,PreProd,Prod))
-      val fixture = buildFixture(emptyUserAnswers)
+      val fixture = buildFixture()
 
       when(fixture.apiHubService.requestAdditionalScope(ArgumentMatchers.eq(testId), ArgumentMatchers.eq(newScope))(any()))
         .thenReturn(Future.successful(Unit))
@@ -56,7 +55,7 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar {
 
     "must show same page with errors when there is no scope name" in {
       val testId = "test-app-id"
-      val fixture = buildFixture(emptyUserAnswers)
+      val fixture = buildFixture()
 
       running(fixture.application) {
         val request = FakeRequest(POST, routes.AddScopeController.onSubmit(testId).url)
@@ -75,7 +74,7 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
       val view = application.injector.instanceOf[AddScopeView]
       val controller = application.injector.instanceOf[AddScopeController]
-      val fixture = buildFixture(emptyUserAnswers)
+      val fixture = buildFixture()
 
       when(fixture.apiHubService.requestAdditionalScope(ArgumentMatchers.eq(testId), ArgumentMatchers.eq(newScope))(any()))
         .thenReturn(Future.successful(Unit))
@@ -90,7 +89,6 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar {
       }
     }
   }
-
 }
 
 object AddScopeControllerSpec extends SpecBase with MockitoSugar {
@@ -100,7 +98,7 @@ object AddScopeControllerSpec extends SpecBase with MockitoSugar {
     apiHubService: ApiHubService
   )
 
-  def buildFixture(userAnswers: UserAnswers): Fixture = {
+  def buildFixture(): Fixture = {
     val apiHubService = mock[ApiHubService]
 
     val application = applicationBuilder(userAnswers = None)
