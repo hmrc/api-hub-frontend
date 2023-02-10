@@ -18,6 +18,7 @@ package controllers
 
 import base.SpecBase
 import controllers.AddScopeControllerSpec.buildFixture
+import forms.ScopeNameFormProvider
 import models.application._
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
@@ -31,6 +32,9 @@ import views.html.AddScopeView
 import scala.concurrent.Future
 
 class AddScopeControllerSpec extends SpecBase with MockitoSugar {
+
+  val formProvider = new ScopeNameFormProvider()
+  val form = formProvider()
 
   "AddScopeController" - {
     "must register the scope and redirect to the Index page when valid" in {
@@ -70,22 +74,21 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
       val testId = "test-app-id"
-      val newScope = NewScope("my_scope", Seq(Dev, Test, PreProd, Prod))
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      val view = application.injector.instanceOf[AddScopeView]
-      val controller = application.injector.instanceOf[AddScopeController]
       val fixture = buildFixture()
+      val view = fixture.application.injector.instanceOf[AddScopeView]
 
-      when(fixture.apiHubService.requestAdditionalScope(ArgumentMatchers.eq(testId), ArgumentMatchers.eq(newScope))(any()))
-        .thenReturn(Future.successful(Unit))
+      val application = models.application.Application(testId, "app-name", Creator("test-creator-email"))
+
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId))(any()))
+        .thenReturn(Future.successful(Some(application)))
 
       running(fixture.application) {
-        val request = FakeRequest(POST, routes.AddScopeController.onPageLoad(testId).url)
+        val request = FakeRequest(GET, routes.AddScopeController.onPageLoad(testId).url)
         val result = route(fixture.application, request).value
 
         status(result) mustBe OK
 
-        contentAsString(result) mustEqual view(testId, controller.scopeForm)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(testId, form)(request, messages(fixture.application)).toString
       }
     }
   }

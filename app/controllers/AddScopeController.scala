@@ -19,8 +19,6 @@ package controllers
 import controllers.actions._
 import forms.ScopeNameFormProvider
 import models.application.{EnvironmentName, NewScope}
-import play.api.data.Form
-import play.api.data.Forms.{mapping, optional, text}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
@@ -40,20 +38,15 @@ class AddScopeController @Inject()(
                                   )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form = formProvider()
-  def scopeForm: Form[ScopeData] = Form(
-      mapping(
-        "scope-name" -> text,
-        "dev" -> optional(text),
-        "test" -> optional(text),
-        "preProd" -> optional(text),
-        "prod" -> optional(text)
-      )(ScopeData.apply)(ScopeData.unapply)
-    )
-
 
   def onPageLoad(id: String): Action[AnyContent] = identify.async {
     implicit request =>
-      apiHubService.getApplication(id) map {
+
+      Console.println(s"REQ:${request}")
+      val eventualMaybeApplication = apiHubService.getApplication(id)
+
+      Console.println(s"MAYBE APP:${eventualMaybeApplication}")
+      eventualMaybeApplication map {
         case Some(application) => Ok(view(application.id, form))
         case _ => NotFound
       }
@@ -61,18 +54,16 @@ class AddScopeController @Inject()(
 
   def onSubmit(id: String): Action[AnyContent] = identify.async {
     implicit request =>
-      val scopeData = scopeForm.bindFromRequest.value.getOrElse(ScopeData(null, None, None, None, None))
-      val envs = Seq(scopeData.dev, scopeData.test, scopeData.preProd, scopeData.prod).flatten[String].flatMap(s => EnvironmentName.enumerable.withName(s))
-
       form.bindFromRequest().fold(
         formWithErrors =>
           Future.successful(BadRequest(view(id, formWithErrors))),
 
-        value => {
-          apiHubService.requestAdditionalScope(id, NewScope(value, envs)).map(
+        scopeData => {
+          val envs = Seq(scopeData.dev, scopeData.test, scopeData.preProd, scopeData.prod).flatten[String].flatMap(s => EnvironmentName.enumerable.withName(s))
+          apiHubService.requestAdditionalScope(id, NewScope(scopeData.scopeName, envs)).map(
             application => Redirect(routes.RequestScopeSuccessController.onPageLoad(id)))
         })
   }
 }
 
-case class ScopeData(scopeName: String, dev: Option[String], test: Option[String], preProd: Option[String], prod: Option[String])
+case class ScopeData(scopeName: String, dev: Option[String] = None, test: Option[String] = None, preProd: Option[String] = None, prod: Option[String] = None)

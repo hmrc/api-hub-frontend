@@ -16,15 +16,25 @@
 
 package forms
 
+import controllers.ScopeData
 import forms.mappings.Mappings
 import play.api.data.Form
+import play.api.data.Forms.{mapping, optional, text => play_text}
 
 import javax.inject.Inject
 
 class ScopeNameFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[String] =
-    Form(
-      "scope-name" -> text("addScope.error.required").verifying(maxLength(100, "addScope.error.length"))
-    )
+  def apply(): Form[ScopeData] = Form(
+    mapping(
+      "scope-name" -> text("addScope.error.required").verifying(maxLength(100, "addScope.error.length")),
+      "dev" -> optional(play_text),
+      "test" -> optional(play_text),
+      "preProd" -> optional(play_text),
+      "prod" -> optional(play_text)
+    )(ScopeData.apply)(ScopeData.unapply).verifying(
+      "addScope.error.required",
+      scopeData => Seq(scopeData.dev, scopeData.test, scopeData.preProd, scopeData.prod)
+        .flatten[String]
+        .nonEmpty))
 }
