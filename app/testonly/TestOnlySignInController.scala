@@ -18,7 +18,7 @@ package testonly
 
 import com.google.inject.{Inject, Singleton}
 import config.FrontendAppConfig
-import play.api.Logging
+import controllers.actions.AuthenticatedIdentifierAction
 import play.api.data.Form
 import play.api.data.Forms.{email, list, mapping, optional, text}
 import play.api.libs.functional.syntax.unlift
@@ -38,7 +38,7 @@ class TestOnlySignInController @Inject()(
   override val controllerComponents: MessagesControllerComponents,
   testOnlySignInView: TestOnlySignIn,
   config: FrontendAppConfig
-) extends FrontendBaseController with Logging {
+) extends FrontendBaseController {
 
   def showSignIn: Action[AnyContent] = Action {
     implicit request =>
@@ -50,12 +50,8 @@ class TestOnlySignInController @Inject()(
       signInForm.bindFromRequest().fold(
         formWithErrors => BadRequest(testOnlySignInView(formWithErrors)),
         data => {
-          val retrievals = Json.stringify(
-            Json.toJson(
-              retrievalsFor(data)
-            )
-          )
-          logger.debug(s"Retrievals JSON from login data: $retrievals")
+          val retrievals = Json.stringify(Json.toJson(retrievalsFor(data)))
+
           Redirect(data.redirectUrl).withSession(
             SessionKeys.authToken -> s"$AUTHORISED_TOKEN$retrievals"
           )
@@ -68,9 +64,7 @@ class TestOnlySignInController @Inject()(
       case Some(authorisation) if authorisation.startsWith(AUTHORISED_TOKEN) =>
         val json = authorisation.drop(AUTHORISED_TOKEN.length)
         Json.parse(json).validate[Retrievals] match {
-          case JsSuccess(retrievals, _) =>
-            logger.debug(s"Parsed retrievals from request body: $retrievals")
-            Ok(json)
+          case JsSuccess(_, _) => Ok(json)
           case _ => Unauthorized
         }
       case _ => Unauthorized
@@ -140,9 +134,9 @@ object TestOnlySignInController {
     )
 
   private val approverPermission: Permission = Permission(
-    resourceType = "api-hub-frontend",
-    resourceLocation = "approvals",
-    actions = List("WRITE")
+    resourceType = AuthenticatedIdentifierAction.approverResourceType,
+    resourceLocation = AuthenticatedIdentifierAction.approverResourceLocation,
+    actions = List(AuthenticatedIdentifierAction.approverAction)
   )
 
   def retrievalsFor(data: TestOnlySignInData): Retrievals = {

@@ -29,24 +29,16 @@ object Retrievals {
       (JsPath \ "retrievals")(2).read[Boolean]
   )(Retrievals.apply _)
 
-//  private val writes: Writes[Retrievals] = (
-//    (JsPath \ "retrievals")(0).write[String] and
-//      (JsPath \ "retrievals")(1).writeNullable[String]and
-//      (JsPath \ "retrievals")(2).write[Boolean]
-//  )(unlift(Retrievals.unapply))
-
-  private val writes: Writes[Retrievals] = new Writes[Retrievals] {
-    override def writes(retrievals: Retrievals): JsValue = {
-      Json.obj(
-        "retrievals" -> JsArray(
-          Seq(
-            JsString(retrievals.principal),
-            retrievals.email.map(JsString).getOrElse(JsNull),
-            JsBoolean(retrievals.canApprove)
-          )
+  private val writes: Writes[Retrievals] = (retrievals: Retrievals) => {
+    Json.obj(
+      "retrievals" -> JsArray(
+        Seq(
+          JsString(retrievals.principal),
+          retrievals.email.map(JsString).getOrElse(JsNull),
+          JsBoolean(retrievals.canApprove)
         )
       )
-    }
+    )
   }
 
   implicit val formatRetrievals: Format[Retrievals] = Format(reads, writes)

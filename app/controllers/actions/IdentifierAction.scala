@@ -63,9 +63,13 @@ class AuthenticatedIdentifierAction @Inject()(val parser: BodyParsers.Default,
 
 object AuthenticatedIdentifierAction {
 
+  val approverResourceType: String = "api-hub-frontend"
+  val approverResourceLocation: String = "approvals"
+  val approverAction: String = "WRITE"
+
   private val canApprovePredicate: Predicate = Predicate.Permission(
-    resource = Resource.from(resourceType = "api-hub-frontend", resourceLocation = "approvals"),
-    action = IAAction("WRITE")
+    resource = Resource.from(resourceType = approverResourceType, resourceLocation = approverResourceLocation),
+    action = IAAction(approverAction)
   )
 
 }

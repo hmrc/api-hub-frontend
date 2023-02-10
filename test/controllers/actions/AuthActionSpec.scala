@@ -64,7 +64,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar {
     }
 
     "when the user has logged in" - {
-      "must setup the user when they can approve" in {
+      "must retrieve user details correctly" in {
 
         implicit val cc: ControllerComponents = stubMessagesControllerComponents()
 
@@ -98,6 +98,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar {
             email = Some("jo.bloggs@email.com"),
             permissions = Permissions(canApprove = true)
           )
+
           when(mockStubBehaviour.stubAuth(ArgumentMatchers.eq(None), ArgumentMatchers.eq(expectedRetrieval)))
             .thenReturn(Future.successful(
               uk.gov.hmrc.internalauth.client.~(
