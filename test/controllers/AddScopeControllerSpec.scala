@@ -37,7 +37,7 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar {
   val form = formProvider()
 
   "AddScopeController" - {
-    "must register the scope and redirect to the Index page when valid" in {
+    "must register the scope and redirect to the application details page when valid" in {
       val testId = "test-app-id"
       val newScope = NewScope("my_scope", Seq(Dev,Test,PreProd,Prod))
       val fixture = buildFixture()
