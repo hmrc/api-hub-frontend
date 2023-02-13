@@ -62,13 +62,14 @@ class ApplicationsConnector @Inject()(
       }
   }
 
-  def requestAdditionalScope(id: String, newScope: NewScope)(implicit hc: HeaderCarrier): Future[Unit] = {
+  def requestAdditionalScope(id: String, newScope: NewScope)(implicit hc: HeaderCarrier): Future[Option[NewScope]] = {
     httpClient
       .post(url"$applicationsBaseUrl/api-hub-applications/applications/$id/environments/scopes")
       .withBody(Json.toJson(Seq(newScope)))
       .execute[Either[UpstreamErrorResponse, Unit]]
       .flatMap {
-        case Right(response) => Future.successful(response)
+        case Right(_) => Future.successful(Some(newScope))
+        case Left(e) if e.statusCode==404 => Future.successful(None)
         case Left(e) => Future.failed(e)
       }
   }

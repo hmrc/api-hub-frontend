@@ -2,11 +2,11 @@ package connectors
 
 import com.github.tomakehurst.wiremock.client.WireMock._
 import connectors.ApplicationsConnectorSpec.{buildConnector, toJsonString}
-import models.application.{Application, Creator, NewApplication}
+import models.application._
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.Configuration
-import play.api.http.Status.NOT_FOUND
+import play.api.http.Status.{NOT_FOUND, NO_CONTENT}
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
@@ -103,6 +103,39 @@ class ApplicationsConnectorSpec
     }
   }
 
+  "ApplicationsConnector.requestAdditionalScope" - {
+    "must place the correct request and return new scope" in {
+      val appId = "id-1"
+      val newScope = NewScope(appId, Seq(Dev))
+
+      stubFor(
+        post(urlEqualTo(s"/api-hub-applications/applications/${appId}/environments/scopes"))
+          .withRequestBody(equalToJson(Json.toJson(Seq(newScope)).toString()))
+          .willReturn(aResponse().withStatus(NO_CONTENT))
+      )
+
+      buildConnector(this).requestAdditionalScope(appId, newScope)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe Some(newScope)
+      }
+    }
+
+    "must return empty when application ID not found" in {
+      val appId = "unknown_id"
+      val newScope = NewScope(appId, Seq(Dev))
+
+      stubFor(
+        post(urlEqualTo(s"/api-hub-applications/applications/${appId}/environments/scopes"))
+          .withRequestBody(equalToJson(Json.toJson(Seq(newScope)).toString()))
+          .willReturn(aResponse().withStatus(NOT_FOUND))
+      )
+
+      buildConnector(this).requestAdditionalScope(appId, newScope)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe None
+      }
+    }
+  }
 
 }
 

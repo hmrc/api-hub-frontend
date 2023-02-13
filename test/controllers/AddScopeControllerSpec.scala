@@ -43,7 +43,7 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar {
       val fixture = buildFixture()
 
       when(fixture.apiHubService.requestAdditionalScope(ArgumentMatchers.eq(testId), ArgumentMatchers.eq(newScope))(any()))
-        .thenReturn(Future.successful(Unit))
+        .thenReturn(Future.successful(Some(newScope)))
 
       running(fixture.application) {
         val request = FakeRequest(POST, routes.AddScopeController.onSubmit(testId).url)

@@ -41,7 +41,7 @@ class ApiHubService @Inject()(applicationsConnector: ApplicationsConnector)
     applicationsConnector.getApplication(id)
   }
 
-  def requestAdditionalScope(id:String, newScope:NewScope)(implicit hc:HeaderCarrier): Future[Unit] = {
+  def requestAdditionalScope(id:String, newScope:NewScope)(implicit hc:HeaderCarrier): Future[Option[NewScope]] = {
     logger.debug(s"Requesting scope named '${newScope.name}' for application id '${id}' in environments ${newScope.environments}")
     applicationsConnector.requestAdditionalScope(id, newScope)
   }
