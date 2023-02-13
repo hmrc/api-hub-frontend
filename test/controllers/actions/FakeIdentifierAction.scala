@@ -16,11 +16,10 @@
 
 package controllers.actions
 
-import javax.inject.Inject
 import models.requests.IdentifierRequest
-import models.user.{LdapUser, UserModel}
 import play.api.mvc._
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class FakeIdentifierAction @Inject()(bodyParsers: PlayBodyParsers) extends IdentifierAction {

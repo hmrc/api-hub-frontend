@@ -14,18 +14,19 @@
  * limitations under the License.
  *@
 
+@import models.user.UserModel
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 
 @this(govukCheckboxes: GovukCheckboxes,
-        layout: templates.Layout,
-        formHelper: FormWithCSRF,
-        govukErrorSummary: GovukErrorSummary,
-        govukButton: GovukButton,
-        govukInput: GovukInput)
+layout: templates.Layout,
+formHelper: FormWithCSRF,
+govukErrorSummary: GovukErrorSummary,
+govukButton: GovukButton,
+govukInput: GovukInput)
 
-@(id: String, form: Form[_])(implicit request: Request[_], messages: Messages)
+@(id: String, form: Form[_], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("addScope.title"))) {
+@layout(pageTitle = title(form, messages("addScope.title")), user = user) {
 
     <h2 class="govuk-heading-l">@messages("addScope.heading")</h2>
 

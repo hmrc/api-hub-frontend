@@ -42,7 +42,7 @@ class AddScopeController @Inject()(
   def onPageLoad(id: String): Action[AnyContent] = identify.async {
     implicit request =>
       apiHubService.getApplication(id) map {
-        case Some(application) => Ok(view(application.id, form))
+        case Some(application) => Ok(view(application.id, form, Some(request.user)))
         case _ => NotFound
       }
   }
@@ -51,7 +51,7 @@ class AddScopeController @Inject()(
     implicit request =>
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(id, formWithErrors))),
+          Future.successful(BadRequest(view(id, formWithErrors, Some(request.user)))),
 
         scopeData => {
           val envs = Seq(scopeData.dev, scopeData.test, scopeData.preProd, scopeData.prod).flatten[String].flatMap(s => EnvironmentName.enumerable.withName(s))

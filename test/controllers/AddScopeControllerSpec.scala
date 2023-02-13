@@ -18,6 +18,7 @@ package controllers
 
 import base.SpecBase
 import controllers.AddScopeControllerSpec.buildFixture
+import controllers.actions.FakeUser
 import forms.NewScopeFormProvider
 import models.application._
 import org.mockito.ArgumentMatchers.any
@@ -118,7 +119,7 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustBe OK
 
-        contentAsString(result) mustEqual view(testId, form)(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(testId, form, Some(FakeUser))(request, messages(fixture.application)).toString
       }
     }
   }
