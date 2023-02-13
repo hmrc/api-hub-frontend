@@ -18,7 +18,7 @@ package services
 
 import com.google.inject.{Inject, Singleton}
 import connectors.ApplicationsConnector
-import models.application.{Application, NewApplication}
+import models.application.{Application, NewApplication, NewScope}
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -39,6 +39,11 @@ class ApiHubService @Inject()(applicationsConnector: ApplicationsConnector)
 
   def getApplication(id:String)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
     applicationsConnector.getApplication(id)
+  }
+
+  def requestAdditionalScope(id:String, newScope:NewScope)(implicit hc:HeaderCarrier): Future[Option[NewScope]] = {
+    logger.debug(s"Requesting scope named '${newScope.name}' for application id '${id}' in environments ${newScope.environments}")
+    applicationsConnector.requestAdditionalScope(id, newScope)
   }
 
 }
