@@ -16,21 +16,6 @@
 
 package controllers.actions
 
-import javax.inject.Inject
-import models.requests.IdentifierRequest
 import models.user.{LdapUser, UserModel}
-import play.api.mvc._
 
-import scala.concurrent.{ExecutionContext, Future}
-
-class FakeIdentifierAction @Inject()(bodyParsers: PlayBodyParsers) extends IdentifierAction {
-
-  override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] =
-    block(IdentifierRequest(request, FakeUser))
-
-  override def parser: BodyParser[AnyContent] =
-    bodyParsers.default
-
-  override protected def executionContext: ExecutionContext =
-    scala.concurrent.ExecutionContext.Implicits.global
-}
+object FakeUser extends UserModel("id", "test-name", LdapUser, Some("test-email"))

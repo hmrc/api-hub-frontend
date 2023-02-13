@@ -15,13 +15,14 @@
  *@
 
 @import models.application.Application
+@import models.user.UserModel
 
 @this(
         layout: templates.Layout,
         govukButton: GovukButton
 )
 
-@(application: Application)(implicit request: Request[_], messages: Messages)
+@(application: Application, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
 @applicationLink(application: Application) = {
     <a href="@routes.ApplicationDetailsController.onPageLoad(application.id)" class="govuk-link govuk-link--no-visited-state">
@@ -29,7 +30,7 @@
     </a>
 }
 
-@layout(pageTitle = titleNoForm(messages("requestScopeSuccess.title"))) {
+@layout(pageTitle = titleNoForm(messages("requestScopeSuccess.title")), user = user) {
 
     <div class="govuk-panel govuk-panel--confirmation">
         <h1 class="govuk-panel__title">

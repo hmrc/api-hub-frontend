@@ -15,6 +15,7 @@
  *@
 
 @import config.FrontendAppConfig
+@import models.user.UserModel
 @import uk.gov.hmrc.hmrcfrontend.views.config.StandardAlphaBanner
 @import views.html.helper.CSPNonce
 
@@ -33,7 +34,7 @@
     alphaBanner: StandardAlphaBanner
 )
 
-@(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = true, showSignOut: Boolean = true)(contentBlock: Html)(implicit request: Request[_], messages: Messages)
+@(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = true, showSignOut: Boolean = true, user: Option[UserModel] = None)(contentBlock: Html)(implicit request: Request[_], messages: Messages)
 
 @head = {
 
@@ -83,9 +84,16 @@
     </div>
 }
 
+@apiHubUserDetail = {
+    @user.map(aUser =>
+        <div class="govuk-body">Signed in as {aUser.email.getOrElse(aUser.userName)} via {aUser.userType}</div>
+    )
+}
+
 @apiHubBanner = {
     <div class="govuk-width-container">
         <div class="govuk-!-padding-bottom-3 govuk-!-padding-top-3 govuk-!-text-align-right">
+            @apiHubUserDetail
             <a class="govuk-link govuk-link--no-visited-state" href="@routes.IndexController.onPageLoad.url">
                 @messages("site.applications")
             </a>

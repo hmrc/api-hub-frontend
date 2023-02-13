@@ -18,6 +18,7 @@ package controllers
 
 import base.SpecBase
 import controllers.RegisterApplicationControllerSpec.buildFixture
+import controllers.actions.FakeUser
 import models.application.{Application, Creator, NewApplication}
 import models.{CheckMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
@@ -35,9 +36,9 @@ class RegisterApplicationControllerSpec extends SpecBase with MockitoSugar {
 
   "RegisterApplicationController" - {
     "must register the application and redirect to the Index page when valid" in {
-      val newApplication = NewApplication("test-app-name", Creator(""))
+      val newApplication = NewApplication("test-app-name", Creator(FakeUser.email.get))
       val testId = "test-app-id"
-      val userAnswers = UserAnswers(userAnswersId)
+      val userAnswers = UserAnswers(FakeUser.userId)
         .set(ApplicationNamePage, newApplication.name)
         .get
 

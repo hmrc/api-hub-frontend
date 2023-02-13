@@ -43,6 +43,6 @@ class CheckYourAnswersController @Inject()(
         ).flatten
       )
 
-      Ok(view(list))
+      Ok(view(list, Some(request.user)))
   }
 }

@@ -36,7 +36,7 @@ class RegisterApplicationSuccessController @Inject()(
 
   def onPageLoad(id:String): Action[AnyContent] = identify.async {
     implicit request => service.getApplication(id).map {
-      case Some(app) => Ok(view(app))
+      case Some(app) => Ok(view(app, Some(request.user)))
       case None => NotFound
     }
   }
