@@ -18,6 +18,7 @@ package testonly
 
 import com.google.inject.{Inject, Singleton}
 import config.FrontendAppConfig
+import controllers.actions.AuthenticatedIdentifierAction
 import play.api.data.Form
 import play.api.data.Forms.{email, list, mapping, optional, text}
 import play.api.libs.functional.syntax.unlift
@@ -49,11 +50,8 @@ class TestOnlySignInController @Inject()(
       signInForm.bindFromRequest().fold(
         formWithErrors => BadRequest(testOnlySignInView(formWithErrors)),
         data => {
-          val retrievals = Json.stringify(
-            Json.toJson(
-              Retrievals(data.principal, data.email)
-            )
-          )
+          val retrievals = Json.stringify(Json.toJson(retrievalsFor(data)))
+
           Redirect(data.redirectUrl).withSession(
             SessionKeys.authToken -> s"$AUTHORISED_TOKEN$retrievals"
           )
@@ -134,5 +132,19 @@ object TestOnlySignInController {
       data.email,
       data.permissions.toSet
     )
+
+  private val approverPermission: Permission = Permission(
+    resourceType = AuthenticatedIdentifierAction.approverResourceType,
+    resourceLocation = AuthenticatedIdentifierAction.approverResourceLocation,
+    actions = List(AuthenticatedIdentifierAction.approverAction)
+  )
+
+  def retrievalsFor(data: TestOnlySignInData): Retrievals = {
+    Retrievals(
+      principal = data.principal,
+      email = data.email,
+      canApprove = data.permissions.contains(approverPermission)
+    )
+  }
 
 }

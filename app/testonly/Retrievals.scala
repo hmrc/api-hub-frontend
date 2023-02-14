@@ -16,16 +16,31 @@
 
 package testonly
 
-import play.api.libs.json.{Format, Json}
+import play.api.libs.functional.syntax._
+import play.api.libs.json._
 
-case class Retrievals(retrievals: Seq[String])
+case class Retrievals(principal: String, email: Option[String], canApprove: Boolean)
 
 object Retrievals {
 
-  def apply(principal: String, email: Option[String]): Retrievals = {
-    Retrievals(Seq(principal, email.getOrElse(s"$principal@digital.hmrc.gov.uk")))
+  private val reads: Reads[Retrievals] = (
+    (JsPath \ "retrievals")(0).read[String] and
+      (JsPath \ "retrievals")(1).readNullable[String] and
+      (JsPath \ "retrievals")(2).read[Boolean]
+  )(Retrievals.apply _)
+
+  private val writes: Writes[Retrievals] = (retrievals: Retrievals) => {
+    Json.obj(
+      "retrievals" -> JsArray(
+        Seq(
+          JsString(retrievals.principal),
+          retrievals.email.map(JsString).getOrElse(JsNull),
+          JsBoolean(retrievals.canApprove)
+        )
+      )
+    )
   }
 
-  implicit val formatRetrievals: Format[Retrievals] = Json.format[Retrievals]
+  implicit val formatRetrievals: Format[Retrievals] = Format(reads, writes)
 
 }
