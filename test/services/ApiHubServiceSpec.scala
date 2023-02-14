@@ -107,4 +107,24 @@ class ApiHubServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar {
     }
   }
 
+  "pendingScopes" - {
+    "must call the applications connectors and return the applications" in {
+      val application1 = Application("id-1", "test-app-name-1", Creator("test-creator-email-1"))
+      val application2 = Application("id-2", "test-app-name-2", Creator("test-creator-email-2"))
+      val expected = Seq(application1, application2)
+
+      val applicationsConnector = mock[ApplicationsConnector]
+      when(applicationsConnector.pendingScopes()(any())).thenReturn(Future.successful(expected))
+
+      val service = new ApiHubService(applicationsConnector)
+
+      service.pendingScopes()(HeaderCarrier()) map {
+        actual =>
+          actual mustBe expected
+          verify(applicationsConnector).pendingScopes()(any())
+          succeed
+      }
+    }
+  }
+
 }

@@ -98,7 +98,7 @@
                 @messages("site.applications")
             </a>
             @if(user.map(_.permissions.canApprove).getOrElse(false)) {
-                <a class="govuk-link govuk-link--no-visited-state govuk-!-margin-left-6" href="@routes.IndexController.onPageLoad.url">
+                <a class="govuk-link govuk-link--no-visited-state govuk-!-margin-left-6" href="@routes.PendingApprovalsController.onPageLoad.url">
                     @messages("site.approvals")
                 </a>
             }
