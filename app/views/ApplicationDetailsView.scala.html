@@ -77,7 +77,7 @@
         <div class="govuk-grid-column-one-third govuk-!-text-align-right">
             @govukButton(
                 ButtonViewModel(messages("applicationDetails.addScope"))
-                    .asLink(routes.ApplicationDetailsController.onPageLoad(application.id).url)
+                    .asLink(routes.AddScopeController.onPageLoad(application.id).url)
             )
         </div>
     </div>

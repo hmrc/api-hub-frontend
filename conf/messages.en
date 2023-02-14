@@ -108,5 +108,18 @@ fake-sign-in.token.lbl = Token (optional)
 fake-sign-in.permissions.lbl = Permissions
 fake-sign-in.button = Sign in
 
+addScope.title = Add a Scope
+addScope.heading = Add a scope
+addScope.scopeName.heading = Scope name
+addScope.scopeName.hint = Add the exact name of the scope you want to use
+addScope.environments.heading = Which environments do you want to enable?
+addScope.environments.dev = dev
+addScope.environments.test = test
+addScope.environments.preProd = pre-prod
+addScope.environments.prod = prod
+
+addScope.error.required = Enter a scope name and select at least one environment
+addScope.error.length = Scope name must be 100 characters or less
+
 pendingApprovals.title = Pending production approvals
 pendingApprovals.heading = Pending production approvals

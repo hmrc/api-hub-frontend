@@ -17,7 +17,7 @@
 package services
 
 import connectors.ApplicationsConnector
-import models.application.{Application, Creator, NewApplication}
+import models.application._
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
 import org.scalatest.freespec.AsyncFreeSpec
@@ -82,6 +82,26 @@ class ApiHubServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar {
         actual =>
           actual mustBe expected
           verify(applicationsConnector).getApplication(ArgumentMatchers.eq("id-1"))(any())
+          succeed
+      }
+    }
+  }
+
+  "requestAdditionalScope" - {
+    "must call the applications connector and return the new scope" in {
+      val applicationId = "app-id"
+      val newScope = NewScope(applicationId, Seq(Dev))
+
+      val applicationsConnector = mock[ApplicationsConnector]
+      when(applicationsConnector.requestAdditionalScope(ArgumentMatchers.eq(applicationId), ArgumentMatchers.eq(newScope))(any()))
+        .thenReturn(Future.successful(Some(newScope)))
+
+      val service = new ApiHubService(applicationsConnector)
+
+      service.requestAdditionalScope(applicationId, newScope)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe Some(newScope)
+          verify(applicationsConnector).requestAdditionalScope(ArgumentMatchers.eq(applicationId), ArgumentMatchers.eq(newScope))(any())
           succeed
       }
     }
