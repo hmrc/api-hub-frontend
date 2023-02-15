@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,19 +12,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@this(
-    layout: templates.Layout
+package controllers.actions
+
+import models.user.{LdapUser, Permissions, UserModel}
+
+object FakeApprover extends UserModel(
+  userId ="id",
+  userName = "test-name",
+  userType = LdapUser,
+  email = Some("test-email"),
+  permissions = Permissions(canApprove = true)
 )
-
-@()(implicit request: Request[_], messages: Messages)
-
-@layout(
-    pageTitle = titleNoForm(messages("unauthorised.title")),
-    timeout   = false
-) {
-
-    <h1 class="govuk-heading-xl">@messages("unauthorised.heading")</h1>
-
-}

@@ -17,7 +17,7 @@
 package controllers
 
 import base.SpecBase
-import controllers.actions.FakeUser
+import controllers.actions.{FakeApprover, FakeUser}
 import models.application.{Application, Creator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar
@@ -25,7 +25,7 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.ApiHubService
-import views.html.PendingApprovalsView
+import views.html.{PendingApprovalsView, UnauthorisedView}
 
 import scala.concurrent.Future
 
@@ -36,7 +36,7 @@ class PendingApprovalsControllerSpec extends SpecBase with MockitoSugar {
     "must return OK and the correct view for a GET" in {
 
       val apiHubService = mock[ApiHubService]
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), user = FakeApprover)
         .bindings(
           bind[ApiHubService].toInstance(apiHubService)
         )
@@ -54,7 +54,24 @@ class PendingApprovalsControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[PendingApprovalsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(applications, Some(FakeUser))(request, messages(application)).toString
+        contentAsString(result) mustEqual view(applications, Some(FakeApprover))(request, messages(application)).toString
+      }
+    }
+
+    "must redirect to the unauthorised page when the user is not an approver" in {
+      val apiHubService = mock[ApiHubService]
+      val application = applicationBuilder(user = FakeUser)
+        .bindings(
+          bind[ApiHubService].toInstance(apiHubService)
+        )
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.PendingApprovalsController.onPageLoad().url)
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad.url)
       }
     }
   }
