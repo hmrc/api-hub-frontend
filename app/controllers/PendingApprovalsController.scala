@@ -30,12 +30,13 @@ import scala.concurrent.ExecutionContext
 class PendingApprovalsController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        identify: IdentifierAction,
+                                       canApprove: AuthorisedApproverAction,
                                        val controllerComponents: MessagesControllerComponents,
                                        view: PendingApprovalsView,
                                        apiHubService: ApiHubService
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = identify.async {
+  def onPageLoad: Action[AnyContent] = (identify andThen canApprove).async {
     implicit request =>
       apiHubService.pendingScopes().map(
         applications => Ok(view(applications, Some(request.user)))
