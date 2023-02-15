@@ -29,8 +29,8 @@ import scala.concurrent.Future
 
 class AuthorisedApproverActionSpec extends AnyFreeSpec with Matchers{
 
-  "filter" - {
-    "must return None if the user is an approver" in {
+  "AuthorisedApproverAction" - {
+    "must return the block's result when the user is an approver" in {
       val request = IdentifierRequest(FakeRequest(), FakeApprover)
       val action = new AuthorisedApproverAction()
       val block = (_: IdentifierRequest[_]) => Future.successful(Results.Ok)

@@ -25,7 +25,7 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.ApiHubService
-import views.html.{PendingApprovalsView, UnauthorisedView}
+import views.html.PendingApprovalsView
 
 import scala.concurrent.Future
 

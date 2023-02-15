@@ -19,9 +19,9 @@ package controllers.actions
 import models.user.{LdapUser, Permissions, UserModel}
 
 object FakeApprover extends UserModel(
-  userId ="id",
-  userName = "test-name",
+  userId ="fake-approver-id",
+  userName = "fake-approver-name",
   userType = LdapUser,
-  email = Some("test-email"),
+  email = Some("fake-approver-email"),
   permissions = Permissions(canApprove = true)
 )
