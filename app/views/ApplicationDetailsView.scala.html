@@ -14,14 +14,15 @@
  * limitations under the License.
  *@
 
-@import models.application.Application
+@import models.application._
 @import models.user.UserModel
 @import views.ViewUtils
 
 @this(
         layout: templates.Layout,
         govukButton: GovukButton,
-        govukTabs: GovukTabs
+        govukTabs: GovukTabs,
+        govukTable: GovukTable
 )
 
 @(application: Application, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
@@ -41,22 +42,22 @@
     </div>
 }
 
-@environmentTab(name: String) = @{
+@environmentTab(name: String, environment: Environment) = @{
     TabItem(
         id = Some(name),
         label = messages(s"applicationDetails.$name"),
         panel = TabPanel(
-            content = HtmlContent(environmentTabContent())
+            content = HtmlContent(environmentTabContent(environment))
         )
     )
 }
 
-@environmentTabContent() = {
+@environmentTabContent(environment: Environment) = {
     <div class = "govuk-grid-row">
         <div class = "govuk-grid-column-one-half">
             <h2 class="govuk-heading-m">@messages("applicationDetails.scopes")</h2>
             <span class="govuk-body">
-                @messages("applicationDetails.noScopes")
+                @environmentTabScopes(environment.scopes)
             </span>
         </div>
         <div class = "govuk-grid-column-one-half">
@@ -66,6 +67,32 @@
             </span>
         </div>
     </div>
+}
+
+@environmentTabScopes(scopes: Seq[Scope]) = {
+    @if(scopes.isEmpty) {
+        @messages("applicationDetails.noScopes")
+    } else {
+        @govukTable(
+            Table(
+                caption = None,
+                head = Some(
+                    Seq(
+                        HeadCell(messages("index.applications.name")),
+                        HeadCell(messages("index.applications.id"))
+                    )
+                ),
+                rows = scopes.map(
+                    scope =>
+                        Seq(
+                            TableRow(content = scope.name),
+                            TableRow(content = scope.status.toString)
+                        )
+                )
+            )
+        )
+
+    }
 }
 
 @layout(pageTitle = titleNoForm(messages("applicationDetails.title")), user = user) {
@@ -100,10 +127,10 @@
     @govukTabs(
         Tabs(
             items = Seq(
-                environmentTab("dev"),
-                environmentTab("test"),
-                environmentTab("preProd"),
-                environmentTab("prod")
+                environmentTab("dev", application.environments.dev),
+                environmentTab("test", application.environments.test),
+                environmentTab("preProd", application.environments.preProd),
+                environmentTab("prod", application.environments.prod)
             )
         )
     )
