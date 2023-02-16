@@ -19,6 +19,7 @@ package connectors
 import com.google.inject.{Inject, Singleton}
 import models.application.{Application, NewApplication, NewScope}
 import play.api.http.HeaderNames.ACCEPT
+import play.api.http.HeaderNames.CONTENT_TYPE
 import play.api.http.MimeTypes.JSON
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HttpReads.Implicits._
@@ -26,6 +27,7 @@ import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
+import scala.Console
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -81,4 +83,16 @@ class ApplicationsConnector @Inject()(
       .execute[Seq[Application]]
   }
 
+  def approveProductionScope(appId: String, scopeName: String)(implicit hc: HeaderCarrier): Future[Option[String]] = {
+    httpClient
+      .put(url"$applicationsBaseUrl/api-hub-applications/applications/$appId/environments/prod/scopes/$scopeName")
+      .setHeader((CONTENT_TYPE, JSON))
+      .withBody("{\"status\":\"APPROVED\"}")
+      .execute[Either[UpstreamErrorResponse, Unit]]
+      .flatMap {
+        case Right(_) => Future.successful(Some("APPROVED"))
+        case Left(e) if e.statusCode == 404 => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
+  }
 }

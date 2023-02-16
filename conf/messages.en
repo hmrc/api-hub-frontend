@@ -123,3 +123,18 @@ addScope.error.length = Scope name must be 100 characters or less
 
 pendingApprovals.title = Pending production approvals
 pendingApprovals.heading = Pending production approvals
+
+approveScope.title = Review production scope request
+approveScope.heading = Review production scope request
+addScope.applicationDetails.heading = Application details
+addScope.applicationDetails.applicationName = Application name
+addScope.applicationDetails.id = Id
+addScope.applicationDetails.requestedScope = Requested scope
+addScope.requesterDetails.heading = Requester details
+addScope.requesterDetails.name = Name
+addScope.requesterDetails.requestedOn = Requested on
+addScope.approveButton.text = Approve
+addScope.declineButton.text = Decline
+
+
+

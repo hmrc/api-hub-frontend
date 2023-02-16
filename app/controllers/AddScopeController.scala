@@ -56,7 +56,7 @@ class AddScopeController @Inject()(
         scopeData => {
           val envs = Seq(scopeData.dev, scopeData.test, scopeData.preProd, scopeData.prod).flatten[String].flatMap(s => EnvironmentName.enumerable.withName(s))
           apiHubService.requestAdditionalScope(id, NewScope(scopeData.scopeName, envs)).map(
-            _ => Redirect(routes.RequestScopeSuccessController.onPageLoad(id)))
+            _ => Redirect(routes.ApplicationDetailsController.onPageLoad(id)))
         })
   }
 }

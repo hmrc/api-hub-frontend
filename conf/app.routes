@@ -38,3 +38,7 @@ GET         /add-scope/:id                           controllers.AddScopeControl
 POST        /add-scope/:id                           controllers.AddScopeController.onSubmit(id: String)
 
 GET         /pending-approvals                       controllers.PendingApprovalsController.onPageLoad()
+
+GET         /approve-scope/:id                       controllers.ApproveScopeController.onPageLoad(id: String)
+GET        /approve-scope/:id/approve/scopes/:scopeName  controllers.ApproveScopeController.onApprove(id: String, scopeName:String)
+GET        /approve-scope/:id/decline               controllers.ApproveScopeController.onDecline(id: String)
