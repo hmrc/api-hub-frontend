@@ -125,3 +125,6 @@ addScope.error.length = Scope name must be 100 characters or less
 
 pendingApprovals.title = Pending production approvals
 pendingApprovals.heading = Pending production approvals
+
+scopeApproved.title = scopeApproved
+scopeApproved.heading = scopeApproved
