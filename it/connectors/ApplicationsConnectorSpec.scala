@@ -6,7 +6,7 @@ import models.application._
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.Configuration
-import play.api.http.Status.{NOT_FOUND, NO_CONTENT}
+import play.api.http.Status.{ACCEPTED, NOT_FOUND, NO_CONTENT}
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
@@ -156,6 +156,47 @@ class ApplicationsConnectorSpec
           actual mustBe expected
       }
     }
+  }
+
+  "ApplicationsConnector.approveProductionScope" - {
+    "must place the correct request and return APPROVED" in {
+      val appId = "app_id"
+      val scope = "a_scope"
+
+      stubFor(
+        put(urlEqualTo(s"/api-hub-applications/applications/${appId}/environments/prod/scopes/${scope}"))
+          .withRequestBody(equalToJson("{\"status\":\"APPROVED\"}"))
+          .withHeader("Content-Type", equalTo("application/json"))
+          .willReturn(
+            aResponse()
+              .withStatus(ACCEPTED)
+          )
+      )
+
+      buildConnector(this).approveProductionScope(appId, scope)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe Some("APPROVED")
+      }
+    }
+
+    "must return empty when applications service not found" in {
+      val appId = "app_id"
+      val scope = "a_scope"
+
+      stubFor(
+        put(urlEqualTo(s"/api-hub-applications/applications/${appId}/environments/prod/scopes/${scope}"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+          )
+      )
+
+      buildConnector(this).approveProductionScope(appId, scope)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe None
+      }
+    }
+
   }
 
 }

@@ -88,10 +88,7 @@ class ApplicationsConnector @Inject()(
       .withBody("{\"status\":\"APPROVED\"}")
       .execute[Either[UpstreamErrorResponse, Unit]]
       .flatMap {
-        case Right(_) => {
-          Console.println("SUCCESS!")
-          Future.successful(Some("APPROVED"))
-        }
+        case Right(_) => Future.successful(Some("APPROVED"))
         case Left(e) if e.statusCode == 404 => Future.successful(None)
         case Left(e) => Future.failed(e)
       }

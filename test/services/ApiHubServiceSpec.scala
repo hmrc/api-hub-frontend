@@ -127,4 +127,22 @@ class ApiHubServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar {
     }
   }
 
+  "approveProductionScope" - {
+    "must call the applications connectors and return APPROVED" in {
+      val appId = "app_id"
+      val scope = "a_scope"
+      val applicationsConnector = mock[ApplicationsConnector]
+      when(applicationsConnector.approveProductionScope(ArgumentMatchers.eq(appId),ArgumentMatchers.eq(scope))(any()))
+        .thenReturn(Future.successful(Some("APPROVED")))
+
+      val service = new ApiHubService(applicationsConnector)
+
+      service.approveProductionScope(appId,scope)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe Some("APPROVED")
+          verify(applicationsConnector).approveProductionScope(ArgumentMatchers.eq(appId),ArgumentMatchers.eq(scope))(any())
+          succeed
+      }
+    }
+  }
 }
