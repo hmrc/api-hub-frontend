@@ -76,7 +76,14 @@ class ApproveScopeControllerSpec extends SpecBase with MockitoSugar {
       val fixture = buildFixture(FakeApprover)
       val view = fixture.application.injector.instanceOf[ApproveProductionScopeView]
 
-      val application = models.application.Application(testId, "app-name", Creator("test-creator-email"))
+      val environmentsWithProdPending = new Environments(
+        Environment(),
+        Environment(),
+        Environment(),
+        new Environment(Seq(Scope("cheese", Pending)), Seq())
+      )
+
+      val application = models.application.Application(testId, "app-name", Creator("test-creator-email"), environmentsWithProdPending)
 
       when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId))(any()))
         .thenReturn(Future.successful(Some(application)))
