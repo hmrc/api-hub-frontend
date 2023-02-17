@@ -58,8 +58,8 @@ signedOut.title = For your security, we signed you out
 signedOut.heading = For your security, we signed you out
 signedOut.guidance = We did not save your answers.
 
-unauthorised.title = You can’t access this service with this account
-unauthorised.heading = You can’t access this service with this account
+unauthorised.title = Unauthorised
+unauthorised.heading = You do not have permission to access this page
 
 applicationName.title = Application Name
 applicationName.heading = What is the name of your application?
@@ -90,6 +90,8 @@ applicationDetails.preProd = pre-prod
 applicationDetails.prod = prod
 applicationDetails.noScopes = You have no scopes
 applicationDetails.noCredentials = You have no credentials
+applicationDetails.scope.name = Name
+applicationDetails.scope.status = Status
 
 requestScopeSuccess.title = Scope requested successfully
 requestScopeSuccess.heading = Scope requested successfully

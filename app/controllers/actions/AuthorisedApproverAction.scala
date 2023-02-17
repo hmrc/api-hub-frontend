@@ -16,21 +16,26 @@
 
 package controllers.actions
 
+import com.google.inject.{Inject, Singleton}
+import controllers.routes
 import models.requests.IdentifierRequest
-import models.user.UserModel
-import play.api.mvc._
+import play.api.mvc.{ActionFilter, Result}
+import play.api.mvc.Results.Redirect
 
-import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeIdentifierAction @Inject()(user: UserModel, bodyParsers: PlayBodyParsers) extends IdentifierAction {
+@Singleton
+class AuthorisedApproverAction @Inject()(implicit val executionContext: ExecutionContext)
+  extends ActionFilter[IdentifierRequest]{
 
-  override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] =
-    block(IdentifierRequest(request, user))
+  override protected def filter[A](request: IdentifierRequest[A]): Future[Option[Result]] = {
+    Future.successful(
+      if (request.user.permissions.canApprove) {
+        None
+      } else {
+        Some(Redirect(routes.UnauthorisedController.onPageLoad))
+      }
+    )
+  }
 
-  override def parser: BodyParser[AnyContent] =
-    bodyParsers.default
-
-  override protected def executionContext: ExecutionContext =
-    scala.concurrent.ExecutionContext.Implicits.global
 }
