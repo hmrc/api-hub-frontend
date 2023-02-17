@@ -29,33 +29,28 @@ import scala.concurrent.{ExecutionContext, Future}
 class ApproveScopeController @Inject()(
                                         override val messagesApi: MessagesApi,
                                         identify: IdentifierAction,
+                                        canApprove: AuthorisedApproverAction,
                                         val controllerComponents: MessagesControllerComponents,
                                         view: ApproveProductionScopeView,
                                         apiHubService: ApiHubService
                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
 
-  def onPageLoad(id: String): Action[AnyContent] = identify.async {
+  def onPageLoad(id: String): Action[AnyContent] = (identify andThen canApprove).async {
     implicit request =>
-      if (request.user.permissions.canApprove) {
-
-        Console.println(s"can approve: ${request.user.permissions.canApprove}")
-        apiHubService.getApplication(id) map {
+      apiHubService.getApplication(id) map {
           case Some(application) => Ok(view(application, Some(request.user)))
           case _ => NotFound
         }
-      } else {
-        Future.successful(Unauthorized)
-      }
   }
 
-  def onApprove(id: String, scopeName: String): Action[AnyContent] = identify.async {
+  def onApprove(id: String, scopeName: String): Action[AnyContent] = (identify andThen canApprove).async {
     implicit request =>
-      apiHubService.approveProductionScope(id, scopeName).map(
-        _ => Redirect(routes.PendingApprovalsController.onPageLoad()))
+        apiHubService.approveProductionScope(id, scopeName).map(
+          _ => Redirect(routes.PendingApprovalsController.onPageLoad()))
   }
 
-  def onDecline(id: String): Action[AnyContent] = identify.async {
+  def onDecline(id: String): Action[AnyContent] = (identify andThen canApprove).async {
     Future.successful(NotImplemented)
   }
 }
