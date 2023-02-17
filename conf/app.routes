@@ -39,4 +39,4 @@ POST        /add-scope/:id                           controllers.AddScopeControl
 
 GET         /pending-approvals                       controllers.PendingApprovalsController.onPageLoad()
 
-GET        /scopeApproved                       controllers.ScopeApprovedController.onPageLoad()
+GET         /scope-approved                          controllers.ScopeApprovedController.onPageLoad()
