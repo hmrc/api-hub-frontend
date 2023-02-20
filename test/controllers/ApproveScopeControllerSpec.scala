@@ -45,7 +45,7 @@ class ApproveScopeControllerSpec extends SpecBase with MockitoSugar {
       val fixture = buildFixture(FakeApprover)
 
       when(fixture.apiHubService.approveProductionScope(ArgumentMatchers.eq(testId), ArgumentMatchers.eq(scope))(any()))
-        .thenReturn(Future.successful(Some("APPROVED")))
+        .thenReturn(Future.successful(true))
 
       running(fixture.application) {
         val request = FakeRequest(GET, routes.ApproveScopeController.onApprove(testId, scope).url)

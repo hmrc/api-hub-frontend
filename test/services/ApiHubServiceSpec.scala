@@ -133,13 +133,13 @@ class ApiHubServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar {
       val scope = "a_scope"
       val applicationsConnector = mock[ApplicationsConnector]
       when(applicationsConnector.approveProductionScope(ArgumentMatchers.eq(appId),ArgumentMatchers.eq(scope))(any()))
-        .thenReturn(Future.successful(Some("APPROVED")))
+        .thenReturn(Future.successful(true))
 
       val service = new ApiHubService(applicationsConnector)
 
       service.approveProductionScope(appId,scope)(HeaderCarrier()) map {
         actual =>
-          actual mustBe Some("APPROVED")
+          actual mustBe true
           verify(applicationsConnector).approveProductionScope(ArgumentMatchers.eq(appId),ArgumentMatchers.eq(scope))(any())
           succeed
       }

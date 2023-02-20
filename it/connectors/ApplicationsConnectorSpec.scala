@@ -6,7 +6,7 @@ import models.application._
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.Configuration
-import play.api.http.Status.{ACCEPTED, NOT_FOUND, NO_CONTENT}
+import play.api.http.Status.{NOT_FOUND, NO_CONTENT}
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
@@ -159,7 +159,7 @@ class ApplicationsConnectorSpec
   }
 
   "ApplicationsConnector.approveProductionScope" - {
-    "must place the correct request and return APPROVED" in {
+    "must place the correct request and return true" in {
       val appId = "app_id"
       val scope = "a_scope"
 
@@ -169,17 +169,17 @@ class ApplicationsConnectorSpec
           .withHeader("Content-Type", equalTo("application/json"))
           .willReturn(
             aResponse()
-              .withStatus(ACCEPTED)
+              .withStatus(NO_CONTENT)
           )
       )
 
       buildConnector(this).approveProductionScope(appId, scope)(HeaderCarrier()) map {
         actual =>
-          actual mustBe Some("APPROVED")
+          actual mustBe true
       }
     }
 
-    "must return empty when applications service not found" in {
+    "must return false when applications service not found" in {
       val appId = "app_id"
       val scope = "a_scope"
 
@@ -193,7 +193,7 @@ class ApplicationsConnectorSpec
 
       buildConnector(this).approveProductionScope(appId, scope)(HeaderCarrier()) map {
         actual =>
-          actual mustBe None
+          actual mustBe false
       }
     }
 

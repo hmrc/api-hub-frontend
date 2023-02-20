@@ -81,15 +81,15 @@ class ApplicationsConnector @Inject()(
       .execute[Seq[Application]]
   }
 
-  def approveProductionScope(appId: String, scopeName: String)(implicit hc: HeaderCarrier): Future[Option[String]] = {
+  def approveProductionScope(appId: String, scopeName: String)(implicit hc: HeaderCarrier): Future[Boolean] = {
     httpClient
       .put(url"$applicationsBaseUrl/api-hub-applications/applications/$appId/environments/prod/scopes/$scopeName")
       .setHeader((CONTENT_TYPE, JSON))
       .withBody("{\"status\":\"APPROVED\"}")
       .execute[Either[UpstreamErrorResponse, Unit]]
       .flatMap {
-        case Right(_) => Future.successful(Some("APPROVED"))
-        case Left(e) if e.statusCode == 404 => Future.successful(None)
+        case Right(_) => Future.successful(true)
+        case Left(e) if e.statusCode == 404 => Future.successful(false)
         case Left(e) => Future.failed(e)
       }
   }

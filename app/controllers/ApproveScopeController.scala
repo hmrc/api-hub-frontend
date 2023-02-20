@@ -46,8 +46,10 @@ class ApproveScopeController @Inject()(
 
   def onApprove(id: String, scopeName: String): Action[AnyContent] = (identify andThen canApprove).async {
     implicit request =>
-        apiHubService.approveProductionScope(id, scopeName).map(
-          _ => Redirect(routes.PendingApprovalsController.onPageLoad()))
+        apiHubService.approveProductionScope(id, scopeName).map {
+          case true => Redirect(routes.PendingApprovalsController.onPageLoad())
+          case false => NotFound
+        }
   }
 
   def onDecline(id: String): Action[AnyContent] = (identify andThen canApprove).async {
