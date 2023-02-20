@@ -20,60 +20,61 @@
 @import models.application.Pending
 
 @this(govukCheckboxes: GovukCheckboxes,
-layout: templates.Layout,
-govukErrorSummary: GovukErrorSummary,
-govukButton: GovukButton,
-govukInput: GovukInput,
-govukSummaryList : GovukSummaryList)
+        layout: templates.Layout,
+        govukErrorSummary: GovukErrorSummary,
+        govukButton: GovukButton,
+        govukInput: GovukInput,
+        govukSummaryList: GovukSummaryList)
 
 @(application: Application, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
-@scopeName(application: Application) = @{application.environments.prod.scopes.filter(s => s.status == Pending).head.name}
+@scopeButton(scopeName: String) = {
+    @govukButton(ButtonViewModel(messages("addScope.approveButton.text")).asLink(routes.ApproveScopeController.onApprove(application.id, scopeName).url))
+}
+
+@scopeNamesAndButtons(application: Application) = @{
+    val scopes = application.environments.prod.scopes.filter(s => s.status == Pending)
+    scopes.map(scope => scope.name)
+            .map(scopeName => SummaryListRow(
+        key = Key(
+            content = Text(scopeName)
+        ),
+        value = Value(
+            content = HtmlContent(scopeButton(scopeName))
+        )
+    ))
+}
 
 @layout(pageTitle = titleNoForm(messages("approveScope.title")), user = user) {
 
     <h2 class="govuk-heading-l">@messages("approveScope.heading")</h2>
 
-        <div class = "govuk-grid-column">
-            <h3 class="govuk-heading-m">@messages("addScope.applicationDetails.heading")</h3>
-            @govukSummaryList(SummaryList(
-                rows = Seq(
-                    SummaryListRow(
-                        key = Key(
-                            content = Text(messages("addScope.applicationDetails.applicationName"))
-                        ),
-                        value = Value(
-                            content = HtmlContent(application.name)
-                        ),
+    <div class = "govuk-grid-column">
+        <h3 class="govuk-heading-m">@messages("addScope.applicationDetails.heading")</h3>
+        @govukSummaryList(SummaryList(
+            rows = Seq(
+                SummaryListRow(
+                    key = Key(
+                        content = Text(messages("addScope.applicationDetails.applicationName"))
                     ),
-                    SummaryListRow(
-                        key = Key(
-                            content = Text(messages("addScope.applicationDetails.id"))
-                        ),
-                        value = Value(
-                            content = Text(application.id)
-                        )
+                    value = Value(
+                        content = HtmlContent(application.name)
                     ),
-                    SummaryListRow(
-                        key = Key(
-                            content = Text(messages("addScope.applicationDetails.requestedScope"))
-                        ),
-                        value = Value(
-                            content = {
-                                Text(scopeName(application))
-                            }
-                        )
+                ),
+                SummaryListRow(
+                    key = Key(
+                        content = Text(messages("addScope.applicationDetails.id"))
+                    ),
+                    value = Value(
+                        content = Text(application.id)
                     )
-                )
-            ))
+                ))))
+
+        <h3 class="govuk-heading-m">@messages("approveScope.applicationDetails.pendingScopeRequests")</h3>
+
+        @govukSummaryList(SummaryList(
+            rows = scopeNamesAndButtons(application)
+        ))
 
     </div>
-
-    @govukButton(
-        ButtonViewModel(messages("addScope.approveButton.text")).asLink(routes.ApproveScopeController.onApprove(application.id, scopeName(application)).url)
-    )
-    @govukButton(
-        ButtonViewModel(messages("addScope.declineButton.text")).withCssClass("govuk-button--warning")
-    )
-
 }
