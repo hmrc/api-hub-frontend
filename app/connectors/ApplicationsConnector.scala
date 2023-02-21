@@ -19,11 +19,15 @@ package connectors
 import com.google.inject.{Inject, Singleton}
 import models.application.{Application, NewApplication, NewScope}
 import play.api.http.HeaderNames.{ACCEPT, CONTENT_TYPE}
+import models.errors.{BadRequest, RequestError, RequestErrorCode}
+import play.api.http.HeaderNames.ACCEPT
 import play.api.http.MimeTypes.JSON
-import play.api.libs.json.Json
+import play.api.http.Status.{BAD_REQUEST, CREATED}
+import play.api.libs.json.{JsError, Json}
 import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.HttpReads.upstreamResponseMessage
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps, UpstreamErrorResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -36,11 +40,38 @@ class ApplicationsConnector @Inject()(
 
   private val applicationsBaseUrl = servicesConfig.baseUrl("api-hub-applications")
 
-  def registerApplication(newApplication: NewApplication)(implicit hc: HeaderCarrier): Future[Application] = {
+  def registerApplication(newApplication: NewApplication)(implicit hc: HeaderCarrier): Future[Either[RequestErrorCode, Application]] = {
     httpClient
       .post(url"$applicationsBaseUrl/api-hub-applications/applications")
       .withBody(Json.toJson(newApplication))
-      .execute[Application]
+      .execute[HttpResponse]
+      .flatMap(
+        response =>
+          response.status match {
+            case CREATED =>
+              response.json.validate[Application].fold(
+                errors => Future.failed(new RuntimeException(JsError.toJson(errors).toString())),
+                application => Future.successful(Right(application))
+              )
+            case BAD_REQUEST =>
+              response.json.validate[RequestError].fold(
+                _ => Future.successful(Left(BadRequest)),
+                requestError => Future.successful(Left(requestError.reason))
+              )
+            case _ =>
+              Future.failed(
+                UpstreamErrorResponse(
+                  message    = upstreamResponseMessage(
+                    "POST",
+                    url"$applicationsBaseUrl/api-hub-applications/applications".toString,
+                    response.status,
+                    response.body
+                  ),
+                  statusCode = response.status
+                )
+              )
+          }
+      )
   }
 
   def getApplications()(implicit hc: HeaderCarrier): Future[Seq[Application]] = {
