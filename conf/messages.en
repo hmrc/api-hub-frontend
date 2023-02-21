@@ -130,3 +130,20 @@ scopeApproved.title = Scope approved successfully
 scopeApproved.heading = Scope approved successfully
 scopeApproved.guidance.heading = What you can do now
 scopeApproved.guidance.content = Return to {0}.
+
+approveScope.title = Review production scope requests
+approveScope.heading = Review production scope requests
+approveScope.applicationDetails.pendingScopeRequests = Pending production scope requests
+
+addScope.applicationDetails.heading = Application details
+addScope.applicationDetails.applicationName = Application name
+addScope.applicationDetails.id = Id
+addScope.applicationDetails.requestedScope = Requested scope
+addScope.requesterDetails.heading = Requester details
+addScope.requesterDetails.name = Name
+addScope.requesterDetails.requestedOn = Requested on
+addScope.approveButton.text = Approve
+addScope.declineButton.text = Decline
+
+
+

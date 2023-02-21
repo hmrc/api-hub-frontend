@@ -158,6 +158,47 @@ class ApplicationsConnectorSpec
     }
   }
 
+  "ApplicationsConnector.approveProductionScope" - {
+    "must place the correct request and return true" in {
+      val appId = "app_id"
+      val scope = "a_scope"
+
+      stubFor(
+        put(urlEqualTo(s"/api-hub-applications/applications/${appId}/environments/prod/scopes/${scope}"))
+          .withRequestBody(equalToJson("{\"status\":\"APPROVED\"}"))
+          .withHeader("Content-Type", equalTo("application/json"))
+          .willReturn(
+            aResponse()
+              .withStatus(NO_CONTENT)
+          )
+      )
+
+      buildConnector(this).approveProductionScope(appId, scope)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe true
+      }
+    }
+
+    "must return false when applications service not found" in {
+      val appId = "app_id"
+      val scope = "a_scope"
+
+      stubFor(
+        put(urlEqualTo(s"/api-hub-applications/applications/${appId}/environments/prod/scopes/${scope}"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+          )
+      )
+
+      buildConnector(this).approveProductionScope(appId, scope)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe false
+      }
+    }
+
+  }
+
 }
 
 object ApplicationsConnectorSpec extends HttpClientV2Support {

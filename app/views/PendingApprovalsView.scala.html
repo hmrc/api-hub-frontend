@@ -25,27 +25,27 @@
 
 @(applications: Seq[Application], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("pendingApprovals.title")), user = user, showBackLink = false) {
+    @layout(pageTitle = titleNoForm(messages("pendingApprovals.title")), user = user, showBackLink = false) {
 
-    <h1 class="govuk-heading-xl">@messages("pendingApprovals.heading")</h1>
+        <h1 class="govuk-heading-xl">@messages("pendingApprovals.heading")</h1>
 
-    @govukTable(
-        Table(
-            caption = None,
-            head = Some(
-                Seq(
-                    HeadCell(messages("index.applications.name")),
-                    HeadCell(messages("index.applications.id"))
-                )
-            ),
-            rows = applications.map(
-                application =>
-                    Seq(
-                        TableRow(content = application.name),
-                        TableRow(content = application.id)
+            @govukTable(
+                Table(
+                    caption = None,
+                    head = Some(
+                        Seq(
+                            HeadCell(messages("index.applications.name")),
+                            HeadCell(messages("index.applications.id"))
+                        )
+                    ),
+                    rows = applications.map(
+                        application =>
+                            Seq(
+                                TableRow(content = HtmlContent(s"""<a href="${routes.ApproveScopeController.onPageLoad(application.id).url}">${application.name}</a>""")),
+                                TableRow(content = application.id)
+                            )
                     )
-            )
-        )
-    )
-
-}
+                )
+)
+        
+    }

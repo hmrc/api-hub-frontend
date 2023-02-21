@@ -50,4 +50,9 @@ class ApiHubService @Inject()(applicationsConnector: ApplicationsConnector)
     applicationsConnector.pendingScopes()
   }
 
+  def approveProductionScope(appId: String, scopeName: String)(implicit hc:HeaderCarrier): Future[Boolean] = {
+    logger.debug(s"Approving scope named '${scopeName}' for application id '${appId}' in PROD environment")
+    applicationsConnector.approveProductionScope(appId, scopeName)
+  }
+
 }
