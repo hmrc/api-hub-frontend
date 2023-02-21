@@ -24,7 +24,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.ApproveProductionScopeView
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class ApproveScopeController @Inject()(
                                         override val messagesApi: MessagesApi,
@@ -50,9 +50,5 @@ class ApproveScopeController @Inject()(
           case true => Redirect(routes.PendingApprovalsController.onPageLoad())
           case false => NotFound
         }
-  }
-
-  def onDecline(id: String): Action[AnyContent] = (identify andThen canApprove).async {
-    Future.successful(NotImplemented)
   }
 }
