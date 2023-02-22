@@ -134,17 +134,6 @@
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <h2 class="govuk-heading-m">@messages("applicationDetails.teamMembers")</h2>
-            @teamMembers(application.teamMembers)
-        </div>
-    </div>
-
-    <div class="govuk-grid-row">
-        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-    </div>
-
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds">
             <h2 class="govuk-heading-m">@messages("applicationDetails.credentials")</h2>
         </div>
     </div>
@@ -159,5 +148,17 @@
             )
         )
     )
+
+    <div class="govuk-grid-row">
+        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+    </div>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h2 class="govuk-heading-m">@messages("applicationDetails.teamMembers")</h2>
+            @teamMembers(application.teamMembers)
+        </div>
+    </div>
+
 
 }
