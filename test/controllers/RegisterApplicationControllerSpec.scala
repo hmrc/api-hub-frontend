@@ -45,7 +45,7 @@ class RegisterApplicationControllerSpec extends SpecBase with MockitoSugar {
       val fixture = buildFixture(userAnswers)
 
       when(fixture.apiHubService.registerApplication(ArgumentMatchers.eq(newApplication))(any()))
-        .thenReturn(Future.successful(Application(testId, newApplication)))
+        .thenReturn(Future.successful(Right(Application(testId, newApplication))))
 
       running(fixture.application) {
         val request = FakeRequest(POST, routes.RegisterApplicationController.create.url)

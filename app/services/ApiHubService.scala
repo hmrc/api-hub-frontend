@@ -19,6 +19,7 @@ package services
 import com.google.inject.{Inject, Singleton}
 import connectors.ApplicationsConnector
 import models.application.{Application, NewApplication, NewScope}
+import models.errors.RequestError
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -28,7 +29,7 @@ import scala.concurrent.Future
 class ApiHubService @Inject()(applicationsConnector: ApplicationsConnector)
   extends Logging {
 
-  def registerApplication(newApplication: NewApplication)(implicit hc: HeaderCarrier): Future[Application] = {
+  def registerApplication(newApplication: NewApplication)(implicit hc: HeaderCarrier): Future[Either[RequestError, Application]] = {
     logger.debug(s"Registering application named '${newApplication.name}', created by user with email '${newApplication.createdBy.email}''")
     applicationsConnector.registerApplication(newApplication)
   }
@@ -41,8 +42,8 @@ class ApiHubService @Inject()(applicationsConnector: ApplicationsConnector)
     applicationsConnector.getApplication(id)
   }
 
-  def requestAdditionalScope(id:String, newScope:NewScope)(implicit hc:HeaderCarrier): Future[Option[NewScope]] = {
-    logger.debug(s"Requesting scope named '${newScope.name}' for application id '${id}' in environments ${newScope.environments}")
+  def requestAdditionalScope(id:String, newScope:NewScope)(implicit hc:HeaderCarrier): Future[Either[RequestError, Option[Unit]]] = {
+    logger.debug(s"Requesting scope named '${newScope.name}' for application id '$id' in environments ${newScope.environments}")
     applicationsConnector.requestAdditionalScope(id, newScope)
   }
 

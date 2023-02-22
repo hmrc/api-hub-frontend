@@ -44,8 +44,10 @@ class RegisterApplicationController @Inject()(
     implicit request =>
       validateAndBuildApplication(request.userAnswers, request.user).fold(
         call => Future.successful(Redirect(call)),
-        newApplication => apiHubService.registerApplication(newApplication)
-          .map(app => Redirect(routes.RegisterApplicationSuccessController.onPageLoad(app.id)))
+        newApplication => apiHubService.registerApplication(newApplication).map {
+          case Right(application) => Redirect(routes.RegisterApplicationSuccessController.onPageLoad(application.id))
+          case _ => InternalServerError
+        }
       )
   }
 

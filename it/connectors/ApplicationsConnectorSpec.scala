@@ -38,7 +38,7 @@ class ApplicationsConnectorSpec
 
       buildConnector(this).registerApplication(newApplication)(HeaderCarrier()) map {
         actual =>
-          actual mustBe expected
+          actual mustBe Right(expected)
       }
     }
   }
@@ -115,7 +115,7 @@ class ApplicationsConnectorSpec
 
       buildConnector(this).requestAdditionalScope(appId, newScope)(HeaderCarrier()) map {
         actual =>
-          actual mustBe Some(newScope)
+          actual mustBe Right(Some(()))
       }
     }
 
@@ -131,7 +131,7 @@ class ApplicationsConnectorSpec
 
       buildConnector(this).requestAdditionalScope(appId, newScope)(HeaderCarrier()) map {
         actual =>
-          actual mustBe None
+          actual mustBe Right(None)
       }
     }
   }

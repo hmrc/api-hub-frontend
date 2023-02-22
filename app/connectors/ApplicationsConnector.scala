@@ -17,61 +17,36 @@
 package connectors
 
 import com.google.inject.{Inject, Singleton}
+import connectors.ApplicationsConnector.{RequestBuilderExtensionOps, deOptionalise}
 import models.application.{Application, NewApplication, NewScope}
+import models.errors.{ErrorResponse, RequestError}
+import play.api.Logging
 import play.api.http.HeaderNames.{ACCEPT, CONTENT_TYPE}
-import models.errors.{BadRequest, RequestError, RequestErrorCode}
-import play.api.http.HeaderNames.ACCEPT
 import play.api.http.MimeTypes.JSON
-import play.api.http.Status.{BAD_REQUEST, CREATED}
-import play.api.libs.json.{JsError, Json}
+import play.api.http.Status.{BAD_REQUEST, NOT_FOUND}
+import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.HttpReads.upstreamResponseMessage
-import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps, UpstreamErrorResponse}
+import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpErrorFunctions, HttpReads, HttpReadsInstances, HttpResponse, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
+import java.net.URL
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ApplicationsConnector @Inject()(
     httpClient: HttpClientV2,
     servicesConfig: ServicesConfig
-  )(implicit ec: ExecutionContext) {
+  )(implicit ec: ExecutionContext) extends Logging {
 
   private val applicationsBaseUrl = servicesConfig.baseUrl("api-hub-applications")
 
-  def registerApplication(newApplication: NewApplication)(implicit hc: HeaderCarrier): Future[Either[RequestErrorCode, Application]] = {
-    httpClient
-      .post(url"$applicationsBaseUrl/api-hub-applications/applications")
-      .withBody(Json.toJson(newApplication))
-      .execute[HttpResponse]
-      .flatMap(
-        response =>
-          response.status match {
-            case CREATED =>
-              response.json.validate[Application].fold(
-                errors => Future.failed(new RuntimeException(JsError.toJson(errors).toString())),
-                application => Future.successful(Right(application))
-              )
-            case BAD_REQUEST =>
-              response.json.validate[RequestError].fold(
-                _ => Future.successful(Left(BadRequest)),
-                requestError => Future.successful(Left(requestError.reason))
-              )
-            case _ =>
-              Future.failed(
-                UpstreamErrorResponse(
-                  message    = upstreamResponseMessage(
-                    "POST",
-                    url"$applicationsBaseUrl/api-hub-applications/applications".toString,
-                    response.status,
-                    response.body
-                  ),
-                  statusCode = response.status
-                )
-              )
-          }
-      )
+  def registerApplication(newApplication: NewApplication)(implicit hc: HeaderCarrier): Future[Either[RequestError, Application]] = {
+    postWithRequiredResponse[NewApplication, Application](
+      url"$applicationsBaseUrl/api-hub-applications/applications",
+      Some(newApplication),
+      Seq((ACCEPT, JSON))
+    )
   }
 
   def getApplications()(implicit hc: HeaderCarrier): Future[Seq[Application]] = {
@@ -93,16 +68,12 @@ class ApplicationsConnector @Inject()(
       }
   }
 
-  def requestAdditionalScope(id: String, newScope: NewScope)(implicit hc: HeaderCarrier): Future[Option[NewScope]] = {
-    httpClient
-      .post(url"$applicationsBaseUrl/api-hub-applications/applications/$id/environments/scopes")
-      .withBody(Json.toJson(Seq(newScope)))
-      .execute[Either[UpstreamErrorResponse, Unit]]
-      .flatMap {
-        case Right(_) => Future.successful(Some(newScope))
-        case Left(e) if e.statusCode==404 => Future.successful(None)
-        case Left(e) => Future.failed(e)
-      }
+  def requestAdditionalScope(id: String, newScope: NewScope)(implicit hc: HeaderCarrier): Future[Either[RequestError, Option[Unit]]] = {
+    postWithOptionalResponse[Seq[NewScope], Unit](
+      url"$applicationsBaseUrl/api-hub-applications/applications/$id/environments/scopes",
+      Some(Seq(newScope)),
+      Seq.empty
+    )
   }
 
   def pendingScopes()(implicit hc: HeaderCarrier): Future[Seq[Application]] = {
@@ -124,4 +95,108 @@ class ApplicationsConnector @Inject()(
         case Left(e) => Future.failed(e)
       }
   }
+  private def postWithOptionalResponse[S: Writes, T: HttpReads]
+    (url: URL, body: Option[S] = None, headers: Seq[(String, String)] = Seq.empty)
+    (implicit hc: HeaderCarrier): Future[Either[RequestError, Option[T]]] = {
+
+    val method = "POST"
+
+    httpClient
+      .post(url)
+      .withOptionalBody(body)
+      .setHeader(headers: _*)
+      .executeX[T](method, url)
+  }
+
+  private def postWithRequiredResponse[S: Writes, T: HttpReads]
+    (url: URL, body: Option[S] = None, headers: Seq[(String, String)] = Seq.empty)
+    (implicit hc: HeaderCarrier): Future[Either[RequestError, T]] = {
+
+    val method = "POST"
+
+    deOptionalise(
+      method,
+      url,
+      postWithOptionalResponse[S, T](url, body, headers)
+    )
+  }
+
+}
+
+object ApplicationsConnector extends Logging {
+
+  implicit class RequestBuilderExtensionOps(requestBuilder: RequestBuilder) {
+
+    def withOptionalBody[B : Writes](body: Option[B])(implicit ec: ExecutionContext): RequestBuilder = {
+      body match {
+        case Some(b) => requestBuilder.withBody(Json.toJson(b))
+        case _ => requestBuilder
+      }
+    }
+
+    def executeX[T : HttpReads](method: String, url: URL)(implicit ec: ExecutionContext): Future[Either[RequestError, Option[T]]] = {
+      requestBuilder.execute[HttpResponse]
+        .flatMap(
+          response =>
+            response.status match {
+              case BAD_REQUEST => processBadRequest(method, url, response)
+              case NOT_FOUND => processNotFound(method, url)
+              case _ => processResultOrError[T](method, url, response)
+            }
+        )
+    }
+  }
+
+  private def processBadRequest[T](method: String, url: URL, response: HttpResponse): Future[Either[RequestError, Option[T]]] = {
+    response.json.validate[ErrorResponse].fold(
+      _ => {
+        logger.warn(s"Received unexpected Bad Request response for $method call to ${url.toString}")
+        Future.failed(
+          UpstreamErrorResponse(
+            HttpErrorFunctions.upstreamResponseMessage(method, url.toString, response.status, response.body),
+            response.status
+          )
+        )
+      },
+      requestError => {
+        logger.info(s"Received expected Bad Request call $requestError for $method call to ${url.toString}")
+        Future.successful(Left(requestError.reason))
+      }
+    )
+  }
+
+  private def processNotFound[T](method: String, url: URL): Future[Either[RequestError, Option[T]]] = {
+    logger.warn(s"Received Not Found response for $method call to ${url.toString}")
+    Future.successful(Right(None))
+  }
+
+  private def processResultOrError[T: HttpReads](method: String, url: URL, response: HttpResponse): Future[Either[RequestError, Option[T]]] = {
+    HttpReadsInstances.readEitherOf[T]
+      .read(method, url.toString, response).fold(
+      upstreamErrorResponse => {
+        logger.error(s"Received upstream error for $method call to ${url.toString}", upstreamErrorResponse)
+        Future.failed(upstreamErrorResponse)
+      },
+      t => {
+        logger.debug(s"Received response body of type ${t.getClass.getSimpleName} for $method call to ${url.toString}")
+        Future.successful(Right(Some(t)))
+      }
+    )
+  }
+
+  private def deOptionalise[T](method: String, url: URL, result: Future[Either[RequestError, Option[T]]])
+      (implicit ec: ExecutionContext): Future[Either[RequestError, T]] = {
+    result.flatMap {
+      case Right(Some(t)) => Future.successful(Right(t))
+      case Right(None) =>
+        Future.failed(
+          UpstreamErrorResponse(
+            HttpErrorFunctions.upstreamResponseMessage(method, url.toString, NOT_FOUND, ""),
+            NOT_FOUND
+          )
+        )
+      case Left(error) => Future.successful(Left(error))
+    }
+  }
+
 }
