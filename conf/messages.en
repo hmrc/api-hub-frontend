@@ -83,6 +83,7 @@ applicationDetails.application.created = Created
 applicationDetails.application.createdBy = Created by
 applicationDetails.addScope = Add scope
 applicationDetails.credentials = Credentials
+applicationDetails.teamMembers = Team members
 applicationDetails.scopes = Scopes
 applicationDetails.dev = dev
 applicationDetails.test = test

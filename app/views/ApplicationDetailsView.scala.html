@@ -69,6 +69,20 @@
     </div>
 }
 
+@teamMember(teamMember: TeamMember) = {
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-quarter">
+            <span class="govuk-body">
+                @teamMember.email
+            </span>
+        </div>
+    </div>
+}
+
+@teamMembers(teamMembers: Seq[TeamMember]) = @{
+    teamMembers.map(member => teamMember(member))
+}
+
 @environmentTabScopes(scopes: Seq[Scope]) = {
     @if(scopes.isEmpty) {
         @messages("applicationDetails.noScopes")
@@ -113,6 +127,17 @@
     @applicationDetail("applicationDetails.application.id", application.id)
     @applicationDetail("applicationDetails.application.created", ViewUtils.formatLocalDateTime(application.created))
     @applicationDetail("applicationDetails.application.createdBy", application.createdBy.email)
+
+    <div class="govuk-grid-row">
+        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+    </div>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h2 class="govuk-heading-m">@messages("applicationDetails.teamMembers")</h2>
+            @teamMembers(application.teamMembers)
+        </div>
+    </div>
 
     <div class="govuk-grid-row">
         <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
