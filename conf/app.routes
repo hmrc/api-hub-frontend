@@ -43,3 +43,18 @@ GET         /scope-approved                          controllers.ScopeApprovedCo
 
 GET         /approve-scope/:id                       controllers.ApproveScopeController.onPageLoad(id: String)
 GET         /approve-scope/:id/approve/scopes/:scopeName  controllers.ApproveScopeController.onApprove(id: String, scopeName:String)
+
+GET        /questionAddTeamMembers                        controllers.QuestionAddTeamMembersController.onPageLoad(mode: Mode = NormalMode)
+POST       /questionAddTeamMembers                        controllers.QuestionAddTeamMembersController.onSubmit(mode: Mode = NormalMode)
+GET        /changeQuestionAddTeamMembers                  controllers.QuestionAddTeamMembersController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeQuestionAddTeamMembers                  controllers.QuestionAddTeamMembersController.onSubmit(mode: Mode = CheckMode)
+
+GET        /addTeamMemberDetails                        controllers.AddTeamMemberDetailsController.onPageLoad(mode: Mode = NormalMode)
+POST       /addTeamMemberDetails                        controllers.AddTeamMemberDetailsController.onSubmit(mode: Mode = NormalMode)
+GET        /changeAddTeamMemberDetails                  controllers.AddTeamMemberDetailsController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeAddTeamMemberDetails                  controllers.AddTeamMemberDetailsController.onSubmit(mode: Mode = CheckMode)
+
+GET        /confirmAddTeamMember                        controllers.ConfirmAddTeamMemberController.onPageLoad(mode: Mode = NormalMode)
+POST       /confirmAddTeamMember                        controllers.ConfirmAddTeamMemberController.onSubmit(mode: Mode = NormalMode)
+GET        /changeConfirmAddTeamMember                  controllers.ConfirmAddTeamMemberController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeConfirmAddTeamMember                  controllers.ConfirmAddTeamMemberController.onSubmit(mode: Mode = CheckMode)
