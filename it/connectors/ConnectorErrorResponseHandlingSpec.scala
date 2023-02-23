@@ -8,13 +8,15 @@ import org.scalatest.matchers.must.Matchers
 import play.api.Logging
 import play.api.http.Status.{BAD_REQUEST, NOT_FOUND}
 import play.api.libs.json.{JsObject, Json, Reads, Writes}
-import uk.gov.hmrc.http.test.{HttpClientSupport, WireMockSupport}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpErrorFunctions, HttpResponse}
+import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpErrorFunctions, HttpResponse}
+import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.client.HttpClientV2
 
 import java.net.URL
 import scala.concurrent.Future
 
-class ConnectorErrorResponseHandlingSpec extends AsyncFreeSpec with Matchers with WireMockSupport with HttpClientSupport {
+class ConnectorErrorResponseHandlingSpec extends AsyncFreeSpec with Matchers with WireMockSupport with HttpClientV2Support {
 
   private implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -30,7 +32,7 @@ class ConnectorErrorResponseHandlingSpec extends AsyncFreeSpec with Matchers wit
           )
       )
 
-      new TestConnector(httpClient).postMethod[Application]().map {
+      new TestConnector(httpClientV2).postMethod[Application]().map {
         result =>
           result mustBe Right(Some(application))
       }
@@ -45,7 +47,7 @@ class ConnectorErrorResponseHandlingSpec extends AsyncFreeSpec with Matchers wit
       )
 
       recoverToSucceededIf[ConnectorException] {
-        new TestConnector(httpClient).postMethod[Application]()
+        new TestConnector(httpClientV2).postMethod[Application]()
       }
     }
 
@@ -59,7 +61,7 @@ class ConnectorErrorResponseHandlingSpec extends AsyncFreeSpec with Matchers wit
       )
 
       recoverToSucceededIf[ConnectorException] {
-        new TestConnector(httpClient).postMethod[Application]()
+        new TestConnector(httpClientV2).postMethod[Application]()
       }
     }
   }
@@ -75,21 +77,23 @@ class ConnectorErrorResponseHandlingSpec extends AsyncFreeSpec with Matchers wit
           )
       )
 
-      new TestConnector(httpClient).postMethod[Application]().map {
+      new TestConnector(httpClientV2).postMethod[Application]().map {
         result =>
           result mustBe Left(ApplicationNameNotUnique)
       }
     }
   }
 
-  class TestConnector(httpClient: HttpClient) extends ConnectorErrorResponseHandling with Logging {
+  class TestConnector(httpClient: HttpClientV2) extends ConnectorErrorResponseHandling with Logging {
 
     private implicit val writesUnit: Writes[Unit] = (_: Unit) => JsObject(Seq.empty)
 
     def postMethod[T : Reads]()(implicit hc: HeaderCarrier): Future[Either[RequestError, Option[T]]] = {
       val url = new URL("http", wireMockHost, wireMockPort, "/test-connector")
 
-      httpClient.POST[Unit, HttpResponse](url, (), Seq.empty)
+      httpClient
+        .post(url)
+        .execute[HttpResponse]
         .flatMap {
           response =>
             response.status match {
