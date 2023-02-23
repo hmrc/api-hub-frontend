@@ -53,7 +53,8 @@ class AuthenticatedIdentifierAction @Inject()(val parser: BodyParsers.Default,
             )
           )
         )
-      case None => Future.successful(
+      case None =>
+        Future.successful(
         Redirect(config.loginUrl, Map("continue_url" -> Seq(config.loginContinueUrl)))
       )
     }

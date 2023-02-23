@@ -31,28 +31,29 @@ import views.html.ConfirmAddTeamMemberView
 import scala.concurrent.{ExecutionContext, Future}
 
 class ConfirmAddTeamMemberController @Inject()(
-                                         override val messagesApi: MessagesApi,
-                                         sessionRepository: SessionRepository,
-                                         navigator: Navigator,
-                                         identify: IdentifierAction,
-                                         getData: DataRetrievalAction,
-                                         requireData: DataRequiredAction,
-                                         formProvider: ConfirmAddTeamMemberFormProvider,
-                                         val controllerComponents: MessagesControllerComponents,
-                                         view: ConfirmAddTeamMemberView
-                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                                override val messagesApi: MessagesApi,
+                                                sessionRepository: SessionRepository,
+                                                navigator: Navigator,
+                                                identify: IdentifierAction,
+                                                getData: DataRetrievalAction,
+                                                requireData: DataRequiredAction,
+                                                formProvider: ConfirmAddTeamMemberFormProvider,
+                                                val controllerComponents: MessagesControllerComponents,
+                                                view: ConfirmAddTeamMemberView
+                                              )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] = { //TODO: (identify andThen getData andThen requireData) {
+    identify {
+      implicit request =>
+        //        val preparedForm = request.userAnswers.get(ConfirmAddTeamMemberPage) match {
+        //          case None => form
+        //          case Some(value) => form.fill(value)
+        //        }
 
-      val preparedForm = request.userAnswers.get(ConfirmAddTeamMemberPage) match {
-        case None => form
-        case Some(value) => form.fill(value)
-      }
-
-      Ok(view(preparedForm, mode))
+        Ok(view(form, mode)) // TODO: use preparedForm
+    }
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
@@ -65,7 +66,7 @@ class ConfirmAddTeamMemberController @Inject()(
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(ConfirmAddTeamMemberPage, value))
-            _              <- sessionRepository.set(updatedAnswers)
+            _ <- sessionRepository.set(updatedAnswers)
           } yield Redirect(navigator.nextPage(ConfirmAddTeamMemberPage, mode, updatedAnswers))
       )
   }
