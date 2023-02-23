@@ -19,7 +19,8 @@ package controllers
 import com.google.inject.Inject
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import models.{CheckMode, UserAnswers}
-import models.application.{Creator, NewApplication}
+import models.application.{Application, Creator, NewApplication}
+import models.errors.ErrorResponseHandling
 import models.user.UserModel
 import pages.ApplicationNamePage
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -38,16 +39,18 @@ class RegisterApplicationController @Inject()(
     apiHubService: ApiHubService
   )(implicit ec: ExecutionContext)
   extends FrontendBaseController
-  with I18nSupport {
+  with I18nSupport
+  with ErrorResponseHandling {
 
   def create(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       validateAndBuildApplication(request.userAnswers, request.user).fold(
         call => Future.successful(Redirect(call)),
-        newApplication => apiHubService.registerApplication(newApplication).map {
-          case Right(application) => Redirect(routes.RegisterApplicationSuccessController.onPageLoad(application.id))
-          case _ => InternalServerError
-        }
+        newApplication =>
+          redirectOrThrow[Application](
+            apiHubService.registerApplication(newApplication),
+            application => routes.RegisterApplicationSuccessController.onPageLoad(application.id)
+          )
       )
   }
 

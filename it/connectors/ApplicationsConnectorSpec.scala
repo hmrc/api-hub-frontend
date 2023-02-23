@@ -9,7 +9,7 @@ import play.api.Configuration
 import play.api.http.Status.{NOT_FOUND, NO_CONTENT}
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
+import uk.gov.hmrc.http.test.{HttpClientSupport, WireMockSupport}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import scala.concurrent.ExecutionContext
@@ -201,7 +201,7 @@ class ApplicationsConnectorSpec
 
 }
 
-object ApplicationsConnectorSpec extends HttpClientV2Support {
+object ApplicationsConnectorSpec extends HttpClientSupport {
 
   def buildConnector(wireMockSupport: WireMockSupport)(implicit ec: ExecutionContext): ApplicationsConnector = {
     val servicesConfig = new ServicesConfig(
@@ -211,7 +211,7 @@ object ApplicationsConnectorSpec extends HttpClientV2Support {
       ))
     )
 
-    new ApplicationsConnector(httpClientV2, servicesConfig)
+    new ApplicationsConnector(httpClient, servicesConfig)
   }
 
   def toJsonString(newApplication: NewApplication): String = {

@@ -19,6 +19,7 @@ package controllers
 import controllers.actions._
 import forms.NewScopeFormProvider
 import models.application.{EnvironmentName, NewScope}
+import models.errors.ErrorResponseHandling
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
@@ -35,7 +36,7 @@ class AddScopeController @Inject()(
                                     view: AddScopeView,
                                     apiHubService: ApiHubService,
                                     formProvider: NewScopeFormProvider
-                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with ErrorResponseHandling {
 
   val form = formProvider()
 
@@ -55,11 +56,10 @@ class AddScopeController @Inject()(
 
         scopeData => {
           val envs = Seq(scopeData.dev, scopeData.test, scopeData.preProd, scopeData.prod).flatten[String].flatMap(s => EnvironmentName.enumerable.withName(s))
-          apiHubService.requestAdditionalScope(id, NewScope(scopeData.scopeName, envs)).map {
-            case Right(Some(_)) => Redirect(routes.RequestScopeSuccessController.onPageLoad(id))
-            case Right(None) => NotFound
-            case _ => InternalServerError
-          }
+          redirectNotFoundOrThrow[Unit](
+            apiHubService.requestAdditionalScope(id, NewScope(scopeData.scopeName, envs)),
+            _ => routes.RequestScopeSuccessController.onPageLoad(id)
+          )
         }
       )
   }

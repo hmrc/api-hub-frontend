@@ -23,14 +23,23 @@ sealed trait RequestError
 
 case object InvalidJson extends RequestError
 
+case object ApplicationNameNotUnique extends RequestError
+
 object RequestError extends Enumerable.Implicits {
 
   val values: Seq[RequestError] = Seq(
-    InvalidJson
+    InvalidJson,
+    ApplicationNameNotUnique
   )
 
   implicit val enumerable: Enumerable[RequestError] =
     Enumerable(values.map(value => value.toString -> value): _*)
+
+  def isRecoverable(requestError: RequestError): Boolean = {
+    Set[RequestError](
+      ApplicationNameNotUnique
+    ).contains(requestError)
+  }
 
 }
 
