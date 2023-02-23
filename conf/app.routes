@@ -1,45 +1,60 @@
 # microservice specific routes
 
-->          /hmrc-frontend                           hmrcfrontend.Routes
+->          /hmrc-frontend                                      hmrcfrontend.Routes
 
-GET         /                                        controllers.IndexController.onPageLoad
-POST        /                                        controllers.IndexController.onSubmit
+GET         /                                                   controllers.IndexController.onPageLoad
+POST        /                                                   controllers.IndexController.onSubmit
 
-GET         /assets/*file                            controllers.Assets.versioned(path="/public", file: Asset)
+GET         /assets/*file                                       controllers.Assets.versioned(path="/public", file: Asset)
 
-GET         /language/:lang                          controllers.LanguageSwitchController.switchToLanguage(lang: String)
+GET         /language/:lang                                     controllers.LanguageSwitchController.switchToLanguage(lang: String)
 
-GET         /refresh-session                         controllers.KeepAliveController.keepAlive
+GET         /refresh-session                                    controllers.KeepAliveController.keepAlive
 
-GET         /there-is-a-problem                      controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
+GET         /there-is-a-problem                                 controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
-GET         /check-your-answers                      controllers.CheckYourAnswersController.onPageLoad
+GET         /check-your-answers                                 controllers.CheckYourAnswersController.onPageLoad
 
-GET         /account/sign-out-survey                 controllers.auth.AuthController.signOut
-GET         /account/sign-out                        controllers.auth.AuthController.signOutNoSurvey
-GET         /account/signed-out                      controllers.auth.SignedOutController.onPageLoad
+GET         /account/sign-out-survey                            controllers.auth.AuthController.signOut
+GET         /account/sign-out                                   controllers.auth.AuthController.signOutNoSurvey
+GET         /account/signed-out                                 controllers.auth.SignedOutController.onPageLoad
 
-GET         /unauthorised                            controllers.UnauthorisedController.onPageLoad
+GET         /unauthorised                                       controllers.UnauthorisedController.onPageLoad
 
-GET         /application-name                        controllers.ApplicationNameController.onPageLoad(mode: Mode = NormalMode)
-POST        /application-name                        controllers.ApplicationNameController.onSubmit(mode: Mode = NormalMode)
-GET         /change-application-name                 controllers.ApplicationNameController.onPageLoad(mode: Mode = CheckMode)
-POST        /change-application-name                 controllers.ApplicationNameController.onSubmit(mode: Mode = CheckMode)
+GET         /application-name                                   controllers.ApplicationNameController.onPageLoad(mode: Mode = NormalMode)
+POST        /application-name                                   controllers.ApplicationNameController.onSubmit(mode: Mode = NormalMode)
+GET         /change-application-name                            controllers.ApplicationNameController.onPageLoad(mode: Mode = CheckMode)
+POST        /change-application-name                            controllers.ApplicationNameController.onSubmit(mode: Mode = CheckMode)
 
-POST        /register-application                    controllers.RegisterApplicationController.create
+POST        /register-application                               controllers.RegisterApplicationController.create
 
-GET         /register-application-success/:id        controllers.RegisterApplicationSuccessController.onPageLoad(id:String)
+GET         /register-application-success/:id                   controllers.RegisterApplicationSuccessController.onPageLoad(id:String)
 
-GET         /application-details/:id                 controllers.ApplicationDetailsController.onPageLoad(id: String)
+GET         /application-details/:id                            controllers.ApplicationDetailsController.onPageLoad(id: String)
 
-GET         /request-scope-success/:id               controllers.RequestScopeSuccessController.onPageLoad(id: String)
+GET         /request-scope-success/:id                          controllers.RequestScopeSuccessController.onPageLoad(id: String)
 
-GET         /add-scope/:id                           controllers.AddScopeController.onPageLoad(id: String)
-POST        /add-scope/:id                           controllers.AddScopeController.onSubmit(id: String)
+GET         /add-scope/:id                                      controllers.AddScopeController.onPageLoad(id: String)
+POST        /add-scope/:id                                      controllers.AddScopeController.onSubmit(id: String)
 
-GET         /pending-approvals                       controllers.PendingApprovalsController.onPageLoad()
+GET         /pending-approvals                                  controllers.PendingApprovalsController.onPageLoad()
 
-GET         /scope-approved                          controllers.ScopeApprovedController.onPageLoad()
+GET         /scope-approved                                     controllers.ScopeApprovedController.onPageLoad()
 
-GET         /approve-scope/:id                       controllers.ApproveScopeController.onPageLoad(id: String)
-GET         /approve-scope/:id/approve/scopes/:scopeName  controllers.ApproveScopeController.onApprove(id: String, scopeName:String)
+GET         /approve-scope/:id                                  controllers.ApproveScopeController.onPageLoad(id: String)
+GET         /approve-scope/:id/approve/scopes/:scopeName        controllers.ApproveScopeController.onApprove(id: String, scopeName:String)
+
+GET         /add-team-members                                   controllers.QuestionAddTeamMembersController.onPageLoad(mode: Mode = NormalMode)
+POST        /add-team-members                                   controllers.QuestionAddTeamMembersController.onSubmit(mode: Mode = NormalMode)
+GET         /change-add-team-members                            controllers.QuestionAddTeamMembersController.onPageLoad(mode: Mode = CheckMode)
+POST        /change-add-team-members                            controllers.QuestionAddTeamMembersController.onSubmit(mode: Mode = CheckMode)
+
+GET         /add-team-member-details                            controllers.AddTeamMemberDetailsController.onPageLoad(mode: Mode = NormalMode)
+POST        /add-team-member-details                            controllers.AddTeamMemberDetailsController.onSubmit(mode: Mode = NormalMode)
+GET         /change-add-team-member-details                     controllers.AddTeamMemberDetailsController.onPageLoad(mode: Mode = CheckMode)
+POST        /change-add-team-member-details                     controllers.AddTeamMemberDetailsController.onSubmit(mode: Mode = CheckMode)
+
+GET         /team-members-overview                              controllers.ConfirmAddTeamMemberController.onPageLoad(mode: Mode = NormalMode)
+POST        /team-members-overview                              controllers.ConfirmAddTeamMemberController.onSubmit(mode: Mode = NormalMode)
+GET         /change-team-members-overview                       controllers.ConfirmAddTeamMemberController.onPageLoad(mode: Mode = CheckMode)
+POST        /change-team-members-overview                       controllers.ConfirmAddTeamMemberController.onSubmit(mode: Mode = CheckMode)

@@ -148,3 +148,22 @@ addScope.declineButton.text = Decline
 
 
 
+
+questionAddTeamMembers.title = Do you want to add team members?
+questionAddTeamMembers.heading = Do you want to add team members?
+questionAddTeamMembers.checkYourAnswersLabel = questionAddTeamMembers
+questionAddTeamMembers.error.required = Select yes if questionAddTeamMembers
+questionAddTeamMembers.change.hidden = QuestionAddTeamMembers
+
+addTeamMemberDetails.title = Add team member details
+addTeamMemberDetails.heading = Add team member details
+addTeamMemberDetails.checkYourAnswersLabel = Add team member
+addTeamMemberDetails.error.required = Enter team member details
+addTeamMemberDetails.error.length = Team member must be 100 characters or less
+addTeamMemberDetails.change.hidden = Add team member details
+
+confirmAddTeamMember.title = Confirm add team member
+confirmAddTeamMember.heading = Confirm add team member
+confirmAddTeamMember.checkYourAnswersLabel = Confirm add team member
+confirmAddTeamMember.error.required = Select yes if adding team member
+confirmAddTeamMember.change.hidden = Confirm add team member
