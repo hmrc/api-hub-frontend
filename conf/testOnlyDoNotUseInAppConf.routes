@@ -12,8 +12,10 @@
 # Add all the application routes to the prod.routes file
 ->         /                                        prod.Routes
 
-GET        /api-hub/test-only/sign-in               testonly.TestOnlySignInController.showSignIn
-POST       /api-hub/test-only/sign-in               testonly.TestOnlySignInController.submit
+GET        /api-hub/test-only/sign-in                             testonly.TestOnlySignInController.showSignIn
+POST       /api-hub/test-only/sign-in                             testonly.TestOnlySignInController.submit
+
+GET        /api-hub/test-only/bad-request-demo/:respondWith      testonly.BadRequestDemoController.onPageLoad(respondWith: String)
 
 + nocsrf
-POST       /api-hub/test-only/internal-auth/auth    testonly.TestOnlySignInController.auth
+POST       /api-hub/test-only/internal-auth/auth                 testonly.TestOnlySignInController.auth
