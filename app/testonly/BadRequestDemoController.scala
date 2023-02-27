@@ -16,10 +16,10 @@
 
 package testonly
 
-import controllers.actions._
+import models.application.Application
+import models.errors.{ServiceRequestError, TeamMemberAlreadyExists, UserRequestError}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import play.api.mvc.Results.Redirect
 import services.BadRequestDemoService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.BadRequestDemoView
@@ -35,10 +35,12 @@ class BadRequestDemoController @Inject()(
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(respondWith: String): Action[AnyContent] = Action.async {
-    implicit request => badRequestDemoService.getHardCodedApplication.flatMap {
-      case Right(application) => Future.successful(Ok(view(application)))
-      // case Left(ApplicationNameNotUnique) => Future.successful(Redirect(routes.ApplicationNameController.onPageLoad(CheckMode)))
-      // case Left(_) => Future.failed(new RuntimeException())
+    implicit request => badRequestDemoService.getHardCodedApplication(respondWith).flatMap {
+      case Right(application) => Future.successful(Ok(view(Right(application))))
+      case Left(TeamMemberAlreadyExists) => Future.successful(Ok(view(Left("This email address already exists in the team members for this application"))))
+      case _: Left[UserRequestError, Application] => Future.successful(Ok(view(Left("We could handle errors made by the user generically"))))
+      case _: Left[ServiceRequestError, Application] => Future.successful(Ok(view(Left("We can chose how to react to request errors made by the frontend (though this should not happen!)"))))
+      case _ => Future.failed(new RuntimeException())
     }
   }
 }

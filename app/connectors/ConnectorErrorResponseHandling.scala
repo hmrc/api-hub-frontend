@@ -38,6 +38,18 @@ trait ConnectorErrorResponseHandling {
     }
   }
 
+  def parseResponseBody[T: Reads](response: HttpResponse): Either[ConnectorException, T] = {
+    if (response.body.trim.isEmpty) {
+      Left(connectorException("No response body returned"))
+    }
+    else {
+      response.json.validate[T].fold(
+        errors => Left(connectorException(s"Unable to deserialise response body: ${JsError.toJson(errors)}")),
+        t => Right(t)
+      )
+    }
+  }
+
   def badRequest(response: HttpResponse): Future[RequestError] = {
     response.json.validate[ErrorResponse].fold(
       errors => {
@@ -55,6 +67,20 @@ trait ConnectorErrorResponseHandling {
       }
     )
   }
+
+  def parseBadRequest(response: HttpResponse): Either[ConnectorException, RequestError] = {
+    response.json.validate[ErrorResponse].fold(
+      errors => {
+        logger.debug(s"Unable to deserialise Bad Request response body: ${JsError.toJson(errors)}")
+        Left(connectorException(response))
+      },
+      errorResponse => {
+        logger.info(errorResponse.toString)
+        Right(errorResponse.reason)
+      }
+    )
+  }
+
 
   def connectorException(message: String): ConnectorException = {
     val exception = ConnectorException(message)

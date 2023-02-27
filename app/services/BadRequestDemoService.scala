@@ -29,8 +29,8 @@ import scala.concurrent.Future
 class BadRequestDemoService @Inject()(badRequestDemoConnector: BadRequestDemoConnector)
   extends Logging {
 
-  def getHardCodedApplication(implicit hc: HeaderCarrier): Future[Either[RequestError, Application]] = {
-    badRequestDemoConnector.getHardCodedApplication
+  def getHardCodedApplication(respondWith: String)(implicit hc: HeaderCarrier): Future[Either[RequestError, Application]] = {
+    badRequestDemoConnector.getHardCodedApplication(respondWith)
   }
 
 }

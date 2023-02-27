@@ -21,16 +21,15 @@
         govukButton: GovukButton
 )
 
-@(application: Application)(implicit request: Request[_], messages: Messages)
+@(content: Either[String, Application])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("badRequestDemo.title"))) {
 
     <h1 class="govuk-heading-xl">@messages("badRequestDemo.heading")</h1>
 
-    <p>
-     Name: @application.name
-    </p>
-    <p>
-     ID: @application.id
-    </p>
+    @if(content.isRight){
+        <p>@content.right.get.name</p>
+    } else {
+        <p>@content.left.get</p>
+    }
 }

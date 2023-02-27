@@ -20,11 +20,14 @@ import com.google.inject.{Inject, Singleton}
 import models.application._
 import models.errors.RequestError
 import play.api.Logging
+import play.api.http.Status.BAD_REQUEST
 import uk.gov.hmrc.http.{HeaderCarrier, HttpErrorFunctions, HttpResponse, StringContextOps}
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import scala.concurrent.{ExecutionContext, Future}
+
+import uk.gov.hmrc.http.HttpReads.Implicits._
 
 @Singleton
 class BadRequestDemoConnector @Inject()(
@@ -34,16 +37,22 @@ class BadRequestDemoConnector @Inject()(
 
   private val applicationsBaseUrl = servicesConfig.baseUrl("api-hub-applications")
 
-  def getHardCodedApplication(implicit hc: HeaderCarrier): Future[Either[RequestError, Application]] = {
+  def getHardCodedApplication(respondWith: String)(implicit hc: HeaderCarrier): Future[Either[RequestError, Application]] = {
     httpClient
-      .get(url"$applicationsBaseUrl/api-hub-applications/test-only/bad-request-demo/success")
+      .get(url"$applicationsBaseUrl/api-hub-applications/test-only/bad-request-demo/$respondWith")
       .execute[HttpResponse]
       .flatMap {
-        response => response.status match {
-          case success if HttpErrorFunctions.is2xx(success) => responseBodyToModel[Application](response).map(Right(_))
-          // case BAD_REQUEST => badRequest(response).map(Left(_)) // Either[RequestErrorParseException, RequestError]
-          // case _ => Future.failed(connectorException(response))
-          case _ => Future.failed(new RuntimeException())
+        response =>
+          response.status match {
+          case success if HttpErrorFunctions.is2xx(success) => parseResponseBody[Application](response).fold(
+              connectorException => Future.failed(connectorException),
+              application => Future.successful(Right(application))
+          )
+          case BAD_REQUEST => parseBadRequest(response).fold (
+            connectorException => Future.failed(connectorException),
+            requestError => Future.successful(Left(requestError))
+          )
+          case _ => Future.failed(new RuntimeException("We will not handle any other status codes"))
         }
       }
   }

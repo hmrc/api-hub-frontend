@@ -21,7 +21,12 @@ import play.api.libs.json.{Format, Json}
 
 sealed trait RequestError
 
-case object InvalidJson extends RequestError
+trait UserRequestError extends RequestError
+case object TeamMemberAlreadyExists extends UserRequestError
+
+trait ServiceRequestError extends RequestError
+
+case object InvalidJson extends ServiceRequestError
 
 case object ApplicationNameNotUnique extends RequestError
 
@@ -29,7 +34,8 @@ object RequestError extends Enumerable.Implicits {
 
   val values: Seq[RequestError] = Seq(
     InvalidJson,
-    ApplicationNameNotUnique
+    ApplicationNameNotUnique,
+    TeamMemberAlreadyExists
   )
 
   implicit val enumerable: Enumerable[RequestError] =
