@@ -35,7 +35,7 @@ object AddTeamMemberDetailsSummary  {
           key     = "addTeamMemberDetails.checkYourAnswersLabel",
           value   = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.AddTeamMemberDetailsController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", routes.AddTeamMemberDetailsController.onPageLoad(CheckMode, 0).url)
               .withVisuallyHiddenText(messages("addTeamMemberDetails.change.hidden"))
           )
         )
