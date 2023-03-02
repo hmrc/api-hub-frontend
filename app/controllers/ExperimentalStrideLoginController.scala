@@ -18,7 +18,7 @@ package controllers
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import play.api.{Configuration, Environment, Logging}
+import play.api.{Configuration, Environment, Logging, Mode}
 import uk.gov.hmrc.auth.core.AuthProvider.PrivilegedApplication
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
@@ -63,7 +63,14 @@ class ExperimentalStrideLoginController @Inject()(
         }.recover {
         case _: NoActiveSession =>
           logger.warn("NoActiveSession")
-          toStrideLogin(routes.ExperimentalStrideLoginController.noRole().absoluteURL())
+          toStrideLogin(
+            if (env.mode.equals(Mode.Dev)) {
+              s"http://${request.host}${request.uri}"
+            }
+            else {
+              s"${request.uri}"
+            }
+          )
         case _: InsufficientEnrolments =>
           logger.warn("InsufficientEnrolments")
           SeeOther(routes.UnauthorisedController.onPageLoad.url)
@@ -96,7 +103,14 @@ class ExperimentalStrideLoginController @Inject()(
         }.recover {
           case _: NoActiveSession =>
             logger.warn("NoActiveSession")
-            toStrideLogin(routes.ExperimentalStrideLoginController.apiHubUser().absoluteURL())
+            toStrideLogin(
+              if (env.mode.equals(Mode.Dev)) {
+                s"http://${request.host}${request.uri}"
+              }
+              else {
+                s"${request.uri}"
+              }
+            )
           case _: InsufficientEnrolments =>
             logger.warn("InsufficientEnrolments")
             SeeOther(routes.UnauthorisedController.onPageLoad.url)
@@ -129,7 +143,14 @@ class ExperimentalStrideLoginController @Inject()(
         }.recover {
         case _: NoActiveSession =>
           logger.warn("NoActiveSession")
-          toStrideLogin(routes.ExperimentalStrideLoginController.apiHubApprover().absoluteURL())
+          toStrideLogin(
+            if (env.mode.equals(Mode.Dev)) {
+              s"http://${request.host}${request.uri}"
+            }
+            else {
+              s"${request.uri}"
+            }
+          )
         case _: InsufficientEnrolments =>
           logger.warn("InsufficientEnrolments")
           SeeOther(routes.UnauthorisedController.onPageLoad.url)
