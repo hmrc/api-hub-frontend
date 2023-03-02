@@ -167,6 +167,3 @@ confirmAddTeamMember.heading = Confirm add team member
 confirmAddTeamMember.checkYourAnswersLabel = Confirm add team member
 confirmAddTeamMember.error.required = Select yes if adding team member
 confirmAddTeamMember.change.hidden = Confirm add team member
-
-testStrideLogin.title = testStrideLogin
-testStrideLogin.heading = testStrideLogin
