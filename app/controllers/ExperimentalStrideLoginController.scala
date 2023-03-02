@@ -50,7 +50,7 @@ class ExperimentalStrideLoginController @Inject()(
               Ok(
                 view(
                   ExperimentalStrideLoginViewModel(
-                    description = "Test login with API Hub User role required",
+                    description = "Test login with no role required",
                     allEnrolments = allEnrolments,
                     authorisedEnrolments = authorisedEnrolments,
                     name = name,
