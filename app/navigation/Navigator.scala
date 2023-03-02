@@ -27,7 +27,8 @@ import models._
 class Navigator @Inject()() {
 
   private val normalRoutes: Page => UserAnswers => Call = {
-    case ApplicationNamePage => _ => routes.CheckYourAnswersController.onPageLoad
+    case ApplicationNamePage => _ => routes.QuestionAddTeamMembersController.onPageLoad(NormalMode)
+    case QuestionAddTeamMembersPage => questionAddTeamMembersNextPage(NormalMode)
     case _ => _ => routes.IndexController.onPageLoad
   }
 
@@ -41,4 +42,14 @@ class Navigator @Inject()() {
     case CheckMode =>
       checkRouteMap(page)(userAnswers)
   }
+
+  private def questionAddTeamMembersNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
+    (mode, userAnswers.get(QuestionAddTeamMembersPage)) match {
+      case (NormalMode, Some(addTeam)) if addTeam => routes.AddTeamMemberDetailsController.onPageLoad(NormalMode)
+      case (NormalMode, Some(_)) => routes.CheckYourAnswersController.onPageLoad
+      case (NormalMode, None) => routes.JourneyRecoveryController.onPageLoad()
+      case _ => routes.CheckYourAnswersController.onPageLoad
+    }
+  }
+
 }

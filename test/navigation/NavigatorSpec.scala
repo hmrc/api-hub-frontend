@@ -20,8 +20,9 @@ import base.SpecBase
 import controllers.routes
 import pages._
 import models._
+import org.scalatest.TryValues
 
-class NavigatorSpec extends SpecBase {
+class NavigatorSpec extends SpecBase with TryValues {
 
   val navigator = new Navigator
 
@@ -35,8 +36,22 @@ class NavigatorSpec extends SpecBase {
         navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad
       }
 
-      "must go from the Application Name page to the Check Your Answers Page" in {
-        navigator.nextPage(ApplicationNamePage, NormalMode, UserAnswers("id")) mustBe routes.CheckYourAnswersController.onPageLoad
+      "must go from the Application Name page to the Do you want to add a team member? page" in {
+        navigator.nextPage(ApplicationNamePage, NormalMode, UserAnswers("id")) mustBe routes.QuestionAddTeamMembersController.onPageLoad(NormalMode)
+      }
+
+      "must go from the Do you want to add a team member? page to the Add a team member page when the user selects yes" in {
+        val userAnswers = UserAnswers("id").set(QuestionAddTeamMembersPage, true).success.value
+        navigator.nextPage(QuestionAddTeamMembersPage, NormalMode, userAnswers) mustBe routes.AddTeamMemberDetailsController.onPageLoad(NormalMode)
+      }
+
+      "must go from the Do you want to add a team member? page to the Check Your Answers page when the user selects no" in {
+        val userAnswers = UserAnswers("id").set(QuestionAddTeamMembersPage, false).success.value
+        navigator.nextPage(QuestionAddTeamMembersPage, NormalMode, userAnswers) mustBe routes.CheckYourAnswersController.onPageLoad
+      }
+
+      "must go from the Do you want to add a team member? page to the Journey recovery page when there is no selection" in {
+        navigator.nextPage(QuestionAddTeamMembersPage, NormalMode, UserAnswers("id")) mustBe routes.JourneyRecoveryController.onPageLoad()
       }
     }
 
