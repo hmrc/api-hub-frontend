@@ -146,14 +146,12 @@ addScope.requesterDetails.requestedOn = Requested on
 addScope.approveButton.text = Approve
 addScope.declineButton.text = Decline
 
-
-
-
 questionAddTeamMembers.title = Do you want to add team members?
 questionAddTeamMembers.heading = Do you want to add team members?
 questionAddTeamMembers.checkYourAnswersLabel = questionAddTeamMembers
-questionAddTeamMembers.error.required = Select yes if questionAddTeamMembers
+questionAddTeamMembers.error.required = Please make a selection
 questionAddTeamMembers.change.hidden = QuestionAddTeamMembers
+questionAddTeamMembers.hint = You can also add team members after your application has been created.
 
 addTeamMemberDetails.title = Add team member details
 addTeamMemberDetails.heading = Add team member details

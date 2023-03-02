@@ -42,25 +42,24 @@ class QuestionAddTeamMembersController @Inject()(
                                                   view: QuestionAddTeamMembersView
                                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form = formProvider()
+  private val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = // TODO: (identify andThen getData andThen requireData)
-    identify {
-      implicit request =>
-        //      val preparedForm = request.userAnswers.get(QuestionAddTeamMembersPage) match {
-        //        case None => form
-        //        case Some(value) => form.fill(value)
-        //      }
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+    implicit request =>
+      val preparedForm = request.userAnswers.get(QuestionAddTeamMembersPage) match {
+        case None => form
+        case Some(value) => form.fill(value)
+      }
 
-        Ok(view(form, mode)) // TODO: use preparedForm
-    }
+      Ok(view(preparedForm, mode, Some(request.user)))
+  }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+          Future.successful(BadRequest(view(formWithErrors, mode, Some(request.user)))),
 
         value =>
           for {
@@ -69,4 +68,5 @@ class QuestionAddTeamMembersController @Inject()(
           } yield Redirect(navigator.nextPage(QuestionAddTeamMembersPage, mode, updatedAnswers))
       )
   }
+
 }
