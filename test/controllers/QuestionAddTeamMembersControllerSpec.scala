@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import controllers.actions.FakeUser
 import forms.QuestionAddTeamMembersFormProvider
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
@@ -35,12 +36,12 @@ import scala.concurrent.Future
 
 class QuestionAddTeamMembersControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  private def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new QuestionAddTeamMembersFormProvider()
-  val form = formProvider()
+  private val formProvider = new QuestionAddTeamMembersFormProvider()
+  private val form = formProvider()
 
-  lazy val questionAddTeamMembersRoute = routes.QuestionAddTeamMembersController.onPageLoad(NormalMode).url
+  private lazy val questionAddTeamMembersRoute = routes.QuestionAddTeamMembersController.onPageLoad(NormalMode).url
 
   "QuestionAddTeamMembers Controller" - {
 
@@ -56,7 +57,7 @@ class QuestionAddTeamMembersControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[QuestionAddTeamMembersView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, Some(FakeUser))(request, messages(application)).toString
       }
     }
 
@@ -75,8 +76,7 @@ class QuestionAddTeamMembersControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(
-          //TODO: form.fill(true)
-          form, NormalMode)(request, messages(application)).toString
+          form.fill(true), NormalMode, Some(FakeUser))(request, messages(application)).toString
       }
     }
 
@@ -122,27 +122,24 @@ class QuestionAddTeamMembersControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, Some(FakeUser))(request, messages(application)).toString
       }
     }
 
-    //TODO:
-//    "must redirect to Journey Recovery for a GET if no existing data is found" in {
-//
-//      val application = applicationBuilder(userAnswers = None).build()
-//
-//      running(application) {
-//        val request = FakeRequest(GET, questionAddTeamMembersRoute)
-//
-//        val result = route(application, request).value
-//
-//        status(result) mustEqual SEE_OTHER
-//        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-//      }
-//    }
+    "must redirect to Journey Recovery for a GET if no existing data is found" in {
+      val application = applicationBuilder(userAnswers = None).build()
+
+      running(application) {
+        val request = FakeRequest(GET, questionAddTeamMembersRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
-
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
@@ -157,4 +154,5 @@ class QuestionAddTeamMembersControllerSpec extends SpecBase with MockitoSugar {
       }
     }
   }
+
 }
