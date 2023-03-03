@@ -16,6 +16,18 @@
 
 package generators
 
+import models.application.TeamMember
+import org.scalacheck.{Arbitrary, Gen}
 
 trait ModelGenerators {
+
+  implicit lazy val arbitraryTeamMember: Arbitrary[TeamMember] =
+    Arbitrary {
+      for {
+        domain <- Gen.oneOf("digital.hmrc.gov.uk", "hmrc.gov.uk")
+        firstName <- Gen.alphaLowerStr
+        lastName <- Gen.alphaLowerStr
+      } yield TeamMember(email = s"$firstName.$lastName@$domain")
+    }
+
 }

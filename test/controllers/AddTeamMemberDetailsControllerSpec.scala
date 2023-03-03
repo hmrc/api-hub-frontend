@@ -23,7 +23,7 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.AddTeamMemberDetailsPage
+import pages.TeamMembersPage
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -62,7 +62,7 @@ class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(AddTeamMemberDetailsPage, "answer").success.value
+      val userAnswers = UserAnswers(userAnswersId).set(TeamMembersPage, Seq.empty).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 

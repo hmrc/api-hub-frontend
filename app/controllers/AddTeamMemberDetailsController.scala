@@ -18,16 +18,16 @@ package controllers
 
 import controllers.actions._
 import forms.AddTeamMemberDetailsFormProvider
-import javax.inject.Inject
 import models.Mode
 import navigation.Navigator
-import pages.AddTeamMemberDetailsPage
+import pages.TeamMembersPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.AddTeamMemberDetailsView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class AddTeamMemberDetailsController @Inject()(
@@ -64,9 +64,9 @@ class AddTeamMemberDetailsController @Inject()(
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(AddTeamMemberDetailsPage, value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(TeamMembersPage, Seq.empty))
             _ <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(AddTeamMemberDetailsPage, mode, updatedAnswers))
+          } yield Redirect(navigator.nextPage(TeamMembersPage, mode, updatedAnswers))
       )
   }
 }
