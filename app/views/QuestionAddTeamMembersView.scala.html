@@ -14,6 +14,8 @@
  * limitations under the License.
  *@
 
+@import models.user.UserModel
+
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
@@ -22,9 +24,9 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("questionAddTeamMembers.title"))) {
+@layout(pageTitle = title(form, messages("questionAddTeamMembers.title")), user = user) {
 
     @formHelper(action = routes.QuestionAddTeamMembersController.onSubmit(mode), 'autoComplete -> "off") {
 
@@ -36,7 +38,7 @@
             RadiosViewModel.yesNo(
                 field = form("value"),
                 legend = LegendViewModel(messages("questionAddTeamMembers.heading")).asPageHeading()
-            )
+            ).copy(hint = Some(Hint(content = messages("questionAddTeamMembers.hint"))))
         )
 
         @govukButton(
