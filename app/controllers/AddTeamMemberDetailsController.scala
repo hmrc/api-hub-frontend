@@ -44,7 +44,7 @@ class AddTeamMemberDetailsController @Inject()(
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = //TODO: (identify andThen getData andThen requireData) {
+  def onPageLoad(mode: Mode, index: Int): Action[AnyContent] = //TODO: (identify andThen getData andThen requireData) {
     identify {
       implicit request =>
         //      val preparedForm = request.userAnswers.get(AddTeamMemberDetailsPage) match {
@@ -52,15 +52,15 @@ class AddTeamMemberDetailsController @Inject()(
         //        case Some(value) => form.fill(value)
         //      }
 
-        Ok(view(form, mode)) // TODO: use preparedForm
+        Ok(view(form, mode, index)) // TODO: use preparedForm
     }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onSubmit(mode: Mode, index: Int): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+          Future.successful(BadRequest(view(formWithErrors, mode, index))),
 
         value =>
           for {

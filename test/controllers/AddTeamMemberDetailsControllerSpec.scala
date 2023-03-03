@@ -35,12 +35,12 @@ import scala.concurrent.Future
 
 class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  private def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new AddTeamMemberDetailsFormProvider()
-  val form = formProvider()
+  private val formProvider = new AddTeamMemberDetailsFormProvider()
+  private val form = formProvider()
 
-  lazy val addTeamMemberDetailsRoute = routes.AddTeamMemberDetailsController.onPageLoad(NormalMode).url
+  private lazy val addTeamMemberDetailsRoute = routes.AddTeamMemberDetailsController.onPageLoad(NormalMode, 0).url
 
   "AddTeamMemberDetails Controller" - {
 
@@ -56,7 +56,7 @@ class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[AddTeamMemberDetailsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, 0)(request, messages(application)).toString
       }
     }
 
@@ -76,7 +76,7 @@ class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(
           //TODO: form.fill("answer")
-          form, NormalMode)(request, messages(application)).toString
+          form, NormalMode, 0)(request, messages(application)).toString
       }
     }
 
@@ -122,7 +122,7 @@ class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, 0)(request, messages(application)).toString
       }
     }
 

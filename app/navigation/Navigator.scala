@@ -45,7 +45,7 @@ class Navigator @Inject()() {
 
   private def questionAddTeamMembersNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
     (mode, userAnswers.get(QuestionAddTeamMembersPage)) match {
-      case (NormalMode, Some(addTeam)) if addTeam => routes.AddTeamMemberDetailsController.onPageLoad(NormalMode)
+      case (NormalMode, Some(addTeam)) if addTeam => routes.AddTeamMemberDetailsController.onPageLoad(NormalMode, 0)
       case (NormalMode, Some(_)) => routes.CheckYourAnswersController.onPageLoad
       case (NormalMode, None) => routes.JourneyRecoveryController.onPageLoad()
       case _ => routes.CheckYourAnswersController.onPageLoad

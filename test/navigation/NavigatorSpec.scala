@@ -42,7 +42,7 @@ class NavigatorSpec extends SpecBase with TryValues {
 
       "must go from the Do you want to add a team member? page to the Add a team member page when the user selects yes" in {
         val userAnswers = UserAnswers("id").set(QuestionAddTeamMembersPage, true).success.value
-        navigator.nextPage(QuestionAddTeamMembersPage, NormalMode, userAnswers) mustBe routes.AddTeamMemberDetailsController.onPageLoad(NormalMode)
+        navigator.nextPage(QuestionAddTeamMembersPage, NormalMode, userAnswers) mustBe routes.AddTeamMemberDetailsController.onPageLoad(NormalMode, 0)
       }
 
       "must go from the Do you want to add a team member? page to the Check Your Answers page when the user selects no" in {
