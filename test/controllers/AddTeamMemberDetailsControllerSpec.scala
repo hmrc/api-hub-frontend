@@ -18,7 +18,8 @@ package controllers
 
 import base.SpecBase
 import forms.AddTeamMemberDetailsFormProvider
-import models.{NormalMode, UserAnswers}
+import models.application.TeamMember
+import models.{CheckMode, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -40,8 +41,6 @@ class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar {
   private val formProvider = new AddTeamMemberDetailsFormProvider()
   private val form = formProvider()
 
-  private lazy val addTeamMemberDetailsRoute = routes.AddTeamMemberDetailsController.onPageLoad(NormalMode, 0).url
-
   "AddTeamMemberDetails Controller" - {
 
     "must return OK and the correct view for a GET" in {
@@ -49,7 +48,7 @@ class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, addTeamMemberDetailsRoute)
+        val request = FakeRequest(GET, routes.AddTeamMemberDetailsController.onPageLoad(NormalMode, 0).url)
 
         val result = route(application, request).value
 
@@ -60,23 +59,38 @@ class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must populate the view correctly on a GET when the question has previously been answered" in {
-
-      val userAnswers = UserAnswers(userAnswersId).set(TeamMembersPage, Seq.empty).success.value
+    "must not populate the view on a GET when the question has previously been answered in Normal Mode" in {
+      val userAnswers = UserAnswers(userAnswersId).set(TeamMembersPage, Seq(TeamMember("test.email@hmrc.gov.uk"))).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, addTeamMemberDetailsRoute)
+        val request = FakeRequest(GET, routes.AddTeamMemberDetailsController.onPageLoad(NormalMode, 0).url)
 
         val view = application.injector.instanceOf[AddTeamMemberDetailsView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(
-          //TODO: form.fill("answer")
-          form, NormalMode, 0)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, 0)(request, messages(application)).toString
+      }
+    }
+
+    "must populate the view correctly on a GET when the question has previously been answered in Check Mode" in {
+      val email = "test.email@hmrc.gov.uk"
+      val userAnswers = UserAnswers(userAnswersId).set(TeamMembersPage, Seq(TeamMember(email))).success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.AddTeamMemberDetailsController.onPageLoad(CheckMode, 1).url)
+
+        val view = application.injector.instanceOf[AddTeamMemberDetailsView]
+
+        val result = route(application, request).value
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form.fill(email), CheckMode, 1)(request, messages(application)).toString
       }
     }
 
@@ -96,8 +110,8 @@ class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, addTeamMemberDetailsRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+          FakeRequest(POST, routes.AddTeamMemberDetailsController.onSubmit(NormalMode, 0).url)
+            .withFormUrlEncodedBody(("value", "test.email@hmrc.gov.uk"))
 
         val result = route(application, request).value
 
@@ -107,12 +121,11 @@ class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
-
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request =
-          FakeRequest(POST, addTeamMemberDetailsRoute)
+          FakeRequest(POST, routes.AddTeamMemberDetailsController.onSubmit(NormalMode, 0).url)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
@@ -126,20 +139,19 @@ class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    //TODO:
-//    "must redirect to Journey Recovery for a GET if no existing data is found" in {
-//
-//      val application = applicationBuilder(userAnswers = None).build()
-//
-//      running(application) {
-//        val request = FakeRequest(GET, addTeamMemberDetailsRoute)
-//
-//        val result = route(application, request).value
-//
-//        status(result) mustEqual SEE_OTHER
-//        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-//      }
-//    }
+    "must redirect to Journey Recovery for a GET if no existing data is found" in {
+
+      val application = applicationBuilder(userAnswers = None).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.AddTeamMemberDetailsController.onPageLoad(NormalMode, 0).url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
@@ -147,7 +159,7 @@ class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, addTeamMemberDetailsRoute)
+          FakeRequest(POST, routes.AddTeamMemberDetailsController.onSubmit(NormalMode, 0).url)
             .withFormUrlEncodedBody(("value", "answer"))
 
         val result = route(application, request).value
@@ -157,4 +169,5 @@ class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar {
       }
     }
   }
+
 }

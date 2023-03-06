@@ -18,11 +18,13 @@ package controllers
 
 import controllers.actions._
 import forms.AddTeamMemberDetailsFormProvider
-import models.Mode
+import models.{CheckMode, Mode, NormalMode, UserAnswers}
+import models.application.TeamMember
 import navigation.Navigator
 import pages.TeamMembersPage
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.AddTeamMemberDetailsView
@@ -42,31 +44,67 @@ class AddTeamMemberDetailsController @Inject()(
                                                 view: AddTeamMemberDetailsView
                                               )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form = formProvider()
+  private val form = formProvider()
 
-  def onPageLoad(mode: Mode, index: Int): Action[AnyContent] = //TODO: (identify andThen getData andThen requireData) {
-    identify {
-      implicit request =>
-        //      val preparedForm = request.userAnswers.get(AddTeamMemberDetailsPage) match {
-        //        case None => form
-        //        case Some(value) => form.fill(value)
-        //      }
-
-        Ok(view(form, mode, index)) // TODO: use preparedForm
-    }
+  def onPageLoad(mode: Mode, index: Int): Action[AnyContent] = (identify andThen getData andThen requireData) {
+    implicit request =>
+      validate(mode, index, request.userAnswers).fold(
+        result => result,
+        teamMembers => Ok(view(prepareForm(index, teamMembers), mode, index))
+      )
+  }
 
   def onSubmit(mode: Mode, index: Int): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+      validate(mode, index, request.userAnswers).fold(
+        result => Future.successful(result),
+        teamMembers => {
+          form.bindFromRequest().fold(
+            formWithErrors =>
+              Future.successful(BadRequest(view(formWithErrors, mode, index))),
 
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode, index))),
-
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(TeamMembersPage, Seq.empty))
-            _ <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(TeamMembersPage, mode, updatedAnswers))
+            email => {
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(TeamMembersPage, updateTeamMembers(email, index, teamMembers)))
+                _ <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(navigator.nextPage(TeamMembersPage, mode, updatedAnswers))
+            }
+          )
+        }
       )
   }
+
+  private def validate(mode: Mode, index: Int, userAnswers: UserAnswers): Either[Result, Seq[TeamMember]] = {
+    (mode, index) match {
+      case (NormalMode, 0) => Right(userAnswers.get(TeamMembersPage).getOrElse(Seq.empty))
+      case (CheckMode, i) if i >= 1 =>
+        userAnswers.get(TeamMembersPage) match {
+          case Some(teamMembers) if i <= teamMembers.length => Right(teamMembers)
+          case _ => Left(NotFound)
+        }
+      case _ => Left(NotFound)
+    }
+  }
+
+  private def prepareForm(index: Int, teamMembers: Seq[TeamMember]): Form[String] = {
+    if (index > 0) {
+      form.fill(teamMembers(index - 1).email)
+    }
+    else {
+      form
+    }
+  }
+
+  private def updateTeamMembers(email: String, index: Int, teamMembers: Seq[TeamMember]): Seq[TeamMember] = {
+    index match {
+      case i if i > 0 => teamMembers
+        .zipWithIndex
+        .map {
+          case (_, j) if j == i - 1 => TeamMember(email)
+          case (teamMember, _) => teamMember
+        }
+      case _ => teamMembers :+ TeamMember(email)
+    }
+  }
+
 }
