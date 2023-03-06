@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import controllers.actions.FakeUser
 import forms.AddTeamMemberDetailsFormProvider
 import models.application.TeamMember
 import models.{CheckMode, NormalMode, UserAnswers}
@@ -55,7 +56,7 @@ class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[AddTeamMemberDetailsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, 0)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, 0, Some(FakeUser))(request, messages(application)).toString
       }
     }
 
@@ -72,7 +73,7 @@ class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, 0)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, 0, Some(FakeUser))(request, messages(application)).toString
       }
     }
 
@@ -90,7 +91,7 @@ class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(email), CheckMode, 1)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(email), CheckMode, 1, Some(FakeUser))(request, messages(application)).toString
       }
     }
 
@@ -135,7 +136,7 @@ class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, 0)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, 0, Some(FakeUser))(request, messages(application)).toString
       }
     }
 

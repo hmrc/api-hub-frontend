@@ -50,7 +50,7 @@ class AddTeamMemberDetailsController @Inject()(
     implicit request =>
       validate(mode, index, request.userAnswers).fold(
         result => result,
-        teamMembers => Ok(view(prepareForm(index, teamMembers), mode, index))
+        teamMembers => Ok(view(prepareForm(index, teamMembers), mode, index, Some(request.user)))
       )
   }
 
@@ -61,7 +61,7 @@ class AddTeamMemberDetailsController @Inject()(
         teamMembers => {
           form.bindFromRequest().fold(
             formWithErrors =>
-              Future.successful(BadRequest(view(formWithErrors, mode, index))),
+              Future.successful(BadRequest(view(formWithErrors, mode, index, Some(request.user)))),
 
             email => {
               for {

@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import models.user.UserModel
 @import viewmodels.InputWidth._
 
 @this(
@@ -24,9 +25,11 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode, index: Int)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, index: Int, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("addTeamMemberDetails.title"))) {
+@layout(pageTitle = title(form, messages("addTeamMemberDetails.title")), user = user) {
+
+    <h1 class="govuk-heading-xl">@messages("addTeamMemberDetails.heading")</h1>
 
     @formHelper(action = routes.AddTeamMemberDetailsController.onSubmit(mode, index)) {
 
@@ -37,9 +40,10 @@
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("addTeamMemberDetails.heading")).asPageHeading()
+                label = LabelViewModel(messages("addTeamMemberDetails.email.label")).withCssClass("govuk-label--m")
             )
             .withWidth(Full)
+            .withHint(HintViewModel(messages("addTeamMemberDetails.email.hint")))
         )
 
         @govukButton(

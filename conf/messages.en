@@ -153,12 +153,14 @@ questionAddTeamMembers.error.required = Please make a selection
 questionAddTeamMembers.change.hidden = QuestionAddTeamMembers
 questionAddTeamMembers.hint = You can also add team members after your application has been created.
 
-addTeamMemberDetails.title = Add team member details
-addTeamMemberDetails.heading = Add team member details
+addTeamMemberDetails.title = Add a team member
+addTeamMemberDetails.heading = Add a team member
 addTeamMemberDetails.checkYourAnswersLabel = Add team member
-addTeamMemberDetails.error.required = Enter team member details
+addTeamMemberDetails.error.required = Please enter a valid email address
 addTeamMemberDetails.error.length = Team member must be 100 characters or less
 addTeamMemberDetails.change.hidden = Add team member details
+addTeamMemberDetails.email.label = Enter your team member''s email address
+addTeamMemberDetails.email.hint = Email address should be valid and either a @digital.hmrc.gov.uk or a @hmrc.gov.uk address
 
 confirmAddTeamMember.title = Confirm add team member
 confirmAddTeamMember.heading = Confirm add team member
