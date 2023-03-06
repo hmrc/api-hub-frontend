@@ -21,27 +21,18 @@ import play.api.data.FormError
 
 class AddTeamMemberDetailsFormProviderSpec extends StringFieldBehaviours {
 
-  val requiredKey = "addTeamMemberDetails.error.required"
-  val lengthKey = "addTeamMemberDetails.error.length"
-  val maxLength = 100
+  val requiredKey = "error.required"
 
   val form = new AddTeamMemberDetailsFormProvider()()
 
-  ".value" - {
+  ".email" - {
 
-    val fieldName = "value"
+    val fieldName = "email"
 
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
-    )
-
-    behave like fieldWithMaxLength(
-      form,
-      fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+      arbitraryHmrcEmail.arbitrary
     )
 
     behave like mandatoryField(
@@ -50,4 +41,5 @@ class AddTeamMemberDetailsFormProviderSpec extends StringFieldBehaviours {
       requiredError = FormError(fieldName, requiredKey)
     )
   }
+
 }

@@ -86,24 +86,24 @@ class AddTeamMemberDetailsController @Inject()(
     }
   }
 
-  private def prepareForm(index: Int, teamMembers: Seq[TeamMember]): Form[String] = {
+  private def prepareForm(index: Int, teamMembers: Seq[TeamMember]): Form[TeamMember] = {
     if (index > 0) {
-      form.fill(teamMembers(index - 1).email)
+      form.fill(teamMembers(index - 1))
     }
     else {
       form
     }
   }
 
-  private def updateTeamMembers(email: String, index: Int, teamMembers: Seq[TeamMember]): Seq[TeamMember] = {
+  private def updateTeamMembers(teamMember: TeamMember, index: Int, teamMembers: Seq[TeamMember]): Seq[TeamMember] = {
     index match {
       case i if i > 0 => teamMembers
         .zipWithIndex
         .map {
-          case (_, j) if j == i - 1 => TeamMember(email)
+          case (_, j) if j == i - 1 => teamMember
           case (teamMember, _) => teamMember
         }
-      case _ => teamMembers :+ TeamMember(email)
+      case _ => teamMembers :+ teamMember
     }
   }
 

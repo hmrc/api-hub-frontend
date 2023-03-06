@@ -17,15 +17,19 @@
 package forms
 
 import javax.inject.Inject
-
 import forms.mappings.Mappings
+import models.application.TeamMember
 import play.api.data.Form
+import play.api.data.Forms.{email, mapping}
+import play.api.data.validation.Constraints.nonEmpty
 
 class AddTeamMemberDetailsFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[String] =
+  def apply(): Form[TeamMember] =
     Form(
-      "value" -> text("addTeamMemberDetails.error.required")
-        .verifying(maxLength(100, "addTeamMemberDetails.error.length"))
+      mapping(
+        "email" -> email.verifying(nonEmpty(errorMessage = "error.required"))
+      )(TeamMember.apply)(TeamMember.unapply)
     )
+
 }

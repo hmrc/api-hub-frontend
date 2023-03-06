@@ -24,10 +24,17 @@ trait ModelGenerators {
   implicit lazy val arbitraryTeamMember: Arbitrary[TeamMember] =
     Arbitrary {
       for {
+        email <- arbitraryHmrcEmail.arbitrary
+      } yield TeamMember(email)
+    }
+
+  lazy val arbitraryHmrcEmail: Arbitrary[String] =
+    Arbitrary {
+      for {
         domain <- Gen.oneOf("digital.hmrc.gov.uk", "hmrc.gov.uk")
         firstName <- Gen.alphaLowerStr
         lastName <- Gen.alphaLowerStr
-      } yield TeamMember(email = s"$firstName.$lastName@$domain")
+      } yield s"$firstName.$lastName@$domain"
     }
 
 }

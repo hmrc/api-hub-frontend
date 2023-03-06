@@ -91,7 +91,7 @@ class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(email), CheckMode, 1, Some(FakeUser))(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(TeamMember(email)), CheckMode, 1, Some(FakeUser))(request, messages(application)).toString
       }
     }
 
@@ -112,7 +112,7 @@ class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, routes.AddTeamMemberDetailsController.onSubmit(NormalMode, 0).url)
-            .withFormUrlEncodedBody(("value", "test.email@hmrc.gov.uk"))
+            .withFormUrlEncodedBody(("email", "test.email@hmrc.gov.uk"))
 
         val result = route(application, request).value
 
