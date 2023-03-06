@@ -17,8 +17,9 @@
 package connectors
 
 import com.google.inject.{Inject, Singleton}
+import config.FrontendAppConfig
 import models.application.{Application, NewApplication, NewScope}
-import play.api.http.HeaderNames.{ACCEPT, CONTENT_TYPE}
+import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION, CONTENT_TYPE}
 import play.api.http.MimeTypes.JSON
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HttpReads.Implicits._
@@ -31,14 +32,17 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class ApplicationsConnector @Inject()(
     httpClient: HttpClientV2,
-    servicesConfig: ServicesConfig
+    servicesConfig: ServicesConfig,
+    frontEndConfig: FrontendAppConfig
   )(implicit ec: ExecutionContext) {
 
   private val applicationsBaseUrl = servicesConfig.baseUrl("api-hub-applications")
+  private val clientAuthToken = frontEndConfig.appAuthToken
 
   def registerApplication(newApplication: NewApplication)(implicit hc: HeaderCarrier): Future[Application] = {
     httpClient
       .post(url"$applicationsBaseUrl/api-hub-applications/applications")
+      .setHeader(AUTHORIZATION -> clientAuthToken)
       .withBody(Json.toJson(newApplication))
       .execute[Application]
   }
@@ -47,6 +51,7 @@ class ApplicationsConnector @Inject()(
     httpClient
       .get(url"$applicationsBaseUrl/api-hub-applications/applications")
       .setHeader((ACCEPT, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Seq[Application]]
   }
 
@@ -54,6 +59,7 @@ class ApplicationsConnector @Inject()(
     httpClient
       .get(url"$applicationsBaseUrl/api-hub-applications/applications/$id")
       .setHeader((ACCEPT, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Either[UpstreamErrorResponse, Application]]
       .flatMap {
         case Right(application) => Future.successful(Some(application))
@@ -65,6 +71,7 @@ class ApplicationsConnector @Inject()(
   def requestAdditionalScope(id: String, newScope: NewScope)(implicit hc: HeaderCarrier): Future[Option[NewScope]] = {
     httpClient
       .post(url"$applicationsBaseUrl/api-hub-applications/applications/$id/environments/scopes")
+      .setHeader(AUTHORIZATION -> clientAuthToken)
       .withBody(Json.toJson(Seq(newScope)))
       .execute[Either[UpstreamErrorResponse, Unit]]
       .flatMap {
@@ -78,6 +85,7 @@ class ApplicationsConnector @Inject()(
     httpClient
       .get(url"$applicationsBaseUrl/api-hub-applications/applications/pending-scopes")
       .setHeader((ACCEPT, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Seq[Application]]
   }
 
@@ -85,6 +93,7 @@ class ApplicationsConnector @Inject()(
     httpClient
       .put(url"$applicationsBaseUrl/api-hub-applications/applications/$appId/environments/prod/scopes/$scopeName")
       .setHeader((CONTENT_TYPE, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
       .withBody("{\"status\":\"APPROVED\"}")
       .execute[Either[UpstreamErrorResponse, Unit]]
       .flatMap {
