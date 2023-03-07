@@ -53,6 +53,10 @@ class NavigatorSpec extends SpecBase with TryValues {
       "must go from the Do you want to add a team member? page to the Journey recovery page when there is no selection" in {
         navigator.nextPage(QuestionAddTeamMembersPage, NormalMode, UserAnswers("id")) mustBe routes.JourneyRecoveryController.onPageLoad()
       }
+
+      "must go from the Team member details page to the Confirm add team member page" in {
+        navigator.nextPage(TeamMembersPage, NormalMode, UserAnswers("id")) mustBe routes.ConfirmAddTeamMemberController.onPageLoad(NormalMode)
+      }
     }
 
     "in Check mode" - {
