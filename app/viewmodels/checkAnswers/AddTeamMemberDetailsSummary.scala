@@ -21,20 +21,20 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 
 object AddTeamMemberDetailsSummary  {
 
-  def row(answers: UserAnswers) /*(implicit messages: Messages)*/: Option[Seq[SummaryListRow]] = {
+  def row(answers: UserAnswers) /*(implicit messages: Messages)*/: Option[SummaryListRow] =
     None
-    // TODO: implement for TeamMembersPage
-  }
-  //    answers.get(AddTeamMemberDetailsPage).map {
-//      answer =>
-//
-//        SummaryListRowViewModel(
-//          key     = "addTeamMemberDetails.checkYourAnswersLabel",
-//          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
-//          actions = Seq(
-//            ActionItemViewModel("site.change", routes.AddTeamMemberDetailsController.onPageLoad(CheckMode).url)
-//              .withVisuallyHiddenText(messages("addTeamMemberDetails.change.hidden"))
-//          )
-//        )
-//    }
+    // TODO: implement for TeamMembersPage on HIPP-369
+
+    //    answers.get(AddTeamMemberDetailsPage).map {
+    //      answer =>
+    //
+    //        SummaryListRowViewModel(
+    //          key     = "addTeamMemberDetails.checkYourAnswersLabel",
+    //          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
+    //          actions = Seq(
+    //            ActionItemViewModel("site.change", routes.AddTeamMemberDetailsController.onPageLoad(CheckMode).url)
+    //              .withVisuallyHiddenText(messages("addTeamMemberDetails.change.hidden"))
+    //          )
+    //        )
+    //    }
 }
