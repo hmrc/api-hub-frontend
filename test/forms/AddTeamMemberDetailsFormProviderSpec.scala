@@ -18,6 +18,7 @@ package forms
 
 import forms.behaviours.StringFieldBehaviours
 import models.application.TeamMember
+import org.scalacheck.Gen
 import play.api.data.FormError
 
 class AddTeamMemberDetailsFormProviderSpec extends StringFieldBehaviours {
@@ -42,13 +43,20 @@ class AddTeamMemberDetailsFormProviderSpec extends StringFieldBehaviours {
       requiredError = FormError(fieldName, invalidKey)
     )
 
+    "must not accept invalid entry" in {
+      forAll(Gen.alphaLowerStr -> "invalidEmail") {
+        email: String =>
+          val result = form.bind(Map(fieldName -> email)).apply(fieldName)
+          result.errors mustBe Seq(FormError(fieldName, invalidKey))
+      }
+    }
+
     "must not accept non-HMRC email addresses" in {
       forAll(arbitraryNonHmrcEmail.arbitrary -> "invalidEmail") {
         email: String =>
           val result = form.bind(Map(fieldName -> email)).apply(fieldName)
-          result.errors must contain(FormError(fieldName, invalidKey))
+          result.errors mustBe Seq(FormError(fieldName, invalidKey))
       }
-
     }
 
     "must lower-case the input value" in {

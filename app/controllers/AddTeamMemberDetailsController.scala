@@ -22,9 +22,9 @@ import models.{CheckMode, Mode, NormalMode, UserAnswers}
 import models.application.TeamMember
 import navigation.Navigator
 import pages.TeamMembersPage
-import play.api.data.Form
+import play.api.data.{Form, FormError}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.AddTeamMemberDetailsView
@@ -48,7 +48,7 @@ class AddTeamMemberDetailsController @Inject()(
 
   def onPageLoad(mode: Mode, index: Int): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
-      validate(mode, index, request.userAnswers).fold(
+      validateParameters(mode, index, request.userAnswers).fold(
         result => result,
         teamMembers => Ok(view(prepareForm(index, teamMembers), mode, index, Some(request.user)))
       )
@@ -56,10 +56,10 @@ class AddTeamMemberDetailsController @Inject()(
 
   def onSubmit(mode: Mode, index: Int): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      validate(mode, index, request.userAnswers).fold(
+      validateParameters(mode, index, request.userAnswers).fold(
         result => Future.successful(result),
         teamMembers => {
-          form.bindFromRequest().fold(
+          validateForm(index, teamMembers).fold(
             formWithErrors =>
               Future.successful(BadRequest(view(formWithErrors, mode, index, Some(request.user)))),
 
@@ -74,7 +74,7 @@ class AddTeamMemberDetailsController @Inject()(
       )
   }
 
-  private def validate(mode: Mode, index: Int, userAnswers: UserAnswers): Either[Result, Seq[TeamMember]] = {
+  private def validateParameters(mode: Mode, index: Int, userAnswers: UserAnswers): Either[Result, Seq[TeamMember]] = {
     (mode, index) match {
       case (NormalMode, 0) => Right(userAnswers.get(TeamMembersPage).getOrElse(Seq.empty))
       case (CheckMode, i) if i >= 1 =>
@@ -92,6 +92,26 @@ class AddTeamMemberDetailsController @Inject()(
     }
     else {
       form
+    }
+  }
+
+  private def validateForm(index: Int, teamMembers: Seq[TeamMember])(implicit request: Request[_]): Form[TeamMember] = {
+    form.bindFromRequest().fold(
+      formWithErrors => formWithErrors,
+      teamMember =>
+        if (isDuplicate(index, teamMember, teamMembers)) {
+          form.fill(teamMember).withError(FormError("email", "addTeamMemberDetails.email.duplicate"))
+        }
+        else {
+          form.fill(teamMember)
+        }
+    )
+  }
+
+  private def isDuplicate(index: Int, teamMember: TeamMember, teamMembers: Seq[TeamMember]): Boolean = {
+    teamMembers.zipWithIndex.exists {
+      case (other, i) if other == teamMember && i != index -1 => true
+      case _ => false
     }
   }
 

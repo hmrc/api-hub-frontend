@@ -20,7 +20,7 @@ import forms.AddTeamMemberDetailsFormProvider.hmrcEmailConstraint
 import forms.mappings.Mappings
 import models.application.TeamMember
 import play.api.data.Form
-import play.api.data.Forms.mapping
+import play.api.data.Forms.{email, mapping, nonEmptyText}
 import play.api.data.validation.Constraints.{emailAddress, nonEmpty}
 import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
 
@@ -31,10 +31,14 @@ class AddTeamMemberDetailsFormProvider @Inject() extends Mappings {
   def apply(): Form[TeamMember] =
     Form(
       mapping(
-        "email" -> text("addTeamMemberDetails.email.invalid")
-          .verifying(nonEmpty(errorMessage = "addTeamMemberDetails.email.invalid"))
-          .verifying(emailAddress(errorMessage = "addTeamMemberDetails.email.invalid"))
-          .verifying(hmrcEmailConstraint)
+        "email" -> text( "addTeamMemberDetails.email.invalid")
+          .verifying(
+            firstError(
+              nonEmpty,
+              emailAddress(errorMessage = "addTeamMemberDetails.email.invalid"),
+              hmrcEmailConstraint
+            )
+          )
       )(email => TeamMember(email.trim.toLowerCase))(TeamMember.unapply)
     )
 
