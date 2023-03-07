@@ -17,11 +17,12 @@
 package forms
 
 import forms.behaviours.StringFieldBehaviours
+import models.application.TeamMember
 import play.api.data.FormError
 
 class AddTeamMemberDetailsFormProviderSpec extends StringFieldBehaviours {
 
-  val requiredKey = "error.required"
+  val invalidKey = "addTeamMemberDetails.email.invalid"
 
   val form = new AddTeamMemberDetailsFormProvider()()
 
@@ -38,8 +39,25 @@ class AddTeamMemberDetailsFormProviderSpec extends StringFieldBehaviours {
     behave like mandatoryField(
       form,
       fieldName,
-      requiredError = FormError(fieldName, requiredKey)
+      requiredError = FormError(fieldName, invalidKey)
     )
+
+    "must not accept non-HMRC email addresses" in {
+      forAll(arbitraryNonHmrcEmail.arbitrary -> "invalidEmail") {
+        email: String =>
+          val result = form.bind(Map(fieldName -> email)).apply(fieldName)
+          result.errors must contain(FormError(fieldName, invalidKey))
+      }
+
+    }
+
+    "must lower-case the input value" in {
+      val email = "Ab.Cd@HmRc.GoV.Uk"
+      form.bind(Map(fieldName -> email)).fold(
+        errors => fail(errors.toString),
+        identity
+      ) mustBe TeamMember(email.trim.toLowerCase())
+    }
   }
 
 }

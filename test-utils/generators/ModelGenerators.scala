@@ -37,4 +37,14 @@ trait ModelGenerators {
       } yield s"$firstName.$lastName@$domain"
     }
 
+  lazy val arbitraryNonHmrcEmail: Arbitrary[String] =
+    Arbitrary {
+      for {
+        topLevelDomain <- Gen.alphaLowerStr
+        domain <- Gen.alphaLowerStr
+        firstName <- Gen.alphaLowerStr
+        lastName <- Gen.alphaLowerStr
+      } yield s"$firstName.$lastName@$domain.$topLevelDomain"
+    }
+
 }
