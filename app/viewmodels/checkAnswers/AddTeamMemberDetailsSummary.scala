@@ -16,28 +16,25 @@
 
 package viewmodels.checkAnswers
 
-import controllers.routes
-import models.{CheckMode, UserAnswers}
-import pages.AddTeamMemberDetailsPage
-import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
+import models.UserAnswers
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.govuk.summarylist._
-import viewmodels.implicits._
 
 object AddTeamMemberDetailsSummary  {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(AddTeamMemberDetailsPage).map {
-      answer =>
+  def row(answers: UserAnswers) /*(implicit messages: Messages)*/: Option[SummaryListRow] =
+    None
+    // TODO: implement for TeamMembersPage on HIPP-369
 
-        SummaryListRowViewModel(
-          key     = "addTeamMemberDetails.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.AddTeamMemberDetailsController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("addTeamMemberDetails.change.hidden"))
-          )
-        )
-    }
+    //    answers.get(AddTeamMemberDetailsPage).map {
+    //      answer =>
+    //
+    //        SummaryListRowViewModel(
+    //          key     = "addTeamMemberDetails.checkYourAnswersLabel",
+    //          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
+    //          actions = Seq(
+    //            ActionItemViewModel("site.change", routes.AddTeamMemberDetailsController.onPageLoad(CheckMode).url)
+    //              .withVisuallyHiddenText(messages("addTeamMemberDetails.change.hidden"))
+    //          )
+    //        )
+    //    }
 }

@@ -24,8 +24,8 @@ trait PageGenerators {
   implicit lazy val arbitraryConfirmAddTeamMemberPage: Arbitrary[ConfirmAddTeamMemberPage.type] =
     Arbitrary(ConfirmAddTeamMemberPage)
 
-  implicit lazy val arbitraryAddTeamMemberDetailsPage: Arbitrary[AddTeamMemberDetailsPage.type] =
-    Arbitrary(AddTeamMemberDetailsPage)
+  implicit lazy val arbitraryTeamMembersPage: Arbitrary[TeamMembersPage.type] =
+    Arbitrary(TeamMembersPage)
 
   implicit lazy val arbitraryQuestionAddTeamMembersPage: Arbitrary[QuestionAddTeamMembersPage.type] =
     Arbitrary(QuestionAddTeamMembersPage)

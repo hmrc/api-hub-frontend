@@ -17,13 +17,17 @@
 package controllers
 
 import base.SpecBase
+import controllers.actions.FakeUser
 import forms.AddTeamMemberDetailsFormProvider
-import models.{NormalMode, UserAnswers}
+import models.application.TeamMember
+import models.{CheckMode, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{verify, when}
+import org.scalatest.{OptionValues, TryValues}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.AddTeamMemberDetailsPage
+import pages.TeamMembersPage
+import play.api.data.FormError
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -33,14 +37,12 @@ import views.html.AddTeamMemberDetailsView
 
 import scala.concurrent.Future
 
-class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar {
+class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar with OptionValues with TryValues {
 
-  def onwardRoute = Call("GET", "/foo")
+  private def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new AddTeamMemberDetailsFormProvider()
-  val form = formProvider()
-
-  lazy val addTeamMemberDetailsRoute = routes.AddTeamMemberDetailsController.onPageLoad(NormalMode).url
+  private val formProvider = new AddTeamMemberDetailsFormProvider()
+  private val form = formProvider()
 
   "AddTeamMemberDetails Controller" - {
 
@@ -49,34 +51,49 @@ class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, addTeamMemberDetailsRoute)
+        val request = FakeRequest(GET, routes.AddTeamMemberDetailsController.onPageLoad(NormalMode, 0).url)
 
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[AddTeamMemberDetailsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, 0, Some(FakeUser))(request, messages(application)).toString
       }
     }
 
-    "must populate the view correctly on a GET when the question has previously been answered" in {
-
-      val userAnswers = UserAnswers(userAnswersId).set(AddTeamMemberDetailsPage, "answer").success.value
+    "must not populate the view on a GET when the question has previously been answered in Normal Mode" in {
+      val userAnswers = UserAnswers(userAnswersId).set(TeamMembersPage, Seq(TeamMember("test.email@hmrc.gov.uk"))).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, addTeamMemberDetailsRoute)
+        val request = FakeRequest(GET, routes.AddTeamMemberDetailsController.onPageLoad(NormalMode, 0).url)
 
         val view = application.injector.instanceOf[AddTeamMemberDetailsView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(
-          //TODO: form.fill("answer")
-          form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, 0, Some(FakeUser))(request, messages(application)).toString
+      }
+    }
+
+    "must populate the view correctly on a GET when the question has previously been answered in Check Mode" in {
+      val email = "test.email@hmrc.gov.uk"
+      val userAnswers = UserAnswers(userAnswersId).set(TeamMembersPage, Seq(TeamMember(email))).success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.AddTeamMemberDetailsController.onPageLoad(CheckMode, 1).url)
+
+        val view = application.injector.instanceOf[AddTeamMemberDetailsView]
+
+        val result = route(application, request).value
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form.fill(TeamMember(email)), CheckMode, 1, Some(FakeUser))(request, messages(application)).toString
       }
     }
 
@@ -96,8 +113,8 @@ class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, addTeamMemberDetailsRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+          FakeRequest(POST, routes.AddTeamMemberDetailsController.onSubmit(NormalMode, 0).url)
+            .withFormUrlEncodedBody(("email", "test.email@hmrc.gov.uk"))
 
         val result = route(application, request).value
 
@@ -107,39 +124,37 @@ class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
-
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request =
-          FakeRequest(POST, addTeamMemberDetailsRoute)
-            .withFormUrlEncodedBody(("value", ""))
+          FakeRequest(POST, routes.AddTeamMemberDetailsController.onSubmit(NormalMode, 0).url)
+            .withFormUrlEncodedBody(("email", ""))
 
-        val boundForm = form.bind(Map("value" -> ""))
+        val boundForm = form.bind(Map("email" -> ""))
 
         val view = application.injector.instanceOf[AddTeamMemberDetailsView]
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, 0, Some(FakeUser))(request, messages(application)).toString
       }
     }
 
-    //TODO:
-//    "must redirect to Journey Recovery for a GET if no existing data is found" in {
-//
-//      val application = applicationBuilder(userAnswers = None).build()
-//
-//      running(application) {
-//        val request = FakeRequest(GET, addTeamMemberDetailsRoute)
-//
-//        val result = route(application, request).value
-//
-//        status(result) mustEqual SEE_OTHER
-//        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-//      }
-//    }
+    "must redirect to Journey Recovery for a GET if no existing data is found" in {
+
+      val application = applicationBuilder(userAnswers = None).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.AddTeamMemberDetailsController.onPageLoad(NormalMode, 0).url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
@@ -147,7 +162,7 @@ class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, addTeamMemberDetailsRoute)
+          FakeRequest(POST, routes.AddTeamMemberDetailsController.onSubmit(NormalMode, 0).url)
             .withFormUrlEncodedBody(("value", "answer"))
 
         val result = route(application, request).value
@@ -156,5 +171,140 @@ class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
+
+    "must save the answer when it is not a duplicate in Normal Mode" in {
+      val teamMember1 = TeamMember("existing.member@hmrc.gov.uk")
+      val teamMember2 = TeamMember("new.member@hmrc.gov.uk")
+
+      val userAnswers = UserAnswers(userAnswersId)
+        .set(TeamMembersPage, Seq(teamMember1))
+        .success
+        .value
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, routes.AddTeamMemberDetailsController.onSubmit(NormalMode, 0).url)
+            .withFormUrlEncodedBody(("email", teamMember2.email))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        val updatedAnswers = userAnswers
+          .set(TeamMembersPage, Seq(teamMember1, teamMember2))
+          .success
+          .value
+
+        verify(mockSessionRepository).set(updatedAnswers)
+      }
+    }
+
+    "must return a Bad Request and errors when a duplicate email is submitted in Normal Mode" in {
+      val teamMember = TeamMember("existing.member@hmrc.gov.uk")
+
+      val userAnswers = UserAnswers(userAnswersId)
+        .set(TeamMembersPage, Seq(teamMember))
+        .success
+        .value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, routes.AddTeamMemberDetailsController.onSubmit(NormalMode, 0).url)
+            .withFormUrlEncodedBody(("email", teamMember.email))
+
+        val boundForm = form
+          .fill(teamMember)
+          .withError(FormError("email", "addTeamMemberDetails.email.duplicate"))
+
+        val view = application.injector.instanceOf[AddTeamMemberDetailsView]
+
+        val result = route(application, request).value
+
+        status(result) mustEqual BAD_REQUEST
+        contentAsString(result) mustEqual view(boundForm, NormalMode, 0, Some(FakeUser))(request, messages(application)).toString
+      }
+    }
+
+    "must save the answer when it is not a duplicate in Check Mode" in {
+      val teamMember1 = TeamMember("existing.member1@hmrc.gov.uk")
+      val teamMember2 = TeamMember("existing.member2@hmrc.gov.uk")
+      val teamMember3 = TeamMember("existing.member3@hmrc.gov.uk")
+
+      val userAnswers = UserAnswers(userAnswersId)
+        .set(TeamMembersPage, Seq(teamMember1, teamMember2))
+        .success
+        .value
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, routes.AddTeamMemberDetailsController.onSubmit(CheckMode, 2).url)
+            .withFormUrlEncodedBody(("email", teamMember3.email))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        val updatedAnswers = userAnswers
+          .set(TeamMembersPage, Seq(teamMember1, teamMember3))
+          .success
+          .value
+
+        verify(mockSessionRepository).set(updatedAnswers)
+      }
+    }
+
+    "must return a Bad Request and errors when a duplicate email is submitted in Check Mode" in {
+      val teamMember1 = TeamMember("existing.member1@hmrc.gov.uk")
+      val teamMember2 = TeamMember("existing.member2@hmrc.gov.uk")
+
+      val userAnswers = UserAnswers(userAnswersId)
+        .set(TeamMembersPage, Seq(teamMember1, teamMember2))
+        .success
+        .value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, routes.AddTeamMemberDetailsController.onSubmit(CheckMode, 2).url)
+            .withFormUrlEncodedBody(("email", teamMember1.email))
+
+        val boundForm = form
+          .fill(teamMember1)
+          .withError(FormError("email", "addTeamMemberDetails.email.duplicate"))
+
+        val view = application.injector.instanceOf[AddTeamMemberDetailsView]
+
+        val result = route(application, request).value
+
+        status(result) mustEqual BAD_REQUEST
+        contentAsString(result) mustEqual view(boundForm, CheckMode, 2, Some(FakeUser))(request, messages(application)).toString
+      }
+    }
   }
+
 }

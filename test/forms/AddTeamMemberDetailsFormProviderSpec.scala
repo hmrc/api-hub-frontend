@@ -17,37 +17,55 @@
 package forms
 
 import forms.behaviours.StringFieldBehaviours
+import models.application.TeamMember
+import org.scalacheck.Gen
 import play.api.data.FormError
 
 class AddTeamMemberDetailsFormProviderSpec extends StringFieldBehaviours {
 
-  val requiredKey = "addTeamMemberDetails.error.required"
-  val lengthKey = "addTeamMemberDetails.error.length"
-  val maxLength = 100
+  val invalidKey = "addTeamMemberDetails.email.invalid"
 
   val form = new AddTeamMemberDetailsFormProvider()()
 
-  ".value" - {
+  ".email" - {
 
-    val fieldName = "value"
+    val fieldName = "email"
 
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
-    )
-
-    behave like fieldWithMaxLength(
-      form,
-      fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+      arbitraryHmrcEmail.arbitrary
     )
 
     behave like mandatoryField(
       form,
       fieldName,
-      requiredError = FormError(fieldName, requiredKey)
+      requiredError = FormError(fieldName, invalidKey)
     )
+
+    "must not accept invalid entry" in {
+      forAll(Gen.alphaLowerStr -> "invalidEmail") {
+        email: String =>
+          val result = form.bind(Map(fieldName -> email)).apply(fieldName)
+          result.errors mustBe Seq(FormError(fieldName, invalidKey))
+      }
+    }
+
+    "must not accept non-HMRC email addresses" in {
+      forAll(arbitraryNonHmrcEmail.arbitrary -> "invalidEmail") {
+        email: String =>
+          val result = form.bind(Map(fieldName -> email)).apply(fieldName)
+          result.errors mustBe Seq(FormError(fieldName, invalidKey))
+      }
+    }
+
+    "must lower-case the input value" in {
+      val email = "Ab.Cd@HmRc.GoV.Uk"
+      form.bind(Map(fieldName -> email)).fold(
+        errors => fail(errors.toString),
+        identity
+      ) mustBe TeamMember(email.trim.toLowerCase())
+    }
   }
+
 }

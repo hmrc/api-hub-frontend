@@ -18,16 +18,18 @@ package controllers
 
 import controllers.actions._
 import forms.AddTeamMemberDetailsFormProvider
-import javax.inject.Inject
-import models.Mode
+import models.{CheckMode, Mode, NormalMode, UserAnswers}
+import models.application.TeamMember
 import navigation.Navigator
-import pages.AddTeamMemberDetailsPage
+import pages.TeamMembersPage
+import play.api.data.{Form, FormError}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.AddTeamMemberDetailsView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class AddTeamMemberDetailsController @Inject()(
@@ -42,31 +44,87 @@ class AddTeamMemberDetailsController @Inject()(
                                                 view: AddTeamMemberDetailsView
                                               )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form = formProvider()
+  private val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = //TODO: (identify andThen getData andThen requireData) {
-    identify {
-      implicit request =>
-        //      val preparedForm = request.userAnswers.get(AddTeamMemberDetailsPage) match {
-        //        case None => form
-        //        case Some(value) => form.fill(value)
-        //      }
-
-        Ok(view(form, mode)) // TODO: use preparedForm
-    }
-
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onPageLoad(mode: Mode, index: Int): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
-
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
-
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(AddTeamMemberDetailsPage, value))
-            _ <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(AddTeamMemberDetailsPage, mode, updatedAnswers))
+      validateParameters(mode, index, request.userAnswers).fold(
+        result => result,
+        teamMembers => Ok(view(prepareForm(index, teamMembers), mode, index, Some(request.user)))
       )
   }
+
+  def onSubmit(mode: Mode, index: Int): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request =>
+      validateParameters(mode, index, request.userAnswers).fold(
+        result => Future.successful(result),
+        teamMembers => {
+          validateForm(index, teamMembers).fold(
+            formWithErrors =>
+              Future.successful(BadRequest(view(formWithErrors, mode, index, Some(request.user)))),
+
+            email => {
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(TeamMembersPage, updateTeamMembers(email, index, teamMembers)))
+                _ <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(navigator.nextPage(TeamMembersPage, mode, updatedAnswers))
+            }
+          )
+        }
+      )
+  }
+
+  private def validateParameters(mode: Mode, index: Int, userAnswers: UserAnswers): Either[Result, Seq[TeamMember]] = {
+    (mode, index) match {
+      case (NormalMode, 0) => Right(userAnswers.get(TeamMembersPage).getOrElse(Seq.empty))
+      case (CheckMode, i) if i >= 1 =>
+        userAnswers.get(TeamMembersPage) match {
+          case Some(teamMembers) if i <= teamMembers.length => Right(teamMembers)
+          case _ => Left(NotFound)
+        }
+      case _ => Left(NotFound)
+    }
+  }
+
+  private def prepareForm(index: Int, teamMembers: Seq[TeamMember]): Form[TeamMember] = {
+    if (index > 0) {
+      form.fill(teamMembers(index - 1))
+    }
+    else {
+      form
+    }
+  }
+
+  private def validateForm(index: Int, teamMembers: Seq[TeamMember])(implicit request: Request[_]): Form[TeamMember] = {
+    form.bindFromRequest().fold(
+      formWithErrors => formWithErrors,
+      teamMember =>
+        if (isDuplicate(index, teamMember, teamMembers)) {
+          form.fill(teamMember).withError(FormError("email", "addTeamMemberDetails.email.duplicate"))
+        }
+        else {
+          form.fill(teamMember)
+        }
+    )
+  }
+
+  private def isDuplicate(index: Int, teamMember: TeamMember, teamMembers: Seq[TeamMember]): Boolean = {
+    teamMembers.zipWithIndex.exists {
+      case (other, i) if other == teamMember && i != index -1 => true
+      case _ => false
+    }
+  }
+
+  private def updateTeamMembers(teamMember: TeamMember, index: Int, teamMembers: Seq[TeamMember]): Seq[TeamMember] = {
+    index match {
+      case i if i > 0 => teamMembers
+        .zipWithIndex
+        .map {
+          case (_, j) if j == i - 1 => teamMember
+          case (teamMember, _) => teamMember
+        }
+      case _ => teamMembers :+ teamMember
+    }
+  }
+
 }

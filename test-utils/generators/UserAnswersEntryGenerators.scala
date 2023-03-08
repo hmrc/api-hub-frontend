@@ -16,6 +16,7 @@
 
 package generators
 
+import models.application.TeamMember
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import pages._
@@ -31,11 +32,11 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
       } yield (page, value)
     }
 
-  implicit lazy val arbitraryAddTeamMemberDetailsUserAnswersEntry: Arbitrary[(AddTeamMemberDetailsPage.type, JsValue)] =
+  implicit lazy val arbitraryTeamMembersUserAnswersEntry: Arbitrary[(TeamMembersPage.type, JsValue)] =
     Arbitrary {
       for {
-        page  <- arbitrary[AddTeamMemberDetailsPage.type]
-        value <- arbitrary[String].suchThat(_.nonEmpty).map(Json.toJson(_))
+        page  <- arbitrary[TeamMembersPage.type]
+        value <- arbitrary[Seq[TeamMember]].suchThat(_.nonEmpty).map(Json.toJson(_))
       } yield (page, value)
     }
 

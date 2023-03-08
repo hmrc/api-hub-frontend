@@ -16,17 +16,13 @@
 
 package pages
 
-import pages.behaviours.PageBehaviours
+import models.application.TeamMember
+import play.api.libs.json.JsPath
 
+case object TeamMembersPage extends QuestionPage[Seq[TeamMember]] {
 
-class AddTeamMemberDetailsPageSpec extends PageBehaviours {
+  override def path: JsPath = JsPath \ toString
 
-  "AddTeamMemberDetailsPage" - {
+  override def toString: String = "teamMembers"
 
-    beRetrievable[String](AddTeamMemberDetailsPage)
-
-    beSettable[String](AddTeamMemberDetailsPage)
-
-    beRemovable[String](AddTeamMemberDetailsPage)
-  }
 }

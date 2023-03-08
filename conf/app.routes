@@ -49,10 +49,10 @@ POST        /add-team-members                                   controllers.Ques
 GET         /change-add-team-members                            controllers.QuestionAddTeamMembersController.onPageLoad(mode: Mode = CheckMode)
 POST        /change-add-team-members                            controllers.QuestionAddTeamMembersController.onSubmit(mode: Mode = CheckMode)
 
-GET         /add-team-member-details                            controllers.AddTeamMemberDetailsController.onPageLoad(mode: Mode = NormalMode)
-POST        /add-team-member-details                            controllers.AddTeamMemberDetailsController.onSubmit(mode: Mode = NormalMode)
-GET         /change-add-team-member-details                     controllers.AddTeamMemberDetailsController.onPageLoad(mode: Mode = CheckMode)
-POST        /change-add-team-member-details                     controllers.AddTeamMemberDetailsController.onSubmit(mode: Mode = CheckMode)
+GET         /add-team-member-details                            controllers.AddTeamMemberDetailsController.onPageLoad(mode: Mode = NormalMode, index: Int = 0)
+POST        /add-team-member-details                            controllers.AddTeamMemberDetailsController.onSubmit(mode: Mode = NormalMode, index: Int = 0)
+GET         /change-add-team-member-details/:index              controllers.AddTeamMemberDetailsController.onPageLoad(mode: Mode = CheckMode, index: Int)
+POST        /change-add-team-member-details/:index              controllers.AddTeamMemberDetailsController.onSubmit(mode: Mode = CheckMode, index: Int)
 
 GET         /team-members-overview                              controllers.ConfirmAddTeamMemberController.onPageLoad(mode: Mode = NormalMode)
 POST        /team-members-overview                              controllers.ConfirmAddTeamMemberController.onSubmit(mode: Mode = NormalMode)

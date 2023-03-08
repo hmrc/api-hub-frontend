@@ -16,16 +16,44 @@
 
 package forms
 
-import javax.inject.Inject
-
+import forms.AddTeamMemberDetailsFormProvider.hmrcEmailConstraint
 import forms.mappings.Mappings
+import models.application.TeamMember
 import play.api.data.Form
+import play.api.data.Forms.{email, mapping, nonEmptyText}
+import play.api.data.validation.Constraints.{emailAddress, nonEmpty}
+import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
+
+import javax.inject.Inject
 
 class AddTeamMemberDetailsFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[String] =
+  def apply(): Form[TeamMember] =
     Form(
-      "value" -> text("addTeamMemberDetails.error.required")
-        .verifying(maxLength(100, "addTeamMemberDetails.error.length"))
+      mapping(
+        "email" -> text( "addTeamMemberDetails.email.invalid")
+          .verifying(
+            firstError(
+              nonEmpty,
+              emailAddress(errorMessage = "addTeamMemberDetails.email.invalid"),
+              hmrcEmailConstraint
+            )
+          )
+      )(email => TeamMember(email.trim.toLowerCase))(TeamMember.unapply)
     )
+
+}
+
+object AddTeamMemberDetailsFormProvider {
+
+  val hmrcEmailConstraint: Constraint[String] = Constraint("hmrcEmailConstraint")({
+    email =>
+      if (email.trim.toLowerCase.endsWith("@hmrc.gov.uk") || email.trim.toLowerCase.endsWith("@digital.hmrc.gov.uk")) {
+        Valid
+      }
+      else {
+        Invalid(Seq(ValidationError("addTeamMemberDetails.email.invalid")))
+      }
+  })
+
 }
