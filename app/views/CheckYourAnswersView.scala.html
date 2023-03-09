@@ -23,13 +23,23 @@
     govukButton: GovukButton
 )
 
-@(list: SummaryList, user: Some[UserModel])(implicit request: Request[_], messages: Messages)
+@(applicationDetails: SummaryList, teamMemberDetails: SummaryList, user: Some[UserModel])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("checkYourAnswers.title")), user = user) {
+@layout(pageTitle = titleNoForm(messages("checkYourAnswers.title")), user = user, fullWidth = true) {
 
-    <h1 class="govuk-heading-xl">@messages("checkYourAnswers.heading")</h1>
+    <h1 class="govuk-heading-l">@messages("checkYourAnswers.heading")</h1>
 
-    @govukSummaryList(list)
+    <h2 class="govuk-heading-m">@messages("checkYourAnswers.applicationDetails.heading")</h2>
+
+    @govukSummaryList(applicationDetails)
+
+    <h2 class="govuk-heading-m govuk-!-margin-top-9">@messages("checkYourAnswers.teamMembers.heading")</h2>
+
+    @govukSummaryList(teamMemberDetails)
+
+    <h2 class="govuk-heading-m govuk-!-margin-top-9">@messages("checkYourAnswers.complete.heading")</h2>
+
+    <p class="govuk-body">@messages("checkYourAnswers.complete.guidance")</p>
 
     @formHelper(action = routes.RegisterApplicationController.create) {
         @govukButton(

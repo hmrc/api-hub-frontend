@@ -44,7 +44,13 @@ index.applications.name = Name
 index.applications.id = Id
 
 checkYourAnswers.title = Check Your Answers
-checkYourAnswers.heading = Check Your Answers
+checkYourAnswers.heading = Check your answers before creating your application
+checkYourAnswers.applicationDetails.heading = Application details
+checkYourAnswers.teamMembers.heading = Team members
+checkYourAnswers.teamMembers.noTeamMembersAdded = No team members added
+checkYourAnswers.teamMembers.teamMembersAdded = Team members added
+checkYourAnswers.complete.heading = Complete your application
+checkYourAnswers.complete.guidance = Team members you have added will be notified by email that they have been added to this application.
 checkYourAnswers.registerApplication = Register application
 
 journeyRecovery.continue.title = Sorry, there is a problem with the service

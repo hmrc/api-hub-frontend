@@ -17,7 +17,7 @@
 package controllers
 
 import base.SpecBase
-import controllers.CheckYourAnswersControllerSpec.buildSummaryList
+import controllers.CheckYourAnswersControllerSpec.{buildApplicationDetailsSummaryList, buildTeamMembersSummaryList}
 import controllers.actions.FakeUser
 import generators.Generators
 import models.UserAnswers
@@ -26,7 +26,7 @@ import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
-import viewmodels.checkAnswers.ApplicationNameSummary
+import viewmodels.checkAnswers.{ApplicationNameSummary, TeamMembersSummary}
 import viewmodels.govuk.SummaryListFluency
 import views.html.CheckYourAnswersView
 
@@ -44,10 +44,11 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[CheckYourAnswersView]
-        val list = buildSummaryList(emptyUserAnswers, messages(application))
+        val applicationDetails = buildApplicationDetailsSummaryList(emptyUserAnswers, messages(application))
+        val teamMemberDetails = buildTeamMembersSummaryList(emptyUserAnswers, messages(application))
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(list, Some(FakeUser))(request, messages(application)).toString
+        contentAsString(result) mustEqual view(applicationDetails, teamMemberDetails, Some(FakeUser))(request, messages(application)).toString
       }
     }
 
@@ -62,10 +63,11 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
           val result = route(application, request).value
 
           val view = application.injector.instanceOf[CheckYourAnswersView]
-          val list = buildSummaryList(userAnswers, messages(application))
+          val applicationDetails = buildApplicationDetailsSummaryList(userAnswers, messages(application))
+          val teamMemberDetails = buildTeamMembersSummaryList(userAnswers, messages(application))
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(list, Some(FakeUser))(request, messages(application)).toString
+          contentAsString(result) mustEqual view(applicationDetails, teamMemberDetails, Some(FakeUser))(request, messages(application)).toString
         }
       })
 
@@ -89,11 +91,17 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
 object CheckYourAnswersControllerSpec extends SummaryListFluency {
 
-  def buildSummaryList(userAnswers: UserAnswers, messages: Messages): SummaryList = {
+  def buildApplicationDetailsSummaryList(userAnswers: UserAnswers, messages: Messages): SummaryList = {
     SummaryListViewModel(
       Seq(
         ApplicationNameSummary.row(userAnswers)(messages)
       ).flatten
+    )
+  }
+
+  def buildTeamMembersSummaryList(userAnswers: UserAnswers, messages: Messages): SummaryList = {
+    SummaryListViewModel(
+      rows = TeamMembersSummary.rows(userAnswers)(messages)
     )
   }
 

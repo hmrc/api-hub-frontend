@@ -17,6 +17,7 @@
 @import config.FrontendAppConfig
 @import models.user.UserModel
 @import uk.gov.hmrc.hmrcfrontend.views.config.StandardAlphaBanner
+@import components.FullWidthMainContent
 @import views.html.helper.CSPNonce
 
 @this(
@@ -31,10 +32,12 @@
     hmrcTimeoutDialog: HmrcTimeoutDialog,
     hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
     hmrcScripts: HmrcScripts,
-    alphaBanner: StandardAlphaBanner
+    alphaBanner: StandardAlphaBanner,
+    twoThirdsMainContent: TwoThirdsMainContent,
+    fullWidthMainContentLayout: FullWidthMainContent
 )
 
-@(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = true, showSignOut: Boolean = true, user: Option[UserModel] = None)(contentBlock: Html)(implicit request: Request[_], messages: Messages)
+@(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = true, showSignOut: Boolean = true, user: Option[UserModel] = None, fullWidth: Boolean = false)(contentBlock: Html)(implicit request: Request[_], messages: Messages)
 
 @head = {
 
@@ -121,5 +124,6 @@
     scriptsBlock       = Some(hmrcScripts(
         nonce        = CSPNonce.get,
         scriptsBlock = Some(additionalScripts)
-    ))
+    )),
+    mainContentLayout = Some(if (fullWidth) fullWidthMainContentLayout(_) else twoThirdsMainContent(_))
 )(content)
