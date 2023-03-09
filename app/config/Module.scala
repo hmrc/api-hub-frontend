@@ -16,21 +16,32 @@
 
 package config
 
-import com.google.inject.AbstractModule
 import controllers.actions._
+import play.api.inject.{Binding, bind => bindz}
+import play.api.{Configuration, Environment}
 
 import java.time.{Clock, ZoneOffset}
+import scala.collection.immutable.Seq
 
-class Module extends AbstractModule {
+class Module extends play.api.inject.Module {
 
-  override def configure(): Unit = {
+  override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[_]] = {
 
-    bind(classOf[DataRetrievalAction]).to(classOf[DataRetrievalActionImpl]).asEagerSingleton()
-    bind(classOf[DataRequiredAction]).to(classOf[DataRequiredActionImpl]).asEagerSingleton()
+    val bindings = Seq(
+    bindz(classOf[DataRetrievalAction]).to(classOf[DataRetrievalActionImpl]).eagerly(),
+    bindz(classOf[DataRequiredAction]).to(classOf[DataRequiredActionImpl]).eagerly(),
 
     // For session based storage instead of cred based, change to SessionIdentifierAction
-    bind(classOf[IdentifierAction]).to(classOf[AuthenticatedIdentifierAction]).asEagerSingleton()
+    bindz(classOf[IdentifierAction]).to(classOf[AuthenticatedIdentifierAction]).eagerly(),
 
-    bind(classOf[Clock]).toInstance(Clock.systemDefaultZone.withZone(ZoneOffset.UTC))
+    bindz(classOf[Clock]).toInstance(Clock.systemDefaultZone.withZone(ZoneOffset.UTC)))
+
+    val authTokenInitialiserBindings: Seq[Binding[_]] = if (configuration.get[Boolean]("create-internal-auth-token-on-start")) {
+        Seq(bindz(classOf[InternalAuthTokenInitialiser]).to(classOf[InternalAuthTokenInitialiserImpl]).eagerly())
+    } else {
+        Seq(bindz(classOf[InternalAuthTokenInitialiser]).to(classOf[NoOpInternalAuthTokenInitialiser]).eagerly())
+    }
+
+    bindings ++ authTokenInitialiserBindings
   }
 }

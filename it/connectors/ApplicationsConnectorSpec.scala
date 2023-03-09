@@ -1,12 +1,14 @@
 package connectors
 
 import com.github.tomakehurst.wiremock.client.WireMock._
+import config.FrontendAppConfig
 import connectors.ApplicationsConnectorSpec.{buildConnector, toJsonString}
 import models.application._
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.Configuration
 import play.api.http.Status.{NOT_FOUND, NO_CONTENT}
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
@@ -27,6 +29,7 @@ class ApplicationsConnectorSpec
       stubFor(
         post(urlEqualTo("/api-hub-applications/applications"))
           .withHeader("Content-Type", equalTo("application/json"))
+          .withHeader("Authorization", equalTo("An authentication token"))
           .withRequestBody(
             equalToJson(toJsonString(newApplication))
           )
@@ -42,7 +45,6 @@ class ApplicationsConnectorSpec
       }
     }
   }
-
   "ApplicationsConnector.getApplications" - {
     "must place the correct request and return the array of applications" in {
       val application1 = Application("id-1", "test-name-1", Creator("test-creator-email-1"))
@@ -52,6 +54,7 @@ class ApplicationsConnectorSpec
       stubFor(
         get(urlEqualTo("/api-hub-applications/applications"))
           .withHeader("Accept", equalTo("application/json"))
+          .withHeader("Authorization", equalTo("An authentication token"))
           .willReturn(
             aResponse()
               .withBody(toJsonString(expected))
@@ -73,6 +76,7 @@ class ApplicationsConnectorSpec
       stubFor(
         get(urlEqualTo("/api-hub-applications/applications/id-1"))
           .withHeader("Accept", equalTo("application/json"))
+          .withHeader("Authorization", equalTo("An authentication token"))
           .willReturn(
             aResponse()
               .withBody(toJsonString(expected))
@@ -110,6 +114,7 @@ class ApplicationsConnectorSpec
       stubFor(
         post(urlEqualTo(s"/api-hub-applications/applications/${appId}/environments/scopes"))
           .withRequestBody(equalToJson(Json.toJson(Seq(newScope)).toString()))
+          .withHeader("Authorization", equalTo("An authentication token"))
           .willReturn(aResponse().withStatus(NO_CONTENT))
       )
 
@@ -145,6 +150,7 @@ class ApplicationsConnectorSpec
       stubFor(
         get(urlEqualTo("/api-hub-applications/applications/pending-scopes"))
           .withHeader("Accept", equalTo("application/json"))
+          .withHeader("Authorization", equalTo("An authentication token"))
           .willReturn(
             aResponse()
               .withBody(toJsonString(expected))
@@ -167,6 +173,7 @@ class ApplicationsConnectorSpec
         put(urlEqualTo(s"/api-hub-applications/applications/${appId}/environments/prod/scopes/${scope}"))
           .withRequestBody(equalToJson("{\"status\":\"APPROVED\"}"))
           .withHeader("Content-Type", equalTo("application/json"))
+          .withHeader("Authorization", equalTo("An authentication token"))
           .willReturn(
             aResponse()
               .withStatus(NO_CONTENT)
@@ -211,7 +218,8 @@ object ApplicationsConnectorSpec extends HttpClientV2Support {
       ))
     )
 
-    new ApplicationsConnector(httpClientV2, servicesConfig)
+    val application = new GuiceApplicationBuilder().build()
+    new ApplicationsConnector(httpClientV2, servicesConfig, application.injector.instanceOf[FrontendAppConfig])
   }
 
   def toJsonString(newApplication: NewApplication): String = {
