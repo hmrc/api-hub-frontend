@@ -24,6 +24,7 @@ import models.user.UserModel
 import pages.ApplicationNamePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
+import repositories.SessionRepository
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
@@ -35,7 +36,8 @@ class RegisterApplicationController @Inject()(
     identify: IdentifierAction,
     getData: DataRetrievalAction,
     requireData: DataRequiredAction,
-    apiHubService: ApiHubService
+    apiHubService: ApiHubService,
+    sessionRepository: SessionRepository
   )(implicit ec: ExecutionContext)
   extends FrontendBaseController
   with I18nSupport {
@@ -44,8 +46,11 @@ class RegisterApplicationController @Inject()(
     implicit request =>
       validateAndBuildApplication(request.userAnswers, request.user).fold(
         call => Future.successful(Redirect(call)),
-        newApplication => apiHubService.registerApplication(newApplication)
-          .map(app => Redirect(routes.RegisterApplicationSuccessController.onPageLoad(app.id)))
+        newApplication =>
+          for {
+            application <- apiHubService.registerApplication(newApplication)
+            _ <- sessionRepository.clear(request.user.userId)
+          } yield Redirect(routes.RegisterApplicationSuccessController.onPageLoad(application.id))
       )
   }
 

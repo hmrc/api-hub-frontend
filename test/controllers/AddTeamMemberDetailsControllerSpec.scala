@@ -81,7 +81,10 @@ class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar with
 
     "must populate the view correctly on a GET when the question has previously been answered in Check Mode" in {
       val email = "test.email@hmrc.gov.uk"
-      val userAnswers = UserAnswers(userAnswersId).set(TeamMembersPage, Seq(TeamMember(email))).success.value
+      val userAnswers = UserAnswers(userAnswersId)
+        .set(TeamMembersPage, Seq(TeamMember("creator.email@hmrc.gov.uk"), TeamMember(email)))
+        .success
+        .value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -261,7 +264,7 @@ class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar with
 
       running(application) {
         val request =
-          FakeRequest(POST, routes.AddTeamMemberDetailsController.onSubmit(CheckMode, 2).url)
+          FakeRequest(POST, routes.AddTeamMemberDetailsController.onSubmit(CheckMode, 1).url)
             .withFormUrlEncodedBody(("email", teamMember3.email))
 
         val result = route(application, request).value
@@ -290,7 +293,7 @@ class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar with
 
       running(application) {
         val request =
-          FakeRequest(POST, routes.AddTeamMemberDetailsController.onSubmit(CheckMode, 2).url)
+          FakeRequest(POST, routes.AddTeamMemberDetailsController.onSubmit(CheckMode, 1).url)
             .withFormUrlEncodedBody(("email", teamMember1.email))
 
         val boundForm = form
@@ -302,7 +305,7 @@ class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar with
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, CheckMode, 2, Some(FakeUser))(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, CheckMode, 1, Some(FakeUser))(request, messages(application)).toString
       }
     }
   }

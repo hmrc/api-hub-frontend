@@ -77,9 +77,9 @@ class AddTeamMemberDetailsController @Inject()(
   private def validateParameters(mode: Mode, index: Int, userAnswers: UserAnswers): Either[Result, Seq[TeamMember]] = {
     (mode, index) match {
       case (NormalMode, 0) => Right(userAnswers.get(TeamMembersPage).getOrElse(Seq.empty))
-      case (CheckMode, i) if i >= 1 =>
+      case (CheckMode, i) if i > 0 =>
         userAnswers.get(TeamMembersPage) match {
-          case Some(teamMembers) if i <= teamMembers.length => Right(teamMembers)
+          case Some(teamMembers) if i < teamMembers.length => Right(teamMembers)
           case _ => Left(NotFound)
         }
       case _ => Left(NotFound)
@@ -88,7 +88,7 @@ class AddTeamMemberDetailsController @Inject()(
 
   private def prepareForm(index: Int, teamMembers: Seq[TeamMember]): Form[TeamMember] = {
     if (index > 0) {
-      form.fill(teamMembers(index - 1))
+      form.fill(teamMembers(index))
     }
     else {
       form
@@ -110,7 +110,7 @@ class AddTeamMemberDetailsController @Inject()(
 
   private def isDuplicate(index: Int, teamMember: TeamMember, teamMembers: Seq[TeamMember]): Boolean = {
     teamMembers.zipWithIndex.exists {
-      case (other, i) if other == teamMember && i != index -1 => true
+      case (other, i) if other == teamMember && (index == 0 || i != index) => true
       case _ => false
     }
   }
@@ -120,7 +120,7 @@ class AddTeamMemberDetailsController @Inject()(
       case i if i > 0 => teamMembers
         .zipWithIndex
         .map {
-          case (_, j) if j == i - 1 => teamMember
+          case (_, j) if j == i => teamMember
           case (teamMember, _) => teamMember
         }
       case _ => teamMembers :+ teamMember

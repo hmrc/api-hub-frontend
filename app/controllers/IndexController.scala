@@ -17,16 +17,19 @@
 package controllers
 
 import controllers.actions.IdentifierAction
+import models.application.TeamMember
 import models.{NormalMode, UserAnswers}
+import pages.TeamMembersPage
+import play.api.Logging
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.IndexView
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class IndexController @Inject()(
                                  val controllerComponents: MessagesControllerComponents,
@@ -34,7 +37,7 @@ class IndexController @Inject()(
                                  sessionRepository: SessionRepository,
                                  view: IndexView,
                                  apiHubService: ApiHubService
-                               )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                               )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   def onPageLoad: Action[AnyContent] = identify.async { implicit request =>
     apiHubService.getApplications() map {
@@ -44,8 +47,15 @@ class IndexController @Inject()(
   }
 
   def onSubmit: Action[AnyContent] = identify.async { implicit request =>
-    sessionRepository.set(UserAnswers(request.user.userId)).map(
-      _ => Redirect(routes.ApplicationNameController.onPageLoad(NormalMode))
+    request.user.email.fold[Future[Result]] {
+      logger.warn("Current user has no email address")
+      Future.successful(InternalServerError)
+    }(
+      email =>
+        for {
+          userAnswers <- Future.fromTry(UserAnswers(request.user.userId).set(TeamMembersPage, Seq(TeamMember(email))))
+          _ <- sessionRepository.set(userAnswers)
+        } yield Redirect(routes.ApplicationNameController.onPageLoad(NormalMode))
     )
   }
 

@@ -19,10 +19,11 @@ package controllers
 import base.SpecBase
 import controllers.IndexControllerSpec.buildFixture
 import controllers.actions.FakeUser
-import models.application.{Application, Creator}
+import models.application.{Application, Creator, TeamMember}
 import models.{NormalMode, UserAnswers}
 import org.mockito.{ArgumentCaptor, MockitoSugar}
 import org.mockito.ArgumentMatchers.any
+import pages.TeamMembersPage
 import play.api.{Application => PlayApplication}
 import play.api.inject.bind
 import play.api.libs.json.Json
@@ -80,7 +81,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar {
 
         val actualUserAnswers = userAnswersCaptor.getValue
         actualUserAnswers.id mustBe userAnswersId
-        actualUserAnswers.data mustBe Json.obj()
+        actualUserAnswers.get(TeamMembersPage) mustBe Some(Seq(TeamMember(FakeUser.email.value)))
       }
     }
 
