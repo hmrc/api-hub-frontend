@@ -81,11 +81,15 @@ class RegisterApplicationControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must clear UserAnswers after registration" in {
-      val newApplication = NewApplication("test-app-name", Creator(FakeUser.email.get))
+      val newApplication = NewApplication("test-app-name", Creator(FakeUser.email.value), Seq(TeamMember(FakeUser.email.value)))
       val testId = "test-app-id"
       val userAnswers = UserAnswers(FakeUser.userId)
         .set(ApplicationNamePage, newApplication.name)
-        .get
+        .success
+        .value
+        .set(TeamMembersPage, Seq(TeamMember(FakeUser.email.value)))
+        .success
+        .value
 
       val fixture = buildFixture(userAnswers)
 
