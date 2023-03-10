@@ -30,7 +30,7 @@ class ApiHubServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar {
 
   "registerApplication" - {
     "must call the applications connector and return the saved application" in {
-      val newApplication = NewApplication("test-app-name", Creator("test-creator-email"), Seq.empty)
+      val newApplication = NewApplication("test-app-name", Creator("test-creator-email"), Seq(TeamMember("test-creator-email")))
       val expected = Application("id", newApplication)
 
       val applicationsConnector = mock[ApplicationsConnector]
