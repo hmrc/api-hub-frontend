@@ -30,7 +30,7 @@ class ApiHubServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar {
 
   "registerApplication" - {
     "must call the applications connector and return the saved application" in {
-      val newApplication = NewApplication("test-app-name", Creator("test-creator-email"))
+      val newApplication = NewApplication("test-app-name", Creator("test-creator-email"), Seq(TeamMember("test-creator-email")))
       val expected = Application("id", newApplication)
 
       val applicationsConnector = mock[ApplicationsConnector]
@@ -50,8 +50,8 @@ class ApiHubServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar {
 
   "getApplications" - {
     "must call the applications connector and return a sequence of applications" in {
-      val application1 = Application("id-1", "test-app-name-1", Creator("test-creator-email-1"))
-      val application2 = Application("id-2", "test-app-name-2", Creator("test-creator-email-2"))
+      val application1 = Application("id-1", "test-app-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1")))
+      val application2 = Application("id-2", "test-app-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2")))
       val expected = Seq(application1, application2)
 
       val applicationsConnector = mock[ApplicationsConnector]
@@ -70,7 +70,7 @@ class ApiHubServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar {
 
   "getApplication" - {
     "must call the applications connector and return an application" in {
-      val application = Application("id-1", "test-app-name-1", Creator("test-creator-email-1"))
+      val application = Application("id-1", "test-app-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1")))
       val expected = Some(application)
 
       val applicationsConnector = mock[ApplicationsConnector]
@@ -109,8 +109,8 @@ class ApiHubServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar {
 
   "pendingScopes" - {
     "must call the applications connectors and return the applications" in {
-      val application1 = Application("id-1", "test-app-name-1", Creator("test-creator-email-1"))
-      val application2 = Application("id-2", "test-app-name-2", Creator("test-creator-email-2"))
+      val application1 = Application("id-1", "test-app-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1")))
+      val application2 = Application("id-2", "test-app-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2")))
       val expected = Seq(application1, application2)
 
       val applicationsConnector = mock[ApplicationsConnector]

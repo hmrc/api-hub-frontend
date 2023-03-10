@@ -19,7 +19,7 @@ package controllers
 import base.SpecBase
 import controllers.ApplicationDetailsControllerSpec.buildFixture
 import controllers.actions.FakeUser
-import models.application.{Application, Creator}
+import models.application.{Application, Creator, TeamMember}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
 import play.api.{Application => PlayApplication}
@@ -39,7 +39,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar {
       val fixture = buildFixture()
 
       val id = "test-id"
-      val application = Application(id, "app-name", Creator("test-creator-email"))
+      val application = Application(id, "app-name", Creator("test-creator-email"), Seq(TeamMember("test-creator-email")))
 
       when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(id))(any()))
         .thenReturn(Future.successful(Some(application)))

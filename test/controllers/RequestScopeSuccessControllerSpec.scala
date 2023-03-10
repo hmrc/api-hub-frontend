@@ -19,7 +19,7 @@ package controllers
 import base.SpecBase
 import controllers.RequestScopeSuccessControllerSpec.{applicationId, buildFixture}
 import controllers.actions.FakeUser
-import models.application.{Application, Creator}
+import models.application.{Application, Creator, TeamMember}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
 import play.api.{Application => PlayApplication}
@@ -38,7 +38,7 @@ class RequestScopeSuccessControllerSpec extends SpecBase with MockitoSugar {
     "must return OK and the correct view for a GET" in {
 
       val fixture = buildFixture()
-      val application = Application(applicationId, "test-name", Creator("test-email"))
+      val application = Application(applicationId, "test-name", Creator("test-email"), Seq(TeamMember("test-email")))
 
       when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id))(any()))
         .thenReturn(Future.successful(Some(application)))
@@ -59,7 +59,7 @@ class RequestScopeSuccessControllerSpec extends SpecBase with MockitoSugar {
     "must return 404 Not Found if the application does not exist" in {
 
       val fixture = buildFixture()
-      val application = Application(applicationId, "test-name", Creator("test-email"))
+      val application = Application(applicationId, "test-name", Creator("test-email"), Seq(TeamMember("test-email")))
 
       when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id))(any()))
         .thenReturn(Future.successful(None))

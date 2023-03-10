@@ -41,8 +41,8 @@ class IndexControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
       val applications = Seq(
-        Application("id-1", "app-name-1", Creator("creator-email-1")),
-        Application("id-2", "app-name-2", Creator("creator-email-2"))
+        Application("id-1", "app-name-1", Creator("creator-email-1"), Seq(TeamMember("creator-email-1"))),
+        Application("id-2", "app-name-2", Creator("creator-email-2"), Seq(TeamMember("creator-email-2")))
       )
 
       val fixture = buildFixture()

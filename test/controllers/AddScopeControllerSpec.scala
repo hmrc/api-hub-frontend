@@ -34,8 +34,8 @@ import scala.concurrent.Future
 
 class AddScopeControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider = new NewScopeFormProvider()
-  val form = formProvider()
+  private val formProvider = new NewScopeFormProvider()
+  private val form = formProvider()
 
   "AddScopeController" - {
     "must register the scope and redirect to the application details page when valid" in {
@@ -108,7 +108,7 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar {
       val fixture = buildFixture()
       val view = fixture.application.injector.instanceOf[AddScopeView]
 
-      val application = models.application.Application(testId, "app-name", Creator("test-creator-email"))
+      val application = models.application.Application(testId, "app-name", Creator("test-creator-email"), Seq(TeamMember("test-creator-email")))
 
       when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId))(any()))
         .thenReturn(Future.successful(Some(application)))
