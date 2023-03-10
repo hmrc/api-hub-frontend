@@ -20,7 +20,7 @@ import forms.AddTeamMemberDetailsFormProvider.hmrcEmailConstraint
 import forms.mappings.Mappings
 import models.application.TeamMember
 import play.api.data.Form
-import play.api.data.Forms.{email, mapping, nonEmptyText}
+import play.api.data.Forms.mapping
 import play.api.data.validation.Constraints.{emailAddress, nonEmpty}
 import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
 
