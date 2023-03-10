@@ -19,7 +19,7 @@ package controllers
 import base.SpecBase
 import controllers.IndexControllerSpec.buildFixture
 import controllers.actions.FakeUser
-import models.application.{Application, Creator}
+import models.application.{Application, Creator, TeamMember}
 import models.{NormalMode, UserAnswers}
 import org.mockito.{ArgumentCaptor, MockitoSugar}
 import org.mockito.ArgumentMatchers.any
@@ -40,8 +40,8 @@ class IndexControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
       val applications = Seq(
-        Application("id-1", "app-name-1", Creator("creator-email-1")),
-        Application("id-2", "app-name-2", Creator("creator-email-2"))
+        Application("id-1", "app-name-1", Creator("creator-email-1"), Seq(TeamMember("creator-email-1"))),
+        Application("id-2", "app-name-2", Creator("creator-email-2"), Seq(TeamMember("creator-email-2")))
       )
 
       val fixture = buildFixture()

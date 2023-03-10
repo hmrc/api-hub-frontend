@@ -19,11 +19,11 @@ package controllers
 import base.SpecBase
 import controllers.RegisterApplicationControllerSpec.buildFixture
 import controllers.actions.FakeUser
-import models.application.{Application, Creator, NewApplication}
+import models.application.{Application, Creator, NewApplication, TeamMember}
 import models.{CheckMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
-import pages.ApplicationNamePage
+import pages.{ApplicationNamePage, TeamMembersPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -36,11 +36,16 @@ class RegisterApplicationControllerSpec extends SpecBase with MockitoSugar {
 
   "RegisterApplicationController" - {
     "must register the application and redirect to the Index page when valid" in {
-      val newApplication = NewApplication("test-app-name", Creator(FakeUser.email.get))
+      val teamMembers = Seq(TeamMember(FakeUser.email.value), TeamMember("team.member@hmrc.gov.uk"))
+      val newApplication = NewApplication("test-app-name", Creator(FakeUser.email.value), teamMembers)
       val testId = "test-app-id"
       val userAnswers = UserAnswers(FakeUser.userId)
         .set(ApplicationNamePage, newApplication.name)
-        .get
+        .success
+        .value
+        .set(TeamMembersPage, teamMembers)
+        .success
+        .value
 
       val fixture = buildFixture(userAnswers)
 

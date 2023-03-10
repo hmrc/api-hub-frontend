@@ -18,7 +18,7 @@ package controllers
 
 import base.SpecBase
 import controllers.actions.{FakeApprover, FakeUser}
-import models.application.{Application, Creator}
+import models.application.{Application, Creator, TeamMember}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar
 import play.api.inject.bind
@@ -42,8 +42,8 @@ class PendingApprovalsControllerSpec extends SpecBase with MockitoSugar {
         )
         .build()
 
-      val application1 = Application("id-1", "test-name-1", Creator("test-creator-email-1"))
-      val application2 = Application("id-2", "test-name-2", Creator("test-creator-email-2"))
+      val application1 = Application("id-1", "test-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1")))
+      val application2 = Application("id-2", "test-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2")))
       val applications: Seq[Application] = Seq(application1, application2)
 
       when(apiHubService.pendingScopes()(any())).thenReturn(Future.successful(applications))

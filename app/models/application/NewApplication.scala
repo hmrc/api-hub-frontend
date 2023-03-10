@@ -18,7 +18,7 @@ package models.application
 
 import play.api.libs.json.{Format, Json}
 
-case class NewApplication(name: String, createdBy: Creator)
+case class NewApplication(name: String, createdBy: Creator, teamMembers: Seq[TeamMember])
 
 object NewApplication {
 

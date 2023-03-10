@@ -19,9 +19,9 @@ package controllers
 import com.google.inject.Inject
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import models.{CheckMode, UserAnswers}
-import models.application.{Creator, NewApplication}
+import models.application.{Creator, NewApplication, TeamMember}
 import models.user.UserModel
-import pages.ApplicationNamePage
+import pages.{ApplicationNamePage, TeamMembersPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import services.ApiHubService
@@ -52,13 +52,21 @@ class RegisterApplicationController @Inject()(
   private def validateAndBuildApplication(userAnswers: UserAnswers, user: UserModel): Either[Call, NewApplication] = {
     for {
       applicationName <- validateApplicationName(userAnswers)
-    } yield NewApplication(applicationName, Creator(email = user.email.getOrElse("")))
+      teamMembers <- validateTeamMembers(userAnswers)
+    } yield NewApplication(applicationName, Creator(email = user.email.getOrElse("")), teamMembers)
   }
 
   private def validateApplicationName(userAnswers: UserAnswers): Either[Call, String] = {
     userAnswers.get(ApplicationNamePage) match {
       case Some(applicationName) => Right(applicationName)
       case _ => Left(routes.ApplicationNameController.onPageLoad(CheckMode))
+    }
+  }
+
+  private def validateTeamMembers(userAnswers: UserAnswers): Either[Call, Seq[TeamMember]] = {
+    userAnswers.get(TeamMembersPage) match {
+      case Some(teamMembers) if teamMembers.nonEmpty => Right(teamMembers)
+      case _ => Left(routes.QuestionAddTeamMembersController.onPageLoad(CheckMode))
     }
   }
 

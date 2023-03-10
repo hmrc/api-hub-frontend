@@ -23,7 +23,7 @@ class ApplicationsConnectorSpec
 
   "ApplicationsConnector.registerApplication" - {
     "must place the correct request and return the stored application" in {
-      val newApplication = NewApplication("test-name", Creator("test-creator-email"))
+      val newApplication = NewApplication("test-name", Creator("test-creator-email"), Seq(TeamMember("test-creator-email")))
       val expected = Application("test-id", newApplication)
 
       stubFor(
@@ -47,8 +47,8 @@ class ApplicationsConnectorSpec
   }
   "ApplicationsConnector.getApplications" - {
     "must place the correct request and return the array of applications" in {
-      val application1 = Application("id-1", "test-name-1", Creator("test-creator-email-1"))
-      val application2 = Application("id-2", "test-name-2", Creator("test-creator-email-2"))
+      val application1 = Application("id-1", "test-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1")))
+      val application2 = Application("id-2", "test-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2")))
       val expected = Seq(application1, application2)
 
       stubFor(
@@ -70,7 +70,7 @@ class ApplicationsConnectorSpec
 
   "ApplicationsConnector.getApplication" - {
     "must place the correct request and return the application" in {
-      val application1 = Application("id-1", "test-name-1", Creator("test-creator-email-1"))
+      val application1 = Application("id-1", "test-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1")))
       val expected = application1
 
       stubFor(
@@ -112,7 +112,7 @@ class ApplicationsConnectorSpec
       val newScope = NewScope(appId, Seq(Dev))
 
       stubFor(
-        post(urlEqualTo(s"/api-hub-applications/applications/${appId}/environments/scopes"))
+        post(urlEqualTo(s"/api-hub-applications/applications/$appId/environments/scopes"))
           .withRequestBody(equalToJson(Json.toJson(Seq(newScope)).toString()))
           .withHeader("Authorization", equalTo("An authentication token"))
           .willReturn(aResponse().withStatus(NO_CONTENT))
@@ -129,7 +129,7 @@ class ApplicationsConnectorSpec
       val newScope = NewScope(appId, Seq(Dev))
 
       stubFor(
-        post(urlEqualTo(s"/api-hub-applications/applications/${appId}/environments/scopes"))
+        post(urlEqualTo(s"/api-hub-applications/applications/$appId/environments/scopes"))
           .withRequestBody(equalToJson(Json.toJson(Seq(newScope)).toString()))
           .willReturn(aResponse().withStatus(NOT_FOUND))
       )
@@ -143,8 +143,8 @@ class ApplicationsConnectorSpec
 
   "ApplicationsConnector.pendingScopes" - {
     "must place the correct request and return the array of applications" in {
-      val application1 = Application("id-1", "test-name-1", Creator("test-creator-email-1"))
-      val application2 = Application("id-2", "test-name-2", Creator("test-creator-email-2"))
+      val application1 = Application("id-1", "test-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1")))
+      val application2 = Application("id-2", "test-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2")))
       val expected = Seq(application1, application2)
 
       stubFor(
@@ -170,7 +170,7 @@ class ApplicationsConnectorSpec
       val scope = "a_scope"
 
       stubFor(
-        put(urlEqualTo(s"/api-hub-applications/applications/${appId}/environments/prod/scopes/${scope}"))
+        put(urlEqualTo(s"/api-hub-applications/applications/$appId/environments/prod/scopes/$scope"))
           .withRequestBody(equalToJson("{\"status\":\"APPROVED\"}"))
           .withHeader("Content-Type", equalTo("application/json"))
           .withHeader("Authorization", equalTo("An authentication token"))
@@ -191,7 +191,7 @@ class ApplicationsConnectorSpec
       val scope = "a_scope"
 
       stubFor(
-        put(urlEqualTo(s"/api-hub-applications/applications/${appId}/environments/prod/scopes/${scope}"))
+        put(urlEqualTo(s"/api-hub-applications/applications/$appId/environments/prod/scopes/$scope"))
           .willReturn(
             aResponse()
               .withStatus(NOT_FOUND)
