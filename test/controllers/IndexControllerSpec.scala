@@ -21,14 +21,13 @@ import controllers.IndexControllerSpec.buildFixture
 import controllers.actions.FakeUser
 import models.application.{Application, Creator, TeamMember}
 import models.{NormalMode, UserAnswers}
-import org.mockito.{ArgumentCaptor, MockitoSugar}
 import org.mockito.ArgumentMatchers.any
+import org.mockito.{ArgumentCaptor, MockitoSugar}
 import pages.TeamMembersPage
-import play.api.{Application => PlayApplication}
 import play.api.inject.bind
-import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import play.api.{Application => PlayApplication}
 import repositories.SessionRepository
 import services.ApiHubService
 import views.html.IndexView
