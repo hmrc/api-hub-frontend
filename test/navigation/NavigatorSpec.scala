@@ -70,6 +70,11 @@ class NavigatorSpec extends SpecBase with TryValues {
       "must go from the Application Name page to the Check Your Answers Page" in {
         navigator.nextPage(ApplicationNamePage, CheckMode, UserAnswers("id")) mustBe routes.CheckYourAnswersController.onPageLoad
       }
+
+      "must go from the Do you want to add a team member? page to the Add a team member page when the user selects yes" in {
+        val userAnswers = UserAnswers("id").set(QuestionAddTeamMembersPage, true).success.value
+        navigator.nextPage(QuestionAddTeamMembersPage, CheckMode, userAnswers) mustBe routes.AddTeamMemberDetailsController.onPageLoad(NormalMode, 0)
+      }
     }
   }
 }

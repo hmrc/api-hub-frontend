@@ -28,6 +28,7 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Application => PlayApplication}
+import repositories.SessionRepository
 import services.ApiHubService
 
 import scala.concurrent.Future
@@ -46,6 +47,8 @@ class RegisterApplicationControllerSpec extends SpecBase with MockitoSugar {
 
       when(fixture.apiHubService.registerApplication(ArgumentMatchers.eq(newApplication))(any()))
         .thenReturn(Future.successful(Application(testId, newApplication)))
+
+      when(fixture.sessionRepository.clear(any())).thenReturn(Future.successful(true))
 
       running(fixture.application) {
         val request = FakeRequest(POST, routes.RegisterApplicationController.create.url)
@@ -71,6 +74,30 @@ class RegisterApplicationControllerSpec extends SpecBase with MockitoSugar {
         verifyZeroInteractions(fixture.apiHubService)
       }
     }
+
+    "must clear UserAnswers after registration" in {
+      val newApplication = NewApplication("test-app-name", Creator(FakeUser.email.get))
+      val testId = "test-app-id"
+      val userAnswers = UserAnswers(FakeUser.userId)
+        .set(ApplicationNamePage, newApplication.name)
+        .get
+
+      val fixture = buildFixture(userAnswers)
+
+      when(fixture.apiHubService.registerApplication(any())(any()))
+        .thenReturn(Future.successful(Application(testId, newApplication)))
+
+      when(fixture.sessionRepository.clear(any())).thenReturn(Future.successful(true))
+
+      running(fixture.application) {
+        val request = FakeRequest(POST, routes.RegisterApplicationController.create.url)
+        val result = route(fixture.application, request).value
+
+        status(result) mustBe SEE_OTHER
+
+        verify(fixture.sessionRepository).clear(userAnswersId)
+      }
+    }
   }
 
 }
@@ -79,19 +106,22 @@ object RegisterApplicationControllerSpec extends SpecBase with MockitoSugar {
 
   case class Fixture(
     application: PlayApplication,
-    apiHubService: ApiHubService
+    apiHubService: ApiHubService,
+    sessionRepository: SessionRepository
   )
 
   def buildFixture(userAnswers: UserAnswers): Fixture = {
     val apiHubService = mock[ApiHubService]
+    val sessionRepository = mock[SessionRepository]
 
     val application = applicationBuilder(userAnswers = Some(userAnswers))
       .overrides(
-        bind[ApiHubService].toInstance(apiHubService)
+        bind[ApiHubService].toInstance(apiHubService),
+        bind[SessionRepository].toInstance(sessionRepository)
       )
       .build()
 
-    Fixture(application, apiHubService)
+    Fixture(application, apiHubService, sessionRepository)
   }
 
 }

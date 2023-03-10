@@ -34,6 +34,7 @@ class Navigator @Inject()() {
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
+    case QuestionAddTeamMembersPage => questionAddTeamMembersNextPage(CheckMode)
     case _ => _ => routes.CheckYourAnswersController.onPageLoad
   }
 
@@ -49,6 +50,7 @@ class Navigator @Inject()() {
       case (NormalMode, Some(addTeam)) if addTeam => routes.AddTeamMemberDetailsController.onPageLoad(NormalMode, 0)
       case (NormalMode, Some(_)) => routes.CheckYourAnswersController.onPageLoad
       case (NormalMode, None) => routes.JourneyRecoveryController.onPageLoad()
+      case (CheckMode, Some(addTeam)) if addTeam => routes.AddTeamMemberDetailsController.onPageLoad(NormalMode, 0)
       case _ => routes.CheckYourAnswersController.onPageLoad
     }
   }
