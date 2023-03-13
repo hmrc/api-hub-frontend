@@ -37,6 +37,7 @@ class Navigator @Inject()() {
   private val checkRouteMap: Page => UserAnswers => Call = {
     case QuestionAddTeamMembersPage => questionAddTeamMembersNextPage(CheckMode)
     case ConfirmAddTeamMemberPage => confirmAddTeamMemberNextPage(CheckMode)
+    case TeamMembersPage => _ => routes.ConfirmAddTeamMemberController.onPageLoad(CheckMode)
     case _ => _ => routes.CheckYourAnswersController.onPageLoad
   }
 

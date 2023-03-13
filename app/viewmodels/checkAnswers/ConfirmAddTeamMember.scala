@@ -16,13 +16,42 @@
 
 package viewmodels.checkAnswers
 
-import models.UserAnswers
+import controllers.routes
+import models.{CheckMode, UserAnswers}
 import pages.TeamMembersPage
+import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{Key, SummaryListRow}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{Actions, Key, SummaryListRow}
+import viewmodels.govuk.summarylist._
+import viewmodels.implicits._
+
 object ConfirmAddTeamMember {
 
-  def rows(answers: UserAnswers): Seq[SummaryListRow] = answers.get(TeamMembersPage).getOrElse(Seq.empty)
-                                           .map { teamMember => SummaryListRow(key = Key(Text(teamMember.email))) }
-}
+  def rows(answers: UserAnswers)(implicit messages: Messages): Seq[SummaryListRow] =
+    answers
+      .get(TeamMembersPage).getOrElse(Seq.empty)
+      .zipWithIndex
+      .map {
+        zipped => SummaryListRow(
+          key = Key(Text(zipped._1.email)),
+          actions = actions(zipped._2)
+        )
+      }
 
+  private def actions(index: Int)(implicit messages: Messages): Option[Actions] = {
+    if (index == 0) {
+      None
+    }
+    else {
+      Some(Actions(
+        items = Seq(
+          ActionItemViewModel(
+            "site.change",
+            routes.AddTeamMemberDetailsController.onPageLoad(CheckMode, index).url
+          )
+        )
+      ))
+    }
+  }
+
+}

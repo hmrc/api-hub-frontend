@@ -92,6 +92,9 @@ class NavigatorSpec extends SpecBase with TryValues {
         navigator.nextPage(ConfirmAddTeamMemberPage, CheckMode, userAnswers) mustBe routes.CheckYourAnswersController.onPageLoad
       }
 
+      "must go from the Team member details page to the Confirm add team member page" in {
+        navigator.nextPage(TeamMembersPage, CheckMode, UserAnswers("id")) mustBe routes.ConfirmAddTeamMemberController.onPageLoad(CheckMode)
+      }
 
     }
   }

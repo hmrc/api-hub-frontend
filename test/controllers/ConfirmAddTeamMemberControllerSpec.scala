@@ -48,10 +48,11 @@ class ConfirmAddTeamMemberControllerSpec extends SpecBase with MockitoSugar with
         .value
       val boundForm = form.bind(Map("value" -> "true"))
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-      val teamMembers = SummaryListViewModel(
-        rows = ConfirmAddTeamMember.rows(userAnswers)
-      )
+
       running(application) {
+        val teamMembers = SummaryListViewModel(
+          rows = ConfirmAddTeamMember.rows(userAnswers)(messages(application))
+        )
         val request = FakeRequest(GET, routes.ConfirmAddTeamMemberController.onPageLoad(NormalMode).url)
 
         val view = application.injector.instanceOf[ConfirmAddTeamMemberView]
@@ -119,11 +120,12 @@ class ConfirmAddTeamMemberControllerSpec extends SpecBase with MockitoSugar with
         .value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-      val teamMembers = SummaryListViewModel(
-        rows = ConfirmAddTeamMember.rows(userAnswers)
-      )
 
       running(application) {
+        val teamMembers = SummaryListViewModel(
+          rows = ConfirmAddTeamMember.rows(userAnswers)(messages(application))
+        )
+
         val request =
           FakeRequest(POST, confirmAddTeamMemberRoute)
             .withFormUrlEncodedBody(("value", ""))
