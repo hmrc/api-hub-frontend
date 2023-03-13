@@ -26,7 +26,6 @@ import org.mockito.ArgumentMatchers.any
 import pages.TeamMembersPage
 import play.api.{Application => PlayApplication}
 import play.api.inject.bind
-import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository

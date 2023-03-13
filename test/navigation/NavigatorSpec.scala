@@ -57,6 +57,18 @@ class NavigatorSpec extends SpecBase with TryValues {
       "must go from the Team member details page to the Confirm add team member page" in {
         navigator.nextPage(TeamMembersPage, NormalMode, UserAnswers("id")) mustBe routes.ConfirmAddTeamMemberController.onPageLoad(NormalMode)
       }
+      "must go from the Confirm Add Team Member page to the Add a team member page when option form's value = true" in {
+        val userAnswers = UserAnswers("id").set(ConfirmAddTeamMemberPage, true).success.value
+        navigator.nextPage(ConfirmAddTeamMemberPage, NormalMode, userAnswers) mustBe routes.AddTeamMemberDetailsController.onPageLoad(NormalMode, 0)
+      }
+      "must go from the Confirm Add Team Member page to the Check Your Answers page when option form's value = false" in {
+        val userAnswers = UserAnswers("id").set(ConfirmAddTeamMemberPage, false).success.value
+        navigator.nextPage(ConfirmAddTeamMemberPage, NormalMode, userAnswers) mustBe routes.CheckYourAnswersController.onPageLoad
+      }
+      "must go from the the Confirm Add Team Member page to the Journey recovery page when there is no selection" in {
+        navigator.nextPage(QuestionAddTeamMembersPage, NormalMode, UserAnswers("id")) mustBe routes.JourneyRecoveryController.onPageLoad()
+      }
+
     }
 
     "in Check mode" - {
@@ -75,6 +87,12 @@ class NavigatorSpec extends SpecBase with TryValues {
         val userAnswers = UserAnswers("id").set(QuestionAddTeamMembersPage, true).success.value
         navigator.nextPage(QuestionAddTeamMembersPage, CheckMode, userAnswers) mustBe routes.AddTeamMemberDetailsController.onPageLoad(NormalMode, 0)
       }
+      "must go from the Do you need to add another team member? on Confirm Add Team Member page to the Check Your Answers page when the user selects no" in {
+        val userAnswers = UserAnswers("id").set(ConfirmAddTeamMemberPage, false).success.value
+        navigator.nextPage(ConfirmAddTeamMemberPage, CheckMode, userAnswers) mustBe routes.CheckYourAnswersController.onPageLoad
+      }
+
+
     }
   }
 }
