@@ -110,7 +110,7 @@ class ConfirmAddTeamMemberControllerSpec extends SpecBase with MockitoSugar with
       }
     }
 
-    "must return a Bad Request and errors when invalid data is submitted" in  {
+    "must return a Bad Request and errors when invalid data is submitted" in {
 
       val userAnswers = UserAnswers(userAnswersId)
         .set(ConfirmAddTeamMemberPage, true)
