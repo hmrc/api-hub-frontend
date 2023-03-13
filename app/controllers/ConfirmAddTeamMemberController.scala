@@ -18,16 +18,18 @@ package controllers
 
 import controllers.actions._
 import forms.ConfirmAddTeamMemberFormProvider
-import javax.inject.Inject
-import models.Mode
+import models.{CheckMode, Mode, NormalMode}
 import navigation.Navigator
 import pages.ConfirmAddTeamMemberPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.checkAnswers.ConfirmAddTeamMember
+import viewmodels.govuk.summarylist._
 import views.html.ConfirmAddTeamMemberView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class ConfirmAddTeamMemberController @Inject()(
@@ -44,24 +46,32 @@ class ConfirmAddTeamMemberController @Inject()(
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = { //TODO: (identify andThen getData andThen requireData) {
-    identify {
-      implicit request =>
-        //        val preparedForm = request.userAnswers.get(ConfirmAddTeamMemberPage) match {
-        //          case None => form
-        //          case Some(value) => form.fill(value)
-        //        }
-
-        Ok(view(form, mode)) // TODO: use preparedForm
-    }
+  def onPageLoad(mode: Mode): Action[AnyContent] = { (identify andThen getData andThen requireData) {
+    implicit request =>
+      val teamMemberDetails = SummaryListViewModel(
+        rows = ConfirmAddTeamMember.rows(request.userAnswers)
+      )
+      request.userAnswers.get(ConfirmAddTeamMemberPage) match {
+        case None => Ok(view(form, teamMemberDetails, Some(request.user), mode))
+        case Some(value) => {
+          Ok(view(mode match{
+                      case NormalMode => form.fill(value)
+                      case CheckMode => form
+                    },
+                  teamMemberDetails, Some(request.user), mode))
+        }
+      }
+   }
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-
+      val teamMemberDetails = SummaryListViewModel(
+        rows = ConfirmAddTeamMember.rows(request.userAnswers)
+      )
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+          Future.successful(BadRequest(view(formWithErrors, teamMemberDetails, Some(request.user), mode))),
 
         value =>
           for {
