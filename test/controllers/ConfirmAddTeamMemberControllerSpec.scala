@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import controllers.actions.FakeUser
 import forms.ConfirmAddTeamMemberFormProvider
 import models.{NormalMode, UserAnswers}
 import org.scalatest.{OptionValues, TryValues}
@@ -59,7 +60,7 @@ class ConfirmAddTeamMemberControllerSpec extends SpecBase with MockitoSugar with
 
         status(result) mustEqual OK
         val actual = contentAsString(result)
-        val expected = view(boundForm, teamMembers, NormalMode)(request, messages(application)).toString
+        val expected = view(boundForm, teamMembers, Some(FakeUser), NormalMode)(request, messages(application)).toString
         actual mustEqual expected
       }
     }
@@ -136,7 +137,7 @@ class ConfirmAddTeamMemberControllerSpec extends SpecBase with MockitoSugar with
         status(result) mustEqual BAD_REQUEST
 
         val actual = contentAsString(result)
-        val expected = view(boundForm, teamMembers, NormalMode)(request, messages(application)).toString
+        val expected = view(boundForm, teamMembers, Some(FakeUser), NormalMode)(request, messages(application)).toString
         actual mustEqual expected
       }
     }

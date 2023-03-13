@@ -52,13 +52,13 @@ class ConfirmAddTeamMemberController @Inject()(
         rows = ConfirmAddTeamMember.rows(request.userAnswers)
       )
       request.userAnswers.get(ConfirmAddTeamMemberPage) match {
-        case None => Ok(view(form, teamMemberDetails, mode))
+        case None => Ok(view(form, teamMemberDetails, Some(request.user), mode))
         case Some(value) => {
           Ok(view(mode match{
                       case NormalMode => form.fill(value)
                       case CheckMode => form
                     },
-                  teamMemberDetails, mode))
+                  teamMemberDetails, Some(request.user), mode))
         }
       }
    }
@@ -71,7 +71,7 @@ class ConfirmAddTeamMemberController @Inject()(
       )
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, teamMemberDetails, mode))),
+          Future.successful(BadRequest(view(formWithErrors, teamMemberDetails, Some(request.user), mode))),
 
         value =>
           for {
