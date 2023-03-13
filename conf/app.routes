@@ -62,3 +62,5 @@ POST        /change-team-members-overview                       controllers.Conf
 GET         /experimentalStrideLogin                            controllers.ExperimentalStrideLoginController.noRole()
 GET         /experimentalStrideLoginUser                        controllers.ExperimentalStrideLoginController.apiHubUser()
 GET         /experimentalStrideLoginApprover                    controllers.ExperimentalStrideLoginController.apiHubApprover()
+
+DELETE      /team-members/:index                                controllers.RemoveTeamMemberController.removeTeamMember(mode: Mode = NormalMode, index: Int)
