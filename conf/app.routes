@@ -62,3 +62,5 @@ POST        /change-team-members-overview                       controllers.Conf
 GET         /experimentalStrideLogin                            controllers.ExperimentalStrideLoginController.noRole()
 GET         /experimentalStrideLoginUser                        controllers.ExperimentalStrideLoginController.apiHubUser()
 GET         /experimentalStrideLoginApprover                    controllers.ExperimentalStrideLoginController.apiHubApprover()
+
+GET         /test-application-auth/:id                          controllers.TestApplicationAuthController.onPageLoad(id: String)
