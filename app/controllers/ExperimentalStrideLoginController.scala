@@ -16,8 +16,9 @@
 
 package controllers
 
+import models.user._
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc._
 import play.api.{Configuration, Environment, Logging, Mode}
 import uk.gov.hmrc.auth.core.AuthProvider.PrivilegedApplication
 import uk.gov.hmrc.auth.core._
@@ -31,12 +32,14 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class ExperimentalStrideLoginController @Inject()(
-  override val messagesApi: MessagesApi,
-  val controllerComponents: MessagesControllerComponents,
-  view: ExperimentalStrideLoginView,
-  override val authConnector: AuthConnector,
-  override val config: Configuration,
-  override val env: Environment
+                                                   override val messagesApi: MessagesApi,
+                                                   val controllerComponents: MessagesControllerComponents,
+                                                   view: ExperimentalStrideLoginView,
+                                                   override val authConnector: AuthConnector,
+                                                   override val config: Configuration,
+                                                   override val env: Environment,
+                                                   ldapAuth: ExperimentalLdapAuth,
+                                                   strideAuth: ExperimentalStrideAuth
 )(implicit ec: ExecutionContext)
   extends FrontendBaseController with I18nSupport with AuthorisedFunctions with AuthRedirects with Logging {
 
@@ -160,6 +163,58 @@ class ExperimentalStrideLoginController @Inject()(
       }
   }
 
+  def apiHubUserOrApprover: Action[AnyContent] = Action.async {
+    implicit request =>
+      logger.info("Authorising")
+      authorised(Enrolment("api_hub_user") or Enrolment("api_hub_approver") and AuthProviders(PrivilegedApplication))
+        .retrieve(Retrievals.allEnrolments and Retrievals.authorisedEnrolments and Retrievals.name and Retrievals.email and Retrievals.credentials) {
+          case allEnrolments ~ authorisedEnrolments ~ name ~ email ~ credentials =>
+            Future.successful(
+              Ok(
+                view(
+                  ExperimentalStrideLoginViewModel(
+                    description = "Test login with API Hub User or Approver role required",
+                    allEnrolments = allEnrolments,
+                    authorisedEnrolments = authorisedEnrolments,
+                    name = name,
+                    email = email,
+                    credentials = credentials
+                  )
+                )
+              )
+            )
+        }.recover {
+        case _: NoActiveSession =>
+          logger.warn("NoActiveSession")
+          toStrideLogin(
+            if (env.mode.equals(Mode.Dev)) {
+              s"http://${request.host}${request.uri}"
+            }
+            else {
+              s"${request.uri}"
+            }
+          )
+        case _: InsufficientEnrolments =>
+          logger.warn("InsufficientEnrolments")
+          SeeOther(routes.UnauthorisedController.onPageLoad.url)
+        case t: Throwable =>
+          logger.error("Throwable", t)
+          throw t
+      }
+  }
+
+  def showAuthentication: Action[AnyContent] = Action.async {
+    implicit request =>
+      strideAuth.authenticate() flatMap {
+        case UserUnauthenticated => ldapAuth.authenticate()
+        case result: UserAuthResult => Future.successful(result)
+      } map {
+        case UserAuthenticated(user) => Ok(user.toString)
+        case UserUnauthorised => Ok("User is unauthorised")
+        case UserUnauthenticated => Ok("User is unauthenticated")
+      }
+  }
+
 }
 
 case class ExperimentalStrideLoginViewModel(
@@ -170,3 +225,11 @@ case class ExperimentalStrideLoginViewModel(
   email: Option[String],
   credentials: Option[Credentials]
 )
+
+sealed trait UserAuthResult
+
+case object UserUnauthenticated extends UserAuthResult
+
+case object UserUnauthorised extends UserAuthResult
+
+case class UserAuthenticated(userModel: UserModel) extends UserAuthResult
