@@ -17,28 +17,41 @@
 package controllers
 
 import base.SpecBase
-import forms.AddTeamMemberDetailsFormProvider
 import models.application.TeamMember
 import models.{NormalMode, UserAnswers}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.{verify, when}
 import org.scalatest.{OptionValues, TryValues}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.TeamMembersPage
+import play.api.inject
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import repositories.SessionRepository
+
+import scala.concurrent.Future
 
 class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with OptionValues with TryValues {
-
-  private val formProvider = new AddTeamMemberDetailsFormProvider()
 
   "RemoveTeamMemberDetails Controller" - {
 
     "must return redirect to confirm team members page when successful removal of team member" in {
 
+      val teamMember1 = TeamMember("creator@hmrc.gov.uk")
+      val teamMember2 = TeamMember("new.member@hmrc.gov.uk")
       val userAnswers = UserAnswers(userAnswersId)
-        .set(TeamMembersPage, Seq(TeamMember("creator.email@hmrc.gov.uk"), TeamMember("team.member.email@hmrc.gov.uk")))
+        .set(TeamMembersPage, Seq(teamMember1, teamMember2))
         .success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
+        .overrides(
+          inject.bind[SessionRepository].toInstance(mockSessionRepository)
+        )
+        .build()
 
 
       running(application) {
@@ -48,6 +61,13 @@ class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with Opt
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.ConfirmAddTeamMemberController.onPageLoad(NormalMode).url
+
+        val updatedAnswers = userAnswers
+          .set(TeamMembersPage, Seq(teamMember1))
+          .success
+          .value
+
+        verify(mockSessionRepository).set(updatedAnswers)
       }
     }
   }
