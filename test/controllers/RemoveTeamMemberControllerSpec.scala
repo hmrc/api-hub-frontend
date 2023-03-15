@@ -25,7 +25,6 @@ import org.scalatestplus.mockito.MockitoSugar
 import pages.TeamMembersPage
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import views.html.AddTeamMemberDetailsView
 
 class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with OptionValues with TryValues {
 
