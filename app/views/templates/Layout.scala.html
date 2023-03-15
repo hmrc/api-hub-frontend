@@ -49,7 +49,7 @@
                 countdown           = Some(appConfig.countdown),
                 keepAliveUrl        = Some(routes.KeepAliveController.keepAlive.url),
                 keepAliveButtonText = Some(messages("timeout.keepAlive")),
-                signOutUrl          = Some(controllers.auth.routes.AuthController.signOut.url),
+                signOutUrl          = Some(controllers.auth.routes.AuthController.signOut().url),
                 signOutButtonText   = Some(messages("timeout.signOut")),
                 title               = Some(messages("timeout.title")),
                 message             = Some(messages("timeout.message"))
@@ -101,7 +101,7 @@
                 @messages("site.applications")
             </a>
             @if(user.map(_.permissions.canApprove).getOrElse(false)) {
-                <a class="govuk-link govuk-link--no-visited-state govuk-!-margin-left-6" href="@routes.PendingApprovalsController.onPageLoad.url">
+                <a class="govuk-link govuk-link--no-visited-state govuk-!-margin-left-6" href="@routes.PendingApprovalsController.onPageLoad().url">
                     @messages("site.approvals")
                 </a>
             }
@@ -115,7 +115,7 @@
     headBlock   = Some(head),
     headerBlock = Some(hmrcStandardHeader(
         serviceUrl  = Some(routes.IndexController.onPageLoad.url),
-        signOutUrl  = if(showSignOut) Some(controllers.auth.routes.AuthController.signOut.url) else None,
+        signOutUrl  = if(showSignOut) Some(controllers.auth.routes.AuthController.signOut().url) else None,
         phaseBanner = Some(alphaBanner(appConfig.feedbackUrl)),
         additionalBannersBlock = Some(apiHubBanner)
     )),

@@ -35,7 +35,7 @@
 @layout(pageTitle = messages("fake-sign-in.title.lbl") + " – " + messages("site.service_name")) {
     <h1 class="govuk-heading-xl">@messages("fake-sign-in.header.lbl")</h1>
     <div class="">
-        @formWithCSRF(action = TestOnlySignInController.submit) {
+        @formWithCSRF(action = TestOnlySignInController.submit()) {
             @if(form.errors.nonEmpty) {
                 @errorSummary(ErrorSummary(
                   errorList = form.errors.asTextErrorLinks,

@@ -41,7 +41,7 @@
 
     <p class="govuk-body">@messages("checkYourAnswers.complete.guidance")</p>
 
-    @formHelper(action = routes.RegisterApplicationController.create) {
+    @formHelper(action = routes.RegisterApplicationController.create()) {
         @govukButton(
             ButtonViewModel(messages("checkYourAnswers.registerApplication"))
         )

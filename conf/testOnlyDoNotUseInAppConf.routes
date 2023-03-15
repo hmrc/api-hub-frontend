@@ -13,7 +13,7 @@
 ->         /                                        prod.Routes
 
 GET        /api-hub/test-only/sign-in               testonly.TestOnlySignInController.showSignIn
-POST       /api-hub/test-only/sign-in               testonly.TestOnlySignInController.submit
+POST       /api-hub/test-only/sign-in               testonly.TestOnlySignInController.submit()
 
 + nocsrf
 POST       /api-hub/test-only/internal-auth/auth    testonly.TestOnlySignInController.auth
