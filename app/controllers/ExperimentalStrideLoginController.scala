@@ -215,6 +215,18 @@ class ExperimentalStrideLoginController @Inject()(
       }
   }
 
+  def showAuthenticationApproverOnly: Action[AnyContent] = Action.async {
+    implicit request =>
+      strideAuth.authenticateApproverOnly() flatMap {
+        case UserUnauthenticated => ldapAuth.authenticate()
+        case result: UserAuthResult => Future.successful(result)
+      } map {
+        case UserAuthenticated(user) => Ok(user.toString)
+        case UserUnauthorised => Ok("User is unauthorised")
+        case UserUnauthenticated => Ok("User is unauthenticated")
+      }
+  }
+
 }
 
 case class ExperimentalStrideLoginViewModel(

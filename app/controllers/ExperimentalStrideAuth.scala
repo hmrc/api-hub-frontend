@@ -42,7 +42,28 @@ class ExperimentalStrideAuth @Inject()(
               userName = name.map(_.name.getOrElse("")).getOrElse(""),
               userType = StrideUser,
               email = email,
-              permissions = Permissions(canApprove = authorisedEnrolments.enrolments.exists(enrolment => enrolment.key.eq("api_hub_approver")))
+              permissions = Permissions(canApprove = authorisedEnrolments.enrolments.exists(enrolment => enrolment.key.equals("api_hub_approver")))
+            )
+          ))
+      }.recover {
+      case _: NoActiveSession =>
+        UserUnauthenticated
+      case _: InsufficientEnrolments =>
+        UserUnauthorised
+    }
+  }
+
+  def authenticateApproverOnly()(implicit request: Request[_]): Future[UserAuthResult] = {
+    authorised(Enrolment("api_hub_approver") and AuthProviders(PrivilegedApplication))
+      .retrieve(Retrievals.authorisedEnrolments and Retrievals.name and Retrievals.email and Retrievals.credentials) {
+        case authorisedEnrolments ~ name ~ email ~ credentials =>
+          Future.successful(UserAuthenticated(
+            UserModel(
+              userId = s"STRIDE-${credentials.map(_.providerId).getOrElse(name)}",
+              userName = name.map(_.name.getOrElse("")).getOrElse(""),
+              userType = StrideUser,
+              email = email,
+              permissions = Permissions(canApprove = authorisedEnrolments.enrolments.exists(enrolment => enrolment.key.equals("api_hub_approver")))
             )
           ))
       }.recover {

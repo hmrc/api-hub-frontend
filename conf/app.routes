@@ -63,3 +63,5 @@ GET         /experimentalStrideLogin                            controllers.Expe
 GET         /experimentalStrideLoginUser                        controllers.ExperimentalStrideLoginController.apiHubUser()
 GET         /experimentalStrideLoginApprover                    controllers.ExperimentalStrideLoginController.apiHubApprover()
 GET         /experimentalStrideLoginUserOrApprover              controllers.ExperimentalStrideLoginController.apiHubUserOrApprover()
+GET         /experimentalAuth                                   controllers.ExperimentalStrideLoginController.showAuthentication()
+GET         /experimentalAuthApproverOnly                       controllers.ExperimentalStrideLoginController.showAuthenticationApproverOnly()
