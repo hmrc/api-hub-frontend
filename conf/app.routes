@@ -67,3 +67,5 @@ GET         /experimentalAuth                                   controllers.Expe
 GET         /experimentalAuthApproverOnly                       controllers.ExperimentalStrideLoginController.showAuthenticationApproverOnly()
 
 GET      /team-members/:index                                controllers.RemoveTeamMemberController.removeTeamMember(mode: Mode = NormalMode, index: Int)
+
+GET         /sign-in                                            controllers.auth.SignInController.onPageLoad()
