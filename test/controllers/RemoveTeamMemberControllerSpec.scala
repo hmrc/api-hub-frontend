@@ -44,7 +44,7 @@ class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with Opt
 
 
       running(application) {
-        val request = FakeRequest(DELETE, routes.RemoveTeamMemberController.removeTeamMember(1).url)
+        val request = FakeRequest(GET, routes.RemoveTeamMemberController.removeTeamMember(1).url)
 
         val result = route(application, request).value
 
