@@ -30,7 +30,6 @@ import views.html.AddTeamMemberDetailsView
 class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with OptionValues with TryValues {
 
   private val formProvider = new AddTeamMemberDetailsFormProvider()
-  private val form = formProvider()
 
   "RemoveTeamMemberDetails Controller" - {
 
@@ -47,8 +46,6 @@ class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with Opt
         val request = FakeRequest(GET, routes.RemoveTeamMemberController.removeTeamMember(1).url)
 
         val result = route(application, request).value
-
-        val view = application.injector.instanceOf[AddTeamMemberDetailsView]
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.ConfirmAddTeamMemberController.onPageLoad(NormalMode).url
