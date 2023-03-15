@@ -63,4 +63,4 @@ GET         /experimentalStrideLogin                            controllers.Expe
 GET         /experimentalStrideLoginUser                        controllers.ExperimentalStrideLoginController.apiHubUser()
 GET         /experimentalStrideLoginApprover                    controllers.ExperimentalStrideLoginController.apiHubApprover()
 
-DELETE      /team-members/:index                                controllers.RemoveTeamMemberController.removeTeamMember(mode: Mode = NormalMode, index: Int)
+GET      /team-members/:index                                controllers.RemoveTeamMemberController.removeTeamMember(mode: Mode = NormalMode, index: Int)
