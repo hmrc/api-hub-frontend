@@ -46,6 +46,10 @@ object ConfirmAddTeamMember {
       Some(Actions(
         items = Seq(
           ActionItemViewModel(
+            "site.remove",
+            routes.RemoveTeamMemberController.removeTeamMember(index).url
+          ),
+          ActionItemViewModel(
             "site.change",
             routes.AddTeamMemberDetailsController.onPageLoad(CheckMode, index).url
           )

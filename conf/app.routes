@@ -65,3 +65,5 @@ GET         /experimentalStrideLoginApprover                    controllers.Expe
 GET         /experimentalStrideLoginUserOrApprover              controllers.ExperimentalStrideLoginController.apiHubUserOrApprover()
 GET         /experimentalAuth                                   controllers.ExperimentalStrideLoginController.showAuthentication()
 GET         /experimentalAuthApproverOnly                       controllers.ExperimentalStrideLoginController.showAuthenticationApproverOnly()
+
+GET      /team-members/:index                                controllers.RemoveTeamMemberController.removeTeamMember(mode: Mode = NormalMode, index: Int)
