@@ -17,8 +17,8 @@
 package controllers.actions
 
 import com.google.inject.Inject
-import config.FrontendAppConfig
 import controllers.actions.AuthenticatedIdentifierAction.canApprovePredicate
+import controllers.auth.routes
 import models.requests.IdentifierRequest
 import models.user.{LdapUser, Permissions, UserModel}
 import play.api.mvc.Results._
@@ -32,8 +32,7 @@ import scala.concurrent.{ExecutionContext, Future}
 trait IdentifierAction extends ActionBuilder[IdentifierRequest, AnyContent] with ActionFunction[Request, IdentifierRequest]
 
 class AuthenticatedIdentifierAction @Inject()(val parser: BodyParsers.Default,
-                                              auth: FrontendAuthComponents,
-                                              config: FrontendAppConfig
+                                              auth: FrontendAuthComponents
                                              )(implicit val executionContext: ExecutionContext) extends IdentifierAction {
 
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
@@ -55,7 +54,7 @@ class AuthenticatedIdentifierAction @Inject()(val parser: BodyParsers.Default,
         )
       case None =>
         Future.successful(
-        Redirect(config.loginUrl, Map("continue_url" -> Seq(config.loginContinueUrl)))
+        Redirect(routes.SignInController.onPageLoad().url)
       )
     }
   }

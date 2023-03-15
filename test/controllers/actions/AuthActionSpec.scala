@@ -17,7 +17,6 @@
 package controllers.actions
 
 import base.SpecBase
-import config.FrontendAppConfig
 import models.requests.IdentifierRequest
 import models.user.{LdapUser, Permissions, UserModel}
 import org.mockito.ArgumentMatchers.any
@@ -50,10 +49,9 @@ class AuthActionSpec extends SpecBase with MockitoSugar {
 
         running(application) {
           val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
-          val appConfig = application.injector.instanceOf[FrontendAppConfig]
           val mockAuth = mock[FrontendAuthComponents]
           when(mockAuth.verify(any())(any(), any())).thenReturn(Future.successful(None))
-          val authAction = new AuthenticatedIdentifierAction(bodyParsers, mockAuth, appConfig)
+          val authAction = new AuthenticatedIdentifierAction(bodyParsers, mockAuth)
           val controller = new Harness(authAction)
           val result = controller.onPageLoad()(FakeRequest())
 
