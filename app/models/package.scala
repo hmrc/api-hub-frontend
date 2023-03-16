@@ -139,6 +139,7 @@ package object models {
                 }
               }
           }
+        case _ => JsError("absolutely unhandled case")
       }
     }
   }

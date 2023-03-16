@@ -56,7 +56,7 @@ class RegisterApplicationControllerSpec extends SpecBase with MockitoSugar {
       when(fixture.sessionRepository.clear(any())).thenReturn(Future.successful(true))
 
       running(fixture.application) {
-        val request = FakeRequest(POST, routes.RegisterApplicationController.create.url)
+        val request = FakeRequest(POST, routes.RegisterApplicationController.create().url)
         val result = route(fixture.application, request).value
 
         status(result) mustBe SEE_OTHER
@@ -70,7 +70,7 @@ class RegisterApplicationControllerSpec extends SpecBase with MockitoSugar {
       val fixture = buildFixture(emptyUserAnswers)
 
       running(fixture.application) {
-        val request = FakeRequest(POST, routes.RegisterApplicationController.create.url)
+        val request = FakeRequest(POST, routes.RegisterApplicationController.create().url)
         val result = route(fixture.application, request).value
 
         status(result) mustBe SEE_OTHER
@@ -99,7 +99,7 @@ class RegisterApplicationControllerSpec extends SpecBase with MockitoSugar {
       when(fixture.sessionRepository.clear(any())).thenReturn(Future.successful(true))
 
       running(fixture.application) {
-        val request = FakeRequest(POST, routes.RegisterApplicationController.create.url)
+        val request = FakeRequest(POST, routes.RegisterApplicationController.create().url)
         val result = route(fixture.application, request).value
 
         status(result) mustBe SEE_OTHER

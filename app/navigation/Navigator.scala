@@ -38,7 +38,7 @@ class Navigator @Inject()() {
     case QuestionAddTeamMembersPage => questionAddTeamMembersNextPage(CheckMode)
     case ConfirmAddTeamMemberPage => confirmAddTeamMemberNextPage(CheckMode)
     case TeamMembersPage => _ => routes.ConfirmAddTeamMemberController.onPageLoad(CheckMode)
-    case _ => _ => routes.CheckYourAnswersController.onPageLoad
+    case _ => _ => routes.CheckYourAnswersController.onPageLoad()
   }
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {
@@ -51,20 +51,20 @@ class Navigator @Inject()() {
   private def questionAddTeamMembersNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
     (mode, userAnswers.get(QuestionAddTeamMembersPage)) match {
       case (NormalMode, Some(true)) => routes.AddTeamMemberDetailsController.onPageLoad(NormalMode, 0)
-      case (NormalMode, Some(_)) => routes.CheckYourAnswersController.onPageLoad
+      case (NormalMode, Some(_)) => routes.CheckYourAnswersController.onPageLoad()
       case (NormalMode, None) => routes.JourneyRecoveryController.onPageLoad()
       case (CheckMode, Some(true)) => routes.AddTeamMemberDetailsController.onPageLoad(NormalMode, 0)
-      case _ => routes.CheckYourAnswersController.onPageLoad
+      case _ => routes.CheckYourAnswersController.onPageLoad()
     }
   }
 
   private def confirmAddTeamMemberNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
     (mode, userAnswers.get(ConfirmAddTeamMemberPage)) match {
       case (NormalMode, Some(true)) => routes.AddTeamMemberDetailsController.onPageLoad(NormalMode, 0)
-      case (NormalMode, Some(_)) => routes.CheckYourAnswersController.onPageLoad
+      case (NormalMode, Some(_)) => routes.CheckYourAnswersController.onPageLoad()
       case (NormalMode, None) => routes.JourneyRecoveryController.onPageLoad()
       case (CheckMode, Some(true)) => routes.AddTeamMemberDetailsController.onPageLoad(NormalMode, 0)
-      case _ => routes.CheckYourAnswersController.onPageLoad
+      case _ => routes.CheckYourAnswersController.onPageLoad()
     }
   }
 }

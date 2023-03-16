@@ -24,7 +24,7 @@
 @(user: Option[UserModel] = None)(implicit request: Request[_], messages: Messages)
 
 @pendingApprovalsLink() = {
-    <a href="@routes.PendingApprovalsController.onPageLoad" class="govuk-link govuk-link--no-visited-state">
+    <a href="@routes.PendingApprovalsController.onPageLoad()" class="govuk-link govuk-link--no-visited-state">
         @messages("pendingApprovals.title")
     </a>
 }

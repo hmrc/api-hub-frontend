@@ -13,10 +13,10 @@ GET         /refresh-session                                    controllers.Keep
 
 GET         /there-is-a-problem                                 controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
-GET         /check-your-answers                                 controllers.CheckYourAnswersController.onPageLoad
+GET         /check-your-answers                                 controllers.CheckYourAnswersController.onPageLoad()
 
-GET         /account/sign-out-survey                            controllers.auth.AuthController.signOut
-GET         /account/sign-out                                   controllers.auth.AuthController.signOutNoSurvey
+GET         /account/sign-out-survey                            controllers.auth.AuthController.signOut()
+GET         /account/sign-out                                   controllers.auth.AuthController.signOutNoSurvey()
 GET         /account/signed-out                                 controllers.auth.SignedOutController.onPageLoad
 
 GET         /unauthorised                                       controllers.UnauthorisedController.onPageLoad
@@ -26,7 +26,7 @@ POST        /application-name                                   controllers.Appl
 GET         /change-application-name                            controllers.ApplicationNameController.onPageLoad(mode: Mode = CheckMode)
 POST        /change-application-name                            controllers.ApplicationNameController.onSubmit(mode: Mode = CheckMode)
 
-POST        /register-application                               controllers.RegisterApplicationController.create
+POST        /register-application                               controllers.RegisterApplicationController.create()
 
 GET         /register-application-success/:id                   controllers.RegisterApplicationSuccessController.onPageLoad(id:String)
 

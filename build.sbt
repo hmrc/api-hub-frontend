@@ -8,14 +8,13 @@ lazy val appName: String = "api-hub-frontend"
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala, SbtAutoBuildPlugin, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin) //Required to prevent https://github.com/scalatest/scalatest/issues/1427
-  .settings(SbtDistributablesPlugin.publishingSettings: _*)
   .settings(inConfig(Test)(testSettings): _*)
   .configs(IntegrationTest)
   .settings(inConfig(IntegrationTest)(itSettings): _*)
   .settings(majorVersion := 0)
   .settings(ThisBuild / useSuperShell := false)
   .settings(
-    scalaVersion := "2.12.15",
+    scalaVersion := "2.13.8",
     name := appName,
     RoutesKeys.routesImport ++= Seq(
       "models._",
@@ -46,7 +45,6 @@ lazy val root = (project in file("."))
     ScoverageKeys.coverageHighlighting := true,
         scalacOptions ++= Seq(
       "-feature",
-      "-Ypartial-unification",
       "-rootdir",
       baseDirectory.value.getCanonicalPath,
       "-Wconf:cat=deprecation:ws,cat=feature:ws,cat=optimizer:ws,src=target/.*:s"

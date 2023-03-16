@@ -29,7 +29,7 @@
 @layout(pageTitle = titleNoForm(messages("confirmAddTeamMember.title")), fullWidth = true) {
     <h1 class="govuk-heading-xl">@messages("confirmAddTeamMember.membersCountHeader", teamMemberDetails.rows.length )</h1>
     @govukSummaryList(teamMemberDetails.copy(rows = teamMemberDetails.rows))
-    @formHelper(action = routes.ConfirmAddTeamMemberController.onSubmit(mode), 'autoComplete -> "off") {
+    @formHelper(action = routes.ConfirmAddTeamMemberController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
 
         @if(form.errors.nonEmpty) {
