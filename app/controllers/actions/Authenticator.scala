@@ -16,16 +16,12 @@
 
 package controllers.actions
 
-import com.google.inject.Singleton
 import play.api.mvc.Request
 
 import scala.concurrent.Future
 
-@Singleton
-class StrideAuthenticator extends Authenticator {
+trait Authenticator {
 
-  def authenticate()(implicit request: Request[_]): Future[UserAuthResult] = {
-    Future.successful(UserUnauthenticated)
-  }
+  def authenticate()(implicit request: Request[_]): Future[UserAuthResult]
 
 }

@@ -28,7 +28,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class LdapAuthenticator @Inject()(
   auth: FrontendAuthComponents
-)(implicit ec: ExecutionContext) extends FrontendHeaderCarrierProvider {
+)(implicit ec: ExecutionContext) extends Authenticator with FrontendHeaderCarrierProvider {
 
   def authenticate()(implicit request: Request[_]): Future[UserAuthResult] = {
     auth.verify(Retrieval.username ~ Retrieval.email ~ Retrieval.hasPredicate(canApprovePredicate)) flatMap {
