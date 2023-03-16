@@ -25,23 +25,29 @@
     pageTitle    = titleNoForm(messages("signIn.title")),
     showBackLink = false,
     timeout      = false,
-    showSignOut  = false
+    showSignOut  = false,
+    fullWidth    = true
 ) {
 
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-one-half">
-            <p class="govuk-body govuk-!-font-weight-bold">@messages("signIn.ldap.heading")</p>
+        <div class="govuk-grid-column-full custom-bottom-padding custom-flex-container">
+            <div class="hipp-card">
+                <p class="govuk-body govuk-!-font-weight-bold">@messages("signIn.ldap.heading")</p>
 
-            <p class="govuk-body">@messages("signIn.ldap.instructions")</p>
+                <p class="govuk-body">@messages("signIn.ldap.instructions")</p>
 
-            <p class="govuk-body-s">@messages("signIn.ldap.guidance")</p>
+                <p class="govuk-body-s">@messages("signIn.ldap.guidance")</p>
 
-            <p class="govuk-body">
-                @govukButton(
-                    ButtonViewModel(messages("site.continue"))
-                        .asLink(ldapSignInUrl)
-                )
-            </p>
+                <p class="govuk-body">
+                    @govukButton(
+                        ButtonViewModel(messages("site.continue"))
+                            .asLink(ldapSignInUrl)
+                    )
+                </p>
+            </div>
+            <div class="hipp-card">
+                <p class="govuk-body govuk-!-font-weight-bold">@messages("signIn.stride.heading")</p>
+            </div>
         </div>
     </div>
 

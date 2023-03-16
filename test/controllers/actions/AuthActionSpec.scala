@@ -36,7 +36,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar {
 
   "Auth Action" - {
 
-    "must redirect the user to sign in when unauthenticated" in {
+    "must redirect the user to sign in when unauthenticated in both Stride and LDAP" in {
       val ldapAuth = mock[LdapAuthenticator]
       val strideAuth = mock[StrideAuthenticator]
 
