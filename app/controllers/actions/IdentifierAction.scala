@@ -17,59 +17,29 @@
 package controllers.actions
 
 import com.google.inject.Inject
-import controllers.actions.AuthenticatedIdentifierAction.canApprovePredicate
-import controllers.auth.routes
 import models.requests.IdentifierRequest
-import models.user.{LdapUser, Permissions, UserModel}
 import play.api.mvc.Results._
 import play.api.mvc._
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.internalauth.client.{FrontendAuthComponents, IAAction, Predicate, Resource, Retrieval, ~}
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import scala.concurrent.{ExecutionContext, Future}
 
 trait IdentifierAction extends ActionBuilder[IdentifierRequest, AnyContent] with ActionFunction[Request, IdentifierRequest]
 
-class AuthenticatedIdentifierAction @Inject()(val parser: BodyParsers.Default,
-                                              auth: FrontendAuthComponents
-                                             )(implicit val executionContext: ExecutionContext) extends IdentifierAction {
+class AuthenticatedIdentifierAction @Inject()(
+  val parser: BodyParsers.Default,
+  ldapAuthenticator: LdapAuthenticator,
+  strideAuthenticator: StrideAuthenticator
+)(implicit val executionContext: ExecutionContext) extends IdentifierAction {
 
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
-    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-
-    auth.verify(Retrieval.username ~ Retrieval.email ~ Retrieval.hasPredicate(canApprovePredicate)) flatMap {
-      case Some(username ~ maybeEmail ~ canApprove) =>
-        block(
-          IdentifierRequest(
-            request,
-            UserModel(
-              s"LDAP-${username.value}",
-              username.value,
-              LdapUser,
-              maybeEmail.map(email => email.value),
-              Permissions(canApprove = canApprove)
-            )
-          )
-        )
-      case None =>
-        Future.successful(
-        Redirect(routes.SignInController.onPageLoad().url)
-      )
+    strideAuthenticator.authenticate()(request).flatMap {
+      case UserUnauthenticated => ldapAuthenticator.authenticate()(request)
+      case result: UserAuthResult => Future.successful(result)
+    }.flatMap {
+      case UserAuthenticated(user) => block(IdentifierRequest(request, user))
+      case UserUnauthorised => Future.successful(Redirect(controllers.routes.UnauthorisedController.onPageLoad))
+      case UserUnauthenticated => Future.successful(Redirect(controllers.auth.routes.SignInController.onPageLoad()))
     }
   }
-
-}
-
-object AuthenticatedIdentifierAction {
-
-  val approverResourceType: String = "api-hub-frontend"
-  val approverResourceLocation: String = "approvals"
-  val approverAction: String = "WRITE"
-
-  private val canApprovePredicate: Predicate = Predicate.Permission(
-    resource = Resource.from(resourceType = approverResourceType, resourceLocation = approverResourceLocation),
-    action = IAAction(approverAction)
-  )
 
 }

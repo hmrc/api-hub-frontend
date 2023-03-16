@@ -18,7 +18,7 @@ package testonly
 
 import com.google.inject.{Inject, Singleton}
 import config.FrontendAppConfig
-import controllers.actions.AuthenticatedIdentifierAction
+import controllers.actions.LdapAuthenticator
 import play.api.data.Form
 import play.api.data.Forms.{email, list, mapping, optional, text}
 import play.api.libs.functional.syntax.unlift
@@ -134,9 +134,9 @@ object TestOnlySignInController {
     )
 
   private val approverPermission: Permission = Permission(
-    resourceType = AuthenticatedIdentifierAction.approverResourceType,
-    resourceLocation = AuthenticatedIdentifierAction.approverResourceLocation,
-    actions = List(AuthenticatedIdentifierAction.approverAction)
+    resourceType = LdapAuthenticator.approverResourceType,
+    resourceLocation = LdapAuthenticator.approverResourceLocation,
+    actions = List(LdapAuthenticator.approverAction)
   )
 
   def retrievalsFor(data: TestOnlySignInData): Retrievals = {
