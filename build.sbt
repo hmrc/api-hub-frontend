@@ -45,10 +45,9 @@ lazy val root = (project in file("."))
     ScoverageKeys.coverageHighlighting := true,
         scalacOptions ++= Seq(
       "-feature",
-      "-deprecation",
       "-rootdir",
       baseDirectory.value.getCanonicalPath,
-      //"-Wconf:cat=deprecation:ws,cat=feature:ws,cat=optimizer:ws,src=target/.*:s"
+      "-Wconf:cat=deprecation:ws,cat=feature:ws,cat=optimizer:ws,src=target/.*:s"
     ),
     libraryDependencies ++= AppDependencies(),
     retrieveManaged := true,
