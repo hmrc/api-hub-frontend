@@ -37,7 +37,7 @@ class ConfirmAddTeamMemberControllerSpec extends SpecBase with MockitoSugar with
 
   lazy val confirmAddTeamMemberRoute: String = routes.ConfirmAddTeamMemberController.onPageLoad(NormalMode).url
   lazy val addTeamMemberRoute: String = routes.AddTeamMemberDetailsController.onPageLoad(NormalMode, 0).url
-  lazy val checkYourAnswersRoute: String = routes.CheckYourAnswersController.onPageLoad.url
+  lazy val checkYourAnswersRoute: String = routes.CheckYourAnswersController.onPageLoad().url
 
   "ConfirmAddTeamMember Controller" - {
 
