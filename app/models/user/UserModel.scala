@@ -21,6 +21,7 @@ import viewmodels.WithName
 sealed trait UserType
 
 case object LdapUser extends WithName("LDAP") with UserType
+case object StrideUser extends WithName("Stride") with UserType
 
 case class Permissions(canApprove: Boolean)
 
