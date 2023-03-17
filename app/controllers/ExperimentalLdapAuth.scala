@@ -18,7 +18,7 @@ package controllers
 
 import com.google.inject.{Inject, Singleton}
 import controllers.ExperimentalLdapAuth.canApprovePredicate
-import controllers.actions.AuthenticatedIdentifierAction.{approverAction, approverResourceLocation, approverResourceType}
+import controllers.actions.LdapAuthenticator.{approverAction, approverResourceLocation, approverResourceType}
 import models.user.{LdapUser, Permissions, UserModel}
 import play.api.mvc.Request
 import uk.gov.hmrc.internalauth.client._
