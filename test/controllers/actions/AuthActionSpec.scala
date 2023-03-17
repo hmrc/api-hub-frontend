@@ -17,21 +17,15 @@
 package controllers.actions
 
 import base.SpecBase
-import config.FrontendAppConfig
-import models.requests.IdentifierRequest
-import models.user.{LdapUser, Permissions, UserModel}
+import controllers.actions.AuthActionSpec.user
+import models.user.{Permissions, StrideUser, UserModel}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.{ArgumentMatchers, MockitoSugar}
+import org.mockito.MockitoSugar
 import play.api.inject.bind
-import play.api.mvc.Results.Ok
 import play.api.mvc._
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.SessionKeys
-import uk.gov.hmrc.internalauth.client.test.{FrontendAuthComponentsStub, StubBehaviour}
-import uk.gov.hmrc.internalauth.client._
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class AuthActionSpec extends SpecBase with MockitoSugar {
@@ -42,87 +36,115 @@ class AuthActionSpec extends SpecBase with MockitoSugar {
 
   "Auth Action" - {
 
-    "when the user hasn't logged in" - {
+    "must redirect the user to sign in when unauthenticated in both Stride and LDAP" in {
+      val ldapAuth = mock[LdapAuthenticator]
+      val strideAuth = mock[StrideAuthenticator]
 
-      "must redirect the user to log in " in {
+      when(ldapAuth.authenticate()(any())).thenReturn(Future.successful(UserUnauthenticated))
+      when(strideAuth.authenticate()(any())).thenReturn(Future.successful(UserUnauthenticated))
 
-        val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(userAnswers = None)
+        .overrides(
+          bind[LdapAuthenticator].toInstance(ldapAuth),
+          bind[StrideAuthenticator].toInstance(strideAuth)
+        )
+        .build()
 
-        running(application) {
-          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
-          val appConfig = application.injector.instanceOf[FrontendAppConfig]
-          val mockAuth = mock[FrontendAuthComponents]
-          when(mockAuth.verify(any())(any(), any())).thenReturn(Future.successful(None))
-          val authAction = new AuthenticatedIdentifierAction(bodyParsers, mockAuth, appConfig)
-          val controller = new Harness(authAction)
-          val result = controller.onPageLoad()(FakeRequest())
+      running(application) {
+        val authAction = application.injector.instanceOf[AuthenticatedIdentifierAction]
+        val controller = new Harness(authAction)
 
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result).value must include("/sign-in")
-        }
+        val result = controller.onPageLoad()(FakeRequest())
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe controllers.auth.routes.SignInController.onPageLoad().url
       }
     }
 
-    "when the user has logged in" - {
-      "must retrieve user details correctly" in {
+    "must allow the request to process when the user is authenticated with Stride" in {
+      val ldapAuth = mock[LdapAuthenticator]
+      val strideAuth = mock[StrideAuthenticator]
 
-        implicit val cc: ControllerComponents = stubMessagesControllerComponents()
+      when(ldapAuth.authenticate()(any())).thenReturn(Future.successful(UserUnauthenticated))
+      when(strideAuth.authenticate()(any())).thenReturn(Future.successful(UserAuthenticated(user)))
 
-        val mockStubBehaviour = mock[StubBehaviour]
-        val stubAuth = FrontendAuthComponentsStub(mockStubBehaviour)
+      val application = applicationBuilder(userAnswers = None)
+        .overrides(
+          bind[LdapAuthenticator].toInstance(ldapAuth),
+          bind[StrideAuthenticator].toInstance(strideAuth)
+        )
+        .build()
 
-        val application = applicationBuilder(userAnswers = None)
-          .bindings(
-            bind[FrontendAuthComponents].toInstance(stubAuth)
-          )
-          .build()
+      running(application) {
+        val authAction = application.injector.instanceOf[AuthenticatedIdentifierAction]
+        val controller = new Harness(authAction)
 
-        running(application) {
+        val result = controller.onPageLoad()(FakeRequest())
 
-          val authAction = application.injector.instanceOf[AuthenticatedIdentifierAction]
+        status(result) mustBe OK
+      }
+    }
 
-          val canApprovePredicate = Predicate.Permission(
-            Resource(
-              ResourceType("api-hub-frontend"),
-              ResourceLocation("approvals")
-            ),
-            IAAction("WRITE")
-          )
+    "must redirect to the Unauthorised page when the user is unauthorised in Stride (ie wrong SRS role)" in {
+      val ldapAuth = mock[LdapAuthenticator]
+      val strideAuth = mock[StrideAuthenticator]
 
-          val expectedRetrieval = Retrieval.username ~ Retrieval.email ~ Retrieval.hasPredicate(canApprovePredicate)
+      when(ldapAuth.authenticate()(any())).thenReturn(Future.successful(UserUnauthenticated))
+      when(strideAuth.authenticate()(any())).thenReturn(Future.successful(UserUnauthorised))
 
-          val testUser = UserModel(
-            userId = "LDAP-jo.bloggs",
-            userName = "jo.bloggs",
-            userType = LdapUser,
-            email = Some("jo.bloggs@email.com"),
-            permissions = Permissions(canApprove = true)
-          )
+      val application = applicationBuilder(userAnswers = None)
+        .overrides(
+          bind[LdapAuthenticator].toInstance(ldapAuth),
+          bind[StrideAuthenticator].toInstance(strideAuth)
+        )
+        .build()
 
-          when(mockStubBehaviour.stubAuth(ArgumentMatchers.eq(None), ArgumentMatchers.eq(expectedRetrieval)))
-            .thenReturn(Future.successful(
-              uk.gov.hmrc.internalauth.client.~(
-                uk.gov.hmrc.internalauth.client.~(
-                  Retrieval.Username(testUser.userName),
-                  testUser.email.map(Retrieval.Email)
-                ),
-                true
-              )
-            ))
+      running(application) {
+        val authAction = application.injector.instanceOf[AuthenticatedIdentifierAction]
+        val controller = new Harness(authAction)
 
-          val result = authAction.invokeBlock(
-            FakeRequest().withSession(SessionKeys.authToken -> "Open sesame"),
-            (identifierRequest: IdentifierRequest[AnyContent]) => {
-              identifierRequest.user mustBe testUser
-              Future.successful(Ok)
-            }
-          )
+        val result = controller.onPageLoad()(FakeRequest())
 
-          status(result) mustBe OK
-        }
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe controllers.routes.UnauthorisedController.onPageLoad.url
+      }
+    }
 
+    "must allow the request to process when the user is authenticated with LDAP" in {
+      val ldapAuth = mock[LdapAuthenticator]
+      val strideAuth = mock[StrideAuthenticator]
+
+      when(ldapAuth.authenticate()(any())).thenReturn(Future.successful(UserAuthenticated(user)))
+      when(strideAuth.authenticate()(any())).thenReturn(Future.successful(UserUnauthenticated))
+
+      val application = applicationBuilder(userAnswers = None)
+        .overrides(
+          bind[LdapAuthenticator].toInstance(ldapAuth),
+          bind[StrideAuthenticator].toInstance(strideAuth)
+        )
+        .build()
+
+      running(application) {
+        val authAction = application.injector.instanceOf[AuthenticatedIdentifierAction]
+        val controller = new Harness(authAction)
+
+        val result = controller.onPageLoad()(FakeRequest())
+
+        status(result) mustBe OK
       }
     }
   }
+
+}
+
+object AuthActionSpec {
+
+  val user: UserModel = UserModel(
+    userId = "test-user-id",
+    userName = "test-user-name",
+    userType = StrideUser,
+    email = Some("test-email"),
+    permissions = Permissions(canApprove = false)
+  )
 
 }

@@ -4,3 +4,24 @@
 .js-enabled .js-visible {
   display: inline-block !important;
 }
+
+.custom-bottom-padding {
+    padding-bottom: 140px !important;
+    padding-top: 80px !important;
+}
+
+.custom-flex-container {
+    display: flex;
+    justify-content: space-between;
+    padding-left: 7%;
+    padding-right: 7%;
+}
+
+.hipp-card {
+    background-color: #f3f2f1;
+    border: solid 1px #505a5f;
+    padding: 24px;
+    width: 30%;
+    min-width: 300px;
+    height: 380px;
+}

@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.actions
 
 import com.google.inject.{Inject, Singleton}
-import controllers.ExperimentalLdapAuth.canApprovePredicate
-import controllers.actions.LdapAuthenticator.{approverAction, approverResourceLocation, approverResourceType}
+import controllers.actions.LdapAuthenticator.canApprovePredicate
 import models.user.{LdapUser, Permissions, UserModel}
 import play.api.mvc.Request
 import uk.gov.hmrc.internalauth.client._
@@ -27,9 +26,9 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvi
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ExperimentalLdapAuth @Inject()(
+class LdapAuthenticator @Inject()(
   auth: FrontendAuthComponents
-)(implicit ec: ExecutionContext) extends FrontendHeaderCarrierProvider {
+)(implicit ec: ExecutionContext) extends Authenticator with FrontendHeaderCarrierProvider {
 
   def authenticate()(implicit request: Request[_]): Future[UserAuthResult] = {
     auth.verify(Retrieval.username ~ Retrieval.email ~ Retrieval.hasPredicate(canApprovePredicate)) flatMap {
@@ -52,7 +51,11 @@ class ExperimentalLdapAuth @Inject()(
 
 }
 
-object ExperimentalLdapAuth {
+object LdapAuthenticator {
+
+  val approverResourceType: String = "api-hub-frontend"
+  val approverResourceLocation: String = "approvals"
+  val approverAction: String = "WRITE"
 
   private val canApprovePredicate: Predicate = Predicate.Permission(
     resource = Resource.from(resourceType = approverResourceType, resourceLocation = approverResourceLocation),
