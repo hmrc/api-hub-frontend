@@ -16,16 +16,49 @@
 
 package controllers.actions
 
-import com.google.inject.Singleton
+import com.google.inject.{Inject, Singleton}
+import controllers.actions.StrideAuthenticator.{API_HUB_APPROVER_ROLE, API_HUB_USER_ROLE}
+import models.user.{Permissions, StrideUser, UserModel}
 import play.api.mvc.Request
+import uk.gov.hmrc.auth.core.AuthProvider.PrivilegedApplication
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
+import uk.gov.hmrc.auth.core.retrieve.~
+import uk.gov.hmrc.auth.core.{AuthConnector, AuthProviders, AuthorisedFunctions, Enrolment, InsufficientEnrolments, NoActiveSession}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class StrideAuthenticator extends Authenticator {
+class StrideAuthenticator @Inject()(
+  override val authConnector: AuthConnector
+)(implicit ec: ExecutionContext) extends Authenticator with AuthorisedFunctions with FrontendHeaderCarrierProvider {
 
   def authenticate()(implicit request: Request[_]): Future[UserAuthResult] = {
-    Future.successful(UserUnauthenticated)
+    authorised(Enrolment(API_HUB_USER_ROLE) or Enrolment(API_HUB_APPROVER_ROLE) and AuthProviders(PrivilegedApplication))
+      .retrieve(Retrievals.authorisedEnrolments and Retrievals.name and Retrievals.email and Retrievals.credentials) {
+        case authorisedEnrolments ~ name ~ email ~ credentials =>
+          Future.successful(UserAuthenticated(
+            UserModel(
+              userId = s"STRIDE-${credentials.map(_.providerId).getOrElse(name)}",
+              userName = name.map(_.name.getOrElse("")).getOrElse(""),
+              userType = StrideUser,
+              email = email,
+              permissions = Permissions(canApprove = authorisedEnrolments.enrolments.exists(enrolment => enrolment.key.equals(API_HUB_APPROVER_ROLE)))
+            )
+          ))
+      }.recover {
+      case _: NoActiveSession =>
+        UserUnauthenticated
+      case _: InsufficientEnrolments =>
+        UserUnauthorised
+    }
   }
+
+}
+
+object StrideAuthenticator {
+
+  val API_HUB_USER_ROLE: String = "api_hub_user"
+  val API_HUB_APPROVER_ROLE: String = "api_hub_approver"
 
 }

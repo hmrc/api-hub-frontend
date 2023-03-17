@@ -19,7 +19,7 @@
     govukButton: GovukButton
 )
 
-@(ldapSignInUrl: String)(implicit request: Request[_], messages: Messages)
+@(ldapSignInUrl: String, strideSignInUrl: String)(implicit request: Request[_], messages: Messages)
 
 @layout(
     pageTitle    = titleNoForm(messages("signIn.title")),
@@ -47,6 +47,17 @@
             </div>
             <div class="hipp-card">
                 <p class="govuk-body govuk-!-font-weight-bold">@messages("signIn.stride.heading")</p>
+
+                <p class="govuk-body">@messages("signIn.stride.instructions")</p>
+
+                <p class="govuk-body-s">@messages("signIn.stride.guidance")</p>
+
+                <p class="govuk-body">
+                    @govukButton(
+                        ButtonViewModel(messages("site.continue"))
+                            .asLink(strideSignInUrl)
+                    )
+                </p>
             </div>
         </div>
     </div>

@@ -180,3 +180,5 @@ signIn.ldap.heading = Sign in via LDAP
 signIn.ldap.instructions = Use your @digital.hmrc.gov.uk email to sign in.
 signIn.ldap.guidance = Digital users will be taken to a sign in screen and be asked to enter their email and password to access the API Hub.
 signIn.stride.heading = Sign in via STRIDE
+signIn.stride.instructions = Use your @hmrc.gov.uk email to sign in.
+signIn.stride.guidance = If you are on a corporate device you will automatically be signed in and taken to The API Hub.

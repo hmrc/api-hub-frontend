@@ -36,7 +36,7 @@ lazy val root = (project in file("."))
     PlayKeys.devSettings ++= Seq(
       "play.http.router" -> "testOnlyDoNotUseInAppConf.Routes",
       "microservice.services.internal-auth.url" -> "http://localhost:9000/api-hub/test-only",
-      "urls.login" -> "http://localhost:9000/api-hub/test-only/sign-in"
+      "urls.loginWithLdap" -> "http://localhost:9000/api-hub/test-only/sign-in"
     ),
     ScoverageKeys.coverageExcludedFiles := "<empty>;Reverse.*;.*handlers.*;.*components.*;" +
       ".*Routes.*;.*viewmodels.govuk.*;",
