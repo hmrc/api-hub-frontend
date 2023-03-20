@@ -18,7 +18,7 @@ package controllers.auth
 
 import com.google.inject.{Inject, Singleton}
 import config.FrontendAppConfig
-import controllers.auth.SignInController.ldapSignInUrl
+import controllers.auth.SignInController.{ldapSignInUrl, strideSignInUrl}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -35,7 +35,7 @@ class SignInController @Inject()(
 
   def onPageLoad(): Action[AnyContent] = Action {
     implicit request =>
-      Ok(view(ldapSignInUrl(config)))
+      Ok(view(ldapSignInUrl(config), strideSignInUrl(config)))
   }
 
 }
@@ -43,7 +43,13 @@ class SignInController @Inject()(
 object SignInController {
 
   private def ldapSignInUrl(config: FrontendAppConfig): String = {
-    s"${config.loginUrl}?${urlEncode("continue_url")}=${urlEncode(config.loginContinueUrl)}"
+    s"${config.loginWithLdapUrl}?${urlEncode("continue_url")}=${urlEncode(config.loginContinueUrl)}"
+  }
+
+  private def strideSignInUrl(config: FrontendAppConfig): String = {
+    val continueUrl = urlEncode(config.loginContinueUrl)
+    val origin = urlEncode(config.appName)
+    s"${config.loginWithStrideUrl}?successURL=$continueUrl&origin=$origin"
   }
 
   private def urlEncode(fragment: String): String = {
