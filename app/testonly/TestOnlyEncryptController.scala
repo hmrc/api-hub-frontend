@@ -57,7 +57,10 @@ private val applicationsBaseUrl = servicesConfig.baseUrl("api-hub-applications")
         .setHeader(AUTHORIZATION -> clientAuthToken)
         .execute[String]
       resp.map {
-        case email => Ok(email)
+        case decryptedEmail => {
+          assert(decryptedEmail == email)
+          Ok(email)
+        }
         case _ => Ok("FAILED")
       }
   }
