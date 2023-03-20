@@ -14,6 +14,6 @@
 
 GET        /api-hub/test-only/sign-in               testonly.TestOnlySignInController.showSignIn
 POST       /api-hub/test-only/sign-in               testonly.TestOnlySignInController.submit()
-
+GET        /api-hub/test-only/decrypt/:email        testonly.TestOnlyEncryptController.encrypt(email:String)
 + nocsrf
 POST       /api-hub/test-only/internal-auth/auth    testonly.TestOnlySignInController.auth
