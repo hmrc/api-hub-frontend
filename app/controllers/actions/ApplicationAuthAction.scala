@@ -28,12 +28,18 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait ApplicationAuthAction extends ActionRefiner[IdentifierRequest, ApplicationRequest]
 
-@Singleton
-class ApplicationAuthActionProvider @Inject()(
-  apiHubService: ApiHubService
-)(implicit val ec: ExecutionContext) {
+trait ApplicationAuthActionProvider {
 
-  def apply(applicationId: String): ApplicationAuthAction = {
+  def apply(applicationId: String)(implicit ec: ExecutionContext): ApplicationAuthAction
+
+}
+
+@Singleton
+class ApplicationAuthActionProviderImpl @Inject()(
+  apiHubService: ApiHubService
+) extends ApplicationAuthActionProvider {
+
+  def apply(applicationId: String)(implicit ec: ExecutionContext): ApplicationAuthAction = {
     new ApplicationAuthAction with FrontendHeaderCarrierProvider {
       override protected def refine[A](identifierRequest: IdentifierRequest[A]): Future[Either[Result, ApplicationRequest[A]]] = {
         implicit val request: Request[_] = identifierRequest

@@ -49,6 +49,7 @@ trait SpecBase
         bind[UserModel].toInstance(user),
         bind[DataRequiredAction].to[DataRequiredActionImpl],
         bind[IdentifierAction].to[FakeIdentifierAction],
-        bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers))
+        bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
+        bind[ApplicationAuthActionProvider].to[FakeApplicationAuthActionProvider]
       )
 }

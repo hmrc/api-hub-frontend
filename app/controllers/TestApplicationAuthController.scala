@@ -32,7 +32,7 @@ class TestApplicationAuthController @Inject()(
 
   def onPageLoad(applicationId: String): Action[AnyContent] = (identify andThen applicationAuth(applicationId)) {
     implicit request =>
-      Ok
+      Ok(s"You have access to application ${request.application.name}")
   }
 
 }
