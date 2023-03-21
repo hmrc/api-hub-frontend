@@ -59,13 +59,6 @@ POST        /team-members-overview                              controllers.Conf
 GET         /change-team-members-overview                       controllers.ConfirmAddTeamMemberController.onPageLoad(mode: Mode = CheckMode)
 POST        /change-team-members-overview                       controllers.ConfirmAddTeamMemberController.onSubmit(mode: Mode = CheckMode)
 
-GET         /experimentalStrideLogin                            controllers.ExperimentalStrideLoginController.noRole()
-GET         /experimentalStrideLoginUser                        controllers.ExperimentalStrideLoginController.apiHubUser()
-GET         /experimentalStrideLoginApprover                    controllers.ExperimentalStrideLoginController.apiHubApprover()
-GET         /experimentalStrideLoginUserOrApprover              controllers.ExperimentalStrideLoginController.apiHubUserOrApprover()
-GET         /experimentalAuth                                   controllers.ExperimentalStrideLoginController.showAuthentication()
-GET         /experimentalAuthApproverOnly                       controllers.ExperimentalStrideLoginController.showAuthenticationApproverOnly()
-
 GET      /team-members/:index                                controllers.RemoveTeamMemberController.removeTeamMember(mode: Mode = NormalMode, index: Int)
 
 GET         /sign-in                                            controllers.auth.SignInController.onPageLoad()
