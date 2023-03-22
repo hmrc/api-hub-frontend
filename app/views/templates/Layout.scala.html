@@ -19,13 +19,12 @@
 @import uk.gov.hmrc.hmrcfrontend.views.config.StandardAlphaBanner
 @import components.FullWidthMainContent
 @import views.html.helper.CSPNonce
+@import templates.ApiHubHeader
 
 @this(
     appConfig: FrontendAppConfig,
     govukLayout: GovukLayout,
-    govukBackLink: GovukBackLink,
     hmrcHead: HmrcHead,
-    hmrcStandardHeader: HmrcStandardHeader,
     hmrcStandardFooter: HmrcStandardFooter,
     hmrcTrackingConsentSnippet: HmrcTrackingConsentSnippet,
     hmrcLanguageSelect: HmrcLanguageSelect,
@@ -34,7 +33,8 @@
     hmrcScripts: HmrcScripts,
     alphaBanner: StandardAlphaBanner,
     twoThirdsMainContent: TwoThirdsMainContent,
-    fullWidthMainContentLayout: FullWidthMainContent
+    fullWidthMainContentLayout: FullWidthMainContent,
+    header: ApiHubHeader
 )
 
 @(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = false, showSignOut: Boolean = true, user: Option[UserModel] = None, fullWidth: Boolean = false)(contentBlock: Html)(implicit request: Request[_], messages: Messages)
@@ -73,9 +73,6 @@
         ))
     }
 
-    @if(showBackLink) {
-        @govukBackLink(BackLinkViewModel(href = "#").withCssClass("js-visible"))
-    }
 }
 
 @content = {
@@ -86,38 +83,10 @@
     </div>
 }
 
-@apiHubUserDetail = {
-    @user.map(aUser =>
-        <div class="govuk-body">Signed in as {aUser.email.getOrElse(aUser.userName)} via {aUser.userType}</div>
-    )
-}
-
-@apiHubBanner = {
-    <div class="govuk-width-container">
-        <div class="govuk-!-padding-bottom-3 govuk-!-padding-top-3 govuk-!-text-align-right">
-            @apiHubUserDetail
-            <a class="govuk-link govuk-link--no-visited-state" href="@routes.IndexController.onPageLoad.url">
-                @messages("site.applications")
-            </a>
-            @if(user.map(_.permissions.canApprove).getOrElse(false)) {
-                <a class="govuk-link govuk-link--no-visited-state govuk-!-margin-left-6" href="@routes.PendingApprovalsController.onPageLoad().url">
-                    @messages("site.approvals")
-                </a>
-            }
-        </div>
-        <hr class="govuk-section-break govuk-section-break--visible">
-    </div>
-}
-
 @govukLayout(
     pageTitle   = Some(pageTitle),
     headBlock   = Some(head),
-    headerBlock = Some(hmrcStandardHeader(
-        serviceUrl  = Some(routes.IndexController.onPageLoad.url),
-        signOutUrl  = if(showSignOut) Some(controllers.auth.routes.AuthController.signOut().url) else None,
-        phaseBanner = Some(alphaBanner(appConfig.feedbackUrl)),
-        additionalBannersBlock = Some(apiHubBanner)
-    )),
+    headerBlock = Some(header(showBackLink, user)),
     beforeContentBlock = Some(beforeContent),
     footerBlock        = Some(hmrcStandardFooter()),
     scriptsBlock       = Some(hmrcScripts(
