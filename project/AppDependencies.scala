@@ -13,7 +13,6 @@ object AppDependencies {
     "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-28"             % "1.1.0",
     "uk.gov.hmrc"       %% "http-verbs-play-28"             % "14.9.0",
     "uk.gov.hmrc"       %% "internal-auth-client-play-28"   % "1.4.0"
-
   )
 
   val test = Seq(
