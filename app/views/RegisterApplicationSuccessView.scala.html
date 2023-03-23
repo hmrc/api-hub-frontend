@@ -37,7 +37,7 @@
     routes.ApplicationDetailsController.onPageLoad(application.id).url
 }
 
-@layout(pageTitle = titleNoForm(messages("registerApplicationSuccess.title")), user = user) {
+@layout(pageTitle = titleNoForm(messages("registerApplicationSuccess.title")), user = user, showBackLink = false) {
   @govukPanel(Panel(
     title = Text(messages("registerApplicationSuccess.heading")
   )))

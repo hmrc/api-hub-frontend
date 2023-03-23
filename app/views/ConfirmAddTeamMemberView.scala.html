@@ -26,7 +26,7 @@
 
 @(form: Form[_], teamMemberDetails: SummaryList, user: Some[UserModel], mode:Mode)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("confirmAddTeamMember.title")), fullWidth = true) {
+@layout(pageTitle = titleNoForm(messages("confirmAddTeamMember.title")), fullWidth = true, user = user) {
     <h1 class="govuk-heading-xl">@messages("confirmAddTeamMember.membersCountHeader", teamMemberDetails.rows.length )</h1>
     @govukSummaryList(teamMemberDetails.copy(rows = teamMemberDetails.rows))
     @formHelper(action = routes.ConfirmAddTeamMemberController.onSubmit(mode), Symbol("autoComplete") -> "off") {
