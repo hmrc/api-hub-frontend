@@ -35,9 +35,7 @@ trait ApplicationAuthActionProvider {
 }
 
 @Singleton
-class ApplicationAuthActionProviderImpl @Inject()(
-                                                   apiHubService: ApiHubService
-                                                 ) extends ApplicationAuthActionProvider {
+class ApplicationAuthActionProviderImpl @Inject()(apiHubService: ApiHubService) extends ApplicationAuthActionProvider {
 
   def apply(applicationId: String)(implicit ec: ExecutionContext): ApplicationAuthAction = {
     new ApplicationAuthAction with FrontendHeaderCarrierProvider {
