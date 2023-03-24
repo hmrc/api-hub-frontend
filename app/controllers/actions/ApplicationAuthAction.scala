@@ -19,8 +19,8 @@ package controllers.actions
 import com.google.inject.{Inject, Singleton}
 import controllers.routes
 import models.requests.{ApplicationRequest, IdentifierRequest}
-import play.api.mvc.{ActionRefiner, Request, Result}
 import play.api.mvc.Results._
+import play.api.mvc.{ActionRefiner, Request, Result}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider
 
@@ -44,15 +44,27 @@ class ApplicationAuthActionProviderImpl @Inject()(
       override protected def refine[A](identifierRequest: IdentifierRequest[A]): Future[Either[Result, ApplicationRequest[A]]] = {
         implicit val request: Request[_] = identifierRequest
 
+        val email = identifierRequest.user.email
+        Console.println(s"EMAIL: $email")
         apiHubService.getApplication(applicationId) map {
-          case Some(application) =>
+          case Some(application) => {
+            val membs = application.teamMembers
+            Console.println(s"TEAM: $membs")
             identifierRequest.user.email match {
-              case Some(email) if application.teamMembers.exists(teamMember => teamMember.email.equals(email)) =>
+
+              case Some(email) if application.teamMembers.exists(teamMember => teamMember.email.equals(email)) => {
+    Console.println("RIGHT")
                 Right(ApplicationRequest(identifierRequest, application))
-              case _ =>
+              }
+              case _ => {
+                Console.println("LEFT")
                 Left(Redirect(routes.UnauthorisedController.onPageLoad))
-            }
-          case None => Left(NotFound)
+              }
+            }}
+          case None => {
+            Console.println("NOT FOUND")
+            Left(NotFound)
+          }
         }
       }
 
