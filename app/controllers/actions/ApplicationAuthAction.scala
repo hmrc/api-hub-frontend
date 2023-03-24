@@ -44,27 +44,17 @@ class ApplicationAuthActionProviderImpl @Inject()(
       override protected def refine[A](identifierRequest: IdentifierRequest[A]): Future[Either[Result, ApplicationRequest[A]]] = {
         implicit val request: Request[_] = identifierRequest
 
-        val email = identifierRequest.user.email
-        Console.println(s"EMAIL: $email")
         apiHubService.getApplication(applicationId) map {
-          case Some(application) => {
-            val membs = application.teamMembers
-            Console.println(s"TEAM: $membs")
+          case Some(application) =>
             identifierRequest.user.email match {
-
-              case Some(email) if application.teamMembers.exists(teamMember => teamMember.email.equals(email)) => {
-    Console.println("RIGHT")
+              case Some(email) if application.teamMembers.exists(teamMember => teamMember.email.equals(email)) =>
                 Right(ApplicationRequest(identifierRequest, application))
-              }
-              case _ => {
-                Console.println("LEFT")
+
+              case _ =>
                 Left(Redirect(routes.UnauthorisedController.onPageLoad))
-              }
-            }}
-          case None => {
-            Console.println("NOT FOUND")
+            }
+          case None =>
             Left(NotFound)
-          }
         }
       }
 

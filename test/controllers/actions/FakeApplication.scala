@@ -29,12 +29,3 @@ object FakeApplication extends Application(
   Seq(TeamMember(FakeUser.email.get)),
   Environments()
 )
-//def fakeApplication(user: UserModel ) { new Application(
-//  "fake-application-id",
-//  "fake-application-name",
-//  LocalDateTime.now(),
-//  Creator(user.email.get),
-//  LocalDateTime.now(),
-//  Seq(TeamMember(user.email.get)),
-//  Environments()
-//)}
