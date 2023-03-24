@@ -32,15 +32,11 @@ class ApplicationDetailsController @Inject()(
   identify: IdentifierAction,
   val controllerComponents: MessagesControllerComponents,
   view: ApplicationDetailsView,
-  apiHubService: ApiHubService
+  applicationAuth: ApplicationAuthActionProvider
 ) (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(id: String): Action[AnyContent] = identify.async {
-    implicit request =>
-      apiHubService.getApplication(id) map {
-        case Some(application) => Ok(view(application, Some(request.user)))
-        case _ => NotFound
-      }
+  def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id)) {
+    implicit request => Ok(view(request.application, Some(request.identifierRequest.user)))
   }
 
 }

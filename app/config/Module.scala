@@ -30,6 +30,7 @@ class Module extends play.api.inject.Module {
     val bindings = Seq(
     bindz(classOf[DataRetrievalAction]).to(classOf[DataRetrievalActionImpl]).eagerly(),
     bindz(classOf[DataRequiredAction]).to(classOf[DataRequiredActionImpl]).eagerly(),
+    bindz[ApplicationAuthActionProvider].to(classOf[ApplicationAuthActionProviderImpl]).eagerly(),
 
     // For session based storage instead of cred based, change to SessionIdentifierAction
     bindz(classOf[IdentifierAction]).to(classOf[AuthenticatedIdentifierAction]).eagerly(),
