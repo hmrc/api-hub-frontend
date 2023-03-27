@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package controllers.actions
+package models.requests
 
-import models.user.{LdapUser, UserModel}
+import models.application.Application
+import play.api.mvc.WrappedRequest
 
-object FakeUser extends UserModel("id", "test-name", LdapUser, Some("test-email"))
-
-object FakeUserNotTeamMember extends UserModel("idx", "test-namex", LdapUser, Some("different-email"))
+case class ApplicationRequest[A](identifierRequest: IdentifierRequest[A],
+                                 application: Application
+                                ) extends WrappedRequest[A](identifierRequest)

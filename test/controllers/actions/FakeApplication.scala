@@ -16,8 +16,16 @@
 
 package controllers.actions
 
-import models.user.{LdapUser, UserModel}
+import models.application.{Application, Creator, Environments, TeamMember}
 
-object FakeUser extends UserModel("id", "test-name", LdapUser, Some("test-email"))
+import java.time.LocalDateTime
 
-object FakeUserNotTeamMember extends UserModel("idx", "test-namex", LdapUser, Some("different-email"))
+object FakeApplication extends Application(
+  "fake-application-id",
+  "fake-application-name",
+  LocalDateTime.now(),
+  Creator(FakeUser.email.get),
+  LocalDateTime.now(),
+  Seq(TeamMember(FakeUser.email.get)),
+  Environments()
+)
