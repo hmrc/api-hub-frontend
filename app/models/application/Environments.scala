@@ -19,6 +19,8 @@ package models.application
 import play.api.libs.json.{Format, Json}
 
 case class Environments(
+  primary:Environment,
+  secondary:Environment,
   dev: Environment,
   test: Environment,
   preProd: Environment,
@@ -29,6 +31,8 @@ object Environments {
 
   def apply(): Environments = {
     Environments(
+      primary = Environment(),
+      secondary = Environment(),
       dev = Environment(),
       test = Environment(),
       preProd = Environment(),
