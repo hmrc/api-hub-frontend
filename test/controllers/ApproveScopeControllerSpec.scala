@@ -80,6 +80,8 @@ class ApproveScopeControllerSpec extends SpecBase with MockitoSugar {
         Environment(),
         Environment(),
         Environment(),
+        Environment(),
+        Environment(),
         new Environment(Seq(Scope("cheese", Pending)), Seq())
       )
 
