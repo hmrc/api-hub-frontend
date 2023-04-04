@@ -16,6 +16,7 @@
 
 package controllers
 
+import config.FrontendAppConfig
 import controllers.actions._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -30,11 +31,12 @@ class ApplicationDetailsController @Inject()(
   identify: IdentifierAction,
   val controllerComponents: MessagesControllerComponents,
   view: ApplicationDetailsView,
-  applicationAuth: ApplicationAuthActionProvider
+  applicationAuth: ApplicationAuthActionProvider,
+  config: FrontendAppConfig
 ) (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id)) {
-    implicit request => Ok(view(request.application, Some(request.identifierRequest.user)))
+    implicit request => Ok(view(request.application, Some(request.identifierRequest.user), config.environmentNames))
   }
 
 }

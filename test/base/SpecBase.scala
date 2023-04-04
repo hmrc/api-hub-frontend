@@ -23,7 +23,7 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.{OptionValues, TryValues}
-import play.api.Application
+import play.api.{Application, Configuration}
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -43,8 +43,10 @@ trait SpecBase
 
   def messages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 
-  protected def applicationBuilder(userAnswers: Option[UserAnswers] = None, user: UserModel = FakeUser): GuiceApplicationBuilder =
-    new GuiceApplicationBuilder()
+  protected def applicationBuilder(userAnswers: Option[UserAnswers] = None,
+                                   user: UserModel = FakeUser,
+                                   testConfiguration: Configuration = Configuration.empty): GuiceApplicationBuilder =
+    GuiceApplicationBuilder(configuration = testConfiguration)
       .overrides(
         bind[UserModel].toInstance(user),
         bind[DataRequiredAction].to[DataRequiredActionImpl],
