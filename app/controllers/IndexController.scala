@@ -40,10 +40,13 @@ class IndexController @Inject()(
                                )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   def onPageLoad: Action[AnyContent] = identify.async { implicit request =>
-    apiHubService.getApplications() map {
-      applications =>
-        Ok(view(applications, Some(request.user)))
-    }
+    request.user.email.fold[Future[Result]] {
+      logger.warn("Current user has no email address")
+      Future.successful(InternalServerError)
+    }(
+      email => apiHubService.getUserApplications(email).map(userApps =>
+      Ok(view(userApps, Some(request.user)))
+    ))
   }
 
   def onSubmit: Action[AnyContent] = identify.async { implicit request =>
