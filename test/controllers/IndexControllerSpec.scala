@@ -84,6 +84,28 @@ class IndexControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must initiate User Answers and redirect to the Application Name page for a GET" in {
+      val fixture = buildFixture()
+
+      when(fixture.mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      running(fixture.application) {
+        val request = FakeRequest(GET, routes.IndexController.createApplication.url)
+
+        val result = route(fixture.application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.ApplicationNameController.onPageLoad(NormalMode).url
+
+        val userAnswersCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+        verify(fixture.mockSessionRepository).set(userAnswersCaptor.capture())
+
+        val actualUserAnswers = userAnswersCaptor.getValue
+        actualUserAnswers.id mustBe userAnswersId
+        actualUserAnswers.get(TeamMembersPage) mustBe Some(Seq(TeamMember(FakeUser.email.value)))
+      }
+    }
+
   }
 
 }
