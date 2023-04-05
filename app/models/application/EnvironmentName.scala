@@ -22,10 +22,14 @@ sealed trait EnvironmentName
 
 case object Primary extends WithName("primary") with EnvironmentName
 case object Secondary extends WithName("secondary") with EnvironmentName
+case object Dev extends WithName("dev") with EnvironmentName
+case object Test extends WithName("test") with EnvironmentName
+case object PreProd extends WithName("preProd") with EnvironmentName
+case object Prod extends WithName("prod") with EnvironmentName
 
 object EnvironmentName extends Enumerable.Implicits {
 
-  val values: Seq[EnvironmentName] = Seq(Primary, Secondary)
+  val values: Seq[EnvironmentName] = Seq(Primary, Secondary, Dev, Test, PreProd, Prod)
 
   implicit val enumerable: Enumerable[EnvironmentName] =
     Enumerable(values.map(value => value.toString -> value): _*)
