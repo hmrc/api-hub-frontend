@@ -59,4 +59,19 @@ class IndexController @Inject()(
     )
   }
 
+    def createApplication: Action[AnyContent] = identify.async { implicit request =>
+    request.user.email.fold[Future[Result]] {
+      logger.warn("Current user has no email address")
+      Future.successful(InternalServerError)
+    }(
+      email =>
+        for {
+          userAnswers <- Future.fromTry(UserAnswers(request.user.userId).set(TeamMembersPage, Seq(TeamMember(email))))
+          _ <- sessionRepository.set(userAnswers)
+        } yield Redirect(routes.ApplicationNameController.onPageLoad(NormalMode))
+    )
+  }
+
+
+
 }

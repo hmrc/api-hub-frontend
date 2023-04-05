@@ -16,6 +16,7 @@
 
 @import models.application.Application
 @import models.user.UserModel
+@import views.ViewUtils
 
 @this(
     layout: templates.Layout,
@@ -36,40 +37,69 @@
 @layout(
     pageTitle    = titleNoForm(messages("index.title")),
     showBackLink = false,
+    fullWidth    = true,
     user = user
 ) {
 
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-one-half">
-            <h1 class="govuk-heading-xl">@messages("index.heading")</h1>
-        </div>
-        <div class="govuk-grid-column-one-half govuk-!-text-align-right">
-            @formHelper(action = routes.IndexController.onSubmit) {
-                @govukButton(
-                    ButtonViewModel(messages("index.registerApplication"))
-                )
-            }
-        </div>
         <div class="govuk-grid-column-full">
-            @govukTable(
-                Table(
-                    caption = None,
-                    head = Some(
-                        Seq(
-                            HeadCell(messages("index.applications.name")),
-                            HeadCell(messages("index.applications.id"))
-                        )
-                    ),
-                    rows = applications.map(
-                        application =>
-                            Seq(
-                                TableRow(content=HtmlContent(appDetailsLink(application))),
-                                TableRow(content=application.id)
-                            )
-                    )
-                )
-            )
+            <h1 class="govuk-heading-l">@messages("index.heading")</h1>
         </div>
+     @if(applications.isEmpty) {
+        <div class="govuk-grid-column-full">
+            <div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+                <div class="govuk-notification-banner__header">
+                    <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                        Welcome to The API Hub
+                    </h2>
+                </div>
+                <div class="govuk-notification-banner__content">
+                    <p class="govuk-notification-banner__heading custom-width-notification">
+                        To begin using HIP API's you will need to register your application with The API Hub. You will then be able to use HIP API's and generate credentials.
+
+                    </p>
+                </div>
+            </div>
+            <div class="hip-card-container">
+                <div class="hip-card-container-top flex">
+                    <div class="align-left">
+                        <h2 class="govuk-heading-m">Registered applications</h2>
+                        <p class="govuk-body">You have no registered applications</p>
+                    </div>
+                    <div class="govuk-button--primary align-right">
+                        @formHelper(action = routes.IndexController.onSubmit) {
+                            @govukButton(
+                                ButtonViewModel(messages("index.registerApplication"))
+                            )
+                        }
+                    </div>
+                </div>
+
+            </div>
+        </div>
+     } else {
+         <div class="govuk-grid-column-full">
+             <div class="hip-card-container">
+                 <h2 class="govuk-heading-m hip-card-header">@applications.length Registered applications </h2>
+                 <div class="hip-card-container-top">
+                   @applications.map( application =>
+                       <div class="hip-inner-card flex">
+                           <h5 class="govuk-heading-s align-left hip-inner-card-title">
+                               <a class="govuk-link govuk-link--no-visited-state" href={routes.ApplicationDetailsController.onPageLoad(application.id).url}>{application.name}</a>
+                           </h5>
+                           <p class="govuk-body align-left">Team members: {application.teamMembers.length}</p>
+                           <p class="govuk-body align-left">Registered: {ViewUtils.formatDate(application.created)}</p>
+                       </div>
+                   )
+
+
+                 </div>
+                 <div class="hip-card-container-bottom spacing-15-top-bottom spacing-30-left-right">
+                     <a class="govuk-link govuk-link--no-visited-state" href="@routes.IndexController.createApplication">Register another application</a>
+                 </div>
+             </div>
+         </div>
+     }
     </div>
 
 }
