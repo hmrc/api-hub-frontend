@@ -16,6 +16,7 @@
 
 package controllers
 
+import config.FrontendAppConfig
 import controllers.actions._
 import forms.NewScopeFormProvider
 import models.application.{EnvironmentName, NewScope}
@@ -34,7 +35,8 @@ class AddScopeController @Inject()(
                                     val controllerComponents: MessagesControllerComponents,
                                     view: AddScopeView,
                                     apiHubService: ApiHubService,
-                                    formProvider: NewScopeFormProvider
+                                    formProvider: NewScopeFormProvider,
+                                    config: FrontendAppConfig
                                   )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form = formProvider()
@@ -42,7 +44,7 @@ class AddScopeController @Inject()(
   def onPageLoad(id: String): Action[AnyContent] = identify.async {
     implicit request =>
       apiHubService.getApplication(id) map {
-        case Some(application) => Ok(view(application.id, form, Some(request.user)))
+        case Some(application) => Ok(view(application.id, form, Some(request.user), config))
         case _ => NotFound
       }
   }
@@ -51,14 +53,14 @@ class AddScopeController @Inject()(
     implicit request =>
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(id, formWithErrors, Some(request.user)))),
+          Future.successful(BadRequest(view(id, formWithErrors, Some(request.user), config))),
 
         scopeData => {
-          val envs = Seq(scopeData.dev, scopeData.test, scopeData.preProd, scopeData.prod).flatten[String].flatMap(s => EnvironmentName.enumerable.withName(s))
+          val envs = Seq(scopeData.primary, scopeData.secondary).flatten[String].flatMap(s => EnvironmentName.enumerable.withName(s))
           apiHubService.requestAdditionalScope(id, NewScope(scopeData.scopeName, envs)).map(
             _ => Redirect(routes.RequestScopeSuccessController.onPageLoad(id)))
         })
   }
 }
 
-case class ScopeData(scopeName: String, dev: Option[String] = None, test: Option[String] = None, preProd: Option[String] = None, prod: Option[String] = None)
+case class ScopeData(scopeName: String, primary: Option[String] = None, secondary: Option[String] = None)
