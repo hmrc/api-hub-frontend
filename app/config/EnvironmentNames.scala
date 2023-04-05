@@ -25,11 +25,9 @@ object EnvironmentNames {
   implicit lazy val configLoader: ConfigLoader[EnvironmentNames] = ConfigLoader {
     config =>
       prefix =>
-
         val service  = Configuration(config).get[Configuration](prefix)
         val primary     = service.get[String]("primary")
         val secondary     = service.get[String]("secondary")
-
         EnvironmentNames(primary, secondary)
   }
 }
