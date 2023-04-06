@@ -26,6 +26,8 @@ import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import uk.gov.hmrc.crypto.{ApplicationCrypto, Crypted, PlainText}
+import uk.gov.hmrc.play.bootstrap.filters.frontend.crypto
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -58,6 +60,19 @@ class ApplicationsConnector @Inject()(
   def getApplication(id:String)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
     httpClient
       .get(url"$applicationsBaseUrl/api-hub-applications/applications/$id")
+      .setHeader((ACCEPT, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Either[UpstreamErrorResponse, Application]]
+      .flatMap {
+        case Right(application) => Future.successful(Some(application))
+        case Left(e) if e.statusCode==404 => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
+  }
+  def getUserApplications(userEmail:String)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
+    val emailEncrypted = crypto.QueryParameterCrypto.encrypt(PlainText(userEmail)).value
+    httpClient
+      .get(url"$applicationsBaseUrl/api-hub-applications/applications/$userEmail")
       .setHeader((ACCEPT, JSON))
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Either[UpstreamErrorResponse, Application]]
