@@ -90,7 +90,7 @@ class ApiHubServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar {
   "requestAdditionalScope" - {
     "must call the applications connector and return the new scope" in {
       val applicationId = "app-id"
-      val newScope = NewScope(applicationId, Seq(Dev))
+      val newScope = NewScope(applicationId, Seq(Primary))
 
       val applicationsConnector = mock[ApplicationsConnector]
       when(applicationsConnector.requestAdditionalScope(ArgumentMatchers.eq(applicationId), ArgumentMatchers.eq(newScope))(any()))

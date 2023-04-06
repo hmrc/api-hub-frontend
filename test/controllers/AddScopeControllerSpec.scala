@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import config.FrontendAppConfig
 import controllers.AddScopeControllerSpec.buildFixture
 import controllers.actions.FakeUser
 import forms.NewScopeFormProvider
@@ -40,7 +41,7 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar {
   "AddScopeController" - {
     "must register the scope and redirect to the application details page when valid" in {
       val testId = "test-app-id"
-      val newScope = NewScope("my_scope", Seq(Dev,Test,PreProd,Prod))
+      val newScope = NewScope("my_scope", Seq(Primary, Secondary))
       val fixture = buildFixture()
 
       when(fixture.apiHubService.requestAdditionalScope(ArgumentMatchers.eq(testId), ArgumentMatchers.eq(newScope))(any()))
@@ -48,7 +49,7 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar {
 
       running(fixture.application) {
         val request = FakeRequest(POST, routes.AddScopeController.onSubmit(testId).url)
-          .withFormUrlEncodedBody(("scope-name","my_scope"),("dev","dev"),("test","test"),("preProd","preProd"),("prod","prod"))
+          .withFormUrlEncodedBody(("scope-name","my_scope"),("primary","primary"),("secondary","secondary"))
         val result = route(fixture.application, request).value
 
         status(result) mustBe SEE_OTHER
@@ -105,9 +106,11 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
       val testId = "test-app-id"
-      val fixture = buildFixture()
+      val env1 = "Narnia"
+      val env2 = "Coventry"
+      val fixture = buildFixture(env1, env2)
       val view = fixture.application.injector.instanceOf[AddScopeView]
-
+      val config = fixture.application.injector.instanceOf[FrontendAppConfig]
       val application = models.application.Application(testId, "app-name", Creator("test-creator-email"), Seq(TeamMember("test-creator-email")))
 
       when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId))(any()))
@@ -119,7 +122,10 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustBe OK
 
-        contentAsString(result) mustEqual view(testId, form, Some(FakeUser))(request, messages(fixture.application)).toString
+        val content = contentAsString(result)
+        content mustEqual view(testId, form, Some(FakeUser), config)(request, messages(fixture.application)).toString
+        content must include(env1)
+        content must include(env2)
       }
     }
   }
@@ -132,13 +138,14 @@ object AddScopeControllerSpec extends SpecBase with MockitoSugar {
     apiHubService: ApiHubService
   )
 
-  def buildFixture(): Fixture = {
+  def buildFixture(environment1: String = "primary", environment2: String = "secondary"): Fixture = {
     val apiHubService = mock[ApiHubService]
 
     val application = applicationBuilder(userAnswers = None)
       .overrides(
         bind[ApiHubService].toInstance(apiHubService)
       )
+      .configure("environment-names.primary" -> environment1, "environment-names.secondary" -> environment2)
       .build()
 
     Fixture(application, apiHubService)

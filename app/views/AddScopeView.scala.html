@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import config.FrontendAppConfig
 @import models.user.UserModel
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 
@@ -24,7 +25,7 @@ govukErrorSummary: GovukErrorSummary,
 govukButton: GovukButton,
 govukInput: GovukInput)
 
-@(id: String, form: Form[_], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+@(id: String, form: Form[_], user: Option[UserModel], config: FrontendAppConfig)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("addScope.title")), user = user) {
 
@@ -59,24 +60,14 @@ govukInput: GovukInput)
             name = "scope-environments",
             items = Seq(
                 CheckboxItem(
-                    content = Text(messages("addScope.environments.dev")),
-                    value = "dev",
-                    name = Some("dev")
+                    content = Text(config.environmentNames.primary),
+                    value = "primary",
+                    name = Some("primary")
                 ),
                 CheckboxItem(
-                    content = Text(messages("addScope.environments.test")),
-                    value = "test",
-                    name = Some("test")
-                ),
-                CheckboxItem(
-                    content = Text(messages("addScope.environments.preProd")),
-                    value = "preProd",
-                    name = Some("preProd")
-                ),
-                CheckboxItem(
-                    content = Text(messages("addScope.environments.prod")),
-                    value = "prod",
-                    name = Some("prod")
+                    content = Text(config.environmentNames.secondary),
+                    value = "secondary",
+                    name = Some("secondary")
                 )
             )
         ))
