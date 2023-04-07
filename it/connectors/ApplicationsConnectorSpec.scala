@@ -10,6 +10,7 @@ import play.api.Configuration
 import play.api.http.Status.{NOT_FOUND, NO_CONTENT}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
+import uk.gov.hmrc.crypto.ApplicationCrypto
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
@@ -219,7 +220,8 @@ object ApplicationsConnectorSpec extends HttpClientV2Support {
     )
 
     val application = new GuiceApplicationBuilder().build()
-    new ApplicationsConnector(httpClientV2, servicesConfig, application.injector.instanceOf[FrontendAppConfig])
+    val crypto: ApplicationCrypto = application.injector.instanceOf[ApplicationCrypto]
+    new ApplicationsConnector(httpClientV2, crypto, servicesConfig, application.injector.instanceOf[FrontendAppConfig])
   }
 
   def toJsonString(newApplication: NewApplication): String = {

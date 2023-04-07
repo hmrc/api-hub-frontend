@@ -26,14 +26,14 @@ import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import uk.gov.hmrc.crypto.{ApplicationCrypto, Crypted, PlainText}
-import uk.gov.hmrc.play.bootstrap.filters.frontend.crypto
+import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ApplicationsConnector @Inject()(
     httpClient: HttpClientV2,
+    crypto: ApplicationCrypto,
     servicesConfig: ServicesConfig,
     frontEndConfig: FrontendAppConfig
   )(implicit ec: ExecutionContext) {
@@ -69,16 +69,15 @@ class ApplicationsConnector @Inject()(
         case Left(e) => Future.failed(e)
       }
   }
-  def getUserApplications(userEmail:String)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
+  def getUserApplications(userEmail:String)(implicit hc: HeaderCarrier): Future[Seq[Application]] = {
     val emailEncrypted = crypto.QueryParameterCrypto.encrypt(PlainText(userEmail)).value
     httpClient
-      .get(url"$applicationsBaseUrl/api-hub-applications/applications/$userEmail")
+      .get(url"$applicationsBaseUrl/api-hub-applications/applications/?teamMember=$emailEncrypted")
       .setHeader((ACCEPT, JSON))
       .setHeader(AUTHORIZATION -> clientAuthToken)
-      .execute[Either[UpstreamErrorResponse, Application]]
+      .execute[Either[UpstreamErrorResponse, Seq[Application]]]
       .flatMap {
-        case Right(application) => Future.successful(Some(application))
-        case Left(e) if e.statusCode==404 => Future.successful(None)
+        case Right(apps:Seq[Application]) => Future.successful(apps)
         case Left(e) => Future.failed(e)
       }
   }

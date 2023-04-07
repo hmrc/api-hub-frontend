@@ -21,7 +21,7 @@ import connectors.ApplicationsConnector
 import models.application.{Application, NewApplication, NewScope}
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 @Singleton
 class ApiHubService @Inject()(applicationsConnector: ApplicationsConnector)
   extends Logging {
@@ -53,9 +53,9 @@ class ApiHubService @Inject()(applicationsConnector: ApplicationsConnector)
     applicationsConnector.approveProductionScope(appId, scopeName)
   }
 
-  def getUserApplications(email:String)(implicit hc:HeaderCarrier, ec: ExecutionContext): Future[Seq[Application]] = {
+  def getUserApplications(email:String)(implicit hc:HeaderCarrier): Future[Seq[Application]] = {
     logger.debug(s"Retrieving applications for user '$email'")
-    applicationsConnector.getApplications().map(_.filter(_.teamMembers.exists(_.email == email)))
+    applicationsConnector.getUserApplications(email)
 
   }
 

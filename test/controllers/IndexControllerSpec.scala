@@ -22,7 +22,7 @@ import controllers.actions.FakeUser
 import models.application.{Application, Creator, TeamMember}
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.{ArgumentCaptor, MockitoSugar}
+import org.mockito.{ArgumentCaptor, ArgumentMatchers, MockitoSugar}
 import pages.TeamMembersPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -40,14 +40,15 @@ class IndexControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
       val applications = Seq(
-        Application("id-1", "app-name-1", Creator("creator-email-1"), Seq(TeamMember("creator-email-1"))),
-        Application("id-2", "app-name-2", Creator("creator-email-2"), Seq(TeamMember("creator-email-2")))
+        Application("id-1", "app-name-1", Creator("creator-email-2"), Seq.empty).copy(teamMembers = Seq(TeamMember("test-email"))),
+        Application("id-2", "app-name-2", Creator("creator-email-2"), Seq.empty).copy(teamMembers = Seq(TeamMember("test-email")))
       )
 
       val fixture = buildFixture()
 
       running(fixture.application) {
-        when(fixture.mockApiHubService.getApplications()(any()))
+
+        when(fixture.mockApiHubService.getUserApplications(ArgumentMatchers.eq("test-email"))(any()))
           .thenReturn(Future.successful(applications))
 
         val request = FakeRequest(GET, routes.IndexController.onPageLoad.url)
