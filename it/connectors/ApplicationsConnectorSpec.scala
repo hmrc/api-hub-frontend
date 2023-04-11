@@ -14,10 +14,12 @@ import uk.gov.hmrc.crypto.ApplicationCrypto
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-
+import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
+import com.google.common.io.Resources
+import com.google.common.base.Charsets.UTF_8
 import java.net.URLEncoder
 import scala.concurrent.ExecutionContext
-
+import com.typesafe.config.ConfigFactory
 class ApplicationsConnectorSpec
   extends AsyncFreeSpec
   with Matchers
@@ -49,11 +51,13 @@ class ApplicationsConnectorSpec
   }
   "ApplicationsConnector.getUserApplications" - {
     "must place the correct request and return the array of applications with given user in team members" in {
-      val application1 = Application("id-1", "test-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1"))).copy(teamMembers = Seq(TeamMember("test-creator-email-1"), TeamMember("test-user-email-2")))
-      val application2 = Application("id-2", "test-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2"))).copy(teamMembers = Seq(TeamMember("test-user-email-2"), TeamMember("test-user-email-3")))
-      val application3 = Application("id-3", "test-name-3", Creator("test-creator-email-4"), Seq(TeamMember("test-creator-email-4"))).copy(teamMembers = Seq(TeamMember("test-creator-email-4")))
+      val testEmail = "test-user-email-2"
+      val application1 = Application("id-1", "test-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1"))).copy(teamMembers = Seq(TeamMember("test-creator-email-1"), TeamMember(testEmail)))
+      val application2 = Application("id-2", "test-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2"))).copy(teamMembers = Seq(TeamMember(testEmail), TeamMember("test-user-email-3")))
       val expected = Seq(application1, application2)
-      val userEmailEncrypted = "lxN+AnqMKIEqH6lxZGtiR3xCtm5oNcc8DwifgoI+O3M="
+      val crypto = new ApplicationCrypto(ConfigFactory.parseResources("application.conf"))
+
+      val userEmailEncrypted = crypto.QueryParameterCrypto.encrypt(PlainText(testEmail)).value
       val userEmailEncoded = URLEncoder.encode(userEmailEncrypted, "UTF-8")
       stubFor(
         get(urlEqualTo(f"/api-hub-applications/applications/?teamMember=$userEmailEncoded"))
