@@ -18,6 +18,7 @@ package controllers
 
 import controllers.actions.IdentifierAction
 import models.application.TeamMember
+import models.requests.IdentifierRequest
 import models.{NormalMode, UserAnswers}
 import pages.TeamMembersPage
 import play.api.Logging
@@ -49,7 +50,11 @@ class IndexController @Inject()(
     ))
   }
 
-  def onSubmit: Action[AnyContent] = identify.async { implicit request =>
+  def onSubmit: Action[AnyContent] = identify.async { implicit request => createUserApplication }
+
+  def createApplication: Action[AnyContent] = identify.async { implicit request => createUserApplication }
+
+  private def createUserApplication(implicit request: IdentifierRequest[AnyContent]): Future[Result] = {
     request.user.email.fold[Future[Result]] {
       logger.warn("Current user has no email address")
       Future.successful(InternalServerError)
@@ -61,20 +66,4 @@ class IndexController @Inject()(
         } yield Redirect(routes.ApplicationNameController.onPageLoad(NormalMode))
     )
   }
-
-    def createApplication: Action[AnyContent] = identify.async { implicit request =>
-    request.user.email.fold[Future[Result]] {
-      logger.warn("Current user has no email address")
-      Future.successful(InternalServerError)
-    }(
-      email =>
-        for {
-          userAnswers <- Future.fromTry(UserAnswers(request.user.userId).set(TeamMembersPage, Seq(TeamMember(email))))
-          _ <- sessionRepository.set(userAnswers)
-        } yield Redirect(routes.ApplicationNameController.onPageLoad(NormalMode))
-    )
-  }
-
-
-
 }
