@@ -54,7 +54,6 @@ class ApiHubService @Inject()(applicationsConnector: ApplicationsConnector)
   }
 
   def getUserApplications(email:String)(implicit hc:HeaderCarrier): Future[Seq[Application]] = {
-    logger.debug(s"Retrieving applications for user '$email'")
     applicationsConnector.getUserApplications(email)
 
   }
