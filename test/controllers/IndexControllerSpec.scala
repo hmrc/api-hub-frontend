@@ -39,16 +39,19 @@ class IndexControllerSpec extends SpecBase with MockitoSugar {
   "Index Controller" - {
 
     "must return OK and the correct view for a GET" in {
+
+      val testEmail = "test-email"
+      val creatorEmail = "creator-email-2"
       val applications = Seq(
-        Application("id-1", "app-name-1", Creator("creator-email-2"), Seq.empty).copy(teamMembers = Seq(TeamMember("test-email"))),
-        Application("id-2", "app-name-2", Creator("creator-email-2"), Seq.empty).copy(teamMembers = Seq(TeamMember("test-email")))
+        Application("id-1", "app-name-1", Creator(creatorEmail), Seq.empty).copy(teamMembers = Seq(TeamMember(testEmail))),
+        Application("id-2", "app-name-2", Creator(creatorEmail), Seq.empty).copy(teamMembers = Seq(TeamMember(testEmail)))
       )
 
       val fixture = buildFixture()
 
       running(fixture.application) {
 
-        when(fixture.mockApiHubService.getUserApplications(ArgumentMatchers.eq("test-email"))(any()))
+        when(fixture.mockApiHubService.getUserApplications(ArgumentMatchers.eq(testEmail))(any()))
           .thenReturn(Future.successful(applications))
 
         val request = FakeRequest(GET, routes.IndexController.onPageLoad.url)
