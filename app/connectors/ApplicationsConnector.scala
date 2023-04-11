@@ -57,12 +57,17 @@ class ApplicationsConnector @Inject()(
       .execute[Seq[Application]]
   }
 
-  def getApplication(id:String)(implicit hc: HeaderCarrier): Future[Seq[Application]] = {
+  def getApplication(id:String)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
     httpClient
       .get(url"$applicationsBaseUrl/api-hub-applications/applications/$id")
       .setHeader((ACCEPT, JSON))
       .setHeader(AUTHORIZATION -> clientAuthToken)
-      .execute[Seq[Application]]
+      .execute[Either[UpstreamErrorResponse, Application]]
+      .flatMap {
+        case Right(application) => Future.successful(Some(application))
+        case Left(e) if e.statusCode==404 => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
   }
   def getUserApplications(userEmail:String)(implicit hc: HeaderCarrier): Future[Seq[Application]] = {
     val emailEncrypted = crypto.QueryParameterCrypto.encrypt(PlainText(userEmail)).value
@@ -70,11 +75,7 @@ class ApplicationsConnector @Inject()(
       .get(url"$applicationsBaseUrl/api-hub-applications/applications/?teamMember=$emailEncrypted")
       .setHeader((ACCEPT, JSON))
       .setHeader(AUTHORIZATION -> clientAuthToken)
-      .execute[Either[UpstreamErrorResponse, Seq[Application]]]
-      .flatMap {
-        case Right(apps:Seq[Application]) => Future.successful(apps)
-        case Left(e) => Future.failed(e)
-      }
+      .execute[Seq[Application]]
   }
 
   def requestAdditionalScope(id: String, newScope: NewScope)(implicit hc: HeaderCarrier): Future[Option[NewScope]] = {

@@ -53,10 +53,9 @@ class ApiHubService @Inject()(applicationsConnector: ApplicationsConnector)
     applicationsConnector.approveProductionScope(appId, scopeName)
   }
 
-  def getUserApplications(email:String)(implicit hc:HeaderCarrier): Future[Seq[Application]] = {
-    applicationsConnector.getUserApplications(email)
+  def getUserApplications(email:String)(implicit hc:HeaderCarrier): Future[Seq[Application]] =
+        applicationsConnector.getUserApplications(email)
 
-  }
 
 
 
