@@ -28,13 +28,11 @@ class NewScopeFormProvider @Inject() extends Mappings {
   def apply(): Form[ScopeData] = Form(
     mapping(
       "scope-name" -> text("addScope.error.required").verifying(maxLength(100, "addScope.error.length")),
-      "dev" -> optional(play_text),
-      "test" -> optional(play_text),
-      "preProd" -> optional(play_text),
-      "prod" -> optional(play_text)
+      "primary" -> optional(play_text),
+      "secondary" -> optional(play_text)
     )(ScopeData.apply)(ScopeData.unapply).verifying(
       "addScope.error.required",
-      scopeData => Seq(scopeData.dev, scopeData.test, scopeData.preProd, scopeData.prod)
+      scopeData => Seq(scopeData.primary, scopeData.secondary)
         .flatten[String]
         .nonEmpty))
 }

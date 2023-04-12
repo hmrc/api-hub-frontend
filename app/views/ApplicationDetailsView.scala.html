@@ -16,6 +16,7 @@
 
 @import models.application._
 @import models.user.UserModel
+@import config.EnvironmentNames
 @import views.ViewUtils
 
 @this(
@@ -25,7 +26,7 @@
         govukTable: GovukTable
 )
 
-@(application: Application, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+@(application: Application, user: Option[UserModel], environmentNames: EnvironmentNames)(implicit request: Request[_], messages: Messages)
 
 @applicationDetail(descriptionKey: String, value: String) = {
     <div class="govuk-grid-row">
@@ -45,7 +46,7 @@
 @environmentTab(name: String, environment: Environment) = @{
     TabItem(
         id = Some(name),
-        label = messages(s"applicationDetails.$name"),
+        label = name,
         panel = TabPanel(
             content = HtmlContent(environmentTabContent(environment))
         )
@@ -141,10 +142,8 @@
     @govukTabs(
         Tabs(
             items = Seq(
-                environmentTab("dev", application.environments.dev),
-                environmentTab("test", application.environments.test),
-                environmentTab("preProd", application.environments.preProd),
-                environmentTab("prod", application.environments.prod)
+                environmentTab(environmentNames.secondary, application.environments.secondary),
+                environmentTab(environmentNames.primary, application.environments.primary),
             )
         )
     )

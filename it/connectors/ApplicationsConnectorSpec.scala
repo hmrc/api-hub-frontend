@@ -139,7 +139,7 @@ class ApplicationsConnectorSpec
   "ApplicationsConnector.requestAdditionalScope" - {
     "must place the correct request and return new scope" in {
       val appId = "id-1"
-      val newScope = NewScope(appId, Seq(Dev))
+      val newScope = NewScope(appId, Seq(Primary))
 
       stubFor(
         post(urlEqualTo(s"/api-hub-applications/applications/$appId/environments/scopes"))
@@ -156,7 +156,7 @@ class ApplicationsConnectorSpec
 
     "must return empty when application ID not found" in {
       val appId = "unknown_id"
-      val newScope = NewScope(appId, Seq(Dev))
+      val newScope = NewScope(appId, Seq(Primary))
 
       stubFor(
         post(urlEqualTo(s"/api-hub-applications/applications/$appId/environments/scopes"))

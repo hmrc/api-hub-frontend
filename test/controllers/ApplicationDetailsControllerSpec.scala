@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import config.EnvironmentNames
 import controllers.ApplicationDetailsControllerSpec.buildFixture
 import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
 import models.user.UserModel
@@ -25,7 +26,7 @@ import org.mockito.{ArgumentMatchers, MockitoSugar}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import play.api.{Application => PlayApplication}
+import play.api.{Configuration, Application => PlayApplication}
 import services.ApiHubService
 import views.html.ApplicationDetailsView
 
@@ -36,7 +37,15 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar {
   "ApplicationDetails Controller" - {
 
     "must return OK and the correct view for a GET" in {
-      val fixture = buildFixture()
+      val primaryEnvName = "primary-env-name"
+      val secondaryEnvName = "secondary-env-name"
+
+      val configWithEnvironmentNames = Configuration.from(Map(
+        "environment-names.primary" -> primaryEnvName,
+        "environment-names.secondary" -> secondaryEnvName
+      ))
+
+      val fixture = buildFixture(testConfiguration = configWithEnvironmentNames)
 
       val id = "test-id"
       when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(id))(any()))
@@ -50,7 +59,10 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar {
         val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(FakeApplication, Some(FakeUser))(request, messages(fixture.playApplication)).toString
+
+        contentAsString(result) mustEqual view(
+          FakeApplication, Some(FakeUser), EnvironmentNames(primaryEnvName, secondaryEnvName)
+        )(request, messages(fixture.playApplication)).toString
       }
     }
   }
@@ -71,7 +83,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar {
     }
   }
   "must redirect to Unauthorised page for a GET when user is not a team member" in {
-    val fixture = buildFixture(user = FakeUserNotTeamMember)
+    val fixture = buildFixture(userModel = FakeUserNotTeamMember)
 
     val id = "test-id"
     when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(id))(any()))
@@ -99,14 +111,13 @@ object ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar {
 
   case class Fixture(playApplication: PlayApplication, apiHubService: ApiHubService)
 
-  def buildFixture(user: UserModel = FakeUser): Fixture = {
+  def buildFixture(userModel: UserModel = FakeUser, testConfiguration: Configuration = Configuration.empty): Fixture = {
     val apiHubService = mock[ApiHubService]
 
-    val playApplication = applicationBuilder(userAnswers = Some(emptyUserAnswers), user = user)
+    val playApplication = applicationBuilder(userAnswers = Some(emptyUserAnswers), user = userModel, testConfiguration)
       .overrides(
         bind[ApiHubService].toInstance(apiHubService)
-      )
-      .build()
+      ).build()
 
     Fixture(playApplication, apiHubService)
   }
