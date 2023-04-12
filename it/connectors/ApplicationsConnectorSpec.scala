@@ -1,6 +1,7 @@
 package connectors
 
 import com.github.tomakehurst.wiremock.client.WireMock._
+import com.typesafe.config.ConfigFactory
 import config.FrontendAppConfig
 import connectors.ApplicationsConnectorSpec.{buildConnector, toJsonString}
 import models.application._
@@ -10,16 +11,13 @@ import play.api.Configuration
 import play.api.http.Status.{NOT_FOUND, NO_CONTENT}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
-import uk.gov.hmrc.crypto.ApplicationCrypto
+import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
-import com.google.common.io.Resources
-import com.google.common.base.Charsets.UTF_8
+
 import java.net.URLEncoder
 import scala.concurrent.ExecutionContext
-import com.typesafe.config.ConfigFactory
 class ApplicationsConnectorSpec
   extends AsyncFreeSpec
   with Matchers
