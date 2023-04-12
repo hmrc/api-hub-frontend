@@ -36,24 +36,21 @@ class AddScopeController @Inject()(
                                     view: AddScopeView,
                                     apiHubService: ApiHubService,
                                     formProvider: NewScopeFormProvider,
-                                    config: FrontendAppConfig
+                                    config: FrontendAppConfig,
+                                    applicationAuth: ApplicationAuthActionProvider
                                   )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form = formProvider()
 
-  def onPageLoad(id: String): Action[AnyContent] = identify.async {
-    implicit request =>
-      apiHubService.getApplication(id) map {
-        case Some(application) => Ok(view(application.id, form, Some(request.user), config))
-        case _ => NotFound
-      }
+  def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id)){
+    implicit request => Ok(view(request.application.id, form, Some(request.identifierRequest.user), config))
   }
 
-  def onSubmit(id: String): Action[AnyContent] = identify.async {
+  def onSubmit(id: String): Action[AnyContent] = (identify andThen applicationAuth(id)).async {
     implicit request =>
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(id, formWithErrors, Some(request.user), config))),
+          Future.successful(BadRequest(view(id, formWithErrors, Some(request.identifierRequest.user), config))),
 
         scopeData => {
           val envs = Seq(scopeData.primary, scopeData.secondary).flatten[String].flatMap(s => EnvironmentName.enumerable.withName(s))

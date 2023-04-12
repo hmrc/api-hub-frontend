@@ -19,9 +19,10 @@ package controllers
 import base.SpecBase
 import config.FrontendAppConfig
 import controllers.AddScopeControllerSpec.buildFixture
-import controllers.actions.FakeUser
+import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
 import forms.NewScopeFormProvider
 import models.application._
+import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
 import play.api.inject.bind
@@ -44,6 +45,9 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar {
       val newScope = NewScope("my_scope", Seq(Primary, Secondary))
       val fixture = buildFixture()
 
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId))(any()))
+        .thenReturn(Future.successful(Some(FakeApplication)))
+
       when(fixture.apiHubService.requestAdditionalScope(ArgumentMatchers.eq(testId), ArgumentMatchers.eq(newScope))(any()))
         .thenReturn(Future.successful(Some(newScope)))
 
@@ -59,9 +63,33 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must redirect to Unauthorised page for a POST when user is not a team member" in {
+      val testId = "test-app-id"
+      val fixture = buildFixture(userModel = FakeUserNotTeamMember)
+
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId))(any()))
+        .thenReturn(Future.successful(Some(FakeApplication)))
+
+      running(fixture.application) {
+        val request = FakeRequest(POST, routes.AddScopeController.onSubmit(testId).url)
+          .withFormUrlEncodedBody(("scope-name", "my_scope"), ("primary", "primary"), ("secondary", "secondary"))
+        val result = route(fixture.application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        val actualRedirectLocation = redirectLocation(result).value
+        val expectedRedirectLocation = routes.UnauthorisedController.onPageLoad.url
+
+        actualRedirectLocation mustEqual expectedRedirectLocation
+      }
+    }
+
     "must show same page with errors when there is no scope name or environments" in {
       val testId = "test-app-id"
       val fixture = buildFixture()
+
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId))(any()))
+        .thenReturn(Future.successful(Some(FakeApplication)))
 
       running(fixture.application) {
         val request = FakeRequest(POST, routes.AddScopeController.onSubmit(testId).url)
@@ -70,13 +98,16 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustBe BAD_REQUEST
         contentAsString(result) must include("Error: Add a Scope - The API Hub - GOV.UK")
 
-        verifyZeroInteractions(fixture.apiHubService)
+        verifyZeroInteractions(fixture.apiHubService.requestAdditionalScope(any(), any())(any()))
       }
     }
 
     "must show same page with errors when there is no scope name and at least one environment" in {
       val testId = "test-app-id"
       val fixture = buildFixture()
+
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId))(any()))
+        .thenReturn(Future.successful(Some(FakeApplication)))
 
       running(fixture.application) {
         val request = FakeRequest(POST, routes.AddScopeController.onSubmit(testId).url).withFormUrlEncodedBody(("dev","dev"))
@@ -85,13 +116,16 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustBe BAD_REQUEST
         contentAsString(result) must include("Error: Add a Scope - The API Hub - GOV.UK")
 
-        verifyZeroInteractions(fixture.apiHubService)
+        verifyZeroInteractions(fixture.apiHubService.requestAdditionalScope(any(), any())(any()))
       }
     }
 
     "must show same page with errors when there is a scope name but no environment" in {
       val testId = "test-app-id"
       val fixture = buildFixture()
+
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId))(any()))
+        .thenReturn(Future.successful(Some(FakeApplication)))
 
       running(fixture.application) {
         val request = FakeRequest(POST, routes.AddScopeController.onSubmit(testId).url).withFormUrlEncodedBody(("scope-name", "a scope"))
@@ -100,7 +134,7 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustBe BAD_REQUEST
         contentAsString(result) must include("Error: Add a Scope - The API Hub - GOV.UK")
 
-        verifyZeroInteractions(fixture.apiHubService)
+        verifyZeroInteractions(fixture.apiHubService.requestAdditionalScope(any(), any())(any()))
       }
     }
 
@@ -111,7 +145,7 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar {
       val fixture = buildFixture(env1, env2)
       val view = fixture.application.injector.instanceOf[AddScopeView]
       val config = fixture.application.injector.instanceOf[FrontendAppConfig]
-      val application = models.application.Application(testId, "app-name", Creator("test-creator-email"), Seq(TeamMember("test-creator-email")))
+      val application = models.application.Application(testId, "app-name", Creator("test-creator-email"), Seq(TeamMember("test-email")))
 
       when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId))(any()))
         .thenReturn(Future.successful(Some(application)))
@@ -128,6 +162,26 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar {
         content must include(env2)
       }
     }
+
+    "must redirect to Unauthorised page for a GET when user is not a team member" in {
+      val testId = "test-app-id"
+      val fixture = buildFixture(userModel = FakeUserNotTeamMember)
+
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId))(any()))
+        .thenReturn(Future.successful(Some(FakeApplication)))
+
+      running(fixture.application) {
+        val request = FakeRequest(GET, routes.AddScopeController.onPageLoad(testId).url)
+        val result = route(fixture.application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        val actualRedirectLocation = redirectLocation(result).value
+        val expectedRedirectLocation = routes.UnauthorisedController.onPageLoad.url
+
+        actualRedirectLocation mustEqual expectedRedirectLocation
+      }
+    }
   }
 }
 
@@ -138,10 +192,10 @@ object AddScopeControllerSpec extends SpecBase with MockitoSugar {
     apiHubService: ApiHubService
   )
 
-  def buildFixture(environment1: String = "primary", environment2: String = "secondary"): Fixture = {
+  def buildFixture(environment1: String = "primary", environment2: String = "secondary", userModel: UserModel = FakeUser): Fixture = {
     val apiHubService = mock[ApiHubService]
 
-    val application = applicationBuilder(userAnswers = None)
+    val application = applicationBuilder(userAnswers = None, user = userModel)
       .overrides(
         bind[ApiHubService].toInstance(apiHubService)
       )

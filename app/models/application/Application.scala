@@ -34,7 +34,7 @@ object Application {
 
   def apply(id: String, name: String, createdBy: Creator, teamMembers: Seq[TeamMember]): Application = {
     val now = LocalDateTime.now()
-    Application(id, name, now, createdBy, now, Seq.empty, Environments())
+    Application(id, name, now, createdBy, now, teamMembers, Environments())
   }
 
   def apply(id: String, newApplication: NewApplication): Application = {

@@ -17,14 +17,12 @@
 package controllers
 
 import controllers.actions._
-
-import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.RequestScopeSuccessView
 
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
 class RequestScopeSuccessController @Inject()(
@@ -32,15 +30,11 @@ class RequestScopeSuccessController @Inject()(
   identify: IdentifierAction,
   val controllerComponents: MessagesControllerComponents,
   view: RequestScopeSuccessView,
-  apiHubService: ApiHubService
+  applicationAuth: ApplicationAuthActionProvider
 ) (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(id: String): Action[AnyContent] = identify.async {
-    implicit request =>
-      apiHubService.getApplication(id) map {
-        case Some(application) => Ok(view(application, Some(request.user)))
-        case _ => NotFound
-      }
+  def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id)){
+    implicit request =>Ok(view(request.application, Some(request.identifierRequest.user)))
   }
 
 }

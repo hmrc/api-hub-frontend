@@ -17,8 +17,10 @@
 package controllers
 
 import base.SpecBase
-import controllers.actions.FakeUser
+import controllers.RegisterApplicationSuccessControllerSpec.buildFixture
+import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
 import models.application.{Application, Creator, TeamMember}
+import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
 import play.api.inject.bind
@@ -35,8 +37,8 @@ class RegisterApplicationSuccessControllerSpec extends SpecBase with MockitoSuga
   "RegisterApplicationSuccess Controller" - {
 
     "must return OK and the correct view for a GET" in {
-      val fixture = RegisterApplicationSuccessControllerSpec.buildFixture()
-      val app = Application("id-1", "test", Creator("creator-email"), Seq(TeamMember("creator-email")))
+      val fixture = buildFixture()
+      val app = Application("id-1", "test", Creator("creator-email"), Seq(TeamMember("test-email")))
 
       when(fixture.apiHubService.getApplication(ArgumentMatchers.eq("id-1"))(any()))
         .thenReturn(Future.successful(Some(app)))
@@ -55,6 +57,27 @@ class RegisterApplicationSuccessControllerSpec extends SpecBase with MockitoSuga
         actual mustEqual expected
       }
     }
+
+    "must redirect to Unauthorised page for a GET when user is not a team member" in {
+      val testId = "test-app-id"
+      val fixture = buildFixture(userModel = FakeUserNotTeamMember)
+
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId))(any()))
+        .thenReturn(Future.successful(Some(FakeApplication)))
+
+      running(fixture.application) {
+        val request = FakeRequest(GET, routes.RegisterApplicationSuccessController.onPageLoad(testId).url)
+        val result = route(fixture.application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        val actualRedirectLocation = redirectLocation(result).value
+        val expectedRedirectLocation = routes.UnauthorisedController.onPageLoad.url
+
+        actualRedirectLocation mustEqual expectedRedirectLocation
+      }
+    }
+
   }
 }
 object RegisterApplicationSuccessControllerSpec extends SpecBase with MockitoSugar {
@@ -64,10 +87,10 @@ object RegisterApplicationSuccessControllerSpec extends SpecBase with MockitoSug
                       apiHubService: ApiHubService
                     )
 
-  def buildFixture(): Fixture = {
+  def buildFixture( userModel: UserModel = FakeUser): Fixture = {
     val apiHubService = mock[ApiHubService]
 
-    val application = applicationBuilder(userAnswers = None)
+    val application = applicationBuilder(userAnswers = None, user = userModel)
       .overrides(
         bind[ApiHubService].toInstance(apiHubService)
       )

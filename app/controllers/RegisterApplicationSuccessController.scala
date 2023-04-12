@@ -17,27 +17,23 @@
 package controllers
 
 import controllers.actions._
-
-import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.RegisterApplicationSuccessView
+
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
 class RegisterApplicationSuccessController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        identify: IdentifierAction,
-                                       service:ApiHubService,
                                        val controllerComponents: MessagesControllerComponents,
-                                       view: RegisterApplicationSuccessView
-                                     )(implicit ec:ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                       view: RegisterApplicationSuccessView,
+                                       applicationAuth: ApplicationAuthActionProvider)
+                                                    (implicit ec:ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(id:String): Action[AnyContent] = identify.async {
-    implicit request => service.getApplication(id).map {
-      case Some(app) => Ok(view(app, Some(request.user)))
-      case None => NotFound
-    }
+  def onPageLoad(id:String): Action[AnyContent] = (identify andThen applicationAuth(id)) {
+    implicit request => Ok(view(request.application, Some(request.identifierRequest.user)))
   }
 }
