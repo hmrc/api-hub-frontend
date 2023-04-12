@@ -10,7 +10,7 @@ site.start = Start now
 site.startAgain = Start again
 site.signIn = Sign in
 site.govuk = GOV.UK
-site.applications = Applications
+site.applications = Your Applications
 site.approvals = Approvals
 
 date.day = Day
@@ -38,7 +38,7 @@ error.required = Please enter a value
 error.summary.title = There is a problem
 
 index.title = Applications
-index.heading = Applications
+index.heading = Your Applications
 index.registerApplication = Register an application
 index.applications.name = Name
 index.applications.id = Id

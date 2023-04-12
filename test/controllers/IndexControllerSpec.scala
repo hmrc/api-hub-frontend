@@ -22,7 +22,7 @@ import controllers.actions.FakeUser
 import models.application.{Application, Creator, TeamMember}
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.{ArgumentCaptor, MockitoSugar}
+import org.mockito.{ArgumentCaptor, ArgumentMatchers, MockitoSugar}
 import pages.TeamMembersPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -39,15 +39,19 @@ class IndexControllerSpec extends SpecBase with MockitoSugar {
   "Index Controller" - {
 
     "must return OK and the correct view for a GET" in {
+
+      val testEmail = "test-email"
+      val creatorEmail = "creator-email-2"
       val applications = Seq(
-        Application("id-1", "app-name-1", Creator("creator-email-1"), Seq(TeamMember("creator-email-1"))),
-        Application("id-2", "app-name-2", Creator("creator-email-2"), Seq(TeamMember("creator-email-2")))
+        Application("id-1", "app-name-1", Creator(creatorEmail), Seq.empty).copy(teamMembers = Seq(TeamMember(testEmail))),
+        Application("id-2", "app-name-2", Creator(creatorEmail), Seq.empty).copy(teamMembers = Seq(TeamMember(testEmail)))
       )
 
       val fixture = buildFixture()
 
       running(fixture.application) {
-        when(fixture.mockApiHubService.getApplications()(any()))
+
+        when(fixture.mockApiHubService.getUserApplications(ArgumentMatchers.eq(testEmail))(any()))
           .thenReturn(Future.successful(applications))
 
         val request = FakeRequest(GET, routes.IndexController.onPageLoad.url)
@@ -69,6 +73,28 @@ class IndexControllerSpec extends SpecBase with MockitoSugar {
 
       running(fixture.application) {
         val request = FakeRequest(POST, routes.IndexController.onSubmit.url)
+
+        val result = route(fixture.application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.ApplicationNameController.onPageLoad(NormalMode).url
+
+        val userAnswersCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+        verify(fixture.mockSessionRepository).set(userAnswersCaptor.capture())
+
+        val actualUserAnswers = userAnswersCaptor.getValue
+        actualUserAnswers.id mustBe userAnswersId
+        actualUserAnswers.get(TeamMembersPage) mustBe Some(Seq(TeamMember(FakeUser.email.value)))
+      }
+    }
+
+    "must initiate User Answers and redirect to the Application Name page for a GET" in {
+      val fixture = buildFixture()
+
+      when(fixture.mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      running(fixture.application) {
+        val request = FakeRequest(GET, routes.IndexController.createApplication.url)
 
         val result = route(fixture.application, request).value
 

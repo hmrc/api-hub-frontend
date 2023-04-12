@@ -17,6 +17,15 @@
     padding-right: 7%;
 }
 
+.hip-card-container {
+    border: solid 1px #b1b4b6;
+    background-color: #f3f2f1;
+    margin-top: 30px;
+}
+.hip-card-container .hip-card-container-top {
+    padding: 30px;
+    border-bottom: solid 1px #b1b4b6;
+}
 .hipp-card {
     background-color: #f3f2f1;
     border: solid 1px #505a5f;
@@ -24,6 +33,42 @@
     width: 30%;
     min-width: 300px;
     height: 380px;
+}
+.hip-card-header {
+    margin-top: 20px;
+    margin-left: 30px;
+    margin-bottom: 0px;
+}
+
+.hip-card-container .hip-card-container-bottom {
+    background-color: #ffffff;
+    padding: 30px;
+}
+
+.hip-inner-card {
+    padding: 10px 20px;
+    background-color: #ffffff;
+    border-bottom: solid 2px #1d70b8;
+    border-top: solid 1px #b1b4b6;
+    border-left: solid 1px #b1b4b6;
+    border-right: solid 1px #b1b4b6;
+    margin-top: 20px;
+}
+.hip-inner-card-title {
+    width: 350px;
+}
+.flex {
+    display: flex;
+}
+
+.flex .align-right {
+    margin-left: auto;
+    align-self: center;
+}
+
+.flex .align-left {
+    margin-right: auto;
+    align-self: center;
 }
 
 .custom-second-nav {
@@ -39,4 +84,10 @@
 .custom-back-link {
     margin-top: 0px !important;
     margin-bottom: 0px !important;
+}
+
+.custom-width-notification {
+    max-width: 100% !important;
+    font-weight: normal !important;
+    font-size: 1.2rem !important;
 }

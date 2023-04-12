@@ -18,6 +18,7 @@ package controllers
 
 import controllers.actions.IdentifierAction
 import models.application.TeamMember
+import models.requests.IdentifierRequest
 import models.{NormalMode, UserAnswers}
 import pages.TeamMembersPage
 import play.api.Logging
@@ -40,13 +41,20 @@ class IndexController @Inject()(
                                )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   def onPageLoad: Action[AnyContent] = identify.async { implicit request =>
-    apiHubService.getApplications() map {
-      applications =>
-        Ok(view(applications, Some(request.user)))
-    }
+    request.user.email.fold[Future[Result]] {
+      logger.warn("Current user has no email address")
+      Future.successful(InternalServerError)
+    }(
+      email => apiHubService.getUserApplications(email).map(userApps =>
+      Ok(view(userApps, Some(request.user)))
+    ))
   }
 
-  def onSubmit: Action[AnyContent] = identify.async { implicit request =>
+  def onSubmit: Action[AnyContent] = identify.async { implicit request => createUserApplication }
+
+  def createApplication: Action[AnyContent] = identify.async { implicit request => createUserApplication }
+
+  private def createUserApplication(implicit request: IdentifierRequest[AnyContent]): Future[Result] = {
     request.user.email.fold[Future[Result]] {
       logger.warn("Current user has no email address")
       Future.successful(InternalServerError)
@@ -58,5 +66,4 @@ class IndexController @Inject()(
         } yield Redirect(routes.ApplicationNameController.onPageLoad(NormalMode))
     )
   }
-
 }

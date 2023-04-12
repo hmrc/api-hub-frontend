@@ -1,6 +1,7 @@
 package connectors
 
 import com.github.tomakehurst.wiremock.client.WireMock._
+import com.typesafe.config.ConfigFactory
 import config.FrontendAppConfig
 import connectors.ApplicationsConnectorSpec.{buildConnector, toJsonString}
 import models.application._
@@ -10,12 +11,13 @@ import play.api.Configuration
 import play.api.http.Status.{NOT_FOUND, NO_CONTENT}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
+import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
+import java.net.URLEncoder
 import scala.concurrent.ExecutionContext
-
 class ApplicationsConnectorSpec
   extends AsyncFreeSpec
   with Matchers
@@ -40,6 +42,32 @@ class ApplicationsConnectorSpec
       )
 
       buildConnector(this).registerApplication(newApplication)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe expected
+      }
+    }
+  }
+  "ApplicationsConnector.getUserApplications" - {
+    "must place the correct request and return the array of applications with given user in team members" in {
+      val testEmail = "test-user-email-2"
+      val application1 = Application("id-1", "test-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1"))).copy(teamMembers = Seq(TeamMember("test-creator-email-1"), TeamMember(testEmail)))
+      val application2 = Application("id-2", "test-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2"))).copy(teamMembers = Seq(TeamMember(testEmail), TeamMember("test-user-email-3")))
+      val expected = Seq(application1, application2)
+      val crypto = new ApplicationCrypto(ConfigFactory.parseResources("application.conf"))
+
+      val userEmailEncrypted = crypto.QueryParameterCrypto.encrypt(PlainText(testEmail)).value
+      val userEmailEncoded = URLEncoder.encode(userEmailEncrypted, "UTF-8")
+      stubFor(
+        get(urlEqualTo(f"/api-hub-applications/applications/?teamMember=$userEmailEncoded"))
+          .withHeader("Accept", equalTo("application/json"))
+          .withHeader("Authorization", equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withBody(toJsonString(expected))
+          )
+      )
+
+      buildConnector(this).getUserApplications("test-user-email-2")(HeaderCarrier()) map {
         actual =>
           actual mustBe expected
       }
@@ -219,7 +247,8 @@ object ApplicationsConnectorSpec extends HttpClientV2Support {
     )
 
     val application = new GuiceApplicationBuilder().build()
-    new ApplicationsConnector(httpClientV2, servicesConfig, application.injector.instanceOf[FrontendAppConfig])
+    val crypto: ApplicationCrypto = application.injector.instanceOf[ApplicationCrypto]
+    new ApplicationsConnector(httpClientV2, crypto, servicesConfig, application.injector.instanceOf[FrontendAppConfig])
   }
 
   def toJsonString(newApplication: NewApplication): String = {

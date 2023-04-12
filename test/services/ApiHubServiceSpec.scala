@@ -23,7 +23,6 @@ import org.mockito.{ArgumentMatchers, MockitoSugar}
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
 import uk.gov.hmrc.http.HeaderCarrier
-
 import scala.concurrent.Future
 
 class ApiHubServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar {
@@ -66,7 +65,23 @@ class ApiHubServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar {
           succeed
       }
     }
-  }
+    "must call the applications connector and return a sequence of applications with a given team member" in {
+      val application1 = Application("id-1", "test-app-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1")))
+      val application2 = Application("id-2", "test-app-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2")))
+      val expected = Seq(application1, application2)
+
+      val applicationsConnector = mock[ApplicationsConnector]
+      when(applicationsConnector.getUserApplications(ArgumentMatchers.eq("test-creator-email-2"))(any())).thenReturn(Future.successful(expected))
+
+      val service = new ApiHubService(applicationsConnector)
+
+      service.getUserApplications("test-creator-email-2")(HeaderCarrier()) map {
+        actual =>
+          actual mustBe expected
+          verify(applicationsConnector).getUserApplications(ArgumentMatchers.eq("test-creator-email-2"))(any())
+          succeed
+      }
+  }}
 
   "getApplication" - {
     "must call the applications connector and return an application" in {

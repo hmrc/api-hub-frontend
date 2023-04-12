@@ -21,9 +21,7 @@ import connectors.ApplicationsConnector
 import models.application.{Application, NewApplication, NewScope}
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
-
 import scala.concurrent.Future
-
 @Singleton
 class ApiHubService @Inject()(applicationsConnector: ApplicationsConnector)
   extends Logging {
@@ -54,5 +52,11 @@ class ApiHubService @Inject()(applicationsConnector: ApplicationsConnector)
     logger.debug(s"Approving scope named '${scopeName}' for application id '${appId}' in PROD environment")
     applicationsConnector.approveProductionScope(appId, scopeName)
   }
+
+  def getUserApplications(email:String)(implicit hc:HeaderCarrier): Future[Seq[Application]] =
+        applicationsConnector.getUserApplications(email)
+
+
+
 
 }
