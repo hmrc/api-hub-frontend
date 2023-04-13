@@ -18,7 +18,7 @@ package models.application
 
 import play.api.libs.json.{Format, Json}
 
-case class Credential(clientId: String, clientSecret: String)
+case class Credential(clientId: String, clientSecret: Option[String], secretFragment: Option[String])
 
 object Credential {
 
