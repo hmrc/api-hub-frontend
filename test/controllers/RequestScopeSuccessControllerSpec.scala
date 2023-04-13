@@ -18,14 +18,15 @@ package controllers
 
 import base.SpecBase
 import controllers.RequestScopeSuccessControllerSpec.{applicationId, buildFixture}
-import controllers.actions.FakeUser
+import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
 import models.application.{Application, Creator, TeamMember}
+import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
-import play.api.{Application => PlayApplication}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import play.api.{Application => PlayApplication}
 import services.ApiHubService
 import views.html.RequestScopeSuccessView
 
@@ -71,9 +72,27 @@ class RequestScopeSuccessControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual NOT_FOUND
       }
-
     }
 
+    "must redirect to Unauthorised page for a GET when user is not a team member" in {
+      val testId = "test-app-id"
+      val fixture = buildFixture(userModel = FakeUserNotTeamMember)
+
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId))(any()))
+        .thenReturn(Future.successful(Some(FakeApplication)))
+
+      running(fixture.playApplication) {
+        val request = FakeRequest(GET, routes.RequestScopeSuccessController.onPageLoad(testId).url)
+        val result = route(fixture.playApplication, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        val actualRedirectLocation = redirectLocation(result).value
+        val expectedRedirectLocation = routes.UnauthorisedController.onPageLoad.url
+
+        actualRedirectLocation mustEqual expectedRedirectLocation
+      }
+    }
   }
 
 }
@@ -84,10 +103,10 @@ object RequestScopeSuccessControllerSpec extends SpecBase with MockitoSugar {
 
   case class Fixture(playApplication: PlayApplication, apiHubService: ApiHubService)
 
-  def buildFixture(): Fixture = {
+  def buildFixture(userModel: UserModel = FakeUser): Fixture = {
     val apiHubService =  mock[ApiHubService]
 
-    val playApplication = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+    val playApplication = applicationBuilder(userAnswers = Some(emptyUserAnswers), user = userModel)
       .overrides(
         bind[ApiHubService].toInstance(apiHubService)
       )
