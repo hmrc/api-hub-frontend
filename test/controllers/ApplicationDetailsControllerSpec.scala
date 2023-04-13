@@ -60,9 +60,16 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
 
-        contentAsString(result) mustEqual view(
+        val content = contentAsString(result)
+        content mustEqual view(
           FakeApplication, Some(FakeUser), EnvironmentNames(primaryEnvName, secondaryEnvName)
         )(request, messages(fixture.playApplication)).toString
+
+        content must include (messages(fixture.playApplication).apply("applicationDetails.credentials.clientSecret"))
+        content must include (messages(fixture.playApplication).apply("applicationDetails.credentials.clientId"))
+        content must include("secondary secret")
+        content must include("secondary_client_id")
+
       }
     }
   }
