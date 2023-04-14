@@ -64,7 +64,7 @@
         <div class = "govuk-grid-column-one-half">
             <h2 class="govuk-heading-m">@messages("applicationDetails.credentials")</h2>
             <span class="govuk-body">
-                @messages("applicationDetails.noCredentials")
+                @environmentTabCredentials(environment.credentials)
             </span>
         </div>
     </div>
@@ -110,7 +110,34 @@
     }
 }
 
-@layout(pageTitle = titleNoForm(messages("applicationDetails.title")), user = user) {
+@environmentTabCredentials(credentials: Seq[Credential]) = {
+    @if(credentials.isEmpty) {
+        @messages("applicationDetails.noCredentials")
+    } else {
+        @govukTable(
+            Table(
+                caption = None,
+                head = Some(
+                    Seq(
+                        HeadCell(messages("applicationDetails.credentials.clientId")),
+                        HeadCell(messages("applicationDetails.credentials.clientSecret"))
+                    )
+                ),
+                rows = credentials.map(
+                    credential => {
+                        val secretOrFragment = credential.clientSecret.getOrElse(credential.secretFragment.getOrElse(""))
+                        Seq(
+                            TableRow(content = credential.clientId),
+                            TableRow(content = secretOrFragment)
+                        )
+                    }
+                )
+            )
+        )
+    }
+}
+
+@layout(pageTitle = titleNoForm(messages("applicationDetails.title")), user = user, fullWidth = true) {
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">

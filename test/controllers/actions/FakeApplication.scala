@@ -16,7 +16,7 @@
 
 package controllers.actions
 
-import models.application.{Application, Creator, Environments, TeamMember}
+import models.application.{Application, Approved, Creator, Credential, Environment, Environments, Scope, TeamMember}
 
 import java.time.LocalDateTime
 
@@ -27,5 +27,10 @@ object FakeApplication extends Application(
   Creator(FakeUser.email.get),
   LocalDateTime.now(),
   Seq(TeamMember(FakeUser.email.get)),
-  Environments()
+  Environments(primary = Environment(scopes = Seq(Scope("scope_name", Approved)), credentials = Seq(Credential("primary_client_id", None, Some("primary fragment")))),
+    secondary = Environment(scopes = Seq(Scope("scope_name", Approved)), credentials = Seq(Credential("secondary_client_id", Some("secondary secret"), Some("secondary fragment")))),
+    dev = Environment(),
+    test = Environment(),
+    preProd = Environment(),
+    prod = Environment())
 )
