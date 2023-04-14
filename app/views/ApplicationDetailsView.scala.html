@@ -119,16 +119,16 @@
                 caption = None,
                 head = Some(
                     Seq(
-                        HeadCell(messages("applicationDetails.credentials.clientSecret")),
-                        HeadCell(messages("applicationDetails.credentials.clientId"))
+                        HeadCell(messages("applicationDetails.credentials.clientId")),
+                        HeadCell(messages("applicationDetails.credentials.clientSecret"))
                     )
                 ),
                 rows = credentials.map(
                     credential => {
                         val secretOrFragment = credential.clientSecret.getOrElse(credential.secretFragment.getOrElse(""))
                         Seq(
-                            TableRow(content = secretOrFragment),
-                            TableRow(content = credential.clientId)
+                            TableRow(content = credential.clientId),
+                            TableRow(content = secretOrFragment)
                         )
                     }
                 )
@@ -137,7 +137,7 @@
     }
 }
 
-@layout(pageTitle = titleNoForm(messages("applicationDetails.title")), user = user) {
+@layout(pageTitle = titleNoForm(messages("applicationDetails.title")), user = user, fullWidth = true) {
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">

@@ -16,7 +16,7 @@
 
 package controllers.actions
 
-import models.application.{Application, Approved, Creator, Credential, Environment, Environments, Scope, ScopeStatus, TeamMember}
+import models.application.{Application, Approved, Creator, Credential, Environment, Environments, Scope, TeamMember}
 
 import java.time.LocalDateTime
 
