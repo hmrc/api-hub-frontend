@@ -14,9 +14,9 @@
  * limitations under the License.
  *@
 
+@import config.EnvironmentNames
 @import models.application._
 @import models.user.UserModel
-@import config.EnvironmentNames
 @import views.ViewUtils
 
 @this(
@@ -37,7 +37,7 @@
         </div>
         <div class="govuk-grid-column-three-quarters">
             <span class="govuk-body">
-                @value
+            @value
             </span>
         </div>
     </div>
@@ -58,13 +58,13 @@
         <div class = "govuk-grid-column-one-half">
             <h2 class="govuk-heading-m">@messages("applicationDetails.scopes")</h2>
             <span class="govuk-body">
-                @environmentTabScopes(environment.scopes)
+            @environmentTabScopes(environment.scopes)
             </span>
         </div>
         <div class = "govuk-grid-column-one-half">
             <h2 class="govuk-heading-m">@messages("applicationDetails.credentials")</h2>
             <span class="govuk-body">
-                @environmentTabCredentials(environment.credentials)
+            @environmentTabCredentials(environment.credentials)
             </span>
         </div>
     </div>
@@ -74,7 +74,7 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-one-quarter">
             <span class="govuk-body">
-                @teamMember.email
+            @teamMember.email
             </span>
         </div>
     </div>
@@ -106,35 +106,38 @@
                 )
             )
         )
-
     }
 }
 
 @environmentTabCredentials(credentials: Seq[Credential]) = {
-    @if(credentials.isEmpty) {
-        @messages("applicationDetails.noCredentials")
-    } else {
-        @govukTable(
-            Table(
-                caption = None,
-                head = Some(
-                    Seq(
-                        HeadCell(messages("applicationDetails.credentials.clientId")),
-                        HeadCell(messages("applicationDetails.credentials.clientSecret"))
-                    )
-                ),
-                rows = credentials.map(
-                    credential => {
-                        val secretOrFragment = credential.clientSecret.getOrElse(credential.secretFragment.getOrElse(""))
-                        Seq(
-                            TableRow(content = credential.clientId),
-                            TableRow(content = secretOrFragment)
-                        )
-                    }
+    @govukTable(
+        Table(
+            caption = None,
+            head = Some(
+                Seq(
+                    HeadCell(messages("applicationDetails.credentials.clientId")),
+                    HeadCell(messages("applicationDetails.credentials.clientSecret"))
                 )
-            )
+            ),
+            rows = {
+                val credentialsWithIdButNoFragmentOrSecret = credentials.filter(credential =>
+                    credential.clientId != null && credential.clientSecret.isEmpty && credential.secretFragment.isEmpty)
+                if (!credentialsWithIdButNoFragmentOrSecret.isEmpty) {
+                    Seq(Seq(TableRow(content = HtmlContent(govukButton(ButtonViewModel(messages("applicationDetails.generateSecret")))))))
+                } else {
+                    credentials.map(
+                        credential => {
+                            val secretOrFragment = credential.clientSecret.getOrElse(credential.secretFragment.getOrElse(""))
+                            Seq(
+                                TableRow(content = credential.clientId),
+                                TableRow(content = secretOrFragment)
+                            )
+                        }
+                    )
+                }
+            }
         )
-    }
+    )
 }
 
 @layout(pageTitle = titleNoForm(messages("applicationDetails.title")), user = user, fullWidth = true) {

@@ -16,7 +16,7 @@
 
 package controllers.actions
 
-import models.application.{Application, Approved, Creator, Credential, Environment, Environments, Scope, TeamMember}
+import models.application._
 
 import java.time.LocalDateTime
 
@@ -27,8 +27,33 @@ object FakeApplication extends Application(
   Creator(FakeUser.email.get),
   LocalDateTime.now(),
   Seq(TeamMember(FakeUser.email.get)),
+  Environments()
+)
+
+object FakeApplicationWithSecrets extends Application(
+  "fake-application-id",
+  "fake-application-name",
+  LocalDateTime.now(),
+  Creator(FakeUser.email.get),
+  LocalDateTime.now(),
+  Seq(TeamMember(FakeUser.email.get)),
   Environments(primary = Environment(scopes = Seq(Scope("scope_name", Approved)), credentials = Seq(Credential("primary_client_id", None, Some("primary fragment")))),
     secondary = Environment(scopes = Seq(Scope("scope_name", Approved)), credentials = Seq(Credential("secondary_client_id", Some("secondary secret"), Some("secondary fragment")))),
+    dev = Environment(),
+    test = Environment(),
+    preProd = Environment(),
+    prod = Environment())
+)
+
+object FakeApplicationWithIdButNoSecrets extends Application(
+  "fake-application-id",
+  "fake-application-name",
+  LocalDateTime.now(),
+  Creator(FakeUser.email.get),
+  LocalDateTime.now(),
+  Seq(TeamMember(FakeUser.email.get)),
+  Environments(primary = Environment(scopes = Seq(Scope("scope_name", Approved)), credentials = Seq(Credential("primary_client_id", None, None))),
+    secondary = Environment(scopes = Seq(Scope("scope_name", Approved)), credentials = Seq(Credential("secondary_client_id", None, None))),
     dev = Environment(),
     test = Environment(),
     preProd = Environment(),

@@ -19,7 +19,7 @@ package controllers
 import base.SpecBase
 import config.EnvironmentNames
 import controllers.ApplicationDetailsControllerSpec.buildFixture
-import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
+import controllers.actions._
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
@@ -47,12 +47,12 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       val fixture = buildFixture(testConfiguration = configWithEnvironmentNames)
 
-      val id = "test-id"
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(id))(any()))
-        .thenReturn(Future.successful(Some(FakeApplication)))
+      val idWithSecrets = "test-id-with-secrets"
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(idWithSecrets))(any()))
+        .thenReturn(Future.successful(Some(FakeApplicationWithSecrets)))
 
       running(fixture.playApplication) {
-        val request = FakeRequest(GET, routes.ApplicationDetailsController.onPageLoad(id).url)
+        val request = FakeRequest(GET, routes.ApplicationDetailsController.onPageLoad(idWithSecrets).url)
 
         val result = route(fixture.playApplication, request).value
 
@@ -62,7 +62,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val content = contentAsString(result)
         content mustEqual view(
-          FakeApplication, Some(FakeUser), EnvironmentNames(primaryEnvName, secondaryEnvName)
+          FakeApplicationWithSecrets, Some(FakeUser), EnvironmentNames(primaryEnvName, secondaryEnvName)
         )(request, messages(fixture.playApplication)).toString
 
         content must include (messages(fixture.playApplication).apply("applicationDetails.credentials.clientSecret"))
@@ -70,6 +70,39 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar {
         content must include("secondary secret")
         content must include("secondary_client_id")
 
+      }
+    }
+
+    "must return OK and the correct view for a GET when no application secrets exist" in {
+      val primaryEnvName = "primary-env-name"
+      val secondaryEnvName = "secondary-env-name"
+
+      val configWithEnvironmentNames = Configuration.from(Map(
+        "environment-names.primary" -> primaryEnvName,
+        "environment-names.secondary" -> secondaryEnvName
+      ))
+
+      val fixture = buildFixture(testConfiguration = configWithEnvironmentNames)
+
+      val idNoSecrets = "test-id-no-secrets"
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(idNoSecrets))(any()))
+        .thenReturn(Future.successful(Some(FakeApplicationWithIdButNoSecrets)))
+
+      running(fixture.playApplication) {
+        val request = FakeRequest(GET, routes.ApplicationDetailsController.onPageLoad(idNoSecrets).url)
+
+        val result = route(fixture.playApplication, request).value
+
+        val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
+
+        status(result) mustEqual OK
+
+        val content = contentAsString(result)
+        content mustEqual view(
+          FakeApplicationWithIdButNoSecrets, Some(FakeUser), EnvironmentNames(primaryEnvName, secondaryEnvName)
+        )(request, messages(fixture.playApplication)).toString
+
+        content must include(messages(fixture.playApplication).apply("applicationDetails.generateSecret"))
       }
     }
   }
