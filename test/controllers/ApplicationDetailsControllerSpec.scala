@@ -19,7 +19,7 @@ package controllers
 import base.SpecBase
 import config.EnvironmentNames
 import controllers.ApplicationDetailsControllerSpec.buildFixture
-import controllers.actions.{FakeApplication, FakeApplicationWithSecrets, FakeUser, FakeUserNotTeamMember}
+import controllers.actions._
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
@@ -86,7 +86,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       val idNoSecrets = "test-id-no-secrets"
       when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(idNoSecrets))(any()))
-        .thenReturn(Future.successful(Some(FakeApplication)))
+        .thenReturn(Future.successful(Some(FakeApplicationWithIdButNoSecrets)))
 
       running(fixture.playApplication) {
         val request = FakeRequest(GET, routes.ApplicationDetailsController.onPageLoad(idNoSecrets).url)
@@ -99,7 +99,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val content = contentAsString(result)
         content mustEqual view(
-          FakeApplication, Some(FakeUser), EnvironmentNames(primaryEnvName, secondaryEnvName)
+          FakeApplicationWithIdButNoSecrets, Some(FakeUser), EnvironmentNames(primaryEnvName, secondaryEnvName)
         )(request, messages(fixture.playApplication)).toString
 
         content must include(messages(fixture.playApplication).apply("applicationDetails.generateSecret"))
