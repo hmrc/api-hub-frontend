@@ -44,17 +44,3 @@ object FakeApplicationWithSecrets extends Application(
     preProd = Environment(),
     prod = Environment())
 )
-object FakeApplicationNoSecrets extends Application(
-  "fake-application-id",
-  "fake-application-name",
-  LocalDateTime.now(),
-  Creator(FakeUser.email.get),
-  LocalDateTime.now(),
-  Seq(TeamMember(FakeUser.email.get)),
-  Environments(primary = Environment(scopes = Seq(Scope("scope_name", Approved)), credentials = Seq()),
-    secondary = Environment(scopes = Seq(Scope("scope_name", Approved)), credentials = Seq()),
-    dev = Environment(),
-    test = Environment(),
-    preProd = Environment(),
-    prod = Environment())
-)
