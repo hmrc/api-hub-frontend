@@ -127,7 +127,14 @@
                 } else {
                     credentials.map(
                         credential => {
-                            val secretOrFragment = credential.clientSecret.getOrElse(credential.secretFragment.getOrElse(""))
+                            val secretOrFragment = credential
+                                .clientSecret
+                                .getOrElse(
+                                    credential
+                                        .secretFragment
+                                        .map(secretFragment => s"****-****-$secretFragment")
+                                        .getOrElse("")
+                                )
                             Seq(
                                 TableRow(content = credential.clientId),
                                 TableRow(content = secretOrFragment)
