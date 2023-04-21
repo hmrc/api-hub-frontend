@@ -5,10 +5,11 @@ import com.typesafe.config.ConfigFactory
 import config.FrontendAppConfig
 import connectors.ApplicationsConnectorSpec.{buildConnector, toJsonString}
 import models.application._
+import org.scalatest.OptionValues
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.Configuration
-import play.api.http.Status.{NOT_FOUND, NO_CONTENT}
+import play.api.http.Status.{CREATED, NOT_FOUND, NO_CONTENT}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
@@ -21,7 +22,8 @@ import scala.concurrent.ExecutionContext
 class ApplicationsConnectorSpec
   extends AsyncFreeSpec
   with Matchers
-  with WireMockSupport {
+  with WireMockSupport
+  with OptionValues {
 
   "ApplicationsConnector.registerApplication" - {
     "must place the correct request and return the stored application" in {
@@ -232,6 +234,46 @@ class ApplicationsConnectorSpec
       }
     }
 
+  }
+
+  "ApplicationsConnector.createPrimarySecret" - {
+    "must place the correct request and return the secret" in {
+      val applicationId = "test-application-id"
+      val expected = Secret("test-secret")
+
+      stubFor(
+        post(urlEqualTo(s"/api-hub-applications/applications/$applicationId/environments/primary/credentials/secret"))
+          .withHeader("Accept", equalTo("application/json"))
+          .withHeader("Authorization", equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withStatus(CREATED)
+              .withBody(Json.toJson(expected).toString())
+          )
+      )
+
+      buildConnector(this).createPrimarySecret(applicationId)(HeaderCarrier()) map {
+        actual =>
+          actual.value mustBe expected
+      }
+    }
+
+    "must return None when the application does not exist" in {
+      val applicationId = "test-application-id"
+
+      stubFor(
+        post(urlEqualTo(s"/api-hub-applications/applications/$applicationId/environments/primary/credentials/secret"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+          )
+      )
+
+      buildConnector(this).createPrimarySecret(applicationId)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe None
+      }
+    }
   }
 
 }
