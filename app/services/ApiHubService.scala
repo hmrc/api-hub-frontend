@@ -18,9 +18,10 @@ package services
 
 import com.google.inject.{Inject, Singleton}
 import connectors.ApplicationsConnector
-import models.application.{Application, NewApplication, NewScope}
+import models.application.{Application, NewApplication, NewScope, Secret}
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
+
 import scala.concurrent.Future
 @Singleton
 class ApiHubService @Inject()(applicationsConnector: ApplicationsConnector)
@@ -40,7 +41,7 @@ class ApiHubService @Inject()(applicationsConnector: ApplicationsConnector)
   }
 
   def requestAdditionalScope(id:String, newScope:NewScope)(implicit hc:HeaderCarrier): Future[Option[NewScope]] = {
-    logger.debug(s"Requesting scope named '${newScope.name}' for application id '${id}' in environments ${newScope.environments}")
+    logger.debug(s"Requesting scope named '${newScope.name}' for application id '$id' in environments ${newScope.environments}")
     applicationsConnector.requestAdditionalScope(id, newScope)
   }
 
@@ -49,14 +50,16 @@ class ApiHubService @Inject()(applicationsConnector: ApplicationsConnector)
   }
 
   def approveProductionScope(appId: String, scopeName: String)(implicit hc:HeaderCarrier): Future[Boolean] = {
-    logger.debug(s"Approving scope named '${scopeName}' for application id '${appId}' in PROD environment")
+    logger.debug(s"Approving scope named '$scopeName' for application id '$appId' in PROD environment")
     applicationsConnector.approveProductionScope(appId, scopeName)
   }
 
   def getUserApplications(email:String)(implicit hc:HeaderCarrier): Future[Seq[Application]] =
         applicationsConnector.getUserApplications(email)
 
-
-
+  def createPrimarySecret(id: String)(implicit hc:HeaderCarrier): Future[Option[Secret]] = {
+    logger.debug(s"Creating primary secret for application $id")
+    applicationsConnector.createPrimarySecret(id)
+  }
 
 }
