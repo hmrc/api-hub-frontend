@@ -184,5 +184,14 @@ signIn.stride.guidance = If you are on a corporate device you will automatically
 signIn.stride.help = To sign in via STRIDE you will need the "The API Hub user" role assigned in the Service Request System.
 signIn.stride.helpLink = Find out how to self serve the role (opens in new tab)
 
-generatePrimarySecretSuccess.title = generatePrimarySecretSuccess
-generatePrimarySecretSuccess.heading = generatePrimarySecretSuccess
+generatePrimarySecretSuccess.title = Client secret successfully created
+generatePrimarySecretSuccess.heading = Client secret successfully created
+generatePrimarySecretSuccess.applicationName = Application name
+generatePrimarySecretSuccess.environment = Environment
+generatePrimarySecretSuccess.scopes = Scopes
+generatePrimarySecretSuccess.clientId = Client ID
+generatePrimarySecretSuccess.clientSecret = Client secret
+generatePrimarySecretSuccess.onceOnlyWarning = You client secret will only be displayed on this page, you will not be able to retrieve it after this.
+generatePrimarySecretSuccess.guidance.heading = What you can do now
+generatePrimarySecretSuccess.guidance.content = Return to your application and manage your {0}.
+generatePrimarySecretSuccess.guidance.link = client secrets

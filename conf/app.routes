@@ -64,4 +64,4 @@ GET      /team-members/:index                                controllers.RemoveT
 
 GET         /sign-in                                            controllers.auth.SignInController.onPageLoad()
 
-GET        /generatePrimarySecretSuccess                       controllers.GeneratePrimarySecretSuccessController.onPageLoad()
+GET        /generate-primary-secret-success/:id                 controllers.GeneratePrimarySecretSuccessController.onPageLoad(id: String)
