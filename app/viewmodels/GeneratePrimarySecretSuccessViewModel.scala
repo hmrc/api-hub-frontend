@@ -63,6 +63,7 @@ object GeneratePrimarySecretSuccessViewModel {
   private def scopesRow(application: Application)(implicit messages: Messages): SummaryListRow = {
     val scopeNames = application.getPrimaryScopes
       .filter(_.status == Approved)
+      .map(_.name)
       .mkString(", ")
 
     SummaryListRowViewModel(
