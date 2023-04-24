@@ -123,7 +123,14 @@
                 val credentialsWithIdButNoFragmentOrSecret = credentials.filter(credential =>
                     credential.clientId != null && credential.clientSecret.isEmpty && credential.secretFragment.isEmpty)
                 if (!credentialsWithIdButNoFragmentOrSecret.isEmpty) {
-                    Seq(Seq(TableRow(content = HtmlContent(govukButton(ButtonViewModel(messages("applicationDetails.generateSecret")))))))
+                    Seq(Seq(TableRow(
+                        content = HtmlContent(
+                            govukButton(
+                                ButtonViewModel(messages("applicationDetails.generateSecret"))
+                                    .asLink(routes.GeneratePrimarySecretSuccessController.onPageLoad(application.id).url)
+                            )
+                        )
+                    )))
                 } else {
                     credentials.map(
                         credential => {
