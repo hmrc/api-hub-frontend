@@ -12,6 +12,7 @@ site.signIn = Sign in
 site.govuk = GOV.UK
 site.applications = Your Applications
 site.approvals = Approvals
+site.copy = Copy
 
 date.day = Day
 date.month = Month

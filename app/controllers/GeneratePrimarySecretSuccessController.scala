@@ -19,10 +19,8 @@ package controllers
 import config.FrontendAppConfig
 import controllers.actions._
 import models.application.ApplicationLenses.ApplicationLensOps
-import models.application.{Application, Credential, Secret}
+import models.application.{Application, Credential}
 import play.api.Logging
-
-import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
@@ -30,6 +28,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.GeneratePrimarySecretSuccessViewModel
 import views.html.GeneratePrimarySecretSuccessView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class GeneratePrimarySecretSuccessController @Inject()(
@@ -46,31 +45,22 @@ class GeneratePrimarySecretSuccessController @Inject()(
     implicit request =>
       qaTechDeliveryValidPrimaryCredential(request.application) match {
         case Some(credential) =>
-          val summaryList = GeneratePrimarySecretSuccessViewModel.buildSummary(
-            request.application,
-            frontendAppConfig.environmentNames,
-            credential,
-            Secret("top-secret")
-          )
+          apiHubService.createPrimarySecret(id).map {
+            case Some(secret) =>
+              val summaryList = GeneratePrimarySecretSuccessViewModel.buildSummary(
+                request.application,
+                frontendAppConfig.environmentNames,
+                credential,
+                secret
+              )
 
-          Future.successful(Ok(view(summaryList, Some(request.identifierRequest.user))))
-
-//          apiHubService.createPrimarySecret(id).map {
-//            case Some(secret) =>
-//              val summaryList = GeneratePrimarySecretSuccessViewModel.buildSummary(
-//                request.application,
-//                frontendAppConfig.environmentNames,
-//                credential,
-//                secret
-//              )
-//
-//              Ok(view(summaryList, Some(request.identifierRequest.user)))
-//            case _ =>
-//              logger.warn(s"No primary secret generated for application $id")
-//              BadRequest
-//          }
+              Ok(view(request.application, summaryList, Some(request.identifierRequest.user)))
+            case _ =>
+              logger.warn(s"No primary secret generated for application $id")
+              NotFound
+          }
         case None =>
-          logger.warn(s"Cannot find valid primary credential for application $id")
+          logger.warn(s"Cannot find valid primary credential to generate secret for application $id")
           Future.successful(BadRequest)
       }
   }
@@ -82,7 +72,7 @@ class GeneratePrimarySecretSuccessController @Inject()(
     else {
       application.getPrimaryCredentials
         .headOption
-//        .filter(_.secretFragment.isEmpty)
+        .filter(_.secretFragment.isEmpty)
     }
   }
 
