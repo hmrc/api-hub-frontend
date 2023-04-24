@@ -63,3 +63,5 @@ POST        /change-team-members-overview                       controllers.Conf
 GET      /team-members/:index                                controllers.RemoveTeamMemberController.removeTeamMember(mode: Mode = NormalMode, index: Int)
 
 GET         /sign-in                                            controllers.auth.SignInController.onPageLoad()
+
+GET        /generate-primary-secret-success/:id                 controllers.GeneratePrimarySecretSuccessController.onPageLoad(id: String)

@@ -12,6 +12,7 @@ site.signIn = Sign in
 site.govuk = GOV.UK
 site.applications = Your Applications
 site.approvals = Approvals
+site.copy = Copy
 
 date.day = Day
 date.month = Month
@@ -183,3 +184,15 @@ signIn.stride.instructions = Use your @hmrc.gov.uk email to sign in.
 signIn.stride.guidance = If you are on a corporate device you will automatically be signed in and taken to The API Hub.
 signIn.stride.help = To sign in via STRIDE you will need the "The API Hub user" role assigned in the Service Request System.
 signIn.stride.helpLink = Find out how to self serve the role (opens in new tab)
+
+generatePrimarySecretSuccess.title = Client secret successfully created
+generatePrimarySecretSuccess.heading = Client secret successfully created
+generatePrimarySecretSuccess.applicationName = Application name
+generatePrimarySecretSuccess.environment = Environment
+generatePrimarySecretSuccess.scopes = Scopes
+generatePrimarySecretSuccess.clientId = Client ID
+generatePrimarySecretSuccess.clientSecret = Client secret
+generatePrimarySecretSuccess.onceOnlyWarning = You client secret will only be displayed on this page, you will not be able to retrieve it after this.
+generatePrimarySecretSuccess.guidance.heading = What you can do now
+generatePrimarySecretSuccess.guidance.content = Return to your application and manage your {0}.
+generatePrimarySecretSuccess.guidance.link = client secrets

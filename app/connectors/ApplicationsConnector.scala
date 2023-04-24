@@ -18,7 +18,7 @@ package connectors
 
 import com.google.inject.{Inject, Singleton}
 import config.FrontendAppConfig
-import models.application.{Application, NewApplication, NewScope}
+import models.application.{Application, NewApplication, NewScope, Secret}
 import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION, CONTENT_TYPE}
 import play.api.http.MimeTypes.JSON
 import play.api.libs.json.Json
@@ -112,4 +112,18 @@ class ApplicationsConnector @Inject()(
         case Left(e) => Future.failed(e)
       }
   }
+
+  def createPrimarySecret(id: String)(implicit hc: HeaderCarrier): Future[Option[Secret]] = {
+    httpClient
+      .post(url"$applicationsBaseUrl/api-hub-applications/applications/$id/environments/primary/credentials/secret")
+      .setHeader((ACCEPT, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Either[UpstreamErrorResponse, Secret]]
+      .flatMap {
+        case Right(secret) => Future.successful(Some(secret))
+        case Left(e) if e.statusCode == 404 => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
+  }
+
 }

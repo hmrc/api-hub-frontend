@@ -20,12 +20,14 @@ import connectors.ApplicationsConnector
 import models.application._
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
+import org.scalatest.OptionValues
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
 import uk.gov.hmrc.http.HeaderCarrier
+
 import scala.concurrent.Future
 
-class ApiHubServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar {
+class ApiHubServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar with OptionValues {
 
   "registerApplication" - {
     "must call the applications connector and return the saved application" in {
@@ -160,4 +162,22 @@ class ApiHubServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar {
       }
     }
   }
+
+  "createPrimarySecret" - {
+    "must call the applications connector and return the secret" in {
+      val applicationId = "test-application-id"
+      val expected = Secret("test-secret")
+      val applicationsConnector = mock[ApplicationsConnector]
+      val service = new ApiHubService(applicationsConnector)
+
+      when(applicationsConnector.createPrimarySecret(ArgumentMatchers.eq(applicationId))(any()))
+        .thenReturn(Future.successful(Some(expected)))
+
+      service.createPrimarySecret(applicationId)(HeaderCarrier()) map {
+        actual =>
+          actual.value mustBe expected
+      }
+    }
+  }
+
 }
