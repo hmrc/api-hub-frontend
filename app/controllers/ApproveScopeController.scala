@@ -16,12 +16,13 @@
 
 package controllers
 
+import config.FrontendAppConfig
 import controllers.actions._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.ApproveProductionScopeView
+import views.html.ApproveScopeView
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
@@ -31,22 +32,23 @@ class ApproveScopeController @Inject()(
                                         identify: IdentifierAction,
                                         canApprove: AuthorisedApproverAction,
                                         val controllerComponents: MessagesControllerComponents,
-                                        view: ApproveProductionScopeView,
-                                        apiHubService: ApiHubService
+                                        view: ApproveScopeView,
+                                        apiHubService: ApiHubService,
+                                        config: FrontendAppConfig
                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
 
   def onPageLoad(id: String): Action[AnyContent] = (identify andThen canApprove).async {
     implicit request =>
       apiHubService.getApplication(id) map {
-          case Some(application) => Ok(view(application, Some(request.user)))
+          case Some(application) => Ok(view(application, Some(request.user), config.environmentNames))
           case _ => NotFound
         }
   }
 
   def onApprove(id: String, scopeName: String): Action[AnyContent] = (identify andThen canApprove).async {
     implicit request =>
-        apiHubService.approveProductionScope(id, scopeName).map {
+        apiHubService.approvePrimaryScope(id, scopeName).map {
           case true => Redirect(routes.PendingApprovalsController.onPageLoad())
           case false => NotFound
         }

@@ -99,9 +99,9 @@ class ApplicationsConnector @Inject()(
       .execute[Seq[Application]]
   }
 
-  def approveProductionScope(appId: String, scopeName: String)(implicit hc: HeaderCarrier): Future[Boolean] = {
+  def approvePrimaryScope(appId: String, scopeName: String)(implicit hc: HeaderCarrier): Future[Boolean] = {
     httpClient
-      .put(url"$applicationsBaseUrl/api-hub-applications/applications/$appId/environments/prod/scopes/$scopeName")
+      .put(url"$applicationsBaseUrl/api-hub-applications/applications/$appId/environments/primary/scopes/$scopeName")
       .setHeader((CONTENT_TYPE, JSON))
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .withBody("{\"status\":\"APPROVED\"}")

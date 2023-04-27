@@ -130,17 +130,17 @@ addScope.environments.heading = Which environments do you want to enable?
 addScope.error.required = Enter a scope name and select at least one environment
 addScope.error.length = Scope name must be 100 characters or less
 
-pendingApprovals.title = Pending production approvals
-pendingApprovals.heading = Pending production approvals
+pendingApprovals.title = Pending approvals
+pendingApprovals.heading = Pending approvals
 
 scopeApproved.title = Scope approved successfully
 scopeApproved.heading = Scope approved successfully
 scopeApproved.guidance.heading = What you can do now
 scopeApproved.guidance.content = Return to {0}.
 
-approveScope.title = Review production scope requests
-approveScope.heading = Review production scope requests
-approveScope.applicationDetails.pendingScopeRequests = Pending production scope requests
+approveScope.title = Review scope requests
+approveScope.heading = Review scope requests
+approveScope.applicationDetails.pendingScopeRequests = Pending scope requests for
 
 addScope.applicationDetails.heading = Application details
 addScope.applicationDetails.applicationName = Application name
