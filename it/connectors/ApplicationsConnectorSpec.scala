@@ -178,7 +178,7 @@ class ApplicationsConnectorSpec
       val expected = Seq(application1, application2)
 
       stubFor(
-        get(urlEqualTo("/api-hub-applications/applications/pending-scopes"))
+        get(urlEqualTo("/api-hub-applications/applications/pending-primary-scopes"))
           .withHeader("Accept", equalTo("application/json"))
           .withHeader("Authorization", equalTo("An authentication token"))
           .willReturn(
@@ -187,7 +187,7 @@ class ApplicationsConnectorSpec
           )
       )
 
-      buildConnector(this).pendingScopes()(HeaderCarrier()) map {
+      buildConnector(this).pendingPrimaryScopes()(HeaderCarrier()) map {
         actual =>
           actual mustBe expected
       }

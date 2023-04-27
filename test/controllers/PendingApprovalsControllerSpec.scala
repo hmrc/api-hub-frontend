@@ -46,7 +46,7 @@ class PendingApprovalsControllerSpec extends SpecBase with MockitoSugar {
       val application2 = Application("id-2", "test-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2")))
       val applications: Seq[Application] = Seq(application1, application2)
 
-      when(apiHubService.pendingScopes()(any())).thenReturn(Future.successful(applications))
+      when(apiHubService.pendingPrimaryScopes()(any())).thenReturn(Future.successful(applications))
 
       running(application) {
         val request = FakeRequest(GET, routes.PendingApprovalsController.onPageLoad().url)

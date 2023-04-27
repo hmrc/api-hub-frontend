@@ -38,7 +38,7 @@ class PendingApprovalsController @Inject()(
 
   def onPageLoad: Action[AnyContent] = (identify andThen canApprove).async {
     implicit request =>
-      apiHubService.pendingScopes().map(
+      apiHubService.pendingPrimaryScopes().map(
         applications => Ok(view(applications, Some(request.user)))
       )
   }

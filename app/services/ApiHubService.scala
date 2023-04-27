@@ -45,8 +45,8 @@ class ApiHubService @Inject()(applicationsConnector: ApplicationsConnector)
     applicationsConnector.requestAdditionalScope(id, newScope)
   }
 
-  def pendingScopes()(implicit hc: HeaderCarrier): Future[Seq[Application]] = {
-    applicationsConnector.pendingScopes()
+  def pendingPrimaryScopes()(implicit hc: HeaderCarrier): Future[Seq[Application]] = {
+    applicationsConnector.pendingPrimaryScopes()
   }
 
   def approveProductionScope(appId: String, scopeName: String)(implicit hc:HeaderCarrier): Future[Boolean] = {

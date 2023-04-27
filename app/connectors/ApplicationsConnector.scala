@@ -91,9 +91,9 @@ class ApplicationsConnector @Inject()(
       }
   }
 
-  def pendingScopes()(implicit hc: HeaderCarrier): Future[Seq[Application]] = {
+  def pendingPrimaryScopes()(implicit hc: HeaderCarrier): Future[Seq[Application]] = {
     httpClient
-      .get(url"$applicationsBaseUrl/api-hub-applications/applications/pending-scopes")
+      .get(url"$applicationsBaseUrl/api-hub-applications/applications/pending-primary-scopes")
       .setHeader((ACCEPT, JSON))
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Seq[Application]]
