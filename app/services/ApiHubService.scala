@@ -45,13 +45,13 @@ class ApiHubService @Inject()(applicationsConnector: ApplicationsConnector)
     applicationsConnector.requestAdditionalScope(id, newScope)
   }
 
-  def pendingScopes()(implicit hc: HeaderCarrier): Future[Seq[Application]] = {
-    applicationsConnector.pendingScopes()
+  def pendingPrimaryScopes()(implicit hc: HeaderCarrier): Future[Seq[Application]] = {
+    applicationsConnector.pendingPrimaryScopes()
   }
 
-  def approveProductionScope(appId: String, scopeName: String)(implicit hc:HeaderCarrier): Future[Boolean] = {
-    logger.debug(s"Approving scope named '$scopeName' for application id '$appId' in PROD environment")
-    applicationsConnector.approveProductionScope(appId, scopeName)
+  def approvePrimaryScope(appId: String, scopeName: String)(implicit hc:HeaderCarrier): Future[Boolean] = {
+    logger.debug(s"Approving scope named '$scopeName' for application id '$appId' in primary environment")
+    applicationsConnector.approvePrimaryScope(appId, scopeName)
   }
 
   def getUserApplications(email:String)(implicit hc:HeaderCarrier): Future[Seq[Application]] =

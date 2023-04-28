@@ -131,33 +131,33 @@ class ApiHubServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar wi
       val expected = Seq(application1, application2)
 
       val applicationsConnector = mock[ApplicationsConnector]
-      when(applicationsConnector.pendingScopes()(any())).thenReturn(Future.successful(expected))
+      when(applicationsConnector.pendingPrimaryScopes()(any())).thenReturn(Future.successful(expected))
 
       val service = new ApiHubService(applicationsConnector)
 
-      service.pendingScopes()(HeaderCarrier()) map {
+      service.pendingPrimaryScopes()(HeaderCarrier()) map {
         actual =>
           actual mustBe expected
-          verify(applicationsConnector).pendingScopes()(any())
+          verify(applicationsConnector).pendingPrimaryScopes()(any())
           succeed
       }
     }
   }
 
-  "approveProductionScope" - {
+  "approveScope" - {
     "must call the applications connectors and return APPROVED" in {
       val appId = "app_id"
       val scope = "a_scope"
       val applicationsConnector = mock[ApplicationsConnector]
-      when(applicationsConnector.approveProductionScope(ArgumentMatchers.eq(appId),ArgumentMatchers.eq(scope))(any()))
+      when(applicationsConnector.approvePrimaryScope(ArgumentMatchers.eq(appId),ArgumentMatchers.eq(scope))(any()))
         .thenReturn(Future.successful(true))
 
       val service = new ApiHubService(applicationsConnector)
 
-      service.approveProductionScope(appId,scope)(HeaderCarrier()) map {
+      service.approvePrimaryScope(appId,scope)(HeaderCarrier()) map {
         actual =>
           actual mustBe true
-          verify(applicationsConnector).approveProductionScope(ArgumentMatchers.eq(appId),ArgumentMatchers.eq(scope))(any())
+          verify(applicationsConnector).approvePrimaryScope(ArgumentMatchers.eq(appId),ArgumentMatchers.eq(scope))(any())
           succeed
       }
     }

@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import config.FrontendAppConfig
 import controllers.ApproveScopeControllerSpec.buildFixture
 import controllers.actions.{FakeApprover, FakeUser}
 import forms.NewScopeFormProvider
@@ -29,7 +30,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Application => PlayApplication}
 import services.ApiHubService
-import views.html.ApproveProductionScopeView
+import views.html.ApproveScopeView
 
 import scala.concurrent.Future
 
@@ -44,7 +45,7 @@ class ApproveScopeControllerSpec extends SpecBase with MockitoSugar {
       val scope = "my scope"
       val fixture = buildFixture(FakeApprover)
 
-      when(fixture.apiHubService.approveProductionScope(ArgumentMatchers.eq(testId), ArgumentMatchers.eq(scope))(any()))
+      when(fixture.apiHubService.approvePrimaryScope(ArgumentMatchers.eq(testId), ArgumentMatchers.eq(scope))(any()))
         .thenReturn(Future.successful(true))
 
       running(fixture.application) {
@@ -54,7 +55,7 @@ class ApproveScopeControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.PendingApprovalsController.onPageLoad().url)
 
-        verify(fixture.apiHubService).approveProductionScope(ArgumentMatchers.eq(testId), ArgumentMatchers.eq(scope))(any())
+        verify(fixture.apiHubService).approvePrimaryScope(ArgumentMatchers.eq(testId), ArgumentMatchers.eq(scope))(any())
       }
     }
     "must block approve for users without approve scope" in {
@@ -74,18 +75,19 @@ class ApproveScopeControllerSpec extends SpecBase with MockitoSugar {
     "must return OK and the correct view for a GET" in {
       val testId = "test-app-id"
       val fixture = buildFixture(FakeApprover)
-      val view = fixture.application.injector.instanceOf[ApproveProductionScopeView]
+      val view = fixture.application.injector.instanceOf[ApproveScopeView]
+      val config = fixture.application.injector.instanceOf[FrontendAppConfig]
 
-      val environmentsWithProdPending = new Environments(
+      val environmentsWithPrimaryPending = new Environments(
+        new Environment(Seq(Scope("cheese", Pending)), Seq()),
         Environment(),
         Environment(),
         Environment(),
         Environment(),
-        Environment(),
-        new Environment(Seq(Scope("cheese", Pending)), Seq())
+        Environment()
       )
 
-      val application = models.application.Application(testId, "app-name", Creator("test-creator-email"), environmentsWithProdPending)
+      val application = models.application.Application(testId, "app-name", Creator("test-creator-email"), environmentsWithPrimaryPending)
 
       when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId))(any()))
         .thenReturn(Future.successful(Some(application)))
@@ -96,7 +98,7 @@ class ApproveScopeControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustBe OK
 
-        contentAsString(result) mustEqual view(application, Some(FakeApprover))(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(application, Some(FakeApprover), config.environmentNames)(request, messages(fixture.application)).toString
       }
     }
 

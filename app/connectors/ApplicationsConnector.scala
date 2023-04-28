@@ -91,17 +91,17 @@ class ApplicationsConnector @Inject()(
       }
   }
 
-  def pendingScopes()(implicit hc: HeaderCarrier): Future[Seq[Application]] = {
+  def pendingPrimaryScopes()(implicit hc: HeaderCarrier): Future[Seq[Application]] = {
     httpClient
-      .get(url"$applicationsBaseUrl/api-hub-applications/applications/pending-scopes")
+      .get(url"$applicationsBaseUrl/api-hub-applications/applications/pending-primary-scopes")
       .setHeader((ACCEPT, JSON))
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Seq[Application]]
   }
 
-  def approveProductionScope(appId: String, scopeName: String)(implicit hc: HeaderCarrier): Future[Boolean] = {
+  def approvePrimaryScope(appId: String, scopeName: String)(implicit hc: HeaderCarrier): Future[Boolean] = {
     httpClient
-      .put(url"$applicationsBaseUrl/api-hub-applications/applications/$appId/environments/prod/scopes/$scopeName")
+      .put(url"$applicationsBaseUrl/api-hub-applications/applications/$appId/environments/primary/scopes/$scopeName")
       .setHeader((CONTENT_TYPE, JSON))
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .withBody("{\"status\":\"APPROVED\"}")

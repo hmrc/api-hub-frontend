@@ -178,7 +178,7 @@ class ApplicationsConnectorSpec
       val expected = Seq(application1, application2)
 
       stubFor(
-        get(urlEqualTo("/api-hub-applications/applications/pending-scopes"))
+        get(urlEqualTo("/api-hub-applications/applications/pending-primary-scopes"))
           .withHeader("Accept", equalTo("application/json"))
           .withHeader("Authorization", equalTo("An authentication token"))
           .willReturn(
@@ -187,20 +187,20 @@ class ApplicationsConnectorSpec
           )
       )
 
-      buildConnector(this).pendingScopes()(HeaderCarrier()) map {
+      buildConnector(this).pendingPrimaryScopes()(HeaderCarrier()) map {
         actual =>
           actual mustBe expected
       }
     }
   }
 
-  "ApplicationsConnector.approveProductionScope" - {
+  "ApplicationsConnector.approvePrimaryScope" - {
     "must place the correct request and return true" in {
       val appId = "app_id"
       val scope = "a_scope"
 
       stubFor(
-        put(urlEqualTo(s"/api-hub-applications/applications/$appId/environments/prod/scopes/$scope"))
+        put(urlEqualTo(s"/api-hub-applications/applications/$appId/environments/primary/scopes/$scope"))
           .withRequestBody(equalToJson("{\"status\":\"APPROVED\"}"))
           .withHeader("Content-Type", equalTo("application/json"))
           .withHeader("Authorization", equalTo("An authentication token"))
@@ -210,7 +210,7 @@ class ApplicationsConnectorSpec
           )
       )
 
-      buildConnector(this).approveProductionScope(appId, scope)(HeaderCarrier()) map {
+      buildConnector(this).approvePrimaryScope(appId, scope)(HeaderCarrier()) map {
         actual =>
           actual mustBe true
       }
@@ -221,14 +221,14 @@ class ApplicationsConnectorSpec
       val scope = "a_scope"
 
       stubFor(
-        put(urlEqualTo(s"/api-hub-applications/applications/$appId/environments/prod/scopes/$scope"))
+        put(urlEqualTo(s"/api-hub-applications/applications/$appId/environments/primary/scopes/$scope"))
           .willReturn(
             aResponse()
               .withStatus(NOT_FOUND)
           )
       )
 
-      buildConnector(this).approveProductionScope(appId, scope)(HeaderCarrier()) map {
+      buildConnector(this).approvePrimaryScope(appId, scope)(HeaderCarrier()) map {
         actual =>
           actual mustBe false
       }

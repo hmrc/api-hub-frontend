@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import config.EnvironmentNames
 @import models.application.{Application, Pending}
 @import models.user.UserModel
 @import uk.gov.hmrc.govukfrontend.views.html.components._
@@ -25,14 +26,14 @@
         govukInput: GovukInput,
         govukSummaryList: GovukSummaryList)
 
-@(application: Application, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+@(application: Application, user: Option[UserModel], environmentNames: EnvironmentNames)(implicit request: Request[_], messages: Messages)
 
 @scopeButton(scopeName: String) = {
     @govukButton(ButtonViewModel(messages("addScope.approveButton.text")).asLink(routes.ApproveScopeController.onApprove(application.id, scopeName).url))
 }
 
 @scopeNamesAndButtons(application: Application) = @{
-    val scopes = application.environments.prod.scopes.filter(s => s.status == Pending)
+    val scopes = application.environments.primary.scopes.filter(s => s.status == Pending)
     scopes.map(scope => scope.name)
             .map(scopeName => SummaryListRow(
         key = Key(
@@ -69,7 +70,7 @@
                     )
                 ))))
 
-        <h3 class="govuk-heading-m">@messages("approveScope.applicationDetails.pendingScopeRequests")</h3>
+        <h3 class="govuk-heading-m">@messages("approveScope.applicationDetails.pendingScopeRequests") @environmentNames.primary</h3>
 
         @govukSummaryList(SummaryList(
             rows = scopeNamesAndButtons(application)
