@@ -20,7 +20,6 @@ import base.SpecBase
 import config.FrontendAppConfig
 import controllers.ApproveScopeControllerSpec.buildFixture
 import controllers.actions.{FakeApprover, FakeUser}
-import forms.NewScopeFormProvider
 import models.application._
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
@@ -35,9 +34,6 @@ import views.html.ApproveScopeView
 import scala.concurrent.Future
 
 class ApproveScopeControllerSpec extends SpecBase with MockitoSugar {
-
-  val formProvider = new NewScopeFormProvider()
-  val form = formProvider()
 
   "ApproveScopeController" - {
     "must approve the scope and redirect to the pending applications page when user is approver" in {
@@ -80,10 +76,6 @@ class ApproveScopeControllerSpec extends SpecBase with MockitoSugar {
 
       val environmentsWithPrimaryPending = new Environments(
         new Environment(Seq(Scope("cheese", Pending)), Seq()),
-        Environment(),
-        Environment(),
-        Environment(),
-        Environment(),
         Environment()
       )
 
