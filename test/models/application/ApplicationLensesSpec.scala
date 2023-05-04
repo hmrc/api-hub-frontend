@@ -341,11 +341,7 @@ object ApplicationLensesSpec {
 
   def randomEnvironments(): Environments = Environments(
     primary = Environment(),
-    secondary = Environment(),
-    dev = randomEnvironment(),
-    test = randomEnvironment(),
-    preProd = randomEnvironment(),
-    prod = randomEnvironment()
+    secondary = Environment()
   )
 
   private def randomEnvironment(): Environment =
