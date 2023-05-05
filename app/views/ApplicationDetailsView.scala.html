@@ -85,73 +85,77 @@
 }
 
 @environmentTabScopes(scopes: Seq[Scope]) = {
-    @if(scopes.isEmpty) {
-        @messages("applicationDetails.noScopes")
-    } else {
-        @govukTable(
-            Table(
-                caption = None,
-                head = Some(
-                    Seq(
-                        HeadCell(messages("applicationDetails.scope.name")),
-                        HeadCell(messages("applicationDetails.scope.status"))
-                    )
-                ),
-                rows = scopes.map(
-                    scope =>
-                        Seq(
-                            TableRow(content = scope.name),
-                            TableRow(content = scope.status.toString)
-                        )
-                )
-            )
-        )
-    }
-}
-
-@environmentTabCredentials(credentials: Seq[Credential]) = {
+@if(scopes.isEmpty) {
+    @messages("applicationDetails.noScopes")
+} else {
     @govukTable(
         Table(
             caption = None,
             head = Some(
                 Seq(
-                    HeadCell(messages("applicationDetails.credentials.clientId")),
-                    HeadCell(messages("applicationDetails.credentials.clientSecret"))
+                    HeadCell(messages("applicationDetails.scope.name")),
+                    HeadCell(messages("applicationDetails.scope.status"))
                 )
             ),
-            rows = {
-                val credentialsWithIdButNoFragmentOrSecret = credentials.filter(credential =>
-                    credential.clientId != null && credential.clientSecret.isEmpty && credential.secretFragment.isEmpty)
-                if (!credentialsWithIdButNoFragmentOrSecret.isEmpty) {
-                    Seq(Seq(TableRow(
-                        content = HtmlContent(
-                            govukButton(
-                                ButtonViewModel(messages("applicationDetails.generateSecret"))
-                                    .asLink(routes.GeneratePrimarySecretSuccessController.onPageLoad(application.id).url)
-                            )
-                        )
-                    )))
-                } else {
-                    credentials.map(
-                        credential => {
-                            val secretOrFragment = credential
-                                .clientSecret
-                                .getOrElse(
-                                    credential
-                                        .secretFragment
-                                        .map(secretFragment => s"****-****-$secretFragment")
-                                        .getOrElse("")
+            rows = scopes.map(
+                scope =>
+                    Seq(
+                        TableRow(content = scope.name),
+                        TableRow(content = scope.status.toString)
+                    )
+            )
+        )
+    )
+}
+}
+
+@environmentTabCredentials(credentials: Seq[Credential]) = {
+@govukTable(
+    Table(
+        caption = None,
+        head = Some(
+            Seq(
+                HeadCell(messages("applicationDetails.credentials.clientId")),
+                HeadCell(messages("applicationDetails.credentials.clientSecret"))
+            )
+        ),
+        rows = {
+
+            def shouldDisplayGenerateSecretButton(credential: Credential): Boolean = {
+                credential.clientId != null && credential.clientSecret.isEmpty && credential.secretFragment.isEmpty
+            }
+
+            credentials.map(
+                credential => {
+                    val secretOrFragment = credential
+                            .clientSecret
+                            .getOrElse(
+                        credential
+                                .secretFragment
+                                .map(secretFragment => s"****-****-$secretFragment")
+                                .getOrElse("")
+                    )
+
+
+                    Seq(
+                        TableRow(content = credential.clientId),
+                        if(shouldDisplayGenerateSecretButton(credential)) {
+                            TableRow(
+                                content = HtmlContent(
+                                    govukButton(
+                                        ButtonViewModel(messages("applicationDetails.generateSecret"))
+                                                .asLink(routes.GeneratePrimarySecretSuccessController.onPageLoad(application.id).url)
+                                    )
                                 )
-                            Seq(
-                                TableRow(content = credential.clientId),
-                                TableRow(content = secretOrFragment)
                             )
+                        } else {
+                            TableRow(content = secretOrFragment)
                         }
                     )
                 }
-            }
-        )
-    )
+            )
+        }
+    ))
 }
 
 @layout(pageTitle = titleNoForm(messages("applicationDetails.title")), user = user, fullWidth = true) {
@@ -161,10 +165,10 @@
             <h2 class="govuk-heading-l">@messages("applicationDetails.heading")</h2>
         </div>
         <div class="govuk-grid-column-one-third govuk-!-text-align-right">
-            @govukButton(
-                ButtonViewModel(messages("applicationDetails.addScope"))
+        @govukButton(
+            ButtonViewModel(messages("applicationDetails.addScope"))
                     .asLink(routes.AddScopeController.onPageLoad(application.id).url)
-            )
+        )
         </div>
     </div>
 
