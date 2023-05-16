@@ -22,14 +22,14 @@ import play.api.libs.json._
 case class TestOnlyAddTokenRequest(
   token      : Option[Token],
   identifier : String,
-  email      : Option[String],
+  email      : String,
   permissions: Set[Permission]
 )
 
 case class TokenData(
   principal  : String,
   permissions: Set[Permission],
-  email      : Option[String]
+  email      : String
 )
 
 object TestOnlyAddTokenRequest {
@@ -37,7 +37,7 @@ object TestOnlyAddTokenRequest {
     implicit val pf: OFormat[Permission] = Permission.format
     ( (__ \ "token"      ).formatNullable[String].inmap[Option[Token]](_.map(Token.apply), _.map(unlift(Token.unapply)))
       ~ (__ \ "principal"  ).format[String]
-      ~ (__ \ "email").formatNullable[String]
+      ~ (__ \ "email").format[String]
       ~ (__ \ "permissions").format[Set[Permission]]
       )(TestOnlyAddTokenRequest.apply, unlift(TestOnlyAddTokenRequest.unapply))
   }
@@ -48,7 +48,7 @@ object TokenData {
     implicit val pf: OFormat[Permission] = Permission.format
     ( (__ \ "principal"  ).format[String]
       ~ (__ \ "permissions").format[Set[Permission]]
-      ~ (__ \ "email").formatNullable[String]
+      ~ (__ \ "email").format[String]
       )(TokenData.apply, unlift(TokenData.unapply))
   }
 }

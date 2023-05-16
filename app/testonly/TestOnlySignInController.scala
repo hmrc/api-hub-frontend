@@ -83,7 +83,7 @@ object TestOnlySignInController {
     mapping(
       "principal" -> text
         .verifying("fake-sign-in.username.error.required", _.trim.nonEmpty),
-      "email" -> optional(email),
+      "email" -> email,
       "token" -> optional(
         text.transform(Token.apply, unlift(Token.unapply))
       ),
@@ -104,7 +104,7 @@ object TestOnlySignInController {
     signInForm.fill(
       TestOnlySignInData(
         principal = "",
-        email = None,
+        email = "",
         token = None,
         redirectUrl = redirectUrl,
         permissions = Nil
@@ -119,7 +119,7 @@ object TestOnlySignInController {
 
   final case class TestOnlySignInData(
     principal   : String,
-    email       : Option[String],
+    email       : String,
     token       : Option[Token],
     redirectUrl : String,
     permissions : List[Permission]

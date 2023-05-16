@@ -19,13 +19,13 @@ package testonly
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
-case class Retrievals(principal: String, email: Option[String], canApprove: Boolean)
+case class Retrievals(principal: String, email: String, canApprove: Boolean)
 
 object Retrievals {
 
   private val reads: Reads[Retrievals] = (
     (JsPath \ "retrievals")(0).read[String] and
-      (JsPath \ "retrievals")(1).readNullable[String] and
+      (JsPath \ "retrievals")(1).read[String] and
       (JsPath \ "retrievals")(2).read[Boolean]
   )(Retrievals.apply _)
 
@@ -34,7 +34,7 @@ object Retrievals {
       "retrievals" -> JsArray(
         Seq(
           JsString(retrievals.principal),
-          retrievals.email.map(JsString).getOrElse(JsNull),
+          JsString(retrievals.principal),
           JsBoolean(retrievals.canApprove)
         )
       )
