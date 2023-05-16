@@ -34,7 +34,7 @@ object Retrievals {
       "retrievals" -> JsArray(
         Seq(
           JsString(retrievals.principal),
-          JsString(retrievals.principal),
+          JsString(retrievals.email),
           JsBoolean(retrievals.canApprove)
         )
       )
