@@ -19,14 +19,15 @@ package testonly
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
-case class Retrievals(principal: String, email: String, canApprove: Boolean)
+case class Retrievals(principal: String, email: String, canApprove: Boolean, canAdminister: Boolean)
 
 object Retrievals {
 
   private val reads: Reads[Retrievals] = (
     (JsPath \ "retrievals")(0).read[String] and
       (JsPath \ "retrievals")(1).read[String] and
-      (JsPath \ "retrievals")(2).read[Boolean]
+      (JsPath \ "retrievals")(2).read[Boolean] and
+      (JsPath \ "retrievals")(3).read[Boolean]
   )(Retrievals.apply _)
 
   private val writes: Writes[Retrievals] = (retrievals: Retrievals) => {
@@ -35,7 +36,8 @@ object Retrievals {
         Seq(
           JsString(retrievals.principal),
           JsString(retrievals.email),
-          JsBoolean(retrievals.canApprove)
+          JsBoolean(retrievals.canApprove),
+          JsBoolean(retrievals.canAdminister)
         )
       )
     )
