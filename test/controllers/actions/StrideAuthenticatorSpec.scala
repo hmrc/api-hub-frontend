@@ -16,7 +16,7 @@
 
 package controllers.actions
 
-import controllers.actions.StrideAuthenticator.{API_HUB_APPROVER_ROLE, API_HUB_USER_ROLE}
+import controllers.actions.StrideAuthenticator.{API_HUB_ADMINISTRATOR_ROLE, API_HUB_APPROVER_ROLE, API_HUB_USER_ROLE}
 import controllers.actions.StrideAuthenticatorSpec._
 import models.user.{Permissions, StrideUser, UserModel}
 import org.mockito.ArgumentMatchers.any
@@ -77,6 +77,27 @@ class StrideAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSu
       }
     }
 
+    "must retrieve an authenticated administrator details correctly" in {
+      val authConnector = mock[AuthConnector]
+      val strideAuthenticator = new StrideAuthenticator(authConnector)
+
+      val user = UserModel(
+        userId = s"STRIDE-$providerId",
+        userName = "jo.bloggs",
+        userType = StrideUser,
+        email = Some("jo.bloggs@email.com"),
+        permissions = Permissions(canApprove = false, canAdminister = true)
+      )
+
+      when(authConnector.authorise(ArgumentMatchers.eq(userPredicate), ArgumentMatchers.eq(userRetrieval))(any(), any()))
+        .thenReturn(Future.successful(retrievalsForUser(user)))
+
+      strideAuthenticator.authenticate()(FakeRequest()).map {
+        result =>
+          result mustBe UserAuthenticated(user)
+      }
+    }
+
     "must return unauthenticated when the user is not authenticated" in {
       val authConnector = mock[AuthConnector]
       val strideAuthenticator = new StrideAuthenticator(authConnector)
@@ -111,7 +132,13 @@ object StrideAuthenticatorSpec {
   type UserRetrieval = Retrieval[Enrolments ~ Option[Name] ~ Option[String] ~ Option[Credentials]]
 
   val userRetrieval: UserRetrieval = Retrievals.authorisedEnrolments and Retrievals.name and Retrievals.email and Retrievals.credentials
-  val userPredicate: Predicate = Enrolment(API_HUB_USER_ROLE) or Enrolment(API_HUB_APPROVER_ROLE) and AuthProviders(PrivilegedApplication)
+
+  val userPredicate: Predicate =
+    Enrolment(API_HUB_USER_ROLE) or
+      Enrolment(API_HUB_APPROVER_ROLE) or
+      Enrolment(API_HUB_ADMINISTRATOR_ROLE) and
+      AuthProviders(PrivilegedApplication)
+
   val providerId: String = "test-provider-id"
 
   case object NoActiveSessionException extends NoActiveSession("test-message")
@@ -133,6 +160,11 @@ object StrideAuthenticatorSpec {
     if (user.permissions.canApprove) {
       Enrolments(
         Set(Enrolment(key = API_HUB_APPROVER_ROLE))
+      )
+    }
+    else if (user.permissions.canAdminister) {
+      Enrolments(
+        Set(Enrolment(key = API_HUB_ADMINISTRATOR_ROLE))
       )
     }
     else {
