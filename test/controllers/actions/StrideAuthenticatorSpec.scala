@@ -44,7 +44,7 @@ class StrideAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSu
         userName = "jo.bloggs",
         userType = StrideUser,
         email = Some("jo.bloggs@email.com"),
-        permissions = Permissions(canApprove = false)
+        permissions = Permissions(canApprove = false, canAdminister = false)
       )
 
       when(authConnector.authorise(ArgumentMatchers.eq(userPredicate), ArgumentMatchers.eq(userRetrieval))(any(), any()))
@@ -65,7 +65,7 @@ class StrideAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSu
         userName = "jo.bloggs",
         userType = StrideUser,
         email = Some("jo.bloggs@email.com"),
-        permissions = Permissions(canApprove = true)
+        permissions = Permissions(canApprove = true, canAdminister = false)
       )
 
       when(authConnector.authorise(ArgumentMatchers.eq(userPredicate), ArgumentMatchers.eq(userRetrieval))(any(), any()))

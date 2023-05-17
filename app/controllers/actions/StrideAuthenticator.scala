@@ -43,7 +43,10 @@ class StrideAuthenticator @Inject()(
               userName = name.map(_.name.getOrElse("")).getOrElse(""),
               userType = StrideUser,
               email = email,
-              permissions = Permissions(canApprove = authorisedEnrolments.enrolments.exists(enrolment => enrolment.key.equals(API_HUB_APPROVER_ROLE)))
+              permissions = Permissions(
+                canApprove = authorisedEnrolments.enrolments.exists(enrolment => enrolment.key.equals(API_HUB_APPROVER_ROLE)),
+                canAdminister = false
+              )
             )
           ))
       }.recover {

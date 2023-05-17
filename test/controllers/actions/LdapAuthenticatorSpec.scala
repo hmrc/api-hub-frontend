@@ -45,7 +45,7 @@ class LdapAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSuga
         userName = "jo.bloggs",
         userType = LdapUser,
         email = Some("jo.bloggs@email.com"),
-        permissions = Permissions(canApprove = false)
+        permissions = Permissions(canApprove = false, canAdminister = false)
       )
 
       when(mockStubBehaviour.stubAuth(ArgumentMatchers.eq(None), ArgumentMatchers.eq(approverRetrieval)))
@@ -68,7 +68,7 @@ class LdapAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSuga
         userName = "jo.bloggs",
         userType = LdapUser,
         email = Some("jo.bloggs@email.com"),
-        permissions = Permissions(canApprove = true)
+        permissions = Permissions(canApprove = true, canAdminister = false)
       )
 
       when(mockStubBehaviour.stubAuth(ArgumentMatchers.eq(None), ArgumentMatchers.eq(approverRetrieval)))

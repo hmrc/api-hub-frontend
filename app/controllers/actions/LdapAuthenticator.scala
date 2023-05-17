@@ -39,7 +39,7 @@ class LdapAuthenticator @Inject()(
             username.value,
             LdapUser,
             maybeEmail.map(email => email.value),
-            Permissions(canApprove = canApprove)
+            Permissions(canApprove = canApprove, canAdminister = false)
           )
         ))
       case None =>
