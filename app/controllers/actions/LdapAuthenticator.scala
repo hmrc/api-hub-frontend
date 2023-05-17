@@ -17,7 +17,7 @@
 package controllers.actions
 
 import com.google.inject.{Inject, Singleton}
-import controllers.actions.LdapAuthenticator.canApprovePredicate
+import controllers.actions.LdapAuthenticator.{canAdministerPredicate, canApprovePredicate}
 import models.user.{LdapUser, Permissions, UserModel}
 import play.api.mvc.Request
 import uk.gov.hmrc.internalauth.client._
@@ -31,15 +31,15 @@ class LdapAuthenticator @Inject()(
 )(implicit ec: ExecutionContext) extends Authenticator with FrontendHeaderCarrierProvider {
 
   def authenticate()(implicit request: Request[_]): Future[UserAuthResult] = {
-    auth.verify(Retrieval.username ~ Retrieval.email ~ Retrieval.hasPredicate(canApprovePredicate)) flatMap {
-      case Some(username ~ maybeEmail ~ canApprove) =>
+    auth.verify(Retrieval.username ~ Retrieval.email ~ Retrieval.hasPredicate(canApprovePredicate) ~ Retrieval.hasPredicate(canAdministerPredicate)) flatMap {
+      case Some(username ~ maybeEmail ~ canApprove ~ canAdminister) =>
         Future.successful(UserAuthenticated(
           UserModel(
             s"LDAP-${username.value}",
             username.value,
             LdapUser,
             maybeEmail.map(email => email.value),
-            Permissions(canApprove = canApprove, canAdminister = false)
+            Permissions(canApprove = canApprove, canAdminister = canAdminister)
           )
         ))
       case None =>
@@ -60,6 +60,15 @@ object LdapAuthenticator {
   private val canApprovePredicate: Predicate = Predicate.Permission(
     resource = Resource.from(resourceType = approverResourceType, resourceLocation = approverResourceLocation),
     action = IAAction(approverAction)
+  )
+
+  val administratorResourceType: String = "api-hub-frontend"
+  val administratorResourceLocation: String = "administration"
+  val administratorAction: String = "WRITE"
+
+  private val canAdministerPredicate: Predicate = Predicate.Permission(
+    resource = Resource.from(resourceType = administratorResourceType, resourceLocation = administratorResourceLocation),
+    action = IAAction(administratorAction)
   )
 
 }
