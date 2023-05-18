@@ -28,37 +28,42 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Application => PlayApplication}
 import services.ApiHubService
+import utils.TestHelpers
 import views.html.RegisterApplicationSuccessView
 
 import scala.concurrent.Future
 
-class RegisterApplicationSuccessControllerSpec extends SpecBase with MockitoSugar{
+class RegisterApplicationSuccessControllerSpec extends SpecBase with MockitoSugar with TestHelpers {
 
   "RegisterApplicationSuccess Controller" - {
 
-    "must return OK and the correct view for a GET" in {
-      val fixture = buildFixture()
+    "must return OK and the correct view for a GET for a team member or administrator" in {
       val app = Application("id-1", "test", Creator("creator-email"), Seq(TeamMember("test-email")))
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq("id-1"))(any()))
-        .thenReturn(Future.successful(Some(app)))
+      forAll(teamMemberAndAdministratorTable) {
+        user: UserModel =>
+          val fixture = buildFixture(user)
 
-      running(fixture.application) {
-        val request = FakeRequest(GET, routes.RegisterApplicationSuccessController.onPageLoad("id-1").url)
+          when(fixture.apiHubService.getApplication(ArgumentMatchers.eq("id-1"))(any()))
+            .thenReturn(Future.successful(Some(app)))
 
-        val result = route(fixture.application, request).value
+          running(fixture.application) {
+            val request = FakeRequest(GET, routes.RegisterApplicationSuccessController.onPageLoad("id-1").url)
 
-        val view = fixture.application.injector.instanceOf[RegisterApplicationSuccessView]
+            val result = route(fixture.application, request).value
 
-        status(result) mustEqual OK
+            val view = fixture.application.injector.instanceOf[RegisterApplicationSuccessView]
 
-        val expected = view(app, Some(FakeUser))(request, messages(fixture.application)).toString
-        val actual = contentAsString(result)
-        actual mustEqual expected
+            status(result) mustEqual OK
+
+            val expected = view(app, Some(user))(request, messages(fixture.application)).toString
+            val actual = contentAsString(result)
+            actual mustEqual expected
+          }
       }
     }
 
-    "must redirect to Unauthorised page for a GET when user is not a team member" in {
+    "must redirect to Unauthorised page for a GET when user is not a team member or administrator" in {
       val testId = "test-app-id"
       val fixture = buildFixture(userModel = FakeUserNotTeamMember)
 

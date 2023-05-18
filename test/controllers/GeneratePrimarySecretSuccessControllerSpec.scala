@@ -30,44 +30,48 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.ApiHubService
+import utils.TestHelpers
 import viewmodels.GeneratePrimarySecretSuccessViewModel
 import views.html.GeneratePrimarySecretSuccessView
 
 import scala.concurrent.Future
 
-class GeneratePrimarySecretSuccessControllerSpec extends SpecBase with MockitoSugar {
+class GeneratePrimarySecretSuccessControllerSpec extends SpecBase with MockitoSugar with TestHelpers {
 
   "GeneratePrimarySecretSuccess Controller" - {
 
-    "must return OK and the correct view for a GET" in {
+    "must return OK and the correct view for a GET for a team member or administrator" in {
       val credential = Credential("test-client-id", None, None)
       val application = FakeApplication
         .setPrimaryScopes(Seq(Scope("test-scope-1", Approved), Scope("test-scope-2", Approved)))
         .setPrimaryCredentials(Seq(credential))
       val secret = Secret("test-secret")
 
-      val fixture = buildFixture()
+      forAll(teamMemberAndAdministratorTable) {
+        user: UserModel =>
+          val fixture = buildFixture(user)
 
-      running(fixture.playApplication) {
-        when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id))(any()))
-          .thenReturn(Future.successful(Some(application)))
+          running(fixture.playApplication) {
+            when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id))(any()))
+              .thenReturn(Future.successful(Some(application)))
 
-        when(fixture.apiHubService.createPrimarySecret(ArgumentMatchers.eq(application.id))(any()))
-          .thenReturn(Future.successful(Some(secret)))
+            when(fixture.apiHubService.createPrimarySecret(ArgumentMatchers.eq(application.id))(any()))
+              .thenReturn(Future.successful(Some(secret)))
 
-        val request = FakeRequest(GET, routes.GeneratePrimarySecretSuccessController.onPageLoad(application.id).url)
-        val result = route(fixture.playApplication, request).value
-        val view = fixture.playApplication.injector.instanceOf[GeneratePrimarySecretSuccessView]
-        val viewModel = GeneratePrimarySecretSuccessViewModel
-          .buildSummary(
-            application,
-            fixture.playApplication.injector.instanceOf[FrontendAppConfig].environmentNames,
-            credential,
-            secret
-          )(messages(fixture.playApplication))
+            val request = FakeRequest(GET, routes.GeneratePrimarySecretSuccessController.onPageLoad(application.id).url)
+            val result = route(fixture.playApplication, request).value
+            val view = fixture.playApplication.injector.instanceOf[GeneratePrimarySecretSuccessView]
+            val viewModel = GeneratePrimarySecretSuccessViewModel
+              .buildSummary(
+                application,
+                fixture.playApplication.injector.instanceOf[FrontendAppConfig].environmentNames,
+                credential,
+                secret
+              )(messages(fixture.playApplication))
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(application, viewModel, Some(FakeUser))(request, messages(fixture.playApplication)).toString
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view(application, viewModel, Some(user))(request, messages(fixture.playApplication)).toString
+          }
       }
     }
 
@@ -103,7 +107,7 @@ class GeneratePrimarySecretSuccessControllerSpec extends SpecBase with MockitoSu
       }
     }
 
-    "must redirect to Unauthorised page for a GET when user is not a team member" in {
+    "must redirect to Unauthorised page for a GET when user is not a team member or administrator" in {
       val fixture = buildFixture(userModel = FakeUserNotTeamMember)
 
       running(fixture.playApplication) {
