@@ -30,40 +30,45 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Application => PlayApplication}
 import services.ApiHubService
+import utils.TestHelpers
 import views.html.AddScopeView
 
 import scala.concurrent.Future
 
-class AddScopeControllerSpec extends SpecBase with MockitoSugar {
+class AddScopeControllerSpec extends SpecBase with MockitoSugar with TestHelpers {
 
   private val formProvider = new NewScopeFormProvider()
   private val form = formProvider()
 
   "AddScopeController" - {
-    "must register the scope and redirect to the application details page when valid" in {
+    "must register the scope and redirect to the application details page for a valid request from a team member or administrator" in {
       val testId = "test-app-id"
       val newScope = NewScope("my_scope", Seq(Primary, Secondary))
-      val fixture = buildFixture()
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId))(any()))
-        .thenReturn(Future.successful(Some(FakeApplication)))
+      forAll(teamMemberAndAdministratorTable) {
+        user: UserModel =>
+          val fixture = buildFixture(userModel = user)
 
-      when(fixture.apiHubService.requestAdditionalScope(ArgumentMatchers.eq(testId), ArgumentMatchers.eq(newScope))(any()))
-        .thenReturn(Future.successful(Some(newScope)))
+          when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId))(any()))
+            .thenReturn(Future.successful(Some(FakeApplication)))
 
-      running(fixture.application) {
-        val request = FakeRequest(POST, routes.AddScopeController.onSubmit(testId).url)
-          .withFormUrlEncodedBody(("scope-name","my_scope"),("primary","primary"),("secondary","secondary"))
-        val result = route(fixture.application, request).value
+          when(fixture.apiHubService.requestAdditionalScope(ArgumentMatchers.eq(testId), ArgumentMatchers.eq(newScope))(any()))
+            .thenReturn(Future.successful(Some(newScope)))
 
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.RequestScopeSuccessController.onPageLoad(testId).url)
+          running(fixture.application) {
+            val request = FakeRequest(POST, routes.AddScopeController.onSubmit(testId).url)
+              .withFormUrlEncodedBody(("scope-name","my_scope"),("primary","primary"),("secondary","secondary"))
+            val result = route(fixture.application, request).value
 
-        verify(fixture.apiHubService).requestAdditionalScope(ArgumentMatchers.eq(testId),ArgumentMatchers.eq(newScope))(any())
+            status(result) mustBe SEE_OTHER
+            redirectLocation(result) mustBe Some(routes.RequestScopeSuccessController.onPageLoad(testId).url)
+
+            verify(fixture.apiHubService).requestAdditionalScope(ArgumentMatchers.eq(testId),ArgumentMatchers.eq(newScope))(any())
+          }
       }
     }
 
-    "must redirect to Unauthorised page for a POST when user is not a team member" in {
+    "must redirect to Unauthorised page for a POST when user is not a team member or administrator" in {
       val testId = "test-app-id"
       val fixture = buildFixture(userModel = FakeUserNotTeamMember)
 
@@ -138,28 +143,32 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must return OK and the correct view for a GET" in {
+    "must return OK and the correct view for a GET for a team member or administrator" in {
       val testId = "test-app-id"
       val env1 = "Narnia"
       val env2 = "Coventry"
-      val fixture = buildFixture(env1, env2)
-      val view = fixture.application.injector.instanceOf[AddScopeView]
-      val config = fixture.application.injector.instanceOf[FrontendAppConfig]
-      val application = models.application.Application(testId, "app-name", Creator("test-creator-email"), Seq(TeamMember("test-email")))
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId))(any()))
-        .thenReturn(Future.successful(Some(application)))
+      forAll(teamMemberAndAdministratorTable) {
+        user: UserModel =>
+          val fixture = buildFixture(env1, env2, user)
+          val view = fixture.application.injector.instanceOf[AddScopeView]
+          val config = fixture.application.injector.instanceOf[FrontendAppConfig]
+          val application = models.application.Application(testId, "app-name", Creator("test-creator-email"), Seq(TeamMember("test-email")))
 
-      running(fixture.application) {
-        val request = FakeRequest(GET, routes.AddScopeController.onPageLoad(testId).url)
-        val result = route(fixture.application, request).value
+          when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId))(any()))
+            .thenReturn(Future.successful(Some(application)))
 
-        status(result) mustBe OK
+          running(fixture.application) {
+            val request = FakeRequest(GET, routes.AddScopeController.onPageLoad(testId).url)
+            val result = route(fixture.application, request).value
 
-        val content = contentAsString(result)
-        content mustEqual view(testId, form, Some(FakeUser), config)(request, messages(fixture.application)).toString
-        content must include(env1)
-        content must include(env2)
+            status(result) mustBe OK
+
+            val content = contentAsString(result)
+            content mustEqual view(testId, form, Some(user), config)(request, messages(fixture.application)).toString
+            content must include(env1)
+            content must include(env2)
+          }
       }
     }
 
@@ -182,7 +191,9 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar {
         actualRedirectLocation mustEqual expectedRedirectLocation
       }
     }
+
   }
+
 }
 
 object AddScopeControllerSpec extends SpecBase with MockitoSugar {

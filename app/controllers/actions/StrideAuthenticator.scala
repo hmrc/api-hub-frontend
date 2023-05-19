@@ -17,7 +17,7 @@
 package controllers.actions
 
 import com.google.inject.{Inject, Singleton}
-import controllers.actions.StrideAuthenticator.{API_HUB_APPROVER_ROLE, API_HUB_USER_ROLE}
+import controllers.actions.StrideAuthenticator.{API_HUB_ADMINISTRATOR_ROLE, API_HUB_APPROVER_ROLE, API_HUB_USER_ROLE}
 import models.user.{Permissions, StrideUser, UserModel}
 import play.api.mvc.Request
 import uk.gov.hmrc.auth.core.AuthProvider.PrivilegedApplication
@@ -34,7 +34,12 @@ class StrideAuthenticator @Inject()(
 )(implicit ec: ExecutionContext) extends Authenticator with AuthorisedFunctions with FrontendHeaderCarrierProvider {
 
   def authenticate()(implicit request: Request[_]): Future[UserAuthResult] = {
-    authorised(Enrolment(API_HUB_USER_ROLE) or Enrolment(API_HUB_APPROVER_ROLE) and AuthProviders(PrivilegedApplication))
+    authorised(
+      Enrolment(API_HUB_USER_ROLE) or
+        Enrolment(API_HUB_APPROVER_ROLE) or
+        Enrolment(API_HUB_ADMINISTRATOR_ROLE) and
+        AuthProviders(PrivilegedApplication)
+    )
       .retrieve(Retrievals.authorisedEnrolments and Retrievals.name and Retrievals.email and Retrievals.credentials) {
         case authorisedEnrolments ~ name ~ email ~ credentials =>
           Future.successful(UserAuthenticated(
@@ -43,7 +48,10 @@ class StrideAuthenticator @Inject()(
               userName = name.map(_.name.getOrElse("")).getOrElse(""),
               userType = StrideUser,
               email = email,
-              permissions = Permissions(canApprove = authorisedEnrolments.enrolments.exists(enrolment => enrolment.key.equals(API_HUB_APPROVER_ROLE)))
+              permissions = Permissions(
+                canApprove = authorisedEnrolments.enrolments.exists(enrolment => enrolment.key.equals(API_HUB_APPROVER_ROLE)),
+                canAdminister = authorisedEnrolments.enrolments.exists(enrolment => enrolment.key.equals(API_HUB_ADMINISTRATOR_ROLE))
+              )
             )
           ))
       }.recover {
@@ -60,5 +68,6 @@ object StrideAuthenticator {
 
   val API_HUB_USER_ROLE: String = "api_hub_user"
   val API_HUB_APPROVER_ROLE: String = "api_hub_approver"
+  val API_HUB_ADMINISTRATOR_ROLE: String = "api_hub_administrator"
 
 }

@@ -144,7 +144,7 @@ object AuthActionSpec {
     userName = "test-user-name",
     userType = StrideUser,
     email = Some("test-email"),
-    permissions = Permissions(canApprove = false)
+    permissions = Permissions(canApprove = false, canAdminister = false)
   )
 
 }

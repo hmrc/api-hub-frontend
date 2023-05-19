@@ -18,7 +18,9 @@ package controllers.actions
 
 import com.google.inject.{Inject, Singleton}
 import controllers.routes
+import models.application.Application
 import models.requests.{ApplicationRequest, IdentifierRequest}
+import models.user.UserModel
 import play.api.mvc.Results._
 import play.api.mvc.{ActionRefiner, Request, Result}
 import services.ApiHubService
@@ -44,11 +46,10 @@ class ApplicationAuthActionProviderImpl @Inject()(apiHubService: ApiHubService) 
 
         apiHubService.getApplication(applicationId) map {
           case Some(application) =>
-            identifierRequest.user.email match {
-              case Some(email) if application.teamMembers.exists(teamMember => teamMember.email.equals(email)) =>
+            if (identifierRequest.user.permissions.canAdminister || isTeamMember(application, identifierRequest.user)) {
                 Right(ApplicationRequest(identifierRequest, application))
-
-              case _ =>
+            }
+            else {
                 Left(Redirect(routes.UnauthorisedController.onPageLoad))
             }
           case None =>
@@ -57,6 +58,13 @@ class ApplicationAuthActionProviderImpl @Inject()(apiHubService: ApiHubService) 
       }
 
       override protected def executionContext: ExecutionContext = ec
+    }
+  }
+
+  private def isTeamMember(application: Application, user: UserModel): Boolean = {
+    user.email match {
+      case Some(email) if application.teamMembers.exists(teamMember => teamMember.email.equals(email)) => true
+      case _ => false
     }
   }
 

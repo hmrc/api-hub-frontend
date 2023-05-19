@@ -16,7 +16,7 @@
 
 package controllers.actions
 
-import controllers.actions.LdapAuthenticatorSpec.{approverRetrieval, requestWithAuthorisation, requestWithoutAuthorisation, retrievalsForUser}
+import controllers.actions.LdapAuthenticatorSpec._
 import models.user.{LdapUser, Permissions, UserModel}
 import org.mockito.{ArgumentMatchers, MockitoSugar}
 import org.scalatest.freespec.AsyncFreeSpec
@@ -45,10 +45,10 @@ class LdapAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSuga
         userName = "jo.bloggs",
         userType = LdapUser,
         email = Some("jo.bloggs@email.com"),
-        permissions = Permissions(canApprove = false)
+        permissions = Permissions(canApprove = false, canAdminister = false)
       )
 
-      when(mockStubBehaviour.stubAuth(ArgumentMatchers.eq(None), ArgumentMatchers.eq(approverRetrieval)))
+      when(mockStubBehaviour.stubAuth(ArgumentMatchers.eq(None), ArgumentMatchers.eq(retrieval)))
         .thenReturn(Future.successful(retrievalsForUser(user)))
 
       ldapAuthenticator.authenticate()(requestWithAuthorisation).map {
@@ -68,10 +68,33 @@ class LdapAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSuga
         userName = "jo.bloggs",
         userType = LdapUser,
         email = Some("jo.bloggs@email.com"),
-        permissions = Permissions(canApprove = true)
+        permissions = Permissions(canApprove = true, canAdminister = false)
       )
 
-      when(mockStubBehaviour.stubAuth(ArgumentMatchers.eq(None), ArgumentMatchers.eq(approverRetrieval)))
+      when(mockStubBehaviour.stubAuth(ArgumentMatchers.eq(None), ArgumentMatchers.eq(retrieval)))
+        .thenReturn(Future.successful(retrievalsForUser(user)))
+
+      ldapAuthenticator.authenticate()(requestWithAuthorisation).map {
+        result =>
+          result mustBe UserAuthenticated(user)
+      }
+    }
+
+    "must retrieve an authenticated administrator details correctly" in {
+      implicit val cc: ControllerComponents = stubMessagesControllerComponents()
+      val mockStubBehaviour = mock[StubBehaviour]
+      val stubAuth = FrontendAuthComponentsStub(mockStubBehaviour)
+      val ldapAuthenticator = new LdapAuthenticator(stubAuth)
+
+      val user = UserModel(
+        userId = "LDAP-jo.bloggs",
+        userName = "jo.bloggs",
+        userType = LdapUser,
+        email = Some("jo.bloggs@email.com"),
+        permissions = Permissions(canApprove = false, canAdminister = true)
+      )
+
+      when(mockStubBehaviour.stubAuth(ArgumentMatchers.eq(None), ArgumentMatchers.eq(retrieval)))
         .thenReturn(Future.successful(retrievalsForUser(user)))
 
       ldapAuthenticator.authenticate()(requestWithAuthorisation).map {
@@ -86,7 +109,7 @@ class LdapAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSuga
       val stubAuth = FrontendAuthComponentsStub(mockStubBehaviour)
       val ldapAuthenticator = new LdapAuthenticator(stubAuth)
 
-      when(mockStubBehaviour.stubAuth(ArgumentMatchers.eq(None), ArgumentMatchers.eq(approverRetrieval)))
+      when(mockStubBehaviour.stubAuth(ArgumentMatchers.eq(None), ArgumentMatchers.eq(retrieval)))
         .thenReturn(Future.failed(UpstreamErrorResponse("Unauthorised", Status.UNAUTHORIZED)))
 
       ldapAuthenticator.authenticate()(requestWithAuthorisation).map {
@@ -123,16 +146,27 @@ object LdapAuthenticatorSpec {
     IAAction("WRITE")
   )
 
-  val approverRetrieval: Retrieval.NonEmptyRetrieval[Retrieval.Username ~ Option[Retrieval.Email] ~ Boolean]
-    = Retrieval.username ~ Retrieval.email ~ Retrieval.hasPredicate(canApprovePredicate)
+  private val canAdministerPredicate = Predicate.Permission(
+    Resource(
+      ResourceType("api-hub-frontend"),
+      ResourceLocation("administration")
+    ),
+    IAAction("WRITE")
+  )
 
-  def retrievalsForUser(user: UserModel): Retrieval.Username ~ Option[Retrieval.Email] ~ Boolean = {
+  val retrieval: Retrieval.NonEmptyRetrieval[Retrieval.Username ~ Option[Retrieval.Email] ~ Boolean ~ Boolean]
+    = Retrieval.username ~ Retrieval.email ~ Retrieval.hasPredicate(canApprovePredicate) ~ Retrieval.hasPredicate(canAdministerPredicate)
+
+  def retrievalsForUser(user: UserModel): Retrieval.Username ~ Option[Retrieval.Email] ~ Boolean ~ Boolean = {
     uk.gov.hmrc.internalauth.client.~(
       uk.gov.hmrc.internalauth.client.~(
-        Retrieval.Username(user.userName),
-        user.email.map(Retrieval.Email)
+        uk.gov.hmrc.internalauth.client.~(
+          Retrieval.Username(user.userName),
+          user.email.map(Retrieval.Email)
+        ),
+        user.permissions.canApprove
       ),
-      user.permissions.canApprove
+      user.permissions.canAdminister
     )
   }
 

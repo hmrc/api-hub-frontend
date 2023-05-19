@@ -28,33 +28,35 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Application => PlayApplication}
 import services.ApiHubService
+import utils.TestHelpers
 import views.html.RequestScopeSuccessView
 
 import scala.concurrent.Future
 
-class RequestScopeSuccessControllerSpec extends SpecBase with MockitoSugar {
+class RequestScopeSuccessControllerSpec extends SpecBase with MockitoSugar with TestHelpers {
 
   "RequestScopeSuccess Controller" - {
 
-    "must return OK and the correct view for a GET" in {
+    "must return OK and the correct view for a GET for a team member or administrator" in {
+      forAll(teamMemberAndAdministratorTable) {
+        user: UserModel =>
+          val fixture = buildFixture(user)
+          val application = Application(applicationId, "test-name", Creator("test-email"), Seq(TeamMember("test-email")))
 
-      val fixture = buildFixture()
-      val application = Application(applicationId, "test-name", Creator("test-email"), Seq(TeamMember("test-email")))
+          when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id))(any()))
+            .thenReturn(Future.successful(Some(application)))
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id))(any()))
-        .thenReturn(Future.successful(Some(application)))
+          running(fixture.playApplication) {
+            val request = FakeRequest(GET, routes.RequestScopeSuccessController.onPageLoad(applicationId).url)
 
-      running(fixture.playApplication) {
-        val request = FakeRequest(GET, routes.RequestScopeSuccessController.onPageLoad(applicationId).url)
+            val result = route(fixture.playApplication, request).value
 
-        val result = route(fixture.playApplication, request).value
+            val view = fixture.playApplication.injector.instanceOf[RequestScopeSuccessView]
 
-        val view = fixture.playApplication.injector.instanceOf[RequestScopeSuccessView]
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(application, Some(FakeUser))(request, messages(fixture.playApplication)).toString
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view(application, Some(user))(request, messages(fixture.playApplication)).toString
+          }
       }
-
     }
 
     "must return 404 Not Found if the application does not exist" in {
@@ -74,7 +76,7 @@ class RequestScopeSuccessControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Unauthorised page for a GET when user is not a team member" in {
+    "must redirect to Unauthorised page for a GET when user is not a team member or administrator" in {
       val testId = "test-app-id"
       val fixture = buildFixture(userModel = FakeUserNotTeamMember)
 

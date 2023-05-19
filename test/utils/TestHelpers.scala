@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package controllers.actions
+package utils
 
-import models.user.{LdapUser, Permissions, UserModel}
+import controllers.actions.{FakeAdministrator, FakeUser}
+import models.user.UserModel
+import org.scalatest.prop.{TableDrivenPropertyChecks, TableFor1}
 
-object FakeApprover extends UserModel(
-  userId ="fake-approver-id",
-  userName = "fake-approver-name",
-  userType = LdapUser,
-  email = Some("fake-approver-email"),
-  permissions = Permissions(canApprove = true, canAdminister = false)
-)
+trait TestHelpers extends TableDrivenPropertyChecks {
+
+  val teamMemberAndAdministratorTable: TableFor1[UserModel] = Table(
+    "User",
+    FakeUser,
+    FakeAdministrator
+  )
+
+}
