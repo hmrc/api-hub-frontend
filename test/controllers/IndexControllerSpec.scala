@@ -17,11 +17,12 @@
 package controllers
 
 import base.SpecBase
-import controllers.IndexControllerSpec.buildFixture
+import controllers.IndexControllerSpec.{buildFixture, buildFixtureWithUser}
 import controllers.actions.FakeUser
 import models.application.{Application, Creator, TeamMember}
+import models.user.{Permissions, UserModel}
 import models.{NormalMode, UserAnswers}
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, anyString}
 import org.mockito.{ArgumentCaptor, ArgumentMatchers, MockitoSugar}
 import pages.TeamMembersPage
 import play.api.inject.bind
@@ -110,6 +111,59 @@ class IndexControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must call apiHubService.getApplications() if user has admin permissions" in {
+      val testEmail = "test-email"
+      val creatorEmail = "creator-email-2"
+      val applications = Seq(
+        Application("id-1", "app-name-1", Creator(creatorEmail), Seq.empty).copy(teamMembers = Seq(TeamMember(testEmail))),
+        Application("id-2", "app-name-2", Creator(creatorEmail), Seq.empty).copy(teamMembers = Seq(TeamMember(testEmail)))
+      )
+      val user: UserModel = FakeUser.copy(permissions = Permissions(false, true))
+      val fixture = buildFixtureWithUser(userModel = user)
+      running(fixture.application) {
+
+        when(fixture.mockApiHubService.getApplications()(any()))
+          .thenReturn(Future.successful(applications))
+
+        val request = FakeRequest(GET, routes.IndexController.onPageLoad.url)
+
+        val result = route(fixture.application, request).value
+        val view = fixture.application.injector.instanceOf[IndexView]
+        status(result) mustEqual OK
+
+        contentAsString(result) mustEqual view(applications, Some(user))(request, messages(fixture.application)).toString
+
+      }
+    }
+
+
+    "must call apiHubService.getUserApplications() if user does not have admin permissions" in {
+      val testEmail = "test-email"
+      val creatorEmail = "creator-email-2"
+      val applications = Seq(
+        Application("id-1", "app-name-1", Creator(creatorEmail), Seq.empty).copy(teamMembers = Seq(TeamMember(testEmail))),
+        Application("id-2", "app-name-2", Creator(creatorEmail), Seq.empty).copy(teamMembers = Seq(TeamMember(testEmail)))
+      )
+      val fixture = buildFixture()
+      running(fixture.application) {
+
+        when(fixture.mockApiHubService.getUserApplications(ArgumentMatchers.eq(testEmail))(any()))
+          .thenReturn(Future.successful(applications))
+
+        val request = FakeRequest(GET, routes.IndexController.onPageLoad.url)
+
+        val result = route(fixture.application, request).value
+        val view = fixture.application.injector.instanceOf[IndexView]
+        status(result) mustEqual OK
+
+        contentAsString(result) mustEqual view(applications, Some(FakeUser))(request, messages(fixture.application)).toString
+
+      }
+    }
+
+
+
+
   }
 
 }
@@ -133,6 +187,18 @@ object IndexControllerSpec extends SpecBase with MockitoSugar {
         )
         .build()
     Fixture(application, mockSessionRepository, mockApiHubService)
+  }
+
+  def buildFixtureWithUser(userModel: UserModel = FakeUser): Fixture = {
+    val apiHubService = mock[ApiHubService]
+    val mockSessionRepository = mock[SessionRepository]
+    val application = applicationBuilder(userAnswers = None, user = userModel)
+      .overrides(
+        bind[ApiHubService].toInstance(apiHubService)
+      )
+      .build()
+
+    Fixture(application, mockSessionRepository, apiHubService)
   }
 
 }
