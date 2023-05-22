@@ -22,7 +22,7 @@ import controllers.actions.FakeUser
 import models.application.{Application, Creator, TeamMember}
 import models.user.{Permissions, UserModel}
 import models.{NormalMode, UserAnswers}
-import org.mockito.ArgumentMatchers.{any, anyString}
+import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentCaptor, ArgumentMatchers, MockitoSugar}
 import pages.TeamMembersPage
 import play.api.inject.bind
@@ -160,12 +160,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar {
 
       }
     }
-
-
-
-
   }
-
 }
 
 object IndexControllerSpec extends SpecBase with MockitoSugar {
