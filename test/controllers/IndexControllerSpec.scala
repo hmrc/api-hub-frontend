@@ -17,7 +17,7 @@
 package controllers
 
 import base.SpecBase
-import controllers.IndexControllerSpec.{buildFixture, buildFixtureWithUser}
+import controllers.IndexControllerSpec.buildFixture
 import controllers.actions.FakeUser
 import models.application.{Application, Creator, TeamMember}
 import models.user.{Permissions, UserModel}
@@ -119,7 +119,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar {
         Application("id-2", "app-name-2", Creator(creatorEmail), Seq.empty).copy(teamMembers = Seq(TeamMember(testEmail)))
       )
       val user: UserModel = FakeUser.copy(permissions = Permissions(false, true))
-      val fixture = buildFixtureWithUser(userModel = user)
+      val fixture = buildFixture(user)
       running(fixture.application) {
 
         when(fixture.mockApiHubService.getApplications()(any()))
@@ -171,29 +171,17 @@ object IndexControllerSpec extends SpecBase with MockitoSugar {
     mockApiHubService: ApiHubService
   )
 
-  def buildFixture(): Fixture = {
+  def buildFixture(userModel: UserModel = FakeUser): Fixture = {
     val mockSessionRepository = mock[SessionRepository]
     val mockApiHubService = mock[ApiHubService]
     val application =
-      applicationBuilder(userAnswers = None)
+      applicationBuilder(userAnswers = None, user = userModel)
         .overrides(
           bind[SessionRepository].toInstance(mockSessionRepository),
           bind[ApiHubService].toInstance(mockApiHubService)
         )
         .build()
     Fixture(application, mockSessionRepository, mockApiHubService)
-  }
-
-  def buildFixtureWithUser(userModel: UserModel = FakeUser): Fixture = {
-    val apiHubService = mock[ApiHubService]
-    val mockSessionRepository = mock[SessionRepository]
-    val application = applicationBuilder(userAnswers = None, user = userModel)
-      .overrides(
-        bind[ApiHubService].toInstance(apiHubService)
-      )
-      .build()
-
-    Fixture(application, mockSessionRepository, apiHubService)
   }
 
 }
