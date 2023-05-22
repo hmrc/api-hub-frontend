@@ -81,7 +81,11 @@
         <ul class="custom-second-nav">
             <li>
                 <a class="govuk-link govuk-link--no-visited-state" style="margin-right: 30px;" href="@routes.IndexController.onPageLoad.url">
-                    @messages("site.applications")
+                    @if(user.map(_.permissions.canAdminister).getOrElse(false)) {
+                        @messages("site.allApplications")
+                    } else {
+                        @messages("site.applications")
+                    }
                 </a>
             </li>
             @if(user.map(_.permissions.canApprove).getOrElse(false)) {

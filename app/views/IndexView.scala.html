@@ -43,7 +43,13 @@
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
-            <h1 class="govuk-heading-l">@messages("index.heading")</h1>
+            <h1 class="govuk-heading-l">
+                @if(user.map(_.permissions.canAdminister).getOrElse(false)) {
+                    @messages("index.heading.admin")
+                } else {
+                    @messages("index.heading")
+                }
+            </h1>
         </div>
      @if(applications.isEmpty) {
         <div class="govuk-grid-column-full">
