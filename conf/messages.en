@@ -11,6 +11,7 @@ site.startAgain = Start again
 site.signIn = Sign in
 site.govuk = GOV.UK
 site.applications = Your Applications
+site.allApplications = All Applications
 site.approvals = Approvals
 site.copy = Copy
 
@@ -40,6 +41,7 @@ error.summary.title = There is a problem
 
 index.title = Applications
 index.heading = Your Applications
+index.heading.admin = All Applications
 index.registerApplication = Register an application
 index.applications.name = Name
 index.applications.id = Id
