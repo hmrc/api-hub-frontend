@@ -41,6 +41,7 @@ class ApiHubService @Inject()(applicationsConnector: ApplicationsConnector)
   }
 
   def deleteApplication(id: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    logger.debug(s"Deleting application with Id $id")
     applicationsConnector.deleteApplication(id)
   }
 

@@ -101,6 +101,7 @@ applicationDetails.noCredentials = You have no credentials
 applicationDetails.scope.name = Name
 applicationDetails.scope.status = Status
 applicationDetails.generateSecret = Generate secret
+applicationDetails.deleteApplication = Delete application
 
 requestScopeSuccess.title = Scope requested successfully
 requestScopeSuccess.heading = Scope requested successfully

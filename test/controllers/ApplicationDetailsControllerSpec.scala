@@ -160,7 +160,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
           .thenReturn(Future.successful(Some(())))
 
         running(fixture.playApplication) {
-          val request = FakeRequest(DELETE, routes.ApplicationDetailsController.delete(FakeApplication.id).url)
+          val request = FakeRequest(POST, routes.ApplicationDetailsController.delete(FakeApplication.id).url)
 
           val result = route(fixture.playApplication, request).value
 
@@ -180,7 +180,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
       .thenReturn(Future.successful(None))
 
     running(fixture.playApplication) {
-      val request = FakeRequest(DELETE, routes.ApplicationDetailsController.delete(FakeApplication.id).url)
+      val request = FakeRequest(POST, routes.ApplicationDetailsController.delete(FakeApplication.id).url)
 
       val result = route(fixture.playApplication, request).value
 
@@ -195,7 +195,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
       .thenReturn(Future.successful(Some(FakeApplication)))
 
     running(fixture.playApplication) {
-      val request = FakeRequest(DELETE, routes.ApplicationDetailsController.delete(FakeApplication.id).url)
+      val request = FakeRequest(POST, routes.ApplicationDetailsController.delete(FakeApplication.id).url)
 
       val result = route(fixture.playApplication, request).value
 
