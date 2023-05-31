@@ -32,6 +32,7 @@ POST        /register-application                               controllers.Regi
 GET         /register-application-success/:id                   controllers.RegisterApplicationSuccessController.onPageLoad(id:String)
 
 GET         /application-details/:id                            controllers.ApplicationDetailsController.onPageLoad(id: String)
+DELETE      /application-details/:id                            controllers.ApplicationDetailsController.delete(id: String)
 
 GET         /request-scope-success/:id                          controllers.RequestScopeSuccessController.onPageLoad(id: String)
 

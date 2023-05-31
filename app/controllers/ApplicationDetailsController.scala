@@ -20,6 +20,7 @@ import config.FrontendAppConfig
 import controllers.actions._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.ApplicationDetailsView
 
@@ -32,11 +33,20 @@ class ApplicationDetailsController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   view: ApplicationDetailsView,
   applicationAuth: ApplicationAuthActionProvider,
-  config: FrontendAppConfig
+  config: FrontendAppConfig,
+  apiHubService: ApiHubService
 ) (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id)) {
     implicit request => Ok(view(request.application, Some(request.identifierRequest.user), config.environmentNames))
+  }
+
+  def delete(id: String): Action[AnyContent] = (identify andThen applicationAuth(id)).async {
+    implicit request =>
+      apiHubService.deleteApplication(id).map {
+        case Some(()) => Redirect(routes.IndexController.onPageLoad)
+        case None => NotFound
+      }
   }
 
 }
