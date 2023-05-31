@@ -134,7 +134,6 @@ class ApiHubServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar wi
       service.deleteApplication(id)(HeaderCarrier()) map {
         actual =>
           actual mustBe None
-          succeed
       }
     }
   }
