@@ -23,7 +23,8 @@
         layout: templates.Layout,
         govukButton: GovukButton,
         govukTabs: GovukTabs,
-        govukTable: GovukTable
+        govukTable: GovukTable,
+        formHelper: FormWithCSRF
 )
 
 @(application: Application, user: Option[UserModel], environmentNames: EnvironmentNames)(implicit request: Request[_], messages: Messages)
@@ -207,5 +208,17 @@
         </div>
     </div>
 
+    <div class="govuk-grid-row">
+        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+    </div>
+
+    <div class="govuk-grid-row">
+        @formHelper(action = routes.ApplicationDetailsController.delete(application.id)) {
+            @govukButton(Button(
+                classes = "govuk-button--warning",
+                content = messages("applicationDetails.deleteApplication")
+            ))
+        }
+    </div>
 
 }

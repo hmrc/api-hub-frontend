@@ -136,6 +136,42 @@ class ApplicationsConnectorSpec
     }
   }
 
+  "ApplicationsConnector.deleteApplication" - {
+    "must place the correct request" in {
+      val id = "test-id"
+
+      stubFor(
+        delete(urlEqualTo(s"/api-hub-applications/applications/$id"))
+          .withHeader("Authorization", equalTo("An authentication token"))
+          .willReturn(
+            aResponse().withStatus(NO_CONTENT)
+          )
+      )
+
+      buildConnector(this).deleteApplication(id)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe Some(())
+      }
+    }
+
+    "must return None when the application is not found" in {
+      val id = "test-id"
+
+      stubFor(
+        delete(urlEqualTo(s"/api-hub-applications/applications/$id"))
+          .withHeader("Authorization", equalTo("An authentication token"))
+          .willReturn(
+            aResponse().withStatus(NOT_FOUND)
+          )
+      )
+
+      buildConnector(this).deleteApplication(id)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe None
+      }
+    }
+  }
+
   "ApplicationsConnector.requestAdditionalScope" - {
     "must place the correct request and return new scope" in {
       val appId = "id-1"

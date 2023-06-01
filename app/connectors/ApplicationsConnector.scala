@@ -21,6 +21,7 @@ import config.FrontendAppConfig
 import models.application.{Application, NewApplication, NewScope, Secret}
 import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION, CONTENT_TYPE}
 import play.api.http.MimeTypes.JSON
+import play.api.http.Status.NOT_FOUND
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.client.HttpClientV2
@@ -76,6 +77,18 @@ class ApplicationsConnector @Inject()(
       .setHeader((ACCEPT, JSON))
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Seq[Application]]
+  }
+
+  def deleteApplication(id: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    httpClient
+      .delete(url"$applicationsBaseUrl/api-hub-applications/applications/$id")
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Either[UpstreamErrorResponse, Unit]]
+      .flatMap {
+        case Right(()) => Future.successful(Some(()))
+        case Left(e) if e.statusCode == NOT_FOUND => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
   }
 
   def requestAdditionalScope(id: String, newScope: NewScope)(implicit hc: HeaderCarrier): Future[Option[NewScope]] = {

@@ -104,6 +104,40 @@ class ApiHubServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar wi
     }
   }
 
+  "deleteApplication" - {
+    "must delete the application via the applications connector" in {
+      val id = "test-id"
+
+      val applicationsConnector = mock[ApplicationsConnector]
+      when(applicationsConnector.deleteApplication(ArgumentMatchers.eq(id))(any()))
+        .thenReturn(Future.successful(Some(())))
+
+      val service = new ApiHubService(applicationsConnector)
+
+      service.deleteApplication(id)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe Some(())
+          verify(applicationsConnector).deleteApplication(any())(any())
+          succeed
+      }
+    }
+
+    "must return None when the applications connectors does to indicate the application was not found" in {
+      val id = "test-id"
+
+      val applicationsConnector = mock[ApplicationsConnector]
+      when(applicationsConnector.deleteApplication(ArgumentMatchers.eq(id))(any()))
+        .thenReturn(Future.successful(None))
+
+      val service = new ApiHubService(applicationsConnector)
+
+      service.deleteApplication(id)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe None
+      }
+    }
+  }
+
   "requestAdditionalScope" - {
     "must call the applications connector and return the new scope" in {
       val applicationId = "app-id"

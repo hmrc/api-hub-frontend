@@ -40,6 +40,11 @@ class ApiHubService @Inject()(applicationsConnector: ApplicationsConnector)
     applicationsConnector.getApplication(id)
   }
 
+  def deleteApplication(id: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    logger.debug(s"Deleting application with Id $id")
+    applicationsConnector.deleteApplication(id)
+  }
+
   def requestAdditionalScope(id:String, newScope:NewScope)(implicit hc:HeaderCarrier): Future[Option[NewScope]] = {
     logger.debug(s"Requesting scope named '${newScope.name}' for application id '$id' in environments ${newScope.environments}")
     applicationsConnector.requestAdditionalScope(id, newScope)

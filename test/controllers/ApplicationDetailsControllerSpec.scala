@@ -147,6 +147,63 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
       actualRedirectLocation mustEqual expectedRedirectLocation
     }
   }
+
+  "must delete the application and redirect to the landing page for a DELETE for a team member or administrator" in {
+    forAll(teamMemberAndAdministratorTable) {
+      user: UserModel =>
+        val fixture = buildFixture(userModel = user)
+
+        when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id))(any()))
+          .thenReturn(Future.successful(Some(FakeApplication)))
+
+        when(fixture.apiHubService.deleteApplication(ArgumentMatchers.eq(FakeApplication.id))(any()))
+          .thenReturn(Future.successful(Some(())))
+
+        running(fixture.playApplication) {
+          val request = FakeRequest(POST, routes.ApplicationDetailsController.delete(FakeApplication.id).url)
+
+          val result = route(fixture.playApplication, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.IndexController.onPageLoad.url
+        }
+    }
+  }
+
+  "must return NotFound for a DELETE when the application is not found" in {
+    val fixture = buildFixture()
+
+    when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id))(any()))
+      .thenReturn(Future.successful(Some(FakeApplication)))
+
+    when(fixture.apiHubService.deleteApplication(ArgumentMatchers.eq(FakeApplication.id))(any()))
+      .thenReturn(Future.successful(None))
+
+    running(fixture.playApplication) {
+      val request = FakeRequest(POST, routes.ApplicationDetailsController.delete(FakeApplication.id).url)
+
+      val result = route(fixture.playApplication, request).value
+
+      status(result) mustEqual NOT_FOUND
+    }
+  }
+
+  "must redirect to Unauthorised page for a DELETE when user is not a team member or administrator" in {
+    val fixture = buildFixture(userModel = FakeUserNotTeamMember)
+
+    when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id))(any()))
+      .thenReturn(Future.successful(Some(FakeApplication)))
+
+    running(fixture.playApplication) {
+      val request = FakeRequest(POST, routes.ApplicationDetailsController.delete(FakeApplication.id).url)
+
+      val result = route(fixture.playApplication, request).value
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual routes.UnauthorisedController.onPageLoad.url
+    }
+  }
+
 }
 
 object ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar {
