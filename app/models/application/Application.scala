@@ -27,7 +27,8 @@ case class Application (
   createdBy: Creator,
   lastUpdated: LocalDateTime,
   teamMembers: Seq[TeamMember],
-  environments: Environments
+  environments: Environments,
+  issues: Seq[String] = Seq.empty
 )
 
 object Application {

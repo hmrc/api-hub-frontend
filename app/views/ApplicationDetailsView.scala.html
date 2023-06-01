@@ -24,7 +24,8 @@
         govukButton: GovukButton,
         govukTabs: GovukTabs,
         govukTable: GovukTable,
-        formHelper: FormWithCSRF
+        formHelper: FormWithCSRF,
+        govukErrorSummary: GovukErrorSummary
 )
 
 @(application: Application, user: Option[UserModel], environmentNames: EnvironmentNames)(implicit request: Request[_], messages: Messages)
@@ -177,6 +178,24 @@
     @applicationDetail("applicationDetails.application.id", application.id)
     @applicationDetail("applicationDetails.application.created", ViewUtils.formatLocalDateTime(application.created))
     @applicationDetail("applicationDetails.application.createdBy", application.createdBy.email)
+
+    @if(application.issues.nonEmpty) {
+        <div class="govuk-grid-row">
+            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+        </div>
+
+        <div class="govuk-grid-row">
+            @govukErrorSummary(ErrorSummary(
+                errorList = application.issues.map(
+                    issue =>
+                        ErrorLink(
+                            content = Text(issue)
+                        )
+                ),
+                title = messages("applicationDetails.thereWereIssues")
+            ))
+        </div>
+    }
 
     <div class="govuk-grid-row">
         <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
