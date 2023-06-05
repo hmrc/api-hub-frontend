@@ -102,6 +102,7 @@ applicationDetails.scope.name = Name
 applicationDetails.scope.status = Status
 applicationDetails.generateSecret = Generate secret
 applicationDetails.deleteApplication = Delete application
+applicationDetails.thereWereIssues = There were issues fetching elements of this application
 
 requestScopeSuccess.title = Scope requested successfully
 requestScopeSuccess.heading = Scope requested successfully
