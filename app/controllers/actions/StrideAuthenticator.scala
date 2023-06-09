@@ -68,6 +68,6 @@ object StrideAuthenticator {
 
   val API_HUB_USER_ROLE: String = "api_hub_user"
   val API_HUB_APPROVER_ROLE: String = "api_hub_approver"
-  val API_HUB_ADMINISTRATOR_ROLE: String = "api_hub_administrator"
+  val API_HUB_ADMINISTRATOR_ROLE: String = "api_hub_app_admin"
 
 }
