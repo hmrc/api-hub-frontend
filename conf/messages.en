@@ -199,10 +199,9 @@ generatePrimarySecretSuccess.guidance.link = client secrets
 
 productionCredentialsChecklist.title = Generating production credentials
 productionCredentialsChecklist.heading = Generating production credentials
-productionCredentialsChecklist.error.required = You must make a selection
-productionCredentialsChecklist.error.invalid = You must select yes to continue else cancel
+productionCredentialsChecklist.error.required = You must confirm you meet the conditions to continue
 productionCredentialsChecklist.guidance = To generate production credentials, you must satisfy the following conditions:
 productionCredentialsChecklist.condition1 = You must have Security Check (SC) Clearance
 productionCredentialsChecklist.condition2 = You must have a secure mechanism for storing production credentials
 productionCredentialsChecklist.condition3 = You must agree that if your credentials are compromised or there is suspicion of compromise by an intruder or unauthorised user, you will notify the API Hub immediately
-productionCredentialsChecklist.caption = I confirm that the above conditions are satisfied
+productionCredentialsChecklist.confirm = I confirm that the above conditions are satisfied

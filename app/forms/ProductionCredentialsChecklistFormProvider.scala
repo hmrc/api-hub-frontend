@@ -17,32 +17,16 @@
 package forms
 
 import javax.inject.Inject
+
 import forms.mappings.Mappings
 import play.api.data.Form
-import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
+import play.api.data.Forms.set
+import models.ProductionCredentialsChecklist
 
 class ProductionCredentialsChecklistFormProvider @Inject() extends Mappings {
 
-  import ProductionCredentialsChecklistFormProvider._
-
-  def apply(): Form[Boolean] =
+  def apply(): Form[Set[ProductionCredentialsChecklist]] =
     Form(
-      "value" -> boolean("productionCredentialsChecklist.error.required")
-        .verifying(booleanTrueConstraint("productionCredentialsChecklist.error.invalid"))
+      "value" -> set(enumerable[ProductionCredentialsChecklist]("productionCredentialsChecklist.error.required")).verifying(nonEmptySet("productionCredentialsChecklist.error.required"))
     )
-
-}
-
-object ProductionCredentialsChecklistFormProvider {
-
-  def booleanTrueConstraint(invalidMessage: String): Constraint[Boolean] = Constraint("constraints.booleanTrue") {
-    boolean =>
-      if (boolean) {
-        Valid
-      }
-      else {
-        Invalid(Seq(ValidationError(invalidMessage)))
-      }
-  }
-
 }

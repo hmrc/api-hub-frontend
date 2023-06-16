@@ -17,122 +17,100 @@
 package controllers
 
 import base.SpecBase
+import controllers.actions.{FakeApplication, FakeUser}
 import forms.ProductionCredentialsChecklistFormProvider
-import navigation.{FakeNavigator, Navigator}
+import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
-import org.scalatestplus.mockito.MockitoSugar
+import org.mockito.{ArgumentMatchers, MockitoSugar}
+import play.api.{Configuration, Application => PlayApplication}
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import repositories.SessionRepository
+import services.ApiHubService
 import views.html.ProductionCredentialsChecklistView
 
 import scala.concurrent.Future
 
 class ProductionCredentialsChecklistControllerSpec extends SpecBase with MockitoSugar {
 
-  private def onwardRoute = Call("GET", "/foo")
+  import ProductionCredentialsChecklistControllerSpec._
 
   private val formProvider = new ProductionCredentialsChecklistFormProvider()
   private val form = formProvider()
 
-  private val applicationId = "test-application-id"
-  private lazy val productionCredentialsChecklistRoute = routes.ProductionCredentialsChecklistController.onPageLoad(applicationId).url
+  private lazy val productionCredentialsChecklistRoute = routes.ProductionCredentialsChecklistController.onPageLoad(FakeApplication.id).url
 
   "ProductionCredentialsChecklist Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val fixture = buildFixture()
 
-      running(application) {
+      running(fixture.playApplication) {
         val request = FakeRequest(GET, productionCredentialsChecklistRoute)
 
-        val result = route(application, request).value
+        val result = route(fixture.playApplication, request).value
 
-        val view = application.injector.instanceOf[ProductionCredentialsChecklistView]
+        val view = fixture.playApplication.injector.instanceOf[ProductionCredentialsChecklistView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, applicationId)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, FakeApplication.id)(request, messages(fixture.playApplication)).toString
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must redirect to the Generate Primary Secret Success page when valid data is submitted" in {
+      val fixture = buildFixture()
 
-      val mockSessionRepository = mock[SessionRepository]
-
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
-          .build()
-
-      running(application) {
+      running(fixture.playApplication) {
         val request =
           FakeRequest(POST, productionCredentialsChecklistRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+            .withFormUrlEncodedBody(("value[0]", "confirm"))
 
-        val result = route(application, request).value
+        val result = route(fixture.playApplication, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual routes.GeneratePrimarySecretSuccessController.onPageLoad(FakeApplication.id).url
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
+      val fixture = buildFixture()
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-
-      running(application) {
+      running(fixture.playApplication) {
         val request =
           FakeRequest(POST, productionCredentialsChecklistRoute)
-            .withFormUrlEncodedBody(("value", ""))
+            .withFormUrlEncodedBody(("value[0]", ""))
 
-        val boundForm = form.bind(Map("value" -> ""))
+        val boundForm = form.bind(Map("value[0]" -> ""))
 
-        val view = application.injector.instanceOf[ProductionCredentialsChecklistView]
+        val view = fixture.playApplication.injector.instanceOf[ProductionCredentialsChecklistView]
 
-        val result = route(application, request).value
+        val result = route(fixture.playApplication, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, applicationId)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, FakeApplication.id)(request, messages(fixture.playApplication)).toString
       }
     }
 
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request = FakeRequest(GET, productionCredentialsChecklistRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to Journey Recovery for a POST if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, productionCredentialsChecklistRoute)
-            .withFormUrlEncodedBody(("value", "true"))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
   }
+
+}
+
+object ProductionCredentialsChecklistControllerSpec extends SpecBase with MockitoSugar {
+
+  case class Fixture(playApplication: PlayApplication, apiHubService: ApiHubService)
+
+  def buildFixture(userModel: UserModel = FakeUser, testConfiguration: Configuration = Configuration.empty): Fixture = {
+    val apiHubService = mock[ApiHubService]
+    when(apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id))(any()))
+      .thenReturn(Future.successful(Some(FakeApplication)))
+
+    val playApplication = applicationBuilder(userAnswers = Some(emptyUserAnswers), user = userModel, testConfiguration)
+      .overrides(
+        bind[ApiHubService].toInstance(apiHubService)
+      ).build()
+
+    Fixture(playApplication, apiHubService)
+  }
+
 }

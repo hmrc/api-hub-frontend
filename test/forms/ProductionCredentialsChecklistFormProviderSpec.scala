@@ -16,30 +16,30 @@
 
 package forms
 
-import forms.behaviours.BooleanFieldBehaviours
+import forms.behaviours.CheckboxFieldBehaviours
+import models.ProductionCredentialsChecklist
 import play.api.data.FormError
 
-class ProductionCredentialsChecklistFormProviderSpec extends BooleanFieldBehaviours {
-
-  val requiredKey = "productionCredentialsChecklist.error.required"
-  val invalidKey = "error.boolean"
+class ProductionCredentialsChecklistFormProviderSpec extends CheckboxFieldBehaviours {
 
   val form = new ProductionCredentialsChecklistFormProvider()()
 
   ".value" - {
 
     val fieldName = "value"
+    val requiredKey = "productionCredentialsChecklist.error.required"
 
-    behave like booleanField(
+    behave like checkboxField[ProductionCredentialsChecklist](
       form,
       fieldName,
-      invalidError = FormError(fieldName, invalidKey)
+      validValues  = ProductionCredentialsChecklist.values,
+      invalidError = FormError(s"$fieldName[0]", "error.invalid")
     )
 
-    behave like mandatoryField(
+    behave like mandatoryCheckboxField(
       form,
       fieldName,
-      requiredError = FormError(fieldName, requiredKey)
+      requiredKey
     )
   }
 }

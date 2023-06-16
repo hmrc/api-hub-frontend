@@ -146,7 +146,7 @@
                                 content = HtmlContent(
                                     govukButton(
                                         ButtonViewModel(messages("applicationDetails.generateSecret"))
-                                                .asLink(routes.GeneratePrimarySecretSuccessController.onPageLoad(application.id).url)
+                                                .asLink(routes.ProductionCredentialsChecklistController.onPageLoad(application.id).url)
                                     )
                                 )
                             )
