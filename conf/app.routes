@@ -61,8 +61,11 @@ POST        /team-members-overview                              controllers.Conf
 GET         /change-team-members-overview                       controllers.ConfirmAddTeamMemberController.onPageLoad(mode: Mode = CheckMode)
 POST        /change-team-members-overview                       controllers.ConfirmAddTeamMemberController.onSubmit(mode: Mode = CheckMode)
 
-GET      /team-members/:index                                controllers.RemoveTeamMemberController.removeTeamMember(mode: Mode = NormalMode, index: Int)
+GET         /team-members/:index                                controllers.RemoveTeamMemberController.removeTeamMember(mode: Mode = NormalMode, index: Int)
 
 GET         /sign-in                                            controllers.auth.SignInController.onPageLoad()
 
 GET        /generate-primary-secret-success/:id                 controllers.GeneratePrimarySecretSuccessController.onPageLoad(id: String)
+
+GET        /generating-credentials/:id                          controllers.ProductionCredentialsChecklistController.onPageLoad(id: String)
+POST       /generating-credentials/:id                          controllers.ProductionCredentialsChecklistController.onSubmit(id: String)

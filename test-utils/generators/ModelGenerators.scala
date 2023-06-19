@@ -16,10 +16,16 @@
 
 package generators
 
+import models.ProductionCredentialsChecklist
 import models.application.TeamMember
 import org.scalacheck.{Arbitrary, Gen}
 
 trait ModelGenerators {
+
+  implicit lazy val arbitraryProductionCredentialsChecklist: Arbitrary[ProductionCredentialsChecklist] =
+    Arbitrary {
+      Gen.oneOf(ProductionCredentialsChecklist.values)
+    }
 
   implicit lazy val arbitraryTeamMember: Arbitrary[TeamMember] =
     Arbitrary {
