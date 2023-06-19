@@ -27,6 +27,8 @@ class ProductionCredentialsChecklistFormProvider @Inject() extends Mappings {
 
   def apply(): Form[Set[ProductionCredentialsChecklist]] =
     Form(
-      "value" -> set(enumerable[ProductionCredentialsChecklist]("productionCredentialsChecklist.error.required")).verifying(nonEmptySet("productionCredentialsChecklist.error.required"))
+      "value" -> set(enumerable[ProductionCredentialsChecklist]("productionCredentialsChecklist.error.required"))
+        .verifying(nonEmptySet("productionCredentialsChecklist.error.required"))
     )
+
 }

@@ -67,5 +67,5 @@ GET         /sign-in                                            controllers.auth
 
 GET        /generate-primary-secret-success/:id                 controllers.GeneratePrimarySecretSuccessController.onPageLoad(id: String)
 
-GET        /productionCredentialsChecklist/:id                  controllers.ProductionCredentialsChecklistController.onPageLoad(id: String)
-POST       /productionCredentialsChecklist/:id                  controllers.ProductionCredentialsChecklistController.onSubmit(id: String)
+GET        /generating-credentials/:id                          controllers.ProductionCredentialsChecklistController.onPageLoad(id: String)
+POST       /generating-credentials/:id                          controllers.ProductionCredentialsChecklistController.onSubmit(id: String)

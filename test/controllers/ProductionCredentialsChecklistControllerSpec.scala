@@ -17,7 +17,7 @@
 package controllers
 
 import base.SpecBase
-import controllers.actions.{FakeApplication, FakeUser}
+import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
 import forms.ProductionCredentialsChecklistFormProvider
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
@@ -27,11 +27,12 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.ApiHubService
+import utils.TestHelpers
 import views.html.ProductionCredentialsChecklistView
 
 import scala.concurrent.Future
 
-class ProductionCredentialsChecklistControllerSpec extends SpecBase with MockitoSugar {
+class ProductionCredentialsChecklistControllerSpec extends SpecBase with MockitoSugar with TestHelpers {
 
   import ProductionCredentialsChecklistControllerSpec._
 
@@ -42,34 +43,39 @@ class ProductionCredentialsChecklistControllerSpec extends SpecBase with Mockito
 
   "ProductionCredentialsChecklist Controller" - {
 
-    "must return OK and the correct view for a GET" in {
+    "must return OK and the correct view for a GET for a team member or administrator" in {
+      forAll(teamMemberAndAdministratorTable) {
+        user =>
+          val fixture = buildFixture(user)
 
-      val fixture = buildFixture()
+          running(fixture.playApplication) {
+            val request = FakeRequest(GET, productionCredentialsChecklistRoute)
 
-      running(fixture.playApplication) {
-        val request = FakeRequest(GET, productionCredentialsChecklistRoute)
+            val result = route(fixture.playApplication, request).value
 
-        val result = route(fixture.playApplication, request).value
+            val view = fixture.playApplication.injector.instanceOf[ProductionCredentialsChecklistView]
 
-        val view = fixture.playApplication.injector.instanceOf[ProductionCredentialsChecklistView]
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, FakeApplication.id)(request, messages(fixture.playApplication)).toString
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view(form, FakeApplication.id)(request, messages(fixture.playApplication)).toString
+          }
       }
     }
 
-    "must redirect to the Generate Primary Secret Success page when valid data is submitted" in {
-      val fixture = buildFixture()
+    "must redirect to the Generate Primary Secret Success page when valid data is submitted by a team member or administrator" in {
+      forAll(teamMemberAndAdministratorTable) {
+        user =>
+          val fixture = buildFixture(user)
 
-      running(fixture.playApplication) {
-        val request =
-          FakeRequest(POST, productionCredentialsChecklistRoute)
-            .withFormUrlEncodedBody(("value[0]", "confirm"))
+          running(fixture.playApplication) {
+            val request =
+              FakeRequest(POST, productionCredentialsChecklistRoute)
+                .withFormUrlEncodedBody(("value[0]", "confirm"))
 
-        val result = route(fixture.playApplication, request).value
+            val result = route(fixture.playApplication, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.GeneratePrimarySecretSuccessController.onPageLoad(FakeApplication.id).url
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual routes.GeneratePrimarySecretSuccessController.onPageLoad(FakeApplication.id).url
+          }
       }
     }
 
@@ -92,6 +98,33 @@ class ProductionCredentialsChecklistControllerSpec extends SpecBase with Mockito
       }
     }
 
+    "must redirect to Unauthorised page for a GET when user is not a team member or administrator" in {
+      val fixture = buildFixture(FakeUserNotTeamMember)
+
+      running(fixture.playApplication) {
+        val request = FakeRequest(GET, productionCredentialsChecklistRoute)
+
+        val result = route(fixture.playApplication, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.UnauthorisedController.onPageLoad.url
+      }
+    }
+
+    "must redirect to Unauthorised page for a POST when user is not a team member or administrator" in {
+      val fixture = buildFixture(FakeUserNotTeamMember)
+
+      running(fixture.playApplication) {
+        val request = FakeRequest(POST, productionCredentialsChecklistRoute)
+          .withFormUrlEncodedBody(("value[0]", "confirm"))
+
+        val result = route(fixture.playApplication, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.UnauthorisedController.onPageLoad.url
+      }
+    }
+
   }
 
 }
@@ -100,12 +133,12 @@ object ProductionCredentialsChecklistControllerSpec extends SpecBase with Mockit
 
   case class Fixture(playApplication: PlayApplication, apiHubService: ApiHubService)
 
-  def buildFixture(userModel: UserModel = FakeUser, testConfiguration: Configuration = Configuration.empty): Fixture = {
+  def buildFixture(userModel: UserModel = FakeUser): Fixture = {
     val apiHubService = mock[ApiHubService]
     when(apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id))(any()))
       .thenReturn(Future.successful(Some(FakeApplication)))
 
-    val playApplication = applicationBuilder(userAnswers = Some(emptyUserAnswers), user = userModel, testConfiguration)
+    val playApplication = applicationBuilder(userAnswers = Some(emptyUserAnswers), user = userModel, Configuration.empty)
       .overrides(
         bind[ApiHubService].toInstance(apiHubService)
       ).build()
