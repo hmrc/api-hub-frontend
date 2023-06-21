@@ -24,12 +24,23 @@ Beyond the typical HMRC Digital platform dependencies this service relies on:
 
 The full set of dependencies can be started using Service Manager and the group API_HUB_ALL.
 
+You can view service dependencies using the Tax Catalogue's Service Relationships 
+section here:
+https://catalogue.tax.service.gov.uk/service/api-hub-frontend
+
 ### api-hub-applications
 The api-hub-applications microservice is the backend component of The API Hub.
 
-This service authenticates to api-hub-applications using internal-auth. See this GitHub repo 
+This service authenticates to api-hub-applications using internal-auth's service-to-service
+auth pattern. See this GitHub repo 
 for more information:
 https://github.com/hmrc/internal-auth
+
+Configuration for service-to-service auth is here:
+https://github.com/hmrc/internal-auth-config
+
+To configure authentication modify this configuration setting in `application.conf`
+- `internal-auth.token`
 
 ### MongoDb
 This service uses MongoDb to persist session-level information. As a scaffold-based frontend
@@ -62,6 +73,9 @@ page that presents the user with a choice to login via LDAP or Stride.
 
 More information on how to login is available on Confluence:
 https://confluence.tools.tax.service.gov.uk/display/AH/Login+Examples
+
+More information on the security model of The API Hub is on confluence:
+https://confluence.tools.tax.service.gov.uk/display/AH/Permissions+Matrix+and+Mappings
 
 #### LDAP
 The service uses internal-auth LDAP authentication. This is stubbed at various
