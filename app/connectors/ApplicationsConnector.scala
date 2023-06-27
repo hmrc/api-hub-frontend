@@ -143,6 +143,8 @@ class ApplicationsConnector @Inject()(
   def testConnectivity()(implicit hc:HeaderCarrier): Future[String] = {
     httpClient
       .get(url"$applicationsBaseUrl/api-hub-applications/test-connectivity")
+      .setHeader((ACCEPT, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[HttpResponse]
       .map(response => {
         if (is2xx(response.status)) {
