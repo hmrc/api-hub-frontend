@@ -67,4 +67,8 @@ class ApiHubService @Inject()(applicationsConnector: ApplicationsConnector)
     applicationsConnector.createPrimarySecret(id)
   }
 
+  def testConnectivity()(implicit hc: HeaderCarrier): Future[String] = {
+    applicationsConnector.testConnectivity()
+  }
+
 }
