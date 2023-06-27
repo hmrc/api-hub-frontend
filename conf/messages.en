@@ -205,3 +205,6 @@ productionCredentialsChecklist.condition1 = You must have Security Check (SC) Cl
 productionCredentialsChecklist.condition2 = You must have a secure mechanism for storing production credentials
 productionCredentialsChecklist.condition3 = You must agree that if your credentials are compromised or there is suspicion of compromise by an intruder or unauthorised user, you will notify the API Hub immediately
 productionCredentialsChecklist.confirm = I confirm that the above conditions are satisfied
+
+testConnectivity.heading = Test Connectivity
+testConnectivity.title = Test Connectivity

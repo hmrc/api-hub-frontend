@@ -9,7 +9,7 @@ import org.scalatest.OptionValues
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.Configuration
-import play.api.http.Status.{CREATED, NOT_FOUND, NO_CONTENT}
+import play.api.http.Status.{CREATED, INTERNAL_SERVER_ERROR, NOT_FOUND, NO_CONTENT, OK}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
@@ -312,6 +312,41 @@ class ApplicationsConnectorSpec
     }
   }
 
+  "ApplicationsConnector.testConnectivity" - {
+    "must place the correct request and return the response" in {
+      val expected = "something"
+
+      stubFor(
+        get(urlEqualTo(s"/api-hub-applications/test-connectivity"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody(expected)
+          )
+      )
+
+      buildConnector(this).testConnectivity()(HeaderCarrier()) map {
+        actual =>
+          actual mustBe expected
+      }
+    }
+
+    "must handle non-200 responses" in {
+
+      stubFor(
+        get(urlEqualTo(s"/api-hub-applications/test-connectivity"))
+          .willReturn(
+            aResponse()
+              .withStatus(INTERNAL_SERVER_ERROR)
+          )
+      )
+
+      buildConnector(this).testConnectivity()(HeaderCarrier()) map {
+        actual =>
+          actual mustBe "Response status was 500"
+      }
+    }
+  }
 }
 
 object ApplicationsConnectorSpec extends HttpClientV2Support {

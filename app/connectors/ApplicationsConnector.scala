@@ -23,11 +23,12 @@ import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION, CONTENT_TYPE}
 import play.api.http.MimeTypes.JSON
 import play.api.http.Status.NOT_FOUND
 import play.api.libs.json.Json
-import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps, UpstreamErrorResponse}
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
+import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.HttpReads.is2xx
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps, UpstreamErrorResponse}
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -137,6 +138,21 @@ class ApplicationsConnector @Inject()(
         case Left(e) if e.statusCode == 404 => Future.successful(None)
         case Left(e) => Future.failed(e)
       }
+  }
+
+  def testConnectivity()(implicit hc:HeaderCarrier): Future[String] = {
+    httpClient
+      .get(url"$applicationsBaseUrl/api-hub-applications/test-connectivity")
+      .setHeader((ACCEPT, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[HttpResponse]
+      .map(response => {
+        if (is2xx(response.status)) {
+          response.body
+        } else {
+          s"Response status was ${response.status}"
+        }
+      })
   }
 
 }
