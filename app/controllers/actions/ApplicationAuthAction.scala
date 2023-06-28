@@ -32,19 +32,19 @@ trait ApplicationAuthAction extends ActionRefiner[IdentifierRequest, Application
 
 trait ApplicationAuthActionProvider {
 
-  def apply(applicationId: String)(implicit ec: ExecutionContext): ApplicationAuthAction
+  def apply(applicationId: String, enrich: Boolean = false)(implicit ec: ExecutionContext): ApplicationAuthAction
 
 }
 
 @Singleton
 class ApplicationAuthActionProviderImpl @Inject()(apiHubService: ApiHubService) extends ApplicationAuthActionProvider {
 
-  def apply(applicationId: String)(implicit ec: ExecutionContext): ApplicationAuthAction = {
+  def apply(applicationId: String, enrich: Boolean = false)(implicit ec: ExecutionContext): ApplicationAuthAction = {
     new ApplicationAuthAction with FrontendHeaderCarrierProvider {
       override protected def refine[A](identifierRequest: IdentifierRequest[A]): Future[Either[Result, ApplicationRequest[A]]] = {
         implicit val request: Request[_] = identifierRequest
 
-        apiHubService.getApplication(applicationId) map {
+        apiHubService.getApplication(applicationId, enrich) map {
           case Some(application) =>
             if (identifierRequest.user.permissions.canAdminister || isTeamMember(application, identifierRequest.user)) {
                 Right(ApplicationRequest(identifierRequest, application))

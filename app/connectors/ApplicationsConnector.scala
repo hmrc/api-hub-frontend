@@ -59,9 +59,9 @@ class ApplicationsConnector @Inject()(
       .execute[Seq[Application]]
   }
 
-  def getApplication(id:String)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
+  def getApplication(id:String, enrich: Boolean)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
     httpClient
-      .get(url"$applicationsBaseUrl/api-hub-applications/applications/$id")
+      .get(url"$applicationsBaseUrl/api-hub-applications/applications/$id?enrich=$enrich")
       .setHeader((ACCEPT, JSON))
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Either[UpstreamErrorResponse, Application]]
@@ -71,6 +71,7 @@ class ApplicationsConnector @Inject()(
         case Left(e) => Future.failed(e)
       }
   }
+
   def getUserApplications(userEmail:String)(implicit hc: HeaderCarrier): Future[Seq[Application]] = {
     val emailEncrypted = crypto.QueryParameterCrypto.encrypt(PlainText(userEmail)).value
     httpClient

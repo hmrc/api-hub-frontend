@@ -40,7 +40,7 @@ class ApplicationAuthActionSpec extends AsyncFreeSpec with Matchers with Mockito
     "must grant a user access to an application when they are in the team" in {
       val fixture = buildFixture()
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id))(any()))
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(false))(any()))
         .thenReturn(Future.successful(Some(FakeApplication)))
 
       fixture.provider.apply(FakeApplication.id).invokeBlock(buildRequest(), buildInvokeBlock()).map {
@@ -53,7 +53,7 @@ class ApplicationAuthActionSpec extends AsyncFreeSpec with Matchers with Mockito
       val fixture = buildFixture()
       val application = FakeApplication.copy(teamMembers = Seq.empty)
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id))(any()))
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), ArgumentMatchers.eq(false))(any()))
         .thenReturn(Future.successful(Some(application)))
 
       fixture.provider.apply(application.id).invokeBlock(buildRequest(FakeAdministrator), buildInvokeBlock()).map {
@@ -66,7 +66,7 @@ class ApplicationAuthActionSpec extends AsyncFreeSpec with Matchers with Mockito
       val fixture = buildFixture()
       val application = FakeApplication.copy(teamMembers = Seq.empty)
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id))(any()))
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), ArgumentMatchers.eq(false))(any()))
         .thenReturn(Future.successful(Some(application)))
 
       fixture.provider.apply(application.id).invokeBlock(buildRequest(), buildInvokeBlock()).map {

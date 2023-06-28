@@ -37,7 +37,7 @@ class ApplicationDetailsController @Inject()(
   apiHubService: ApiHubService
 ) (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id)) {
+  def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id, enrich = true)) {
     implicit request => Ok(view(request.application, Some(request.identifierRequest.user), config.environmentNames))
   }
 

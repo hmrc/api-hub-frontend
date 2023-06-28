@@ -43,7 +43,7 @@ class TestConnectivityControllerSpec extends SpecBase with MockitoSugar {
         when(fixture.mockApiHubService.testConnectivity()(any()))
           .thenReturn(Future.successful(expected))
 
-        val request = FakeRequest(GET, routes.TestConnectivityController.onPageLoad.url)
+        val request = FakeRequest(GET, routes.TestConnectivityController.onPageLoad().url)
 
         val result = route(fixture.application, request).value
 

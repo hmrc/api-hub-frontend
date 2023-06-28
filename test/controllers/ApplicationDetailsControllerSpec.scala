@@ -52,7 +52,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         user: UserModel =>
           val fixture = buildFixture(userModel = user, testConfiguration = configWithEnvironmentNames)
 
-          when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(idWithSecrets))(any()))
+          when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(idWithSecrets), ArgumentMatchers.eq(true))(any()))
             .thenReturn(Future.successful(Some(FakeApplicationWithSecrets)))
 
           running(fixture.playApplication) {
@@ -89,7 +89,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
       val fixture = buildFixture(testConfiguration = configWithEnvironmentNames)
 
       val idNoSecrets = "test-id-no-secrets"
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(idNoSecrets))(any()))
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(idNoSecrets), ArgumentMatchers.eq(true))(any()))
         .thenReturn(Future.successful(Some(FakeApplicationWithIdButNoSecrets)))
 
       running(fixture.playApplication) {
@@ -116,7 +116,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
 
     val id = "test-id"
 
-    when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(id))(any()))
+    when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(id), ArgumentMatchers.eq(true))(any()))
       .thenReturn(Future.successful(None))
 
     running(fixture.playApplication) {
@@ -131,7 +131,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
     val fixture = buildFixture(userModel = FakeUserNotTeamMember)
 
     val id = "test-id"
-    when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(id))(any()))
+    when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(id), ArgumentMatchers.eq(true))(any()))
       .thenReturn(Future.successful(Some(FakeApplication)))
 
     running(fixture.playApplication) {
@@ -153,7 +153,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
       user: UserModel =>
         val fixture = buildFixture(userModel = user)
 
-        when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id))(any()))
+        when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(false))(any()))
           .thenReturn(Future.successful(Some(FakeApplication)))
 
         when(fixture.apiHubService.deleteApplication(ArgumentMatchers.eq(FakeApplication.id))(any()))
@@ -173,7 +173,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
   "must return NotFound for a DELETE when the application is not found" in {
     val fixture = buildFixture()
 
-    when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id))(any()))
+    when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(false))(any()))
       .thenReturn(Future.successful(Some(FakeApplication)))
 
     when(fixture.apiHubService.deleteApplication(ArgumentMatchers.eq(FakeApplication.id))(any()))
@@ -191,7 +191,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
   "must redirect to Unauthorised page for a DELETE when user is not a team member or administrator" in {
     val fixture = buildFixture(userModel = FakeUserNotTeamMember)
 
-    when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id))(any()))
+    when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(false))(any()))
       .thenReturn(Future.successful(Some(FakeApplication)))
 
     running(fixture.playApplication) {

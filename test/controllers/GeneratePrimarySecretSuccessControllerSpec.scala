@@ -52,7 +52,7 @@ class GeneratePrimarySecretSuccessControllerSpec extends SpecBase with MockitoSu
           val fixture = buildFixture(user)
 
           running(fixture.playApplication) {
-            when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id))(any()))
+            when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), ArgumentMatchers.eq(false))(any()))
               .thenReturn(Future.successful(Some(application)))
 
             when(fixture.apiHubService.createPrimarySecret(ArgumentMatchers.eq(application.id))(any()))
@@ -79,7 +79,7 @@ class GeneratePrimarySecretSuccessControllerSpec extends SpecBase with MockitoSu
       val fixture = buildFixture()
 
       running(fixture.playApplication) {
-        when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id))(any()))
+        when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(false))(any()))
           .thenReturn(Future.successful(None))
 
         val request = FakeRequest(GET, routes.GeneratePrimarySecretSuccessController.onPageLoad(FakeApplication.id).url)
@@ -97,7 +97,7 @@ class GeneratePrimarySecretSuccessControllerSpec extends SpecBase with MockitoSu
       val fixture = buildFixture()
 
       running(fixture.playApplication) {
-        when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id))(any()))
+        when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), ArgumentMatchers.eq(false))(any()))
           .thenReturn(Future.successful(Some(application)))
 
         val request = FakeRequest(GET, routes.GeneratePrimarySecretSuccessController.onPageLoad(application.id).url)
@@ -111,7 +111,7 @@ class GeneratePrimarySecretSuccessControllerSpec extends SpecBase with MockitoSu
       val fixture = buildFixture(userModel = FakeUserNotTeamMember)
 
       running(fixture.playApplication) {
-        when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id))(any()))
+        when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(false))(any()))
           .thenReturn(Future.successful(Some(FakeApplication)))
 
         val request = FakeRequest(GET, routes.GeneratePrimarySecretSuccessController.onPageLoad(FakeApplication.id).url)
