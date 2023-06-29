@@ -23,7 +23,8 @@ class ApplicationsConnectorSpec
   extends AsyncFreeSpec
   with Matchers
   with WireMockSupport
-  with OptionValues {
+  with OptionValues
+  with ApplicationGetterBehaviours {
 
   "ApplicationsConnector.registerApplication" - {
     "must place the correct request and return the stored application" in {
@@ -103,46 +104,15 @@ class ApplicationsConnectorSpec
   }
 
   "ApplicationsConnector.getApplication" - {
-    "must place the correct request and return the application" in {
-      val application1 = Application("id-1", "test-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1")))
-      val expected = application1
-
-      stubFor(
-        get(urlEqualTo("/api-hub-applications/applications/id-1?enrich=true"))
-          .withHeader("Accept", equalTo("application/json"))
-          .withHeader("Authorization", equalTo("An authentication token"))
-          .willReturn(
-            aResponse()
-              .withBody(toJsonString(expected))
-          )
-      )
-
-      buildConnector(this).getApplication("id-1", enrich = true)(HeaderCarrier()) map {
-        actual =>
-          actual mustBe Some(expected)
-      }
+    "must" - {
+      behave like successfulApplicationGetter(true)
     }
 
-    "must place the correct request when not enriching with IDMS data" in {
-      val application1 = Application("id-1", "test-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1")))
-      val expected = application1
-
-      stubFor(
-        get(urlEqualTo("/api-hub-applications/applications/id-1?enrich=false"))
-          .willReturn(
-            aResponse()
-              .withBody(toJsonString(expected))
-          )
-      )
-
-      buildConnector(this).getApplication("id-1", enrich = false)(HeaderCarrier()) map {
-        actual =>
-          actual mustBe Some(expected)
-      }
+    "must" - {
+      behave like successfulApplicationGetter(false)
     }
 
     "must return none when application is not found" in {
-
       stubFor(
         get(urlEqualTo("/api-hub-applications/applications/id-1"))
           .withHeader("Accept", equalTo("application/json"))
@@ -396,6 +366,34 @@ object ApplicationsConnectorSpec extends HttpClientV2Support {
 
   def toJsonString(applications: Seq[Application]): String = {
     Json.toJson(applications).toString()
+  }
+
+}
+
+trait ApplicationGetterBehaviours {
+  this: AsyncFreeSpec with Matchers with WireMockSupport =>
+
+  def successfulApplicationGetter(enrich: Boolean): Unit = {
+    s"must place the correct request and return the application when enrich = $enrich" in {
+      val application1 = Application("id-1", "test-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1")))
+      val expected = application1
+
+      stubFor(
+        get(urlEqualTo(s"/api-hub-applications/applications/id-1?enrich=$enrich"))
+          .withHeader("Accept", equalTo("application/json"))
+          .withHeader("Authorization", equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withBody(toJsonString(expected))
+          )
+      )
+
+      buildConnector(this).getApplication("id-1", enrich)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe Some(expected)
+      }
+    }
+
   }
 
 }
