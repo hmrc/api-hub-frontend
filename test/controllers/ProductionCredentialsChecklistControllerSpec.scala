@@ -135,7 +135,7 @@ object ProductionCredentialsChecklistControllerSpec extends SpecBase with Mockit
 
   def buildFixture(userModel: UserModel = FakeUser): Fixture = {
     val apiHubService = mock[ApiHubService]
-    when(apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id))(any()))
+    when(apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(false))(any()))
       .thenReturn(Future.successful(Some(FakeApplication)))
 
     val playApplication = applicationBuilder(userAnswers = Some(emptyUserAnswers), user = userModel, Configuration.empty)

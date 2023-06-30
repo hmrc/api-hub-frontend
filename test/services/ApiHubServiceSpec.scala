@@ -27,7 +27,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 
-class ApiHubServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar with OptionValues {
+class ApiHubServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar with OptionValues with ApplicationGetterBehaviours {
 
   "registerApplication" - {
     "must call the applications connector and return the saved application" in {
@@ -86,21 +86,12 @@ class ApiHubServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar wi
   }}
 
   "getApplication" - {
-    "must call the applications connector and return an application" in {
-      val application = Application("id-1", "test-app-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1")))
-      val expected = Some(application)
+    "must" - {
+      behave like successfulApplicationGetter(true)
+    }
 
-      val applicationsConnector = mock[ApplicationsConnector]
-      when(applicationsConnector.getApplication(ArgumentMatchers.eq("id-1"))(any())).thenReturn(Future.successful(expected))
-
-      val service = new ApiHubService(applicationsConnector)
-
-      service.getApplication("id-1")(HeaderCarrier()) map {
-        actual =>
-          actual mustBe expected
-          verify(applicationsConnector).getApplication(ArgumentMatchers.eq("id-1"))(any())
-          succeed
-      }
+    "must" - {
+      behave like successfulApplicationGetter(false)
     }
   }
 
@@ -226,6 +217,30 @@ class ApiHubServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar wi
       service.testConnectivity()(HeaderCarrier()) map {
         actual =>
           actual mustBe expected
+      }
+    }
+  }
+
+}
+
+trait ApplicationGetterBehaviours {
+  this: AsyncFreeSpec with Matchers with MockitoSugar =>
+
+  def successfulApplicationGetter(enrich: Boolean): Unit = {
+    s"must call the applications connector with enrich set to $enrich and return an application" in {
+      val application = Application("id-1", "test-app-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1")))
+      val expected = Some(application)
+
+      val applicationsConnector = mock[ApplicationsConnector]
+      when(applicationsConnector.getApplication(ArgumentMatchers.eq("id-1"), ArgumentMatchers.eq(enrich))(any())).thenReturn(Future.successful(expected))
+
+      val service = new ApiHubService(applicationsConnector)
+
+      service.getApplication("id-1", enrich)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe expected
+          verify(applicationsConnector).getApplication(ArgumentMatchers.eq("id-1"), ArgumentMatchers.eq(enrich))(any())
+          succeed
       }
     }
   }

@@ -40,7 +40,7 @@ class ApproveScopeController @Inject()(
 
   def onPageLoad(id: String): Action[AnyContent] = (identify andThen canApprove).async {
     implicit request =>
-      apiHubService.getApplication(id) map {
+      apiHubService.getApplication(id, enrich = false) map {
           case Some(application) => Ok(view(application, Some(request.user), config.environmentNames))
           case _ => NotFound
         }

@@ -44,7 +44,7 @@ class RegisterApplicationSuccessControllerSpec extends SpecBase with MockitoSuga
         user: UserModel =>
           val fixture = buildFixture(user)
 
-          when(fixture.apiHubService.getApplication(ArgumentMatchers.eq("id-1"))(any()))
+          when(fixture.apiHubService.getApplication(ArgumentMatchers.eq("id-1"), ArgumentMatchers.eq(false))(any()))
             .thenReturn(Future.successful(Some(app)))
 
           running(fixture.application) {
@@ -67,7 +67,7 @@ class RegisterApplicationSuccessControllerSpec extends SpecBase with MockitoSuga
       val testId = "test-app-id"
       val fixture = buildFixture(userModel = FakeUserNotTeamMember)
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId))(any()))
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId), ArgumentMatchers.eq(false))(any()))
         .thenReturn(Future.successful(Some(FakeApplication)))
 
       running(fixture.application) {

@@ -49,7 +49,7 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar with TestHelpers
         user: UserModel =>
           val fixture = buildFixture(userModel = user)
 
-          when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId))(any()))
+          when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId), ArgumentMatchers.eq(false))(any()))
             .thenReturn(Future.successful(Some(FakeApplication)))
 
           when(fixture.apiHubService.requestAdditionalScope(ArgumentMatchers.eq(testId), ArgumentMatchers.eq(newScope))(any()))
@@ -72,7 +72,7 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar with TestHelpers
       val testId = "test-app-id"
       val fixture = buildFixture(userModel = FakeUserNotTeamMember)
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId))(any()))
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId), ArgumentMatchers.eq(false))(any()))
         .thenReturn(Future.successful(Some(FakeApplication)))
 
       running(fixture.application) {
@@ -93,7 +93,7 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar with TestHelpers
       val testId = "test-app-id"
       val fixture = buildFixture()
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId))(any()))
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId), ArgumentMatchers.eq(false))(any()))
         .thenReturn(Future.successful(Some(FakeApplication)))
 
       running(fixture.application) {
@@ -111,7 +111,7 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar with TestHelpers
       val testId = "test-app-id"
       val fixture = buildFixture()
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId))(any()))
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId), ArgumentMatchers.eq(false))(any()))
         .thenReturn(Future.successful(Some(FakeApplication)))
 
       running(fixture.application) {
@@ -129,7 +129,7 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar with TestHelpers
       val testId = "test-app-id"
       val fixture = buildFixture()
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId))(any()))
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId), ArgumentMatchers.eq(false))(any()))
         .thenReturn(Future.successful(Some(FakeApplication)))
 
       running(fixture.application) {
@@ -155,7 +155,7 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar with TestHelpers
           val config = fixture.application.injector.instanceOf[FrontendAppConfig]
           val application = models.application.Application(testId, "app-name", Creator("test-creator-email"), Seq(TeamMember("test-email")))
 
-          when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId))(any()))
+          when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId), ArgumentMatchers.eq(false))(any()))
             .thenReturn(Future.successful(Some(application)))
 
           running(fixture.application) {
@@ -176,7 +176,7 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar with TestHelpers
       val testId = "test-app-id"
       val fixture = buildFixture(userModel = FakeUserNotTeamMember)
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId))(any()))
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId), ArgumentMatchers.eq(false))(any()))
         .thenReturn(Future.successful(Some(FakeApplication)))
 
       running(fixture.application) {

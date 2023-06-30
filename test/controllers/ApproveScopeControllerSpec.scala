@@ -81,7 +81,7 @@ class ApproveScopeControllerSpec extends SpecBase with MockitoSugar {
 
       val application = models.application.Application(testId, "app-name", Creator("test-creator-email"), environmentsWithPrimaryPending)
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId))(any()))
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId), ArgumentMatchers.eq(false))(any()))
         .thenReturn(Future.successful(Some(application)))
 
       running(fixture.application) {

@@ -43,7 +43,7 @@ class RequestScopeSuccessControllerSpec extends SpecBase with MockitoSugar with 
           val fixture = buildFixture(user)
           val application = Application(applicationId, "test-name", Creator("test-email"), Seq(TeamMember("test-email")))
 
-          when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id))(any()))
+          when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), ArgumentMatchers.eq(false))(any()))
             .thenReturn(Future.successful(Some(application)))
 
           running(fixture.playApplication) {
@@ -64,7 +64,7 @@ class RequestScopeSuccessControllerSpec extends SpecBase with MockitoSugar with 
       val fixture = buildFixture()
       val application = Application(applicationId, "test-name", Creator("test-email"), Seq(TeamMember("test-email")))
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id))(any()))
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), ArgumentMatchers.eq(false))(any()))
         .thenReturn(Future.successful(None))
 
       running(fixture.playApplication) {
@@ -80,7 +80,7 @@ class RequestScopeSuccessControllerSpec extends SpecBase with MockitoSugar with 
       val testId = "test-app-id"
       val fixture = buildFixture(userModel = FakeUserNotTeamMember)
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId))(any()))
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId), ArgumentMatchers.eq(false))(any()))
         .thenReturn(Future.successful(Some(FakeApplication)))
 
       running(fixture.playApplication) {
