@@ -110,8 +110,7 @@
                                 govukInput(Input(
                                     id         = s"permissions_${i}_actions",
                                     name       = s"permissions[$i].actions",
-                                    value      = form.data.get(s"permissions[$i].actions"),
-                                    attributes = Map("oninput"-> "this.value = this.value.toUpperCase();")
+                                    value      = form.data.get(s"permissions[$i].actions")
                                 )))
                             )
                         )
