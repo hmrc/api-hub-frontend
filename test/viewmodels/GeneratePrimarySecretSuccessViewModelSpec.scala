@@ -18,13 +18,15 @@ package viewmodels
 
 import config.EnvironmentNames
 import controllers.actions.FakeApplication
-import models.application.{Application, Approved, Credential, Pending, Scope, Secret}
 import models.application.ApplicationLenses.ApplicationLensOps
+import models.application._
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{Actions, Key, SummaryList, SummaryListRow, Value}
+import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
+import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist._
 import viewmodels.GeneratePrimarySecretSuccessViewModelSpec._
 
 class GeneratePrimarySecretSuccessViewModelSpec extends AnyFreeSpec with Matchers {
@@ -95,10 +97,14 @@ object GeneratePrimarySecretSuccessViewModelSpec {
         SummaryListRow(
           key = Key(Text(messages("generatePrimarySecretSuccess.clientSecret"))),
           value = Value(Text(secret.secret)),
-          actions = Some(Actions())
+          actions = Some(Actions(items = Seq(ActionItem(content = HtmlContent(
+            new GovukButton().apply(
+              Button(
+                id = Some("copy-to-clipboard-button"),
+                content = Text("Copy"))
+            ))))))
         )
-      )
-    )
+      ))
   }
 
 }

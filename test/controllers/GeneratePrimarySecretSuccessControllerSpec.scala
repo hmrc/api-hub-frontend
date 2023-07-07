@@ -25,10 +25,10 @@ import models.application.{Approved, Credential, Scope, Secret}
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
-import play.api.{Configuration, Application => PlayApplication}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import play.api.{Configuration, Application => PlayApplication}
 import services.ApiHubService
 import utils.TestHelpers
 import viewmodels.GeneratePrimarySecretSuccessViewModel
@@ -70,7 +70,7 @@ class GeneratePrimarySecretSuccessControllerSpec extends SpecBase with MockitoSu
               )(messages(fixture.playApplication))
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual view(application, viewModel, Some(user))(request, messages(fixture.playApplication)).toString
+            contentAsString(result) mustEqual view(application, viewModel, Some(user), secret.secret)(request, messages(fixture.playApplication)).toString
           }
       }
     }

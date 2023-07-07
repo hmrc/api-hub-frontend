@@ -14,12 +14,12 @@
  * limitations under the License.
  *@
 
+@import components.FullWidthMainContent
 @import config.FrontendAppConfig
 @import models.user.UserModel
-@import uk.gov.hmrc.hmrcfrontend.views.config.StandardAlphaBanner
-@import components.FullWidthMainContent
-@import views.html.helper.CSPNonce
 @import templates.ApiHubHeader
+@import uk.gov.hmrc.hmrcfrontend.views.config.StandardAlphaBanner
+@import views.html.helper.CSPNonce
 
 @this(
     appConfig: FrontendAppConfig,
@@ -37,7 +37,7 @@
     header: ApiHubHeader
 )
 
-@(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = false, showSignOut: Boolean = true, user: Option[UserModel] = None, fullWidth: Boolean = false)(contentBlock: Html)(implicit request: Request[_], messages: Messages)
+@(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = false, showSignOut: Boolean = true, user: Option[UserModel] = None, fullWidth: Boolean = false,   customScriptsBlock: Option[Html] = None)(contentBlock: Html)(implicit request: Request[_], messages: Messages)
 
 @head = {
 
@@ -61,6 +61,10 @@
 
 @additionalScripts = {
     <script @{CSPNonce.attr} src='@controllers.routes.Assets.versioned("javascripts/application.min.js")'></script>
+    @{if (customScriptsBlock.isDefined) {
+        customScriptsBlock.get
+        }
+    }
 }
 
 @beforeContent = {
@@ -92,5 +96,5 @@
     scriptsBlock       = Some(hmrcScripts(
         scriptsBlock = Some(additionalScripts)
     )),
-    mainContentLayout = Some(if (fullWidth) fullWidthMainContentLayout(_) else twoThirdsMainContent(_))
+    mainContentLayout = Some(if (fullWidth) fullWidthMainContentLayout(_) else twoThirdsMainContent(_)),
 )(content)
