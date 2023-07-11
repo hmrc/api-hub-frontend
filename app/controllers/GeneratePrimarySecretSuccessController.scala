@@ -54,7 +54,7 @@ class GeneratePrimarySecretSuccessController @Inject()(
                 secret
               )
 
-              Ok(view(request.application, summaryList, Some(request.identifierRequest.user)))
+              Ok(view(request.application, summaryList, Some(request.identifierRequest.user), secret.secret))
             case _ =>
               logger.warn(s"No primary secret generated for application $id")
               NotFound
