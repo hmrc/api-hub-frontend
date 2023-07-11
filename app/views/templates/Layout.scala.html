@@ -34,7 +34,8 @@
     alphaBanner: StandardAlphaBanner,
     twoThirdsMainContent: TwoThirdsMainContent,
     fullWidthMainContentLayout: FullWidthMainContent,
-    header: ApiHubHeader
+    header: ApiHubHeader,
+    hmrcInternalHead: HmrcInternalHead
 )
 
 @(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = false, showSignOut: Boolean = true, user: Option[UserModel] = None, fullWidth: Boolean = false,   customScriptsBlock: Option[Html] = None)(contentBlock: Html)(implicit request: Request[_], messages: Messages)
@@ -89,7 +90,7 @@
 
 @govukLayout(
     pageTitle   = Some(pageTitle),
-    headBlock   = Some(head),
+    headBlock   = Some(hmrcInternalHead()),
     headerBlock = Some(header(showBackLink, user)),
     beforeContentBlock = Some(beforeContent),
     footerBlock        = Some(hmrcStandardFooter()),
