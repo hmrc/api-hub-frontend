@@ -90,7 +90,7 @@
 
 @govukLayout(
     pageTitle   = Some(pageTitle),
-    headBlock   = Some(hmrcInternalHead(head)),
+    headBlock   = Some(hmrcInternalHead(Some(head))),
     headerBlock = Some(header(showBackLink, user)),
     beforeContentBlock = Some(beforeContent),
     footerBlock        = Some(hmrcStandardFooter()),
