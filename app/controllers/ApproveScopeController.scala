@@ -18,11 +18,12 @@ package controllers
 
 import config.FrontendAppConfig
 import controllers.actions._
+import controllers.utils.ErrorHandling
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.ApproveScopeView
+import views.html.{ApproveScopeView, ErrorTemplate}
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
@@ -34,15 +35,15 @@ class ApproveScopeController @Inject()(
                                         val controllerComponents: MessagesControllerComponents,
                                         view: ApproveScopeView,
                                         apiHubService: ApiHubService,
-                                        config: FrontendAppConfig
-                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
-
+                                        config: FrontendAppConfig,
+                                        val errorTemplate: ErrorTemplate
+                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with ErrorHandling {
 
   def onPageLoad(id: String): Action[AnyContent] = (identify andThen canApprove).async {
     implicit request =>
       apiHubService.getApplication(id, enrich = false) map {
           case Some(application) => Ok(view(application, Some(request.user), config.environmentNames))
-          case _ => NotFound
+          case _ => notFound()
         }
   }
 
@@ -50,7 +51,11 @@ class ApproveScopeController @Inject()(
     implicit request =>
         apiHubService.approvePrimaryScope(id, scopeName).map {
           case true => Redirect(routes.PendingApprovalsController.onPageLoad())
-          case false => NotFound
+          case false => notFound()
         }
   }
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 }

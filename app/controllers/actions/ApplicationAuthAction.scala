@@ -18,13 +18,16 @@ package controllers.actions
 
 import com.google.inject.{Inject, Singleton}
 import controllers.routes
+import controllers.utils.ErrorHandling
 import models.application.Application
 import models.requests.{ApplicationRequest, IdentifierRequest}
 import models.user.UserModel
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.Results._
 import play.api.mvc.{ActionRefiner, Request, Result}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider
+import views.html.ErrorTemplate
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -37,7 +40,8 @@ trait ApplicationAuthActionProvider {
 }
 
 @Singleton
-class ApplicationAuthActionProviderImpl @Inject()(apiHubService: ApiHubService) extends ApplicationAuthActionProvider {
+class ApplicationAuthActionProviderImpl @Inject()(apiHubService: ApiHubService, val errorTemplate: ErrorTemplate)(implicit val messagesApi: MessagesApi)
+  extends ApplicationAuthActionProvider with ErrorHandling with I18nSupport {
 
   def apply(applicationId: String, enrich: Boolean = false)(implicit ec: ExecutionContext): ApplicationAuthAction = {
     new ApplicationAuthAction with FrontendHeaderCarrierProvider {
@@ -53,7 +57,7 @@ class ApplicationAuthActionProviderImpl @Inject()(apiHubService: ApiHubService) 
                 Left(Redirect(routes.UnauthorisedController.onPageLoad))
             }
           case None =>
-            Left(NotFound)
+            Left(notFound())
         }
       }
 
