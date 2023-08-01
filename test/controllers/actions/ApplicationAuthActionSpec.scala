@@ -85,7 +85,7 @@ object ApplicationAuthActionSpec extends MockitoSugar {
 
   def buildFixture(): Fixture = {
     val apiHubService = mock[ApiHubService]
-    Fixture(new ApplicationAuthActionProviderImpl(apiHubService), apiHubService)
+    Fixture(new ApplicationAuthActionProviderImpl(apiHubService, FakeErrorResultBuilder), apiHubService)
   }
 
   def buildInvokeBlock[A](): ApplicationRequest[A] => Future[Result] = {

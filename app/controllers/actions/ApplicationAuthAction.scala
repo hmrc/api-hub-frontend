@@ -18,6 +18,7 @@ package controllers.actions
 
 import com.google.inject.{Inject, Singleton}
 import controllers.routes
+import controllers.helpers.ErrorResultBuilder
 import models.application.Application
 import models.requests.{ApplicationRequest, IdentifierRequest}
 import models.user.UserModel
@@ -37,7 +38,7 @@ trait ApplicationAuthActionProvider {
 }
 
 @Singleton
-class ApplicationAuthActionProviderImpl @Inject()(apiHubService: ApiHubService) extends ApplicationAuthActionProvider {
+class ApplicationAuthActionProviderImpl @Inject()(apiHubService: ApiHubService, errorResultBuilder: ErrorResultBuilder) extends ApplicationAuthActionProvider {
 
   def apply(applicationId: String, enrich: Boolean = false)(implicit ec: ExecutionContext): ApplicationAuthAction = {
     new ApplicationAuthAction with FrontendHeaderCarrierProvider {
@@ -53,7 +54,7 @@ class ApplicationAuthActionProviderImpl @Inject()(apiHubService: ApiHubService) 
                 Left(Redirect(routes.UnauthorisedController.onPageLoad))
             }
           case None =>
-            Left(NotFound)
+            Left(errorResultBuilder.notFound())
         }
       }
 

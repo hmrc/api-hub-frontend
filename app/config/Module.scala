@@ -17,6 +17,7 @@
 package config
 
 import controllers.actions._
+import controllers.helpers.{ErrorResultBuilder, ErrorResultBuilderImpl}
 import play.api.inject.{Binding, bind => bindz}
 import play.api.{Configuration, Environment}
 
@@ -31,6 +32,7 @@ class Module extends play.api.inject.Module {
     bindz(classOf[DataRetrievalAction]).to(classOf[DataRetrievalActionImpl]).eagerly(),
     bindz(classOf[DataRequiredAction]).to(classOf[DataRequiredActionImpl]).eagerly(),
     bindz[ApplicationAuthActionProvider].to(classOf[ApplicationAuthActionProviderImpl]).eagerly(),
+    bindz[ErrorResultBuilder].to(classOf[ErrorResultBuilderImpl]).eagerly(),
 
     // For session based storage instead of cred based, change to SessionIdentifierAction
     bindz(classOf[IdentifierAction]).to(classOf[AuthenticatedIdentifierAction]).eagerly(),

@@ -18,6 +18,7 @@ package controllers
 
 import config.FrontendAppConfig
 import controllers.actions._
+import controllers.helpers.ErrorResultBuilder
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
@@ -34,7 +35,8 @@ class ApproveScopeController @Inject()(
                                         val controllerComponents: MessagesControllerComponents,
                                         view: ApproveScopeView,
                                         apiHubService: ApiHubService,
-                                        config: FrontendAppConfig
+                                        config: FrontendAppConfig,
+                                        errorResultBuilder: ErrorResultBuilder
                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
 
@@ -50,7 +52,7 @@ class ApproveScopeController @Inject()(
     implicit request =>
         apiHubService.approvePrimaryScope(id, scopeName).map {
           case true => Redirect(routes.PendingApprovalsController.onPageLoad())
-          case false => NotFound
+          case false => errorResultBuilder.notFound()
         }
   }
 }
