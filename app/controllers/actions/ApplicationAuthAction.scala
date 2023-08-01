@@ -18,7 +18,7 @@ package controllers.actions
 
 import com.google.inject.{Inject, Singleton}
 import controllers.routes
-import controllers.utils.ErrorHandling
+import controllers.utils.ErrorResults
 import models.application.Application
 import models.requests.{ApplicationRequest, IdentifierRequest}
 import models.user.UserModel
@@ -41,7 +41,7 @@ trait ApplicationAuthActionProvider {
 
 @Singleton
 class ApplicationAuthActionProviderImpl @Inject()(apiHubService: ApiHubService, val errorTemplate: ErrorTemplate)(implicit val messagesApi: MessagesApi)
-  extends ApplicationAuthActionProvider with ErrorHandling with I18nSupport {
+  extends ApplicationAuthActionProvider with ErrorResults with I18nSupport {
 
   def apply(applicationId: String, enrich: Boolean = false)(implicit ec: ExecutionContext): ApplicationAuthAction = {
     new ApplicationAuthAction with FrontendHeaderCarrierProvider {

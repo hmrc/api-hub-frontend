@@ -18,7 +18,7 @@ package controllers
 
 import config.FrontendAppConfig
 import controllers.actions._
-import controllers.utils.ErrorHandling
+import controllers.utils.ErrorResults
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
@@ -37,7 +37,7 @@ class ApproveScopeController @Inject()(
                                         apiHubService: ApiHubService,
                                         config: FrontendAppConfig,
                                         val errorTemplate: ErrorTemplate
-                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with ErrorHandling {
+                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with ErrorResults {
 
   def onPageLoad(id: String): Action[AnyContent] = (identify andThen canApprove).async {
     implicit request =>
@@ -54,8 +54,5 @@ class ApproveScopeController @Inject()(
           case false => notFound()
         }
   }
-<<<<<<< Updated upstream
-=======
 
->>>>>>> Stashed changes
 }

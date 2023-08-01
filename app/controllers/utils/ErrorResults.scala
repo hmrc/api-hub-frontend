@@ -21,7 +21,7 @@ import play.api.mvc.{Request, Result}
 import play.api.mvc.Results.NotFound
 import views.html.ErrorTemplate
 
-trait ErrorHandling {
+trait ErrorResults {
 
   def errorTemplate: ErrorTemplate
 
