@@ -16,7 +16,7 @@
 
 package repositories
 
-import config.FrontendAppConfig
+import config.{CryptoProvider, FrontendAppConfig}
 import models.UserAnswers
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model._
@@ -34,25 +34,32 @@ import scala.concurrent.{ExecutionContext, Future}
 class SessionRepository @Inject()(
                                    mongoComponent: MongoComponent,
                                    appConfig: FrontendAppConfig,
-                                   clock: Clock
+                                   clock: Clock,
+                                   cryptoProvider: CryptoProvider
                                  )(implicit ec: ExecutionContext)
   extends PlayMongoRepository[UserAnswers](
     collectionName = "user-answers",
     mongoComponent = mongoComponent,
-    domainFormat   = UserAnswers.format,
+    domainFormat   = UserAnswers.encryptedFormat(cryptoProvider.get()),
     indexes        = Seq(
       IndexModel(
         Indexes.ascending("lastUpdated"),
         IndexOptions()
           .name("lastUpdatedIdx")
           .expireAfter(appConfig.cacheTtl, TimeUnit.SECONDS)
+      ),
+      IndexModel(
+        Indexes.ascending("userId"),
+        IndexOptions()
+          .name("userIdIdx")
+          .unique(true)
       )
     )
   ) {
 
   implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
 
-  private def byId(id: String): Bson = Filters.equal("_id", id)
+  private def byId(id: String): Bson = Filters.equal("userId", id)
 
   def keepAlive(id: String): Future[Boolean] =
     collection
@@ -73,7 +80,7 @@ class SessionRepository @Inject()(
 
   def set(answers: UserAnswers): Future[Boolean] = {
 
-    val updatedAnswers = answers copy (lastUpdated = Instant.now(clock))
+    val updatedAnswers = answers.copy(lastUpdated = Instant.now(clock))
 
     collection
       .replaceOne(
@@ -90,4 +97,5 @@ class SessionRepository @Inject()(
       .deleteOne(byId(id))
       .toFuture()
       .map(_ => true)
+
 }
