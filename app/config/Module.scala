@@ -19,6 +19,7 @@ package config
 import controllers.actions._
 import play.api.inject.{Binding, bind => bindz}
 import play.api.{Configuration, Environment}
+import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 
 import java.time.{Clock, ZoneOffset}
 import scala.collection.immutable.Seq
@@ -28,14 +29,13 @@ class Module extends play.api.inject.Module {
   override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[_]] = {
 
     val bindings = Seq(
-    bindz(classOf[DataRetrievalAction]).to(classOf[DataRetrievalActionImpl]).eagerly(),
-    bindz(classOf[DataRequiredAction]).to(classOf[DataRequiredActionImpl]).eagerly(),
-    bindz[ApplicationAuthActionProvider].to(classOf[ApplicationAuthActionProviderImpl]).eagerly(),
-
-    // For session based storage instead of cred based, change to SessionIdentifierAction
-    bindz(classOf[IdentifierAction]).to(classOf[AuthenticatedIdentifierAction]).eagerly(),
-
-    bindz(classOf[Clock]).toInstance(Clock.systemDefaultZone.withZone(ZoneOffset.UTC)))
+      bindz(classOf[DataRetrievalAction]).to(classOf[DataRetrievalActionImpl]).eagerly(),
+      bindz(classOf[DataRequiredAction]).to(classOf[DataRequiredActionImpl]).eagerly(),
+      bindz[ApplicationAuthActionProvider].to(classOf[ApplicationAuthActionProviderImpl]).eagerly(),
+      bindz(classOf[IdentifierAction]).to(classOf[AuthenticatedIdentifierAction]).eagerly(),
+      bindz(classOf[Clock]).toInstance(Clock.systemDefaultZone.withZone(ZoneOffset.UTC)),
+      bindz[Encrypter with Decrypter].toProvider[CryptoProvider]
+    )
 
     val authTokenInitialiserBindings: Seq[Binding[_]] = if (configuration.get[Boolean]("create-internal-auth-token-on-start")) {
         Seq(bindz(classOf[InternalAuthTokenInitialiser]).to(classOf[InternalAuthTokenInitialiserImpl]).eagerly())
@@ -45,4 +45,5 @@ class Module extends play.api.inject.Module {
 
     bindings ++ authTokenInitialiserBindings
   }
+
 }
