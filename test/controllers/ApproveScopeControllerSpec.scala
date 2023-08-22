@@ -36,7 +36,7 @@ import scala.concurrent.Future
 class ApproveScopeControllerSpec extends SpecBase with MockitoSugar {
 
   "ApproveScopeController" - {
-    "must approve the scope and redirect to the pending applications page when user is approver" in {
+    "must approve the scope and redirect to the scope approved page when user is approver" in {
       val testId = "test-app-id"
       val scope = "my scope"
       val fixture = buildFixture(FakeApprover)
@@ -49,7 +49,7 @@ class ApproveScopeControllerSpec extends SpecBase with MockitoSugar {
         val result = route(fixture.application, request).value
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.PendingApprovalsController.onPageLoad().url)
+        redirectLocation(result) mustBe Some(routes.ScopeApprovedController.onPageLoad().url)
 
         verify(fixture.apiHubService).approvePrimaryScope(ArgumentMatchers.eq(testId), ArgumentMatchers.eq(scope))(any())
       }
