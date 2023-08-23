@@ -49,8 +49,9 @@ class ApproveScopeController @Inject()(
   def onApprove(id: String, scopeName: String): Action[AnyContent] = (identify andThen canApprove).async {
     implicit request =>
         apiHubService.approvePrimaryScope(id, scopeName).map {
-          case true => Redirect(routes.PendingApprovalsController.onPageLoad())
+          case true => Redirect(routes.ScopeApprovedController.onPageLoad())
           case false => NotFound
         }
   }
+
 }
