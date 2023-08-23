@@ -17,13 +17,15 @@
 package controllers
 
 import base.SpecBase
-import controllers.IndexControllerSpec.{buildFixture, buildFixtureWithUser}
+import controllers.IndexControllerSpec.{buildFixture, buildFixtureWithUser, validateHtml}
 import controllers.actions.FakeUser
 import models.application.{Application, Creator, TeamMember}
 import models.user.{Permissions, UserModel}
 import models.{NormalMode, UserAnswers}
+import nu.validator.htmlparser.sax.HtmlParser
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentCaptor, ArgumentMatchers, MockitoSugar}
+import org.xml.sax.helpers.DefaultHandler
 import pages.TeamMembersPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -33,7 +35,9 @@ import repositories.SessionRepository
 import services.ApiHubService
 import views.html.IndexView
 
+import java.io.ByteArrayInputStream
 import scala.concurrent.Future
+import scala.xml.InputSource
 
 class IndexControllerSpec extends SpecBase with MockitoSugar {
 
@@ -64,6 +68,8 @@ class IndexControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual view(applications, Some(FakeUser))(request, messages(fixture.application)).toString
+        validateHtml(contentAsString(result))
+        println(contentAsString(result))
       }
     }
 
@@ -194,6 +200,15 @@ object IndexControllerSpec extends SpecBase with MockitoSugar {
       .build()
 
     Fixture(application, mockSessionRepository, apiHubService)
+  }
+
+  def validateHtml(html: String): Unit = {
+    val parser: HtmlParser = new HtmlParser()
+    val byteStream: ByteArrayInputStream = new ByteArrayInputStream(html.getBytes)
+    val inputSource: InputSource = new InputSource(byteStream)
+    parser.setContentHandler(new DefaultHandler())
+    parser.setScriptingEnabled(true)
+    parser.parse(inputSource)
   }
 
 }
