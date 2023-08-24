@@ -17,6 +17,7 @@
 package config
 
 import controllers.actions._
+import controllers.helpers.{ErrorResultBuilder, ErrorResultBuilderImpl}
 import play.api.inject.{Binding, bind => bindz}
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
@@ -34,7 +35,8 @@ class Module extends play.api.inject.Module {
       bindz[ApplicationAuthActionProvider].to(classOf[ApplicationAuthActionProviderImpl]).eagerly(),
       bindz(classOf[IdentifierAction]).to(classOf[AuthenticatedIdentifierAction]).eagerly(),
       bindz(classOf[Clock]).toInstance(Clock.systemDefaultZone.withZone(ZoneOffset.UTC)),
-      bindz[Encrypter with Decrypter].toProvider[CryptoProvider]
+      bindz[Encrypter with Decrypter].toProvider[CryptoProvider],
+      bindz(classOf[ErrorResultBuilder]).to(classOf[ErrorResultBuilderImpl]).eagerly()
     )
 
     val authTokenInitialiserBindings: Seq[Binding[_]] = if (configuration.get[Boolean]("create-internal-auth-token-on-start")) {

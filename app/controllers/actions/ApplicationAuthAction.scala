@@ -17,10 +17,12 @@
 package controllers.actions
 
 import com.google.inject.{Inject, Singleton}
+import controllers.helpers.ErrorResultBuilder
 import controllers.routes
 import models.application.Application
 import models.requests.{ApplicationRequest, IdentifierRequest}
 import models.user.UserModel
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.Results._
 import play.api.mvc.{ActionRefiner, Request, Result}
 import services.ApiHubService
@@ -37,7 +39,11 @@ trait ApplicationAuthActionProvider {
 }
 
 @Singleton
-class ApplicationAuthActionProviderImpl @Inject()(apiHubService: ApiHubService) extends ApplicationAuthActionProvider {
+class ApplicationAuthActionProviderImpl @Inject()(
+  apiHubService: ApiHubService,
+  errorResultBuilder: ErrorResultBuilder,
+  override val messagesApi: MessagesApi
+) extends ApplicationAuthActionProvider with I18nSupport {
 
   def apply(applicationId: String, enrich: Boolean = false)(implicit ec: ExecutionContext): ApplicationAuthAction = {
     new ApplicationAuthAction with FrontendHeaderCarrierProvider {
@@ -53,7 +59,12 @@ class ApplicationAuthActionProviderImpl @Inject()(apiHubService: ApiHubService) 
                 Left(Redirect(routes.UnauthorisedController.onPageLoad))
             }
           case None =>
-            Left(NotFound)
+            Left(
+              errorResultBuilder.notFound(
+                Messages("site.applicationNotFoundHeading"),
+                Messages("site.applicationNotFoundMessage", applicationId)
+              )
+            )
         }
       }
 

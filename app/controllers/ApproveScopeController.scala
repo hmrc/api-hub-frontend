@@ -18,7 +18,8 @@ package controllers
 
 import config.FrontendAppConfig
 import controllers.actions._
-import play.api.i18n.{I18nSupport, MessagesApi}
+import controllers.helpers.ErrorResultBuilder
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -34,23 +35,29 @@ class ApproveScopeController @Inject()(
                                         val controllerComponents: MessagesControllerComponents,
                                         view: ApproveScopeView,
                                         apiHubService: ApiHubService,
-                                        config: FrontendAppConfig
+                                        config: FrontendAppConfig,
+                                        errorResultBuilder: ErrorResultBuilder
                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
-
 
   def onPageLoad(id: String): Action[AnyContent] = (identify andThen canApprove).async {
     implicit request =>
       apiHubService.getApplication(id, enrich = false) map {
-          case Some(application) => Ok(view(application, Some(request.user), config.environmentNames))
-          case _ => NotFound
-        }
+        case Some(application) => Ok(view(application, Some(request.user), config.environmentNames))
+        case _ => errorResultBuilder.notFound(
+            Messages("site.applicationNotFoundHeading"),
+            Messages("site.applicationNotFoundMessage", id)
+          )
+      }
   }
 
   def onApprove(id: String, scopeName: String): Action[AnyContent] = (identify andThen canApprove).async {
     implicit request =>
         apiHubService.approvePrimaryScope(id, scopeName).map {
           case true => Redirect(routes.ScopeApprovedController.onPageLoad())
-          case false => NotFound
+          case false => errorResultBuilder.notFound(
+            Messages("approveScope.notFound.heading"),
+            Messages("approveScope.notFound.message", scopeName, id)
+          )
         }
   }
 

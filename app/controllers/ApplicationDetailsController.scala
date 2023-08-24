@@ -18,7 +18,8 @@ package controllers
 
 import config.FrontendAppConfig
 import controllers.actions._
-import play.api.i18n.{I18nSupport, MessagesApi}
+import controllers.helpers.ErrorResultBuilder
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -34,7 +35,8 @@ class ApplicationDetailsController @Inject()(
   view: ApplicationDetailsView,
   applicationAuth: ApplicationAuthActionProvider,
   config: FrontendAppConfig,
-  apiHubService: ApiHubService
+  apiHubService: ApiHubService,
+  errorResultBuilder: ErrorResultBuilder
 ) (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id, enrich = true)) {
@@ -45,7 +47,10 @@ class ApplicationDetailsController @Inject()(
     implicit request =>
       apiHubService.deleteApplication(id).map {
         case Some(()) => Redirect(routes.IndexController.onPageLoad)
-        case None => NotFound
+        case None => errorResultBuilder.notFound(
+            Messages("site.applicationNotFoundHeading"),
+            Messages("site.applicationNotFoundMessage", id)
+          )
       }
   }
 
