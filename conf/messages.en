@@ -47,8 +47,6 @@ index.heading.admin = All Applications
 index.registerApplication = Register an application
 index.applications.name = Name
 index.applications.id = Id
-index.noEmail.heading = No email address
-index.noEmail.message = You have logged in using an account that does not have an email address.
 
 checkYourAnswers.title = Check Your Answers
 checkYourAnswers.heading = Check your answers before creating your application

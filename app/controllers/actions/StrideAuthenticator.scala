@@ -47,7 +47,14 @@ class StrideAuthenticator @Inject()(
               userId = s"STRIDE-${credentials.map(_.providerId).getOrElse(name)}",
               userName = name.map(_.name.getOrElse("")).getOrElse(""),
               userType = StrideUser,
-              email = email,
+              email = email.flatMap(
+                e => if (e.trim.isEmpty) {
+                  None
+                }
+                else {
+                  Some(e)
+                }
+              ),
               permissions = Permissions(
                 canApprove = authorisedEnrolments.enrolments.exists(enrolment => enrolment.key.equals(API_HUB_APPROVER_ROLE)),
                 canAdminister = authorisedEnrolments.enrolments.exists(enrolment => enrolment.key.equals(API_HUB_ADMINISTRATOR_ROLE))

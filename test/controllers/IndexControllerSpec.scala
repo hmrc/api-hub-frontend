@@ -161,7 +161,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must return Bad Request if the user has no email address for a GET" in {
+    "must return Internal Server Error if the user has no email address for a GET" in {
       val fixture = buildFixtureWithUser(FakeUser.copy(email = None))
 
       running(fixture.application) {
@@ -169,18 +169,18 @@ class IndexControllerSpec extends SpecBase with MockitoSugar {
         val result = route(fixture.application, request).value
         val view = fixture.application.injector.instanceOf[ErrorTemplate]
 
-        status(result) mustEqual BAD_REQUEST
+        status(result) mustEqual INTERNAL_SERVER_ERROR
         contentAsString(result) mustBe
           view(
-            "Bad request - 400",
-            "No email address",
-            "You have logged in using an account that does not have an email address."
+            "Sorry, we are experiencing technical difficulties - 500",
+            "Sorry, we’re experiencing technical difficulties",
+            "Please try again in a few minutes."
           )(request, messages(fixture.application))
             .toString()
       }
     }
 
-    "must return Bad Request if the user has no email address while attempting to create an application" in {
+    "must return Internal Server Error if the user has no email address while attempting to create an application" in {
       val fixture = buildFixtureWithUser(FakeUser.copy(email = None))
 
       running(fixture.application) {
@@ -188,12 +188,12 @@ class IndexControllerSpec extends SpecBase with MockitoSugar {
         val result = route(fixture.application, request).value
         val view = fixture.application.injector.instanceOf[ErrorTemplate]
 
-        status(result) mustEqual BAD_REQUEST
+        status(result) mustEqual INTERNAL_SERVER_ERROR
         contentAsString(result) mustBe
           view(
-            "Bad request - 400",
-            "No email address",
-            "You have logged in using an account that does not have an email address."
+            "Sorry, we are experiencing technical difficulties - 500",
+            "Sorry, we’re experiencing technical difficulties",
+            "Please try again in a few minutes."
           )(request, messages(fixture.application))
             .toString()
       }
