@@ -24,35 +24,11 @@ import play.api.mvc.{Request, Result}
 import play.api.mvc.Results.{BadRequest, InternalServerError, NotFound}
 import views.html.ErrorTemplate
 
-trait ErrorResultBuilder {
-
-  def badRequest()(implicit request: Request[_]): Result
-
-  def badRequest(message: String)(implicit request: Request[_]): Result
-
-  def badRequest(heading: String, message: String)(implicit request: Request[_]): Result
-
-  def badRequest(title: String, heading: String, message: String)(implicit request: Request[_]): Result
-
-  def notFound()(implicit request: Request[_]): Result
-
-  def notFound(message: String)(implicit request: Request[_]): Result
-
-  def notFound(heading: String, message: String)(implicit request: Request[_]): Result
-
-  def notFound(title: String, heading: String, message: String)(implicit request: Request[_]): Result
-
-  def internalServerError(error: String)(implicit request: Request[_]): Result
-
-  def internalServerError(t: Throwable)(implicit request: Request[_]): Result
-
-}
-
 @Singleton
-class ErrorResultBuilderImpl @Inject()(
+class ErrorResultBuilder @Inject()(
   errorTemplate: ErrorTemplate,
   override val messagesApi: MessagesApi
-) extends ErrorResultBuilder with I18nSupport with Logging {
+) extends I18nSupport with Logging {
 
   def badRequest()(implicit request: Request[_]): Result = {
     badRequest(None, None, None)
@@ -109,10 +85,12 @@ class ErrorResultBuilderImpl @Inject()(
   }
 
   def internalServerError(error: String)(implicit request: Request[_]): Result = {
+    logger.warn(s"Internal server error: $error")
     internalServerError()
   }
 
   def internalServerError(t: Throwable)(implicit request: Request[_]): Result = {
+    logger.warn("Internal server error", t)
     internalServerError()
   }
 
