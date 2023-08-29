@@ -28,6 +28,7 @@ import play.api.inject
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
+import views.html.ErrorTemplate
 
 import scala.concurrent.Future
 
@@ -80,9 +81,8 @@ class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with Opt
 
     val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
-
     running(application) {
-      val request = FakeRequest(DELETE, routes.RemoveTeamMemberController.removeTeamMember(0).url)
+      val request = FakeRequest(GET, routes.RemoveTeamMemberController.removeTeamMember(0).url)
 
       val result = route(application, request).value
       status(result) mustEqual NOT_FOUND
@@ -97,12 +97,19 @@ class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with Opt
 
     val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
-
     running(application) {
-      val request = FakeRequest(DELETE, routes.RemoveTeamMemberController.removeTeamMember(99).url)
-
+      val request = FakeRequest(GET, routes.RemoveTeamMemberController.removeTeamMember(99).url)
       val result = route(application, request).value
+      val view = application.injector.instanceOf[ErrorTemplate]
+
       status(result) mustEqual NOT_FOUND
+      contentAsString(result) mustBe
+        view(
+          "Page not found - 404",
+          "This page can’t be found",
+          "Cannot find this team member."
+        )(request, messages(application))
+          .toString()
     }
   }
 
@@ -111,10 +118,20 @@ class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with Opt
     val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
     running(application) {
-      val request = FakeRequest(DELETE, routes.RemoveTeamMemberController.removeTeamMember(1).url)
+      val request = FakeRequest(GET, routes.RemoveTeamMemberController.removeTeamMember(1).url)
 
       val result = route(application, request).value
+      val view = application.injector.instanceOf[ErrorTemplate]
+
       status(result) mustEqual NOT_FOUND
+      contentAsString(result) mustBe
+        view(
+          "Page not found - 404",
+          "This page can’t be found",
+          "Cannot find this team member."
+        )(request, messages(application))
+          .toString()
     }
   }
+
 }

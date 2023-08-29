@@ -31,7 +31,7 @@ import play.api.test.Helpers._
 import play.api.{Application => PlayApplication}
 import repositories.SessionRepository
 import services.ApiHubService
-import views.html.IndexView
+import views.html.{ErrorTemplate, IndexView}
 
 import scala.concurrent.Future
 
@@ -160,7 +160,46 @@ class IndexControllerSpec extends SpecBase with MockitoSugar {
 
       }
     }
+
+    "must return Bad Request if the user has no email address for a GET" in {
+      val fixture = buildFixtureWithUser(FakeUser.copy(email = None))
+
+      running(fixture.application) {
+        val request = FakeRequest(GET, routes.IndexController.onPageLoad.url)
+        val result = route(fixture.application, request).value
+        val view = fixture.application.injector.instanceOf[ErrorTemplate]
+
+        status(result) mustEqual BAD_REQUEST
+        contentAsString(result) mustBe
+          view(
+            "Bad request - 400",
+            "No email address",
+            "You have logged in using an account that does not have an email address."
+          )(request, messages(fixture.application))
+            .toString()
+      }
+    }
+
+    "must return Bad Request if the user has no email address while attempting to create an application" in {
+      val fixture = buildFixtureWithUser(FakeUser.copy(email = None))
+
+      running(fixture.application) {
+        val request = FakeRequest(POST, routes.IndexController.onSubmit.url)
+        val result = route(fixture.application, request).value
+        val view = fixture.application.injector.instanceOf[ErrorTemplate]
+
+        status(result) mustEqual BAD_REQUEST
+        contentAsString(result) mustBe
+          view(
+            "Bad request - 400",
+            "No email address",
+            "You have logged in using an account that does not have an email address."
+          )(request, messages(fixture.application))
+            .toString()
+      }
+    }
   }
+
 }
 
 object IndexControllerSpec extends SpecBase with MockitoSugar {

@@ -18,6 +18,7 @@ package controllers.helpers
 
 import com.google.inject.{Inject, Singleton}
 import play.api.Logging
+import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND}
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Request, Result}
 import play.api.mvc.Results.{BadRequest, InternalServerError, NotFound}
@@ -71,7 +72,8 @@ class ErrorResultBuilderImpl @Inject()(
 
   private def badRequest(title: Option[String], heading: Option[String], message: Option[String])(implicit request: Request[_]): Result = {
     BadRequest(
-      errorTemplate(
+      logAndBuildErrorTemplate(
+        BAD_REQUEST,
         title.getOrElse(Messages("global.error.badRequest400.title")),
         heading.getOrElse(Messages("global.error.badRequest400.heading")),
         message.getOrElse(Messages("global.error.badRequest400.message"))
@@ -97,7 +99,8 @@ class ErrorResultBuilderImpl @Inject()(
 
   private def notFound(title: Option[String], heading: Option[String], message: Option[String])(implicit request: Request[_]): Result = {
     NotFound(
-      errorTemplate(
+      logAndBuildErrorTemplate(
+        NOT_FOUND,
         title.getOrElse(Messages("global.error.pageNotFound404.title")),
         heading.getOrElse(Messages("global.error.pageNotFound404.heading")),
         message.getOrElse(Messages("global.error.pageNotFound404.message"))
@@ -115,11 +118,22 @@ class ErrorResultBuilderImpl @Inject()(
 
   private def internalServerError()(implicit request: Request[_]): Result = {
     InternalServerError(
-      errorTemplate(
+      logAndBuildErrorTemplate(
+        INTERNAL_SERVER_ERROR,
         Messages("global.error.InternalServerError500.title"),
         Messages("global.error.InternalServerError500.heading"),
         Messages("global.error.InternalServerError500.message")
       )
+    )
+  }
+
+  private def logAndBuildErrorTemplate(status: Int, title: String, heading: String, message: String)(implicit request: Request[_]) = {
+    logger.warn(s"Responding with error status $status. Title: $title Heading: $heading Message: $message")
+
+    errorTemplate(
+      title,
+      heading,
+      message
     )
   }
 

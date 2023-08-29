@@ -32,7 +32,7 @@ import play.api.{Configuration, Application => PlayApplication}
 import services.ApiHubService
 import utils.TestHelpers
 import viewmodels.GeneratePrimarySecretSuccessViewModel
-import views.html.GeneratePrimarySecretSuccessView
+import views.html.{ErrorTemplate, GeneratePrimarySecretSuccessView}
 
 import scala.concurrent.Future
 
@@ -89,6 +89,37 @@ class GeneratePrimarySecretSuccessControllerSpec extends SpecBase with MockitoSu
       }
     }
 
+    "must return 404 Not Found when the primary credential does not exist in IDMS" in {
+      val credential = Credential("test-client-id", None, None)
+      val application = FakeApplication
+        .setPrimaryScopes(Seq(Scope("test-scope-1", Approved), Scope("test-scope-2", Approved)))
+        .setPrimaryCredentials(Seq(credential))
+
+      val fixture = buildFixture()
+
+      running(fixture.playApplication) {
+        when(fixture.apiHubService.getApplication(any(), any())(any()))
+          .thenReturn(Future.successful(Some(application)))
+
+        when(fixture.apiHubService.createPrimarySecret(ArgumentMatchers.eq(application.id))(any()))
+          .thenReturn(Future.successful(None))
+
+        val request = FakeRequest(GET, routes.GeneratePrimarySecretSuccessController.onPageLoad(application.id).url)
+        val result = route(fixture.playApplication, request).value
+        val view = fixture.playApplication.injector.instanceOf[ErrorTemplate]
+
+        status(result) mustEqual NOT_FOUND
+        contentAsString(result) mustBe
+          view(
+            "Page not found - 404",
+            "Primary credential not found",
+            "This application's primary credential cannot be found in IDMS."
+          )(request, messages(fixture.playApplication))
+            .toString()
+      }
+
+    }
+
     "must return 400 Bad Request when the application does not have a valid primary credential" in {
       val credential = Credential("test-client-id", None, Some("secret-fragment"))
       val application = FakeApplication
@@ -102,8 +133,16 @@ class GeneratePrimarySecretSuccessControllerSpec extends SpecBase with MockitoSu
 
         val request = FakeRequest(GET, routes.GeneratePrimarySecretSuccessController.onPageLoad(application.id).url)
         val result = route(fixture.playApplication, request).value
+        val view = fixture.playApplication.injector.instanceOf[ErrorTemplate]
 
         status(result) mustBe BAD_REQUEST
+        contentAsString(result) mustBe
+          view(
+            "Bad request - 400",
+            "Invalid primary credential",
+            "This application does not have a valid primary credential to generate a secret for."
+          )(request, messages(fixture.playApplication))
+            .toString()
       }
     }
 

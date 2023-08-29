@@ -47,6 +47,8 @@ index.heading.admin = All Applications
 index.registerApplication = Register an application
 index.applications.name = Name
 index.applications.id = Id
+index.noEmail.heading = No email address
+index.noEmail.message = You have logged in using an account that does not have an email address.
 
 checkYourAnswers.title = Check Your Answers
 checkYourAnswers.heading = Check your answers before creating your application
@@ -201,6 +203,10 @@ generatePrimarySecretSuccess.onceOnlyWarning = You client secret will only be di
 generatePrimarySecretSuccess.guidance.heading = What you can do now
 generatePrimarySecretSuccess.guidance.content = Return to your application and manage your {0}.
 generatePrimarySecretSuccess.guidance.link = client secrets
+generatePrimarySecretSuccess.notFound.heading = Primary credential not found
+generatePrimarySecretSuccess.notFound.message = This application''s primary credential cannot be found in IDMS.
+generatePrimarySecretSuccess.invalidCredential.heading = Invalid primary credential
+generatePrimarySecretSuccess.invalidCredential.message = This application does not have a valid primary credential to generate a secret for.
 
 productionCredentialsChecklist.title = Generating production credentials
 productionCredentialsChecklist.heading = Generating production credentials
