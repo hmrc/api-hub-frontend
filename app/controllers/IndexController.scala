@@ -17,13 +17,14 @@
 package controllers
 
 import controllers.actions.IdentifierAction
+import controllers.helpers.ErrorResultBuilder
 import models.application.TeamMember
 import models.requests.IdentifierRequest
 import models.{NormalMode, UserAnswers}
 import pages.TeamMembersPage
 import play.api.Logging
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc._
 import repositories.SessionRepository
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -37,13 +38,13 @@ class IndexController @Inject()(
                                  identify: IdentifierAction,
                                  sessionRepository: SessionRepository,
                                  view: IndexView,
-                                 apiHubService: ApiHubService
+                                 apiHubService: ApiHubService,
+                                 errorResultBuilder: ErrorResultBuilder
                                )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   def onPageLoad: Action[AnyContent] = identify.async { implicit request =>
     request.user.email.fold[Future[Result]] {
-      logger.warn("Current user has no email address")
-      Future.successful(InternalServerError)
+      noEmail()
     }(email =>
       if (request.user.permissions.canAdminister){
           apiHubService.getApplications().map(apps => Ok(view(apps, Some(request.user))))
@@ -53,15 +54,13 @@ class IndexController @Inject()(
     )
   }
 
-
   def onSubmit: Action[AnyContent] = identify.async { implicit request => createUserApplication }
 
   def createApplication: Action[AnyContent] = identify.async { implicit request => createUserApplication }
 
   private def createUserApplication(implicit request: IdentifierRequest[AnyContent]): Future[Result] = {
     request.user.email.fold[Future[Result]] {
-      logger.warn("Current user has no email address")
-      Future.successful(InternalServerError)
+      noEmail()
     }(
       email =>
         for {
@@ -70,4 +69,11 @@ class IndexController @Inject()(
         } yield Redirect(routes.ApplicationNameController.onPageLoad(NormalMode))
     )
   }
+
+  private def noEmail()(implicit request: Request[_]): Future[Result] = {
+    Future.successful(
+      errorResultBuilder.internalServerError("The current user does not have an email address")
+    )
+  }
+
 }

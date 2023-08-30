@@ -18,10 +18,11 @@ package controllers
 
 import config.FrontendAppConfig
 import controllers.actions._
+import controllers.helpers.ErrorResultBuilder
 import models.application.ApplicationLenses.ApplicationLensOps
 import models.application.{Application, Credential}
 import play.api.Logging
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -38,7 +39,8 @@ class GeneratePrimarySecretSuccessController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   view: GeneratePrimarySecretSuccessView,
   apiHubService: ApiHubService,
-  frontendAppConfig: FrontendAppConfig
+  frontendAppConfig: FrontendAppConfig,
+  errorResultBuilder: ErrorResultBuilder
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id)).async {
@@ -56,12 +58,18 @@ class GeneratePrimarySecretSuccessController @Inject()(
 
               Ok(view(request.application, summaryList, Some(request.identifierRequest.user), secret.secret))
             case _ =>
-              logger.warn(s"No primary secret generated for application $id")
-              NotFound
+              errorResultBuilder.notFound(
+                Messages("generatePrimarySecretSuccess.notFound.heading"),
+                Messages("generatePrimarySecretSuccess.notFound.message")
+              )
           }
         case None =>
-          logger.warn(s"Cannot find valid primary credential to generate secret for application $id")
-          Future.successful(BadRequest)
+          Future.successful(
+            errorResultBuilder.badRequest(
+              Messages("generatePrimarySecretSuccess.invalidCredential.heading"),
+              Messages("generatePrimarySecretSuccess.invalidCredential.message")
+            )
+          )
       }
   }
 
