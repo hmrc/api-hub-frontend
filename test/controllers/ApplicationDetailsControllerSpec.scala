@@ -28,12 +28,12 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Configuration, Application => PlayApplication}
 import services.ApiHubService
-import utils.TestHelpers
+import utils.{HtmlValidation, TestHelpers}
 import views.html.ApplicationDetailsView
 
 import scala.concurrent.Future
 
-class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with TestHelpers {
+class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with TestHelpers with HtmlValidation {
 
   "ApplicationDetails Controller" - {
 
@@ -73,6 +73,8 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
             content must include (messages(fixture.playApplication).apply("applicationDetails.credentials.clientId"))
             content must include("secondary secret")
             content must include("secondary_client_id")
+
+            content must validateAsHtml
           }
       }
     }
