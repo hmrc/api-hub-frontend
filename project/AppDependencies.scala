@@ -29,7 +29,7 @@ object AppDependencies {
     "uk.gov.hmrc.mongo"       %% "hmrc-mongo-test-play-28" % hmrcMongoVersion,
     "com.vladsch.flexmark"    %  "flexmark-all"            % "0.62.2",
     "uk.gov.hmrc"             %% "bootstrap-test-play-28"  % bootstrapPlayVersion,
-    "nu.validator"            %  "htmlparser"              % "1.4.16"
+    "nu.validator"            %  "validator"               % "20.7.2"
   ).map(_ % "test, it")
 
   def apply(): Seq[ModuleID] = compile ++ test
