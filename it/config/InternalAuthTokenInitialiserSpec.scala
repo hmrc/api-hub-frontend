@@ -48,6 +48,11 @@ class InternalAuthTokenInitialiserSpec extends AnyFreeSpec with Matchers with Sc
             "resourceType" -> "api-hub-applications",
             "resourceLocation" -> "*",
             "actions" -> List("READ","WRITE","DELETE")
+          ),
+          Json.obj(
+            "resourceType" -> "integration-catalogue",
+            "resourceLocation" -> "*",
+            "actions" -> List("READ","WRITE","DELETE")
           )
         )
       )

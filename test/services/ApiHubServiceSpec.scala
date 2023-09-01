@@ -16,7 +16,8 @@
 
 package services
 
-import connectors.ApplicationsConnector
+import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
+import generators.ApiDetailGenerators
 import models.application._
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
@@ -27,7 +28,13 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 
-class ApiHubServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar with OptionValues with ApplicationGetterBehaviours {
+class ApiHubServiceSpec
+  extends AsyncFreeSpec
+    with Matchers
+    with MockitoSugar
+    with OptionValues
+    with ApplicationGetterBehaviours
+    with ApiDetailGenerators {
 
   "registerApplication" - {
     "must call the applications connector and return the saved application" in {
@@ -38,7 +45,8 @@ class ApiHubServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar wi
       when(applicationsConnector.registerApplication(ArgumentMatchers.eq(newApplication))(any()))
         .thenReturn(Future.successful(expected))
 
-      val service = new ApiHubService(applicationsConnector)
+      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
 
       service.registerApplication(newApplication)(HeaderCarrier()) map {
         actual =>
@@ -58,7 +66,8 @@ class ApiHubServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar wi
       val applicationsConnector = mock[ApplicationsConnector]
       when(applicationsConnector.getApplications()(any())).thenReturn(Future.successful(expected))
 
-      val service = new ApiHubService(applicationsConnector)
+      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
 
       service.getApplications()(HeaderCarrier()) map {
         actual =>
@@ -75,7 +84,8 @@ class ApiHubServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar wi
       val applicationsConnector = mock[ApplicationsConnector]
       when(applicationsConnector.getUserApplications(ArgumentMatchers.eq("test-creator-email-2"))(any())).thenReturn(Future.successful(expected))
 
-      val service = new ApiHubService(applicationsConnector)
+      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
 
       service.getUserApplications("test-creator-email-2")(HeaderCarrier()) map {
         actual =>
@@ -103,7 +113,8 @@ class ApiHubServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar wi
       when(applicationsConnector.deleteApplication(ArgumentMatchers.eq(id))(any()))
         .thenReturn(Future.successful(Some(())))
 
-      val service = new ApiHubService(applicationsConnector)
+      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
 
       service.deleteApplication(id)(HeaderCarrier()) map {
         actual =>
@@ -120,7 +131,8 @@ class ApiHubServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar wi
       when(applicationsConnector.deleteApplication(ArgumentMatchers.eq(id))(any()))
         .thenReturn(Future.successful(None))
 
-      val service = new ApiHubService(applicationsConnector)
+      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
 
       service.deleteApplication(id)(HeaderCarrier()) map {
         actual =>
@@ -138,7 +150,8 @@ class ApiHubServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar wi
       when(applicationsConnector.requestAdditionalScope(ArgumentMatchers.eq(applicationId), ArgumentMatchers.eq(newScope))(any()))
         .thenReturn(Future.successful(Some(newScope)))
 
-      val service = new ApiHubService(applicationsConnector)
+      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
 
       service.requestAdditionalScope(applicationId, newScope)(HeaderCarrier()) map {
         actual =>
@@ -158,7 +171,8 @@ class ApiHubServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar wi
       val applicationsConnector = mock[ApplicationsConnector]
       when(applicationsConnector.pendingPrimaryScopes()(any())).thenReturn(Future.successful(expected))
 
-      val service = new ApiHubService(applicationsConnector)
+      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
 
       service.pendingPrimaryScopes()(HeaderCarrier()) map {
         actual =>
@@ -177,7 +191,8 @@ class ApiHubServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar wi
       when(applicationsConnector.approvePrimaryScope(ArgumentMatchers.eq(appId),ArgumentMatchers.eq(scope))(any()))
         .thenReturn(Future.successful(true))
 
-      val service = new ApiHubService(applicationsConnector)
+      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
 
       service.approvePrimaryScope(appId,scope)(HeaderCarrier()) map {
         actual =>
@@ -193,7 +208,8 @@ class ApiHubServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar wi
       val applicationId = "test-application-id"
       val expected = Secret("test-secret")
       val applicationsConnector = mock[ApplicationsConnector]
-      val service = new ApiHubService(applicationsConnector)
+      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
 
       when(applicationsConnector.createPrimarySecret(ArgumentMatchers.eq(applicationId))(any()))
         .thenReturn(Future.successful(Some(expected)))
@@ -209,7 +225,8 @@ class ApiHubServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar wi
     "must call the applications connector and return something" in {
       val expected = "something"
       val applicationsConnector = mock[ApplicationsConnector]
-      val service = new ApiHubService(applicationsConnector)
+      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
 
       when(applicationsConnector.testConnectivity()(any()))
         .thenReturn(Future.successful(expected))
@@ -217,6 +234,24 @@ class ApiHubServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar wi
       service.testConnectivity()(HeaderCarrier()) map {
         actual =>
           actual mustBe expected
+      }
+    }
+  }
+
+  "getApiDetail" - {
+    "must call the integration catalogue connector and return the API detail" in {
+      val expected = arbitraryApiDetail.arbitrary.sample.value
+
+      val applicationsConnector = mock[ApplicationsConnector]
+      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+
+      when(integrationCatalogueConnector.getApiDetail(ArgumentMatchers.eq(expected.id))(any()))
+        .thenReturn(Future.successful(Some(expected)))
+
+      service.getApiDetail(expected.id)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe Some(expected)
       }
     }
   }
@@ -234,7 +269,8 @@ trait ApplicationGetterBehaviours {
       val applicationsConnector = mock[ApplicationsConnector]
       when(applicationsConnector.getApplication(ArgumentMatchers.eq("id-1"), ArgumentMatchers.eq(enrich))(any())).thenReturn(Future.successful(expected))
 
-      val service = new ApiHubService(applicationsConnector)
+      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
 
       service.getApplication("id-1", enrich)(HeaderCarrier()) map {
         actual =>
