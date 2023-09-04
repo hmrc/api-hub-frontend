@@ -25,7 +25,6 @@
 
 @layout(pageTitle = titleNoForm(messages("apiDetails.title")), user = user) {
 
-    <h1 class="govuk-heading-l">@messages("apiDetails.heading")</h1>
-    <p class="govuk-body">@apiDetail.title</p>
+    <h1 class="govuk-heading-l">@messages("apiDetails.apiName"): @apiDetail.title</h1>
 
 }

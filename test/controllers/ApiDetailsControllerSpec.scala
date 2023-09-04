@@ -16,19 +16,16 @@
 
 package controllers
 
-import controllers.actions.{FakeOptionalIdentifierAction, FakeUser, OptionalIdentifierAction, OptionalUserProvider, OptionalUserProviderImpl}
+import base.OptionallyAuthenticatedSpecBase
+import controllers.actions.FakeUser
 import generators.ApiDetailGenerators
 import models.api.ApiDetail
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import play.api.Application
-import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.ApiHubService
@@ -36,7 +33,7 @@ import views.html.{ApiDetailsView, ErrorTemplate}
 
 import scala.concurrent.Future
 
-class ApiDetailsControllerSpec extends AnyFreeSpec with Matchers with MockitoSugar with ScalaCheckDrivenPropertyChecks with ApiDetailGenerators {
+class ApiDetailsControllerSpec extends OptionallyAuthenticatedSpecBase with MockitoSugar with ScalaCheckDrivenPropertyChecks with ApiDetailGenerators {
 
   "GET" - {
     "must return OK and the correct view when the API detail exists for an unauthenticated user" in {
@@ -108,19 +105,13 @@ class ApiDetailsControllerSpec extends AnyFreeSpec with Matchers with MockitoSug
   private def buildFixture(userModel: Option[UserModel] = None): Fixture = {
     val apiHubService = mock[ApiHubService]
 
-    val application = GuiceApplicationBuilder()
+    val application = applicationBuilder(userModel)
       .overrides(
-        bind[OptionalUserProvider].toInstance(new OptionalUserProviderImpl(userModel)),
-        bind[OptionalIdentifierAction].to[FakeOptionalIdentifierAction],
         bind[ApiHubService].toInstance(apiHubService)
       )
       .build()
 
     Fixture(apiHubService, application)
-  }
-
-  def messages(application: Application): Messages = {
-    application.injector.instanceOf[MessagesApi].preferred(FakeRequest())
   }
 
 }

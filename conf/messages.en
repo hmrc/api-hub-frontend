@@ -219,6 +219,6 @@ testConnectivity.heading = Test Connectivity
 testConnectivity.title = Test Connectivity
 
 apiDetails.title = API Details
-apiDetails.heading = API details
+apiDetails.apiName = API Name
 apiDetails.notFound.heading = API not found
 apiDetails.notFound.message = Cannot find an API with Id {0}.
