@@ -240,7 +240,7 @@ class ApiHubServiceSpec
 
   "getApiDetail" - {
     "must call the integration catalogue connector and return the API detail" in {
-      val expected = arbitraryApiDetail.arbitrary.sample.value
+      val expected = sampleApiDetail()
 
       val applicationsConnector = mock[ApplicationsConnector]
       val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]

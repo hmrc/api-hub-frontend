@@ -18,8 +18,9 @@ package generators
 
 import models.api.{ApiDetail, Endpoint, EndpointMethod}
 import org.scalacheck.{Arbitrary, Gen}
+import org.scalatest.OptionValues
 
-trait ApiDetailGenerators {
+trait ApiDetailGenerators extends OptionValues {
 
   implicit lazy val arbitraryEndpointMethod: Arbitrary[EndpointMethod] =
     Arbitrary {
@@ -49,5 +50,13 @@ trait ApiDetailGenerators {
         endpoints <- Gen.listOf(arbitraryEndpoint.arbitrary)
       } yield ApiDetail(id.toString, title, description, version, endpoints)
     }
+
+  implicit val arbitraryApiDetails: Arbitrary[Seq[ApiDetail]] =
+    Arbitrary {
+      Gen.nonEmptyListOf(arbitraryApiDetail.arbitrary)
+    }
+
+  def sampleApiDetail(): ApiDetail =
+    arbitraryApiDetail.arbitrary.sample.value
 
 }
