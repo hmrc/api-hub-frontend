@@ -78,6 +78,11 @@ class InternalAuthTokenInitialiserImpl @Inject() (
             "resourceType" -> "api-hub-applications",
             "resourceLocation" -> "*",
             "actions" -> List("READ","WRITE","DELETE")
+          ),
+          Json.obj(
+            "resourceType" -> "integration-catalogue",
+            "resourceLocation" -> "*",
+            "actions" -> List("READ","WRITE","DELETE")
           )
         )
       ))

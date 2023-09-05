@@ -217,3 +217,8 @@ productionCredentialsChecklist.confirm = I confirm that the above conditions are
 
 testConnectivity.heading = Test Connectivity
 testConnectivity.title = Test Connectivity
+
+apiDetails.title = API Details
+apiDetails.apiName = API Name
+apiDetails.notFound.heading = API not found
+apiDetails.notFound.message = Cannot find an API with Id {0}.

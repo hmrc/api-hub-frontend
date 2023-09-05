@@ -72,3 +72,4 @@ POST        /generating-credentials/:id                                        c
 
 GET         /test-connectivity                                                 controllers.TestConnectivityController.onPageLoad()
 
+GET         /apis/details/:id                                                  controllers.ApiDetailsController.onPageLoad(id: String)
