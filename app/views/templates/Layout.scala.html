@@ -66,9 +66,9 @@
         customScriptsBlock.get
         }
     }
-    <script @{CSPNonce.attr} defer>
+    <script @{CSPNonce.attr} defer="true">
     for (var i = 0; i < 3; i++) {
-        document.querySelector("body > footer > div > div > div.govuk-footer__meta-item.govuk-footer__meta-item--grow > ul > li:nth-child(1) > a").parentNode.remove();
+        document.querySelector("body > footer > div > div > div.govuk-footer__meta-item.govuk-footer__meta-item--grow > ul > li:nth-child(1)").remove();
     }
     </script>
 }
