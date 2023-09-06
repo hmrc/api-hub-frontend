@@ -205,6 +205,8 @@ generatePrimarySecretSuccess.notFound.heading = Primary credential not found
 generatePrimarySecretSuccess.notFound.message = This application''s primary credential cannot be found in IDMS.
 generatePrimarySecretSuccess.invalidCredential.heading = Invalid primary credential
 generatePrimarySecretSuccess.invalidCredential.message = This application does not have a valid primary credential to generate a secret for.
+generatePrimarySecretSuccess.alreadyGenerated.heading = Secret already generated
+generatePrimarySecretSuccess.alreadyGenerated.message = A primary credential secret has already been generated for this application.
 
 productionCredentialsChecklist.title = Generating production credentials
 productionCredentialsChecklist.heading = Generating production credentials

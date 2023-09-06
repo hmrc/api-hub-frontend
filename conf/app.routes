@@ -65,8 +65,6 @@ GET         /application/register/remove-team-member/:index                    c
 
 GET         /sign-in                                                           controllers.auth.SignInController.onPageLoad()
 
-GET         /generate-primary-secret-success/:id                               controllers.GeneratePrimarySecretSuccessController.onPageLoad(id: String)
-
 GET         /generating-credentials/:id                                        controllers.ProductionCredentialsChecklistController.onPageLoad(id: String)
 POST        /generating-credentials/:id                                        controllers.ProductionCredentialsChecklistController.onSubmit(id: String)
 
