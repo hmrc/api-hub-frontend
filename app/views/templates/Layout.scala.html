@@ -20,12 +20,13 @@
 @import templates.ApiHubHeader
 @import uk.gov.hmrc.hmrcfrontend.views.config.StandardAlphaBanner
 @import views.html.helper.CSPNonce
+@import views.html.util.FooterWithItems
 
 @this(
     appConfig: FrontendAppConfig,
     govukLayout: GovukLayout,
     hmrcHead: HmrcHead,
-    hmrcStandardFooter: HmrcStandardFooter,
+    footerWithItems: FooterWithItems,
     hmrcTrackingConsentSnippet: HmrcTrackingConsentSnippet,
     hmrcLanguageSelect: HmrcLanguageSelect,
     hmrcTimeoutDialog: HmrcTimeoutDialog,
@@ -66,11 +67,6 @@
         customScriptsBlock.get
         }
     }
-    <script @{CSPNonce.attr} defer="true">
-    for (var i = 0; i < 3; i++) {
-        document.querySelector("body > footer > div > div > div.govuk-footer__meta-item.govuk-footer__meta-item--grow > ul > li:nth-child(1)").remove();
-    }
-    </script>
 }
 
 @beforeContent = {
@@ -98,7 +94,7 @@
     headBlock   = Some(hmrcInternalHead(Some(head))),
     headerBlock = Some(header(showBackLink, user)),
     beforeContentBlock = Some(beforeContent),
-    footerBlock        = Some(hmrcStandardFooter()),
+    footerBlock        = Some(footerWithItems()),
     scriptsBlock       = Some(hmrcScripts(
         scriptsBlock = Some(additionalScripts)
     )),
