@@ -17,10 +17,11 @@
 package controllers
 
 import controllers.actions._
+import controllers.helpers.ErrorResultBuilder
 import models.Mode
 import navigation.Navigator
 import pages.TeamMembersPage
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc._
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -34,15 +35,16 @@ class RemoveTeamMemberController @Inject()(     override val messagesApi: Messag
                                                 identify: IdentifierAction,
                                                 getData: DataRetrievalAction,
                                                 requireData: DataRequiredAction,
-                                                val controllerComponents: MessagesControllerComponents
+                                                val controllerComponents: MessagesControllerComponents,
+                                                errorResultBuilder: ErrorResultBuilder
                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def removeTeamMember(mode: Mode, index: Int): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      request.userAnswers.get(TeamMembersPage).fold[Future[Result]](Future.successful(NotFound))(
+      request.userAnswers.get(TeamMembersPage).fold[Future[Result]](teamMemberNotFound())(
         teamMembers => {
           if (index == 0 || teamMembers.length < index ) {
-            Future.successful(NotFound)
+            teamMemberNotFound()
           } else {
             val members = teamMembers.patch(index, Nil, 1)
             for {
@@ -53,4 +55,11 @@ class RemoveTeamMemberController @Inject()(     override val messagesApi: Messag
         }
       )
   }
+
+  private def teamMemberNotFound()(implicit request: Request[_]): Future[Result] = {
+    Future.successful(
+      errorResultBuilder.notFound(Messages("addTeamMemberDetails.notFound"))
+    )
+  }
+
 }

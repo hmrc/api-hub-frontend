@@ -14,6 +14,8 @@ site.applications = Your Applications
 site.allApplications = All Applications
 site.approvals = Approvals
 site.copy = Copy
+site.applicationNotFoundHeading = Application not found
+site.applicationNotFoundMessage = Cannot find an application with Id {0}.
 
 date.day = Day
 date.month = Month
@@ -141,6 +143,8 @@ scopeApproved.guidance.content = Return to {0}.
 approveScope.title = Review scope requests
 approveScope.heading = Review scope requests
 approveScope.applicationDetails.pendingScopeRequests = Pending scope requests for
+approveScope.notFound.heading = Scope request not found
+approveScope.notFound.message = Cannot find a request for scope {0} for an application with Id {1}.
 
 addScope.applicationDetails.heading = Application details
 addScope.applicationDetails.applicationName = Application name
@@ -167,6 +171,7 @@ addTeamMemberDetails.email.duplicate = This email address has already been added
 addTeamMemberDetails.email.label = Enter your team member''s email address
 addTeamMemberDetails.email.hint = Email address should be valid and either a @digital.hmrc.gov.uk or a @hmrc.gov.uk address
 addTeamMemberDetails.change.hidden = Add team member details
+addTeamMemberDetails.notFound = Cannot find this team member.
 
 confirmAddTeamMember.title = Confirm add team member
 confirmAddTeamMember.membersCountHeader = {0} Team members
@@ -196,6 +201,12 @@ generatePrimarySecretSuccess.onceOnlyWarning = You client secret will only be di
 generatePrimarySecretSuccess.guidance.heading = What you can do now
 generatePrimarySecretSuccess.guidance.content = Return to your application and manage your {0}.
 generatePrimarySecretSuccess.guidance.link = client secrets
+generatePrimarySecretSuccess.notFound.heading = Primary credential not found
+generatePrimarySecretSuccess.notFound.message = This application''s primary credential cannot be found in IDMS.
+generatePrimarySecretSuccess.invalidCredential.heading = Invalid primary credential
+generatePrimarySecretSuccess.invalidCredential.message = This application does not have a valid primary credential to generate a secret for.
+generatePrimarySecretSuccess.alreadyGenerated.heading = Secret already generated
+generatePrimarySecretSuccess.alreadyGenerated.message = A primary credential secret has already been generated for this application.
 
 productionCredentialsChecklist.title = Generating production credentials
 productionCredentialsChecklist.heading = Generating production credentials
@@ -208,3 +219,8 @@ productionCredentialsChecklist.confirm = I confirm that the above conditions are
 
 testConnectivity.heading = Test Connectivity
 testConnectivity.title = Test Connectivity
+
+apiDetails.title = API Details
+apiDetails.apiName = API Name
+apiDetails.notFound.heading = API not found
+apiDetails.notFound.message = Cannot find an API with Id {0}.

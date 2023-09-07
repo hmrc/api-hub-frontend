@@ -29,7 +29,7 @@ import play.api.test.Helpers._
 import play.api.{Configuration, Application => PlayApplication}
 import services.ApiHubService
 import utils.TestHelpers
-import views.html.ApplicationDetailsView
+import views.html.{ApplicationDetailsView, ErrorTemplate}
 
 import scala.concurrent.Future
 
@@ -121,9 +121,17 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
 
     running(fixture.playApplication) {
       val request = FakeRequest(GET, routes.ApplicationDetailsController.onPageLoad(id).url)
+      val view = fixture.playApplication.injector.instanceOf[ErrorTemplate]
 
       val result = route(fixture.playApplication, request).value
       status(result) mustBe NOT_FOUND
+      contentAsString(result) mustBe
+        view(
+          "Page not found - 404",
+          "Application not found",
+          s"Cannot find an application with Id $id."
+        )(request, messages(fixture.playApplication))
+          .toString()
     }
   }
 

@@ -29,7 +29,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Application => PlayApplication}
 import services.ApiHubService
-import views.html.ApproveScopeView
+import views.html.{ApproveScopeView, ErrorTemplate}
 
 import scala.concurrent.Future
 
@@ -54,6 +54,7 @@ class ApproveScopeControllerSpec extends SpecBase with MockitoSugar {
         verify(fixture.apiHubService).approvePrimaryScope(ArgumentMatchers.eq(testId), ArgumentMatchers.eq(scope))(any())
       }
     }
+
     "must block approve for users without approve scope" in {
       val fixture = buildFixture(FakeUser)
       val testId = "test-app-id"
@@ -66,7 +67,6 @@ class ApproveScopeControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad.url)
       }
     }
-
 
     "must return OK and the correct view for a GET" in {
       val testId = "test-app-id"
@@ -103,6 +103,53 @@ class ApproveScopeControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad.url)
+      }
+    }
+
+    "must return Not Found for a GET when the application does not exist" in {
+      val testId = "test-app-id"
+      val fixture = buildFixture(FakeApprover)
+
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId), ArgumentMatchers.eq(false))(any()))
+        .thenReturn(Future.successful(None))
+
+      running(fixture.application) {
+        val request = FakeRequest(GET, routes.ApproveScopeController.onPageLoad(testId).url)
+        val result = route(fixture.application, request).value
+        val view = fixture.application.injector.instanceOf[ErrorTemplate]
+
+        status(result) mustBe NOT_FOUND
+        contentAsString(result) mustBe
+          view(
+            "Page not found - 404",
+            "Application not found",
+            s"Cannot find an application with Id $testId."
+          )(request, messages(fixture.application))
+            .toString()
+      }
+    }
+
+    "must return Not Found while approving when the application does not exist" in {
+      val testId = "test-app-id"
+      val scope = "my scope"
+      val fixture = buildFixture(FakeApprover)
+
+      when(fixture.apiHubService.approvePrimaryScope(ArgumentMatchers.eq(testId), ArgumentMatchers.eq(scope))(any()))
+        .thenReturn(Future.successful(false))
+
+      running(fixture.application) {
+        val request = FakeRequest(GET, routes.ApproveScopeController.onApprove(testId, scope).url)
+        val result = route(fixture.application, request).value
+        val view = fixture.application.injector.instanceOf[ErrorTemplate]
+
+        status(result) mustBe NOT_FOUND
+        contentAsString(result) mustBe
+          view(
+            "Page not found - 404",
+            "Scope request not found",
+            s"Cannot find a request for scope $scope for an application with Id $testId."
+          )(request, messages(fixture.application))
+            .toString()
       }
     }
   }

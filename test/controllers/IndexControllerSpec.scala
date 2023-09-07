@@ -31,7 +31,7 @@ import play.api.test.Helpers._
 import play.api.{Application => PlayApplication}
 import repositories.SessionRepository
 import services.ApiHubService
-import views.html.IndexView
+import views.html.{ErrorTemplate, IndexView}
 
 import scala.concurrent.Future
 
@@ -160,7 +160,46 @@ class IndexControllerSpec extends SpecBase with MockitoSugar {
 
       }
     }
+
+    "must return Internal Server Error if the user has no email address for a GET" in {
+      val fixture = buildFixtureWithUser(FakeUser.copy(email = None))
+
+      running(fixture.application) {
+        val request = FakeRequest(GET, routes.IndexController.onPageLoad.url)
+        val result = route(fixture.application, request).value
+        val view = fixture.application.injector.instanceOf[ErrorTemplate]
+
+        status(result) mustEqual INTERNAL_SERVER_ERROR
+        contentAsString(result) mustBe
+          view(
+            "Sorry, we are experiencing technical difficulties - 500",
+            "Sorry, we’re experiencing technical difficulties",
+            "Please try again in a few minutes."
+          )(request, messages(fixture.application))
+            .toString()
+      }
+    }
+
+    "must return Internal Server Error if the user has no email address while attempting to create an application" in {
+      val fixture = buildFixtureWithUser(FakeUser.copy(email = None))
+
+      running(fixture.application) {
+        val request = FakeRequest(POST, routes.IndexController.onSubmit.url)
+        val result = route(fixture.application, request).value
+        val view = fixture.application.injector.instanceOf[ErrorTemplate]
+
+        status(result) mustEqual INTERNAL_SERVER_ERROR
+        contentAsString(result) mustBe
+          view(
+            "Sorry, we are experiencing technical difficulties - 500",
+            "Sorry, we’re experiencing technical difficulties",
+            "Please try again in a few minutes."
+          )(request, messages(fixture.application))
+            .toString()
+      }
+    }
   }
+
 }
 
 object IndexControllerSpec extends SpecBase with MockitoSugar {

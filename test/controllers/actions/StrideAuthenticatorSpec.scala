@@ -98,6 +98,27 @@ class StrideAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSu
       }
     }
 
+    "must map an empty email address to None" in {
+      val authConnector = mock[AuthConnector]
+      val strideAuthenticator = new StrideAuthenticator(authConnector)
+
+      val user = UserModel(
+        userId = s"STRIDE-$providerId",
+        userName = "jo.bloggs",
+        userType = StrideUser,
+        email = Some(" "),
+        permissions = Permissions(canApprove = false, canAdminister = false)
+      )
+
+      when(authConnector.authorise(ArgumentMatchers.eq(userPredicate), ArgumentMatchers.eq(userRetrieval))(any(), any()))
+        .thenReturn(Future.successful(retrievalsForUser(user)))
+
+      strideAuthenticator.authenticate()(FakeRequest()).map {
+        result =>
+          result mustBe UserAuthenticated(user.copy(email = None))
+      }
+    }
+
     "must return unauthenticated when the user is not authenticated" in {
       val authConnector = mock[AuthConnector]
       val strideAuthenticator = new StrideAuthenticator(authConnector)

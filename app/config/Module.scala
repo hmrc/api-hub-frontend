@@ -33,6 +33,7 @@ class Module extends play.api.inject.Module {
       bindz(classOf[DataRequiredAction]).to(classOf[DataRequiredActionImpl]).eagerly(),
       bindz[ApplicationAuthActionProvider].to(classOf[ApplicationAuthActionProviderImpl]).eagerly(),
       bindz(classOf[IdentifierAction]).to(classOf[AuthenticatedIdentifierAction]).eagerly(),
+      bindz(classOf[OptionalIdentifierAction]).to(classOf[OptionallyAuthenticatedIdentifierAction]),
       bindz(classOf[Clock]).toInstance(Clock.systemDefaultZone.withZone(ZoneOffset.UTC)),
       bindz[Encrypter with Decrypter].toProvider[CryptoProvider]
     )

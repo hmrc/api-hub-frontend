@@ -33,7 +33,7 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
-import views.html.AddTeamMemberDetailsView
+import views.html.{AddTeamMemberDetailsView, ErrorTemplate}
 
 import scala.concurrent.Future
 
@@ -307,6 +307,70 @@ class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar with
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(boundForm, CheckMode, 1, Some(FakeUser))(request, messages(application)).toString
       }
+    }
+
+    "must return Not Found when the index is invalid for a GET in Check Mode" in {
+      val userAnswers = UserAnswers(userAnswersId)
+        .set(TeamMembersPage, Seq(TeamMember("test-email")))
+        .success
+        .value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.AddTeamMemberDetailsController.onPageLoad(CheckMode, 0).url)
+
+        val view = application.injector.instanceOf[ErrorTemplate]
+
+        val result = route(application, request).value
+
+        status(result) mustEqual NOT_FOUND
+        contentAsString(result) mustBe
+          view(
+            "Page not found - 404",
+            "This page can’t be found",
+            "Cannot find this team member."
+          )(request, messages(application))
+            .toString()
+      }
+    }
+
+    "must return Not Found when the index is invalid for a POST in Check Mode" in {
+      val userAnswers = UserAnswers(userAnswersId)
+        .set(TeamMembersPage, Seq(TeamMember("test-email")))
+        .success
+        .value
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, routes.AddTeamMemberDetailsController.onSubmit(CheckMode, 1).url)
+            .withFormUrlEncodedBody(("email", "test.email@hmrc.gov.uk"))
+
+        val view = application.injector.instanceOf[ErrorTemplate]
+
+        val result = route(application, request).value
+
+        status(result) mustEqual NOT_FOUND
+        contentAsString(result) mustBe
+          view(
+            "Page not found - 404",
+            "This page can’t be found",
+            "Cannot find this team member."
+          )(request, messages(application))
+            .toString()
+      }
+
     }
   }
 

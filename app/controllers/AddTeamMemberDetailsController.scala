@@ -17,13 +17,14 @@
 package controllers
 
 import controllers.actions._
+import controllers.helpers.ErrorResultBuilder
 import forms.AddTeamMemberDetailsFormProvider
 import models.{CheckMode, Mode, NormalMode, UserAnswers}
 import models.application.TeamMember
 import navigation.Navigator
 import pages.TeamMembersPage
 import play.api.data.{Form, FormError}
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -41,7 +42,8 @@ class AddTeamMemberDetailsController @Inject()(
                                                 requireData: DataRequiredAction,
                                                 formProvider: AddTeamMemberDetailsFormProvider,
                                                 val controllerComponents: MessagesControllerComponents,
-                                                view: AddTeamMemberDetailsView
+                                                view: AddTeamMemberDetailsView,
+                                                errorResultBuilder: ErrorResultBuilder
                                               )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
@@ -74,15 +76,15 @@ class AddTeamMemberDetailsController @Inject()(
       )
   }
 
-  private def validateParameters(mode: Mode, index: Int, userAnswers: UserAnswers): Either[Result, Seq[TeamMember]] = {
+  private def validateParameters(mode: Mode, index: Int, userAnswers: UserAnswers)(implicit request: Request[_]): Either[Result, Seq[TeamMember]] = {
     (mode, index) match {
       case (NormalMode, 0) => Right(userAnswers.get(TeamMembersPage).getOrElse(Seq.empty))
       case (CheckMode, i) if i > 0 =>
         userAnswers.get(TeamMembersPage) match {
           case Some(teamMembers) if i < teamMembers.length => Right(teamMembers)
-          case _ => Left(NotFound)
+          case _ => Left(errorResultBuilder.notFound(Messages("addTeamMemberDetails.notFound")))
         }
-      case _ => Left(NotFound)
+      case _ => Left(errorResultBuilder.notFound(Messages("addTeamMemberDetails.notFound")))
     }
   }
 
