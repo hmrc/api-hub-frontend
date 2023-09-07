@@ -17,8 +17,11 @@
 package controllers
 
 import base.SpecBase
+import config.FrontendAppConfig
 import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
 import forms.ProductionCredentialsChecklistFormProvider
+import models.application.{Application, Credential, Secret}
+import models.application.ApplicationLenses.ApplicationLensOps
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
@@ -28,7 +31,8 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.ApiHubService
 import utils.TestHelpers
-import views.html.ProductionCredentialsChecklistView
+import viewmodels.GeneratePrimarySecretSuccessViewModel
+import views.html.{ErrorTemplate, GeneratePrimarySecretSuccessView, ProductionCredentialsChecklistView}
 
 import scala.concurrent.Future
 
@@ -61,10 +65,14 @@ class ProductionCredentialsChecklistControllerSpec extends SpecBase with Mockito
       }
     }
 
-    "must redirect to the Generate Primary Secret Success page when valid data is submitted by a team member or administrator" in {
+    "must return the Generate Primary Secret Success view when valid data is submitted by a team member or administrator" in {
       forAll(teamMemberAndAdministratorTable) {
         user =>
           val fixture = buildFixture(user)
+          val secret = Secret("test-secret")
+
+          when(fixture.apiHubService.createPrimarySecret(ArgumentMatchers.eq(applicationWithValidPrimaryCredential.id))(any()))
+            .thenReturn(Future.successful(Some(secret)))
 
           running(fixture.playApplication) {
             val request =
@@ -72,9 +80,18 @@ class ProductionCredentialsChecklistControllerSpec extends SpecBase with Mockito
                 .withFormUrlEncodedBody(("value[0]", "confirm"))
 
             val result = route(fixture.playApplication, request).value
+            val view = fixture.playApplication.injector.instanceOf[GeneratePrimarySecretSuccessView]
+            val frontendAppConfig = fixture.playApplication.injector.instanceOf[FrontendAppConfig]
 
-            status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual routes.GeneratePrimarySecretSuccessController.onPageLoad(FakeApplication.id).url
+            val summaryList = GeneratePrimarySecretSuccessViewModel.buildSummary(
+              applicationWithValidPrimaryCredential,
+              frontendAppConfig.environmentNames,
+              applicationWithValidPrimaryCredential.getPrimaryCredentials.head,
+              secret
+            )(messages(fixture.playApplication))
+
+            status(result) mustEqual OK
+            contentAsString(result) mustBe view(applicationWithValidPrimaryCredential, summaryList, Some(user), secret.secret)(request, messages(fixture.playApplication)).toString()
           }
       }
     }
@@ -125,6 +142,119 @@ class ProductionCredentialsChecklistControllerSpec extends SpecBase with Mockito
       }
     }
 
+    "must return Bad Request when the primary credentials are invalid for a GET" in {
+      val fixture = buildFixture(application = Some(applicationWithoutValidCredential))
+
+      running(fixture.playApplication) {
+        val request = FakeRequest(GET, productionCredentialsChecklistRoute)
+
+        val result = route(fixture.playApplication, request).value
+        val view = fixture.playApplication.injector.instanceOf[ErrorTemplate]
+
+        status(result) mustEqual BAD_REQUEST
+
+        contentAsString(result) mustBe
+          view(
+            "Bad request - 400",
+            "Invalid primary credential",
+            "This application does not have a valid primary credential to generate a secret for."
+          )(request, messages(fixture.playApplication))
+            .toString()
+      }
+    }
+
+    "must return Bad Request when the primary credentials are invalid for a POST" in {
+      val fixture = buildFixture(application = Some(applicationWithoutValidCredential))
+
+      running(fixture.playApplication) {
+        val request =
+          FakeRequest(POST, productionCredentialsChecklistRoute)
+            .withFormUrlEncodedBody(("value[0]", "confirm"))
+
+        val result = route(fixture.playApplication, request).value
+        val view = fixture.playApplication.injector.instanceOf[ErrorTemplate]
+
+        status(result) mustEqual BAD_REQUEST
+
+        contentAsString(result) mustBe
+          view(
+            "Bad request - 400",
+            "Invalid primary credential",
+            "This application does not have a valid primary credential to generate a secret for."
+          )(request, messages(fixture.playApplication))
+            .toString()
+      }
+    }
+
+    "must return Bad Request when the primary credential secret has already been generated for a GET" in {
+      val fixture = buildFixture(application = Some(applicationWithPrimaryCredentialWithSecret))
+
+      running(fixture.playApplication) {
+        val request = FakeRequest(GET, productionCredentialsChecklistRoute)
+
+        val result = route(fixture.playApplication, request).value
+        val view = fixture.playApplication.injector.instanceOf[ErrorTemplate]
+
+        status(result) mustEqual BAD_REQUEST
+
+        contentAsString(result) mustBe
+          view(
+            "Bad request - 400",
+            "Secret already generated",
+            "A primary credential secret has already been generated for this application."
+          )(request, messages(fixture.playApplication))
+            .toString()
+      }
+    }
+
+    "must return Bad Request when the primary credential secret has already been generated for a POST" in {
+      val fixture = buildFixture(application = Some(applicationWithPrimaryCredentialWithSecret))
+
+      running(fixture.playApplication) {
+        val request =
+          FakeRequest(POST, productionCredentialsChecklistRoute)
+            .withFormUrlEncodedBody(("value[0]", "confirm"))
+
+        val result = route(fixture.playApplication, request).value
+        val view = fixture.playApplication.injector.instanceOf[ErrorTemplate]
+
+        status(result) mustEqual BAD_REQUEST
+
+        contentAsString(result) mustBe
+          view(
+            "Bad request - 400",
+            "Secret already generated",
+            "A primary credential secret has already been generated for this application."
+          )(request, messages(fixture.playApplication))
+            .toString()
+      }
+    }
+
+    "must return Bad Request when IDMS cannot find the primary credential for a POST" in {
+      val fixture = buildFixture()
+
+      when(fixture.apiHubService.createPrimarySecret(ArgumentMatchers.eq(applicationWithValidPrimaryCredential.id))(any()))
+        .thenReturn(Future.successful(None))
+
+      running(fixture.playApplication) {
+        val request =
+          FakeRequest(POST, productionCredentialsChecklistRoute)
+            .withFormUrlEncodedBody(("value[0]", "confirm"))
+
+        val result = route(fixture.playApplication, request).value
+        val view = fixture.playApplication.injector.instanceOf[ErrorTemplate]
+
+        status(result) mustEqual NOT_FOUND
+
+        contentAsString(result) mustBe
+          view(
+            "Page not found - 404",
+            "Primary credential not found",
+            "This application's primary credential cannot be found in IDMS."
+          )(request, messages(fixture.playApplication))
+            .toString()
+      }
+    }
   }
 
 }
@@ -133,17 +263,30 @@ object ProductionCredentialsChecklistControllerSpec extends SpecBase with Mockit
 
   case class Fixture(playApplication: PlayApplication, apiHubService: ApiHubService)
 
-  def buildFixture(userModel: UserModel = FakeUser): Fixture = {
+  def buildFixture(userModel: UserModel = FakeUser, application: Option[Application] = Some(applicationWithValidPrimaryCredential)): Fixture = {
     val apiHubService = mock[ApiHubService]
-    when(apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(false))(any()))
-      .thenReturn(Future.successful(Some(FakeApplication)))
+    when(apiHubService.getApplication(any(), any())(any()))
+      .thenReturn(Future.successful(application))
 
-    val playApplication = applicationBuilder(userAnswers = Some(emptyUserAnswers), user = userModel, Configuration.empty)
+    val configuration = Configuration.from(Map(
+      "environment-names.primary" -> "test-primary",
+      "environment-names.secondary" -> "test-secondary"
+    ))
+
+    val playApplication = applicationBuilder(userAnswers = Some(emptyUserAnswers), user = userModel, configuration)
       .overrides(
         bind[ApiHubService].toInstance(apiHubService)
       ).build()
 
     Fixture(playApplication, apiHubService)
   }
+
+  val applicationWithValidPrimaryCredential: Application = FakeApplication
+    .setPrimaryCredentials(Seq(Credential("test-client-id", None, None)))
+
+  val applicationWithoutValidCredential: Application = FakeApplication
+
+  val applicationWithPrimaryCredentialWithSecret: Application = FakeApplication
+    .setPrimaryCredentials(Seq(Credential("test-client-id", None, Some("test-secret-fragment"))))
 
 }
