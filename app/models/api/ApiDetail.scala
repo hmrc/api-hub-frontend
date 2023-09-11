@@ -23,7 +23,8 @@ case class ApiDetail(
   title: String,
   description: String,
   version: String,
-  endpoints: Seq[Endpoint]
+  endpoints: Seq[Endpoint],
+  openApiSpecification: String
 )
 
 object ApiDetail {

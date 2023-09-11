@@ -71,3 +71,6 @@ POST        /generating-credentials/:id                                        c
 GET         /test-connectivity                                                 controllers.TestConnectivityController.onPageLoad()
 
 GET         /apis/details/:id                                                  controllers.ApiDetailsController.onPageLoad(id: String)
+
+GET         /apis/details/:id/oas                                              controllers.OasController.getOas(id: String)
+GET         /apis/details/:id/specification                                    controllers.OasController.getRedoc(id: String)
