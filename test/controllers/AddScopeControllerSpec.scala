@@ -30,12 +30,12 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Application => PlayApplication}
 import services.ApiHubService
-import utils.TestHelpers
+import utils.{HtmlValidation, TestHelpers}
 import views.html.AddScopeView
 
 import scala.concurrent.Future
 
-class AddScopeControllerSpec extends SpecBase with MockitoSugar with TestHelpers {
+class AddScopeControllerSpec extends SpecBase with MockitoSugar with TestHelpers with HtmlValidation {
 
   private val formProvider = new NewScopeFormProvider()
   private val form = formProvider()
@@ -102,6 +102,7 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar with TestHelpers
 
         status(result) mustBe BAD_REQUEST
         contentAsString(result) must include("Error: Add a Scope - The API Hub - GOV.UK")
+        contentAsString(result) must validateAsHtml
 
         verifyZeroInteractions(fixture.apiHubService.requestAdditionalScope(any(), any())(any()))
       }
@@ -120,6 +121,7 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar with TestHelpers
 
         status(result) mustBe BAD_REQUEST
         contentAsString(result) must include("Error: Add a Scope - The API Hub - GOV.UK")
+        contentAsString(result) must validateAsHtml
 
         verifyZeroInteractions(fixture.apiHubService.requestAdditionalScope(any(), any())(any()))
       }
@@ -138,6 +140,7 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar with TestHelpers
 
         status(result) mustBe BAD_REQUEST
         contentAsString(result) must include("Error: Add a Scope - The API Hub - GOV.UK")
+        contentAsString(result) must validateAsHtml
 
         verifyZeroInteractions(fixture.apiHubService.requestAdditionalScope(any(), any())(any()))
       }
@@ -168,6 +171,7 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar with TestHelpers
             content mustEqual view(testId, form, Some(user), config)(request, messages(fixture.application)).toString
             content must include(env1)
             content must include(env2)
+            content must validateAsHtml
           }
       }
     }

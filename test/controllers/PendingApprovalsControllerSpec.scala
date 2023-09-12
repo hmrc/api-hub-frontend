@@ -25,11 +25,12 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.ApiHubService
+import utils.HtmlValidation
 import views.html.PendingApprovalsView
 
 import scala.concurrent.Future
 
-class PendingApprovalsControllerSpec extends SpecBase with MockitoSugar {
+class PendingApprovalsControllerSpec extends SpecBase with MockitoSugar with HtmlValidation {
 
   "PendingApprovals Controller" - {
 
@@ -55,6 +56,7 @@ class PendingApprovalsControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(applications, Some(FakeApprover))(request, messages(application)).toString
+        contentAsString(result) must validateAsHtml
       }
     }
 

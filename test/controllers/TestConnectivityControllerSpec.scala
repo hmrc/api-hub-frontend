@@ -26,11 +26,12 @@ import play.api.test.Helpers._
 import play.api.{Application => PlayApplication}
 import repositories.SessionRepository
 import services.ApiHubService
+import utils.HtmlValidation
 import views.html.TestConnectivityView
 
 import scala.concurrent.Future
 
-class TestConnectivityControllerSpec extends SpecBase with MockitoSugar {
+class TestConnectivityControllerSpec extends SpecBase with MockitoSugar with HtmlValidation {
 
   "Test Connectivity Controller" - {
 
@@ -52,6 +53,7 @@ class TestConnectivityControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual view(expected)(request, messages(fixture.application)).toString
+        contentAsString(result) must validateAsHtml
       }
     }
   }

@@ -39,7 +39,7 @@
         </div>
         <div class="govuk-grid-column-three-quarters">
             <span class="govuk-body">
-            @value
+                @value
             </span>
         </div>
     </div>
@@ -59,15 +59,15 @@
     <div class = "govuk-grid-row">
         <div class = "govuk-grid-column-one-half">
             <h2 class="govuk-heading-m">@messages("applicationDetails.scopes")</h2>
-            <span class="govuk-body">
-            @environmentTabScopes(environment.scopes)
-            </span>
+            <div class="govuk-body">
+                @environmentTabScopes(environment.scopes)
+            </div>
         </div>
         <div class = "govuk-grid-column-one-half">
             <h2 class="govuk-heading-m">@messages("applicationDetails.credentials")</h2>
-            <span class="govuk-body">
-            @environmentTabCredentials(environment.credentials)
-            </span>
+            <div class="govuk-body">
+                @environmentTabCredentials(environment.credentials)
+            </div>
         </div>
     </div>
 }
@@ -76,7 +76,7 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-one-quarter">
             <span class="govuk-body">
-            @teamMember.email
+                @teamMember.email
             </span>
         </div>
     </div>

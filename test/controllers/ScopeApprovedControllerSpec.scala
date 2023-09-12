@@ -20,9 +20,10 @@ import base.SpecBase
 import controllers.actions.{FakeApprover, FakeUser}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import utils.HtmlValidation
 import views.html.ScopeApprovedView
 
-class ScopeApprovedControllerSpec extends SpecBase {
+class ScopeApprovedControllerSpec extends SpecBase with HtmlValidation {
 
   "ScopeApproved Controller" - {
     "must return OK and the correct view for a GET" in {
@@ -37,6 +38,7 @@ class ScopeApprovedControllerSpec extends SpecBase {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(Some(FakeApprover))(request, messages(application)).toString
+        contentAsString(result) must validateAsHtml
       }
     }
 

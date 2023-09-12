@@ -21,13 +21,10 @@ import models.application.ApplicationLenses.ApplicationLensOps
 import models.application.{Application, Approved, Credential, Secret}
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
-import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, SummaryList, SummaryListRow}
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
-
 
 object GeneratePrimarySecretSuccessViewModel {
 
@@ -91,13 +88,10 @@ object GeneratePrimarySecretSuccessViewModel {
       value   = ValueViewModel(HtmlFormat.escape(secret.secret).toString),
       actions = Seq(
         ActionItem(
-          content = HtmlContent(
-            new GovukButton().apply(
-              Button(
-                id = Some("copy-to-clipboard-button"),
-                content = Text("Copy"))
-            )
-          )
+          href = "#",
+          content = Text("Copy"),
+          classes = "govuk-button",
+          attributes = Map("id" -> "copy-to-clipboard-button")
         )
       )
     )

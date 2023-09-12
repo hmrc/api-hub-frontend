@@ -28,11 +28,12 @@ import play.api.inject
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
+import utils.HtmlValidation
 import views.html.ErrorTemplate
 
 import scala.concurrent.Future
 
-class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with OptionValues with TryValues {
+class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with OptionValues with TryValues with HtmlValidation {
 
   "RemoveTeamMemberDetails Controller" - {
 
@@ -53,7 +54,6 @@ class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with Opt
           inject.bind[SessionRepository].toInstance(mockSessionRepository)
         )
         .build()
-
 
       running(application) {
         val request = FakeRequest(GET, routes.RemoveTeamMemberController.removeTeamMember(1).url)
@@ -110,6 +110,7 @@ class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with Opt
           "Cannot find this team member."
         )(request, messages(application))
           .toString()
+      contentAsString(result) must validateAsHtml
     }
   }
 
@@ -131,6 +132,7 @@ class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with Opt
           "Cannot find this team member."
         )(request, messages(application))
           .toString()
+      contentAsString(result) must validateAsHtml
     }
   }
 

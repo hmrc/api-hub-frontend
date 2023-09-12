@@ -26,11 +26,12 @@ import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
+import utils.HtmlValidation
 import viewmodels.checkAnswers.{ApplicationNameSummary, TeamMembersSummary}
 import viewmodels.govuk.SummaryListFluency
 import views.html.CheckYourAnswersView
 
-class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency with ScalaCheckPropertyChecks with Generators {
+class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency with ScalaCheckPropertyChecks with Generators with HtmlValidation {
 
   "Check Your Answers Controller" - {
 
@@ -49,6 +50,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(applicationDetails, teamMemberDetails, Some(FakeUser))(request, messages(application)).toString
+        contentAsString(result) must validateAsHtml
       }
     }
 
@@ -68,6 +70,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
           status(result) mustEqual OK
           contentAsString(result) mustEqual view(applicationDetails, teamMemberDetails, Some(FakeUser))(request, messages(application)).toString
+          contentAsString(result) must validateAsHtml
         }
       })
 

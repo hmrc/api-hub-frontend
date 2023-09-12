@@ -20,7 +20,7 @@ import com.google.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
-import uk.gov.hmrc.play.bootstrap.binders.SafeRedirectUrl
+import uk.gov.hmrc.http.StringContextOps
 
 @Singleton
 class FrontendAppConfig @Inject() (configuration: Configuration) {
@@ -32,7 +32,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   private val contactFormServiceIdentifier = "api-hub-frontend"
 
   def feedbackUrl(implicit request: RequestHeader): String =
-    s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier&backUrl=${SafeRedirectUrl(host + request.uri).encodedUrl}"
+    s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier&backUrl=${url"$host${request.uri}"}"
 
   val loginWithLdapUrl: String   = configuration.get[String]("urls.loginWithLdap")
   val loginWithStrideUrl: String = configuration.get[String]("urls.loginWithStride")
