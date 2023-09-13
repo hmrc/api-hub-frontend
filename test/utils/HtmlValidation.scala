@@ -28,7 +28,7 @@ import scala.xml.InputSource
 
 trait HtmlValidation {
 
-  class StringIsValidHtmlMatcher extends Matcher[String] {
+  class StringIsValidHtmlMatcher(failOnWarnings: Boolean) extends Matcher[String] {
     override def apply(html: String): MatchResult = {
       val sourceCode = new SourceCode()
       val imageCollector = new ImageCollector(sourceCode)
@@ -60,7 +60,6 @@ trait HtmlValidation {
 
       validator.setUpValidatorAndParsers(errorHandler, true, false)
 
-      // Perform the validation
       validator.checkHtmlInputSource(
         new InputSource(
           new ByteArrayInputStream(html.getBytes("UTF-8"))
@@ -72,13 +71,15 @@ trait HtmlValidation {
       val output = out.toString("UTF-8")
 
       MatchResult(
-        errorHandler.getFatalErrors + errorHandler.getErrors == 0,
-        s"HTML has ${errorHandler.getErrors} errors and ${errorHandler.getWarnings} warnings ${System.lineSeparator()}$output",
+        (errorHandler.getFatalErrors + errorHandler.getErrors == 0)
+          && (!failOnWarnings || (failOnWarnings && errorHandler.getWarnings == 0)),
+        s"HTML has ${errorHandler.getFatalErrors} fatal errors ${errorHandler.getErrors} errors and ${errorHandler.getWarnings} warnings ${System.lineSeparator()}$output",
         output
       )
     }
   }
 
-  def validateAsHtml = new StringIsValidHtmlMatcher
+  def validateAsHtmlWithoutWarnings = new StringIsValidHtmlMatcher(true)
+  def validateAsHtml = new StringIsValidHtmlMatcher(false)
 
 }
