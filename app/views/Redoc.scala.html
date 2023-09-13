@@ -24,7 +24,15 @@ layout: templates.Layout
 
 @(apiDetail: ApiDetail, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("apiDetails.title")), user = user, fullWidth = true) {
+@scripts() = {
+    <style>
+        .govuk-width-container {
+            max-width: none;
+        }
+    </style>
+}
+
+@layout(pageTitle = titleNoForm(messages("apiDetails.title")), user = user, fullWidth = true, customScriptsBlock = Some(scripts())) {
     <div id="redoc"></div>
 
     <script src='@controllers.routes.Assets.versioned("javascripts/redoc/redoc.standalone.js")' charset="UTF-8" @{CSPNonce.attr}> </script>
