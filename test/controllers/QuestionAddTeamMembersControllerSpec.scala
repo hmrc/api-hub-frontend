@@ -30,11 +30,12 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
+import utils.HtmlValidation
 import views.html.QuestionAddTeamMembersView
 
 import scala.concurrent.Future
 
-class QuestionAddTeamMembersControllerSpec extends SpecBase with MockitoSugar {
+class QuestionAddTeamMembersControllerSpec extends SpecBase with MockitoSugar with HtmlValidation {
 
   private def onwardRoute = Call("GET", "/foo")
 
@@ -58,6 +59,7 @@ class QuestionAddTeamMembersControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, Some(FakeUser))(request, messages(application)).toString
+        contentAsString(result) must validateAsHtml
       }
     }
 
@@ -77,6 +79,7 @@ class QuestionAddTeamMembersControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(
           form.fill(true), NormalMode, Some(FakeUser))(request, messages(application)).toString
+        contentAsString(result) must validateAsHtml
       }
     }
 
@@ -123,6 +126,7 @@ class QuestionAddTeamMembersControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(boundForm, NormalMode, Some(FakeUser))(request, messages(application)).toString
+        contentAsString(result) must validateAsHtml
       }
     }
 

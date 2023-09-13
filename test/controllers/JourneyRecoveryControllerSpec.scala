@@ -20,9 +20,10 @@ import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
+import utils.HtmlValidation
 import views.html.{JourneyRecoveryContinueView, JourneyRecoveryStartAgainView}
 
-class JourneyRecoveryControllerSpec extends SpecBase {
+class JourneyRecoveryControllerSpec extends SpecBase with HtmlValidation {
 
   "JourneyRecovery Controller" - {
 
@@ -42,6 +43,7 @@ class JourneyRecoveryControllerSpec extends SpecBase {
 
           status(result) mustEqual OK
           contentAsString(result) mustEqual continueView(continueUrl.unsafeValue)(request, messages(application)).toString
+          contentAsString(result) must validateAsHtml
         }
       }
     }
@@ -62,6 +64,7 @@ class JourneyRecoveryControllerSpec extends SpecBase {
 
           status(result) mustEqual OK
           contentAsString(result) mustEqual startAgainView()(request, messages(application)).toString
+          contentAsString(result) must validateAsHtml
         }
       }
     }
@@ -81,6 +84,7 @@ class JourneyRecoveryControllerSpec extends SpecBase {
 
           status(result) mustEqual OK
           contentAsString(result) mustEqual startAgainView()(request, messages(application)).toString
+          contentAsString(result) must validateAsHtml
         }
       }
     }

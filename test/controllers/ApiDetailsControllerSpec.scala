@@ -29,11 +29,17 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.ApiHubService
+import utils.HtmlValidation
 import views.html.{ApiDetailsView, ErrorTemplate}
 
 import scala.concurrent.Future
 
-class ApiDetailsControllerSpec extends OptionallyAuthenticatedSpecBase with MockitoSugar with ScalaCheckDrivenPropertyChecks with ApiDetailGenerators {
+class ApiDetailsControllerSpec
+  extends OptionallyAuthenticatedSpecBase
+    with MockitoSugar
+    with ScalaCheckDrivenPropertyChecks
+    with ApiDetailGenerators
+    with HtmlValidation {
 
   "GET" - {
     "must return OK and the correct view when the API detail exists for an unauthenticated user" in {
@@ -51,6 +57,7 @@ class ApiDetailsControllerSpec extends OptionallyAuthenticatedSpecBase with Mock
 
           status(result) mustBe OK
           contentAsString(result) mustBe view(apiDetail, None)(request, messages(fixture.application)).toString()
+          contentAsString(result) must validateAsHtml
         }
       }
     }
@@ -70,6 +77,7 @@ class ApiDetailsControllerSpec extends OptionallyAuthenticatedSpecBase with Mock
 
           status(result) mustBe OK
           contentAsString(result) mustBe view(apiDetail, Some(FakeUser))(request, messages(fixture.application)).toString()
+          contentAsString(result) must validateAsHtml
         }
       }
     }
@@ -96,6 +104,8 @@ class ApiDetailsControllerSpec extends OptionallyAuthenticatedSpecBase with Mock
             s"Cannot find an API with Id $id."
           )(request, messages(fixture.application))
             .toString()
+
+        contentAsString(result) must validateAsHtml
       }
     }
   }

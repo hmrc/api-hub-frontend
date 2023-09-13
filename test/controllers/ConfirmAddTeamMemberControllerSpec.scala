@@ -26,11 +26,12 @@ import pages.ConfirmAddTeamMemberPage
 import play.api.data.Form
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import utils.HtmlValidation
 import viewmodels.checkAnswers.ConfirmAddTeamMember
 import viewmodels.govuk.summarylist.SummaryListViewModel
 import views.html.ConfirmAddTeamMemberView
 
-class ConfirmAddTeamMemberControllerSpec extends SpecBase with MockitoSugar with OptionValues with TryValues {
+class ConfirmAddTeamMemberControllerSpec extends SpecBase with MockitoSugar with OptionValues with TryValues with HtmlValidation {
 
   val formProvider = new ConfirmAddTeamMemberFormProvider()
   val form: Form[Boolean] = formProvider()
@@ -63,6 +64,7 @@ class ConfirmAddTeamMemberControllerSpec extends SpecBase with MockitoSugar with
         val actual = contentAsString(result)
         val expected = view(boundForm, teamMembers, Some(FakeUser), NormalMode)(request, messages(application)).toString
         actual mustEqual expected
+        actual must validateAsHtml
       }
     }
 
@@ -141,6 +143,7 @@ class ConfirmAddTeamMemberControllerSpec extends SpecBase with MockitoSugar with
         val actual = contentAsString(result)
         val expected = view(boundForm, teamMembers, Some(FakeUser), NormalMode)(request, messages(application)).toString
         actual mustEqual expected
+        actual must validateAsHtml
       }
     }
 

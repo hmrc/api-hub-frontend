@@ -30,11 +30,12 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
+import utils.HtmlValidation
 import views.html.ApplicationNameView
 
 import scala.concurrent.Future
 
-class ApplicationNameControllerSpec extends SpecBase with MockitoSugar {
+class ApplicationNameControllerSpec extends SpecBase with MockitoSugar with HtmlValidation {
 
   def onwardRoute = Call("GET", "/foo")
 
@@ -58,6 +59,7 @@ class ApplicationNameControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, Some(FakeUser))(request, messages(application)).toString
+        contentAsString(result) must validateAsHtml
       }
     }
 
@@ -76,6 +78,7 @@ class ApplicationNameControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, Some(FakeUser))(request, messages(application)).toString
+        contentAsString(result) must validateAsHtml
       }
     }
 
@@ -122,6 +125,7 @@ class ApplicationNameControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(boundForm, NormalMode, Some(FakeUser))(request, messages(application)).toString
+        contentAsString(result) must validateAsHtml
       }
     }
 

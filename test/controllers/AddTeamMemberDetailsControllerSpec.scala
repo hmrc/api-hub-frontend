@@ -33,11 +33,12 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
+import utils.HtmlValidation
 import views.html.{AddTeamMemberDetailsView, ErrorTemplate}
 
 import scala.concurrent.Future
 
-class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar with OptionValues with TryValues {
+class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar with OptionValues with TryValues with HtmlValidation {
 
   private def onwardRoute = Call("GET", "/foo")
 
@@ -59,6 +60,7 @@ class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar with
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, 0, Some(FakeUser))(request, messages(application)).toString
+        contentAsString(result) must validateAsHtml
       }
     }
 
@@ -76,6 +78,7 @@ class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar with
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, 0, Some(FakeUser))(request, messages(application)).toString
+        contentAsString(result) must validateAsHtml
       }
     }
 
@@ -97,6 +100,7 @@ class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar with
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form.fill(TeamMember(email)), CheckMode, 1, Some(FakeUser))(request, messages(application)).toString
+        contentAsString(result) must validateAsHtml
       }
     }
 
@@ -142,6 +146,7 @@ class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar with
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(boundForm, NormalMode, 0, Some(FakeUser))(request, messages(application)).toString
+        contentAsString(result) must validateAsHtml
       }
     }
 
@@ -238,6 +243,7 @@ class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar with
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(boundForm, NormalMode, 0, Some(FakeUser))(request, messages(application)).toString
+        contentAsString(result) must validateAsHtml
       }
     }
 
@@ -306,6 +312,7 @@ class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar with
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(boundForm, CheckMode, 1, Some(FakeUser))(request, messages(application)).toString
+        contentAsString(result) must validateAsHtml
       }
     }
 
@@ -332,6 +339,7 @@ class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar with
             "Cannot find this team member."
           )(request, messages(application))
             .toString()
+        contentAsString(result) must validateAsHtml
       }
     }
 
@@ -369,6 +377,7 @@ class AddTeamMemberDetailsControllerSpec extends SpecBase with MockitoSugar with
             "Cannot find this team member."
           )(request, messages(application))
             .toString()
+        contentAsString(result) must validateAsHtml
       }
 
     }

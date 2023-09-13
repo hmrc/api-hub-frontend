@@ -28,12 +28,12 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Application => PlayApplication}
 import services.ApiHubService
-import utils.TestHelpers
+import utils.{HtmlValidation, TestHelpers}
 import views.html.RequestScopeSuccessView
 
 import scala.concurrent.Future
 
-class RequestScopeSuccessControllerSpec extends SpecBase with MockitoSugar with TestHelpers {
+class RequestScopeSuccessControllerSpec extends SpecBase with MockitoSugar with TestHelpers with HtmlValidation {
 
   "RequestScopeSuccess Controller" - {
 
@@ -55,6 +55,7 @@ class RequestScopeSuccessControllerSpec extends SpecBase with MockitoSugar with 
 
             status(result) mustEqual OK
             contentAsString(result) mustEqual view(application, Some(user))(request, messages(fixture.playApplication)).toString
+            contentAsString(result) must validateAsHtml
           }
       }
     }

@@ -30,13 +30,13 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.ApiHubService
-import utils.TestHelpers
+import utils.{HtmlValidation, TestHelpers}
 import viewmodels.GeneratePrimarySecretSuccessViewModel
 import views.html.{ErrorTemplate, GeneratePrimarySecretSuccessView, ProductionCredentialsChecklistView}
 
 import scala.concurrent.Future
 
-class ProductionCredentialsChecklistControllerSpec extends SpecBase with MockitoSugar with TestHelpers {
+class ProductionCredentialsChecklistControllerSpec extends SpecBase with MockitoSugar with TestHelpers with HtmlValidation {
 
   import ProductionCredentialsChecklistControllerSpec._
 
@@ -61,6 +61,7 @@ class ProductionCredentialsChecklistControllerSpec extends SpecBase with Mockito
 
             status(result) mustEqual OK
             contentAsString(result) mustEqual view(form, FakeApplication.id)(request, messages(fixture.playApplication)).toString
+            contentAsString(result) must validateAsHtml
           }
       }
     }
@@ -91,7 +92,9 @@ class ProductionCredentialsChecklistControllerSpec extends SpecBase with Mockito
             )(messages(fixture.playApplication))
 
             status(result) mustEqual OK
-            contentAsString(result) mustBe view(applicationWithValidPrimaryCredential, summaryList, Some(user), secret.secret)(request, messages(fixture.playApplication)).toString()
+            contentAsString(result) mustBe
+              view(applicationWithValidPrimaryCredential, summaryList, Some(user), secret.secret)(request, messages(fixture.playApplication)).toString()
+            contentAsString(result) must validateAsHtml
           }
       }
     }
@@ -102,9 +105,8 @@ class ProductionCredentialsChecklistControllerSpec extends SpecBase with Mockito
       running(fixture.playApplication) {
         val request =
           FakeRequest(POST, productionCredentialsChecklistRoute)
-            .withFormUrlEncodedBody(("value[0]", ""))
 
-        val boundForm = form.bind(Map("value[0]" -> ""))
+        val boundForm = form.bind(Map.empty[String, String])
 
         val view = fixture.playApplication.injector.instanceOf[ProductionCredentialsChecklistView]
 
@@ -112,6 +114,7 @@ class ProductionCredentialsChecklistControllerSpec extends SpecBase with Mockito
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(boundForm, FakeApplication.id)(request, messages(fixture.playApplication)).toString
+        contentAsString(result) must validateAsHtml
       }
     }
 
@@ -160,6 +163,7 @@ class ProductionCredentialsChecklistControllerSpec extends SpecBase with Mockito
             "This application does not have a valid primary credential to generate a secret for."
           )(request, messages(fixture.playApplication))
             .toString()
+        contentAsString(result) must validateAsHtml
       }
     }
 
@@ -183,6 +187,7 @@ class ProductionCredentialsChecklistControllerSpec extends SpecBase with Mockito
             "This application does not have a valid primary credential to generate a secret for."
           )(request, messages(fixture.playApplication))
             .toString()
+        contentAsString(result) must validateAsHtml
       }
     }
 
@@ -204,6 +209,7 @@ class ProductionCredentialsChecklistControllerSpec extends SpecBase with Mockito
             "A primary credential secret has already been generated for this application."
           )(request, messages(fixture.playApplication))
             .toString()
+        contentAsString(result) must validateAsHtml
       }
     }
 
@@ -227,6 +233,7 @@ class ProductionCredentialsChecklistControllerSpec extends SpecBase with Mockito
             "A primary credential secret has already been generated for this application."
           )(request, messages(fixture.playApplication))
             .toString()
+        contentAsString(result) must validateAsHtml
       }
     }
 
@@ -253,6 +260,8 @@ class ProductionCredentialsChecklistControllerSpec extends SpecBase with Mockito
             "This application's primary credential cannot be found in IDMS."
           )(request, messages(fixture.playApplication))
             .toString()
+
+        contentAsString(result) must validateAsHtml
       }
     }
   }

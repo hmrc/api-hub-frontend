@@ -53,4 +53,13 @@ trait ModelGenerators {
       } yield s"$firstName.$lastName@$domain.$topLevelDomain"
     }
 
+  lazy val genLegalUnicodeChar: Gen[Char] = Arbitrary.arbChar.arbitrary.suchThat(
+    c =>
+      Character.isDefined(c)
+        && Character.UnicodeBlock.of(c) != Character.UnicodeBlock.PRIVATE_USE_AREA
+        && !Character.isISOControl(c)
+  )
+
+  lazy val genLegalUnicodeString: Gen[String] = Gen.nonEmptyListOf(genLegalUnicodeChar).map(_.mkString)
+
 }

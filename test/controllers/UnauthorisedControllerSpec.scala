@@ -19,9 +19,10 @@ package controllers
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import utils.HtmlValidation
 import views.html.UnauthorisedView
 
-class UnauthorisedControllerSpec extends SpecBase {
+class UnauthorisedControllerSpec extends SpecBase with HtmlValidation {
 
   "Unauthorised Controller" - {
 
@@ -38,6 +39,7 @@ class UnauthorisedControllerSpec extends SpecBase {
 
         status(result) mustEqual FORBIDDEN
         contentAsString(result) mustEqual view()(request, messages(application)).toString
+        contentAsString(result) must validateAsHtml
       }
     }
   }

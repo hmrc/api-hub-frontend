@@ -23,9 +23,7 @@ import models.application._
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
-import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist._
 import viewmodels.GeneratePrimarySecretSuccessViewModelSpec._
 
@@ -97,12 +95,14 @@ object GeneratePrimarySecretSuccessViewModelSpec {
         SummaryListRow(
           key = Key(Text(messages("generatePrimarySecretSuccess.clientSecret"))),
           value = Value(Text(secret.secret)),
-          actions = Some(Actions(items = Seq(ActionItem(content = HtmlContent(
-            new GovukButton().apply(
-              Button(
-                id = Some("copy-to-clipboard-button"),
-                content = Text("Copy"))
-            ))))))
+          actions = Some(Actions(items = Seq(
+            ActionItem(
+              href = "#",
+              content = Text("Copy"),
+              classes = "govuk-button",
+              attributes = Map("id" -> "copy-to-clipboard-button")
+            )
+          )))
         )
       ))
   }

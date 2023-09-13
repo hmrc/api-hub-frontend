@@ -31,11 +31,12 @@ import play.api.test.Helpers._
 import play.api.{Application => PlayApplication}
 import repositories.SessionRepository
 import services.ApiHubService
+import utils.HtmlValidation
 import views.html.{ErrorTemplate, IndexView}
 
 import scala.concurrent.Future
 
-class IndexControllerSpec extends SpecBase with MockitoSugar {
+class IndexControllerSpec extends SpecBase with MockitoSugar with HtmlValidation {
 
   "Index Controller" - {
 
@@ -64,6 +65,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual view(applications, Some(FakeUser))(request, messages(fixture.application)).toString
+        contentAsString(result) must validateAsHtml
       }
     }
 
@@ -132,10 +134,9 @@ class IndexControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual view(applications, Some(user))(request, messages(fixture.application)).toString
-
+        contentAsString(result) must validateAsHtml
       }
     }
-
 
     "must call apiHubService.getUserApplications() if user does not have admin permissions" in {
       val testEmail = "test-email"
@@ -157,7 +158,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual view(applications, Some(FakeUser))(request, messages(fixture.application)).toString
-
+        contentAsString(result) must validateAsHtml
       }
     }
 
@@ -177,6 +178,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar {
             "Please try again in a few minutes."
           )(request, messages(fixture.application))
             .toString()
+        contentAsString(result) must validateAsHtml
       }
     }
 
@@ -196,6 +198,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar {
             "Please try again in a few minutes."
           )(request, messages(fixture.application))
             .toString()
+        contentAsString(result) must validateAsHtml
       }
     }
   }

@@ -29,11 +29,12 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Application => PlayApplication}
 import services.ApiHubService
+import utils.HtmlValidation
 import views.html.{ApproveScopeView, ErrorTemplate}
 
 import scala.concurrent.Future
 
-class ApproveScopeControllerSpec extends SpecBase with MockitoSugar {
+class ApproveScopeControllerSpec extends SpecBase with MockitoSugar with HtmlValidation {
 
   "ApproveScopeController" - {
     "must approve the scope and redirect to the scope approved page when user is approver" in {
@@ -91,6 +92,7 @@ class ApproveScopeControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustBe OK
 
         contentAsString(result) mustEqual view(application, Some(FakeApprover), config.environmentNames)(request, messages(fixture.application)).toString
+        contentAsString(result) must validateAsHtml
       }
     }
 
@@ -126,6 +128,7 @@ class ApproveScopeControllerSpec extends SpecBase with MockitoSugar {
             s"Cannot find an application with Id $testId."
           )(request, messages(fixture.application))
             .toString()
+        contentAsString(result) must validateAsHtml
       }
     }
 
@@ -150,6 +153,7 @@ class ApproveScopeControllerSpec extends SpecBase with MockitoSugar {
             s"Cannot find a request for scope $scope for an application with Id $testId."
           )(request, messages(fixture.application))
             .toString()
+        contentAsString(result) must validateAsHtml
       }
     }
   }
