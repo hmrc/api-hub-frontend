@@ -21,6 +21,7 @@ import controllers.actions.OptionalIdentifierAction
 import controllers.helpers.ErrorResultBuilder
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.AddAnApiSessionRepository
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.ApiDetailsView
@@ -33,7 +34,8 @@ class ApiDetailsController @Inject()(
   apiHubService: ApiHubService,
   view: ApiDetailsView,
   errorResultBuilder: ErrorResultBuilder,
-  optionallyIdentified: OptionalIdentifierAction
+  optionallyIdentified: OptionalIdentifierAction,
+  addAnApiSessionRepository: AddAnApiSessionRepository
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(id: String): Action[AnyContent] = optionallyIdentified.async {
