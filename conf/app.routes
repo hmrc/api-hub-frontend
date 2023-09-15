@@ -69,5 +69,9 @@ GET         /generating-credentials/:id                                        c
 POST        /generating-credentials/:id                                        controllers.ProductionCredentialsChecklistController.onSubmit(id: String)
 
 GET         /test-connectivity                                                 controllers.TestConnectivityController.onPageLoad()
+GET         /health                                                            controllers.TestConnectivityController.onPageLoad()
 
 GET         /apis/details/:id                                                  controllers.ApiDetailsController.onPageLoad(id: String)
+
+GET         /apis                                                              controllers.HipApisController.onPageLoad()
+POST        /apis                                                              controllers.HipApisController.onSubmit()

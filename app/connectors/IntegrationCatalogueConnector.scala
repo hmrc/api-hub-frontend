@@ -18,14 +18,14 @@ package connectors
 
 import com.google.inject.{Inject, Singleton}
 import config.FrontendAppConfig
-import models.api.{ApiDetail, IntegrationId}
+import models.api.{ApiDetail, IntegrationId, IntegrationResponse}
 import play.api.Logging
 import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION}
 import play.api.http.MimeTypes.JSON
 import play.api.http.Status.NOT_FOUND
-import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps, UpstreamErrorResponse}
-import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import java.util.UUID
@@ -57,6 +57,18 @@ class IntegrationCatalogueConnector @Inject()(
           }
       case _ => Future.successful(None)
     }
+  }
+
+  def getAllHipApis()(implicit hc: HeaderCarrier): Future[Seq[ApiDetail]] = {
+    Console.println(s"clientAuthToken: $clientAuthToken")
+    httpClient.get(url"$integrationCatalogueBaseUrl/integration-catalogue/integrations?platformFilter=hip&integrationType=api")
+      .setHeader((ACCEPT, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Either[UpstreamErrorResponse, IntegrationResponse]]
+      .flatMap {
+        case Right(integrationResponse) => Future.successful(integrationResponse.results)
+        case Left(e) => Future.failed(e)
+      }
   }
 
 }

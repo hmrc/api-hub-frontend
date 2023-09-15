@@ -256,6 +256,24 @@ class ApiHubServiceSpec
     }
   }
 
+  "getAllApis" - {
+    "must call the integration catalogue connector and some API details" in {
+      val expected = Seq(sampleApiDetail())
+
+      val applicationsConnector = mock[ApplicationsConnector]
+      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+
+      when(integrationCatalogueConnector.getAllHipApis()(any()))
+        .thenReturn(Future.successful(expected))
+
+      service.getAllHipApis()(HeaderCarrier()) map {
+        actual =>
+          actual mustBe expected
+      }
+    }
+  }
+
 }
 
 trait ApplicationGetterBehaviours {

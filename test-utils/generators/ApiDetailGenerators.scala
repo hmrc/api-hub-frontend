@@ -16,7 +16,7 @@
 
 package generators
 
-import models.api.{ApiDetail, Endpoint, EndpointMethod}
+import models.api.{ApiDetail, Endpoint, EndpointMethod, IntegrationResponse}
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.OptionValues
 
@@ -58,5 +58,8 @@ trait ApiDetailGenerators extends OptionValues {
 
   def sampleApiDetail(): ApiDetail =
     arbitraryApiDetail.arbitrary.sample.value
+
+  def sampleApis() : IntegrationResponse =
+    IntegrationResponse(1,None, Seq(sampleApiDetail()))
 
 }
