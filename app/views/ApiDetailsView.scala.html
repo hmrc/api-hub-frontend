@@ -18,7 +18,8 @@
 @import models.user.UserModel
 
 @this(
-  layout: templates.Layout
+  layout: templates.Layout,
+  govukButton : GovukButton
 )
 
 @(apiDetail: ApiDetail, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
@@ -26,5 +27,14 @@
 @layout(pageTitle = titleNoForm(messages("apiDetails.title")), user = user) {
 
     <h1 class="govuk-heading-l">@messages("apiDetails.apiName"): @apiDetail.title</h1>
+
+    @user.foreach {_ =>
+        @govukButton(
+            Button(
+                href = Some(routes.AddAnApiStartController.onPageLoad(apiDetail.id).url),
+                content = Text(messages("apiDetails.addToAnApplication"))
+            )
+        )
+    }
 
 }
