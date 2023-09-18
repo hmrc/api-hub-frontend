@@ -2,16 +2,16 @@ package repositories
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class SessionRepositorySpec extends UserAnswersRepositoryBehaviours {
+class AddAnApiSessionRepositorySpec extends UserAnswersRepositoryBehaviours {
 
-  protected override val repository = new SessionRepository(
+  protected override val repository = new AddAnApiSessionRepository(
     mongoComponent = mongoComponent,
     appConfig      = mockAppConfig,
     clock          = stubClock,
     cryptoProvider = cryptoProvider
   )
 
-  "SessionRepository" - {
+  "AddAnApiSessionRepository" - {
     behave like userAnswersRepository(repository)
   }
 

@@ -16,6 +16,8 @@ site.approvals = Approvals
 site.copy = Copy
 site.applicationNotFoundHeading = Application not found
 site.applicationNotFoundMessage = Cannot find an application with Id {0}.
+site.apiNotFound.heading = API not found
+site.apiNotFound.message = Cannot find an API with Id {0}.
 
 date.day = Day
 date.month = Month
@@ -222,8 +224,7 @@ testConnectivity.title = Test Connectivity
 
 apiDetails.title = API Details
 apiDetails.apiName = API Name
-apiDetails.notFound.heading = API not found
-apiDetails.notFound.message = Cannot find an API with Id {0}.
+apiDetails.addToAnApplication = Add to an application
 
 hipApis.title = HIP APIs
 hipApis.search.heading = Search for an API

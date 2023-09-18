@@ -24,12 +24,12 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class SessionRepository @Inject()(
+class AddAnApiSessionRepository @Inject()(
   mongoComponent: MongoComponent,
   appConfig: FrontendAppConfig,
   clock: Clock,
   cryptoProvider: CryptoProvider
 )(implicit ec: ExecutionContext)
-  extends UserAnswersRepository(mongoComponent, appConfig, clock, cryptoProvider, "user-answers") {
+  extends UserAnswersRepository(mongoComponent, appConfig, clock, cryptoProvider, "add-an-api-user-answers") {
 
 }

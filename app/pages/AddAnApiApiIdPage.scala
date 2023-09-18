@@ -14,22 +14,14 @@
  * limitations under the License.
  */
 
-package repositories
+package pages
 
-import config.{CryptoProvider, FrontendAppConfig}
-import uk.gov.hmrc.mongo.MongoComponent
+import play.api.libs.json.JsPath
 
-import java.time.Clock
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext
+case object AddAnApiApiIdPage extends QuestionPage[String] {
 
-@Singleton
-class SessionRepository @Inject()(
-  mongoComponent: MongoComponent,
-  appConfig: FrontendAppConfig,
-  clock: Clock,
-  cryptoProvider: CryptoProvider
-)(implicit ec: ExecutionContext)
-  extends UserAnswersRepository(mongoComponent, appConfig, clock, cryptoProvider, "user-answers") {
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "apiId"
 
 }

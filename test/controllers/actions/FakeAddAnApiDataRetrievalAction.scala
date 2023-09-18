@@ -14,22 +14,19 @@
  * limitations under the License.
  */
 
-package repositories
+package controllers.actions
 
-import config.{CryptoProvider, FrontendAppConfig}
-import uk.gov.hmrc.mongo.MongoComponent
+import models.UserAnswers
+import models.requests.{IdentifierRequest, OptionalDataRequest}
 
-import java.time.Clock
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
-@Singleton
-class SessionRepository @Inject()(
-  mongoComponent: MongoComponent,
-  appConfig: FrontendAppConfig,
-  clock: Clock,
-  cryptoProvider: CryptoProvider
-)(implicit ec: ExecutionContext)
-  extends UserAnswersRepository(mongoComponent, appConfig, clock, cryptoProvider, "user-answers") {
+class FakeAddAnApiDataRetrievalAction(dataToReturn: Option[UserAnswers]) extends AddAnApiDataRetrievalAction {
+
+  override protected def transform[A](request: IdentifierRequest[A]): Future[OptionalDataRequest[A]] = {
+    Future(OptionalDataRequest(request.request, request.user, dataToReturn))
+  }
+
+  override protected implicit val executionContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
 
 }

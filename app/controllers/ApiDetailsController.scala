@@ -41,8 +41,8 @@ class ApiDetailsController @Inject()(
       apiHubService.getApiDetail(id).map {
         case Some(apiDetail) => Ok(view(apiDetail, request.user))
         case _ => errorResultBuilder.notFound(
-          Messages("apiDetails.notFound.heading"),
-          Messages("apiDetails.notFound.message", id)
+          Messages("site.apiNotFound.heading"),
+          Messages("site.apiNotFound.message", id)
         )
       }
   }
