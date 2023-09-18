@@ -60,7 +60,6 @@ class IntegrationCatalogueConnector @Inject()(
   }
 
   def getAllHipApis()(implicit hc: HeaderCarrier): Future[Seq[ApiDetail]] = {
-    Console.println(s"clientAuthToken: $clientAuthToken")
     httpClient.get(url"$integrationCatalogueBaseUrl/integration-catalogue/integrations?platformFilter=hip&integrationType=api")
       .setHeader((ACCEPT, JSON))
       .setHeader(AUTHORIZATION -> clientAuthToken)
