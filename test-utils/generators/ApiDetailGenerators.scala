@@ -48,7 +48,8 @@ trait ApiDetailGenerators extends OptionValues {
         description <- Gen.alphaNumStr
         version <- Gen.alphaNumStr
         endpoints <- Gen.listOf(arbitraryEndpoint.arbitrary)
-      } yield ApiDetail(id.toString, title, description, version, endpoints)
+        shortDescription <- Gen.alphaNumStr
+      } yield ApiDetail(id.toString, title,description, version, endpoints, Some(shortDescription))
     }
 
   implicit val arbitraryApiDetails: Arbitrary[Seq[ApiDetail]] =

@@ -31,33 +31,26 @@ govukTable: GovukTable,
 @(form: Form[_], user: Option[UserModel], apiDetails: Seq[ApiDetail] = Seq.empty)(implicit request: Request[_], messages: Messages)
 
 @anApi(apiDetail: ApiDetail) = {
-    <div class = "govuk-grid-row">
-        <div class = "govuk-grid-column-two-thirds">
-            <a href="">@apiDetail.title</a>
-        </div>
-        <div class="govuk-grid-column-one-third">@{messages("hipApis.api.endpoints",apiDetail.endpoints.size)}</div>
+
+    <div class="api-panel">
+
+        <span class="call-out-type information">
+            <a class="govuk-link govuk-link--no-visited-state" href="@routes.ApiDetailsController.onPageLoad(apiDetail.id)">@apiDetail.title</a>
+        </span>
+
+        <span class="call-out-data-attribute">@{messages("hipApis.api.endpoints",apiDetail.endpoints.size)}</span>
+
+        <p class="govuk-body additional-message">@apiDetail.shortDescription</p>
+
     </div>
-    <div class = "govuk-grid-row">
-    @apiDetail.description</div>
 }
 
 @apis(apiDetails: Seq[ApiDetail]) = {
-@if(apiDetails.isEmpty) {
-    @messages("hipApis.searchResults.empty")
-} else {
-    @govukTable(
-        Table(
-            caption = None,
-            head = None,
-            rows = apiDetails.map(
-                apiDetail =>
-                    Seq(
-                        TableRow(content = HtmlContent(anApi(apiDetail)))
-                    )
-            )
-        )
-    )
-}
+    @if(apiDetails.isEmpty) {
+        @messages("hipApis.searchResults.empty")
+    } else {
+        @apiDetails.map( api => anApi(api))
+    }
 }
 
 @layout(pageTitle = title(form, messages("hipApis.title")), user = user) {
@@ -68,33 +61,16 @@ govukTable: GovukTable,
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        <h2 class="govuk-heading-m">@messages("hipApis.title")</h2>
+        <h2 class="govuk-heading-l">@messages("hipApis.title")</h2>
         <div class = "govuk-grid-row">
-            <div class = "govuk-grid-column-one-third-from-desktop">
-                <h3 class="govuk-heading-m">@messages("hipApis.search.heading")</h3>
-                <div class="govuk-body">
-                @govukInput(
-                    InputViewModel(
-                        field = form("value"),
-                        label = LabelViewModel(messages("hipApis.search.heading"))
-                    )
-                            .withWidth(Full)
-                            .withHint(HintViewModel(messages("hipApis.search.hint")))
-                )
-                </div>
-            </div>
-            <div class = "govuk-grid-column-two-thirds-from-desktop">
-                <h3 class="govuk-heading-m">@messages("hipApis.searchResults.heading", apiDetails.size)</h3>
+            <div class = "govuk-grid-column-full">
+                <h3 class="govuk-label--s">@messages("hipApis.searchResults.heading", apiDetails.size)</h3>
                 <div class="govuk-body">
                 @apis(apiDetails)
                 </div>
             </div>
         </div>
 
-
-        @govukButton(
-            ButtonViewModel(messages("site.continue"))
-        )
     }
 }
 

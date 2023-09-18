@@ -61,7 +61,7 @@ class HipApisControllerSpec
 
           status(result) mustBe OK
           contentAsString(result) mustBe view(form, None, Seq(apiDetail))(request, messages(fixture.application)).toString()
-//          contentAsString(result) must validateAsHtml
+          contentAsString(result) must validateAsHtml
         }
       }
     }
