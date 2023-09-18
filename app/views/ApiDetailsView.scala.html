@@ -28,7 +28,7 @@
 
     <h1 class="govuk-heading-l">@messages("apiDetails.apiName"): @apiDetail.title</h1>
 
-    @user.foreach {_ =>
+    @if(user.isDefined) {
         @govukButton(
             Button(
                 href = Some(routes.AddAnApiStartController.onPageLoad(apiDetail.id).url),
