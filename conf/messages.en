@@ -240,3 +240,5 @@ addAnApiSelectApplication.heading = Select application
 addAnApiSelectApplication.error.required = Please select an application
 addAnApiSelectApplication.noApplications = To subscribe to an API, you must first register an application.
 addAnApiSelectApplication.registerApplication = Register an application
+addAnApiSelectApplication.whichApplication = Which application would you like to add the {0} to?
+addAnApiSelectApplication.returnTo = Return to {0}

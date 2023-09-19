@@ -72,7 +72,12 @@ GET         /test-connectivity                                                 c
 
 GET         /apis/details/:id                                                  controllers.ApiDetailsController.onPageLoad(id: String)
 
-GET         /add-an-api/start/:id                                              controllers.AddAnApiStartController.onPageLoad(id: String)
+GET         /apis/add-an-api/start/:id                                         controllers.AddAnApiStartController.onPageLoad(id: String)
+
+GET         /apis/add-an-api/select-application                                controllers.AddAnApiSelectApplicationController.onPageLoad(mode: Mode = NormalMode)
+POST        /apis/add-an-api/select-application                                controllers.AddAnApiSelectApplicationController.onSubmit(mode: Mode = NormalMode)
+GET         /apis/add-an-api/change-select-application                         controllers.AddAnApiSelectApplicationController.onPageLoad(mode: Mode = CheckMode)
+POST        /apis/add-an-api/change-select-application                         controllers.AddAnApiSelectApplicationController.onSubmit(mode: Mode = CheckMode)
 
 GET         /apis                                                              controllers.HipApisController.onPageLoad()
 POST        /apis                                                              controllers.HipApisController.onSubmit()

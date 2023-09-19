@@ -72,10 +72,10 @@ class ApplicationsConnector @Inject()(
       }
   }
 
-  def getUserApplications(userEmail:String)(implicit hc: HeaderCarrier): Future[Seq[Application]] = {
+  def getUserApplications(userEmail:String, enrich: Boolean)(implicit hc: HeaderCarrier): Future[Seq[Application]] = {
     val emailEncrypted = crypto.QueryParameterCrypto.encrypt(PlainText(userEmail)).value
     httpClient
-      .get(url"$applicationsBaseUrl/api-hub-applications/applications/?teamMember=$emailEncrypted")
+      .get(url"$applicationsBaseUrl/api-hub-applications/applications/?teamMember=$emailEncrypted&enrich=$enrich")
       .setHeader((ACCEPT, JSON))
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Seq[Application]]

@@ -17,10 +17,14 @@
 @import models.api.ApiDetail
 @import models.application.Application
 @import models.user.UserModel
+@import views.html.helper.CSPNonce
 
 @this(
     layout: templates.Layout,
-    govukButton : GovukButton
+    govukButton : GovukButton,
+    formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukRadios: GovukRadios
 )
 
 @(
@@ -32,7 +36,86 @@
     applicationsWithoutAccess: Seq[Application]
 )(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("addAnApiSelectApplication.title")), user = user) {
+@scripts() = {
+    <link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css' media="all" rel="stylesheet" type="text/css" @{CSPNonce.attr}/>
+
+    <style>
+        .call-out-panel {
+          font-family: "GDS Transport", arial, sans-serif;
+          min-height: 45px;
+          background-color: #fbfbfb;
+          border: solid 1px #ebebeb;
+          border-radius: 5px;
+          padding: 20px;
+          margin-top: 20px;
+          margin-bottom: 40px;
+          border-radius: 5px;
+          font-size: 0.8rem;
+        }
+        .call-out-panel .call-out-body {
+          margin-top: 8px;
+          padding-left: 27px;
+          margin-bottom: 8px;
+        }
+        .call-out-panel .call-out-list-item {
+          background-color: #ebebeb;
+          padding: 8px 20px;
+          width: 80%;
+        }
+        .call-out-panel ul {
+          margin-left: 37px;
+          margin-top: 16px;
+          font-size: 1rem;
+          margin-bottom: 12px;
+        }
+        .call-out-panel .additional-message {
+          margin-left: 37px;
+          margin-top: 16px;
+          font-size: 1rem !important;
+          margin-bottom: 4px;
+        }
+        .call-out-panel .call-out-type {
+          font-family: "GDS Transport", arial, sans-serif;
+          margin-bottom: 20px;
+          margin-left: 14px;
+          font-weight: 700;
+          font-size: 1rem !important;
+        }
+        .call-out-panel .information-tag {
+          font-size: 1.2rem;
+          margin-bottom: 0px;
+        }
+        .call-out-panel .information {
+          color: #4c2c92;
+        }
+        .call-out-panel .warning {
+          color: #f47738;
+        }
+    </style>
+}
+
+@displayApplicationsWithAccess() = {
+    <div class="call-out-panel">
+        <p class="govuk-body information-tag">
+            <i class="fa-solid fa-circle-info information"></i>
+            <span class="call-out-type information">
+                The following applications already have access to the weighting API:
+            </span>
+        </p>
+
+        <ul class="govuk-list">
+            @applicationsWithAccess.map(application =>
+                <li class="call-out-list-item">{application.name}</li>
+            )
+        </ul>
+
+        @if(applicationsWithoutAccess.isEmpty) {
+            <p class="govuk-body additional-message">This API is available in all of your applications.</p>
+        }
+    </div>
+}
+
+@layout(pageTitle = title(form, messages("addAnApiSelectApplication.title")), user = user, customScriptsBlock = Some(scripts())) {
 
     @if(applicationsWithAccess.isEmpty && applicationsWithoutAccess.isEmpty) {
         <div class="govuk-grid-row">
@@ -48,6 +131,59 @@
                 )
             </div>
         </div>
+    } else if(applicationsWithoutAccess.isEmpty) {
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <h1 class="govuk-heading-l">
+                    @messages("addAnApiSelectApplication.whichApplication", apiDetail.title)
+                </h1>
+
+                @displayApplicationsWithAccess()
+
+                @govukButton(
+                    Button(
+                        href = Some(routes.ApiDetailsController.onPageLoad(apiDetail.id).url),
+                        content = Text(messages("addAnApiSelectApplication.returnTo", apiDetail.title))
+                    )
+                )
+            </div>
+        </div>
+    } else {
+        @formHelper(action = routes.AddAnApiSelectApplicationController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+            @if(form.errors.nonEmpty) {
+                @govukErrorSummary(ErrorSummaryViewModel(form))
+            }
+
+            @govukRadios(
+                RadiosViewModel(
+                    field = form("value"),
+                    items = applicationsWithoutAccess.map(
+                        application =>
+                            RadioItem(
+                                content = Text(application.name),
+                                value = Some(application.id)
+                            )
+                    ),
+                    fieldset = Fieldset(
+                        legend = Some(Legend(
+                            content = messages("addAnApiSelectApplication.whichApplication", apiDetail.title),
+                            classes = "govuk-fieldset__legend--l",
+                            isPageHeading = true
+                        ))
+                    )
+                ).copy(
+                    hint = if (applicationsWithAccess.nonEmpty) {
+                        Some(Hint(content = HtmlContent(displayApplicationsWithAccess())))
+                    } else {
+                        None
+                    }
+                )
+            )
+
+            @govukButton(
+                ButtonViewModel(messages("site.continue"))
+            )
+        }
     }
 
 }

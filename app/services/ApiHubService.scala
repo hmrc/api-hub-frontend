@@ -63,7 +63,7 @@ class ApiHubService @Inject()(
   }
 
   def getUserApplications(email:String, enrich: Boolean = false)(implicit hc:HeaderCarrier): Future[Seq[Application]] =
-    applicationsConnector.getUserApplications(email)
+    applicationsConnector.getUserApplications(email, enrich)
 
   def createPrimarySecret(id: String)(implicit hc:HeaderCarrier): Future[Option[Secret]] = {
     logger.debug(s"Creating primary secret for application $id")
