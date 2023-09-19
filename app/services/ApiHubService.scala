@@ -62,8 +62,8 @@ class ApiHubService @Inject()(
     applicationsConnector.approvePrimaryScope(appId, scopeName)
   }
 
-  def getUserApplications(email:String)(implicit hc:HeaderCarrier): Future[Seq[Application]] =
-        applicationsConnector.getUserApplications(email)
+  def getUserApplications(email:String, enrich: Boolean = false)(implicit hc:HeaderCarrier): Future[Seq[Application]] =
+    applicationsConnector.getUserApplications(email)
 
   def createPrimarySecret(id: String)(implicit hc:HeaderCarrier): Future[Option[Secret]] = {
     logger.debug(s"Creating primary secret for application $id")

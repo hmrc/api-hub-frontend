@@ -138,6 +138,13 @@ object ApplicationLenses {
         applicationTeamMembers.get(application) :+ TeamMember(email)
       )
 
+    def getRequiredScopeNames: Set[String] = {
+      application
+        .getSecondaryScopes
+        .map(_.name)
+        .toSet
+    }
+
   }
 
 }

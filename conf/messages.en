@@ -234,3 +234,9 @@ hipApis.search.error.required = Enter a search term
 hipApis.api.endpoints = {0} Endpoints
 hipApis.searchResults.empty = No APIs found.
 hipApis.link.text = HIP APIs
+
+addAnApiSelectApplication.title = Select application
+addAnApiSelectApplication.heading = Select application
+addAnApiSelectApplication.error.required = Please select an application
+addAnApiSelectApplication.noApplications = To subscribe to an API, you must first register an application.
+addAnApiSelectApplication.registerApplication = Register an application
