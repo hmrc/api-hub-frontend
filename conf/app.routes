@@ -73,3 +73,6 @@ GET         /test-connectivity                                                 c
 GET         /apis/details/:id                                                  controllers.ApiDetailsController.onPageLoad(id: String)
 
 GET         /add-an-api/start/:id                                              controllers.AddAnApiStartController.onPageLoad(id: String)
+
+GET         /apis                                                              controllers.HipApisController.onPageLoad()
+POST        /apis                                                              controllers.HipApisController.onSubmit()

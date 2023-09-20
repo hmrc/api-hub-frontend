@@ -225,3 +225,12 @@ testConnectivity.title = Test Connectivity
 apiDetails.title = API Details
 apiDetails.apiName = API Name
 apiDetails.addToAnApplication = Add to an application
+
+hipApis.title = HIP APIs
+hipApis.search.heading = Search for an API
+hipApis.search.hint = Search by API name, or keyword.
+hipApis.searchResults.heading = API Results ({0})
+hipApis.search.error.required = Enter a search term
+hipApis.api.endpoints = {0} Endpoints
+hipApis.searchResults.empty = No APIs found.
+hipApis.link.text = HIP APIs

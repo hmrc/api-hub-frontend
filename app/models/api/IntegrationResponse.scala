@@ -18,17 +18,8 @@ package models.api
 
 import play.api.libs.json.{Format, Json}
 
-case class ApiDetail(
-  id: String,
-  title: String,
-  description: String,
-  version: String,
-  endpoints: Seq[Endpoint],
-  shortDescription: Option[String]
-)
+case class IntegrationResponse(count: Int, pagedCount: Option[Int] = None, results: Seq[ApiDetail])
 
-object ApiDetail {
-
-  implicit val formatApiDetail: Format[ApiDetail] = Json.format[ApiDetail]
-
+object IntegrationResponse {
+  implicit val formatIntegrationResponse: Format[IntegrationResponse] = Json.format[IntegrationResponse]
 }

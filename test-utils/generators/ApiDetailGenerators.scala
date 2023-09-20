@@ -16,7 +16,7 @@
 
 package generators
 
-import models.api.{ApiDetail, Endpoint, EndpointMethod}
+import models.api.{ApiDetail, Endpoint, EndpointMethod, IntegrationResponse}
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.OptionValues
 
@@ -48,7 +48,8 @@ trait ApiDetailGenerators extends OptionValues {
         description <- Gen.alphaNumStr
         version <- Gen.alphaNumStr
         endpoints <- Gen.listOf(arbitraryEndpoint.arbitrary)
-      } yield ApiDetail(id.toString, title, description, version, endpoints)
+        shortDescription <- Gen.alphaNumStr
+      } yield ApiDetail(id.toString, title,description, version, endpoints, Some(shortDescription))
     }
 
   implicit val arbitraryApiDetails: Arbitrary[Seq[ApiDetail]] =
@@ -58,5 +59,8 @@ trait ApiDetailGenerators extends OptionValues {
 
   def sampleApiDetail(): ApiDetail =
     arbitraryApiDetail.arbitrary.sample.value
+
+  def sampleApis() : IntegrationResponse =
+    IntegrationResponse(1,None, Seq(sampleApiDetail()))
 
 }

@@ -78,4 +78,8 @@ class ApiHubService @Inject()(
     integrationCatalogueConnector.getApiDetail(id)
   }
 
+  def getAllHipApis()(implicit hc: HeaderCarrier): Future[Seq[ApiDetail]] = {
+    integrationCatalogueConnector.getAllHipApis()
+  }
+
 }
