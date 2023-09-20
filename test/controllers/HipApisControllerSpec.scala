@@ -82,8 +82,6 @@ class HipApisControllerSpec
         }
       }
     }
-
-
   }
 
   private case class Fixture(apiHubService: ApiHubService, application: Application)
