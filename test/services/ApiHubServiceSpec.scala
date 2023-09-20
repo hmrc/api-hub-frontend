@@ -82,7 +82,8 @@ class ApiHubServiceSpec
       val expected = Seq(application1, application2)
 
       val applicationsConnector = mock[ApplicationsConnector]
-      when(applicationsConnector.getUserApplications(ArgumentMatchers.eq("test-creator-email-2"))(any())).thenReturn(Future.successful(expected))
+      when(applicationsConnector.getUserApplications(ArgumentMatchers.eq("test-creator-email-2"), ArgumentMatchers.eq(false))(any()))
+        .thenReturn(Future.successful(expected))
 
       val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
       val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
@@ -90,7 +91,7 @@ class ApiHubServiceSpec
       service.getUserApplications("test-creator-email-2")(HeaderCarrier()) map {
         actual =>
           actual mustBe expected
-          verify(applicationsConnector).getUserApplications(ArgumentMatchers.eq("test-creator-email-2"))(any())
+          verify(applicationsConnector).getUserApplications(ArgumentMatchers.eq("test-creator-email-2"), ArgumentMatchers.eq(false))(any())
           succeed
       }
   }}

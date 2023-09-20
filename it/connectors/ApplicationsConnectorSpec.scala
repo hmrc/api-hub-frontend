@@ -73,7 +73,7 @@ class ApplicationsConnectorSpec
           )
       )
 
-      buildConnector(this).getUserApplications("test-user-email-2")(HeaderCarrier()) map {
+      buildConnector(this).getUserApplications("test-user-email-2", false)(HeaderCarrier()) map {
         actual =>
           actual mustBe expected
       }
