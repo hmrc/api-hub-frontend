@@ -19,7 +19,6 @@ package controllers
 import com.google.inject.{Inject, Singleton}
 import controllers.actions.OptionalIdentifierAction
 import controllers.helpers.ErrorResultBuilder
-import forms.SearchHipApisFormProvider
 import models.api.ApiDetail
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
