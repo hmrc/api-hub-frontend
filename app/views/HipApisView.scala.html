@@ -28,7 +28,7 @@ govukTable: GovukTable,
 
 )
 
-@(form: Form[_], user: Option[UserModel], apiDetails: Seq[ApiDetail] = Seq.empty)(implicit request: Request[_], messages: Messages)
+@(user: Option[UserModel], apiDetails: Seq[ApiDetail] = Seq.empty)(implicit request: Request[_], messages: Messages)
 
 @anApi(apiDetail: ApiDetail) = {
 
@@ -53,24 +53,17 @@ govukTable: GovukTable,
     }
 }
 
-@layout(pageTitle = title(form, messages("hipApis.title")), user = user) {
+@layout(pageTitle = titleNoForm(messages("hipApis.title")), user = user) {
 
-    @formHelper(action = routes.HipApisController.onSubmit()) {
-
-        @if(form.errors.nonEmpty) {
-            @govukErrorSummary(ErrorSummaryViewModel(form))
-        }
-
-        <h2 class="govuk-heading-l">@messages("hipApis.title")</h2>
-        <div class = "govuk-grid-row">
-            <div class = "govuk-grid-column-full">
-                <h3 class="govuk-label--s">@messages("hipApis.searchResults.heading", apiDetails.size)</h3>
-                <div class="govuk-body">
-                @apis(apiDetails)
-                </div>
+    <h2 class="govuk-heading-l">@messages("hipApis.title")</h2>
+    <div class = "govuk-grid-row">
+        <div class = "govuk-grid-column-full">
+            <h3 class="govuk-label--s">@messages("hipApis.searchResults.heading", apiDetails.size)</h3>
+            <div class="govuk-body">
+            @apis(apiDetails)
             </div>
         </div>
+    </div>
 
-    }
 }
 

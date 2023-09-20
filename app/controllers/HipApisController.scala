@@ -35,15 +35,13 @@ class HipApisController @Inject()(
   apiHubService: ApiHubService,
   view: HipApisView,
   errorResultBuilder: ErrorResultBuilder,
-  optionallyIdentified: OptionalIdentifierAction,
-  formProvider: SearchHipApisFormProvider
+  optionallyIdentified: OptionalIdentifierAction
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form = formProvider()
   def onPageLoad(): Action[AnyContent] = optionallyIdentified.async {
     implicit request =>
       apiHubService.getAllHipApis().map {
-        case apiDetails: Seq[ApiDetail] => Ok(view(form, request.user, apiDetails))
+        case apiDetails: Seq[ApiDetail] => Ok(view(request.user, apiDetails))
         case _ => InternalServerError
       }
   }

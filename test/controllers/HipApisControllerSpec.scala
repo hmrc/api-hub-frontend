@@ -42,9 +42,6 @@ class HipApisControllerSpec
     with ApiDetailGenerators
     with HtmlValidation {
 
-  private val formProvider = new SearchHipApisFormProvider()
-  private val form = formProvider()
-
   "GET" - {
     "must return OK and the correct view when the API detail exists for an unauthenticated user" in {
       val fixture = buildFixture()
@@ -60,7 +57,7 @@ class HipApisControllerSpec
           val result = route(fixture.application, request).value
 
           status(result) mustBe OK
-          contentAsString(result) mustBe view(form, None, Seq(apiDetail))(request, messages(fixture.application)).toString()
+          contentAsString(result) mustBe view(None, Seq(apiDetail))(request, messages(fixture.application)).toString()
           contentAsString(result) must validateAsHtml
         }
       }
@@ -80,7 +77,7 @@ class HipApisControllerSpec
           val result = route(fixture.application, request).value
 
           status(result) mustBe OK
-          contentAsString(result) mustBe view(form, Some(FakeUser), Seq(apiDetail))(request, messages(fixture.application)).toString()
+          contentAsString(result) mustBe view(Some(FakeUser), Seq(apiDetail))(request, messages(fixture.application)).toString()
           contentAsString(result) must validateAsHtml
         }
       }
