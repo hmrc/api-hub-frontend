@@ -18,7 +18,6 @@ package controllers
 
 import base.OptionallyAuthenticatedSpecBase
 import controllers.actions.FakeUser
-import forms.SearchHipApisFormProvider
 import generators.ApiDetailGenerators
 import models.api.ApiDetail
 import models.user.UserModel
