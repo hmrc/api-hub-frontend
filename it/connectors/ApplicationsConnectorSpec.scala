@@ -3,7 +3,7 @@ package connectors
 import com.github.tomakehurst.wiremock.client.WireMock._
 import com.typesafe.config.ConfigFactory
 import config.FrontendAppConfig
-import connectors.ApplicationsConnectorSpec.{buildConnector, toJsonString}
+import connectors.ApplicationsConnectorSpec.{ApplicationGetterBehaviours, buildConnector, toJsonString}
 import models.application._
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AsyncFreeSpec
@@ -52,31 +52,12 @@ class ApplicationsConnectorSpec
   }
 
   "ApplicationsConnector.getUserApplications" - {
-    "must place the correct request and return the array of applications with given user in team members" in {
-      val testEmail = "test-user-email-2"
-      val application1 = Application("id-1", "test-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1")))
-        .copy(teamMembers = Seq(TeamMember("test-creator-email-1"), TeamMember(testEmail)))
-      val application2 = Application("id-2", "test-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2")))
-        .copy(teamMembers = Seq(TeamMember(testEmail), TeamMember("test-user-email-3")))
-      val expected = Seq(application1, application2)
-      val crypto = new ApplicationCrypto(ConfigFactory.parseResources("application.conf"))
+    "must" - {
+      behave like successfulUserApplicationsGetter(true)
+    }
 
-      val userEmailEncrypted = crypto.QueryParameterCrypto.encrypt(PlainText(testEmail)).value
-      val userEmailEncoded = URLEncoder.encode(userEmailEncrypted, "UTF-8")
-      stubFor(
-        get(urlEqualTo(f"/api-hub-applications/applications/?teamMember=$userEmailEncoded&enrich=false"))
-          .withHeader("Accept", equalTo("application/json"))
-          .withHeader("Authorization", equalTo("An authentication token"))
-          .willReturn(
-            aResponse()
-              .withBody(toJsonString(expected))
-          )
-      )
-
-      buildConnector(this).getUserApplications("test-user-email-2", false)(HeaderCarrier()) map {
-        actual =>
-          actual mustBe expected
-      }
+    "must" - {
+      behave like successfulUserApplicationsGetter(false)
     }
   }
 
@@ -368,29 +349,58 @@ object ApplicationsConnectorSpec extends HttpClientV2Support {
     Json.toJson(applications).toString()
   }
 
-}
+  trait ApplicationGetterBehaviours {
+    this: AsyncFreeSpec with Matchers with WireMockSupport =>
 
-trait ApplicationGetterBehaviours {
-  this: AsyncFreeSpec with Matchers with WireMockSupport =>
+    def successfulApplicationGetter(enrich: Boolean): Unit = {
+      s"must place the correct request and return the application when enrich = $enrich" in {
+        val application1 = Application("id-1", "test-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1")))
+        val expected = application1
 
-  def successfulApplicationGetter(enrich: Boolean): Unit = {
-    s"must place the correct request and return the application when enrich = $enrich" in {
-      val application1 = Application("id-1", "test-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1")))
-      val expected = application1
+        stubFor(
+          get(urlEqualTo(s"/api-hub-applications/applications/id-1?enrich=$enrich"))
+            .withHeader("Accept", equalTo("application/json"))
+            .withHeader("Authorization", equalTo("An authentication token"))
+            .willReturn(
+              aResponse()
+                .withBody(toJsonString(expected))
+            )
+        )
 
-      stubFor(
-        get(urlEqualTo(s"/api-hub-applications/applications/id-1?enrich=$enrich"))
-          .withHeader("Accept", equalTo("application/json"))
-          .withHeader("Authorization", equalTo("An authentication token"))
-          .willReturn(
-            aResponse()
-              .withBody(toJsonString(expected))
-          )
-      )
+        buildConnector(this).getApplication("id-1", enrich)(HeaderCarrier()) map {
+          actual =>
+            actual mustBe Some(expected)
+        }
+      }
 
-      buildConnector(this).getApplication("id-1", enrich)(HeaderCarrier()) map {
-        actual =>
-          actual mustBe Some(expected)
+    }
+
+    def successfulUserApplicationsGetter(enrich: Boolean): Unit = {
+      s"must place the correct request and return the applications for a given user when enrich = $enrich" in {
+        val testEmail = "test-user-email-2"
+        val application1 = Application("id-1", "test-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1")))
+          .copy(teamMembers = Seq(TeamMember("test-creator-email-1"), TeamMember(testEmail)))
+        val application2 = Application("id-2", "test-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2")))
+          .copy(teamMembers = Seq(TeamMember(testEmail), TeamMember("test-user-email-3")))
+        val expected = Seq(application1, application2)
+        val crypto = new ApplicationCrypto(ConfigFactory.parseResources("application.conf"))
+
+        val userEmailEncrypted = crypto.QueryParameterCrypto.encrypt(PlainText(testEmail)).value
+        val userEmailEncoded = URLEncoder.encode(userEmailEncrypted, "UTF-8")
+        stubFor(
+          get(urlEqualTo(f"/api-hub-applications/applications/?teamMember=$userEmailEncoded&enrich=$enrich"))
+            .withHeader("Accept", equalTo("application/json"))
+            .withHeader("Authorization", equalTo("An authentication token"))
+            .willReturn(
+              aResponse()
+                .withBody(toJsonString(expected))
+            )
+        )
+
+        buildConnector(this).getUserApplications("test-user-email-2", enrich)(HeaderCarrier()) map {
+          actual =>
+            actual mustBe expected
+        }
       }
     }
 
