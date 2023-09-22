@@ -64,7 +64,7 @@ class ApplicationsConnectorSpec
       val userEmailEncrypted = crypto.QueryParameterCrypto.encrypt(PlainText(testEmail)).value
       val userEmailEncoded = URLEncoder.encode(userEmailEncrypted, "UTF-8")
       stubFor(
-        get(urlEqualTo(f"/api-hub-applications/applications/?teamMember=$userEmailEncoded"))
+        get(urlEqualTo(f"/api-hub-applications/applications/?teamMember=$userEmailEncoded&enrich=false"))
           .withHeader("Accept", equalTo("application/json"))
           .withHeader("Authorization", equalTo("An authentication token"))
           .willReturn(
