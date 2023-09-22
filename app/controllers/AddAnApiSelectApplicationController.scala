@@ -52,11 +52,13 @@ class AddAnApiSelectApplicationController @Inject()(
   view: AddAnApiSelectApplicationView
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport{
 
+  private val form = formProvider()
+
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       val preparedForm = request.userAnswers.get(AddAnApiSelectApplicationPage) match {
-        case None => formProvider()
-        case Some(value) => formProvider().fill(value)
+        case None => form
+        case Some(value) => form.fill(value)
       }
 
       buildView(mode, preparedForm, Ok)
@@ -64,7 +66,7 @@ class AddAnApiSelectApplicationController @Inject()(
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      formProvider().bindFromRequest().fold(
+      form.bindFromRequest().fold(
         formWithErrors =>
           buildView(mode, formWithErrors, BadRequest),
         value =>
