@@ -18,7 +18,6 @@ package controllers
 
 import com.google.inject.{Inject, Singleton}
 import controllers.actions.OptionalIdentifierAction
-import controllers.helpers.ErrorResultBuilder
 import models.api.ApiDetail
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -33,7 +32,6 @@ class HipApisController @Inject()(
   override val controllerComponents: MessagesControllerComponents,
   apiHubService: ApiHubService,
   view: HipApisView,
-  errorResultBuilder: ErrorResultBuilder,
   optionallyIdentified: OptionalIdentifierAction
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
@@ -46,8 +44,7 @@ class HipApisController @Inject()(
   }
 
   def onSubmit() : Action[AnyContent] = optionallyIdentified.async {
-    implicit request =>
-      Future.successful((NotImplemented))
+    Future.successful(NotImplemented)
   }
 
 }
