@@ -330,6 +330,27 @@ class ApplicationLensesSpec extends AnyFreeSpec with Matchers with LensBehaviour
       }
     }
 
+    "getRequiredScopeNames" - {
+      "must return the set of all secondary scopes" in {
+        val scopes = Seq(
+          Scope("test-scope-1", Approved),
+          Scope("test-scope-1", Approved),
+          Scope("test-scope-2", Approved)
+        )
+
+        val application = testApplication.setSecondaryScopes(scopes)
+
+        val actual = application.getRequiredScopeNames
+        actual must contain theSameElementsAs Set("test-scope-1", "test-scope-2")
+      }
+
+      "must return an empty set when there are no secondary scopes" in {
+        val application = testApplication.setSecondaryScopes(Seq.empty)
+
+        val actual = application.getRequiredScopeNames
+        actual mustBe empty
+      }
+    }
   }
 
 }

@@ -53,7 +53,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with HtmlValidation
 
       running(fixture.application) {
 
-        when(fixture.mockApiHubService.getUserApplications(ArgumentMatchers.eq(testEmail))(any()))
+        when(fixture.mockApiHubService.getUserApplications(ArgumentMatchers.eq(testEmail), ArgumentMatchers.eq(false))(any()))
           .thenReturn(Future.successful(applications))
 
         val request = FakeRequest(GET, routes.IndexController.onPageLoad.url)
@@ -148,7 +148,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with HtmlValidation
       val fixture = buildFixture()
       running(fixture.application) {
 
-        when(fixture.mockApiHubService.getUserApplications(ArgumentMatchers.eq(testEmail))(any()))
+        when(fixture.mockApiHubService.getUserApplications(ArgumentMatchers.eq(testEmail), ArgumentMatchers.eq(false))(any()))
           .thenReturn(Future.successful(applications))
 
         val request = FakeRequest(GET, routes.IndexController.onPageLoad.url)

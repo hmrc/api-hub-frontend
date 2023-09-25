@@ -114,8 +114,6 @@ class IntegrationCatalogueConnectorSpec
       }
 
       "must fail with an exception when integration catalogue returns a failure response" in {
-        val expected = sampleApis()
-
         stubFor(
           get(urlEqualTo(s"/integration-catalogue/integrations"))
             .withQueryParam("platformFilter", equalTo("hip"))
