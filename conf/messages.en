@@ -242,3 +242,11 @@ addAnApiSelectApplication.noApplications = To subscribe to an API, you must firs
 addAnApiSelectApplication.registerApplication = Register an application
 addAnApiSelectApplication.whichApplication = Which application would you like to add the {0} to?
 addAnApiSelectApplication.returnTo = Return to {0}
+
+addAnApiSelectEndpoints.title = Select endpoints
+addAnApiSelectEndpoints.heading = Which end points do you want to use?
+addAnApiSelectEndpoints.endpoint1 = endpoint1
+addAnApiSelectEndpoints.endpoint2 = endpoint2
+addAnApiSelectEndpoints.checkYourAnswersLabel = Endpoints
+addAnApiSelectEndpoints.error.required = Please select at least one end point
+addAnApiSelectEndpoints.change.hidden = AddAnApiSelectEndpoints

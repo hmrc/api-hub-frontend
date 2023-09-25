@@ -16,11 +16,16 @@
 
 package generators
 
-import models.ProductionCredentialsChecklist
+import models.{AddAnApiSelectEndpoints, ProductionCredentialsChecklist}
 import models.application.TeamMember
 import org.scalacheck.{Arbitrary, Gen}
 
 trait ModelGenerators {
+
+  implicit lazy val arbitraryAddAnApiSelectEndpoints: Arbitrary[AddAnApiSelectEndpoints] =
+    Arbitrary {
+      Gen.oneOf(AddAnApiSelectEndpoints.values)
+    }
 
   implicit lazy val arbitraryProductionCredentialsChecklist: Arbitrary[ProductionCredentialsChecklist] =
     Arbitrary {
