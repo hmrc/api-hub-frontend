@@ -16,6 +16,7 @@
 
 package models
 
+import models.api.{ApiDetail, Endpoint, EndpointMethod}
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
@@ -46,4 +47,24 @@ object AddAnApiSelectEndpoints extends Enumerable.Implicits {
 
   implicit val enumerable: Enumerable[AddAnApiSelectEndpoints] =
     Enumerable(values.map(v => v.toString -> v): _*)
+}
+
+case class AvailableEndpoint(endpoint: Endpoint, endpointMethod: EndpointMethod)
+
+object AvailableEndpoints {
+
+  def build(apiDetail: ApiDetail): Map[Set[String], AvailableEndpoint] = {
+    apiDetail
+      .endpoints
+      .flatMap(
+        endpoint =>
+          endpoint.methods.map(
+            endpointMethod =>
+              (AvailableEndpoint(endpoint, endpointMethod), endpointMethod.scopes.toSet)
+          )
+      )
+      .map(endpoint => endpoint._2 -> endpoint._1)
+      .toMap
+  }
+
 }

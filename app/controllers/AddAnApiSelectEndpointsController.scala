@@ -18,8 +18,10 @@ package controllers
 
 import controllers.actions._
 import forms.AddAnApiSelectEndpointsFormProvider
+
 import javax.inject.Inject
 import models.Mode
+import models.api.ApiDetail
 import navigation.Navigator
 import pages.AddAnApiSelectEndpointsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -42,10 +44,11 @@ class AddAnApiSelectEndpointsController @Inject()(
                                         view: AddAnApiSelectEndpointsView
                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form = formProvider()
-
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
+
+      val apiDetail: ApiDetail = ???
+      val form = formProvider.apply(apiDetail)
 
       val preparedForm = request.userAnswers.get(AddAnApiSelectEndpointsPage) match {
         case None => form
@@ -57,6 +60,9 @@ class AddAnApiSelectEndpointsController @Inject()(
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+
+      val apiDetail: ApiDetail = ???
+      val form = formProvider.apply(apiDetail)
 
       form.bindFromRequest().fold(
         formWithErrors =>

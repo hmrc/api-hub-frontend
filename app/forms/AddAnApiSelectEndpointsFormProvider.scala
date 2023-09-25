@@ -16,17 +16,27 @@
 
 package forms
 
-import javax.inject.Inject
-
 import forms.mappings.Mappings
+import models.api.ApiDetail
+import models.{AvailableEndpoints, Enumerable}
 import play.api.data.Form
 import play.api.data.Forms.set
-import models.AddAnApiSelectEndpoints
+
+import javax.inject.Inject
 
 class AddAnApiSelectEndpointsFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[Set[AddAnApiSelectEndpoints]] =
+  def apply(apiDetail: ApiDetail): Form[Set[Set[String]]] = {
+    val availableEndpoints = AvailableEndpoints.build(apiDetail)
+
+    implicit val enumerableScopes: Enumerable[Set[String]] = (str: String) => {
+      availableEndpoints.keySet.find(_.toString() == str)
+    }
+
     Form(
-      "value" -> set(enumerable[AddAnApiSelectEndpoints]("addAnApiSelectEndpoints.error.required")).verifying(nonEmptySet("addAnApiSelectEndpoints.error.required"))
+      "value" -> set(enumerable[Set[String]]("addAnApiSelectEndpoints.error.required"))
+        .verifying(nonEmptySet("addAnApiSelectEndpoints.error.required"))
     )
+  }
+
 }
