@@ -4,6 +4,7 @@ import com.github.tomakehurst.wiremock.client.WireMock._
 import com.typesafe.config.ConfigFactory
 import config.FrontendAppConfig
 import connectors.ApplicationsConnectorSpec.{ApplicationGetterBehaviours, buildConnector, toJsonString}
+import models.UserEmail
 import models.application._
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AsyncFreeSpec
