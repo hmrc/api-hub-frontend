@@ -76,24 +76,15 @@ class ApiHubServiceSpec
           succeed
       }
     }
-    "must call the applications connector and return a sequence of applications with a given team member" in {
-      val application1 = Application("id-1", "test-app-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1")))
-      val application2 = Application("id-2", "test-app-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2")))
-      val expected = Seq(application1, application2)
 
-      val applicationsConnector = mock[ApplicationsConnector]
-      when(applicationsConnector.getUserApplications(ArgumentMatchers.eq("test-creator-email-2"))(any())).thenReturn(Future.successful(expected))
+    "must" - {
+      behave like successfulUserApplicationsGetter(enrich = true)
+    }
 
-      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
-
-      service.getUserApplications("test-creator-email-2")(HeaderCarrier()) map {
-        actual =>
-          actual mustBe expected
-          verify(applicationsConnector).getUserApplications(ArgumentMatchers.eq("test-creator-email-2"))(any())
-          succeed
-      }
-  }}
+    "must" - {
+      behave like successfulUserApplicationsGetter(enrich = false)
+    }
+  }
 
   "getApplication" - {
     "must" - {
@@ -295,6 +286,28 @@ trait ApplicationGetterBehaviours {
         actual =>
           actual mustBe expected
           verify(applicationsConnector).getApplication(ArgumentMatchers.eq("id-1"), ArgumentMatchers.eq(enrich))(any())
+          succeed
+      }
+    }
+  }
+
+  def successfulUserApplicationsGetter(enrich: Boolean): Unit = {
+    s"must call the applications connector and return a user's applications when enrich is $enrich" in {
+      val application1 = Application("id-1", "test-app-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1")))
+      val application2 = Application("id-2", "test-app-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2")))
+      val expected = Seq(application1, application2)
+
+      val applicationsConnector = mock[ApplicationsConnector]
+      when(applicationsConnector.getUserApplications(ArgumentMatchers.eq("test-creator-email-2"), ArgumentMatchers.eq(enrich))(any()))
+        .thenReturn(Future.successful(expected))
+
+      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+
+      service.getUserApplications("test-creator-email-2", enrich = enrich)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe expected
+          verify(applicationsConnector).getUserApplications(ArgumentMatchers.eq("test-creator-email-2"), ArgumentMatchers.eq(enrich))(any())
           succeed
       }
     }
