@@ -18,6 +18,7 @@ package connectors
 
 import com.google.inject.{Inject, Singleton}
 import config.FrontendAppConfig
+import models.UserEmail
 import models.application.{Application, NewApplication, NewScope, Secret}
 import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION, CONTENT_TYPE}
 import play.api.http.MimeTypes.JSON
@@ -81,10 +82,13 @@ class ApplicationsConnector @Inject()(
       .execute[Seq[Application]]
   }
 
-  def deleteApplication(id: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+
+
+  def deleteApplication(id: String, currentUser: Option[String])(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
     httpClient
       .delete(url"$applicationsBaseUrl/api-hub-applications/applications/$id")
       .setHeader(AUTHORIZATION -> clientAuthToken)
+      .withBody(Json.toJson(UserEmail(currentUser)))
       .execute[Either[UpstreamErrorResponse, Unit]]
       .flatMap {
         case Right(()) => Future.successful(Some(()))

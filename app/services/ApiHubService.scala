@@ -43,9 +43,9 @@ class ApiHubService @Inject()(
     applicationsConnector.getApplication(id, enrich)
   }
 
-  def deleteApplication(id: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+  def deleteApplication(id: String, userEmail: Option[String])(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
     logger.debug(s"Deleting application with Id $id")
-    applicationsConnector.deleteApplication(id)
+    applicationsConnector.deleteApplication(id, userEmail)
   }
 
   def requestAdditionalScope(id:String, newScope:NewScope)(implicit hc:HeaderCarrier): Future[Option[NewScope]] = {

@@ -160,7 +160,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
     }
   }
 
-  "must delete the application and redirect to the landing page for a DELETE for a team member or administrator" in {
+  "must delete the application and pass current user and redirect to the landing page for a DELETE for a team member or administrator" in {
     forAll(teamMemberAndAdministratorTable) {
       user: UserModel =>
         val fixture = buildFixture(userModel = user)
@@ -168,7 +168,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(false))(any()))
           .thenReturn(Future.successful(Some(FakeApplication)))
 
-        when(fixture.apiHubService.deleteApplication(ArgumentMatchers.eq(FakeApplication.id))(any()))
+        when(fixture.apiHubService.deleteApplication(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(user.email))(any()))
           .thenReturn(Future.successful(Some(())))
 
         running(fixture.playApplication) {
@@ -188,7 +188,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
     when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(false))(any()))
       .thenReturn(Future.successful(Some(FakeApplication)))
 
-    when(fixture.apiHubService.deleteApplication(ArgumentMatchers.eq(FakeApplication.id))(any()))
+    when(fixture.apiHubService.deleteApplication(ArgumentMatchers.eq(FakeApplication.id), any())(any()))
       .thenReturn(Future.successful(None))
 
     running(fixture.playApplication) {

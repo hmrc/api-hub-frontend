@@ -46,7 +46,7 @@ class HipApisController @Inject()(
   }
 
   def onSubmit() : Action[AnyContent] = optionallyIdentified.async {
-    implicit request =>
+    implicit _request =>
       Future.successful((NotImplemented))
   }
 

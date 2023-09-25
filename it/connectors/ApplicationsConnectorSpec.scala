@@ -4,12 +4,13 @@ import com.github.tomakehurst.wiremock.client.WireMock._
 import com.typesafe.config.ConfigFactory
 import config.FrontendAppConfig
 import connectors.ApplicationsConnectorSpec.{buildConnector, toJsonString}
+import models.UserEmail
 import models.application._
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.Configuration
-import play.api.http.Status.{CREATED, INTERNAL_SERVER_ERROR, NOT_FOUND, NO_CONTENT, OK}
+import play.api.http.Status._
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
@@ -132,15 +133,17 @@ class ApplicationsConnectorSpec
     "must place the correct request" in {
       val id = "test-id"
 
+      val userEmail = Some("me@test.com")
       stubFor(
         delete(urlEqualTo(s"/api-hub-applications/applications/$id"))
           .withHeader("Authorization", equalTo("An authentication token"))
+          .withRequestBody(equalToJson(Json.toJson(UserEmail(userEmail)).toString()))
           .willReturn(
             aResponse().withStatus(NO_CONTENT)
           )
       )
 
-      buildConnector(this).deleteApplication(id)(HeaderCarrier()) map {
+      buildConnector(this).deleteApplication(id, userEmail)(HeaderCarrier()) map {
         actual =>
           actual mustBe Some(())
       }
@@ -157,7 +160,7 @@ class ApplicationsConnectorSpec
           )
       )
 
-      buildConnector(this).deleteApplication(id)(HeaderCarrier()) map {
+      buildConnector(this).deleteApplication(id, None)(HeaderCarrier()) map {
         actual =>
           actual mustBe None
       }
