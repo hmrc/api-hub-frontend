@@ -14,18 +14,25 @@
  * limitations under the License.
  */
 
-package pages
+package models
 
-import pages.behaviours.PageBehaviours
+import models.api.{ApiDetail, Endpoint, EndpointMethod}
 
-class AddAnApiSelectEndpointsPageSpec extends PageBehaviours {
+case class AvailableEndpoint(endpoint: Endpoint, endpointMethod: EndpointMethod)
 
-  "AddAnApiSelectEndpointsPage" - {
+object AvailableEndpoints {
 
-    beRetrievable[Set[Set[String]]](AddAnApiSelectEndpointsPage)
-
-    beSettable[Set[Set[String]]](AddAnApiSelectEndpointsPage)
-
-    beRemovable[Set[Set[String]]](AddAnApiSelectEndpointsPage)
+  def build(apiDetail: ApiDetail): Map[Set[String], Seq[AvailableEndpoint]] = {
+    apiDetail
+      .endpoints
+      .flatMap(
+        endpoint =>
+          endpoint.methods.map(
+            endpointMethod =>
+              (AvailableEndpoint(endpoint, endpointMethod), endpointMethod.scopes.toSet)
+          )
+      )
+      .groupMapReduce(_._2)(row => Seq(row._1))(_ ++ _)
   }
+
 }

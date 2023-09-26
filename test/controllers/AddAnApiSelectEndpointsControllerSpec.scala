@@ -17,122 +17,129 @@
 package controllers
 
 import base.SpecBase
+import controllers.actions.FakeUser
 import forms.AddAnApiSelectEndpointsFormProvider
-import models.{NormalMode, AddAnApiSelectEndpoints, UserAnswers}
+import generators.ApiDetailGenerators
+import models.api.ApiDetail
+import models.{AvailableEndpoints, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
+import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.AddAnApiSelectEndpointsPage
+import pages.{AddAnApiApiIdPage, AddAnApiSelectEndpointsPage}
+import play.api.Application
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import repositories.SessionRepository
+import repositories.AddAnApiSessionRepository
+import services.ApiHubService
 import views.html.AddAnApiSelectEndpointsView
 
+import java.time.{Clock, Instant, ZoneId}
 import scala.concurrent.Future
 
-class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar {
+class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar with ApiDetailGenerators {
 
-  def onwardRoute = Call("GET", "/foo")
+  private def nextPage = Call("GET", "/foo")
+  private val clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
+  private lazy val addAnApiSelectEndpointsRoute = routes.AddAnApiSelectEndpointsController.onPageLoad(NormalMode).url
 
-  lazy val addAnApiSelectEndpointsRoute = routes.AddAnApiSelectEndpointsController.onPageLoad(NormalMode).url
-
-  val formProvider = new AddAnApiSelectEndpointsFormProvider()
-  val form = formProvider()
+  private val apiDetail = sampleApiDetail()
+  private val formProvider = new AddAnApiSelectEndpointsFormProvider()
+  private val form = formProvider(apiDetail)
 
   "AddAnApiSelectEndpoints Controller" - {
 
     "must return OK and the correct view for a GET" in {
+      val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+        .thenReturn(Future.successful(Some(apiDetail)))
 
-      running(application) {
+      running(fixture.application) {
         val request = FakeRequest(GET, addAnApiSelectEndpointsRoute)
-
-        val result = route(application, request).value
-
-        val view = application.injector.instanceOf[AddAnApiSelectEndpointsView]
+        val result = route(fixture.application, request).value
+        val view = fixture.application.injector.instanceOf[AddAnApiSelectEndpointsView]
 
         status(result) mustEqual OK
 
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, Some(FakeUser), apiDetail)(request, messages(fixture.application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
+      val userAnswers = buildUserAnswers(apiDetail)
+        .set(AddAnApiSelectEndpointsPage, AvailableEndpoints.build(apiDetail).keySet).success.value
 
-      val userAnswers = UserAnswers(userAnswersId).set(AddAnApiSelectEndpointsPage, AddAnApiSelectEndpoints.values.toSet).success.value
+      val fixture = buildFixture(Some(userAnswers))
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+        .thenReturn(Future.successful(Some(apiDetail)))
 
-      running(application) {
+      running(fixture.application) {
         val request = FakeRequest(GET, addAnApiSelectEndpointsRoute)
 
-        val view = application.injector.instanceOf[AddAnApiSelectEndpointsView]
+        val view = fixture.application.injector.instanceOf[AddAnApiSelectEndpointsView]
 
-        val result = route(application, request).value
+        val result = route(fixture.application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(AddAnApiSelectEndpoints.values.toSet), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual
+          view(form.fill(AvailableEndpoints.build(apiDetail).keySet), NormalMode, Some(FakeUser), apiDetail)(request, messages(fixture.application)).toString
       }
     }
 
     "must redirect to the next page when valid data is submitted" in {
+      val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
 
-      val mockSessionRepository = mock[SessionRepository]
+      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+        .thenReturn(Future.successful(Some(apiDetail)))
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(fixture.addAnApiSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
-          .build()
-
-      running(application) {
+      running(fixture.application) {
         val request =
           FakeRequest(POST, addAnApiSelectEndpointsRoute)
-            .withFormUrlEncodedBody(("value[0]", AddAnApiSelectEndpoints.values.head.toString))
+            .withFormUrlEncodedBody(("value[0]", AvailableEndpoints.build(apiDetail).keySet.head.toString()))
 
-        val result = route(application, request).value
+        val result = route(fixture.application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual nextPage.url
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
+      val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+        .thenReturn(Future.successful(Some(apiDetail)))
 
-      running(application) {
+      running(fixture.application) {
         val request =
           FakeRequest(POST, addAnApiSelectEndpointsRoute)
             .withFormUrlEncodedBody(("value", "invalid value"))
 
         val boundForm = form.bind(Map("value" -> "invalid value"))
 
-        val view = application.injector.instanceOf[AddAnApiSelectEndpointsView]
+        val view = fixture.application.injector.instanceOf[AddAnApiSelectEndpointsView]
 
-        val result = route(application, request).value
+        val result = route(fixture.application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, Some(FakeUser), apiDetail)(request, messages(fixture.application)).toString
       }
     }
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
+      val fixture = buildFixture(None)
 
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
+      running(fixture.application) {
         val request = FakeRequest(GET, addAnApiSelectEndpointsRoute)
 
-        val result = route(application, request).value
+        val result = route(fixture.application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
@@ -140,19 +147,46 @@ class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
+      val fixture = buildFixture(None)
 
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
+      running(fixture.application) {
         val request =
           FakeRequest(POST, addAnApiSelectEndpointsRoute)
-            .withFormUrlEncodedBody(("value[0]", AddAnApiSelectEndpoints.values.head.toString))
+            .withFormUrlEncodedBody(("value[0]", AvailableEndpoints.build(apiDetail).keySet.head.toString()))
 
-        val result = route(application, request).value
+        val result = route(fixture.application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }
+
+  private case class Fixture(
+    application: Application,
+    apiHubService: ApiHubService,
+    addAnApiSessionRepository: AddAnApiSessionRepository
+  )
+
+  private def buildFixture(userAnswers: Option[UserAnswers]): Fixture = {
+    val apiHubService = mock[ApiHubService]
+    val addAnApiSessionRepository = mock[AddAnApiSessionRepository]
+
+    val application = applicationBuilder(userAnswers)
+      .overrides(
+        bind[ApiHubService].toInstance(apiHubService),
+        bind[AddAnApiSessionRepository].toInstance(addAnApiSessionRepository),
+        bind[Navigator].toInstance(new FakeNavigator(nextPage)),
+        bind[Clock].toInstance(clock)
+      )
+      .build()
+
+    Fixture(application, apiHubService, addAnApiSessionRepository)
+  }
+
+  private def buildUserAnswers(apiDetail: ApiDetail): UserAnswers = {
+    UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
+      .set(AddAnApiApiIdPage, apiDetail.id).toOption.value
+  }
+
 }

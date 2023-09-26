@@ -17,62 +17,85 @@
 package controllers
 
 import controllers.actions._
+import controllers.helpers.ErrorResultBuilder
 import forms.AddAnApiSelectEndpointsFormProvider
-
-import javax.inject.Inject
 import models.Mode
-import models.api.ApiDetail
 import navigation.Navigator
-import pages.AddAnApiSelectEndpointsPage
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.SessionRepository
+import pages.{AddAnApiApiIdPage, AddAnApiSelectEndpointsPage}
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.mvc._
+import repositories.AddAnApiSessionRepository
+import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.AddAnApiSelectEndpointsView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class AddAnApiSelectEndpointsController @Inject()(
-                                        override val messagesApi: MessagesApi,
-                                        sessionRepository: SessionRepository,
-                                        navigator: Navigator,
-                                        identify: IdentifierAction,
-                                        getData: DataRetrievalAction,
-                                        requireData: DataRequiredAction,
-                                        formProvider: AddAnApiSelectEndpointsFormProvider,
-                                        val controllerComponents: MessagesControllerComponents,
-                                        view: AddAnApiSelectEndpointsView
-                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+  override val messagesApi: MessagesApi,
+  sessionRepository: AddAnApiSessionRepository,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  getData: AddAnApiDataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: AddAnApiSelectEndpointsFormProvider,
+  val controllerComponents: MessagesControllerComponents,
+  view: AddAnApiSelectEndpointsView,
+  apiHubService: ApiHubService,
+  errorResultBuilder: ErrorResultBuilder
+)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+      request.userAnswers.get(AddAnApiApiIdPage) match {
+        case Some(apiId) =>
+          apiHubService.getApiDetail(apiId).flatMap {
+            case Some(apiDetail) =>
+              val form = formProvider.apply(apiDetail)
 
-      val apiDetail: ApiDetail = ???
-      val form = formProvider.apply(apiDetail)
+              val preparedForm = request.userAnswers.get(AddAnApiSelectEndpointsPage) match {
+                case None => form
+                case Some(value) => form.fill(value)
+              }
 
-      val preparedForm = request.userAnswers.get(AddAnApiSelectEndpointsPage) match {
-        case None => form
-        case Some(value) => form.fill(value)
+              Future.successful(Ok(view(preparedForm, mode, Some(request.user), apiDetail)))
+            case None => apiNotFound(apiId)
+          }
+        case _ => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
       }
-
-      Ok(view(preparedForm, mode))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+      request.userAnswers.get(AddAnApiApiIdPage) match {
+        case Some(apiId) =>
+          apiHubService.getApiDetail(apiId).flatMap {
+            case Some(apiDetail) =>
+              val form = formProvider.apply(apiDetail)
 
-      val apiDetail: ApiDetail = ???
-      val form = formProvider.apply(apiDetail)
-
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
-
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(AddAnApiSelectEndpointsPage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(AddAnApiSelectEndpointsPage, mode, updatedAnswers))
-      )
+              form.bindFromRequest().fold(
+                formWithErrors =>
+                  Future.successful(BadRequest(view(formWithErrors, mode, Some(request.user), apiDetail))),
+                value =>
+                  for {
+                    updatedAnswers <- Future.fromTry(request.userAnswers.set(AddAnApiSelectEndpointsPage, value))
+                    _              <- sessionRepository.set(updatedAnswers)
+                  } yield Redirect(navigator.nextPage(AddAnApiSelectEndpointsPage, mode, updatedAnswers))
+              )
+            case None => apiNotFound(apiId)
+          }
+        case _ => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+      }
   }
+
+  private def apiNotFound(apiId: String)(implicit request: Request[_]): Future[Result] = {
+    Future.successful(
+      errorResultBuilder.notFound(
+        Messages("site.apiNotFound.heading"),
+        Messages("site.apiNotFound.message", apiId)
+      )
+    )
+  }
+
 }

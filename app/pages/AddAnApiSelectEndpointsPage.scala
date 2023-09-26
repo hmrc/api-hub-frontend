@@ -16,7 +16,6 @@
 
 package pages
 
-import models.AddAnApiSelectEndpoints
 import play.api.libs.json.JsPath
 
 case object AddAnApiSelectEndpointsPage extends QuestionPage[Set[Set[String]]] {

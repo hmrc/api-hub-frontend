@@ -14,6 +14,10 @@
  * limitations under the License.
  *@
 
+@import models.AvailableEndpoint
+@import models.api.ApiDetail
+@import models.user.UserModel
+
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
@@ -22,11 +26,84 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, user: Option[UserModel], apiDetail: ApiDetail)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("addAnApiSelectEndpoints.title"))) {
+@scripts() = {
+    <style>
+        .scopes-list {
+            font-size: 16px;
+        }
+        .custom-normal-case {
+            text-transform: none !important;
+        }
+        .notgovuk-checkboxes__item {
+            margin-top: 30px;
+            padding: 30px 30px 10px 30px;
+            background-color: #f3f2f1;
+        }
+    </style>
+}
 
-    @formHelper(action = routes.AddAnApiSelectEndpointsController.onSubmit(mode), 'autoComplete -> "off") {
+@checkboxItems(apiDetail: ApiDetail) = @{
+    val availableEndpoints = AvailableEndpoints.build(apiDetail)
+
+    availableEndpoints
+        .toSeq
+        .zipWithIndex
+        .map {
+            case (value, index) =>
+                CheckboxItemViewModel(
+                    content =
+                        if (value._2.size == 1) {
+                            Text(messages("addAnApiSelectEndpoints.selectEndpoint"))
+                        }
+                        else {
+                            Text(messages("addAnApiSelectEndpoints.selectEndpoints"))
+                        },
+                    fieldId = "value",
+                    index   = index,
+                    value   = value._1.toString
+                ).withHint(Hint(content = HtmlContent(checkBoxItemContentHtml(value._1, value._2))))
+        }
+
+}
+
+@checkBoxItemContentHtml(scopes: Set[String], availableEndpoints: Seq[AvailableEndpoint]) = {
+    @for(availableEndpoint <- availableEndpoints) {
+        <p class="govuk-body govuk-!-margin-bottom-2 ">
+            <strong class="govuk-tag govuk-tag--blue ">
+                @availableEndpoint.endpointMethod.httpMethod
+            </strong>
+            <strong>
+                @availableEndpoint.endpoint.path
+            </strong>
+        </p>
+        <p class="govuk-body-s">
+            @availableEndpoint.endpointMethod.summary.getOrElse("")
+        </p>
+    }
+
+    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+
+    <div>
+        <p class="govuk-body govuk-!-font-size-16 govuk-!-margin-top-3 govuk-!-margin-bottom-1">
+            @messages("addAnApiSelectEndpoints.scopesUsed")
+        </p>
+        <ul class="govuk-list govuk-list-inline scopes-list">
+            @for(scope <- scopes) {
+                <li>
+                    <strong class="govuk-tag govuk-tag--grey custom-normal-case">
+                        @scope
+                    </strong>
+                </li>
+            }
+        </ul>
+    </div>
+}
+
+@layout(pageTitle = title(form, messages("addAnApiSelectEndpoints.title")), user = user, customScriptsBlock = Some(scripts())) {
+
+    @formHelper(action = routes.AddAnApiSelectEndpointsController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
@@ -36,8 +113,10 @@
             CheckboxesViewModel(
                 form   = form,
                 name   = "value",
-                legend = LegendViewModel(messages("addAnApiSelectEndpoints.heading")).asPageHeading(),
-                items  = AddAnApiSelectEndpoints.checkboxItems
+                legend = LegendViewModel(messages("addAnApiSelectEndpoints.heading"))
+                    .withCssClass("govuk-fieldset__legend--l")
+                    .asPageHeading(),
+                items  = checkboxItems(apiDetail)
             )
         )
 

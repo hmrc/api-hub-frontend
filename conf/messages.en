@@ -245,8 +245,9 @@ addAnApiSelectApplication.returnTo = Return to {0}
 
 addAnApiSelectEndpoints.title = Select endpoints
 addAnApiSelectEndpoints.heading = Which end points do you want to use?
-addAnApiSelectEndpoints.endpoint1 = endpoint1
-addAnApiSelectEndpoints.endpoint2 = endpoint2
 addAnApiSelectEndpoints.checkYourAnswersLabel = Endpoints
 addAnApiSelectEndpoints.error.required = Please select at least one end point
 addAnApiSelectEndpoints.change.hidden = AddAnApiSelectEndpoints
+addAnApiSelectEndpoints.selectEndpoint = Select endpoint
+addAnApiSelectEndpoints.selectEndpoints = Select endpoints
+addAnApiSelectEndpoints.scopesUsed = These end points use the following scopes:
