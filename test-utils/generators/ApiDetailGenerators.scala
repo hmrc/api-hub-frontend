@@ -28,7 +28,7 @@ trait ApiDetailGenerators extends OptionValues {
         httpMethod <- Gen.oneOf("GET", "POST", "PUT", "PATCH", "DELETE")
         summary <- Gen.option(Gen.alphaNumStr)
         description <- Gen.option(Gen.alphaNumStr)
-        scopes <- Gen.listOf(Gen.alphaNumStr)
+        scopes <- Gen.listOf(Gen.alphaNumStr.suchThat(_.nonEmpty))
       } yield EndpointMethod(httpMethod, summary, description, scopes)
     }
 

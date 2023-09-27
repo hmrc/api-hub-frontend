@@ -1,0 +1,174 @@
+/*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package models
+
+import models.api.{ApiDetail, Endpoint, EndpointMethod}
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.prop.TableDrivenPropertyChecks
+
+class AvailableEndpointsSpec extends AnyFreeSpec with Matchers with TableDrivenPropertyChecks {
+
+  private val testApiDetail = ApiDetail(
+    id = "test-id",
+    title = "test-title",
+    description = "test-description",
+    version = "test-version",
+    endpoints = Seq.empty,
+    shortDescription = None
+  )
+
+  "build" - {
+    "must group endpoint methods by the same set of scopes" in {
+      val scopeSets = Table(
+        "Scopes",
+        Seq.empty,
+        Seq("test-scopes-1"),
+        Seq("test-scopes-1", "test-scopes-2"),
+        Seq("test-scopes-1", "test-scopes-2", "test-scopes-3")
+      )
+
+      forAll(scopeSets) {scopes =>
+        val path1 = "/test-path-1"
+        val path2 = "/test-path-2"
+
+        val endpoint1method1 = EndpointMethod(
+          httpMethod = "GET",
+          summary = None,
+          description = None,
+          scopes = scopes
+        )
+
+        val endpoint1method2 = EndpointMethod(
+          httpMethod = "POST",
+          summary = None,
+          description = None,
+          scopes = scopes
+        )
+
+        val endpoint2method1 = EndpointMethod(
+          httpMethod = "GET",
+          summary = None,
+          description = None,
+          scopes = scopes
+        )
+
+        val apiDetail = testApiDetail.copy(
+          endpoints = Seq(
+            Endpoint(
+              path = path1,
+              methods = Seq(endpoint1method1, endpoint1method2)
+            ),
+            Endpoint(
+              path = path2,
+              methods = Seq(endpoint2method1)
+            )
+          )
+        )
+
+        val expected = Map(
+          scopes.toSet -> Seq(
+            AvailableEndpoint(path1, endpoint1method1),
+            AvailableEndpoint(path1, endpoint1method2),
+            AvailableEndpoint(path2, endpoint2method1)
+          )
+        )
+
+        val actual = AvailableEndpoints.build(apiDetail)
+
+        actual mustBe expected
+      }
+    }
+
+    "must group endpoints by different sets of scopes" in {
+      val scopeSets = Table(
+        ("Scopes1", "Scopes2"),
+        (Seq("test-scopes-1"), Seq.empty),
+        (Seq("test-scopes-1"), Seq("test-scopes-2")),
+        (Seq("test-scopes-1"), Seq("test-scopes-1", "test-scopes-2")),
+        (Seq("test-scopes-1"), Seq("test-scopes-1", "test-scopes-2", "test-scopes-3"))
+      )
+
+      forAll(scopeSets) {(scopes1, scopes2) =>
+        val path1 = "/test-path-1"
+        val path2 = "/test-path-2"
+        val path3 = "/test-path-2"
+
+        val endpoint1method1 = EndpointMethod(
+          httpMethod = "GET",
+          summary = None,
+          description = None,
+          scopes = scopes1
+        )
+
+        val endpoint1method2 = EndpointMethod(
+          httpMethod = "POST",
+          summary = None,
+          description = None,
+          scopes = scopes2
+        )
+
+        val endpoint2method1 = EndpointMethod(
+          httpMethod = "GET",
+          summary = None,
+          description = None,
+          scopes = scopes1
+        )
+
+        val endpoint3method1 = EndpointMethod(
+          httpMethod = "GET",
+          summary = None,
+          description = None,
+          scopes = scopes2
+        )
+
+        val apiDetail = testApiDetail.copy(
+          endpoints = Seq(
+            Endpoint(
+              path = path1,
+              methods = Seq(endpoint1method1, endpoint1method2)
+            ),
+            Endpoint(
+              path = path2,
+              methods = Seq(endpoint2method1)
+            ),
+            Endpoint(
+              path = path3,
+              methods = Seq(endpoint3method1)
+            )
+          )
+        )
+
+        val expected = Map(
+          scopes1.toSet -> Seq(
+            AvailableEndpoint(path1, endpoint1method1),
+            AvailableEndpoint(path2, endpoint2method1)
+          ),
+          scopes2.toSet -> Seq(
+            AvailableEndpoint(path1, endpoint1method2),
+            AvailableEndpoint(path3, endpoint3method1)
+          )
+        )
+
+        val actual = AvailableEndpoints.build(apiDetail)
+
+        actual mustBe expected
+      }
+    }
+  }
+
+}

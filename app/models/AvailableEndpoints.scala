@@ -16,9 +16,9 @@
 
 package models
 
-import models.api.{ApiDetail, Endpoint, EndpointMethod}
+import models.api.{ApiDetail, EndpointMethod}
 
-case class AvailableEndpoint(endpoint: Endpoint, endpointMethod: EndpointMethod)
+case class AvailableEndpoint(path: String, endpointMethod: EndpointMethod)
 
 object AvailableEndpoints {
 
@@ -29,10 +29,11 @@ object AvailableEndpoints {
         endpoint =>
           endpoint.methods.map(
             endpointMethod =>
-              (AvailableEndpoint(endpoint, endpointMethod), endpointMethod.scopes.toSet)
+              (AvailableEndpoint(endpoint.path, endpointMethod), endpointMethod.scopes.toSet)
           )
       )
-      .groupMapReduce(_._2)(row => Seq(row._1))(_ ++ _)
+      .groupMap(_._2)(_._1)
+//      .groupMapReduce(_._2)(row => Set(row._1))(_ ++ _)
   }
 
 }
