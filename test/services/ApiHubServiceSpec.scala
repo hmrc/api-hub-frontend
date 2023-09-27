@@ -97,20 +97,21 @@ class ApiHubServiceSpec
   }
 
   "deleteApplication" - {
-    "must delete the application via the applications connector" in {
+    "must delete the application via the applications connector for the specified user" in {
       val id = "test-id"
 
+      val userEmail = Some("me@test.com")
       val applicationsConnector = mock[ApplicationsConnector]
-      when(applicationsConnector.deleteApplication(ArgumentMatchers.eq(id))(any()))
+      when(applicationsConnector.deleteApplication(ArgumentMatchers.eq(id), ArgumentMatchers.eq(userEmail))(any()))
         .thenReturn(Future.successful(Some(())))
 
       val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
       val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
 
-      service.deleteApplication(id)(HeaderCarrier()) map {
+      service.deleteApplication(id, userEmail)(HeaderCarrier()) map {
         actual =>
           actual mustBe Some(())
-          verify(applicationsConnector).deleteApplication(any())(any())
+          verify(applicationsConnector).deleteApplication(any(), ArgumentMatchers.eq(userEmail))(any())
           succeed
       }
     }
@@ -119,13 +120,13 @@ class ApiHubServiceSpec
       val id = "test-id"
 
       val applicationsConnector = mock[ApplicationsConnector]
-      when(applicationsConnector.deleteApplication(ArgumentMatchers.eq(id))(any()))
+      when(applicationsConnector.deleteApplication(ArgumentMatchers.eq(id), any())(any()))
         .thenReturn(Future.successful(None))
 
       val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
       val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
 
-      service.deleteApplication(id)(HeaderCarrier()) map {
+      service.deleteApplication(id, None)(HeaderCarrier()) map {
         actual =>
           actual mustBe None
       }

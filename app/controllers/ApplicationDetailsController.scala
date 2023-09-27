@@ -45,7 +45,7 @@ class ApplicationDetailsController @Inject()(
 
   def delete(id: String): Action[AnyContent] = (identify andThen applicationAuth(id)).async {
     implicit request =>
-      apiHubService.deleteApplication(id).map {
+      apiHubService.deleteApplication(id, request.identifierRequest.user.email).map {
         case Some(()) => Redirect(routes.IndexController.onPageLoad)
         case None => errorResultBuilder.notFound(
             Messages("site.applicationNotFoundHeading"),
