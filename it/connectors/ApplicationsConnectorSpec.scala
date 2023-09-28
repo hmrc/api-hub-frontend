@@ -116,8 +116,9 @@ class ApplicationsConnectorSpec
 
       val userEmail = Some("me@test.com")
       stubFor(
-        delete(urlEqualTo(s"/api-hub-applications/applications/$id"))
+        post(urlEqualTo(s"/api-hub-applications/applications/$id/delete"))
           .withHeader("Authorization", equalTo("An authentication token"))
+          .withHeader("Content-Type", equalTo("application/json"))
           .withRequestBody(equalToJson(Json.toJson(UserEmail(userEmail)).toString()))
           .willReturn(
             aResponse().withStatus(NO_CONTENT)
@@ -134,7 +135,7 @@ class ApplicationsConnectorSpec
       val id = "test-id"
 
       stubFor(
-        delete(urlEqualTo(s"/api-hub-applications/applications/$id"))
+        post(urlEqualTo(s"/api-hub-applications/applications/$id/delete"))
           .withHeader("Authorization", equalTo("An authentication token"))
           .willReturn(
             aResponse().withStatus(NOT_FOUND)

@@ -86,7 +86,7 @@ class ApplicationsConnector @Inject()(
 
   def deleteApplication(id: String, currentUser: Option[String])(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
     httpClient
-      .delete(url"$applicationsBaseUrl/api-hub-applications/applications/$id")
+      .post(url"$applicationsBaseUrl/api-hub-applications/applications/$id/delete")
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .withBody(Json.toJson(UserEmail(currentUser)))
       .execute[Either[UpstreamErrorResponse, Unit]]
