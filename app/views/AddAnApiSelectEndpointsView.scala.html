@@ -45,7 +45,7 @@
 }
 
 @checkboxItems(apiDetail: ApiDetail) = @{
-    val availableEndpoints = AvailableEndpoints.build(apiDetail)
+    val availableEndpoints = AvailableEndpoints(apiDetail)
 
     availableEndpoints
         .toSeq

@@ -71,7 +71,7 @@ class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar w
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
       val userAnswers = buildUserAnswers(apiDetail)
-        .set(AddAnApiSelectEndpointsPage, AvailableEndpoints.build(apiDetail).keySet).success.value
+        .set(AddAnApiSelectEndpointsPage, AvailableEndpoints(apiDetail).keySet).success.value
 
       val fixture = buildFixture(Some(userAnswers))
 
@@ -87,7 +87,7 @@ class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar w
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual
-          view(form.fill(AvailableEndpoints.build(apiDetail).keySet), NormalMode, Some(FakeUser), apiDetail)(request, messages(fixture.application)).toString
+          view(form.fill(AvailableEndpoints(apiDetail).keySet), NormalMode, Some(FakeUser), apiDetail)(request, messages(fixture.application)).toString
       }
     }
 
@@ -102,7 +102,7 @@ class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar w
       running(fixture.application) {
         val request =
           FakeRequest(POST, addAnApiSelectEndpointsRoute)
-            .withFormUrlEncodedBody(("value[0]", AvailableEndpoints.build(apiDetail).keySet.head.toString()))
+            .withFormUrlEncodedBody(("value[0]", AvailableEndpoints(apiDetail).keySet.head.toString()))
 
         val result = route(fixture.application, request).value
 
@@ -152,7 +152,7 @@ class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar w
       running(fixture.application) {
         val request =
           FakeRequest(POST, addAnApiSelectEndpointsRoute)
-            .withFormUrlEncodedBody(("value[0]", AvailableEndpoints.build(apiDetail).keySet.head.toString()))
+            .withFormUrlEncodedBody(("value[0]", AvailableEndpoints(apiDetail).keySet.head.toString()))
 
         val result = route(fixture.application, request).value
 

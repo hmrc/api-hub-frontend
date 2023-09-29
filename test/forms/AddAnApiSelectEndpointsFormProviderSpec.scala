@@ -34,7 +34,7 @@ class AddAnApiSelectEndpointsFormProviderSpec extends CheckboxFieldBehaviours wi
     behave like checkboxField[Set[String]](
       form,
       fieldName,
-      validValues  = AvailableEndpoints.build(apiDetail).keySet.toSeq,
+      validValues  = AvailableEndpoints(apiDetail).keySet.toSeq,
       invalidError = FormError(s"$fieldName[0]", "error.invalid")
     )
 

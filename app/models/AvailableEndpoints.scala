@@ -17,12 +17,13 @@
 package models
 
 import models.api.{ApiDetail, EndpointMethod}
+import pages.AddAnApiSelectEndpointsPage
 
 case class AvailableEndpoint(path: String, endpointMethod: EndpointMethod)
 
 object AvailableEndpoints {
 
-  def build(apiDetail: ApiDetail): Map[Set[String], Seq[AvailableEndpoint]] = {
+  def apply(apiDetail: ApiDetail): Map[Set[String], Seq[AvailableEndpoint]] = {
     apiDetail
       .endpoints
       .flatMap(
@@ -33,7 +34,18 @@ object AvailableEndpoints {
           )
       )
       .groupMap(_._2)(_._1)
-//      .groupMapReduce(_._2)(row => Set(row._1))(_ ++ _)
+  }
+
+  def selectedEndpoints(apiDetail: ApiDetail, selectedScopes: Set[Set[String]]): Map[Set[String], Seq[AvailableEndpoint]] = {
+    AvailableEndpoints(apiDetail)
+      .filter(row => selectedScopes.contains(row._1))
+  }
+
+  def selectedEndpoints(apiDetail: ApiDetail, userAnswers: UserAnswers): Map[Set[String], Seq[AvailableEndpoint]] = {
+    selectedEndpoints(
+      apiDetail,
+      userAnswers.get(AddAnApiSelectEndpointsPage).getOrElse(Set.empty)
+    )
   }
 
 }

@@ -32,7 +32,7 @@ class AvailableEndpointsSpec extends AnyFreeSpec with Matchers with TableDrivenP
     shortDescription = None
   )
 
-  "build" - {
+  "apply" - {
     "must group endpoint methods by the same set of scopes" in {
       val scopeSets = Table(
         "Scopes",
@@ -88,7 +88,7 @@ class AvailableEndpointsSpec extends AnyFreeSpec with Matchers with TableDrivenP
           )
         )
 
-        val actual = AvailableEndpoints.build(apiDetail)
+        val actual = AvailableEndpoints(apiDetail)
 
         actual mustBe expected
       }
@@ -106,7 +106,7 @@ class AvailableEndpointsSpec extends AnyFreeSpec with Matchers with TableDrivenP
       forAll(scopeSets) {(scopes1, scopes2) =>
         val path1 = "/test-path-1"
         val path2 = "/test-path-2"
-        val path3 = "/test-path-2"
+        val path3 = "/test-path-3"
 
         val endpoint1method1 = EndpointMethod(
           httpMethod = "GET",
@@ -164,10 +164,146 @@ class AvailableEndpointsSpec extends AnyFreeSpec with Matchers with TableDrivenP
           )
         )
 
-        val actual = AvailableEndpoints.build(apiDetail)
+        val actual = AvailableEndpoints(apiDetail)
 
         actual mustBe expected
       }
+    }
+  }
+
+  "selectedEndpoints" - {
+    "must return the correct endpoints for the selected scopes" in {
+      val path1 = "/test-path-1"
+      val path2 = "/test-path-2"
+      val path3 = "/test-path-3"
+      val path4 = "/test-path-4"
+
+      val scopes1 = Seq("test-scopes-1", "test-scopes-2")
+      val scopes2 = Seq("test-scopes-1", "test-scopes-3")
+
+      val endpoint1method1 = EndpointMethod(
+        httpMethod = "GET",
+        summary = None,
+        description = None,
+        scopes = scopes1
+      )
+
+      val endpoint1method2 = EndpointMethod(
+        httpMethod = "POST",
+        summary = None,
+        description = None,
+        scopes = scopes2
+      )
+
+      val endpoint1method3 = EndpointMethod(
+        httpMethod = "PUT",
+        summary = None,
+        description = None,
+        scopes = Seq("test-scopes-1", "no-match")
+      )
+
+      val endpoint2method1 = EndpointMethod(
+        httpMethod = "GET",
+        summary = None,
+        description = None,
+        scopes = scopes1
+      )
+
+      val endpoint3method1 = EndpointMethod(
+        httpMethod = "POST",
+        summary = None,
+        description = None,
+        scopes = scopes2
+      )
+
+      val endpoint4method1 = EndpointMethod(
+        httpMethod = "POST",
+        summary = None,
+        description = None,
+        scopes = Seq("test-scopes-1", "no-match")
+      )
+
+      val apiDetail = testApiDetail.copy(
+        endpoints = Seq(
+          Endpoint(
+            path = path1,
+            methods = Seq(endpoint1method1, endpoint1method2, endpoint1method3)
+          ),
+          Endpoint(
+            path = path2,
+            methods = Seq(endpoint2method1)
+          ),
+          Endpoint(
+            path = path3,
+            methods = Seq(endpoint3method1)
+          ),
+          Endpoint(
+            path = path4,
+            methods = Seq(endpoint4method1)
+          )
+        )
+      )
+
+      val actual = AvailableEndpoints.selectedEndpoints(apiDetail, Set(scopes1.toSet, scopes2.toSet))
+
+      val expected = Map(
+        scopes1.toSet -> Seq(AvailableEndpoint(path1, endpoint1method1), AvailableEndpoint(path2, endpoint2method1)),
+        scopes2.toSet -> Seq(AvailableEndpoint(path1, endpoint1method2), AvailableEndpoint(path3, endpoint3method1))
+      )
+
+      actual mustBe expected
+    }
+
+    "must return an empty map when the selected scopes do not match any endpoints" in {
+      val path1 = "/test-path-1"
+
+      val scopes1 = Seq("test-scopes-1", "test-scopes-2")
+
+      val endpoint1method1 = EndpointMethod(
+        httpMethod = "GET",
+        summary = None,
+        description = None,
+        scopes = scopes1
+      )
+
+      val apiDetail = testApiDetail.copy(
+        endpoints = Seq(
+          Endpoint(
+            path = path1,
+            methods = Seq(endpoint1method1)
+          )
+        )
+      )
+
+      val actual = AvailableEndpoints.selectedEndpoints(apiDetail, Set(Set("no-match")))
+
+      actual mustBe empty
+    }
+
+    "must return an empty map for an empty set of selected scopes" in {
+      val path1 = "/test-path-1"
+
+      val scopes1 = Seq("test-scopes-1", "test-scopes-2")
+
+      val endpoint1method1 = EndpointMethod(
+        httpMethod = "GET",
+        summary = None,
+        description = None,
+        scopes = scopes1
+      )
+
+      val apiDetail = testApiDetail.copy(
+        endpoints = Seq(
+          Endpoint(
+            path = path1,
+            methods = Seq(endpoint1method1)
+          )
+        )
+      )
+
+      val actual = AvailableEndpoints.selectedEndpoints(apiDetail, Set.empty[Set[String]])
+
+      actual mustBe empty
     }
   }
 

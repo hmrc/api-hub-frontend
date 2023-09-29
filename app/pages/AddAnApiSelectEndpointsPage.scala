@@ -22,6 +22,6 @@ case object AddAnApiSelectEndpointsPage extends QuestionPage[Set[Set[String]]] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "selectedEndpoints"
+  override def toString: String = "selectedScopes"
 
 }

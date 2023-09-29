@@ -27,7 +27,7 @@ import javax.inject.Inject
 class AddAnApiSelectEndpointsFormProvider @Inject() extends Mappings {
 
   def apply(apiDetail: ApiDetail): Form[Set[Set[String]]] = {
-    val availableEndpoints = AvailableEndpoints.build(apiDetail)
+    val availableEndpoints = AvailableEndpoints(apiDetail)
 
     implicit val enumerableScopes: Enumerable[Set[String]] = (str: String) => {
       availableEndpoints.keySet.find(_.toString() == str)
