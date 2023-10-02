@@ -54,9 +54,6 @@ class AddAnApiSelectEndpointsController @Inject()(
             case Some(apiDetail) =>
               val form = formProvider.apply(apiDetail)
 
-              println("***********************")
-              println(request.userAnswers.get(AddAnApiSelectEndpointsPage).toString)
-              form.value.getOrElse(Set.empty).contains(Set(""))
               val preparedForm = request.userAnswers.get(AddAnApiSelectEndpointsPage) match {
                 case None => form
                 case Some(value) => form.fill(value)
