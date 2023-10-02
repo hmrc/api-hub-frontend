@@ -25,7 +25,13 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode, user: Option[UserModel], apiDetail: ApiDetail)(implicit request: Request[_], messages: Messages)
+@(form: Form[Set[Set[String]]], mode: Mode, user: Option[UserModel], apiDetail: ApiDetail)(implicit request: Request[_], messages: Messages)
+
+@checked(value: Set[String]) = {
+    @if(form.value.getOrElse(Set.empty).contains(value)) {
+        checked
+    }
+}
 
 @layout(pageTitle = title(form, messages("addAnApiSelectEndpoints.title")), user = user) {
 
@@ -56,7 +62,7 @@
                     @AvailableEndpoints(apiDetail).toSeq.zipWithIndex.map {case (value, index) =>
                     <div class="custom-checkbox-holder">
                         <div class="govuk-checkboxes__item govuk-!-margin-bottom-5">
-                            <input class="govuk-checkboxes__input" id="value_@index" name="value[@index]" type="checkbox" value="@(value._1.toString)">
+                            <input class="govuk-checkboxes__input" id="value_@index" name="value[@index]" type="checkbox" value="@(value._1.toString)" @checked(value._1)>
                             <label class="govuk-label govuk-checkboxes__label" for="value_@index">
                                 @if(value._2.size == 1) {
                                     @messages("addAnApiSelectEndpoints.selectEndpoint")
