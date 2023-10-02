@@ -188,3 +188,14 @@
 .call-out-panel .warning {
   color: #f47738;
 }
+.scopes-list {
+    font-size: 16px;
+}
+.custom-normal-case {
+    text-transform: none !important;
+}
+.custom-checkbox-holder {
+    margin-top: 30px;
+    padding: 30px 30px 10px 30px;
+    background-color: #f3f2f1;
+}

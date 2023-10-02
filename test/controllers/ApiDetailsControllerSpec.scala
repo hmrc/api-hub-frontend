@@ -23,6 +23,7 @@ import models.api.ApiDetail
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
+import org.scalatest.OptionValues
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import play.api.Application
 import play.api.inject.bind
@@ -39,7 +40,8 @@ class ApiDetailsControllerSpec
     with MockitoSugar
     with ScalaCheckDrivenPropertyChecks
     with ApiDetailGenerators
-    with HtmlValidation {
+    with HtmlValidation
+    with OptionValues {
 
   "GET" - {
     "must return OK and the correct view when the API detail exists for an unauthenticated user" in {

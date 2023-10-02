@@ -25,7 +25,7 @@ import models.{AvailableEndpoints, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.{AddAnApiApiIdPage, AddAnApiSelectEndpointsPage}
 import play.api.Application
@@ -35,12 +35,13 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AddAnApiSessionRepository
 import services.ApiHubService
+import utils.HtmlValidation
 import views.html.AddAnApiSelectEndpointsView
 
 import java.time.{Clock, Instant, ZoneId}
 import scala.concurrent.Future
 
-class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar with ApiDetailGenerators {
+class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar with ApiDetailGenerators with HtmlValidation {
 
   private def nextPage = Call("GET", "/foo")
   private val clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
@@ -66,6 +67,7 @@ class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar w
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual view(form, NormalMode, Some(FakeUser), apiDetail)(request, messages(fixture.application)).toString
+        contentAsString(result) must validateAsHtml
       }
     }
 
@@ -80,14 +82,13 @@ class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar w
 
       running(fixture.application) {
         val request = FakeRequest(GET, addAnApiSelectEndpointsRoute)
-
         val view = fixture.application.injector.instanceOf[AddAnApiSelectEndpointsView]
-
         val result = route(fixture.application, request).value
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual
           view(form.fill(AvailableEndpoints(apiDetail).keySet), NormalMode, Some(FakeUser), apiDetail)(request, messages(fixture.application)).toString
+        contentAsString(result) must validateAsHtml
       }
     }
 
@@ -111,6 +112,31 @@ class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar w
       }
     }
 
+    "must save the answer when valid data is submitted" in {
+      val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
+
+      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+        .thenReturn(Future.successful(Some(apiDetail)))
+
+      when(fixture.addAnApiSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      running(fixture.application) {
+        val request =
+          FakeRequest(POST, addAnApiSelectEndpointsRoute)
+            .withFormUrlEncodedBody(("value[0]", AvailableEndpoints(apiDetail).keySet.head.toString()))
+
+        val result = route(fixture.application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        val expected = UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
+          .set(AddAnApiApiIdPage, apiDetail.id).toOption.value
+          .set(AddAnApiSelectEndpointsPage, Set(AvailableEndpoints(apiDetail).keySet.head)).toOption.value
+
+        verify(fixture.addAnApiSessionRepository).set(ArgumentMatchers.eq(expected))
+      }
+    }
+
     "must return a Bad Request and errors when invalid data is submitted" in {
       val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
 
@@ -130,6 +156,7 @@ class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar w
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(boundForm, NormalMode, Some(FakeUser), apiDetail)(request, messages(fixture.application)).toString
+        contentAsString(result) must validateAsHtml
       }
     }
 
@@ -152,7 +179,7 @@ class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar w
       running(fixture.application) {
         val request =
           FakeRequest(POST, addAnApiSelectEndpointsRoute)
-            .withFormUrlEncodedBody(("value[0]", AvailableEndpoints(apiDetail).keySet.head.toString()))
+            .withFormUrlEncodedBody(("value[0]", "test-value"))
 
         val result = route(fixture.application, request).value
 

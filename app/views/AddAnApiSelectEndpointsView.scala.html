@@ -22,86 +22,12 @@
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
-    govukCheckboxes: GovukCheckboxes,
     govukButton: GovukButton
 )
 
 @(form: Form[_], mode: Mode, user: Option[UserModel], apiDetail: ApiDetail)(implicit request: Request[_], messages: Messages)
 
-@scripts() = {
-    <style>
-        .scopes-list {
-            font-size: 16px;
-        }
-        .custom-normal-case {
-            text-transform: none !important;
-        }
-        .notgovuk-checkboxes__item {
-            margin-top: 30px;
-            padding: 30px 30px 10px 30px;
-            background-color: #f3f2f1;
-        }
-    </style>
-}
-
-@checkboxItems(apiDetail: ApiDetail) = @{
-    val availableEndpoints = AvailableEndpoints(apiDetail)
-
-    availableEndpoints
-        .toSeq
-        .zipWithIndex
-        .map {
-            case (value, index) =>
-                CheckboxItemViewModel(
-                    content =
-                        if (value._2.size == 1) {
-                            Text(messages("addAnApiSelectEndpoints.selectEndpoint"))
-                        }
-                        else {
-                            Text(messages("addAnApiSelectEndpoints.selectEndpoints"))
-                        },
-                    fieldId = "value",
-                    index   = index,
-                    value   = value._1.toString
-                ).withHint(Hint(content = HtmlContent(checkBoxItemContentHtml(value._1, value._2))))
-        }
-
-}
-
-@checkBoxItemContentHtml(scopes: Set[String], availableEndpoints: Seq[AvailableEndpoint]) = {
-    @for(availableEndpoint <- availableEndpoints) {
-        <p class="govuk-body govuk-!-margin-bottom-2 ">
-            <strong class="govuk-tag govuk-tag--blue ">
-                @availableEndpoint.endpointMethod.httpMethod
-            </strong>
-            <strong>
-                @availableEndpoint.path
-            </strong>
-        </p>
-        <p class="govuk-body-s">
-            @availableEndpoint.endpointMethod.summary.getOrElse("")
-        </p>
-    }
-
-    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-
-    <div>
-        <p class="govuk-body govuk-!-font-size-16 govuk-!-margin-top-3 govuk-!-margin-bottom-1">
-            @messages("addAnApiSelectEndpoints.scopesUsed")
-        </p>
-        <ul class="govuk-list govuk-list-inline scopes-list">
-            @for(scope <- scopes) {
-                <li>
-                    <strong class="govuk-tag govuk-tag--grey custom-normal-case">
-                        @scope
-                    </strong>
-                </li>
-            }
-        </ul>
-    </div>
-}
-
-@layout(pageTitle = title(form, messages("addAnApiSelectEndpoints.title")), user = user, customScriptsBlock = Some(scripts())) {
+@layout(pageTitle = title(form, messages("addAnApiSelectEndpoints.title")), user = user) {
 
     @formHelper(action = routes.AddAnApiSelectEndpointsController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
@@ -109,16 +35,72 @@
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
         }
 
-        @govukCheckboxes(
-            CheckboxesViewModel(
-                form   = form,
-                name   = "value",
-                legend = LegendViewModel(messages("addAnApiSelectEndpoints.heading"))
-                    .withCssClass("govuk-fieldset__legend--l")
-                    .asPageHeading(),
-                items  = checkboxItems(apiDetail)
-            )
-        )
+        <div class="govuk-form-group">
+            <fieldset class="govuk-fieldset" @if(form.errors.nonEmpty){aria-describedby="value-error"}>
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                    <h1 class="govuk-fieldset__heading">
+                        @messages("addAnApiSelectEndpoints.heading")
+                    </h1>
+                </legend>
+
+                @if(form.errors.nonEmpty) {
+                    <p id="value-error" class="govuk-error-message">
+                        <span class="govuk-visually-hidden">Error:</span>
+                        @for(error <- form.errors) {
+                            @error.format
+                        }
+                    </p>
+                }
+
+                <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                    @AvailableEndpoints(apiDetail).toSeq.zipWithIndex.map {case (value, index) =>
+                    <div class="custom-checkbox-holder">
+                        <div class="govuk-checkboxes__item govuk-!-margin-bottom-5">
+                            <input class="govuk-checkboxes__input" id="value_@index" name="value[@index]" type="checkbox" value="@(value._1.toString)">
+                            <label class="govuk-label govuk-checkboxes__label" for="value_@index">
+                                @if(value._2.size == 1) {
+                                    @messages("addAnApiSelectEndpoints.selectEndpoint")
+                                } else {
+                                    @messages("addAnApiSelectEndpoints.selectEndpoints")
+                                }
+                            </label>
+                        </div>
+
+                        @for(availableEndpoint <- value._2) {
+                            <p class="govuk-body govuk-!-margin-bottom-2 ">
+                                <strong class="govuk-tag govuk-tag--blue ">
+                                    @availableEndpoint.endpointMethod.httpMethod
+                                </strong>
+                                <strong>
+                                    @availableEndpoint.path
+                                </strong>
+                            </p>
+                            <p class="govuk-body-s">
+                                @availableEndpoint.endpointMethod.summary.getOrElse("")
+                            </p>
+                        }
+
+                        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+
+                        <p class="govuk-body govuk-!-font-size-16 govuk-!-margin-top-3 govuk-!-margin-bottom-1">
+                            @messages("addAnApiSelectEndpoints.scopesUsed")
+                        </p>
+
+                        <ul class="govuk-list govuk-list-inline scopes-list">
+                            @for(scope <- value._1) {
+                                <li>
+                                    <strong class="govuk-tag govuk-tag--grey custom-normal-case">
+                                        @scope
+                                    </strong>
+                                </li>
+                            }
+                        </ul>
+
+                    </div>
+                    }
+                </div>
+            </fieldset>
+        </div>
 
         @govukButton(
             ButtonViewModel(messages("site.continue"))
