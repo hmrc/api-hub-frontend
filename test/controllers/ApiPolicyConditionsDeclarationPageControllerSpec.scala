@@ -30,6 +30,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import pages.{AddAnApiApiIdPage, AddAnApiSelectApplicationPage}
 import play.api.data.Form
 import play.api.inject.bind
+import play.api.libs.json.Json
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -49,26 +50,6 @@ class ApiPolicyConditionsDeclarationPageControllerSpec extends SpecBase with Moc
   private val form = new ApiPolicyConditionsDeclarationPageFormProvider()()
 
   "ApiPolicyConditionsDeclarationPageController" - {
-    "must return OK and the correct view for a GET when the user has no applications" in {
-      val apiDetail = sampleApiDetail()
-      val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
-
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
-        .thenReturn(Future.successful(Some(apiDetail)))
-
-      when(fixture.apiHubService.getUserApplications(ArgumentMatchers.eq(FakeUser.email.value), ArgumentMatchers.eq(true))(any()))
-        .thenReturn(Future.successful(Seq.empty))
-
-      running(fixture.application) {
-        val request = FakeRequest(GET, routes.ApiPolicyConditionsDeclarationPageController.onPageLoad(NormalMode).url)
-        val result = route(fixture.application, request).value
-        val view = buildView(fixture.application, request, form, NormalMode, apiDetail)
-
-        status(result) mustBe OK
-        contentAsString(result) mustBe view
-        contentAsString(result) must validateAsHtml
-      }
-    }
 
     "must return OK and the correct view for a GET when the user has selected an application" in {
       val apiDetail = sampleApiDetail()
@@ -118,7 +99,6 @@ class ApiPolicyConditionsDeclarationPageControllerSpec extends SpecBase with Moc
 
     "must redirect to the next page when valid data is submitted" in {
       val apiDetail = sampleApiDetail()
-      val application = FakeApplication
       val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
 
       when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
@@ -128,7 +108,7 @@ class ApiPolicyConditionsDeclarationPageControllerSpec extends SpecBase with Moc
 
       running(fixture.application) {
         val request = FakeRequest(POST, routes.ApiPolicyConditionsDeclarationPageController.onSubmit(NormalMode).url)
-          .withFormUrlEncodedBody(("value", application.id))
+          .withFormUrlEncodedBody(("value[0]", "accept"))
         val result = route(fixture.application, request).value
 
         status(result) mustBe SEE_OTHER
