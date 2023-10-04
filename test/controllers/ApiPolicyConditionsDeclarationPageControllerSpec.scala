@@ -30,7 +30,6 @@ import org.scalatestplus.mockito.MockitoSugar
 import pages.{AddAnApiApiIdPage, AddAnApiSelectApplicationPage}
 import play.api.data.Form
 import play.api.inject.bind
-import play.api.libs.json.Json
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -73,12 +72,11 @@ class ApiPolicyConditionsDeclarationPageControllerSpec extends SpecBase with Moc
       }
     }
 
-    "must populate the view correctly on a GET when the question has previously been answered" in {
+    "must populate the view correctly on a GET" in {
       val apiDetail = sampleApiDetail()
       val application = FakeApplication
       val userAnswers = buildUserAnswers(apiDetail).set(AddAnApiSelectApplicationPage, application.id).toOption.value
       val fixture = buildFixture(Some(userAnswers))
-      val filledForm = form.fill(Set(ApiPolicyConditionsDeclaration.Accept))
 
       when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
@@ -89,7 +87,7 @@ class ApiPolicyConditionsDeclarationPageControllerSpec extends SpecBase with Moc
       running(fixture.application) {
         val request = FakeRequest(GET, routes.ApiPolicyConditionsDeclarationPageController.onPageLoad(NormalMode).url)
         val result = route(fixture.application, request).value
-        val view = buildView(fixture.application, request, filledForm, NormalMode, apiDetail)
+        val view = buildView(fixture.application, request, form, NormalMode, apiDetail)
 
         status(result) mustBe OK
         contentAsString(result) mustBe view
