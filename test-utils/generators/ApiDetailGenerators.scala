@@ -17,10 +17,12 @@
 package generators
 
 import models.api.{ApiDetail, Endpoint, EndpointMethod, IntegrationResponse}
+import org.scalacheck.rng.Seed
 import org.scalacheck.{Arbitrary, Gen}
-import org.scalatest.OptionValues
 
-trait ApiDetailGenerators extends OptionValues {
+trait ApiDetailGenerators {
+
+  private val maxListSize = 10
 
   implicit lazy val arbitraryEndpointMethod: Arbitrary[EndpointMethod] =
     Arbitrary {
@@ -28,7 +30,7 @@ trait ApiDetailGenerators extends OptionValues {
         httpMethod <- Gen.oneOf("GET", "POST", "PUT", "PATCH", "DELETE")
         summary <- Gen.option(Gen.alphaNumStr)
         description <- Gen.option(Gen.alphaNumStr)
-        scopes <- Gen.listOf(Gen.alphaNumStr)
+        scopes <- Gen.listOf(Gen.alphaNumStr.suchThat(_.nonEmpty))
       } yield EndpointMethod(httpMethod, summary, description, scopes)
     }
 
@@ -36,7 +38,7 @@ trait ApiDetailGenerators extends OptionValues {
     Arbitrary {
       for {
         path <- Gen.alphaNumStr
-        methods <- Gen.listOf(arbitraryEndpointMethod.arbitrary)
+        methods <- Gen.nonEmptyListOf(arbitraryEndpointMethod.arbitrary)
       } yield Endpoint(path, methods)
     }
 
@@ -47,7 +49,7 @@ trait ApiDetailGenerators extends OptionValues {
         title <- Gen.alphaNumStr
         description <- Gen.alphaNumStr
         version <- Gen.alphaNumStr
-        endpoints <- Gen.listOf(arbitraryEndpoint.arbitrary)
+        endpoints <- Gen.nonEmptyListOf(arbitraryEndpoint.arbitrary)
         shortDescription <- Gen.alphaNumStr
       } yield ApiDetail(id.toString, title,description, version, endpoints, Some(shortDescription))
     }
@@ -57,10 +59,12 @@ trait ApiDetailGenerators extends OptionValues {
       Gen.nonEmptyListOf(arbitraryApiDetail.arbitrary)
     }
 
+  private val parameters = Gen.Parameters.default.withSize(maxListSize)
+
   def sampleApiDetail(): ApiDetail =
-    arbitraryApiDetail.arbitrary.sample.value
+    arbitraryApiDetail.arbitrary.pureApply(parameters, Seed.random())
 
   def sampleApis() : IntegrationResponse =
-    IntegrationResponse(1,None, Seq(sampleApiDetail()))
+    IntegrationResponse(1, None, arbitraryApiDetails.arbitrary.pureApply(parameters, Seed.random()))
 
 }
