@@ -16,6 +16,7 @@
 
 package generators
 
+import models.ApiPolicyConditionsDeclaration
 import models.application.TeamMember
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
@@ -23,6 +24,14 @@ import pages._
 import play.api.libs.json.{JsValue, Json}
 
 trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
+
+  implicit lazy val arbitraryApiPolicyConditionsDeclarationPageUserAnswersEntry: Arbitrary[(ApiPolicyConditionsDeclarationPage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[ApiPolicyConditionsDeclarationPage.type]
+        value <- arbitrary[ApiPolicyConditionsDeclaration].map(Json.toJson(_))
+      } yield (page, value)
+    }
 
   implicit lazy val arbitraryAddAnApiSelectEndpointsUserAnswersEntry: Arbitrary[(AddAnApiSelectEndpointsPage.type, JsValue)] =
     Arbitrary {

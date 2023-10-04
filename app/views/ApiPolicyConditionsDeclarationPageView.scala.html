@@ -1,0 +1,94 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.api.ApiDetail
+
+@this(
+        layout: templates.Layout,
+        formHelper: FormWithCSRF,
+        govukErrorSummary: GovukErrorSummary,
+        govukCheckboxes: GovukCheckboxes,
+        govukButton: GovukButton,
+        govukInsetText: GovukInsetText
+)
+
+@(form: Form[_], mode: Mode, apiDetail: ApiDetail)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = title(form, messages("apiPolicyConditionsDeclarationPage.title", apiDetail.title))) {
+
+    <h1 class="govuk-heading-xl">@messages("apiPolicyConditionsDeclarationPage.heading", apiDetail.title)</h1>
+
+
+    @formHelper(action = routes.ApiPolicyConditionsDeclarationPageController.onSubmit(mode), 'autoComplete -> "off") {
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
+        }
+
+        <div>
+        @govukInsetText(InsetText(content = Text(messages("apiPolicyConditionsDeclarationPage.statement"))))
+        </div>
+
+        <div class="govuk-grid-row">
+            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+        </div>
+
+        <h1 class="govuk-heading-l">@messages("apiPolicyConditionsDeclarationPage.checkYourAnswersLabel", apiDetail.title)</h1>
+
+        <div>
+            <p class="govuk-body">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vitae et leo duis ut diam quam nulla. Sagittis purus sit amet volutpat consequat mauris nunc. Morbi tristique senectus et netus et malesuada fames ac.</p>        <div class="govuk-grid-row">
+            <ul class="govuk-list govuk-list--bullet">
+                <li>
+                    Ridiculus mus mauris vitae ultricies. Id semper risus in hendrerit gravida rutrum.
+                </li>
+                <li>
+                    Mi tempus imperdiet nulla malesuada pellentesque elit eget. Purus gravida quis blandit turpis.
+                </li>
+                <li>
+                    Pretium vulputate sapien nec sagittis aliquam malesuada bibendum arcu.
+                </li>
+                <li>
+                    Turpis tincidunt id aliquet risus feugiat in ante metus dictum. Aliquet risus feugiat in ante metus dictum.
+                </li>
+            </ul>
+
+            <p class="govuk-body">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vitae et leo duis ut diam quam nulla. Sagittis purus sit amet volutpat consequat mauris nunc. Morbi tristique senectus et netus et malesuada fames ac.</p>
+        </div>
+
+            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+
+            @govukCheckboxes(
+                CheckboxesViewModel(
+                    form = form,
+                    name = "value",
+                    legend = Legend(""),
+                    items = ApiPolicyConditionsDeclaration.checkboxItems
+                )
+            )
+
+            @govukButton(
+                ButtonViewModel(messages("apiPolicyConditionsDeclarationPage.button.accept"))
+            )
+            @govukButton(
+                ButtonViewModel(content = messages("apiPolicyConditionsDeclarationPage.button.cancel"))
+                        .asSecondaryButton()
+                        .asLink(routes.ApiDetailsController.onPageLoad(apiDetail.id).url)
+            )
+
+            }
+}
