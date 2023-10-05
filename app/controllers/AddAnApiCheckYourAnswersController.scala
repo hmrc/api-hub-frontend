@@ -26,7 +26,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import services.ApiHubService
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.checkAnswers.{AddAnApiApiIdSummary, AddAnApiSelectApplicationSummary}
+import viewmodels.checkAnswers.{AddAnApiApiIdSummary, AddAnApiSelectApplicationSummary, AddAnApiSelectEndpointsSummary}
 import viewmodels.govuk.summarylist._
 import views.html.AddAnApiCheckYourAnswersView
 
@@ -50,8 +50,9 @@ class AddAnApiCheckYourAnswersController @Inject()(
         applicationSummary <- buildApplicationSummary(application)
         apiDetail <- fetchApiDetail(request.userAnswers)
         apiDetailSummary <- buildApiDetailSummary(apiDetail)
+        endpointsSummary <- buildEndpointsSummary(request.userAnswers, apiDetail)
       } yield SummaryListViewModel(
-        rows = Seq(applicationSummary, apiDetailSummary).flatten
+        rows = Seq(applicationSummary, apiDetailSummary, endpointsSummary).flatten
       )).map(summaryList => Ok(view(summaryList, Some(request.user))))
   }
 
@@ -79,6 +80,12 @@ class AddAnApiCheckYourAnswersController @Inject()(
 
   private def buildApiDetailSummary(apiDetail: Option[ApiDetail])(implicit request: Request[_]): Future[Option[SummaryListRow]] = {
     Future.successful(AddAnApiApiIdSummary.row(apiDetail))
+  }
+
+  private def buildEndpointsSummary(userAnswers: UserAnswers, apiDetail: Option[ApiDetail])(implicit request: Request[_]): Future[Option[SummaryListRow]] = {
+    Future.successful(
+      apiDetail.flatMap(AddAnApiSelectEndpointsSummary.row(userAnswers, _))
+    )
   }
 
 }

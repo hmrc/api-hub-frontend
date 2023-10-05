@@ -17,10 +17,10 @@
 package viewmodels.checkAnswers
 
 import controllers.routes
-import models.{CheckMode, UserAnswers}
+import models.api.ApiDetail
+import models.{AvailableEndpoint, AvailableEndpoints, CheckMode, UserAnswers}
 import pages.AddAnApiSelectEndpointsPage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
@@ -28,16 +28,19 @@ import viewmodels.implicits._
 
 object AddAnApiSelectEndpointsSummary  {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, apiDetail: ApiDetail)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(AddAnApiSelectEndpointsPage).map {
       answers =>
 
+        val endpoints = AvailableEndpoints.selectedEndpoints(apiDetail, answers)
+          .values
+          .flatten
+          .map(endpoint => s"<li>${httpMethod(endpoint)} ${endpoint.path}</li>")
+          .mkString
+
         val value = ValueViewModel(
           HtmlContent(
-            answers.map {
-              answer => HtmlFormat.escape(messages(s"addAnApiSelectEndpoints.$answer")).toString
-            }
-            .mkString(",<br>")
+            s"<ul class='govuk-list'>$endpoints</ul>"
           )
         )
 
@@ -50,4 +53,9 @@ object AddAnApiSelectEndpointsSummary  {
           )
         )
     }
+
+  private def httpMethod(endpoint: AvailableEndpoint): String = {
+    s"<strong class='govuk-tag govuk-tag--blue'>${endpoint.endpointMethod.httpMethod}</strong>"
+  }
+
 }

@@ -25,7 +25,7 @@
 
 @(summaryList: SummaryList, user: Some[UserModel])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("addAnApiCheckYourAnswers.title")), user = user) {
+@layout(pageTitle = titleNoForm(messages("addAnApiCheckYourAnswers.title")), user = user, fullWidth = true) {
 
     <h1 class="govuk-heading-l">@messages("addAnApiCheckYourAnswers.heading")</h1>
 
