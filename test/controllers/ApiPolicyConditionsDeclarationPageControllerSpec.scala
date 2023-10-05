@@ -23,11 +23,11 @@ import generators.ApiDetailGenerators
 import models.api.ApiDetail
 import models.{ApiPolicyConditionsDeclaration, Mode, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers
+import org.mockito.{ArgumentCaptor, ArgumentMatchers}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{AddAnApiApiIdPage, AddAnApiSelectApplicationPage}
+import pages.{AddAnApiApiIdPage, AddAnApiSelectApplicationPage, ApiPolicyConditionsDeclarationPage}
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.mvc.Request
@@ -52,14 +52,10 @@ class ApiPolicyConditionsDeclarationPageControllerSpec extends SpecBase with Moc
 
     "must return OK and the correct view for a GET when the user has selected an application" in {
       val apiDetail = sampleApiDetail()
-      val application = FakeApplication
       val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
 
       when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
-
-      when(fixture.apiHubService.getUserApplications(ArgumentMatchers.eq(FakeUser.email.value), ArgumentMatchers.eq(true))(any()))
-        .thenReturn(Future.successful(Seq(application)))
 
       running(fixture.application) {
         val request = FakeRequest(GET, routes.ApiPolicyConditionsDeclarationPageController.onPageLoad(NormalMode).url)
@@ -80,9 +76,6 @@ class ApiPolicyConditionsDeclarationPageControllerSpec extends SpecBase with Moc
 
       when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
-
-      when(fixture.apiHubService.getUserApplications(ArgumentMatchers.eq(FakeUser.email.value), ArgumentMatchers.eq(true))(any()))
-        .thenReturn(Future.successful(Seq(application)))
 
       running(fixture.application) {
         val request = FakeRequest(GET, routes.ApiPolicyConditionsDeclarationPageController.onPageLoad(NormalMode).url)
@@ -137,6 +130,35 @@ class ApiPolicyConditionsDeclarationPageControllerSpec extends SpecBase with Moc
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must save the answer when valid data is submitted" in {
+      val apiDetail = sampleApiDetail()
+      val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
+
+      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+        .thenReturn(Future.successful(Some(apiDetail)))
+
+      when(fixture.addAnApiSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      running(fixture.application) {
+        val request =
+          FakeRequest(POST, routes.ApiPolicyConditionsDeclarationPageController.onSubmit(NormalMode).url)
+            .withFormUrlEncodedBody(("value[0]", "accept"))
+
+        val result = route(fixture.application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+//        val expected = UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
+//          .set(AddAnApiApiIdPage, apiDetail.id).toOption.value
+//          .set(ApiPolicyConditionsDeclarationPage, Set(ApiPolicyConditionsDeclaration.Accept)).toOption.value
+
+        val captor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+        verify(fixture.addAnApiSessionRepository).set(captor.capture())
+        val userAnswers: UserAnswers = captor.getValue
+        userAnswers.get(ApiPolicyConditionsDeclarationPage) mustEqual Some(Set(ApiPolicyConditionsDeclaration.Accept))
       }
     }
   }
