@@ -151,10 +151,6 @@ class ApiPolicyConditionsDeclarationPageControllerSpec extends SpecBase with Moc
 
         status(result) mustEqual SEE_OTHER
 
-//        val expected = UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
-//          .set(AddAnApiApiIdPage, apiDetail.id).toOption.value
-//          .set(ApiPolicyConditionsDeclarationPage, Set(ApiPolicyConditionsDeclaration.Accept)).toOption.value
-
         val captor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
         verify(fixture.addAnApiSessionRepository).set(captor.capture())
         val userAnswers: UserAnswers = captor.getValue
