@@ -154,6 +154,26 @@ class ApiHubServiceSpec
     }
   }
 
+  "addScopes" - {
+    "must call the applications connector with the correct request" in {
+      val applicationId = "app-id"
+      val scopes = Set("test-scope-1", "test-scope-2")
+      val newScopes = scopes.map(NewScope(_, Seq(Secondary))).toSeq
+
+      val applicationsConnector = mock[ApplicationsConnector]
+      when(applicationsConnector.addScopes(ArgumentMatchers.eq(applicationId), ArgumentMatchers.eq(newScopes))(any()))
+        .thenReturn(Future.successful(Some(())))
+
+      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+
+      service.addScopes(applicationId, scopes)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe Some(())
+      }
+    }
+  }
+
   "pendingScopes" - {
     "must call the applications connectors and return the applications" in {
       val application1 = Application("id-1", "test-app-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1")))
