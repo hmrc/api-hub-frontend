@@ -75,7 +75,10 @@ class ApiHubService @Inject()(
   }
 
   def getApiDetail(id: String)(implicit hc: HeaderCarrier): Future[Option[ApiDetail]] = {
-    integrationCatalogueConnector.getApiDetail(id)
+    val eventualMaybeDetail = integrationCatalogueConnector.getApiDetail(id)
+
+    Console.println(s"maybeDetail : $eventualMaybeDetail")
+    eventualMaybeDetail
   }
 
   def getAllHipApis()(implicit hc: HeaderCarrier): Future[Seq[ApiDetail]] = {

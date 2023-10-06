@@ -86,3 +86,5 @@ GET         /apis/add-an-api/select-endpoints                                  c
 POST        /apis/add-an-api/select-endpoints                                  controllers.AddAnApiSelectEndpointsController.onSubmit(mode: Mode = NormalMode)
 GET         /apis/add-an-api/change-select-endpoints                           controllers.AddAnApiSelectEndpointsController.onPageLoad(mode: Mode = CheckMode)
 POST        /apis/add-an-api/change-select-endpoints                           controllers.AddAnApiSelectEndpointsController.onSubmit(mode: Mode = CheckMode)
+
+GET        /apis/add-an-api/success/:applicationId/:apiId                      controllers.AddAnApiSuccessController.onPageLoad(applicationId: String, apiId: String)

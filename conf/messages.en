@@ -18,6 +18,8 @@ site.applicationNotFoundHeading = Application not found
 site.applicationNotFoundMessage = Cannot find an application with Id {0}.
 site.apiNotFound.heading = API not found
 site.apiNotFound.message = Cannot find an API with Id {0}.
+site.neitherApiNorApplicationFound.heading = Neither Api nor application found
+site.neitherApiNorApplicationFound.message = Cannot find an API with Id {0} or an application with Id {1}.
 
 date.day = Day
 date.month = Month
@@ -251,3 +253,10 @@ addAnApiSelectEndpoints.change.hidden = AddAnApiSelectEndpoints
 addAnApiSelectEndpoints.selectEndpoint = Select endpoint
 addAnApiSelectEndpoints.selectEndpoints = Select endpoints
 addAnApiSelectEndpoints.scopesUsed = These end points use the following scopes:
+
+addAnApiSuccess.title = API added successfully
+addAnApiSuccess.heading = API added successfully
+addAnApiSuccess.summary = {0} is now available within your application
+addAnApiSuccess.advice.heading = What you can do next
+addAnApiSuccess.advice.body1 = You can now use the API within your application, with the credentials that are available in the credentials section of your application.
+addAnApiSuccess.advice.body2 = View your application: {0}
