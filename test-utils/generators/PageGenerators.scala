@@ -21,6 +21,9 @@ import pages._
 
 trait PageGenerators {
 
+  implicit lazy val arbitraryApiPolicyConditionsDeclarationPage: Arbitrary[ApiPolicyConditionsDeclarationPage.type] =
+    Arbitrary(ApiPolicyConditionsDeclarationPage)
+
   implicit lazy val arbitraryAddAnApiSelectEndpointsPage: Arbitrary[AddAnApiSelectEndpointsPage.type] =
     Arbitrary(AddAnApiSelectEndpointsPage)
 

@@ -16,11 +16,16 @@
 
 package generators
 
-import models.ProductionCredentialsChecklist
 import models.application.TeamMember
+import models.{ApiPolicyConditionsDeclaration, ProductionCredentialsChecklist}
 import org.scalacheck.{Arbitrary, Gen}
 
 trait ModelGenerators {
+
+  implicit lazy val arbitraryApiPolicyConditionsDeclaration: Arbitrary[ApiPolicyConditionsDeclaration] =
+    Arbitrary {
+      Gen.oneOf(ApiPolicyConditionsDeclaration.values)
+    }
 
   implicit lazy val arbitraryProductionCredentialsChecklist: Arbitrary[ProductionCredentialsChecklist] =
     Arbitrary {

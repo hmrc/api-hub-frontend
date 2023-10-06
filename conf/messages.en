@@ -247,6 +247,16 @@ addAnApiSelectApplication.returnTo = Return to {0}
 addAnApiSelectApplication.checkYourAnswersLabel = Application
 addAnApiSelectApplication.change.hidden = Select application
 
+apiPolicyConditionsDeclarationPage.title = Review the usage policy for {0}
+apiPolicyConditionsDeclarationPage.heading = Review the usage policy for {0}
+apiPolicyConditionsDeclarationPage.accept = I confirm that my application and team meets the API policy and usage requirements
+apiPolicyConditionsDeclarationPage.checkYourAnswersLabel = {0} API Policy
+apiPolicyConditionsDeclarationPage.error.required = You must agree to the API policy requirements.
+apiPolicyConditionsDeclarationPage.change.hidden = APIPolicyConditionsDeclarationPage
+apiPolicyConditionsDeclarationPage.button.accept = Accept and continue
+apiPolicyConditionsDeclarationPage.button.cancel = Cancel
+apiPolicyConditionsDeclarationPage.statement = Please review the API policy to ensure you meet the requirements of usage.\nIf you do not meet the stated requirements you may not be able to use the API in the production environment.
+
 addAnApiSelectEndpoints.title = Select endpoints
 addAnApiSelectEndpoints.heading = Which end points do you want to use?
 addAnApiSelectEndpoints.checkYourAnswersLabel = Endpoints
