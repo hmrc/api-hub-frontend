@@ -56,10 +56,6 @@ class AddAnApiCheckYourAnswersController @Inject()(
       )).map(summaryList => Ok(view(summaryList, Some(request.user))))
   }
 
-  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData) {
-    NotImplemented
-  }
-
   private def fetchApplication(userAnswers: UserAnswers)(implicit request: Request[_]): Future[Option[Application]] = {
     userAnswers.get(AddAnApiSelectApplicationPage) match {
       case Some(applicationId) => apiHubService.getApplication(applicationId, enrich = false)

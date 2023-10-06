@@ -82,8 +82,6 @@ class ApplicationsConnector @Inject()(
       .execute[Seq[Application]]
   }
 
-
-
   def deleteApplication(id: String, currentUser: Option[String])(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
     httpClient
       .post(url"$applicationsBaseUrl/api-hub-applications/applications/$id/delete")
@@ -105,6 +103,19 @@ class ApplicationsConnector @Inject()(
       .execute[Either[UpstreamErrorResponse, Unit]]
       .flatMap {
         case Right(_) => Future.successful(Some(newScope))
+        case Left(e) if e.statusCode==404 => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
+  }
+
+  def addScopes(id: String, newScopes: Seq[NewScope])(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    httpClient
+      .post(url"$applicationsBaseUrl/api-hub-applications/applications/$id/environments/scopes")
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .withBody(Json.toJson(newScopes))
+      .execute[Either[UpstreamErrorResponse, Unit]]
+      .flatMap {
+        case Right(_) => Future.successful(Some(()))
         case Left(e) if e.statusCode==404 => Future.successful(None)
         case Left(e) => Future.failed(e)
       }

@@ -37,7 +37,7 @@
     <p class="govuk-body">@messages("addAnApiCheckYourAnswers.guidance.p1")</p>
     <p class="govuk-body">@messages("addAnApiCheckYourAnswers.guidance.p2")</p>
 
-    @formHelper(action = routes.AddAnApiCheckYourAnswersController.onSubmit()) {
+    @formHelper(action = routes.AddAnApiCompleteController.addApi()) {
         @govukButton(
             ButtonViewModel(messages("site.continue")).withCssClass("govuk-!-margin-top-5")
         )

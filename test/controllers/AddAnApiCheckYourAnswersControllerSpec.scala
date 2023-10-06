@@ -20,7 +20,6 @@ import base.SpecBase
 import controllers.actions.{FakeApplication, FakeUser}
 import models.UserAnswers
 import models.api.{ApiDetail, Endpoint, EndpointMethod}
-import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -30,7 +29,6 @@ import play.api.Application
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import repositories.AddAnApiSessionRepository
 import services.ApiHubService
 import utils.HtmlValidation
 import viewmodels.checkAnswers.{AddAnApiApiIdSummary, AddAnApiSelectApplicationSummary, AddAnApiSelectEndpointsSummary}
@@ -128,7 +126,6 @@ class AddAnApiCheckYourAnswersControllerSpec extends SpecBase with SummaryListFl
 
   private def buildFixture(userAnswers: Option[UserAnswers]): Fixture = {
     val apiHubService = mock[ApiHubService]
-    val addAnApiSessionRepository = mock[AddAnApiSessionRepository]
 
     val application = applicationBuilder(userAnswers)
       .overrides(

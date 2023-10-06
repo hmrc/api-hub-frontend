@@ -10,9 +10,11 @@ import org.scalatest.OptionValues
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.Configuration
+import play.api.http.ContentTypes
 import play.api.http.Status._
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
+import play.api.test.Helpers.{AUTHORIZATION, CONTENT_TYPE}
 import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
@@ -20,6 +22,7 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import java.net.URLEncoder
 import scala.concurrent.ExecutionContext
+
 class ApplicationsConnectorSpec
   extends AsyncFreeSpec
   with Matchers
@@ -178,6 +181,42 @@ class ApplicationsConnectorSpec
       )
 
       buildConnector(this).requestAdditionalScope(appId, newScope)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe None
+      }
+    }
+  }
+
+  "ApplicationsConnector.addScopes" - {
+    "must place the correct request" in {
+      val appId = "id-1"
+      val newScopes = Seq(NewScope("test-scope-1", Seq(Secondary)), NewScope("test-scope-2", Seq(Secondary)))
+
+      stubFor(
+        post(urlEqualTo(s"/api-hub-applications/applications/$appId/environments/scopes"))
+          .withRequestBody(equalToJson(Json.toJson(newScopes).toString()))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .withHeader(CONTENT_TYPE, equalTo(ContentTypes.JSON))
+          .willReturn(aResponse().withStatus(NO_CONTENT))
+      )
+
+      buildConnector(this).addScopes(appId, newScopes)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe Some(())
+      }
+    }
+
+    "must return None when the application is not found" in {
+      val appId = "id-1"
+      val newScopes = Seq(NewScope("test-scope-1", Seq(Secondary)), NewScope("test-scope-2", Seq(Secondary)))
+
+      stubFor(
+        post(urlEqualTo(s"/api-hub-applications/applications/$appId/environments/scopes"))
+          .withRequestBody(equalToJson(Json.toJson(newScopes).toString()))
+          .willReturn(aResponse().withStatus(NOT_FOUND))
+      )
+
+      buildConnector(this).addScopes(appId, newScopes)(HeaderCarrier()) map {
         actual =>
           actual mustBe None
       }
