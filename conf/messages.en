@@ -237,6 +237,8 @@ hipApis.api.endpoints = {0} Endpoints
 hipApis.searchResults.empty = No APIs found.
 hipApis.link.text = HIP APIs
 
+addAnApiApiId.checkYourAnswersLabel = API Name
+
 addAnApiSelectApplication.title = Select application
 addAnApiSelectApplication.heading = Select application
 addAnApiSelectApplication.error.required = Please select an application
@@ -244,6 +246,18 @@ addAnApiSelectApplication.noApplications = To subscribe to an API, you must firs
 addAnApiSelectApplication.registerApplication = Register an application
 addAnApiSelectApplication.whichApplication = Which application would you like to add the {0} to?
 addAnApiSelectApplication.returnTo = Return to {0}
+addAnApiSelectApplication.checkYourAnswersLabel = Application
+addAnApiSelectApplication.change.hidden = Select application
+
+apiPolicyConditionsDeclarationPage.title = Review the usage policy for {0}
+apiPolicyConditionsDeclarationPage.heading = Review the usage policy for {0}
+apiPolicyConditionsDeclarationPage.accept = I confirm that my application and team meets the API policy and usage requirements
+apiPolicyConditionsDeclarationPage.checkYourAnswersLabel = {0} API Policy
+apiPolicyConditionsDeclarationPage.error.required = You must agree to the API policy requirements.
+apiPolicyConditionsDeclarationPage.change.hidden = APIPolicyConditionsDeclarationPage
+apiPolicyConditionsDeclarationPage.button.accept = Accept and continue
+apiPolicyConditionsDeclarationPage.button.cancel = Cancel
+apiPolicyConditionsDeclarationPage.statement = Please review the API policy to ensure you meet the requirements of usage.\nIf you do not meet the stated requirements you may not be able to use the API in the production environment.
 
 addAnApiSelectEndpoints.title = Select endpoints
 addAnApiSelectEndpoints.heading = Which end points do you want to use?
@@ -253,6 +267,13 @@ addAnApiSelectEndpoints.change.hidden = AddAnApiSelectEndpoints
 addAnApiSelectEndpoints.selectEndpoint = Select endpoint
 addAnApiSelectEndpoints.selectEndpoints = Select endpoints
 addAnApiSelectEndpoints.scopesUsed = These end points use the following scopes:
+
+addAnApiCheckYourAnswers.title = Check your answers
+addAnApiCheckYourAnswers.heading = Check your answers before continuing
+addAnApiCheckYourAnswers.details = Details
+addAnApiCheckYourAnswers.guidance.heading = Finishing adding API to application
+addAnApiCheckYourAnswers.guidance.p1 = Once the API has been added to your application you will be able to use it in the test environment.
+addAnApiCheckYourAnswers.guidance.p2 = To use this API in production you will need to request production access.
 
 addAnApiSuccess.title = API added successfully
 addAnApiSuccess.heading = API added successfully

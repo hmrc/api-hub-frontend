@@ -40,6 +40,8 @@ class Navigator @Inject()() {
     case QuestionAddTeamMembersPage => questionAddTeamMembersNextPage(CheckMode)
     case ConfirmAddTeamMemberPage => confirmAddTeamMemberNextPage(CheckMode)
     case TeamMembersPage => _ => routes.ConfirmAddTeamMemberController.onPageLoad(CheckMode)
+    case AddAnApiSelectApplicationPage => _ => routes.AddAnApiCheckYourAnswersController.onPageLoad()
+    case AddAnApiSelectEndpointsPage => _ => routes.AddAnApiCheckYourAnswersController.onPageLoad()
     case _ => _ => routes.CheckYourAnswersController.onPageLoad()
   }
 
