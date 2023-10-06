@@ -17,17 +17,18 @@
 package controllers
 
 import base.SpecBase
-import controllers.actions.FakeApplication
+import controllers.actions.{FakeApplication, FakeUser}
 import models.{ApiPolicyConditionsDeclaration, CheckMode, UserAnswers}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{verify, when}
 import org.mockito.MockitoSugar.mock
 import pages.{AddAnApiApiIdPage, AddAnApiSelectApplicationPage, AddAnApiSelectEndpointsPage, ApiPolicyConditionsDeclarationPage}
 import play.api.Application
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import repositories.AddAnApiSessionRepository
 import services.ApiHubService
 import utils.HtmlValidation
 import views.html.ErrorTemplate
@@ -53,12 +54,32 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation {
       when(fixture.apiHubService.addScopes(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(selectedScopes.flatten))(any()))
         .thenReturn(Future.successful(Some(())))
 
+      when(fixture.addAnApiSessionRepository.clear(any())).thenReturn(Future.successful(true))
+
       running(fixture.application) {
         val request = FakeRequest(POST, routes.AddAnApiCompleteController.addApi().url)
         val result = route(fixture.application, request).value
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.IndexController.onPageLoad.url)
+      }
+    }
+
+    "must delete the user answers on success" in {
+      val fixture = buildFixture(Some(fullUserAnswers))
+
+      when(fixture.apiHubService.addScopes(any(), any())(any()))
+        .thenReturn(Future.successful(Some(())))
+
+      when(fixture.addAnApiSessionRepository.clear(any())).thenReturn(Future.successful(true))
+
+      running(fixture.application) {
+        val request = FakeRequest(POST, routes.AddAnApiCompleteController.addApi().url)
+        val result = route(fixture.application, request).value
+
+        status(result) mustBe SEE_OTHER
+
+        verify(fixture.addAnApiSessionRepository).clear(ArgumentMatchers.eq(FakeUser.userId))
       }
     }
 
@@ -85,7 +106,7 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation {
       }
     }
 
-    "must redirect to the HIP APIs page when no API Id answer exists" in {
+    "must redirect to the journey recovery page when no API Id answer exists" in {
       val userAnswers = fullUserAnswers.remove(AddAnApiApiIdPage).toOption.value
       val fixture = buildFixture(Some(userAnswers))
 
@@ -94,7 +115,7 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation {
         val result = route(fixture.application, request).value
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.HipApisController.onPageLoad().url)
+        redirectLocation(result) mustBe Some(routes.JourneyRecoveryController.onPageLoad().url)
       }
     }
 
@@ -152,20 +173,23 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation {
 
   private case class Fixture(
     application: Application,
-    apiHubService: ApiHubService
+    apiHubService: ApiHubService,
+    addAnApiSessionRepository: AddAnApiSessionRepository
   )
 
   private def buildFixture(userAnswers: Option[UserAnswers]): Fixture = {
     val apiHubService = mock[ApiHubService]
+    val addAnApiSessionRepository = mock[AddAnApiSessionRepository]
 
     val application = applicationBuilder(userAnswers)
       .overrides(
         bind[ApiHubService].toInstance(apiHubService),
+        bind[AddAnApiSessionRepository].toInstance(addAnApiSessionRepository),
         bind[Clock].toInstance(clock)
       )
       .build()
 
-    Fixture(application, apiHubService)
+    Fixture(application, apiHubService, addAnApiSessionRepository)
   }
 
 }

@@ -22,6 +22,7 @@ import models.{ApiPolicyConditionsDeclaration, CheckMode, UserAnswers}
 import pages.{AddAnApiApiIdPage, AddAnApiSelectApplicationPage, AddAnApiSelectEndpointsPage, ApiPolicyConditionsDeclarationPage}
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, Request, Result}
+import repositories.AddAnApiSessionRepository
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
@@ -35,7 +36,8 @@ class AddAnApiCompleteController @Inject()(
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   apiHubService: ApiHubService,
-  errorResultBuilder: ErrorResultBuilder
+  errorResultBuilder: ErrorResultBuilder,
+  addAnApiSessionRepository: AddAnApiSessionRepository
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   import AddAnApiCompleteController._
@@ -44,9 +46,12 @@ class AddAnApiCompleteController @Inject()(
     implicit request =>
       validate(request.userAnswers).fold(
         call => Future.successful(Redirect(call)),
-        addAnApiRequest => apiHubService.addScopes(addAnApiRequest.applicationId, addAnApiRequest.scopes) map {
-          case Some(_) => Redirect(routes.IndexController.onPageLoad)
-          case None => applicationNotFound(addAnApiRequest.applicationId)
+        addAnApiRequest => apiHubService.addScopes(addAnApiRequest.applicationId, addAnApiRequest.scopes) flatMap {
+          case Some(_) =>
+            addAnApiSessionRepository.clear(request.user.userId).map(_ =>
+              Redirect(routes.IndexController.onPageLoad)
+            )
+          case None => Future.successful(applicationNotFound(addAnApiRequest.applicationId))
         }
       )
   }
@@ -63,7 +68,7 @@ class AddAnApiCompleteController @Inject()(
   private def validateApiId(userAnswers: UserAnswers): Either[Call, String] = {
     userAnswers.get(AddAnApiApiIdPage) match {
       case Some(apiId) => Right(apiId)
-      case None => Left(routes.HipApisController.onPageLoad())
+      case None => Left(routes.JourneyRecoveryController.onPageLoad())
     }
   }
 
@@ -76,8 +81,8 @@ class AddAnApiCompleteController @Inject()(
 
   private def validateSelectedEndpoints(userAnswers: UserAnswers): Either[Call, Set[String]] = {
     userAnswers.get(AddAnApiSelectEndpointsPage) match {
-      case Some(endpoints) => Right(endpoints.flatten)
-      case None => Left(routes.AddAnApiSelectEndpointsController.onPageLoad(CheckMode))
+      case Some(endpoints) if endpoints.nonEmpty => Right(endpoints.flatten)
+      case _ => Left(routes.AddAnApiSelectEndpointsController.onPageLoad(CheckMode))
     }
   }
 
