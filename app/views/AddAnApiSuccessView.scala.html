@@ -16,14 +16,15 @@
 
 @import models.api.ApiDetail
 @import models.application.Application
+@import models.user.UserModel
 
 @this(
-        layout: templates.Layout,
-        govukButton: GovukButton,
-        govukPanel: GovukPanel
+layout: templates.Layout,
+govukButton: GovukButton,
+govukPanel: GovukPanel
 )
 
-@(application: Application, api: ApiDetail)(implicit request: Request[_], messages: Messages)
+@(application: Application, api: ApiDetail, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
 @applicationLink(application: Application) = {
     <a href='@applicationLinkUrl(application)' class='govuk-link govuk-link--no-visited-state'>
@@ -36,9 +37,10 @@
     routes.ApplicationDetailsController.onPageLoad(application.id).url
 }
 
-@layout(pageTitle = titleNoForm(messages("addAnApiSuccess.title"))) {
+@layout(pageTitle = titleNoForm(messages("addAnApiSuccess.title")), showBackLink = false, user = user) {
 
     @govukPanel(Panel(
+        classes = "govuk-!-margin-bottom-9",
         title = Text(messages("addAnApiSuccess.title")),
         content = HtmlContent(messages("addAnApiSuccess.summary", api.title))
     ))

@@ -42,7 +42,7 @@ class AddAnApiSuccessController @Inject()(
         api <- apiHubService.getApiDetail(apiId)
         application <- apiHubService.getApplication(applicationId, false)
       } yield (api, application) match {
-        case (Some(apiDetail), Some(application)) => Ok(view(application, apiDetail))
+        case (Some(apiDetail), Some(application)) => Ok(view(application, apiDetail, Some(request.user)))
         case (Some(_), None) => errorResultBuilder.notFound(
           Messages("site.applicationNotFoundHeading"),
           Messages("site.applicationNotFoundMessage", applicationId))

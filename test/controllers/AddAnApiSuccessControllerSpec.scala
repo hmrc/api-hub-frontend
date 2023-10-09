@@ -42,11 +42,11 @@ import scala.concurrent.Future
 
 class AddAnApiSuccessControllerSpec extends SpecBase with MockitoSugar with HtmlValidation with ApiDetailGenerators {
 
-  val apiDetail = mock[ApiDetail]
+  val apiDetail: ApiDetail = mock[ApiDetail]
   when(apiDetail.title).thenReturn("API title")
   when(apiDetail.id).thenReturn("api_id")
 
-  val app = mock[Application]
+  val app: Application = mock[Application]
   when(app.id).thenReturn("app_id")
   when(app.name).thenReturn("app_name")
 
@@ -54,31 +54,9 @@ class AddAnApiSuccessControllerSpec extends SpecBase with MockitoSugar with Html
   private val clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
 
   "GET" - {
-    "must return OK and the correct view when the API detail exists for an unauthenticated user" in {
-      val fixture = buildFixture(Some(buildUserAnswers()))
-
-      running(fixture.application) {
-        val view = fixture.application.injector.instanceOf[AddAnApiSuccessView]
-
-        when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
-          .thenReturn(Future.successful(Some(apiDetail)))
-
-        when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(app.id), any())(any()))
-          .thenReturn(Future.successful(Some(app)))
-
-        Console.println(s"URL: ${routes.AddAnApiSuccessController.onPageLoad(app.id, apiDetail.id).url}");
-        val request = FakeRequest(GET, routes.AddAnApiSuccessController.onPageLoad(app.id, apiDetail.id).url)
-        val result = route(fixture.application, request).value
-
-        status(result) mustBe OK
-        contentAsString(result) mustBe view(app, apiDetail)(request, messages(fixture.application)).toString()
-        contentAsString(result) must validateAsHtml
-      }
-
-    }
 
     "must return OK and the correct view when the API detail exists for an authenticated user" in {
-      val fixture = buildFixture(Some(buildUserAnswers()))
+      val fixture = buildFixture
 
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[AddAnApiSuccessView]
@@ -93,14 +71,14 @@ class AddAnApiSuccessControllerSpec extends SpecBase with MockitoSugar with Html
         val result = route(fixture.application, request).value
 
         status(result) mustBe OK
-        contentAsString(result) mustBe view(app, apiDetail)(request, messages(fixture.application)).toString()
+        contentAsString(result) mustBe view(app, apiDetail, Some(FakeUser))(request, messages(fixture.application)).toString()
         contentAsString(result) must validateAsHtml
       }
     }
 
 
     "must return a 404 Not Found page when the API detail does not exist" in {
-      val fixture = buildFixture(Some(buildUserAnswers()))
+      val fixture = buildFixture
 
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[ErrorTemplate]
@@ -129,7 +107,7 @@ class AddAnApiSuccessControllerSpec extends SpecBase with MockitoSugar with Html
     }
 
     "must return a 404 Not Found page when the Application does not exist" in {
-      val fixture = buildFixture(Some(buildUserAnswers()))
+      val fixture = buildFixture
 
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[ErrorTemplate]
@@ -158,7 +136,7 @@ class AddAnApiSuccessControllerSpec extends SpecBase with MockitoSugar with Html
     }
 
     "must return a 404 Not Found page when neither the Application not the Api exist" in {
-      val fixture = buildFixture(Some(buildUserAnswers()))
+      val fixture = buildFixture
 
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[ErrorTemplate]
@@ -194,11 +172,11 @@ class AddAnApiSuccessControllerSpec extends SpecBase with MockitoSugar with Html
                               addAnApiSuccessController: AddAnApiSuccessController
                             )
 
-  private def buildFixture(userAnswers: Option[UserAnswers]): Fixture = {
+  private def buildFixture: Fixture = {
     val apiHubService = mock[ApiHubService]
     val addAnApiSessionRepository = mock[AddAnApiSessionRepository]
 
-    val application = applicationBuilder(userAnswers)
+    val application = applicationBuilder(None)
       .overrides(
         bind[ApiHubService].toInstance(apiHubService),
         bind[AddAnApiSessionRepository].toInstance(addAnApiSessionRepository),
@@ -211,9 +189,4 @@ class AddAnApiSuccessControllerSpec extends SpecBase with MockitoSugar with Html
     Fixture(application, apiHubService, addAnApiSessionRepository, controller)
   }
 
-  private def buildUserAnswers(): UserAnswers = {
-    UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
-      .set(AddAnApiApiIdPage, apiDetail.id).toOption.value
-      .set(AddAnApiSelectApplicationPage, app.id).toOption.value
-  }
 }
