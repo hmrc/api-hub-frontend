@@ -33,6 +33,7 @@ class Navigator @Inject()() {
     case ConfirmAddTeamMemberPage => confirmAddTeamMemberNextPage(NormalMode)
     case AddAnApiApiIdPage => _ => routes.AddAnApiSelectApplicationController.onPageLoad(NormalMode)
     case AddAnApiSelectApplicationPage => _ => routes.AddAnApiSelectEndpointsController.onPageLoad(NormalMode)
+    case AddAnApiSelectEndpointsPage => _ => routes.ApiPolicyConditionsDeclarationPageController.onPageLoad(NormalMode)
     case ApiPolicyConditionsDeclarationPage => _ => routes.AddAnApiCheckYourAnswersController.onPageLoad()
     case _ => _ => routes.IndexController.onPageLoad
   }

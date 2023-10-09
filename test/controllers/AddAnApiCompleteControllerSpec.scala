@@ -41,8 +41,9 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation {
   private val clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
   private val selectedScopes = Set(Set("test-scope-1", "test-scope-2"), Set("test-scope-1", "test-scope-3"))
   private val acceptedPolicyConditions: Set[ApiPolicyConditionsDeclaration] = Set(ApiPolicyConditionsDeclaration.Accept)
+  private val apiId = "test-api-id"
   private val fullUserAnswers = emptyUserAnswers
-    .set(AddAnApiApiIdPage, "test-api-id").toOption.value
+    .set(AddAnApiApiIdPage, apiId).toOption.value
     .set(AddAnApiSelectApplicationPage, FakeApplication.id).toOption.value
     .set(AddAnApiSelectEndpointsPage, selectedScopes).toOption.value
     .set(ApiPolicyConditionsDeclarationPage, acceptedPolicyConditions).toOption.value
@@ -51,7 +52,8 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation {
     "must place the correct request when a valid set of answers is submitted and redirect to the success page" in {
       val fixture = buildFixture(Some(fullUserAnswers))
 
-      when(fixture.apiHubService.addScopes(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(selectedScopes.flatten))(any()))
+      val expectedScopes = Set("test-scope-1", "test-scope-2", "test-scope-3")
+      when(fixture.apiHubService.addScopes(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(expectedScopes))(any()))
         .thenReturn(Future.successful(Some(())))
 
       when(fixture.addAnApiSessionRepository.clear(any())).thenReturn(Future.successful(true))
@@ -61,7 +63,7 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation {
         val result = route(fixture.application, request).value
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.IndexController.onPageLoad.url)
+        redirectLocation(result) mustBe Some(routes.AddAnApiSuccessController.onPageLoad(FakeApplication.id, apiId).url)
       }
     }
 
