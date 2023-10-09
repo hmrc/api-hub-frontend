@@ -29,9 +29,7 @@ class NavigatorSpec extends SpecBase with TryValues {
   "Navigator" - {
 
     "in Normal mode" - {
-
       "must go from a page that doesn't exist in the route map to Index" in {
-
         case object UnknownPage extends Page
         navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad
       }
@@ -57,24 +55,40 @@ class NavigatorSpec extends SpecBase with TryValues {
       "must go from the Team member details page to the Confirm add team member page" in {
         navigator.nextPage(TeamMembersPage, NormalMode, UserAnswers("id")) mustBe routes.ConfirmAddTeamMemberController.onPageLoad(NormalMode)
       }
+
       "must go from the Confirm Add Team Member page to the Add a team member page when option form's value = true" in {
         val userAnswers = UserAnswers("id").set(ConfirmAddTeamMemberPage, true).success.value
         navigator.nextPage(ConfirmAddTeamMemberPage, NormalMode, userAnswers) mustBe routes.AddTeamMemberDetailsController.onPageLoad(NormalMode, 0)
       }
+
       "must go from the Confirm Add Team Member page to the Check Your Answers page when option form's value = false" in {
         val userAnswers = UserAnswers("id").set(ConfirmAddTeamMemberPage, false).success.value
         navigator.nextPage(ConfirmAddTeamMemberPage, NormalMode, userAnswers) mustBe routes.CheckYourAnswersController.onPageLoad()
       }
+
       "must go from the the Confirm Add Team Member page to the Journey recovery page when there is no selection" in {
         navigator.nextPage(QuestionAddTeamMembersPage, NormalMode, UserAnswers("id")) mustBe routes.JourneyRecoveryController.onPageLoad()
       }
 
+      "must go from the Add An API API Id (start) page to the Select Application page" in {
+        navigator.nextPage(AddAnApiApiIdPage, NormalMode, UserAnswers("id")) mustBe routes.AddAnApiSelectApplicationController.onPageLoad(NormalMode)
+      }
+
+      "must go from the Add An API Select Application page to the Select Endpoints page" in {
+        navigator.nextPage(AddAnApiSelectApplicationPage, NormalMode, UserAnswers("id")) mustBe routes.AddAnApiSelectEndpointsController.onPageLoad(NormalMode)
+      }
+
+      "must go from the Add An API Select Endpoints page to the Accept Policy Conditions page" in {
+        navigator.nextPage(AddAnApiSelectEndpointsPage, NormalMode, UserAnswers("id")) mustBe routes.ApiPolicyConditionsDeclarationPageController.onPageLoad(NormalMode)
+      }
+
+      "must go from the Add An API Accept Policy Conditions page to the Check Your Answers page" in {
+        navigator.nextPage(ApiPolicyConditionsDeclarationPage, NormalMode, UserAnswers("id")) mustBe routes.AddAnApiCheckYourAnswersController.onPageLoad()
+      }
     }
 
     "in Check mode" - {
-
       "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
-
         case object UnknownPage extends Page
         navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id")) mustBe routes.CheckYourAnswersController.onPageLoad()
       }
@@ -87,6 +101,7 @@ class NavigatorSpec extends SpecBase with TryValues {
         val userAnswers = UserAnswers("id").set(QuestionAddTeamMembersPage, true).success.value
         navigator.nextPage(QuestionAddTeamMembersPage, CheckMode, userAnswers) mustBe routes.AddTeamMemberDetailsController.onPageLoad(NormalMode, 0)
       }
+
       "must go from the Do you need to add another team member? on Confirm Add Team Member page to the Check Your Answers page when the user selects no" in {
         val userAnswers = UserAnswers("id").set(ConfirmAddTeamMemberPage, false).success.value
         navigator.nextPage(ConfirmAddTeamMemberPage, CheckMode, userAnswers) mustBe routes.CheckYourAnswersController.onPageLoad()
@@ -96,6 +111,17 @@ class NavigatorSpec extends SpecBase with TryValues {
         navigator.nextPage(TeamMembersPage, CheckMode, UserAnswers("id")) mustBe routes.ConfirmAddTeamMemberController.onPageLoad(CheckMode)
       }
 
+      "must go from the Add An API Select Application page to the Check Your Answers page" in {
+        navigator.nextPage(AddAnApiSelectApplicationPage, CheckMode, UserAnswers("id")) mustBe routes.AddAnApiCheckYourAnswersController.onPageLoad()
+      }
+
+      "must go from the Add An API Select Endpoints page to the Check Your Answers page" in {
+        navigator.nextPage(AddAnApiSelectEndpointsPage, CheckMode, UserAnswers("id")) mustBe routes.AddAnApiCheckYourAnswersController.onPageLoad()
+      }
+
+      "must go from the Add An API Accept Policy Conditions page to the Check Your Answers page" in {
+        navigator.nextPage(ApiPolicyConditionsDeclarationPage, CheckMode, UserAnswers("id")) mustBe routes.AddAnApiCheckYourAnswersController.onPageLoad()
+      }
     }
   }
 }
