@@ -92,4 +92,5 @@ GET         /apis/add-an-api/change-select-endpoints                           c
 POST        /apis/add-an-api/change-select-endpoints                           controllers.AddAnApiSelectEndpointsController.onSubmit(mode: Mode = CheckMode)
 
 GET         /apis/add-an-api/check-your-answers                                 controllers.AddAnApiCheckYourAnswersController.onPageLoad()
-POST        /apis/add-an-api/check-your-answers                                 controllers.AddAnApiCheckYourAnswersController.onSubmit()
+
+POST        /apis/add-an-api/add-api                                            controllers.AddAnApiCompleteController.addApi()

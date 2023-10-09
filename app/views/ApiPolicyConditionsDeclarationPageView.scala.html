@@ -32,7 +32,7 @@
     <h1 class="govuk-heading-xl">@messages("apiPolicyConditionsDeclarationPage.heading", apiDetail.title)</h1>
 
 
-    @formHelper(action = routes.ApiPolicyConditionsDeclarationPageController.onSubmit(mode), 'autoComplete -> "off") {
+    @formHelper(action = routes.ApiPolicyConditionsDeclarationPageController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
