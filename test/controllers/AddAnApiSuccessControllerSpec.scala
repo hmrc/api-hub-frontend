@@ -19,7 +19,6 @@ package controllers
 import base.SpecBase
 import controllers.actions.FakeUser
 import generators.ApiDetailGenerators
-import models.UserAnswers
 import models.api.ApiDetail
 import models.application.Application
 import navigation.{FakeNavigator, Navigator}
@@ -27,7 +26,6 @@ import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{AddAnApiApiIdPage, AddAnApiSelectApplicationPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._

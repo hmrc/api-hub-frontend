@@ -49,7 +49,7 @@ class AddAnApiCompleteController @Inject()(
         addAnApiRequest => apiHubService.addScopes(addAnApiRequest.applicationId, addAnApiRequest.scopes) flatMap {
           case Some(_) =>
             addAnApiSessionRepository.clear(request.user.userId).map(_ =>
-              Redirect(routes.IndexController.onPageLoad)
+              Redirect(routes.AddAnApiSuccessController.onPageLoad(addAnApiRequest.applicationId, addAnApiRequest.apiId))
             )
           case None => Future.successful(applicationNotFound(addAnApiRequest.applicationId))
         }
@@ -58,11 +58,11 @@ class AddAnApiCompleteController @Inject()(
 
   private def validate(userAnswers: UserAnswers): Either[Call, AddAnApiRequest] = {
     for {
-      _ <- validateApiId(userAnswers)
+      apiId <- validateApiId(userAnswers)
       applicationId <- validateSelectedApplication(userAnswers)
       endpoints <- validateSelectedEndpoints(userAnswers)
       _ <- validatePolicyConditions(userAnswers)
-    } yield AddAnApiRequest(applicationId, endpoints)
+    } yield AddAnApiRequest(applicationId, apiId, endpoints)
   }
 
   private def validateApiId(userAnswers: UserAnswers): Either[Call, String] = {
@@ -104,6 +104,6 @@ class AddAnApiCompleteController @Inject()(
 
 object AddAnApiCompleteController {
 
-  case class AddAnApiRequest(applicationId: String, scopes: Set[String])
+  case class AddAnApiRequest(applicationId: String, apiId: String, scopes: Set[String])
 
 }
