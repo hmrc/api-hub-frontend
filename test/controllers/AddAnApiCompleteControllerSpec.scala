@@ -51,7 +51,8 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation {
     "must place the correct request when a valid set of answers is submitted and redirect to the success page" in {
       val fixture = buildFixture(Some(fullUserAnswers))
 
-      when(fixture.apiHubService.addScopes(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(selectedScopes.flatten))(any()))
+      val expectedScopes = Set("test-scope-1", "test-scope-2", "test-scope-3")
+      when(fixture.apiHubService.addScopes(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(expectedScopes))(any()))
         .thenReturn(Future.successful(Some(())))
 
       when(fixture.addAnApiSessionRepository.clear(any())).thenReturn(Future.successful(true))
