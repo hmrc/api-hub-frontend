@@ -281,3 +281,5 @@ addAnApiSuccess.summary = {0} is now available within your application
 addAnApiSuccess.advice.heading = What you can do next
 addAnApiSuccess.advice.body1 = You can now use the API within your application, with the credentials that are available in the credentials section of your application.
 addAnApiSuccess.advice.body2 = View your application: {0}
+
+addAnApiComplete.failed = You should check this application''s details before trying again as it is possible that this action was partially successful.

@@ -94,13 +94,18 @@ class ErrorResultBuilder @Inject()(
     internalServerError()
   }
 
-  private def internalServerError()(implicit request: Request[_]): Result = {
+  def internalServerError(message: String, t: Throwable)(implicit request: Request[_]): Result = {
+    logger.warn("Internal server error", t)
+    internalServerError(Some(message))
+  }
+
+  private def internalServerError(message: Option[String] = None)(implicit request: Request[_]): Result = {
     InternalServerError(
       logAndBuildErrorTemplate(
         INTERNAL_SERVER_ERROR,
         Messages("global.error.InternalServerError500.title"),
         Messages("global.error.InternalServerError500.heading"),
-        Messages("global.error.InternalServerError500.message")
+        message.getOrElse(Messages("global.error.InternalServerError500.message"))
       )
     )
   }
