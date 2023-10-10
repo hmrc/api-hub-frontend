@@ -24,6 +24,7 @@ import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, Request, Result}
 import repositories.AddAnApiSessionRepository
 import services.ApiHubService
+import uk.gov.hmrc.http.UpstreamErrorResponse
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
@@ -52,6 +53,8 @@ class AddAnApiCompleteController @Inject()(
               Redirect(routes.AddAnApiSuccessController.onPageLoad(addAnApiRequest.applicationId, addAnApiRequest.apiId))
             )
           case None => Future.successful(applicationNotFound(addAnApiRequest.applicationId))
+        } recoverWith {
+          case e: UpstreamErrorResponse if e.statusCode == BAD_GATEWAY => Future.successful(badGateway(e))
         }
       )
   }
@@ -98,6 +101,10 @@ class AddAnApiCompleteController @Inject()(
       heading = Messages("site.applicationNotFoundHeading"),
       message = Messages("site.applicationNotFoundMessage", applicationId)
     )
+  }
+
+  private def badGateway(t: Throwable)(implicit request: Request[_]): Result = {
+    errorResultBuilder.internalServerError(Messages("addAnApiComplete.failed"), t)
   }
 
 }

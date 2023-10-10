@@ -30,6 +30,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AddAnApiSessionRepository
 import services.ApiHubService
+import uk.gov.hmrc.http.UpstreamErrorResponse
 import utils.HtmlValidation
 import views.html.ErrorTemplate
 
@@ -169,6 +170,28 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation {
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.JourneyRecoveryController.onPageLoad().url)
+      }
+    }
+
+    "must return a 500 Internal Server Error with suitable message if the backend returned 502 Bad Gateway" in {
+      val fixture = buildFixture(Some(fullUserAnswers))
+
+      when(fixture.apiHubService.addScopes(any(), any())(any()))
+        .thenReturn(Future.failed(UpstreamErrorResponse.apply("test-message", BAD_GATEWAY)))
+
+      running(fixture.application) {
+        val request = FakeRequest(POST, routes.AddAnApiCompleteController.addApi().url)
+        val result = route(fixture.application, request).value
+        val view = fixture.application.injector.instanceOf[ErrorTemplate]
+
+        status(result) mustBe INTERNAL_SERVER_ERROR
+        contentAsString(result) mustBe view.apply(
+          pageTitle = "Sorry, we are experiencing technical difficulties - 500",
+          heading = "Sorry, we’re experiencing technical difficulties",
+          message = "You should check this application's details before trying again as it is possible that this action was partially successful."
+        )(request, messages(fixture.application))
+          .toString()
+        contentAsString(result) must validateAsHtml
       }
     }
   }
