@@ -1,0 +1,1 @@
+GET         /application/details/:id                                            controllers.application.ApplicationDetailsController.onPageLoad(id: String)

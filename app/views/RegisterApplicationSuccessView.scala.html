@@ -34,7 +34,7 @@
 }
 
 @applicationLinkUrl(application: Application) = @{
-    routes.ApplicationDetailsController.onPageLoad(application.id).url
+    controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url
 }
 
 @layout(pageTitle = titleNoForm(messages("registerApplicationSuccess.title")), user = user, showBackLink = false) {

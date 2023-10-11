@@ -32,9 +32,8 @@ govukPanel: GovukPanel
     </a>
 }
 
-
 @applicationLinkUrl(application: Application) = @{
-    routes.ApplicationDetailsController.onPageLoad(application.id).url
+    controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url
 }
 
 @layout(pageTitle = titleNoForm(messages("addAnApiSuccess.title")), showBackLink = false, user = user) {
