@@ -23,7 +23,7 @@ import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.Redoc
+import views.html.RedocView
 
 import scala.concurrent.ExecutionContext
 
@@ -31,7 +31,7 @@ import scala.concurrent.ExecutionContext
 class OasRedocController @Inject()(
   override val controllerComponents: MessagesControllerComponents,
   apiHubService: ApiHubService,
-  view: Redoc,
+  view: RedocView,
   errorResultBuilder: ErrorResultBuilder,
   optionallyIdentified: OptionalIdentifierAction
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
