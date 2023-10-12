@@ -18,8 +18,9 @@ package viewmodels.checkAnswers
 
 import controllers.actions.FakeUser
 import controllers.routes
-import models.{CheckMode, UserAnswers}
+import models.api.ApiDetailLensesSpec.sampleOas
 import models.api.{ApiDetail, Endpoint, EndpointMethod}
+import models.{CheckMode, UserAnswers}
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -27,7 +28,7 @@ import pages.AddAnApiSelectEndpointsPage
 import play.api.i18n.Messages
 import play.api.libs.json.Json
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, Actions, Key, SummaryListRow, Value}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist._
 
 import java.time.Instant
 
@@ -55,7 +56,8 @@ class AddAnApiSelectEndpointsSummarySpec extends AnyFreeSpec with Matchers with 
         )
       )
     ),
-    None
+    None,
+    sampleOas
   )
 
   "row" - {

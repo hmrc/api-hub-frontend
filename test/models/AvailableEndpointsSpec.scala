@@ -16,6 +16,7 @@
 
 package models
 
+import models.api.ApiDetailLensesSpec.sampleOas
 import models.api.{ApiDetail, Endpoint, EndpointMethod}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -29,7 +30,8 @@ class AvailableEndpointsSpec extends AnyFreeSpec with Matchers with TableDrivenP
     description = "test-description",
     version = "test-version",
     endpoints = Seq.empty,
-    shortDescription = None
+    shortDescription = None,
+    openApiSpecification = sampleOas
   )
 
   "apply" - {
