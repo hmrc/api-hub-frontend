@@ -31,7 +31,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.ApiHubService
 import utils.HtmlValidation
-import views.html.{ErrorTemplate, Redoc}
+import views.html.{ErrorTemplate, RedocView}
 
 import scala.concurrent.Future
 
@@ -48,7 +48,7 @@ class OasControllerSpec
       val fixture = buildFixture()
 
       running(fixture.application) {
-        val view = fixture.application.injector.instanceOf[Redoc]
+        val view = fixture.application.injector.instanceOf[RedocView]
 
         val apiDetail = ApiDetail("apiId", "an api", "a description", "1.0.0", Seq.empty, None, sampleOas)
         when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any())).thenReturn(Future.successful(Some(apiDetail)))
@@ -68,7 +68,7 @@ class OasControllerSpec
       val fixture = buildFixture(userModel = Some(FakeUser))
 
       running(fixture.application) {
-        val view = fixture.application.injector.instanceOf[Redoc]
+        val view = fixture.application.injector.instanceOf[RedocView]
 
         val apiDetail = ApiDetail("apiId", "an api", "a description", "1.0.0", Seq.empty, None, sampleOas)
         when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
