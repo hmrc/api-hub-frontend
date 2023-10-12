@@ -32,17 +32,6 @@ object ApplicationPages {
   case object LeaveApplicationPage extends ApplicationPage
   case object DeleteApplicationPage extends ApplicationPage
 
-  def values(): Seq[ApplicationPage] =
-    Seq(
-      DetailsPage,
-      ApisPage,
-      EnvironmentsAndCredentialsPage,
-      ManageTeamMembersPage,
-      EditApplicationNamePage,
-      LeaveApplicationPage,
-      DeleteApplicationPage
-    )
-
 }
 
 case class ApplicationNavItem(page: ApplicationPage, title: String, link: Call, isCurrentPage: Boolean)
