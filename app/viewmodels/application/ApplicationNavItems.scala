@@ -23,6 +23,7 @@ import play.api.mvc.Call
 sealed trait ApplicationPage
 
 object ApplicationPages {
+
   case object DetailsPage extends ApplicationPage
   case object ApisPage extends ApplicationPage
   case object EnvironmentsAndCredentialsPage extends ApplicationPage
@@ -30,9 +31,21 @@ object ApplicationPages {
   case object EditApplicationNamePage extends ApplicationPage
   case object LeaveApplicationPage extends ApplicationPage
   case object DeleteApplicationPage extends ApplicationPage
+
+  def values(): Seq[ApplicationPage] =
+    Seq(
+      DetailsPage,
+      ApisPage,
+      EnvironmentsAndCredentialsPage,
+      ManageTeamMembersPage,
+      EditApplicationNamePage,
+      LeaveApplicationPage,
+      DeleteApplicationPage
+    )
+
 }
 
-case class ApplicationNavItem(title: String, link: Call, isCurrentPage: Boolean)
+case class ApplicationNavItem(page: ApplicationPage, title: String, link: Call, isCurrentPage: Boolean)
 
 object ApplicationNavItems {
 
@@ -41,37 +54,44 @@ object ApplicationNavItems {
   def apply(application: Application, currentPage: ApplicationPage)(implicit messages: Messages): Seq[ApplicationNavItem] = {
     Seq(
       ApplicationNavItem(
-        title = messages("Application details"),
+        page = DetailsPage,
+        title = messages("applicationNav.page.applicationDetails"),
         link = controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id),
         isCurrentPage = currentPage == DetailsPage
       ),
       ApplicationNavItem(
-        title = messages("Application APIs"),
+        page = ApisPage,
+        title = messages("applicationNav.page.applicationApis"),
         link = controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id),
         isCurrentPage = currentPage == ApisPage
       ),
       ApplicationNavItem(
-        title = messages("Environments and credentials"),
+        page = EnvironmentsAndCredentialsPage,
+        title = messages("applicationNav.page.environmentsAndCredentials"),
         link = controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id),
         isCurrentPage = currentPage == EnvironmentsAndCredentialsPage
       ),
       ApplicationNavItem(
-        title = messages("Manage team members"),
+        page = ManageTeamMembersPage,
+        title = messages("applicationNav.page.manageTeamMembers"),
         link = controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id),
         isCurrentPage = currentPage == ManageTeamMembersPage
       ),
       ApplicationNavItem(
-        title = messages("Edit application name"),
+        page = EditApplicationNamePage,
+        title = messages("applicationNav.page.editApplicationName"),
         link = controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id),
         isCurrentPage = currentPage == EditApplicationNamePage
       ),
       ApplicationNavItem(
-        title = messages("Leave application"),
+        page = LeaveApplicationPage,
+        title = messages("applicationNav.page.leaveApplication"),
         link = controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id),
         isCurrentPage = currentPage == LeaveApplicationPage
       ),
       ApplicationNavItem(
-        title = messages("Delete application"),
+        page = DeleteApplicationPage,
+        title = messages("applicationNav.page.deleteApplication"),
         link = controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id),
         isCurrentPage = currentPage == DeleteApplicationPage
       )
