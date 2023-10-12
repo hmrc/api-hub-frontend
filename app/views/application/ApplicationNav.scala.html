@@ -18,26 +18,34 @@
 @import viewmodels.application.{ApplicationPage, ApplicationNavItems}
 @import views.html.helper.CSPNonce
 
-@(application: Application, currentPage: ApplicationPage)(implicit request: Request[_], messages: Messages)
+@(application: Application, currentPage: ApplicationPage)(contentBlock: Html)(implicit request: Request[_], messages: Messages)
 
-<div id="navContent" class="govuk-grid-column-one-quarter sidebar">
-    <div class="theiaStickySidebar">
-        <div class="side-nav">
-            <span class="govuk-heading-s govuk-!-margin-bottom-1 govuk-!-margin-top-2">
-                @application.name
-            </span>
+<div class="govuk-grid-row">
+    <div id="navContent" class="govuk-grid-column-one-quarter sidebar">
+        <div class="theiaStickySidebar">
+            <div class="side-nav">
+                <span class="govuk-heading-s govuk-!-margin-bottom-1 govuk-!-margin-top-2">
+                    @application.name
+                </span>
 
-            <ul class="side-nav__component">
-                @for(navItem <- ApplicationNavItems(application, currentPage)) {
+                <ul class="side-nav__component">
+                    @for(navItem <- ApplicationNavItems(application, currentPage)) {
                     <li class="side-nav__list  @if(navItem.isCurrentPage){side-nav__list--selected}">
-                        <a id="nav-manage-details" class="side-nav__link" href="@navItem.link.url">
+                        <a class="side-nav__link" href="@navItem.link.url">
                             @navItem.title
                         </a>
                     </li>
-                }
-            </ul>
+                    }
+                </ul>
 
-            <br>
+                <br>
+            </div>
+        </div>
+    </div>
+
+    <div class="govuk-grid-column-two-thirds content">
+        <div class="theiaStickySidebar">
+            @contentBlock
         </div>
     </div>
 </div>

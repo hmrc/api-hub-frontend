@@ -41,51 +41,48 @@
 
 @layout(pageTitle = titleNoForm(messages("applicationDetails.title")), user = user, fullWidth = true) {
 
-    <div class="govuk-grid-row">
-        @views.html.application.ApplicationNav(application, ApplicationPages.DetailsPage)
-        <div class="govuk-grid-column-two-thirds content">
-            <div class="theiaStickySidebar">
-                <h1 class="govuk-heading-l">@messages("applicationDetails.heading")</h1>
+    @views.html.application.ApplicationNav(application, ApplicationPages.DetailsPage) {
 
-                @applicationDetail("Application", application.name)
-                @applicationDetail("Created", ViewUtils.formatDate(application.created))
-                @applicationDetail("Application ID", application.id)
+        <h1 class="govuk-heading-l">@messages("applicationDetails.heading")</h1>
 
-                <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+        @applicationDetail("Application", application.name)
+        @applicationDetail("Created", ViewUtils.formatDate(application.created))
+        @applicationDetail("Application ID", application.id)
 
-                <div class="govuk-grid-row govuk-!-margin-bottom-0">
-                    <div class="govuk-grid-column-one-half">
-                        <h2 class="govuk-heading-m govuk-!-margin-bottom-4 govuk-!-margin-top-2">
-                            Application API's
-                        </h2>
-                    </div>
-                </div>
+        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
 
-                <p class="govuk-body">
-                    You have no API's added, <a href="@{routes.HipApisController.onPageLoad().url}" class="govuk-link govuk-link--no-visited-state">add API's</a> to your application.
-                </p>
-
-                <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-top-5">
-
-                <div class="govuk-grid-row">
-                    <div class="govuk-grid-column-one-half">
-                        <h2 class="govuk-heading-m govuk-!-margin-top-2">
-                            Team members (@{application.teamMembers.size})
-                        </h2>
-                    </div>
-                </div>
-
-                @govukTable(
-                    Table(
-                        caption = None,
-                        head = Some(Seq(HeadCell(messages("Email address")))),
-                        rows = application.teamMembers.map(
-                            teamMember =>
-                                Seq(TableRow(content = teamMember.email))
-                        )
-                    )
-                )
+        <div class="govuk-grid-row govuk-!-margin-bottom-0">
+            <div class="govuk-grid-column-one-half">
+                <h2 class="govuk-heading-m govuk-!-margin-bottom-4 govuk-!-margin-top-2">
+                    Application API's
+                </h2>
             </div>
         </div>
-    </div>
+
+        <p class="govuk-body">
+            You have no API's added, <a href="@{routes.HipApisController.onPageLoad().url}" class="govuk-link govuk-link--no-visited-state">add API's</a> to your application.
+        </p>
+
+        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-top-5">
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-one-half">
+                <h2 class="govuk-heading-m govuk-!-margin-top-2">
+                    Team members (@{application.teamMembers.size})
+                </h2>
+            </div>
+        </div>
+
+        @govukTable(
+            Table(
+                caption = None,
+                head = Some(Seq(HeadCell(messages("Email address")))),
+                rows = application.teamMembers.map(
+                    teamMember =>
+                        Seq(TableRow(content = teamMember.email))
+                )
+            )
+        )
+    }
+
 }
