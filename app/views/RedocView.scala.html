@@ -25,15 +25,13 @@ layout: templates.Layout
 
 @(apiDetail: ApiDetail, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
-@scripts() = {
-    <style>
-        .govuk-width-container {
-            max-width: none;
-        }
-    </style>
+@styles() = {
+    .govuk-width-container {
+        max-width: none;
+    }
 }
 
-@layout(pageTitle = titleNoForm(messages("apiDetails.title")), user = user, fullWidth = true, customScriptsBlock = Some(scripts())) {
+@layout(pageTitle = titleNoForm(messages("apiDetails.title")), user = user, showBackLink = false, fullWidth = true, customStyles = Some(styles())) {
     <div id="redoc"></div>
 
     <script src='@controllers.routes.Assets.versioned("javascripts/redoc/redoc.standalone.js")' charset="UTF-8" @{CSPNonce.attr}> </script>
@@ -42,7 +40,7 @@ layout: templates.Layout
     To fix this issue:
     https://github.com/Redocly/redoc/issues/1108#issuecomment-585990742
     *@
-    <script defer="false" @{CSPNonce.attr}>
+    <script @{CSPNonce.attr}>
         var options = {
           hideHostname: true,
           theme: {

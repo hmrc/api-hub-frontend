@@ -58,9 +58,7 @@ class OasControllerSpec
 
         status(result) mustBe OK
         contentAsString(result) mustBe view(apiDetail, None)(request, messages(fixture.application)).toString()
-        // Does not validate.
-        // contentAsString(result) must validateAsHtml
-
+        contentAsString(result) must validateAsHtml
       }
     }
 
