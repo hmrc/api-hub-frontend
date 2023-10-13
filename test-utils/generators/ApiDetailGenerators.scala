@@ -51,7 +51,8 @@ trait ApiDetailGenerators {
         version <- Gen.alphaNumStr
         endpoints <- Gen.nonEmptyListOf(arbitraryEndpoint.arbitrary)
         shortDescription <- Gen.alphaNumStr
-      } yield ApiDetail(id.toString, title,description, version, endpoints, Some(shortDescription))
+        openApiSpecification <- Gen.alphaNumStr
+      } yield ApiDetail(id.toString, title,description, version, endpoints, Some(shortDescription), openApiSpecification)
     }
 
   implicit val arbitraryApiDetails: Arbitrary[Seq[ApiDetail]] =
@@ -66,5 +67,87 @@ trait ApiDetailGenerators {
 
   def sampleApis() : IntegrationResponse =
     IntegrationResponse(1, None, arbitraryApiDetails.arbitrary.pureApply(parameters, Seed.random()))
+
+  def sampleOas: String =
+    """openapi: 3.0.3
+      |info:
+      |  title: Swagger Sample - OpenAPI 3.0
+      |  description: |-
+      |    This is a sample
+      |  version: 1.0.0
+      |tags:
+      |  - name: thing
+      |    description: put thing
+      |paths:
+      |  /thing:
+      |    put:
+      |      tags:
+      |        - thing
+      |      summary: Update a thing
+      |      description: Update an existing pet by Id
+      |      operationId: updatePet
+      |      requestBody:
+      |        description: Update a thing
+      |        content:
+      |          application/json:
+      |            schema:
+      |              $ref: '#/components/schemas/Thing'
+      |          application/xml:
+      |            schema:
+      |              $ref: '#/components/schemas/Thing'
+      |          application/x-www-form-urlencoded:
+      |            schema:
+      |              $ref: '#/components/schemas/Thing'
+      |        required: true
+      |      responses:
+      |        '200':
+      |          description: Successful operation
+      |          content:
+      |            application/json:
+      |              schema:
+      |                $ref: '#/components/schemas/Thing'
+      |            application/xml:
+      |              schema:
+      |                $ref: '#/components/schemas/Thing'
+      |        '400':
+      |          description: Invalid ID supplied
+      |        '404':
+      |          description: Pet not found
+      |        '405':
+      |          description: Validation exception
+      |      security:
+      |        - petstore_auth:
+      |            - write:pets
+      |            - read:pets
+      |
+      |components:
+      |  schemas:
+      |    Thing:
+      |      properties:
+      |        id:
+      |          type: integer
+      |          example: 10
+      |      xml:
+      |        name: thing
+      |  requestBodies:
+      |    Thing:
+      |      description: Thing that needs to be added
+      |      content:
+      |        application/json:
+      |          schema:
+      |            $ref: '#/components/schemas/Thing'
+      |        application/xml:
+      |          schema:
+      |            $ref: '#/components/schemas/Thing'
+      |  securitySchemes:
+      |    petstore_auth:
+      |      type: oauth2
+      |      flows:
+      |        implicit:
+      |          authorizationUrl: https://petstore3.swagger.io/oauth/authorize
+      |          scopes:
+      |            write:pets: modify pets in your account
+      |            read:pets: read your pets
+      |""".stripMargin
 
 }

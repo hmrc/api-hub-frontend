@@ -97,3 +97,7 @@ GET         /apis/add-an-api/success/:applicationId/:apiId                      
 GET         /apis/add-an-api/check-your-answers                                 controllers.AddAnApiCheckYourAnswersController.onPageLoad()
 
 POST        /apis/add-an-api/add-api                                            controllers.AddAnApiCompleteController.addApi()
+
+GET         /apis/view-specification/:apiId                                     controllers.OasRedocController.onPageLoad(apiId: String)
+GET         /apis/oas/:apiId                                                    controllers.OasRedocController.getOas(apiId: String)
+

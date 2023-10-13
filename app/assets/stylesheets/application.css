@@ -199,3 +199,27 @@
     padding: 30px 30px 10px 30px;
     background-color: #f3f2f1;
 }
+
+.side-nav {
+    border-right: none;
+    display: block;
+    overflow: hidden;
+}
+
+.side-nav__link {
+    color: #1d70b8;
+    font-family: "GDS Transport", Arial, sans-serif;
+    display: block;
+    position: relative;
+    border-radius: 0;
+    margin-bottom: 5px;
+    text-decoration: none;
+}
+
+.side-nav__component {
+    border: none;
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+

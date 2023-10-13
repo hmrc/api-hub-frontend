@@ -39,7 +39,7 @@
     hmrcInternalHead: HmrcInternalHead
 )
 
-@(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = false, showSignOut: Boolean = true, user: Option[UserModel] = None, fullWidth: Boolean = false,   customScriptsBlock: Option[Html] = None)(contentBlock: Html)(implicit request: Request[_], messages: Messages)
+@(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = false, showSignOut: Boolean = true, user: Option[UserModel] = None, fullWidth: Boolean = false,   customScriptsBlock: Option[Html] = None, customStyles: Option[Html] = None)(contentBlock: Html)(implicit request: Request[_], messages: Messages)
 
 @head = {
 
@@ -59,6 +59,12 @@
     )
 
     <link href='@routes.Assets.versioned("stylesheets/application.css")' media="all" rel="stylesheet" type="text/css"@CSPNonce.get.map {n=> nonce="@n"} />
+
+    @if(customStyles.isDefined) {
+        <style>
+            @customStyles.get
+        </style>
+    }
 }
 
 @additionalScripts = {
