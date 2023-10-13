@@ -38,7 +38,7 @@ class HipApisController @Inject()(
   def onPageLoad(): Action[AnyContent] = optionallyIdentified.async {
     implicit request =>
       apiHubService.getAllHipApis().map {
-        case apiDetails: Seq[ApiDetail] => Ok(view(request.user, apiDetails))
+        case apiDetails: Seq[ApiDetail] => Ok(view(request.user, apiDetails.sortWith( _.title < _.title)))
         case _ => InternalServerError
       }
   }
