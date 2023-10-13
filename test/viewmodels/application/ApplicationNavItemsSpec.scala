@@ -50,7 +50,7 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TableDrivenPro
           ApplicationNavItem(
             EnvironmentsAndCredentialsPage,
             "Environments and credentials",
-            controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id),
+            controllers.application.routes.EnvironmentAndCredentialsController.onPageLoad(FakeApplication.id),
             isCurrentPage = false
           ),
           ApplicationNavItem(

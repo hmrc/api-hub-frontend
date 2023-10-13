@@ -123,6 +123,15 @@ applicationApis.apis.heading = Application API''s
 applicationApis.apis.hipApis = add API''s
 applicationApis.apis.noApis = You have no API''s added, {0} to your application.
 
+environmentAndCredentials.title = Environments and Credentials
+environmentAndCredentials.heading = Environments and credentials
+environmentAndCredentials.development.label = HIP Development
+environmentAndCredentials.development.heading = Development environment
+environmentAndCredentials.production.label = HIP Production
+environmentAndCredentials.production.heading = Production environment
+environmentAndCredentials.clientId = Client ID
+environmentAndCredentials.clientSecret = Client Secret
+
 applicationNav.page.applicationDetails = Application details
 applicationNav.page.applicationApis = Application APIs
 applicationNav.page.environmentsAndCredentials = Environments and credentials

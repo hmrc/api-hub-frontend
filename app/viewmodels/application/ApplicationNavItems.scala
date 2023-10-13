@@ -57,7 +57,7 @@ object ApplicationNavItems {
       ApplicationNavItem(
         page = EnvironmentsAndCredentialsPage,
         title = messages("applicationNav.page.environmentsAndCredentials"),
-        link = controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id),
+        link = controllers.application.routes.EnvironmentAndCredentialsController.onPageLoad(application.id),
         isCurrentPage = currentPage == EnvironmentsAndCredentialsPage
       ),
       ApplicationNavItem(
