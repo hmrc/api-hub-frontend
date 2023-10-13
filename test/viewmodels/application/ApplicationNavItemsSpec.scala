@@ -44,7 +44,7 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TableDrivenPro
           ApplicationNavItem(
             ApisPage,
             "Application APIs",
-            controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id),
+            controllers.application.routes.ApplicationApisController.onPageLoad(FakeApplication.id),
             isCurrentPage = false
           ),
           ApplicationNavItem(

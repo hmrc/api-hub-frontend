@@ -117,6 +117,12 @@ applicationDetails.generateSecret = Generate secret
 applicationDetails.deleteApplication = Delete application
 applicationDetails.thereWereIssues = There were issues fetching elements of this application
 
+applicationApis.title = Application APIs
+applicationApis.heading = Manage application API''s
+applicationApis.apis.heading = Application API''s
+applicationApis.apis.hipApis = add API''s
+applicationApis.apis.noApis = You have no API''s added, {0} to your application.
+
 applicationNav.page.applicationDetails = Application details
 applicationNav.page.applicationApis = Application APIs
 applicationNav.page.environmentsAndCredentials = Environments and credentials

@@ -1,1 +1,2 @@
 GET         /details/:id                                                controllers.application.ApplicationDetailsController.onPageLoad(id: String)
+GET         /apis/:id                                                   controllers.application.ApplicationApisController.onPageLoad(id: String)
