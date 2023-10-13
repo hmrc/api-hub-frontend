@@ -1,6 +1,7 @@
 # microservice specific routes
 
 ->          /hmrc-frontend                                                     hmrcfrontend.Routes
+->          /application                                                       application.Routes
 
 GET         /                                                                  controllers.IndexController.onPageLoad
 GET         /application/register/start                                        controllers.IndexController.createApplication

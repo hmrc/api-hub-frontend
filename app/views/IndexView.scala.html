@@ -28,7 +28,7 @@
 @(applications: Seq[Application], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
 @appDetailsLink(app:Application) = {
-    <a href="@routes.ApplicationDetailsController.onPageLoad(app.id).url">
+    <a href="@controllers.application.routes.ApplicationDetailsController.onPageLoad(app.id).url">
         @app.name
     </a>
 
@@ -91,7 +91,7 @@
                    @applications.map( application =>
                        <div class="hip-inner-card flex">
                            <h5 class="govuk-heading-s align-left hip-inner-card-title">
-                               <a class="govuk-link govuk-link--no-visited-state" href={routes.ApplicationDetailsController.onPageLoad(application.id).url}>{application.name}</a>
+                               <a class="govuk-link govuk-link--no-visited-state" href={controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url}>{application.name}</a>
                            </h5>
                            <p class="govuk-body align-left">Team members: {application.teamMembers.length}</p>
                            <p class="govuk-body align-left">Registered: {ViewUtils.formatDate(application.created)}</p>
