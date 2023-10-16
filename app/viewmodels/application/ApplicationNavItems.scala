@@ -51,7 +51,7 @@ object ApplicationNavItems {
       ApplicationNavItem(
         page = ApisPage,
         title = messages("applicationNav.page.applicationApis"),
-        link = controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id),
+        link = controllers.application.routes.ApplicationApisController.onPageLoad(application.id),
         isCurrentPage = currentPage == ApisPage
       ),
       ApplicationNavItem(
