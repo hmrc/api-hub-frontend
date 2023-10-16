@@ -50,7 +50,7 @@ class HipApisControllerSpec
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[HipApisView]
 
-        forAll {(apiDetail: ApiDetail) =>
+        forAll { (apiDetail: ApiDetail) =>
           when(fixture.apiHubService.getAllHipApis()(any()))
             .thenReturn(Future.successful(Seq(apiDetail)))
 
@@ -70,7 +70,7 @@ class HipApisControllerSpec
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[HipApisView]
 
-        forAll {(apiDetail: ApiDetail) =>
+        forAll { (apiDetail: ApiDetail) =>
           when(fixture.apiHubService.getAllHipApis()(any()))
             .thenReturn(Future.successful(Seq(apiDetail)))
 
@@ -83,7 +83,30 @@ class HipApisControllerSpec
         }
       }
     }
-  }
+
+    "must return the apis in case-insensitive alphabetical order" in {
+      val fixture = buildFixture()
+
+      running(fixture.application) {
+        val view = fixture.application.injector.instanceOf[HipApisView]
+
+        val zebras = ApiDetail("id1", "zebras", "zebras api", "1.0.0", Seq.empty, None, "oas")
+        val molluscs = ApiDetail("id2", "MOLLUSCS", "molluscs api", "1.0.0", Seq.empty, None, "oas")
+        val aardvarks = ApiDetail("id3", "aardvarks", "aardvarks api", "1.0.0", Seq.empty, None, "oas")
+        val pigeons = ApiDetail("id4", "PIGEONS", "pigeons api", "1.0.0", Seq.empty, None, "oas")
+
+        when(fixture.apiHubService.getAllHipApis()(any()))
+          .thenReturn(Future.successful(Seq(molluscs, zebras, aardvarks, pigeons)))
+
+        val request = FakeRequest(GET, routes.HipApisController.onPageLoad().url)
+        val result = route(fixture.application, request).value
+
+        status(result) mustBe OK
+        contentAsString(result) mustBe view(None, Seq(aardvarks, molluscs, pigeons, zebras))(request, messages(fixture.application)).toString()
+        contentAsString(result) must validateAsHtml
+      }
+    }
+ }
 
   private case class Fixture(apiHubService: ApiHubService, application: Application)
 
