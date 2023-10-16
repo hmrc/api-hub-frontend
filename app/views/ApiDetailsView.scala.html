@@ -16,6 +16,7 @@
 
 @import models.api._
 @import models.user.UserModel
+@import views.html.helper.CSPNonce
 
 @this(
         layout: templates.Layout,
@@ -24,31 +25,86 @@
 
 @(apiDetail: ApiDetail, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
+@endpointName(endpoint: Endpoint) = @{
+    endpoint.path.replace("/", "-")
+}
+
 @layout(pageTitle = titleNoForm(messages("apiDetails.title")), user = user) {
 
     <div class="govuk-grid-row">
-        <div id="navContent" class="govuk-grid-column-one-quarter" style="height: 4954px;">
-            <nav class="side-nav">
-                <ul class="side-nav__component">
-                    <li class="side-nav__list">
-                        <a href="@routes.OasRedocController.onPageLoad(apiDetail.id).url" target="_blank" class="side-nav__link">
-                            Redoc API view (opens in new tab)</a>
-                    </li>
+        <div id="navContent" class="govuk-grid-column-one-quarter sidebar">
+            <div class="theiaStickySidebar">
+                <div class="side-nav">
+                    <ul class="side-nav__component">
+                        <li class="side-nav__list">
+                            <a class="side-nav__link" href="#details">
+                                Details
+                            </a>
+                        </li>
 
-                </ul>
-            </nav>
+                        <li>
+                            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+                        </li>
+
+                        <li class="side-nav__list">
+                            <span class="side-nav__title">End points</span>
+                            @for(endpoint <- apiDetail.endpoints) {
+                                <a href="#@{endpointName(endpoint)}" class="side-nav__link">@{endpointName(endpoint)}</a>
+                            }
+                        </li>
+
+                        <li>
+                            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+                        </li>
+
+                        <li class="side-nav__list">
+                            <a href="@routes.OasRedocController.onPageLoad(apiDetail.id).url" target="_blank" class="side-nav__link">
+                                Redoc API view (opens in new tab)
+                            </a>
+                        </li>
+                    </ul>
+
+                    <br>
+                </div>
+            </div>
         </div>
-        <div id="subContent" class="govuk-grid-column-three-quarters" style="height: 4954px;">
-            <h1 class="govuk-heading-l">@messages("apiDetails.apiName"): @apiDetail.title</h1>
-            @if(user.isDefined) {
-                @govukButton(
-                    Button(
-                        href = Some(routes.AddAnApiStartController.onPageLoad(apiDetail.id).url),
-                        content = Text(messages("apiDetails.addToAnApplication"))
+
+        <div class="govuk-grid-column-two-thirds content">
+            <div class="theiaStickySidebar">
+
+                <h1 id="details" class="govuk-heading-l">@messages("apiDetails.apiName"): @apiDetail.title</h1>
+
+                <h2 class="govuk-heading-m">
+                    API Overview
+                </h2>
+
+                <p class="govuk-body">
+                    @apiDetail.shortDescription
+                </p>
+
+                @if(user.isDefined) {
+                    @govukButton(
+                        Button(
+                            href = Some(routes.AddAnApiStartController.onPageLoad(apiDetail.id).url),
+                            content = Text(messages("apiDetails.addToAnApplication"))
+                        )
                     )
-                )
-            }
+                }
+
+            </div>
         </div>
     </div>
+
+    <script src='@controllers.routes.Assets.versioned("javascripts/jquery-1.11.3.js")' @CSPNonce.attr></script>
+    <script src='@controllers.routes.Assets.versioned("javascripts/theia-sticky-sidebar.min.js")' @CSPNonce.attr></script>
+
+    <script type="text/javascript" @CSPNonce.attr>
+      jQuery(document).ready(function() {
+        jQuery('.content, .sidebar').theiaStickySidebar({
+          // Settings
+          additionalMarginTop: 30
+        });
+      });
+    </script>
 
 }
