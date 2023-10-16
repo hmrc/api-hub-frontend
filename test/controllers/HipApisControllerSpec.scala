@@ -84,16 +84,16 @@ class HipApisControllerSpec
       }
     }
 
-    "must return the apis in alphabetical order" in {
+    "must return the apis in case-insensitive alphabetical order" in {
       val fixture = buildFixture()
 
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[HipApisView]
 
         val zebras = ApiDetail("id1", "zebras", "zebras api", "1.0.0", Seq.empty, None, "oas")
-        val molluscs = ApiDetail("id2", "molluscs", "molluscs api", "1.0.0", Seq.empty, None, "oas")
+        val molluscs = ApiDetail("id2", "MOLLUSCS", "molluscs api", "1.0.0", Seq.empty, None, "oas")
         val aardvarks = ApiDetail("id3", "aardvarks", "aardvarks api", "1.0.0", Seq.empty, None, "oas")
-        val pigeons = ApiDetail("id4", "pigeons", "pigeons api", "1.0.0", Seq.empty, None, "oas")
+        val pigeons = ApiDetail("id4", "PIGEONS", "pigeons api", "1.0.0", Seq.empty, None, "oas")
 
         when(fixture.apiHubService.getAllHipApis()(any()))
           .thenReturn(Future.successful(Seq(molluscs, zebras, aardvarks, pigeons)))
