@@ -233,6 +233,18 @@
   line-height: 1.25;
   color: #1d70b8;
 }
+.side-nav__title {
+  padding: 12px 30px 8px 15px;
+  text-decoration: none;
+  display: block;
+  background-color: transparent;
+  font-family: "GDS Transport", arial, sans-serif;
+  font-weight: 400;
+  text-transform: none;
+  font-size: 16px;
+  line-height: 1.25;
+  color: #000;
+}
 .side-nav__list--selected .side-nav__link, .side-nav__list--selected:hover .side-nav__link {
   color: #fff;
   background-color: #005ea5;
