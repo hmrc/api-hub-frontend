@@ -19,6 +19,7 @@ package controllers.application
 import base.SpecBase
 import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
 import controllers.routes
+import models.application.TeamMember
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
@@ -53,6 +54,44 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
             contentAsString(result) mustBe view(FakeApplication, Some(user))(request, messages(fixture.playApplication)).toString
             contentAsString(result) must validateAsHtml
           }
+      }
+    }
+
+    "must sort the application's team members alphabetically" in {
+      val application = FakeApplication.copy(
+        teamMembers = Seq(
+          TeamMember(email = FakeUser.email.value),
+          TeamMember(email = "cc@hmrc.gov.uk"),
+          TeamMember(email = "ab@hmrc.gov.uk"),
+          TeamMember(email = "aa@hmrc.gov.uk"),
+          TeamMember(email = "Zb@hmrc.gov.uk"),
+          TeamMember(email = "za@hmrc.gov.uk")
+        )
+      )
+
+      val expected = FakeApplication.copy(
+        teamMembers = Seq(
+          TeamMember(email = "aa@hmrc.gov.uk"),
+          TeamMember(email = "ab@hmrc.gov.uk"),
+          TeamMember(email = "cc@hmrc.gov.uk"),
+          TeamMember(email = FakeUser.email.value),
+          TeamMember(email = "za@hmrc.gov.uk"),
+          TeamMember(email = "Zb@hmrc.gov.uk")
+        )
+      )
+
+      val fixture = buildFixture()
+
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any())(any()))
+        .thenReturn(Future.successful(Some(application)))
+
+      running(fixture.playApplication) {
+        val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url)
+        val result = route(fixture.playApplication, request).value
+        val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
+
+        status(result) mustBe OK
+        contentAsString(result) mustBe view(expected, Some(FakeUser))(request, messages(fixture.playApplication)).toString
       }
     }
 
