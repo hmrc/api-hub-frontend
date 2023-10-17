@@ -34,7 +34,10 @@ class ApplicationDetailsController @Inject()(
 
   def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id, enrich = true)) {
     implicit request =>
-      Ok(view(request.application, Some(request.identifierRequest.user)))
+      val sorted = request.application.copy(
+        teamMembers = request.application.teamMembers.sortWith(_.email.toUpperCase() < _.email.toUpperCase())
+      )
+      Ok(view(sorted, Some(request.identifierRequest.user)))
   }
 
 }
