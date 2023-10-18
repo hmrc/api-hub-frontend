@@ -26,7 +26,7 @@
 @(apiDetail: ApiDetail, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
 @endpointName(endpoint: Endpoint) = @{
-    endpoint.path.replace("/", "-") match {
+    endpoint.path.replaceAll("""[^a-zA-Z0-9\-_:.]""", "-") match {
         case s"-$rest" => rest
         case default => default
     }
@@ -56,7 +56,7 @@
                         <li class="side-nav__list">
                             <span class="side-nav__title">Endpoints</span>
                             @for(endpoint <- apiDetail.endpoints) {
-                                <a href="#@{endpointName(endpoint)}" class="side-nav__link">@{endpointName(endpoint)}</a>
+                                <a href="#@{endpointName(endpoint)}" class="side-nav__link">@{endpoint.path}</a>
                             }
                         </li>
 
@@ -158,12 +158,20 @@
     <script src='@controllers.routes.Assets.versioned("javascripts/theia-sticky-sidebar.min.js")' @CSPNonce.attr></script>
 
     <script type="text/javascript" @CSPNonce.attr>
-      jQuery(document).ready(function() {
-        jQuery('.content, .sidebar').theiaStickySidebar({
-          // Settings
-          additionalMarginTop: 30
+        $(document).ready(function() {
+            $('.content, .sidebar').theiaStickySidebar({
+                // Settings
+                additionalMarginTop: 30
+            });
         });
-      });
+
+        $(document).on('click', 'a[href^="#"]', function (event) {
+            event.preventDefault();
+
+            $('html, body').animate({
+                scrollTop: $($.attr(this, 'href')).offset().top
+            }, 500);
+        });
     </script>
 
 }
