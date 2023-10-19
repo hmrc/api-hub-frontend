@@ -66,7 +66,7 @@ trait ApiDetailGenerators {
       Gen.nonEmptyListOf(arbitraryApiDetail.arbitrary)
     }
 
-  private val parameters = Gen.Parameters.default //.withSize(maxListSize)
+  private val parameters = Gen.Parameters.default
 
   def sampleApiDetail(): ApiDetail =
     genApiDetail.pureApply(parameters, Seed.random())
