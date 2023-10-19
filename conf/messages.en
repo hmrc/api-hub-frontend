@@ -257,6 +257,17 @@ testConnectivity.title = Test Connectivity
 apiDetails.title = API Details
 apiDetails.apiName = API Name
 apiDetails.addToAnApplication = Add to an application
+apiDetails.leftNav.details = Details
+apiDetails.leftNav.endpoints = Endpoints
+apiDetails.leftNav.viewApiSpec = Interactive API view
+apiDetails.details.overview = API Overview
+apiDetails.details.version = Version
+apiDetails.viewApiSpec.information = View API specification
+apiDetails.viewApiSpec.message = To view the API specification use the {0}.
+apiDetails.viewApiSpec.link = Interactive API spec viewer
+apiDetails.endpoints.heading = Endpoints
+apiDetails.endpoints.summary = Summary
+apiDetails.endpoints.description = Description
 
 hipApis.title = HIP APIs
 hipApis.search.heading = Search for an API

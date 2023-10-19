@@ -36,6 +36,12 @@
     <link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css' media="all" rel="stylesheet" type="text/css" @{CSPNonce.attr}/>
 }
 
+@viewApiSpecLink() = {
+    <a href="@routes.OasRedocController.onPageLoad(apiDetail.id).url" target="_blank" class="govuk-link govuk-link--no-visited-state">
+        @messages("apiDetails.viewApiSpec.link")
+    </a>
+}
+
 @layout(pageTitle = titleNoForm(messages("apiDetails.title")), user = user, customScriptsBlock = Some(scripts()), fullWidth = true) {
 
     <div class="govuk-grid-row">
@@ -45,7 +51,7 @@
                     <ul class="side-nav__component">
                         <li class="side-nav__list">
                             <a class="side-nav__link" href="#details">
-                                Details
+                                @messages("apiDetails.leftNav.details")
                             </a>
                         </li>
 
@@ -54,7 +60,7 @@
                         </li>
 
                         <li class="side-nav__list">
-                            <span class="side-nav__title">Endpoints</span>
+                            <span class="side-nav__title">@messages("apiDetails.leftNav.endpoints")</span>
                             @for(endpoint <- apiDetail.endpoints) {
                                 <a href="#@{endpointName(endpoint)}" class="side-nav__link">@{endpoint.path}</a>
                             }
@@ -66,7 +72,7 @@
 
                         <li class="side-nav__list">
                             <a href="@routes.OasRedocController.onPageLoad(apiDetail.id).url" target="_blank" class="side-nav__link">
-                                Interactive API view
+                                @messages("apiDetails.leftNav.viewApiSpec")
                             </a>
                         </li>
                     </ul>
@@ -80,7 +86,7 @@
                 <h1 id="details" class="govuk-heading-l">@messages("apiDetails.apiName"): @apiDetail.title</h1>
 
                 <h2 class="govuk-heading-m">
-                    API Overview
+                    @messages("apiDetails.details.overview")
                 </h2>
 
                 <p class="govuk-body">
@@ -98,7 +104,7 @@
 
                 <div class="govuk-grid-row govuk-!-margin-bottom-2">
                     <div class="govuk-grid-column-one-quarter">
-                        <span class="govuk-body govuk-!-font-weight-bold govuk-!-margin-0">@messages("Version"):</span>
+                        <span class="govuk-body govuk-!-font-weight-bold govuk-!-margin-0">@messages("apiDetails.details.version"):</span>
                     </div>
                     <div class="govuk-grid-column-three-quarters">
                         <p class="govuk-body govuk-!-margin-0">
@@ -113,23 +119,28 @@
                     <p class="govuk-body information-tag">
                         <i class="fa-solid fa-circle-info information"></i>
                         <span class="call-out-type information">
-                            View API specification
+                            @messages("apiDetails.viewApiSpec.information")
                         </span>
                     </p>
                     <p class="govuk-body additional-message">
-                        To view the API specification use the <a href="@routes.OasRedocController.onPageLoad(apiDetail.id).url" target="_blank" class="govuk-link govuk-link--no-visited-state">Interactive API spec viewer</a>.
+                        @Html(
+                            messages(
+                                "apiDetails.viewApiSpec.message",
+                                viewApiSpecLink()
+                            )
+                        )
                     </p>
                 </div>
 
                 <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-6 govuk-!-margin-top-0">
 
                 <h2 class="govuk-heading-m">
-                    Endpoints
+                    @messages("apiDetails.endpoints.heading")
                 </h2>
 
                 @apiDetail.endpoints.zipWithIndex.map {case (endpoint, index) =>
                     @if(index > 0) {
-                        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-bottom-7 govuk-!-margin-top-0">
+                        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-bottom-6 govuk-!-margin-top-0">
                     }
 
                     <section id="@endpointName(endpoint)" class="govuk-!-padding-top-5">
@@ -138,15 +149,19 @@
 
                             <code class="code--header"><strong class="bold-xsmall">@endpoint.path</strong></code>
 
-                            <strong class="govuk-heading-s govuk-!-margin-bottom-4 govuk-!-margin-top-5">Summary</strong>
-                            <p class="govuk-body">
-                                @method.summary.getOrElse("")
-                            </p>
+                            @if(method.summary.isDefined) {
+                                <strong class="govuk-heading-s govuk-!-margin-bottom-4 govuk-!-margin-top-5">@messages("apiDetails.endpoints.summary")</strong>
+                                <p class="govuk-body">
+                                    @method.summary.getOrElse("")
+                                </p>
+                            }
 
-                            <strong class="govuk-heading-s govuk-!-margin-bottom-4 govuk-!-margin-top-5">Description</strong>
-                            <p class="govuk-body">
-                                @method.description.getOrElse("")
-                            </p>
+                            @if(method.description.isDefined) {
+                                <strong class="govuk-heading-s govuk-!-margin-bottom-4 govuk-!-margin-top-5">@messages("apiDetails.endpoints.description")</strong>
+                                <p class="govuk-body">
+                                    @method.description.getOrElse("")
+                                </p>
+                            }
                         }
                     </section>
                 }
