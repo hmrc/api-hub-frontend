@@ -22,48 +22,54 @@ import org.scalacheck.{Arbitrary, Gen}
 
 trait ApiDetailGenerators {
 
-  private val maxListSize = 10
+  private val listSizeQuota = 10
+  private val maxSensibleStringSize = 500
 
-  implicit lazy val arbitraryEndpointMethod: Arbitrary[EndpointMethod] =
-    Arbitrary {
-      for {
-        httpMethod <- Gen.oneOf("GET", "POST", "PUT", "PATCH", "DELETE")
-        summary <- Gen.option(Gen.alphaNumStr)
-        description <- Gen.option(Gen.alphaNumStr)
-        scopes <- Gen.listOf(Gen.alphaNumStr.suchThat(_.nonEmpty))
-      } yield EndpointMethod(httpMethod, summary, description, scopes)
-    }
+  private def sensiblySizedAlphaNumStr: Gen[String] = Gen.resize(maxSensibleStringSize, Gen.alphaNumStr)
 
-  implicit lazy val arbitraryEndpoint: Arbitrary[Endpoint] =
-    Arbitrary {
-      for {
-        path <- Gen.alphaNumStr
-        methods <- Gen.nonEmptyListOf(arbitraryEndpointMethod.arbitrary)
-      } yield Endpoint(path, methods)
-    }
+  private def genEndpointMethod: Gen[EndpointMethod] = Gen.sized {size =>
+    for {
+      httpMethod <- Gen.oneOf("GET", "POST", "PUT", "PATCH", "DELETE")
+      summary <- Gen.option(sensiblySizedAlphaNumStr)
+      description <- Gen.option(sensiblySizedAlphaNumStr)
+      scopes <- Gen.listOfN(size / listSizeQuota, sensiblySizedAlphaNumStr.suchThat(_.nonEmpty))
+    } yield EndpointMethod(httpMethod, summary, description, scopes)
+  }
 
-  implicit lazy val arbitraryApiDetail: Arbitrary[ApiDetail] =
-    Arbitrary {
-      for {
-        id <- Gen.uuid
-        title <- Gen.alphaNumStr
-        description <- Gen.alphaNumStr
-        version <- Gen.alphaNumStr
-        endpoints <- Gen.nonEmptyListOf(arbitraryEndpoint.arbitrary)
-        shortDescription <- Gen.alphaNumStr
-        openApiSpecification <- Gen.alphaNumStr
-      } yield ApiDetail(id.toString, title,description, version, endpoints, Some(shortDescription), openApiSpecification)
-    }
+  implicit lazy val arbitraryEndpointMethod: Arbitrary[EndpointMethod] = Arbitrary(genEndpointMethod)
+
+  private def genEndpoint: Gen[Endpoint] = Gen.sized {size=>
+    for {
+      path <- sensiblySizedAlphaNumStr.suchThat(_.nonEmpty)
+      methods <- Gen.listOfN(size / listSizeQuota, genEndpointMethod).suchThat(_.nonEmpty)
+    } yield Endpoint(path, methods)
+  }
+
+  implicit lazy val arbitraryEndpoint: Arbitrary[Endpoint] = Arbitrary(genEndpoint)
+
+  private def genApiDetail: Gen[ApiDetail] = Gen.sized {size =>
+    for {
+      id <- Gen.uuid
+      title <- sensiblySizedAlphaNumStr
+      description <- sensiblySizedAlphaNumStr
+      version <- sensiblySizedAlphaNumStr
+      endpoints <- Gen.listOfN(size / listSizeQuota, arbitraryEndpoint.arbitrary).suchThat(_.nonEmpty)
+      shortDescription <- sensiblySizedAlphaNumStr
+      openApiSpecification <- sensiblySizedAlphaNumStr
+    } yield ApiDetail(id.toString, title,description, version, endpoints, Some(shortDescription), openApiSpecification)
+  }
+
+  implicit lazy val arbitraryApiDetail: Arbitrary[ApiDetail] = Arbitrary(genApiDetail)
 
   implicit val arbitraryApiDetails: Arbitrary[Seq[ApiDetail]] =
     Arbitrary {
       Gen.nonEmptyListOf(arbitraryApiDetail.arbitrary)
     }
 
-  private val parameters = Gen.Parameters.default.withSize(maxListSize)
+  private val parameters = Gen.Parameters.default
 
   def sampleApiDetail(): ApiDetail =
-    arbitraryApiDetail.arbitrary.pureApply(parameters, Seed.random())
+    genApiDetail.pureApply(parameters, Seed.random())
 
   def sampleApis() : IntegrationResponse =
     IntegrationResponse(1, None, arbitraryApiDetails.arbitrary.pureApply(parameters, Seed.random()))
