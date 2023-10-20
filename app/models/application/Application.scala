@@ -28,7 +28,8 @@ case class Application (
   lastUpdated: LocalDateTime,
   teamMembers: Seq[TeamMember],
   environments: Environments,
-  issues: Seq[String] = Seq.empty
+  issues: Seq[String] = Seq.empty,
+  apis: Seq[Api] = Seq.empty
 )
 
 object Application {
