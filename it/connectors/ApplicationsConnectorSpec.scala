@@ -91,10 +91,12 @@ class ApplicationsConnectorSpec
   "ApplicationsConnector.getApplication" - {
     "must" - {
       behave like successfulApplicationGetter(true)
+      behave like successfulApplicationGetter(true, true)
     }
 
     "must" - {
       behave like successfulApplicationGetter(false)
+      behave like successfulApplicationGetter(true, true)
     }
 
     "must return none when application is not found" in {
@@ -395,10 +397,17 @@ object ApplicationsConnectorSpec extends HttpClientV2Support {
   trait ApplicationGetterBehaviours {
     this: AsyncFreeSpec with Matchers with WireMockSupport =>
 
-    def successfulApplicationGetter(enrich: Boolean): Unit = {
+    def successfulApplicationGetter(enrich: Boolean, includeApis: Boolean = false): Unit = {
       s"must place the correct request and return the application when enrich = $enrich" in {
         val api = Api("api_id", Seq(Endpoint("GET", "/foo/bar")))
-        val application1 = Application("id-1", "test-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1"))).copy(apis = Seq(api))
+        val application1 = {
+          val anApplicationWithoutApis = Application("id-1", "test-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1")))
+          if (includeApis) {
+            anApplicationWithoutApis.copy(apis = Seq(api))
+          } else {
+            anApplicationWithoutApis
+          }
+        }
         val expected = application1
 
         val expectedJson = toJsonString(expected)
