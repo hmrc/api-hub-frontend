@@ -50,17 +50,19 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation {
     .set(AddAnApiSelectEndpointsPage, selectedScopes).toOption.value
     .set(ApiPolicyConditionsDeclarationPage, acceptedPolicyConditions).toOption.value
 
-  private val apiDetail = mock[ApiDetail]
+  val expectedScopes = Set("test-scope-1", "test-scope-2")
+  private val apiDetail = ApiDetail("api_id",
+    "API title",
+    "",
+    "",
+    Seq(Endpoint("/foo/bar", Seq(EndpointMethod("GET", None, None, expectedScopes.toSeq)))),
+    None,
+    "")
 
   "AddAnApiCompleteController" - {
     "must place the correct request when a valid set of answers is submitted and redirect to the success page" in {
+
       val fixture = buildFixture(Some(fullUserAnswers))
-
-      val expectedScopes = Set("test-scope-1", "test-scope-2")
-
-      when(apiDetail.title).thenReturn("API title")
-      when(apiDetail.id).thenReturn("api_id")
-      when(apiDetail.endpoints).thenReturn(Seq(Endpoint("/foo/bar", Seq(EndpointMethod("GET", None, None, expectedScopes.toSeq)))))
 
       when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiId))(any())).thenReturn(Future.successful(Some(apiDetail)))
 
@@ -84,7 +86,8 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation {
     "must delete the user answers on success" in {
       val fixture = buildFixture(Some(fullUserAnswers))
 
-      setupMockApiDetail(fixture)
+      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiId))(any())).thenReturn(Future.successful(Some(apiDetail)))
+
       when(fixture.apiHubService.addApi(any(), any(), any())(any()))
         .thenReturn(Future.successful(Some(())))
 
@@ -103,7 +106,8 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation {
     "must return a Not Found page when the application does not exist" in {
       val fixture = buildFixture(Some(fullUserAnswers))
 
-      setupMockApiDetail(fixture)
+      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiId))(any())).thenReturn(Future.successful(Some(apiDetail)))
+
       when(fixture.apiHubService.addApi(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(apiId), any())(any()))
         .thenReturn(Future.successful(None))
 
@@ -150,6 +154,8 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation {
       val userAnswers = fullUserAnswers.remove(AddAnApiApiIdPage).toOption.value
       val fixture = buildFixture(Some(userAnswers))
 
+      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiId))(any())).thenReturn(Future.successful(Some(apiDetail)))
+
       running(fixture.application) {
         val request = FakeRequest(POST, routes.AddAnApiCompleteController.addApi().url)
         val result = route(fixture.application, request).value
@@ -162,7 +168,8 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation {
     "must redirect to the select application page in check mode page when the selected application answer is missing" in {
       val userAnswers = fullUserAnswers.remove(AddAnApiSelectApplicationPage).toOption.value
       val fixture = buildFixture(Some(userAnswers))
-      setupMockApiDetail(fixture)
+
+      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiId))(any())).thenReturn(Future.successful(Some(apiDetail)))
 
       running(fixture.application) {
         val request = FakeRequest(POST, routes.AddAnApiCompleteController.addApi().url)
@@ -176,7 +183,8 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation {
     "must redirect to the select endpoints page in check mode page when the selected endpoints answer is missing" in {
       val userAnswers = fullUserAnswers.remove(AddAnApiSelectEndpointsPage).toOption.value
       val fixture = buildFixture(Some(userAnswers))
-      setupMockApiDetail(fixture)
+
+      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiId))(any())).thenReturn(Future.successful(Some(apiDetail)))
 
       running(fixture.application) {
         val request = FakeRequest(POST, routes.AddAnApiCompleteController.addApi().url)
@@ -190,7 +198,8 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation {
     "must redirect to the accept policy declaration page in check mode page when the policy declaration answer is missing" in {
       val userAnswers = fullUserAnswers.remove(ApiPolicyConditionsDeclarationPage).toOption.value
       val fixture = buildFixture(Some(userAnswers))
-      setupMockApiDetail(fixture)
+
+      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiId))(any())).thenReturn(Future.successful(Some(apiDetail)))
 
       running(fixture.application) {
         val request = FakeRequest(POST, routes.AddAnApiCompleteController.addApi().url)
@@ -216,7 +225,7 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation {
     "must return a 500 Internal Server Error with suitable message if the backend returned 502 Bad Gateway" in {
       val fixture = buildFixture(Some(fullUserAnswers))
 
-      setupMockApiDetail(fixture)
+      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiId))(any())).thenReturn(Future.successful(Some(apiDetail)))
 
       when(fixture.apiHubService.addApi(any(), any(), any())(any()))
         .thenReturn(Future.failed(UpstreamErrorResponse.apply("test-message", BAD_GATEWAY)))
@@ -236,13 +245,6 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation {
         contentAsString(result) must validateAsHtml
       }
     }
-  }
-
-  private def setupMockApiDetail(fixture: Fixture) = {
-    when(apiDetail.title).thenReturn("API title")
-    when(apiDetail.id).thenReturn("api_id")
-    when(apiDetail.endpoints).thenReturn(Seq(Endpoint("/foo/bar", Seq(EndpointMethod("GET", None, None, Seq.empty)))))
-    when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiId))(any())).thenReturn(Future.successful(Some(apiDetail)))
   }
 
   private case class Fixture(

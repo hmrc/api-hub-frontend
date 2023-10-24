@@ -18,7 +18,7 @@ package models.requests
 
 import play.api.libs.json.{Format, Json}
 
-case class AddApiRequest(apiId: String, endpoints: Seq[AddApiRequestEndpoint] = Seq.empty, scopes: Seq[String] = Seq.empty)
+case class AddApiRequest(id: String, endpoints: Seq[AddApiRequestEndpoint], scopes: Seq[String])
 
 object AddApiRequest {
 

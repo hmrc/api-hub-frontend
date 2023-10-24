@@ -18,10 +18,9 @@ package services
 
 import com.google.inject.{Inject, Singleton}
 import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
-import controllers.AddAnApiCompleteController.AddAnApiRequest
 import models.AvailableEndpoint
 import models.api.ApiDetail
-import models.application.{Application, NewApplication, NewScope, Secondary, Secret}
+import models.application._
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
