@@ -20,6 +20,7 @@ import com.google.inject.{Inject, Singleton}
 import config.FrontendAppConfig
 import models.UserEmail
 import models.application.{Application, NewApplication, NewScope, Secret}
+import models.requests.AddApiRequest
 import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION, CONTENT_TYPE}
 import play.api.http.MimeTypes.JSON
 import play.api.http.Status.NOT_FOUND
@@ -121,6 +122,18 @@ class ApplicationsConnector @Inject()(
       }
   }
 
+  def addApi(applicationId: String, addApiRequest: AddApiRequest)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    httpClient
+      .post(url"$applicationsBaseUrl/api-hub-applications/applications/$applicationId/apis")
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .withBody(Json.toJson(addApiRequest))
+      .execute[Either[UpstreamErrorResponse, Unit]]
+      .flatMap {
+        case Right(_) => Future.successful(Some(()))
+        case Left(e) if e.statusCode == 404 => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
+  }
   def pendingPrimaryScopes()(implicit hc: HeaderCarrier): Future[Seq[Application]] = {
     httpClient
       .get(url"$applicationsBaseUrl/api-hub-applications/applications/pending-primary-scopes")

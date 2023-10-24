@@ -18,8 +18,11 @@ package services
 
 import com.google.inject.{Inject, Singleton}
 import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
+import controllers.AddAnApiCompleteController.AddAnApiRequest
+import models.AvailableEndpoint
 import models.api.ApiDetail
 import models.application.{Application, NewApplication, NewScope, Secondary, Secret}
+import models.requests.{AddApiRequest, AddApiRequestEndpoint}
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -55,6 +58,12 @@ class ApiHubService @Inject()(
 
   def addScopes(id: String, scopeNames: Set[String])(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
     applicationsConnector.addScopes(id, scopeNames.map(name => NewScope(name, Seq(Secondary))).toSeq)
+  }
+
+  def addApi(applicationId: String, apiId: String, availableEndpoints: Seq[AvailableEndpoint])(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    val scopes = availableEndpoints.flatMap(ae => ae.endpointMethod.scopes)
+    val endpoints = availableEndpoints.map(ae => AddApiRequestEndpoint(ae.endpointMethod.httpMethod, ae.path))
+    applicationsConnector.addApi(applicationId, AddApiRequest(apiId, endpoints, scopes))
   }
 
   def pendingPrimaryScopes()(implicit hc: HeaderCarrier): Future[Seq[Application]] = {
