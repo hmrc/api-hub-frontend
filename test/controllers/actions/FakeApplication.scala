@@ -39,8 +39,8 @@ object FakeApplicationWithSecrets extends Application(
   LocalDateTime.now(),
   Seq(TeamMember(FakeUser.email.get)),
   Environments(
-    primary = Environment(scopes = Seq(Scope("scope_name", Approved)), credentials = Seq(Credential("primary_client_id", None, Some("primary fragment")))),
-    secondary = Environment(scopes = Seq(Scope("scope_name", Approved)), credentials = Seq(Credential("secondary_client_id", Some("secondary secret"), Some("secondary fragment"))))
+    primary = Environment(scopes = Seq(Scope("scope_name", Approved)), credentials = Seq(Credential("primary_client_id", LocalDateTime.now(), None, Some("primary fragment")))),
+    secondary = Environment(scopes = Seq(Scope("scope_name", Approved)), credentials = Seq(Credential("secondary_client_id", LocalDateTime.now(), Some("secondary secret"), Some("secondary fragment"))))
   ),
   Seq.empty
 )
@@ -53,8 +53,8 @@ object FakeApplicationWithIdButNoSecrets extends Application(
   LocalDateTime.now(),
   Seq(TeamMember(FakeUser.email.get)),
   Environments(
-    primary = Environment(scopes = Seq(Scope("scope_name", Approved)), credentials = Seq(Credential("primary_client_id", None, None))),
-    secondary = Environment(scopes = Seq(Scope("scope_name", Approved)), credentials = Seq(Credential("secondary_client_id", None, None)))
+    primary = Environment(scopes = Seq(Scope("scope_name", Approved)), credentials = Seq(Credential("primary_client_id", LocalDateTime.now(), None, None))),
+    secondary = Environment(scopes = Seq(Scope("scope_name", Approved)), credentials = Seq(Credential("secondary_client_id", LocalDateTime.now(), None, None)))
   ),
   Seq.empty
 )

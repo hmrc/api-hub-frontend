@@ -74,8 +74,8 @@ class ProductionCredentialsChecklistController @Inject() (
 
   private def validatePrimaryCredential(application: Application)(implicit request: Request[_]): Either[Future[Result], Credential] = {
     application.getPrimaryCredentials match {
-      case Seq(credential @ Credential(_, _, None)) => Right(credential)
-      case Seq(Credential(_, _, Some(_))) => Left(secretAlreadyGenerated())
+      case Seq(credential @ Credential(_, _, _, None)) => Right(credential)
+      case Seq(Credential(_, _, _, Some(_))) => Left(secretAlreadyGenerated())
       case _ => Left(invalidCredential())
     }
   }

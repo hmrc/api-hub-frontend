@@ -27,6 +27,8 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist._
 import viewmodels.GeneratePrimarySecretSuccessViewModelSpec._
 
+import java.time.{Clock, Instant, LocalDateTime, ZoneId}
+
 class GeneratePrimarySecretSuccessViewModelSpec extends AnyFreeSpec with Matchers {
 
   private implicit val messages: Messages = play.api.test.Helpers.stubMessages()
@@ -65,8 +67,9 @@ class GeneratePrimarySecretSuccessViewModelSpec extends AnyFreeSpec with Matcher
 
 object GeneratePrimarySecretSuccessViewModelSpec {
 
+  private val clock: Clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
   private val environmentNames = EnvironmentNames("primary", "secondary")
-  private val credential = Credential("test-client-id", None, None)
+  private val credential = Credential("test-client-id", LocalDateTime.now(clock), None, None)
   private val secret = Secret("test-secret")
 
   def buildSummaryList(application: Application, scopes: String)(implicit messages: Messages): SummaryList = {
