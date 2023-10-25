@@ -34,6 +34,7 @@ import utils.{HtmlValidation, TestHelpers}
 import viewmodels.GeneratePrimarySecretSuccessViewModel
 import views.html.{ErrorTemplate, GeneratePrimarySecretSuccessView, ProductionCredentialsChecklistView}
 
+import java.time.{Clock, Instant, LocalDateTime, ZoneId}
 import scala.concurrent.Future
 
 class ProductionCredentialsChecklistControllerSpec extends SpecBase with MockitoSugar with TestHelpers with HtmlValidation {
@@ -272,6 +273,8 @@ object ProductionCredentialsChecklistControllerSpec extends SpecBase with Mockit
 
   case class Fixture(playApplication: PlayApplication, apiHubService: ApiHubService)
 
+  private val clock: Clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
+
   def buildFixture(userModel: UserModel = FakeUser, application: Option[Application] = Some(applicationWithValidPrimaryCredential)): Fixture = {
     val apiHubService = mock[ApiHubService]
     when(apiHubService.getApplication(any(), any())(any()))
@@ -291,11 +294,11 @@ object ProductionCredentialsChecklistControllerSpec extends SpecBase with Mockit
   }
 
   val applicationWithValidPrimaryCredential: Application = FakeApplication
-    .setPrimaryCredentials(Seq(Credential("test-client-id", None, None)))
+    .setPrimaryCredentials(Seq(Credential("test-client-id", LocalDateTime.now(clock), None, None)))
 
   val applicationWithoutValidCredential: Application = FakeApplication
 
   val applicationWithPrimaryCredentialWithSecret: Application = FakeApplication
-    .setPrimaryCredentials(Seq(Credential("test-client-id", None, Some("test-secret-fragment"))))
+    .setPrimaryCredentials(Seq(Credential("test-client-id", LocalDateTime.now(clock), None, Some("test-secret-fragment"))))
 
 }

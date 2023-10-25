@@ -22,6 +22,7 @@ import models.Lens
 import models.application.ApplicationLenses._
 import models.application.ApplicationLensesSpec._
 
+import java.time.{Clock, Instant, LocalDateTime, ZoneId}
 import scala.util.Random
 
 class ApplicationLensesSpec extends AnyFreeSpec with Matchers with LensBehaviours {
@@ -210,6 +211,19 @@ class ApplicationLensesSpec extends AnyFreeSpec with Matchers with LensBehaviour
       }
     }
 
+    "getPrimaryMasterCredential" - {
+      "must return the most recently created credential" in {
+        val master = randomCredential().copy(created = LocalDateTime.now())
+        val credential1 = randomCredential().copy(created = LocalDateTime.now().minusDays(1))
+        val credential2 = randomCredential().copy(created = LocalDateTime.now().minusDays(2))
+
+        val application = testApplication
+          .setPrimaryCredentials(Seq(credential1, master, credential2))
+
+        application.getPrimaryMasterCredential mustBe Some(master)
+      }
+    }
+
     "getPrimaryCredentials" - {
       "must" - {
         behave like applicationCredentialsGetterFunction(
@@ -261,6 +275,19 @@ class ApplicationLensesSpec extends AnyFreeSpec with Matchers with LensBehaviour
           applicationSecondaryScopes,
           (application, scope) => ApplicationLensOps(application).addSecondaryScope(scope)
         )
+      }
+    }
+
+    "getSecondaryMasterCredential" - {
+      "must return the most recently created credential" in {
+        val master = randomCredential().copy(created = LocalDateTime.now())
+        val credential1 = randomCredential().copy(created = LocalDateTime.now().minusDays(1))
+        val credential2 = randomCredential().copy(created = LocalDateTime.now().minusDays(2))
+
+        val application = testApplication
+          .setSecondaryCredentials(Seq(credential1, master, credential2))
+
+        application.getSecondaryMasterCredential mustBe master
       }
     }
 
@@ -358,7 +385,8 @@ class ApplicationLensesSpec extends AnyFreeSpec with Matchers with LensBehaviour
 //noinspection ScalaStyle
 object ApplicationLensesSpec {
 
-  val testApplication: Application = Application("test-id", "test-name", Creator("test-email"), Seq(TeamMember("test-email")))
+  private val testApplication: Application = Application("test-id", "test-name", Creator("test-email"), Seq(TeamMember("test-email")))
+  private val clock: Clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
 
   def randomEnvironments(): Environments = Environments(
     primary = Environment(),
@@ -379,6 +407,7 @@ object ApplicationLensesSpec {
     val clientSecret = s"test-client-secret${randomString()}"
     Credential(
       clientId = s"test-client-id${randomString()}",
+      created = LocalDateTime.now(clock),
       clientSecret = Some(clientSecret),
       secretFragment = Some(clientSecret.takeRight(4))
     )

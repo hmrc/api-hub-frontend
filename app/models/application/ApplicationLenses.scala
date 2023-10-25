@@ -92,6 +92,11 @@ object ApplicationLenses {
       applicationPrimaryScopes.get(application)
         .exists(scope => scope.status == Pending)
 
+    def getPrimaryMasterCredential: Option[Credential] =
+      applicationPrimaryCredentials.get(application)
+        .sortWith((a, b) => a.created.isAfter(b.created))
+        .headOption
+
     def getPrimaryCredentials: Seq[Credential] =
       applicationPrimaryCredentials.get(application)
 
@@ -115,6 +120,11 @@ object ApplicationLenses {
         application,
         applicationSecondaryScopes.get(application) :+ scope
       )
+
+    def getSecondaryMasterCredential: Credential =
+      applicationSecondaryCredentials.get(application)
+        .sortWith((a, b) => a.created.isAfter(b.created))
+        .head
 
     def getSecondaryCredentials: Seq[Credential] =
       applicationSecondaryCredentials.get(application)
