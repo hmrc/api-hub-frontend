@@ -18,10 +18,10 @@ package controllers
 
 import controllers.actions.{AddAnApiDataRetrievalAction, DataRequiredAction, IdentifierAction}
 import controllers.helpers.ErrorResultBuilder
-import models.{ApiPolicyConditionsDeclaration, CheckMode, UserAnswers}
+import models.{ApiPolicyConditionsDeclaration, AvailableEndpoints, CheckMode, UserAnswers}
 import pages.{AddAnApiApiIdPage, AddAnApiSelectApplicationPage, AddAnApiSelectEndpointsPage, ApiPolicyConditionsDeclarationPage}
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, Request, Result}
+import play.api.mvc._
 import repositories.AddAnApiSessionRepository
 import services.ApiHubService
 import uk.gov.hmrc.http.UpstreamErrorResponse
@@ -31,34 +31,54 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class AddAnApiCompleteController @Inject()(
-  override val messagesApi: MessagesApi,
-  identify: IdentifierAction,
-  getData: AddAnApiDataRetrievalAction,
-  requireData: DataRequiredAction,
-  val controllerComponents: MessagesControllerComponents,
-  apiHubService: ApiHubService,
-  errorResultBuilder: ErrorResultBuilder,
-  addAnApiSessionRepository: AddAnApiSessionRepository
-)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                            override val messagesApi: MessagesApi,
+                                            identify: IdentifierAction,
+                                            getData: AddAnApiDataRetrievalAction,
+                                            requireData: DataRequiredAction,
+                                            val controllerComponents: MessagesControllerComponents,
+                                            apiHubService: ApiHubService,
+                                            errorResultBuilder: ErrorResultBuilder,
+                                            addAnApiSessionRepository: AddAnApiSessionRepository
+                                          )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   import AddAnApiCompleteController._
 
   def addApi(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      validate(request.userAnswers).fold(
-        call => Future.successful(Redirect(call)),
-        addAnApiRequest => apiHubService.addScopes(addAnApiRequest.applicationId, addAnApiRequest.scopes) flatMap {
-          case Some(_) =>
-            addAnApiSessionRepository.clear(request.user.userId).map(_ =>
-              Redirect(routes.AddAnApiSuccessController.onPageLoad(addAnApiRequest.applicationId, addAnApiRequest.apiId))
-            )
-          case None => Future.successful(applicationNotFound(addAnApiRequest.applicationId))
-        } recoverWith {
-          case e: UpstreamErrorResponse if e.statusCode == BAD_GATEWAY => Future.successful(badGateway(e))
-        }
-      )
+      request.userAnswers.get(AddAnApiApiIdPage) match {
+        case Some(apiId) =>
+          apiHubService.getApiDetail(apiId).flatMap {
+            case Some(apiDetail) =>
+              validate(request.userAnswers).fold(
+                call => Future.successful(Redirect(call)),
+                addAnApiRequest => {
+                  val selectedEndpoints = AvailableEndpoints.selectedEndpoints(apiDetail, request.userAnswers).flatten(_._2).toSeq
+                  apiHubService.addApi(addAnApiRequest.applicationId, addAnApiRequest.apiId, selectedEndpoints)
+                } flatMap {
+                  case Some(_) =>
+                    addAnApiSessionRepository.clear(request.user.userId).map(_ =>
+                      Redirect(routes.AddAnApiSuccessController.onPageLoad(addAnApiRequest.applicationId, addAnApiRequest.apiId))
+                    )
+                  case None => Future.successful(applicationNotFound(addAnApiRequest.applicationId))
+                } recoverWith {
+                  case e: UpstreamErrorResponse if e.statusCode == BAD_GATEWAY => Future.successful(badGateway(e))
+                }
+              )
+            case None => apiNotFound(apiId)
+          }
+        case _ => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+      }
+
   }
 
+  private def apiNotFound(apiId: String)(implicit request: Request[_]): Future[Result] = {
+    Future.successful(
+      errorResultBuilder.notFound(
+        Messages("site.apiNotFound.heading"),
+        Messages("site.apiNotFound.message", apiId)
+      )
+    )
+  }
   private def validate(userAnswers: UserAnswers): Either[Call, AddAnApiRequest] = {
     for {
       apiId <- validateApiId(userAnswers)

@@ -18,7 +18,10 @@ package services
 
 import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
 import generators.ApiDetailGenerators
+import models.AvailableEndpoint
+import models.api.EndpointMethod
 import models.application._
+import models.requests.{AddApiRequest, AddApiRequestEndpoint}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
 import org.scalatest.OptionValues
@@ -286,6 +289,30 @@ class ApiHubServiceSpec
     }
   }
 
+  "addApi" - {
+    "must call the applications connector with correct request and return something" in {
+      val applicationsConnector = mock[ApplicationsConnector]
+      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+
+      val applicationId = "applicationId"
+      val apiId = "apiId"
+      val verb = "GET"
+      val path = "/foo/bar"
+      val scopes = Seq("test-scope-1", "test-scope-2")
+      val availableEndpoints = Seq(AvailableEndpoint(path, EndpointMethod(verb, None, None, scopes)))
+
+      val apiRequest = AddApiRequest(apiId, Seq(AddApiRequestEndpoint(verb, path)), scopes);
+
+      val expected = Some(())
+      when(applicationsConnector.addApi(ArgumentMatchers.eq(applicationId), ArgumentMatchers.eq(apiRequest))(any())).thenReturn(Future.successful(expected))
+
+      service.addApi(applicationId, apiId, availableEndpoints)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe expected
+      }
+    }
+  }
 }
 
 trait ApplicationGetterBehaviours {
