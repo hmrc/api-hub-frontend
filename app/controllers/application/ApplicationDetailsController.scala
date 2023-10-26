@@ -19,6 +19,7 @@ package controllers.application
 import com.google.inject.Inject
 import controllers.actions.{ApplicationAuthActionProvider, IdentifierAction}
 import controllers.helpers.ApplicationApiBuilder
+import models.application.Application
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -38,12 +39,19 @@ class ApplicationDetailsController @Inject()(
     implicit request =>
       applicationApiBuilder.build(request.application).map {
         case Right(applicationApis) =>
-          val sorted = request.application.copy(
-            teamMembers = request.application.teamMembers.sortWith(_.email.toUpperCase() < _.email.toUpperCase())
-          )
-          Ok(view(sorted, applicationApis, Some(request.identifierRequest.user)))
+          Ok(view(
+            sortTeamMembers(request.application),
+            applicationApis,
+            Some(request.identifierRequest.user)
+          ))
         case Left(result) => result
       }
+  }
+
+  private def sortTeamMembers(application: Application): Application = {
+    application.copy(
+      teamMembers = application.teamMembers.sortWith(_.email.toUpperCase() < _.email.toUpperCase())
+    )
   }
 
 }

@@ -167,6 +167,21 @@ class ApplicationLensesSpec extends AnyFreeSpec with Matchers with LensBehaviour
     }
   }
 
+  "applicationApis" - {
+    "must get the correct APIs" in {
+      val application = testApplication.copy(apis = randomApis())
+      val actual = applicationApis.get(application)
+      actual mustBe application.apis
+    }
+
+    "must set the APIs correctly" in {
+      val application = testApplication.copy(apis = randomApis())
+      val expected = randomApis()
+      val actual = applicationApis.set(application, expected).apis
+      actual mustBe expected
+    }
+  }
+
   "ApplicationLensOps" - {
     "getPrimaryScopes" - {
       "must" - {
@@ -378,6 +393,16 @@ class ApplicationLensesSpec extends AnyFreeSpec with Matchers with LensBehaviour
         actual mustBe empty
       }
     }
+
+    "addApi" - {
+      "must add the API to the application" in {
+        val existing = randomApis()
+        val application = testApplication.copy(apis = existing)
+        val added = randomApi()
+        val actual = application.addApi(added).apis
+        actual mustBe existing :+ added
+      }
+    }
   }
 
 }
@@ -436,6 +461,20 @@ object ApplicationLensesSpec {
   private def randomTeamMembers(): Seq[TeamMember] =
     (0 to Random.nextInt(5))
       .map(_ => randomTeamMember())
+
+  private def randomEndpoint(): SelectedEndpoint =
+    SelectedEndpoint(randomString(), randomString())
+
+  private def randomEndpoints(): Seq[SelectedEndpoint] =
+    (0 to Random.nextInt(5))
+      .map(_ => randomEndpoint())
+
+  private def randomApi(): Api =
+    Api(randomString(), randomEndpoints())
+
+  private def randomApis(): Seq[Api] =
+    (0 to Random.nextInt(5))
+      .map(_ => randomApi())
 
   private def randomString(): String = Random.alphanumeric.take(Random.nextInt(10) + 1).mkString
 
