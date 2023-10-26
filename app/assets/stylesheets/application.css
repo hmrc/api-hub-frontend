@@ -280,3 +280,10 @@
   background-color: #F7F7F7;
   line-height: 1.1em;
 }
+
+.environment-block-header {
+  display: flex;
+}
+.environment-block-header .left, .environment-block-header .right {
+  flex-grow: 1;
+}
