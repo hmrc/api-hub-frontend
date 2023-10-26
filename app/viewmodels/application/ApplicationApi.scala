@@ -16,13 +16,42 @@
 
 package viewmodels.application
 
-import models.api.ApiDetail
+import models.api.{ApiDetail, EndpointMethod}
+import models.application.{Application, EnvironmentName, Primary, Secondary}
+import models.application.ApplicationLenses.ApplicationLensOps
 
-sealed trait ApplicationEndpointAccess
+sealed trait ApplicationEndpointAccess {
+  def isAccessible: Boolean
+}
 
-case object Accessible extends ApplicationEndpointAccess
-case object Inaccessible extends ApplicationEndpointAccess
-case object Requested extends ApplicationEndpointAccess
+case object Accessible extends ApplicationEndpointAccess {
+  override val isAccessible: Boolean = true
+}
+
+case object Inaccessible extends ApplicationEndpointAccess {
+  override val isAccessible: Boolean = false
+}
+
+case object Requested extends ApplicationEndpointAccess {
+  override val isAccessible: Boolean = false
+}
+
+object ApplicationEndpointAccess {
+
+  def apply(application: Application, endpointMethod: EndpointMethod, environmentName: EnvironmentName): ApplicationEndpointAccess = {
+    val scopes = environmentName match {
+      case Primary => application.getPrimaryScopes
+      case Secondary => application.getSecondaryScopes
+    }
+
+    if (endpointMethod.scopes.toSet.subsetOf(scopes.map(_.name).toSet)) {
+      Accessible
+    } else {
+      Inaccessible
+    }
+  }
+
+}
 
 case class ApplicationEndpoint(
   httpMethod: String,
@@ -36,7 +65,7 @@ case class ApplicationApi(apiDetail: ApiDetail, endpoints: Seq[ApplicationEndpoi
 
   def selectedEndpoints: Int = endpoints.size
   def totalEndpoints: Int = apiDetail.endpoints.flatMap(_.methods).size
-  def availablePrimaryEndpoints: Int = endpoints.count(_.primaryAccess == Accessible)
-  def availableSecondaryEndpoints: Int = endpoints.count(_.secondaryAccess == Accessible)
+  def availablePrimaryEndpoints: Int = endpoints.count(_.primaryAccess.isAccessible)
+  def availableSecondaryEndpoints: Int = endpoints.count(_.secondaryAccess.isAccessible)
 
 }

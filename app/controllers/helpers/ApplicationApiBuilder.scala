@@ -17,8 +17,7 @@
 package controllers.helpers
 
 import com.google.inject.Inject
-import models.api.{ApiDetail, EndpointMethod}
-import models.application.ApplicationLenses.ApplicationLensOps
+import models.api.ApiDetail
 import models.application._
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Request, Result}
@@ -57,27 +56,14 @@ class ApplicationApiBuilder @Inject()(
                         endpoint.httpMethod,
                         endpoint.path,
                         endpointMethod.scopes,
-                        determineAccess(application, endpointMethod, Primary),
-                        determineAccess(application, endpointMethod, Secondary)
+                        ApplicationEndpointAccess(application, endpointMethod, Primary),
+                        ApplicationEndpointAccess(application, endpointMethod, Secondary)
                       )
                   )
             }
             ApplicationApi(apiDetail, endpoints)
         }
     )
-  }
-
-  private def determineAccess(application: Application, endpointMethod: EndpointMethod, environmentName: EnvironmentName): ApplicationEndpointAccess = {
-    val scopes = environmentName match {
-      case Primary => application.getPrimaryScopes
-      case Secondary => application.getSecondaryScopes
-    }
-
-    if (endpointMethod.scopes.toSet.subsetOf(scopes.map(_.name).toSet)) {
-      Accessible
-    } else {
-      Inaccessible
-    }
   }
 
   private def fetchApiDetails(application: Application)(implicit request: Request[_]): Future[Either[Result, Seq[ApiDetail]]] = {

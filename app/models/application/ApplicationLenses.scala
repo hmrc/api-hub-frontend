@@ -74,6 +74,12 @@ object ApplicationLenses {
       set = (application, teamMembers) => application.copy(teamMembers = teamMembers)
     )
 
+  val applicationApis: Lens[Application, Seq[Api]] =
+    Lens[Application, Seq[Api]](
+      get = _.apis,
+      set = (application, apis) => application.copy(apis = apis)
+    )
+
   implicit class ApplicationLensOps(application: Application) {
 
     def getPrimaryScopes: Seq[Scope] =
@@ -155,6 +161,11 @@ object ApplicationLenses {
         .toSet
     }
 
+    def addApi(api: Api): Application =
+      applicationApis.set(
+        application,
+        applicationApis.get(application) :+ api
+      )
   }
 
 }
