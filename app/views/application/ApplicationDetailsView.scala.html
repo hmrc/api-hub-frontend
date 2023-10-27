@@ -16,7 +16,7 @@
 
 @import models.application._
 @import models.user.UserModel
-@import viewmodels.application.ApplicationPages
+@import viewmodels.application.{ApplicationApi, ApplicationPages}
 @import views.ViewUtils
 
 @this(
@@ -24,7 +24,7 @@
     govukTable: GovukTable
 )
 
-@(application: Application, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+@(application: Application, applicationApis: Seq[ApplicationApi], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
 @applicationDetail(titleKey: String, value: String) = {
     <div class="govuk-grid-row govuk-!-margin-bottom-2">
@@ -60,16 +60,44 @@
         <div class="govuk-grid-row govuk-!-margin-bottom-0">
             <div class="govuk-grid-column-one-half">
                 <h2 class="govuk-heading-m govuk-!-margin-bottom-4 govuk-!-margin-top-2">
-                    @messages("applicationDetails.apis.heading")
+                    @if(applicationApis.isEmpty) {
+                        @messages("applicationDetails.apis.heading.noApis")
+                    } else {
+                        @messages("applicationDetails.apis.heading", applicationApis.size)
+                    }
                 </h2>
             </div>
         </div>
 
-        <p class="govuk-body">
-            @Html(messages("applicationDetails.apis.noApis", hipApisLink()))
-        </p>
+        @if(applicationApis.isEmpty) {
+            <p class="govuk-body">
+                @Html(messages("applicationDetails.apis.noApis", hipApisLink()))
+            </p>
 
-        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-top-5">
+            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-top-5">
+        } else {
+            @govukTable(
+                Table(
+                    caption = None,
+                    head = Some(
+                        Seq(
+                            HeadCell(messages("applicationDetails.apis.apiName")),
+                            HeadCell(messages("applicationDetails.apis.devEnv")),
+                            HeadCell(messages("applicationDetails.apis.prodEnv"))
+                        )
+                    ),
+                    rows = applicationApis.map(
+                        applicationApi=>
+                            Seq(
+                                TableRow(content = applicationApi.apiDetail.title),
+                                TableRow(content = messages("applicationDetails.apis.endpointsAvailable", applicationApi.availableSecondaryEndpoints, applicationApi.totalEndpoints)),
+                                TableRow(content = messages("applicationDetails.apis.endpointsAvailable", applicationApi.availablePrimaryEndpoints, applicationApi.totalEndpoints))
+                            )
+                    ),
+                    firstCellIsHeader = true
+                )
+            )
+        }
 
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-one-half">

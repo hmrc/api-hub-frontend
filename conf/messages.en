@@ -98,9 +98,15 @@ applicationDetails.application.application = Application
 applicationDetails.application.applicationId = Application ID
 applicationDetails.application.created = Created
 applicationDetails.application.createdBy = Created by
-applicationDetails.apis.heading = Application API''s
+applicationDetails.apis.heading.noApis = Application API''s
+applicationDetails.apis.heading = Application API''s ({0})
 applicationDetails.apis.hipApis = add API''s
 applicationDetails.apis.noApis = You have no API''s added, {0} to your application.
+applicationDetails.apis.endpointsAvailable = {0} of {1} endpoints available
+applicationDetails.apis.apiName = API name
+applicationDetails.apis.devEnv = Dev env
+applicationDetails.apis.prodEnv = Prod env
+
 applicationDetails.teamMembers.heading = Team members ({0})
 applicationDetails.teamMembers.emailAddress = Email address
 applicationDetails.addScope = Add scope

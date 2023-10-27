@@ -18,10 +18,10 @@ package models.application
 
 import play.api.libs.json.{Format, Json}
 
-case class Endpoint(httpMethod: String, path: String)
+case class SelectedEndpoint(httpMethod: String, path: String)
 
-object Endpoint {
+object SelectedEndpoint {
 
-  implicit val endpointFormat: Format[Endpoint] = Json.format[Endpoint]
+  implicit val endpointFormat: Format[SelectedEndpoint] = Json.format[SelectedEndpoint]
 
 }

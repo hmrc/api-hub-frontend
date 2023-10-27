@@ -18,6 +18,8 @@ package controllers.application
 
 import com.google.inject.Inject
 import controllers.actions.{ApplicationAuthActionProvider, IdentifierAction}
+import controllers.helpers.ApplicationApiBuilder
+import models.application.Application
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -29,15 +31,27 @@ class ApplicationDetailsController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   identify: IdentifierAction,
   applicationAuth: ApplicationAuthActionProvider,
-  view: ApplicationDetailsView
+  view: ApplicationDetailsView,
+  applicationApiBuilder: ApplicationApiBuilder
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id, enrich = true)) {
+  def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id, enrich = true)).async {
     implicit request =>
-      val sorted = request.application.copy(
-        teamMembers = request.application.teamMembers.sortWith(_.email.toUpperCase() < _.email.toUpperCase())
-      )
-      Ok(view(sorted, Some(request.identifierRequest.user)))
+      applicationApiBuilder.build(request.application).map {
+        case Right(applicationApis) =>
+          Ok(view(
+            sortTeamMembers(request.application),
+            applicationApis,
+            Some(request.identifierRequest.user)
+          ))
+        case Left(result) => result
+      }
+  }
+
+  private def sortTeamMembers(application: Application): Application = {
+    application.copy(
+      teamMembers = application.teamMembers.sortWith(_.email.toUpperCase() < _.email.toUpperCase())
+    )
   }
 
 }

@@ -397,7 +397,7 @@ object ApplicationsConnectorSpec extends HttpClientV2Support {
 
     def successfulApplicationGetter(enrich: Boolean): Unit = {
       s"must place the correct request and return the application when enrich = $enrich" in {
-        val api = Api("api_id", Seq(Endpoint("GET", "/foo/bar")))
+        val api = Api("api_id", Seq(SelectedEndpoint("GET", "/foo/bar")))
         val applicationWithApis = Application("id-1", "test-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1"))).copy(apis = Seq(api))
         val expected = applicationWithApis
 
