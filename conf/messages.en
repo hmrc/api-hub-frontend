@@ -125,9 +125,16 @@ applicationDetails.thereWereIssues = There were issues fetching elements of this
 
 applicationApis.title = Application APIs
 applicationApis.heading = Manage application APIs
-applicationApis.apis.heading = Application APIs
+applicationApis.apis.heading.noApis = Application APIs
+applicationApis.apis.heading = Application APIs ({0})
 applicationApis.apis.hipApis = add APIs
 applicationApis.apis.noApis = You have no APIs added, {0} to your application.
+applicationApis.apis.endpointsAdded = {0} of {1} endpoints added
+applicationApis.apis.headings.endpoint = Endpoint
+applicationApis.apis.headings.scopes = Scopes
+applicationApis.apis.headings.dev = Dev
+applicationApis.apis.headings.prod = Prod
+applicationApis.apis.viewSpecification = View specification
 
 environmentAndCredentials.title = Environments and Credentials
 environmentAndCredentials.heading = Environments and credentials
