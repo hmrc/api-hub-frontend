@@ -18,6 +18,7 @@ package controllers.application
 
 import com.google.inject.Inject
 import controllers.actions.{ApplicationAuthActionProvider, IdentifierAction}
+import controllers.helpers.ApplicationApiBuilder
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -29,12 +30,17 @@ class ApplicationApisController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   identify: IdentifierAction,
   applicationAuth: ApplicationAuthActionProvider,
-  view: ApplicationApisView
+  view: ApplicationApisView,
+  applicationApiBuilder: ApplicationApiBuilder
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id, enrich = true)) {
+  def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id, enrich = true)).async {
     implicit request =>
-      Ok(view(request.application, Some(request.identifierRequest.user)))
+      applicationApiBuilder.build(request.application).map {
+        case Right(applicationApis) => Ok(view(request.application, applicationApis, Some(request.identifierRequest.user)))
+        case Left(result) => result
+      }
+
   }
 
 }

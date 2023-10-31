@@ -16,13 +16,106 @@
 
 @import models.application._
 @import models.user.UserModel
-@import viewmodels.application.ApplicationPages
+@import viewmodels.application._
+@import views.html.helper.CSPNonce
 
 @this(
-    layout: templates.Layout
+    layout: templates.Layout,
+    govukTable: GovukTable,
+    govukButton : GovukButton
 )
 
-@(application: Application, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+@(application: Application, applicationApis: Seq[ApplicationApi], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+
+@scripts() = {
+    <link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css' media="all" rel="stylesheet" type="text/css" @{CSPNonce.attr}/>
+}
+
+@styles() = {
+    .hip-details {
+      font-size: 1.1875rem;
+      line-height: 1.47368;
+      display: block;
+    }
+
+    .hip-details__summary {
+      background-color: #fff;
+      border-top: 4px solid rgba(0, 0, 0, 0);
+      padding: 20px 24px 24px;
+    }
+
+    .hip-details__summary {
+      color: #005eb8;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .hip-expander {
+      background-color: #fff;
+      border: 1px solid #d8dde0;
+      border-bottom-width: 4px;
+      margin-top: 16px;
+      margin-bottom: 16px;
+      font-family: "nta", Arial, sans-serif;
+    }
+
+    .hip-expander .hip-details__summary-text {
+      color: #005eb8;
+      cursor: pointer;
+      display: inline-block;
+      position: relative;
+    }
+
+    .hip-details__summary-text {
+      text-decoration: underline;
+    }
+
+    @@media (min-width: 40.0625em) {
+      .hip-expander .hip-details__text {
+        padding-top: 0;
+      }
+    }
+    @@media (min-width: 40.0625em) {
+      .hip-expander .hip-details__text {
+        padding-right: 24px;
+      }
+    }
+    @@media (min-width: 40.0625em) {
+      .hip-expander .hip-details__text {
+        padding-left: 24px;
+      }
+    }
+    @@media (min-width: 40.0625em) {
+      .hip-expander .hip-details__text {
+        padding-bottom: 24px;
+      }
+    }
+    .hip-expander .nhsuk-details__text {
+      padding-bottom: 16px;
+      padding-left: 16px;
+      padding-right: 16px;
+      padding-top: 0;
+      border-left: 0;
+      margin-left: 0;
+      margin-top: 0;
+    }
+
+    .hip-details__text {
+      margin-top: 8px;
+      padding: 16px;
+      padding-left: 20px;
+    }
+
+    .hip-details__summary-info {
+      float: right;
+      color: #000 !important;
+      margin-top: 6px;
+    }
+
+    .ready {
+      color: #00703c;
+    }
+}
 
 @hipApisLink() = {
     <a href="@{routes.HipApisController.onPageLoad().url}" class="govuk-link govuk-link--no-visited-state">
@@ -30,7 +123,30 @@
     </a>
 }
 
-@layout(pageTitle = titleNoForm(messages("applicationApis.title")), user = user, fullWidth = true) {
+@endpointScopes(scopes: Seq[String]) = {
+    <ul class="govuk-list govuk-!-margin-bottom-0">
+        @for(scope <- scopes) {
+            <li>@scope</li>
+        }
+    </ul>
+}
+
+@endpointAccess(access: ApplicationEndpointAccess) = {
+    @if(access == Accessible) {
+        <i class="fa-solid fa-circle-check ready"></i>
+    } else if (access == Inaccessible) {
+        <i class="fa-solid fa-times-circle"></i>
+    } else {
+        <i class="fa-solid fa-circle-exclamation warning-colour"></i>
+    }
+}
+
+@endpointName(endpoint: ApplicationEndpoint) = {
+    <strong class="govuk-tag govuk-tag--purple">@{endpoint.httpMethod}</strong>
+    @endpoint.path
+}
+
+@layout(pageTitle = titleNoForm(messages("applicationApis.title")), user = user, fullWidth = true, customScriptsBlock = Some(scripts()), customStyles = Some(styles())) {
 
     @views.html.application.ApplicationNav(application, ApplicationPages.ApisPage) {
 
@@ -41,14 +157,66 @@
         <div class="govuk-grid-row govuk-!-margin-bottom-0">
             <div class="govuk-grid-column-one-half">
                 <h2 class="govuk-heading-m govuk-!-margin-bottom-4 govuk-!-margin-top-2">
-                    @messages("applicationApis.apis.heading")
+                    @if(applicationApis.isEmpty) {
+                        @messages("applicationApis.apis.heading.noApis")
+                    } else {
+                        @messages("applicationApis.apis.heading", applicationApis.size)
+                    }
                 </h2>
             </div>
         </div>
 
-        <p class="govuk-body">
-            @Html(messages("applicationApis.apis.noApis", hipApisLink()))
-        </p>
+        @if(applicationApis.isEmpty) {
+            <p class="govuk-body">
+                @Html(messages("applicationApis.apis.noApis", hipApisLink()))
+            </p>
+        } else {
+            @for(applicationApi <- applicationApis) {
+                <details class="hip-details hip-expander">
+                    <summary class="hip-details__summary">
+                        <span class="hip-details__summary-text govuk-heading-s govuk-!-margin-bottom-0">
+                            @applicationApi.apiDetail.title
+                        </span>
+                        <span class="hip-details__summary-info govuk-body-s">
+                            @messages("applicationApis.apis.endpointsAdded", applicationApi.selectedEndpoints, applicationApi.totalEndpoints)
+                        </span>
+                    </summary>
+
+                    <div class="hip-details__text">
+                        @govukTable(
+                            Table(
+                                caption = None,
+                                head = Some(
+                                    Seq(
+                                        HeadCell(messages("applicationApis.apis.headings.endpoint")),
+                                        HeadCell(messages("applicationApis.apis.headings.scopes")),
+                                        HeadCell(messages("applicationApis.apis.headings.dev")),
+                                        HeadCell(messages("applicationApis.apis.headings.prod"))
+                                    )
+                                ),
+                                rows = applicationApi.endpoints.map(
+                                    endpoint =>
+                                        Seq(
+                                            TableRow(content = HtmlContent(endpointName(endpoint))),
+                                            TableRow(content = HtmlContent(endpointScopes(endpoint.scopes))),
+                                            TableRow(content = HtmlContent(endpointAccess(endpoint.secondaryAccess))),
+                                            TableRow(content = HtmlContent(endpointAccess(endpoint.primaryAccess)))
+                                        )
+                                ),
+                                firstCellIsHeader = true
+                            )
+                        )
+
+                        <div class="govuk-button-group">
+                            <a class="govuk-link govuk-link--no-visited-state" href="@routes.ApiDetailsController.onPageLoad(applicationApi.apiDetail.id)">
+                                @messages("applicationApis.apis.viewSpecification")
+                            </a>
+                        </div>
+                    </div>
+
+                </details>
+            }
+        }
     }
 
 }
