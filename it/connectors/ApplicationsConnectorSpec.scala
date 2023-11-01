@@ -363,6 +363,15 @@ class ApplicationsConnectorSpec
       }
     }
   }
+
+  "ApplicationsConnector.addCredential" - {
+    "must place the correct request and return the new Credential" in {
+      succeed
+    }
+
+    "must return None "
+  }
+
 }
 
 object ApplicationsConnectorSpec extends HttpClientV2Support {

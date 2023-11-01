@@ -127,10 +127,10 @@ object ApplicationLenses {
         applicationSecondaryScopes.get(application) :+ scope
       )
 
-    def getSecondaryMasterCredential: Credential =
+    def getSecondaryMasterCredential: Option[Credential] =
       applicationSecondaryCredentials.get(application)
         .sortWith((a, b) => a.created.isAfter(b.created))
-        .head
+        .headOption
 
     def getSecondaryCredentials: Seq[Credential] =
       applicationSecondaryCredentials.get(application)

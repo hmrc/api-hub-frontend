@@ -19,7 +19,7 @@ package connectors
 import com.google.inject.{Inject, Singleton}
 import config.FrontendAppConfig
 import models.UserEmail
-import models.application.{Application, NewApplication, NewScope, Secret}
+import models.application.{Application, Credential, EnvironmentName, NewApplication, NewScope, Secret}
 import models.requests.AddApiRequest
 import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION, CONTENT_TYPE}
 import play.api.http.MimeTypes.JSON
@@ -182,6 +182,19 @@ class ApplicationsConnector @Inject()(
           s"Response status was ${response.status}"
         }
       })
+  }
+
+  def addCredential(application: Application, environmentName: EnvironmentName)(implicit hc:HeaderCarrier): Future[Option[Credential]] = {
+    httpClient
+      .post(url"$applicationsBaseUrl/api-hub-applications/applications/${application.id}/environments/$environmentName/credentials")
+      .setHeader((ACCEPT, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Either[UpstreamErrorResponse, Credential]]
+      .flatMap {
+        case Right(credential) => Future.successful(Some(credential))
+        case Left(e) if e.statusCode == 404 => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
   }
 
 }
