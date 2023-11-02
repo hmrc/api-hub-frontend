@@ -20,6 +20,7 @@ import com.google.inject.{Inject, Singleton}
 import config.FrontendAppConfig
 import models.UserEmail
 import models.application.{Application, Credential, EnvironmentName, NewApplication, NewScope, Secret}
+import models.exception.{ApplicationCredentialLimitException, ApplicationsException}
 import models.requests.AddApiRequest
 import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION, CONTENT_TYPE}
 import play.api.http.MimeTypes.JSON
@@ -184,15 +185,19 @@ class ApplicationsConnector @Inject()(
       })
   }
 
-  def addCredential(application: Application, environmentName: EnvironmentName)(implicit hc:HeaderCarrier): Future[Option[Credential]] = {
+  def addCredential(
+    id: String,
+    environmentName: EnvironmentName
+  )(implicit hc:HeaderCarrier): Future[Either[ApplicationsException, Option[Credential]]] = {
     httpClient
-      .post(url"$applicationsBaseUrl/api-hub-applications/applications/${application.id}/environments/$environmentName/credentials")
+      .post(url"$applicationsBaseUrl/api-hub-applications/applications/$id/environments/$environmentName/credentials")
       .setHeader((ACCEPT, JSON))
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Either[UpstreamErrorResponse, Credential]]
       .flatMap {
-        case Right(credential) => Future.successful(Some(credential))
-        case Left(e) if e.statusCode == 404 => Future.successful(None)
+        case Right(credential) => Future.successful(Right(Some(credential)))
+        case Left(e) if e.statusCode == 404 => Future.successful(Right(None))
+        case Left(e) if e.statusCode == 409 => Future.successful(Left(ApplicationCredentialLimitException.forId(id, environmentName)))
         case Left(e) => Future.failed(e)
       }
   }

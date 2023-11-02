@@ -21,6 +21,7 @@ import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
 import models.AvailableEndpoint
 import models.api.ApiDetail
 import models.application._
+import models.exception.ApplicationsException
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
@@ -92,6 +93,10 @@ class ApiHubService @Inject()(
 
   def getAllHipApis()(implicit hc: HeaderCarrier): Future[Seq[ApiDetail]] = {
     integrationCatalogueConnector.getAllHipApis()
+  }
+
+  def addCredential(id: String, environmentName: EnvironmentName)(implicit hc: HeaderCarrier): Future[Either[ApplicationsException, Option[Credential]]] = {
+    applicationsConnector.addCredential(id, environmentName)
   }
 
 }

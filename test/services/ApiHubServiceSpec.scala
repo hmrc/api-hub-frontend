@@ -17,6 +17,7 @@
 package services
 
 import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
+import controllers.actions.FakeApplication
 import generators.ApiDetailGenerators
 import models.AvailableEndpoint
 import models.api.EndpointMethod
@@ -29,6 +30,7 @@ import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
 import uk.gov.hmrc.http.HeaderCarrier
 
+import java.time.LocalDateTime
 import scala.concurrent.Future
 
 class ApiHubServiceSpec
@@ -302,7 +304,7 @@ class ApiHubServiceSpec
       val scopes = Seq("test-scope-1", "test-scope-2")
       val availableEndpoints = Seq(AvailableEndpoint(path, EndpointMethod(verb, None, None, scopes)))
 
-      val apiRequest = AddApiRequest(apiId, Seq(AddApiRequestEndpoint(verb, path)), scopes);
+      val apiRequest = AddApiRequest(apiId, Seq(AddApiRequestEndpoint(verb, path)), scopes)
 
       val expected = Some(())
       when(applicationsConnector.addApi(ArgumentMatchers.eq(applicationId), ArgumentMatchers.eq(apiRequest))(any())).thenReturn(Future.successful(expected))
@@ -310,6 +312,23 @@ class ApiHubServiceSpec
       service.addApi(applicationId, apiId, availableEndpoints)(HeaderCarrier()) map {
         actual =>
           actual mustBe expected
+      }
+    }
+  }
+
+  "addCredential" - {
+    "must call the applications connector with the correct request and return the response" in {
+      val applicationsConnector = mock[ApplicationsConnector]
+      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+      val expected = Credential("test-client-id", LocalDateTime.now(), Some("test-secret"), Some("test-fragment"))
+
+      when(applicationsConnector.addCredential(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(Primary))(any()))
+        .thenReturn(Future.successful(Right(Some(expected))))
+
+      service.addCredential(FakeApplication.id, Primary)(HeaderCarrier()).map {
+        actual =>
+          actual mustBe Right(Some(expected))
       }
     }
   }
