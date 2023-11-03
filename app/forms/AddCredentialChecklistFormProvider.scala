@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,16 +12,22 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@this(
-    layout: templates.Layout
-)
+package forms
 
-@(pageTitle: String, heading: String, message: String)(implicit request: Request[_], messages: Messages)
+import com.google.inject.Inject
+import forms.mappings.Mappings
+import models.AddCredentialChecklist
+import play.api.data.Form
+import play.api.data.Forms.set
 
-@layout(pageTitle = titleNoForm(pageTitle)) {
-    <h1 class="govuk-heading-xl">@messages(heading)</h1>
+class AddCredentialChecklistFormProvider  @Inject() extends Mappings {
 
-    <p class="govuk-body">@Html(messages(message))</p>
+  def apply(): Form[Set[AddCredentialChecklist]] =
+    Form(
+      "value" -> set(enumerable[AddCredentialChecklist]("addCredentialChecklist.error.required"))
+        .verifying(nonEmptySet("addCredentialChecklist.error.required"))
+    )
+
 }

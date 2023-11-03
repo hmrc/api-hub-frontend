@@ -1,3 +1,8 @@
 GET         /details/:id                                                controllers.application.ApplicationDetailsController.onPageLoad(id: String)
+
 GET         /apis/:id                                                   controllers.application.ApplicationApisController.onPageLoad(id: String)
+
 GET         /environment-and-credentials/:id                            controllers.application.EnvironmentAndCredentialsController.onPageLoad(id: String)
+
+GET         /add-credential-checklist/:id                               controllers.application.AddCredentialChecklistController.onPageLoad(id: String)
+POST        /add-credential-success/:id                                 controllers.application.AddCredentialChecklistController.onSubmit(id: String)
