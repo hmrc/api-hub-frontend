@@ -19,7 +19,7 @@ package controllers.application
 import controllers.actions._
 import controllers.helpers.ErrorResultBuilder
 import forms.AddCredentialChecklistFormProvider
-import models.application.{Application, Credential, Primary}
+import models.application.{Application, Credential, Primary, Secondary}
 import models.exception.ApplicationCredentialLimitException
 import models.user.UserModel
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
@@ -33,7 +33,7 @@ import views.html.application.{AddCredentialChecklistView, AddCredentialSuccessV
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class AddCredentialChecklistController @Inject()(
+class AddCredentialController @Inject()(
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   applicationAuth: ApplicationAuthActionProvider,
@@ -47,12 +47,12 @@ class AddCredentialChecklistController @Inject()(
 
   private val form = formProvider()
 
-  def onPageLoad(applicationId: String): Action[AnyContent] = (identify andThen applicationAuth(applicationId)) {
+  def checklist(applicationId: String): Action[AnyContent] = (identify andThen applicationAuth(applicationId)) {
     implicit request =>
       Ok(view(form, applicationId))
   }
 
-  def onSubmit(applicationId: String): Action[AnyContent] = (identify andThen applicationAuth(applicationId)).async {
+  def addProductionCredential(applicationId: String): Action[AnyContent] = (identify andThen applicationAuth(applicationId)).async {
     implicit request =>
       form.bindFromRequest().fold(
         formWithErrors =>
@@ -69,6 +69,17 @@ class AddCredentialChecklistController @Inject()(
             case Left(e) => Future.successful(errorResultBuilder.internalServerError(e))
           }
       )
+  }
+
+  def addDevelopmentCredential(applicationId: String): Action[AnyContent] = (identify andThen applicationAuth(applicationId)).async {
+    implicit request =>
+      apiHubService.addCredential(request.application.id, Secondary) flatMap {
+        case Right(Some(_)) =>
+          Future.successful(SeeOther(controllers.application.routes.EnvironmentAndCredentialsController.onPageLoad(request.application.id).url))
+        case Right(None) => applicationNotFound(request.application)
+        case Left(_: ApplicationCredentialLimitException) => tooManyCredentials(request.application)
+        case Left(e) => Future.successful(errorResultBuilder.internalServerError(e))
+      }
   }
 
   private def fetchApiNames(application: Application)(implicit hc: HeaderCarrier): Future[Seq[String]] = {

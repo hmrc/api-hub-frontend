@@ -21,7 +21,7 @@ import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
 import controllers.routes
 import forms.AddCredentialChecklistFormProvider
 import models.api.ApiDetail
-import models.application.{Api, Application, Credential, Primary}
+import models.application.{Api, Application, Credential, Primary, Secondary}
 import models.exception.ApplicationCredentialLimitException
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
@@ -40,11 +40,11 @@ import views.html.application.{AddCredentialChecklistView, AddCredentialSuccessV
 import java.time.{Clock, Instant, LocalDateTime, ZoneId}
 import scala.concurrent.Future
 
-class AddCredentialChecklistControllerSpec extends SpecBase with MockitoSugar with TestHelpers with HtmlValidation {
+class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHelpers with HtmlValidation {
 
-  import AddCredentialChecklistControllerSpec._
+  import AddCredentialControllerSpec._
 
-  "AddCredentialChecklistController" - {
+  "AddCredentialChecklistController.checklist" - {
     "must return OK and the correct view for a GET for a team member or administrator" in {
       forAll(teamMemberAndAdministratorTable) {
         user =>
@@ -52,7 +52,7 @@ class AddCredentialChecklistControllerSpec extends SpecBase with MockitoSugar wi
 
           running(fixture.playApplication) {
             implicit val msgs: Messages = messages(fixture.playApplication)
-            implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, addCredentialChecklistGetRoute())
+            implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, checklistRoute())
             val result = route(fixture.playApplication, request).value
             val view = fixture.playApplication.injector.instanceOf[AddCredentialChecklistView]
 
@@ -63,6 +63,20 @@ class AddCredentialChecklistControllerSpec extends SpecBase with MockitoSugar wi
       }
     }
 
+    "must redirect to Unauthorised page for a GET when user is not a team member or administrator" in {
+      val fixture = buildFixture(FakeUserNotTeamMember)
+
+      running(fixture.playApplication) {
+        implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, checklistRoute())
+        val result = route(fixture.playApplication, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustEqual routes.UnauthorisedController.onPageLoad.url
+      }
+    }
+  }
+
+  "AddCredentialChecklistController.addProductionCredential" - {
     "must return the Add Credential Success view when valid data is submitted by a team member or administrator" in {
       forAll(teamMemberAndAdministratorTable) {
         user =>
@@ -91,7 +105,7 @@ class AddCredentialChecklistControllerSpec extends SpecBase with MockitoSugar wi
 
           running(fixture.playApplication) {
             implicit val msgs: Messages = messages(fixture.playApplication)
-            implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, addCredentialChecklistPostRoute())
+            implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, addProductionCredentialRoute())
               .withFormUrlEncodedBody(("value[0]", "confirm"))
 
             val result = route(fixture.playApplication, request).value
@@ -115,7 +129,7 @@ class AddCredentialChecklistControllerSpec extends SpecBase with MockitoSugar wi
 
       running(fixture.playApplication) {
         implicit val msgs: Messages = messages(fixture.playApplication)
-        implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, addCredentialChecklistPostRoute())
+        implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, addProductionCredentialRoute())
           .withFormUrlEncodedBody()
 
         val result = route(fixture.playApplication, request).value
@@ -128,23 +142,11 @@ class AddCredentialChecklistControllerSpec extends SpecBase with MockitoSugar wi
       }
     }
 
-    "must redirect to Unauthorised page for a GET when user is not a team member or administrator" in {
-      val fixture = buildFixture(FakeUserNotTeamMember)
-
-      running(fixture.playApplication) {
-        implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, addCredentialChecklistGetRoute())
-        val result = route(fixture.playApplication, request).value
-
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustEqual routes.UnauthorisedController.onPageLoad.url
-      }
-    }
-
     "must redirect to Unauthorised page for a POST when user is not a team member or administrator" in {
       val fixture = buildFixture(FakeUserNotTeamMember)
 
       running(fixture.playApplication) {
-        implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, addCredentialChecklistPostRoute())
+        implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, addProductionCredentialRoute())
           .withFormUrlEncodedBody(("value[0]", "confirm"))
 
         val result = route(fixture.playApplication, request).value
@@ -161,8 +163,57 @@ class AddCredentialChecklistControllerSpec extends SpecBase with MockitoSugar wi
         .thenReturn(Future.successful(Left(ApplicationCredentialLimitException("test-message"))))
 
       running(fixture.playApplication) {
-        implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, addCredentialChecklistPostRoute())
+        implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, addProductionCredentialRoute())
           .withFormUrlEncodedBody(("value[0]", "confirm"))
+
+        val result = route(fixture.playApplication, request).value
+
+        status(result) mustBe BAD_REQUEST
+        contentAsString(result) must validateAsHtml
+      }
+    }
+  }
+
+  "AddCredentialChecklistController.addDevelopmentCredential" - {
+    "must add the credential and redirect to the Environments and Credentials page" in {
+      val fixture = buildFixture()
+
+      val credential = Credential("test-client-id", LocalDateTime.now(clock), Some("test-secret"), Some("test-fragment"))
+
+      when(fixture.apiHubService.addCredential(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(Secondary))(any()))
+        .thenReturn(Future.successful(Right(Some(credential))))
+
+      running(fixture.playApplication) {
+        implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(POST, addDevelopmentCredentialRoute())
+
+        val result = route(fixture.playApplication, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe controllers.application.routes.EnvironmentAndCredentialsController.onPageLoad(FakeApplication.id).url
+      }
+    }
+
+    "must redirect to Unauthorised page for a POST when user is not a team member or administrator" in {
+      val fixture = buildFixture(FakeUserNotTeamMember)
+
+      running(fixture.playApplication) {
+        implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(POST, addDevelopmentCredentialRoute())
+
+        val result = route(fixture.playApplication, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe routes.UnauthorisedController.onPageLoad.url
+      }
+    }
+
+    "must return 400 Bad Request when the credential limit has been exceeded" in {
+      val fixture = buildFixture()
+
+      when(fixture.apiHubService.addCredential(any(), any())(any()))
+        .thenReturn(Future.successful(Left(ApplicationCredentialLimitException("test-message"))))
+
+      running(fixture.playApplication) {
+        implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(POST, addDevelopmentCredentialRoute())
 
         val result = route(fixture.playApplication, request).value
 
@@ -174,13 +225,14 @@ class AddCredentialChecklistControllerSpec extends SpecBase with MockitoSugar wi
 
 }
 
-object AddCredentialChecklistControllerSpec extends SpecBase with MockitoSugar {
+object AddCredentialControllerSpec extends SpecBase with MockitoSugar {
 
   private case class Fixture(playApplication: PlayApplication, apiHubService: ApiHubService)
 
   private val clock: Clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
-  private def addCredentialChecklistGetRoute() = controllers.application.routes.AddCredentialChecklistController.onPageLoad(FakeApplication.id).url
-  private def addCredentialChecklistPostRoute() = controllers.application.routes.AddCredentialChecklistController.onSubmit(FakeApplication.id).url
+  private def checklistRoute() = controllers.application.routes.AddCredentialController.checklist(FakeApplication.id).url
+  private def addProductionCredentialRoute() = controllers.application.routes.AddCredentialController.addProductionCredential(FakeApplication.id).url
+  private def addDevelopmentCredentialRoute() = controllers.application.routes.AddCredentialController.addDevelopmentCredential(FakeApplication.id).url
   private val formProvider = new AddCredentialChecklistFormProvider()
   private val form = formProvider()
 
