@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,16 +12,19 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@this(
-    layout: templates.Layout
-)
+package models.exception
 
-@(pageTitle: String, heading: String, message: String)(implicit request: Request[_], messages: Messages)
+import models.application.EnvironmentName
 
-@layout(pageTitle = titleNoForm(pageTitle)) {
-    <h1 class="govuk-heading-xl">@messages(heading)</h1>
+//noinspection ScalaStyle
+case class ApplicationCredentialLimitException(message: String) extends ApplicationsException("message", null)
 
-    <p class="govuk-body">@Html(messages(message))</p>
+object ApplicationCredentialLimitException {
+
+  def forId(id: String, environmentName: EnvironmentName): ApplicationCredentialLimitException = {
+    ApplicationCredentialLimitException(s"Application $id has reached its $environmentName credential limit.")
+  }
+
 }

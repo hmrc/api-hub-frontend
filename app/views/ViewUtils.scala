@@ -38,13 +38,18 @@ object ViewUtils {
   }
 
   private val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy HH:mm")
+  private val shortDateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMM yyyy HH:mm")
   private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
 
   def formatLocalDateTime(value: LocalDateTime): String = {
     value.format(dateTimeFormatter)
   }
 
-def formatDate(value: LocalDateTime): String = {
+  def formatShortLocalDateTime(value: LocalDateTime): String = {
+    value.format(shortDateTimeFormatter)
+  }
+
+  def formatDate(value: LocalDateTime): String = {
     s"${value.format(dateFormatter)}"
   }
 

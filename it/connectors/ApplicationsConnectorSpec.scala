@@ -3,9 +3,11 @@ package connectors
 import com.github.tomakehurst.wiremock.client.WireMock._
 import com.typesafe.config.ConfigFactory
 import config.FrontendAppConfig
-import connectors.ApplicationsConnectorSpec.{ApplicationGetterBehaviours, buildConnector, toJsonString}
+import connectors.ApplicationsConnectorSpec.ApplicationGetterBehaviours
 import models.UserEmail
 import models.application._
+import models.exception.ApplicationCredentialLimitException
+import models.user.{LdapUser, UserModel}
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -21,6 +23,7 @@ import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import java.net.URLEncoder
+import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext
 
 class ApplicationsConnectorSpec
@@ -29,6 +32,8 @@ class ApplicationsConnectorSpec
   with WireMockSupport
   with OptionValues
   with ApplicationGetterBehaviours {
+
+  import ApplicationsConnectorSpec._
 
   "ApplicationsConnector.registerApplication" - {
     "must place the correct request and return the stored application" in {
@@ -363,6 +368,63 @@ class ApplicationsConnectorSpec
       }
     }
   }
+
+  "ApplicationsConnector.addCredential" - {
+    "must place the correct request and return the new Credential" in {
+      val expected = Credential("test-client-id", LocalDateTime.now(), Some("test-secret"), Some("test-fragment"))
+
+      stubFor(
+        post(urlEqualTo(s"/api-hub-applications/applications/${FakeApplication.id}/environments/primary/credentials"))
+          .withHeader("Accept", equalTo("application/json"))
+          .withHeader("Authorization", equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withStatus(CREATED)
+              .withBody(Json.toJson(expected).toString())
+          )
+      )
+
+      buildConnector(this).addCredential(FakeApplication.id, Primary)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe Right(Some(expected))
+      }
+    }
+
+    "must return None if the application was not found" in {
+      stubFor(
+        post(urlEqualTo(s"/api-hub-applications/applications/${FakeApplication.id}/environments/primary/credentials"))
+          .withHeader("Accept", equalTo("application/json"))
+          .withHeader("Authorization", equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+          )
+      )
+
+      buildConnector(this).addCredential(FakeApplication.id, Primary)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe Right(None)
+      }
+    }
+
+    "must Conflict???" in {
+      stubFor(
+        post(urlEqualTo(s"/api-hub-applications/applications/${FakeApplication.id}/environments/primary/credentials"))
+          .withHeader("Accept", equalTo("application/json"))
+          .withHeader("Authorization", equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withStatus(CONFLICT)
+          )
+      )
+
+      buildConnector(this).addCredential(FakeApplication.id, Primary)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe Left(ApplicationCredentialLimitException.forId(FakeApplication.id, Primary))
+      }
+    }
+  }
+
 }
 
 object ApplicationsConnectorSpec extends HttpClientV2Support {
@@ -391,6 +453,19 @@ object ApplicationsConnectorSpec extends HttpClientV2Support {
   def toJsonString(applications: Seq[Application]): String = {
     Json.toJson(applications).toString()
   }
+
+  object FakeUser extends UserModel("id", "test-name", LdapUser, Some("test-email"))
+
+  object FakeApplication extends Application(
+    "fake-application-id",
+    "fake-application-name",
+    LocalDateTime.now(),
+    Creator(FakeUser.email.get),
+    LocalDateTime.now(),
+    Seq(TeamMember(FakeUser.email.get)),
+    Environments(),
+    Seq.empty
+  )
 
   trait ApplicationGetterBehaviours {
     this: AsyncFreeSpec with Matchers with WireMockSupport =>
