@@ -48,8 +48,8 @@ class ProductionCredentialsChecklistControllerSpec extends SpecBase with Mockito
 
   "ProductionCredentialsChecklist Controller" - {
 
-    "must return OK and the correct view for a GET for a team member or administrator" in {
-      forAll(teamMemberAndAdministratorTable) {
+    "must return OK and the correct view for a GET for a team member or supporter" in {
+      forAll(teamMemberAndSupporterTable) {
         user =>
           val fixture = buildFixture(user)
 
@@ -67,8 +67,8 @@ class ProductionCredentialsChecklistControllerSpec extends SpecBase with Mockito
       }
     }
 
-    "must return the Generate Primary Secret Success view when valid data is submitted by a team member or administrator" in {
-      forAll(teamMemberAndAdministratorTable) {
+    "must return the Generate Primary Secret Success view when valid data is submitted by a team member or supporter" in {
+      forAll(teamMemberAndSupporterTable) {
         user =>
           val fixture = buildFixture(user)
           val secret = Secret("test-secret")
@@ -119,7 +119,7 @@ class ProductionCredentialsChecklistControllerSpec extends SpecBase with Mockito
       }
     }
 
-    "must redirect to Unauthorised page for a GET when user is not a team member or administrator" in {
+    "must redirect to Unauthorised page for a GET when user is not a team member or supporter" in {
       val fixture = buildFixture(FakeUserNotTeamMember)
 
       running(fixture.playApplication) {
@@ -132,7 +132,7 @@ class ProductionCredentialsChecklistControllerSpec extends SpecBase with Mockito
       }
     }
 
-    "must redirect to Unauthorised page for a POST when user is not a team member or administrator" in {
+    "must redirect to Unauthorised page for a POST when user is not a team member or supporter" in {
       val fixture = buildFixture(FakeUserNotTeamMember)
 
       running(fixture.playApplication) {

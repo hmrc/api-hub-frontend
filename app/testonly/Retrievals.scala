@@ -19,7 +19,7 @@ package testonly
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
-case class Retrievals(principal: String, email: String, canApprove: Boolean, canAdminister: Boolean)
+case class Retrievals(principal: String, email: String, canApprove: Boolean, canSupport: Boolean)
 
 object Retrievals {
 
@@ -37,7 +37,7 @@ object Retrievals {
           JsString(retrievals.principal),
           JsString(retrievals.email),
           JsBoolean(retrievals.canApprove),
-          JsBoolean(retrievals.canAdminister)
+          JsBoolean(retrievals.canSupport)
         )
       )
     )

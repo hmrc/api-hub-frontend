@@ -16,16 +16,16 @@
 
 package utils
 
-import controllers.actions.{FakeAdministrator, FakeUser}
+import controllers.actions.{FakeSupporter, FakeUser}
 import models.user.UserModel
 import org.scalatest.prop.{TableDrivenPropertyChecks, TableFor1}
 
 trait TestHelpers extends TableDrivenPropertyChecks {
 
-  val teamMemberAndAdministratorTable: TableFor1[UserModel] = Table(
+  val teamMemberAndSupporterTable: TableFor1[UserModel] = Table(
     "User",
     FakeUser,
-    FakeAdministrator
+    FakeSupporter
   )
 
 }

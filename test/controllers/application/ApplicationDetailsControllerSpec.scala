@@ -40,8 +40,8 @@ import scala.concurrent.Future
 class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with TestHelpers with HtmlValidation{
 
   "ApplicationDetails Controller" - {
-    "must return OK and the correct view for a GET for a team member or administrator" in {
-      forAll(teamMemberAndAdministratorTable) {
+    "must return OK and the correct view for a GET for a team member or supporter" in {
+      forAll(teamMemberAndSupporterTable) {
         user: UserModel =>
           val fixture = buildFixture(userModel = user)
 
@@ -159,7 +159,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
       }
     }
 
-    "must redirect to Unauthorised page for a GET when user is not a team member or administrator" in {
+    "must redirect to Unauthorised page for a GET when user is not a team member or supporter" in {
       val fixture = buildFixture(userModel = FakeUserNotTeamMember)
 
       when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(true))(any()))

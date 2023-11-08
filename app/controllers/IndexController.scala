@@ -46,7 +46,7 @@ class IndexController @Inject()(
     request.user.email.fold[Future[Result]] {
       noEmail()
     }(email =>
-      if (request.user.permissions.canAdminister){
+      if (request.user.permissions.canSupport){
           apiHubService.getApplications().map(apps => Ok(view(apps, Some(request.user))))
       }else{
         apiHubService.getUserApplications(email).map(userApps => Ok(view(userApps, Some(request.user))))

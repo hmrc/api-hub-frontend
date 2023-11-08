@@ -37,10 +37,10 @@ class RegisterApplicationSuccessControllerSpec extends SpecBase with MockitoSuga
 
   "RegisterApplicationSuccess Controller" - {
 
-    "must return OK and the correct view for a GET for a team member or administrator" in {
+    "must return OK and the correct view for a GET for a team member or supporter" in {
       val app = Application("id-1", "test", Creator("creator-email"), Seq(TeamMember("test-email")))
 
-      forAll(teamMemberAndAdministratorTable) {
+      forAll(teamMemberAndSupporterTable) {
         user: UserModel =>
           val fixture = buildFixture(user)
 
@@ -64,7 +64,7 @@ class RegisterApplicationSuccessControllerSpec extends SpecBase with MockitoSuga
       }
     }
 
-    "must redirect to Unauthorised page for a GET when user is not a team member or administrator" in {
+    "must redirect to Unauthorised page for a GET when user is not a team member or supporter" in {
       val testId = "test-app-id"
       val fixture = buildFixture(userModel = FakeUserNotTeamMember)
 

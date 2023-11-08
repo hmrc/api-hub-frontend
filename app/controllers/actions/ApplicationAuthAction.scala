@@ -52,7 +52,7 @@ class ApplicationAuthActionProviderImpl @Inject()(
 
         apiHubService.getApplication(applicationId, enrich) map {
           case Some(application) =>
-            if (identifierRequest.user.permissions.canAdminister || isTeamMember(application, identifierRequest.user)) {
+            if (identifierRequest.user.permissions.canSupport || isTeamMember(application, identifierRequest.user)) {
                 Right(ApplicationRequest(identifierRequest, application))
             }
             else {

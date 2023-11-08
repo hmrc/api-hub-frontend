@@ -44,7 +44,7 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
             <h1 class="govuk-heading-l">
-                @if(user.map(_.permissions.canAdminister).getOrElse(false)) {
+                @if(user.map(_.permissions.canSupport).getOrElse(false)) {
                     @messages("index.heading.admin")
                 } else {
                     @messages("index.heading")

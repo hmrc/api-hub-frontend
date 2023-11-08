@@ -41,11 +41,11 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar with TestHelpers
   private val form = formProvider()
 
   "AddScopeController" - {
-    "must register the scope and redirect to the application details page for a valid request from a team member or administrator" in {
+    "must register the scope and redirect to the application details page for a valid request from a team member or supporter" in {
       val testId = "test-app-id"
       val newScope = NewScope("my_scope", Seq(Primary, Secondary))
 
-      forAll(teamMemberAndAdministratorTable) {
+      forAll(teamMemberAndSupporterTable) {
         user: UserModel =>
           val fixture = buildFixture(userModel = user)
 
@@ -68,7 +68,7 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar with TestHelpers
       }
     }
 
-    "must redirect to Unauthorised page for a POST when user is not a team member or administrator" in {
+    "must redirect to Unauthorised page for a POST when user is not a team member or supporter" in {
       val testId = "test-app-id"
       val fixture = buildFixture(userModel = FakeUserNotTeamMember)
 
@@ -146,12 +146,12 @@ class AddScopeControllerSpec extends SpecBase with MockitoSugar with TestHelpers
       }
     }
 
-    "must return OK and the correct view for a GET for a team member or administrator" in {
+    "must return OK and the correct view for a GET for a team member or supporter" in {
       val testId = "test-app-id"
       val env1 = "Narnia"
       val env2 = "Coventry"
 
-      forAll(teamMemberAndAdministratorTable) {
+      forAll(teamMemberAndSupporterTable) {
         user: UserModel =>
           val fixture = buildFixture(env1, env2, user)
           val view = fixture.application.injector.instanceOf[AddScopeView]

@@ -17,7 +17,7 @@
 package controllers.actions
 
 import com.google.inject.{Inject, Singleton}
-import controllers.actions.StrideAuthenticator.{API_HUB_ADMINISTRATOR_ROLE, API_HUB_APPROVER_ROLE, API_HUB_USER_ROLE}
+import controllers.actions.StrideAuthenticator.{API_HUB_APPROVER_ROLE, API_HUB_SUPPORT_ROLE, API_HUB_USER_ROLE}
 import models.user.{Permissions, StrideUser, UserModel}
 import play.api.mvc.Request
 import uk.gov.hmrc.auth.core.AuthProvider.PrivilegedApplication
@@ -37,7 +37,7 @@ class StrideAuthenticator @Inject()(
     authorised(
       Enrolment(API_HUB_USER_ROLE) or
         Enrolment(API_HUB_APPROVER_ROLE) or
-        Enrolment(API_HUB_ADMINISTRATOR_ROLE) and
+        Enrolment(API_HUB_SUPPORT_ROLE) and
         AuthProviders(PrivilegedApplication)
     )
       .retrieve(Retrievals.authorisedEnrolments and Retrievals.name and Retrievals.email and Retrievals.credentials) {
@@ -57,7 +57,7 @@ class StrideAuthenticator @Inject()(
               ),
               permissions = Permissions(
                 canApprove = authorisedEnrolments.enrolments.exists(enrolment => enrolment.key.equals(API_HUB_APPROVER_ROLE)),
-                canAdminister = authorisedEnrolments.enrolments.exists(enrolment => enrolment.key.equals(API_HUB_ADMINISTRATOR_ROLE))
+                canSupport = authorisedEnrolments.enrolments.exists(enrolment => enrolment.key.equals(API_HUB_SUPPORT_ROLE))
               )
             )
           ))
@@ -75,6 +75,6 @@ object StrideAuthenticator {
 
   val API_HUB_USER_ROLE: String = "api_hub_user"
   val API_HUB_APPROVER_ROLE: String = "api_hub_approver"
-  val API_HUB_ADMINISTRATOR_ROLE: String = "api_hub_app_admin"
+  val API_HUB_SUPPORT_ROLE: String = "api_hub_support"
 
 }

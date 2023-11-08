@@ -48,18 +48,18 @@ class ApplicationAuthActionSpec extends SpecBase with Matchers with MockitoSugar
       status(result) mustBe OK
     }
 
-    "must grant a user access to an application when they are an administrator but not in the team" in {
+    "must grant a user access to an application when they are a supporter but not in the team" in {
       val fixture = buildFixture()
       val application = FakeApplication.copy(teamMembers = Seq.empty)
 
       when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), ArgumentMatchers.eq(false))(any()))
         .thenReturn(Future.successful(Some(application)))
 
-      val result = fixture.provider.apply(application.id).invokeBlock(buildRequest(FakeAdministrator), buildInvokeBlock())
+      val result = fixture.provider.apply(application.id).invokeBlock(buildRequest(FakeSupporter), buildInvokeBlock())
       status(result) mustBe OK
     }
 
-    "must redirect to the Unauthorised page when the user is not in the team or an administrator" in {
+    "must redirect to the Unauthorised page when the user is not in the team or an supporter" in {
       val fixture = buildFixture()
       val application = FakeApplication.copy(teamMembers = Seq.empty)
 
