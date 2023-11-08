@@ -11,7 +11,7 @@ This service provides the following functionality:
 - Registration of applications and their team members
 - Request mechanism for production scopes and credentials
 - Approval of production scope requests
-- Administration of applications
+- Support of applications
 
 ## Requirements
 

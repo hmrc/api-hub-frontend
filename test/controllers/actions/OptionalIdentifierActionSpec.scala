@@ -171,7 +171,7 @@ object OptionalIdentifierActionSpec {
     userName = "test-user-name",
     userType = StrideUser,
     email = Some("test-email"),
-    permissions = Permissions(canApprove = false, canAdminister = false)
+    permissions = Permissions(canApprove = false, canSupport = false)
   )
 
   def unauthenticatedRequest(): FakeRequest[AnyContentAsEmpty.type] = {

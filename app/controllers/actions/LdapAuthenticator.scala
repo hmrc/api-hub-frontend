@@ -17,7 +17,7 @@
 package controllers.actions
 
 import com.google.inject.{Inject, Singleton}
-import controllers.actions.LdapAuthenticator.{canAdministerPredicate, canApprovePredicate}
+import controllers.actions.LdapAuthenticator.{canApprovePredicate, canSupportPredicate}
 import models.user.{LdapUser, Permissions, UserModel}
 import play.api.mvc.Request
 import uk.gov.hmrc.internalauth.client._
@@ -31,15 +31,15 @@ class LdapAuthenticator @Inject()(
 )(implicit ec: ExecutionContext) extends Authenticator with FrontendHeaderCarrierProvider {
 
   def authenticate()(implicit request: Request[_]): Future[UserAuthResult] = {
-    auth.verify(Retrieval.username ~ Retrieval.email ~ Retrieval.hasPredicate(canApprovePredicate) ~ Retrieval.hasPredicate(canAdministerPredicate)) flatMap {
-      case Some(username ~ maybeEmail ~ canApprove ~ canAdminister) =>
+    auth.verify(Retrieval.username ~ Retrieval.email ~ Retrieval.hasPredicate(canApprovePredicate) ~ Retrieval.hasPredicate(canSupportPredicate)) flatMap {
+      case Some(username ~ maybeEmail ~ canApprove ~ canSupport) =>
         Future.successful(UserAuthenticated(
           UserModel(
             s"LDAP-${username.value}",
             username.value,
             LdapUser,
             maybeEmail.map(email => email.value),
-            Permissions(canApprove = canApprove, canAdminister = canAdminister)
+            Permissions(canApprove = canApprove, canSupport = canSupport)
           )
         ))
       case None =>
@@ -62,13 +62,11 @@ object LdapAuthenticator {
     action = IAAction(approverAction)
   )
 
-  val administratorResourceType: String = "api-hub-frontend"
-  val administratorResourceLocation: String = "administration"
-  val administratorAction: String = "WRITE"
-
-  private val canAdministerPredicate: Predicate = Predicate.Permission(
-    resource = Resource.from(resourceType = administratorResourceType, resourceLocation = administratorResourceLocation),
-    action = IAAction(administratorAction)
+  val supportResourceType: String = "api-hub-frontend"
+  val supportResourceLocation: String = "support"
+  val supportAction: String = "WRITE"
+  private val canSupportPredicate: Predicate = Predicate.Permission(
+    resource = Resource.from(resourceType = supportResourceType, resourceLocation = supportResourceLocation),
+    action = IAAction(supportAction)
   )
-
 }

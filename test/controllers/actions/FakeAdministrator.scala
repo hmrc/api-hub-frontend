@@ -18,10 +18,10 @@ package controllers.actions
 
 import models.user.{LdapUser, Permissions, UserModel}
 
-object FakeAdministrator extends UserModel(
-  userId ="fake-administrator-id",
-  userName = "fake-administrator-name",
+object FakeSupporter extends UserModel(
+  userId ="fake-supporter-id",
+  userName = "fake-supporter-name",
   userType = LdapUser,
-  email = Some("fake-administrator-email"),
-  permissions = Permissions(canApprove = false, canAdminister = true)
+  email = Some("fake-supporter-email"),
+  permissions = Permissions(canApprove = false, canSupport = true)
 )

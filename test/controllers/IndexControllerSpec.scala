@@ -113,7 +113,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with HtmlValidation
       }
     }
 
-    "must call apiHubService.getApplications() if user has admin permissions" in {
+    "must call apiHubService.getApplications() if user has support permissions" in {
       val testEmail = "test-email"
       val creatorEmail = "creator-email-2"
       val applications = Seq(
@@ -138,7 +138,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with HtmlValidation
       }
     }
 
-    "must call apiHubService.getUserApplications() if user does not have admin permissions" in {
+    "must call apiHubService.getUserApplications() if user does not have support permissions" in {
       val testEmail = "test-email"
       val creatorEmail = "creator-email-2"
       val applications = Seq(

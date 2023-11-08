@@ -23,5 +23,5 @@ object FakeApprover extends UserModel(
   userName = "fake-approver-name",
   userType = LdapUser,
   email = Some("fake-approver-email"),
-  permissions = Permissions(canApprove = true, canAdminister = false)
+  permissions = Permissions(canApprove = true, canSupport = false)
 )

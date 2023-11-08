@@ -45,7 +45,7 @@ class LdapAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSuga
         userName = "jo.bloggs",
         userType = LdapUser,
         email = Some("jo.bloggs@email.com"),
-        permissions = Permissions(canApprove = false, canAdminister = false)
+        permissions = Permissions(canApprove = false, canSupport = false)
       )
 
       when(mockStubBehaviour.stubAuth(ArgumentMatchers.eq(None), ArgumentMatchers.eq(retrieval)))
@@ -68,7 +68,7 @@ class LdapAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSuga
         userName = "jo.bloggs",
         userType = LdapUser,
         email = Some("jo.bloggs@email.com"),
-        permissions = Permissions(canApprove = true, canAdminister = false)
+        permissions = Permissions(canApprove = true, canSupport = false)
       )
 
       when(mockStubBehaviour.stubAuth(ArgumentMatchers.eq(None), ArgumentMatchers.eq(retrieval)))
@@ -80,7 +80,7 @@ class LdapAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSuga
       }
     }
 
-    "must retrieve an authenticated administrator details correctly" in {
+    "must retrieve an authenticated supporter details correctly" in {
       implicit val cc: ControllerComponents = stubMessagesControllerComponents()
       val mockStubBehaviour = mock[StubBehaviour]
       val stubAuth = FrontendAuthComponentsStub(mockStubBehaviour)
@@ -91,7 +91,7 @@ class LdapAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSuga
         userName = "jo.bloggs",
         userType = LdapUser,
         email = Some("jo.bloggs@email.com"),
-        permissions = Permissions(canApprove = false, canAdminister = true)
+        permissions = Permissions(canApprove = false, canSupport = true)
       )
 
       when(mockStubBehaviour.stubAuth(ArgumentMatchers.eq(None), ArgumentMatchers.eq(retrieval)))
@@ -146,28 +146,27 @@ object LdapAuthenticatorSpec {
     IAAction("WRITE")
   )
 
-  private val canAdministerPredicate = Predicate.Permission(
+  private val canSupportPredicate = Predicate.Permission(
     Resource(
       ResourceType("api-hub-frontend"),
-      ResourceLocation("administration")
+      ResourceLocation("support")
     ),
     IAAction("WRITE")
   )
 
   val retrieval: Retrieval.NonEmptyRetrieval[Retrieval.Username ~ Option[Retrieval.Email] ~ Boolean ~ Boolean]
-    = Retrieval.username ~ Retrieval.email ~ Retrieval.hasPredicate(canApprovePredicate) ~ Retrieval.hasPredicate(canAdministerPredicate)
+    = Retrieval.username ~ Retrieval.email ~ Retrieval.hasPredicate(canApprovePredicate) ~ Retrieval.hasPredicate(canSupportPredicate)
 
   def retrievalsForUser(user: UserModel): Retrieval.Username ~ Option[Retrieval.Email] ~ Boolean ~ Boolean = {
-    uk.gov.hmrc.internalauth.client.~(
       uk.gov.hmrc.internalauth.client.~(
         uk.gov.hmrc.internalauth.client.~(
-          Retrieval.Username(user.userName),
-          user.email.map(Retrieval.Email)
+          uk.gov.hmrc.internalauth.client.~(
+            Retrieval.Username(user.userName),
+            user.email.map(Retrieval.Email)
+          ),
+          user.permissions.canApprove
         ),
-        user.permissions.canApprove
-      ),
-      user.permissions.canAdminister
-    )
+        user.permissions.canSupport
+      )
   }
-
 }

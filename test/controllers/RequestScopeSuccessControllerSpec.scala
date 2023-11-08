@@ -37,8 +37,8 @@ class RequestScopeSuccessControllerSpec extends SpecBase with MockitoSugar with 
 
   "RequestScopeSuccess Controller" - {
 
-    "must return OK and the correct view for a GET for a team member or administrator" in {
-      forAll(teamMemberAndAdministratorTable) {
+    "must return OK and the correct view for a GET for a team member or supporter" in {
+      forAll(teamMemberAndSupporterTable) {
         user: UserModel =>
           val fixture = buildFixture(user)
           val application = Application(applicationId, "test-name", Creator("test-email"), Seq(TeamMember("test-email")))
@@ -77,7 +77,7 @@ class RequestScopeSuccessControllerSpec extends SpecBase with MockitoSugar with 
       }
     }
 
-    "must redirect to Unauthorised page for a GET when user is not a team member or administrator" in {
+    "must redirect to Unauthorised page for a GET when user is not a team member or supporter" in {
       val testId = "test-app-id"
       val fixture = buildFixture(userModel = FakeUserNotTeamMember)
 

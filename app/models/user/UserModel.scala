@@ -23,11 +23,11 @@ sealed trait UserType
 case object LdapUser extends WithName("LDAP") with UserType
 case object StrideUser extends WithName("Stride") with UserType
 
-case class Permissions(canApprove: Boolean, canAdminister: Boolean)
+case class Permissions(canApprove: Boolean, canSupport: Boolean)
 
 object Permissions {
 
-  def apply(): Permissions = Permissions(canApprove = false, canAdminister = false)
+  def apply(): Permissions = Permissions(canApprove = false, canSupport = false)
 
 }
 

@@ -45,8 +45,8 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
   import AddCredentialControllerSpec._
 
   "AddCredentialChecklistController.checklist" - {
-    "must return OK and the correct view for a GET for a team member or administrator" in {
-      forAll(teamMemberAndAdministratorTable) {
+    "must return OK and the correct view for a GET for a team member or supporter" in {
+      forAll(teamMemberAndSupporterTable) {
         user =>
           val fixture = buildFixture(user)
 
@@ -63,7 +63,7 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
       }
     }
 
-    "must redirect to Unauthorised page for a GET when user is not a team member or administrator" in {
+    "must redirect to Unauthorised page for a GET when user is not a team member or supporter" in {
       val fixture = buildFixture(FakeUserNotTeamMember)
 
       running(fixture.playApplication) {
@@ -77,8 +77,8 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
   }
 
   "AddCredentialChecklistController.addProductionCredential" - {
-    "must return the Add Credential Success view when valid data is submitted by a team member or administrator" in {
-      forAll(teamMemberAndAdministratorTable) {
+    "must return the Add Credential Success view when valid data is submitted by a team member or supporter" in {
+      forAll(teamMemberAndSupporterTable) {
         user =>
           val api1 = ApiDetail("test-api-1", "test-api-name-1", "", "", Seq.empty, None, "")
           val api2 = ApiDetail("test-api-2", "test-api-name-2", "", "", Seq.empty, None, "")
@@ -142,7 +142,7 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
       }
     }
 
-    "must redirect to Unauthorised page for a POST when user is not a team member or administrator" in {
+    "must redirect to Unauthorised page for a POST when user is not a team member or supporter" in {
       val fixture = buildFixture(FakeUserNotTeamMember)
 
       running(fixture.playApplication) {
@@ -193,7 +193,7 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
       }
     }
 
-    "must redirect to Unauthorised page for a POST when user is not a team member or administrator" in {
+    "must redirect to Unauthorised page for a POST when user is not a team member or supporter" in {
       val fixture = buildFixture(FakeUserNotTeamMember)
 
       running(fixture.playApplication) {
