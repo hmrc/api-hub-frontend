@@ -150,6 +150,10 @@ environmentAndCredentials.clientId = Client ID
 environmentAndCredentials.clientSecret = Client Secret
 environmentAndCredentials.created = Created
 environmentAndCredentials.addNewCredential = Add new credential
+environmentAndCredentials.noCredentials = There are no production credentials generated.
+environmentAndCredentials.notPrivileged = You do not have permission to manage credentials
+environmentAndCredentials.notPrivileged.additional1 = To manage production credentials you need SC clearance and the relevant role assigned to your account.
+environmentAndCredentials.notPrivileged.additional2 = To find out more, view our access and roles guide.
 
 addCredentialChecklist.title = Generating production credentials
 addCredentialChecklist.heading = Generating production credentials
