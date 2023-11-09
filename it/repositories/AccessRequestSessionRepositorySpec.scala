@@ -11,7 +11,7 @@ class AccessRequestSessionRepositorySpec extends UserAnswersRepositoryBehaviours
     cryptoProvider = cryptoProvider
   )
 
-  "AddAnApiSessionRepository" - {
+  "AccessRequestSessionRepository" - {
     behave like userAnswersRepository(repository)
   }
 
