@@ -17,7 +17,7 @@
 package controllers.actions
 
 import com.google.inject.{Inject, Singleton}
-import controllers.actions.LdapAuthenticator.{canApprovePredicate, canSupportPredicate}
+import controllers.actions.LdapAuthenticator.{canApprovePredicate, canSupportPredicate, isPrivilegedPredicate}
 import models.user.{LdapUser, Permissions, UserModel}
 import play.api.mvc.Request
 import uk.gov.hmrc.internalauth.client._
@@ -31,15 +31,21 @@ class LdapAuthenticator @Inject()(
 )(implicit ec: ExecutionContext) extends Authenticator with FrontendHeaderCarrierProvider {
 
   def authenticate()(implicit request: Request[_]): Future[UserAuthResult] = {
-    auth.verify(Retrieval.username ~ Retrieval.email ~ Retrieval.hasPredicate(canApprovePredicate) ~ Retrieval.hasPredicate(canSupportPredicate)) flatMap {
-      case Some(username ~ maybeEmail ~ canApprove ~ canSupport) =>
+    auth.verify(
+      Retrieval.username ~
+        Retrieval.email ~
+        Retrieval.hasPredicate(canApprovePredicate) ~
+        Retrieval.hasPredicate(canSupportPredicate) ~
+        Retrieval.hasPredicate(isPrivilegedPredicate)
+    ) flatMap {
+      case Some(username ~ maybeEmail ~ canApprove ~ canSupport ~ isPrivileged) =>
         Future.successful(UserAuthenticated(
           UserModel(
             s"LDAP-${username.value}",
             username.value,
             LdapUser,
             maybeEmail.map(email => email.value),
-            Permissions(canApprove = canApprove, canSupport = canSupport)
+            Permissions(canApprove = canApprove, canSupport = canSupport, isPrivileged = isPrivileged)
           )
         ))
       case None =>
@@ -65,8 +71,19 @@ object LdapAuthenticator {
   val supportResourceType: String = "api-hub-frontend"
   val supportResourceLocation: String = "support"
   val supportAction: String = "WRITE"
+
   private val canSupportPredicate: Predicate = Predicate.Permission(
     resource = Resource.from(resourceType = supportResourceType, resourceLocation = supportResourceLocation),
     action = IAAction(supportAction)
   )
+
+  val privilegedResourceType: String = "api-hub-frontend"
+  val privilegedResourceLocation: String = "privileged-usage"
+  val privilegedAction: String = "WRITE"
+
+  private val isPrivilegedPredicate: Predicate = Predicate.Permission(
+    resource = Resource.from(resourceType = privilegedResourceType, resourceLocation = privilegedResourceLocation),
+    action = IAAction(privilegedAction)
+  )
+
 }

@@ -23,5 +23,5 @@ object FakeSupporter extends UserModel(
   userName = "fake-supporter-name",
   userType = LdapUser,
   email = Some("fake-supporter-email"),
-  permissions = Permissions(canApprove = false, canSupport = true)
+  permissions = Permissions(canApprove = false, canSupport = true, isPrivileged = false)
 )

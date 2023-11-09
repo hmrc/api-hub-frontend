@@ -120,7 +120,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with HtmlValidation
         Application("id-1", "app-name-1", Creator(creatorEmail), Seq.empty).copy(teamMembers = Seq(TeamMember(testEmail))),
         Application("id-2", "app-name-2", Creator(creatorEmail), Seq.empty).copy(teamMembers = Seq(TeamMember(testEmail)))
       )
-      val user: UserModel = FakeUser.copy(permissions = Permissions(false, true))
+      val user: UserModel = FakeUser.copy(permissions = Permissions(canApprove = false, canSupport = true, isPrivileged = false))
       val fixture = buildFixtureWithUser(userModel = user)
       running(fixture.application) {
 
