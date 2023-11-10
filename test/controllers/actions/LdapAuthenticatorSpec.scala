@@ -45,7 +45,7 @@ class LdapAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSuga
         userName = "jo.bloggs",
         userType = LdapUser,
         email = Some("jo.bloggs@email.com"),
-        permissions = Permissions(canApprove = false, canSupport = false)
+        permissions = Permissions(canApprove = false, canSupport = false, isPrivileged = false)
       )
 
       when(mockStubBehaviour.stubAuth(ArgumentMatchers.eq(None), ArgumentMatchers.eq(retrieval)))
@@ -68,7 +68,7 @@ class LdapAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSuga
         userName = "jo.bloggs",
         userType = LdapUser,
         email = Some("jo.bloggs@email.com"),
-        permissions = Permissions(canApprove = true, canSupport = false)
+        permissions = Permissions(canApprove = true, canSupport = false, isPrivileged = false)
       )
 
       when(mockStubBehaviour.stubAuth(ArgumentMatchers.eq(None), ArgumentMatchers.eq(retrieval)))
@@ -91,7 +91,30 @@ class LdapAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSuga
         userName = "jo.bloggs",
         userType = LdapUser,
         email = Some("jo.bloggs@email.com"),
-        permissions = Permissions(canApprove = false, canSupport = true)
+        permissions = Permissions(canApprove = false, canSupport = true, isPrivileged = false)
+      )
+
+      when(mockStubBehaviour.stubAuth(ArgumentMatchers.eq(None), ArgumentMatchers.eq(retrieval)))
+        .thenReturn(Future.successful(retrievalsForUser(user)))
+
+      ldapAuthenticator.authenticate()(requestWithAuthorisation).map {
+        result =>
+          result mustBe UserAuthenticated(user)
+      }
+    }
+
+    "must retrieve an authenticated privileged user's details correctly" in {
+      implicit val cc: ControllerComponents = stubMessagesControllerComponents()
+      val mockStubBehaviour = mock[StubBehaviour]
+      val stubAuth = FrontendAuthComponentsStub(mockStubBehaviour)
+      val ldapAuthenticator = new LdapAuthenticator(stubAuth)
+
+      val user = UserModel(
+        userId = "LDAP-jo.bloggs",
+        userName = "jo.bloggs",
+        userType = LdapUser,
+        email = Some("jo.bloggs@email.com"),
+        permissions = Permissions(canApprove = false, canSupport = false, isPrivileged = true)
       )
 
       when(mockStubBehaviour.stubAuth(ArgumentMatchers.eq(None), ArgumentMatchers.eq(retrieval)))
@@ -154,10 +177,23 @@ object LdapAuthenticatorSpec {
     IAAction("WRITE")
   )
 
-  val retrieval: Retrieval.NonEmptyRetrieval[Retrieval.Username ~ Option[Retrieval.Email] ~ Boolean ~ Boolean]
-    = Retrieval.username ~ Retrieval.email ~ Retrieval.hasPredicate(canApprovePredicate) ~ Retrieval.hasPredicate(canSupportPredicate)
+  private val isPrivilegedPredicate = Predicate.Permission(
+    Resource(
+      ResourceType("api-hub-frontend"),
+      ResourceLocation("privileged-usage")
+    ),
+    IAAction("WRITE")
+  )
 
-  def retrievalsForUser(user: UserModel): Retrieval.Username ~ Option[Retrieval.Email] ~ Boolean ~ Boolean = {
+  val retrieval: Retrieval.NonEmptyRetrieval[Retrieval.Username ~ Option[Retrieval.Email] ~ Boolean ~ Boolean ~ Boolean]
+    = Retrieval.username ~
+      Retrieval.email ~
+      Retrieval.hasPredicate(canApprovePredicate) ~
+      Retrieval.hasPredicate(canSupportPredicate) ~
+    Retrieval.hasPredicate(isPrivilegedPredicate)
+
+  def retrievalsForUser(user: UserModel): Retrieval.Username ~ Option[Retrieval.Email] ~ Boolean ~ Boolean ~ Boolean = {
+    uk.gov.hmrc.internalauth.client.~(
       uk.gov.hmrc.internalauth.client.~(
         uk.gov.hmrc.internalauth.client.~(
           uk.gov.hmrc.internalauth.client.~(
@@ -167,6 +203,9 @@ object LdapAuthenticatorSpec {
           user.permissions.canApprove
         ),
         user.permissions.canSupport
-      )
+      ),
+      user.permissions.isPrivileged
+    )
   }
+
 }

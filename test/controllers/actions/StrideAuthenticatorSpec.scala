@@ -16,7 +16,7 @@
 
 package controllers.actions
 
-import controllers.actions.StrideAuthenticator.{API_HUB_APPROVER_ROLE, API_HUB_SUPPORT_ROLE, API_HUB_USER_ROLE}
+import controllers.actions.StrideAuthenticator.{API_HUB_APPROVER_ROLE, API_HUB_PRIVILEGED_USER_ROLE, API_HUB_SUPPORT_ROLE, API_HUB_USER_ROLE}
 import controllers.actions.StrideAuthenticatorSpec._
 import models.user.{Permissions, StrideUser, UserModel}
 import org.mockito.ArgumentMatchers.any
@@ -44,7 +44,7 @@ class StrideAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSu
         userName = "jo.bloggs",
         userType = StrideUser,
         email = Some("jo.bloggs@email.com"),
-        permissions = Permissions(canApprove = false, canSupport = false)
+        permissions = Permissions(canApprove = false, canSupport = false, isPrivileged = false)
       )
 
       when(authConnector.authorise(ArgumentMatchers.eq(userPredicate), ArgumentMatchers.eq(userRetrieval))(any(), any()))
@@ -65,7 +65,7 @@ class StrideAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSu
         userName = "jo.bloggs",
         userType = StrideUser,
         email = Some("jo.bloggs@email.com"),
-        permissions = Permissions(canApprove = true, canSupport = false)
+        permissions = Permissions(canApprove = true, canSupport = false, isPrivileged = false)
       )
 
       when(authConnector.authorise(ArgumentMatchers.eq(userPredicate), ArgumentMatchers.eq(userRetrieval))(any(), any()))
@@ -86,7 +86,28 @@ class StrideAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSu
         userName = "jo.bloggs",
         userType = StrideUser,
         email = Some("jo.bloggs@email.com"),
-        permissions = Permissions(canApprove = false, canSupport = true)
+        permissions = Permissions(canApprove = false, canSupport = true, isPrivileged = false)
+      )
+
+      when(authConnector.authorise(ArgumentMatchers.eq(userPredicate), ArgumentMatchers.eq(userRetrieval))(any(), any()))
+        .thenReturn(Future.successful(retrievalsForUser(user)))
+
+      strideAuthenticator.authenticate()(FakeRequest()).map {
+        result =>
+          result mustBe UserAuthenticated(user)
+      }
+    }
+
+    "must retrieve an authenticated privileged user's details correctly" in {
+      val authConnector = mock[AuthConnector]
+      val strideAuthenticator = new StrideAuthenticator(authConnector)
+
+      val user = UserModel(
+        userId = s"STRIDE-$providerId",
+        userName = "jo.bloggs",
+        userType = StrideUser,
+        email = Some("jo.bloggs@email.com"),
+        permissions = Permissions(canApprove = false, canSupport = false, isPrivileged = true)
       )
 
       when(authConnector.authorise(ArgumentMatchers.eq(userPredicate), ArgumentMatchers.eq(userRetrieval))(any(), any()))
@@ -107,7 +128,7 @@ class StrideAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSu
         userName = "jo.bloggs",
         userType = StrideUser,
         email = Some(" "),
-        permissions = Permissions(canApprove = false, canSupport = false)
+        permissions = Permissions(canApprove = false, canSupport = false, isPrivileged = false)
       )
 
       when(authConnector.authorise(ArgumentMatchers.eq(userPredicate), ArgumentMatchers.eq(userRetrieval))(any(), any()))
@@ -157,7 +178,8 @@ object StrideAuthenticatorSpec {
   val userPredicate: Predicate =
     Enrolment(API_HUB_USER_ROLE) or
       Enrolment(API_HUB_APPROVER_ROLE) or
-      Enrolment(API_HUB_SUPPORT_ROLE) and
+      Enrolment(API_HUB_SUPPORT_ROLE) or
+      Enrolment(API_HUB_PRIVILEGED_USER_ROLE) and
       AuthProviders(PrivilegedApplication)
 
   val providerId: String = "test-provider-id"
@@ -186,6 +208,11 @@ object StrideAuthenticatorSpec {
     else if (user.permissions.canSupport) {
       Enrolments(
         Set(Enrolment(key = API_HUB_SUPPORT_ROLE))
+      )
+    }
+    else if (user.permissions.isPrivileged) {
+      Enrolments(
+        Set(Enrolment(key = API_HUB_PRIVILEGED_USER_ROLE))
       )
     }
     else {

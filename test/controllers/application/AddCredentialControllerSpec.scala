@@ -17,7 +17,7 @@
 package controllers.application
 
 import base.SpecBase
-import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
+import controllers.actions.{FakeApplication, FakePrivilegedUser, FakeUser, FakeUserNotTeamMember}
 import controllers.routes
 import forms.AddCredentialChecklistFormProvider
 import models.api.ApiDetail
@@ -45,8 +45,8 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
   import AddCredentialControllerSpec._
 
   "AddCredentialChecklistController.checklist" - {
-    "must return OK and the correct view for a GET for a team member or supporter" in {
-      forAll(teamMemberAndSupporterTable) {
+    "must return OK and the correct view for a GET for a privileged user who is a team member or support" in {
+      forAll(privilegedTeamMemberAndSupporterTable) {
         user =>
           val fixture = buildFixture(user)
 
@@ -63,8 +63,23 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
       }
     }
 
-    "must redirect to Unauthorised page for a GET when user is not a team member or supporter" in {
-      val fixture = buildFixture(FakeUserNotTeamMember)
+    "must redirect to Unauthorised page for a GET for a team member or supporter who is not a privileged user" in {
+      forAll(teamMemberAndSupporterTable) {
+        user =>
+          val fixture = buildFixture(user)
+
+          running(fixture.playApplication) {
+            implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, checklistRoute())
+            val result = route(fixture.playApplication, request).value
+
+            status(result) mustBe SEE_OTHER
+            redirectLocation(result).value mustEqual routes.UnauthorisedController.onPageLoad.url
+          }
+      }
+    }
+
+    "must redirect to Unauthorised page for a GET for a privileged user who is not a team member" in {
+      val fixture = buildFixture(FakePrivilegedUser)
 
       running(fixture.playApplication) {
         implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, checklistRoute())
@@ -77,8 +92,8 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
   }
 
   "AddCredentialChecklistController.addProductionCredential" - {
-    "must return the Add Credential Success view when valid data is submitted by a team member or supporter" in {
-      forAll(teamMemberAndSupporterTable) {
+    "must return the Add Credential Success view when valid data is submitted by a a privileged user who is a team member or supporter" in {
+      forAll(privilegedTeamMemberAndSupporterTable) {
         user =>
           val api1 = ApiDetail("test-api-1", "test-api-name-1", "", "", Seq.empty, None, "")
           val api2 = ApiDetail("test-api-2", "test-api-name-2", "", "", Seq.empty, None, "")
@@ -125,7 +140,7 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
-      val fixture = buildFixture()
+      val fixture = buildFixture(FakeUser.copy(permissions = FakeUser.permissions.copy(isPrivileged = true)))
 
       running(fixture.playApplication) {
         implicit val msgs: Messages = messages(fixture.playApplication)
@@ -142,8 +157,8 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
       }
     }
 
-    "must redirect to Unauthorised page for a POST when user is not a team member or supporter" in {
-      val fixture = buildFixture(FakeUserNotTeamMember)
+    "must redirect to Unauthorised page for a POST when the user is a privileged user but not a team member or support" in {
+      val fixture = buildFixture(FakePrivilegedUser)
 
       running(fixture.playApplication) {
         implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, addProductionCredentialRoute())
@@ -157,7 +172,7 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
     }
 
     "must return 400 Bad Request when the credential limit has been exceeded" in {
-      val fixture = buildFixture()
+      val fixture = buildFixture(FakeUser.copy(permissions = FakeUser.permissions.copy(isPrivileged = true)))
 
       when(fixture.apiHubService.addCredential(any(), any())(any()))
         .thenReturn(Future.successful(Left(ApplicationCredentialLimitException("test-message"))))

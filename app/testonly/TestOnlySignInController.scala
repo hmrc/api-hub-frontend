@@ -145,12 +145,19 @@ object TestOnlySignInController {
     actions = List(LdapAuthenticator.supportAction)
   )
 
+  private val privilegedPermission: Permission = Permission(
+    resourceType = LdapAuthenticator.privilegedResourceType,
+    resourceLocation = LdapAuthenticator.privilegedResourceLocation,
+    actions = List(LdapAuthenticator.privilegedAction)
+  )
+
   def retrievalsFor(data: TestOnlySignInData): Retrievals = {
     Retrievals(
       principal = data.principal,
       email = data.email,
       canApprove = data.permissions.contains(approverPermission),
-      canSupport = data.permissions.contains(supporterPermission)
+      canSupport = data.permissions.contains(supporterPermission),
+      isPrivileged = data.permissions.contains(privilegedPermission)
     )
   }
 

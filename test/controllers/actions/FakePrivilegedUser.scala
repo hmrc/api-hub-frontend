@@ -14,27 +14,14 @@
  * limitations under the License.
  */
 
-package models.user
+package controllers.actions
 
-import viewmodels.WithName
+import models.user.{LdapUser, Permissions, UserModel}
 
-sealed trait UserType
-
-case object LdapUser extends WithName("LDAP") with UserType
-case object StrideUser extends WithName("Stride") with UserType
-
-case class Permissions(canApprove: Boolean, canSupport: Boolean, isPrivileged: Boolean)
-
-object Permissions {
-
-  def apply(): Permissions = Permissions(canApprove = false, canSupport = false, isPrivileged = false)
-
-}
-
-case class UserModel(
-  userId: String,
-  userName: String,
-  userType: UserType,
-  email: Option[String] = Option.empty,
-  permissions: Permissions = Permissions()
+object FakePrivilegedUser extends UserModel(
+  userId ="fake-privileged-user-id",
+  userName = "fake-privileged-user-name",
+  userType = LdapUser,
+  email = Some("fake-privileged-user-email"),
+  permissions = Permissions(canApprove = false, canSupport = false, isPrivileged = true)
 )

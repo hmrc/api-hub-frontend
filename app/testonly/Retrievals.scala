@@ -19,7 +19,7 @@ package testonly
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
-case class Retrievals(principal: String, email: String, canApprove: Boolean, canSupport: Boolean)
+case class Retrievals(principal: String, email: String, canApprove: Boolean, canSupport: Boolean, isPrivileged: Boolean)
 
 object Retrievals {
 
@@ -27,7 +27,8 @@ object Retrievals {
     (JsPath \ "retrievals")(0).read[String] and
       (JsPath \ "retrievals")(1).read[String] and
       (JsPath \ "retrievals")(2).read[Boolean] and
-      (JsPath \ "retrievals")(3).read[Boolean]
+      (JsPath \ "retrievals")(3).read[Boolean] and
+      (JsPath \ "retrievals")(4).read[Boolean]
   )(Retrievals.apply _)
 
   private val writes: Writes[Retrievals] = (retrievals: Retrievals) => {
@@ -37,7 +38,8 @@ object Retrievals {
           JsString(retrievals.principal),
           JsString(retrievals.email),
           JsBoolean(retrievals.canApprove),
-          JsBoolean(retrievals.canSupport)
+          JsBoolean(retrievals.canSupport),
+          JsBoolean(retrievals.isPrivileged)
         )
       )
     )

@@ -36,6 +36,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class AddCredentialController @Inject()(
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
+  isPrivileged: AuthorisedPrivilegedUserAction,
   applicationAuth: ApplicationAuthActionProvider,
   formProvider: AddCredentialChecklistFormProvider,
   val controllerComponents: MessagesControllerComponents,
@@ -47,12 +48,12 @@ class AddCredentialController @Inject()(
 
   private val form = formProvider()
 
-  def checklist(applicationId: String): Action[AnyContent] = (identify andThen applicationAuth(applicationId)) {
+  def checklist(applicationId: String): Action[AnyContent] = (identify andThen isPrivileged andThen applicationAuth(applicationId)) {
     implicit request =>
       Ok(view(form, applicationId))
   }
 
-  def addProductionCredential(applicationId: String): Action[AnyContent] = (identify andThen applicationAuth(applicationId)).async {
+  def addProductionCredential(applicationId: String): Action[AnyContent] = (identify andThen isPrivileged andThen applicationAuth(applicationId)).async {
     implicit request =>
       form.bindFromRequest().fold(
         formWithErrors =>
