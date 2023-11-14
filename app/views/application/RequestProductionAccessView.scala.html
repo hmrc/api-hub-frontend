@@ -23,10 +23,13 @@
 @this(
         layout: templates.Layout,
         govukTable: GovukTable,
-        govukButton: GovukButton
+        govukButton: GovukButton,
+        govukCheckboxes: GovukCheckboxes,
+        govukErrorSummary: GovukErrorSummary,
+        formHelper: FormWithCSRF
 )
 
-@(application: Application, applicationApis: Seq[ApplicationApi], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, application: Application, applicationApis: Seq[ApplicationApi], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
 @scripts() = {
     <link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css' media="all" rel="stylesheet" type="text/css"
@@ -36,6 +39,89 @@
 }
 
 @styles() = {
+    .hip-details {
+    font-size: 1.1875rem;
+    line-height: 1.47368;
+    display: block;
+    }
+
+    .hip-details__summary {
+    background-color: #fff;
+    border-top: 4px solid rgba(0, 0, 0, 0);
+    padding: 20px 24px 24px;
+    }
+
+    .hip-details__summary {
+    color: #005eb8;
+    cursor: pointer;
+    position: relative;
+    }
+
+    .hip-expander {
+    background-color: #fff;
+    border: 1px solid #d8dde0;
+    border-bottom-width: 4px;
+    margin-top: 16px;
+    margin-bottom: 16px;
+    font-family: "nta", Arial, sans-serif;
+    }
+
+    .hip-expander .hip-details__summary-text {
+    color: #005eb8;
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    }
+
+    .hip-details__summary-text {
+    text-decoration: underline;
+    }
+
+    @@media (min-width: 40.0625em) {
+    .hip-expander .hip-details__text {
+    padding-top: 0;
+    }
+    }
+    @@media (min-width: 40.0625em) {
+    .hip-expander .hip-details__text {
+    padding-right: 24px;
+    }
+    }
+    @@media (min-width: 40.0625em) {
+    .hip-expander .hip-details__text {
+    padding-left: 24px;
+    }
+    }
+    @@media (min-width: 40.0625em) {
+    .hip-expander .hip-details__text {
+    padding-bottom: 24px;
+    }
+    }
+    .hip-expander .nhsuk-details__text {
+    padding-bottom: 16px;
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-top: 0;
+    border-left: 0;
+    margin-left: 0;
+    margin-top: 0;
+    }
+
+    .hip-details__text {
+    margin-top: 8px;
+    padding: 16px;
+    padding-left: 20px;
+    }
+
+    .hip-details__summary-info {
+    float: right;
+    color: #000 !important;
+    margin-top: 6px;
+    }
+
+    .ready {
+    color: #00703c;
+    }
     .custom-checkbox-holder {
     margin-top: 30px;
     padding: 30px 30px 10px 30px;
@@ -96,44 +182,96 @@
 
     <div class="custom-checkbox-holder govuk-!-margin-top-0">
 
-    @for(applicationApi <- applicationApis) {
+    @formHelper(action = controllers.application.routes.RequestProductionAccessController.onSubmit(application.id), Symbol("autoComplete") -> "off") {
 
-        @{
-            if(applicationApi != applicationApis.head) {
-                        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible"/>
-            }
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
         }
+        @for(applicationApi <- applicationApis) {
 
-        <div>
-            <p class="govuk-body">
-                @messages("requestProductionAccess.apiName")
-            <strong>@applicationApi.apiDetail.title</strong>
-            </p>
-        </div>
+            @{
+                if(applicationApi != applicationApis.head) {
+                            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible"/>
+                }
+            }
 
-        <details class="govuk-details">
-            <summary class="govuk-details__summary">
-                <span class="govuk-details__summary-text">
-                @messages("requestProductionAccess.viewDetails")
-                </span>
-            </summary>
-
-            <div class="govuk-details__text">
-                @applicationApi.endpoints.map(endpoint => endpointDetails(endpoint, applicationApi.apiDetail))
-
-            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-            <p>
-                @messages("requestProductionAccess.scopes")
-                @endpointScopes(applicationApi.endpoints.flatMap(endpoint => endpoint.scopes))
-            </p>
+            <div>
+                <p class="govuk-body">
+                    @messages("requestProductionAccess.apiName")
+                <strong>@applicationApi.apiDetail.title</strong>
+                </p>
             </div>
 
-        </details>
+            <details class="govuk-details">
+                <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">
+                    @messages("requestProductionAccess.viewDetails")
+                    </span>
+                </summary>
 
+                <div class="govuk-details__text">
+                    @applicationApi.endpoints.map(endpoint => endpointDetails(endpoint, applicationApi.apiDetail))
+
+                <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+                <p>
+                    @messages("requestProductionAccess.scopes")
+                    @endpointScopes(applicationApi.endpoints.flatMap(endpoint => endpoint.scopes))
+                </p>
+                </div>
+
+            </details>
+
+        }
+        </div>
+        <p>
+            <h2 class="govuk-body-l">@messages("requestProductionAccess.instruction")</h2>
+        </p>
+
+        @for(applicationApi <- applicationApis) {
+            <details class="hip-details hip-expander">
+                <summary class="hip-details__summary">
+                    <span class="hip-details__summary-text govuk-heading-s govuk-!-margin-bottom-0">
+                        @{applicationApi.apiDetail.title} usage policy
+                    </span>
+                    <span class="hip-details__summary-info govuk-body-s"/>
+                </summary>
+                <div class="hip-details__text">
+
+                    <p class="govuk-body">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vitae et leo duis ut diam quam nulla. Sagittis purus sit amet volutpat consequat mauris nunc. Morbi tristique senectus et netus et malesuada fames ac.</p>
+
+                    <ul class="govuk-list govuk-list--bullet">
+                        <li>
+                            Ridiculus mus mauris vitae ultricies. Id semper risus in hendrerit gravida rutrum.
+                        </li>
+                        <li>
+                            Mi tempus imperdiet nulla malesuada pellentesque elit eget. Purus gravida quis blandit turpis.
+                        </li>
+                        <li>
+                            Pretium vulputate sapien nec sagittis aliquam malesuada bibendum arcu.
+                        </li>
+                        <li>
+                            Turpis tincidunt id aliquet risus feugiat in ante metus dictum. Aliquet risus feugiat in ante metus dictum.
+                        </li>
+                    </ul>
+
+                    <p class="govuk-body">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vitae et leo duis ut diam quam nulla. Sagittis purus sit amet volutpat consequat mauris nunc. Morbi tristique senectus et netus et malesuada fames ac.</p>
+
+                </div>
+            </details>
+        }
+
+
+        @govukCheckboxes(
+            CheckboxesViewModel(
+                form = form,
+                name = "value",
+                legend = Legend(""),
+                items = RequestProductionAccessDeclaration.checkboxItems
+            )
+        )
+
+        @govukButton(
+            ButtonViewModel(messages("requestProductionAccess.button.accept"))
+        )
     }
-    </div>
-    <p>
-        <h2 class="govuk-body-l">@messages("requestProductionAccess.instruction")</h2>
-    </p>
-
 }

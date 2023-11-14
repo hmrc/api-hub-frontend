@@ -8,4 +8,5 @@ GET         /add-credential-checklist/:id                               controll
 POST        /add-credential-success/:id                                 controllers.application.AddCredentialController.addProductionCredential(id: String)
 POST        /add-development-credential/:id                             controllers.application.AddCredentialController.addDevelopmentCredential(id: String)
 
-GET         /apis/request-production-access/:id                         controllers.application.RequestProductionAccessController.onPageLoad(id: String)
+GET         /apis/request-production-access/:id                         controllers.application.RequestProductionAccessController.onPageLoad(id: String, mode: Mode = CheckMode)
+POST        /apis/request-production-access/:id                         controllers.application.RequestProductionAccessController.onSubmit(id: String, mode: Mode = CheckMode)

@@ -19,28 +19,44 @@ package controllers.application
 import com.google.inject.Inject
 import controllers.actions.{ApplicationAuthActionProvider, IdentifierAction}
 import controllers.helpers.ApplicationApiBuilder
+import forms.{ApiPolicyConditionsDeclarationPageFormProvider, RequestProductionAccessDeclarationFormProvider}
+import models.{ApiPolicyConditionsDeclaration, Mode}
+import pages.RequestProductionAccessPage
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.application.RequestProductionAccessView
+import views.html.defaultpages.notFound
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class RequestProductionAccessController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   identify: IdentifierAction,
   applicationAuth: ApplicationAuthActionProvider,
   view: RequestProductionAccessView,
-  applicationApiBuilder: ApplicationApiBuilder
-)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+  applicationApiBuilder: ApplicationApiBuilder,
+  formProvider: RequestProductionAccessDeclarationFormProvider)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id, enrich = true)).async {
+  val form = formProvider()
+
+  def onPageLoad(id: String, mode: Mode): Action[AnyContent] = (identify andThen applicationAuth(id, enrich = true)).async {
     implicit request =>
       applicationApiBuilder.build(request.application).map {
-        case Right(applicationApis) => Ok(view(request.application, applicationApis, Some(request.identifierRequest.user)))
+        case Right(applicationApis) => Ok(view(form, mode, request.application, applicationApis, Some(request.identifierRequest.user)))
         case Left(result) => result
       }
 
   }
 
+  def onSubmit(id: String, mode: Mode): Action[AnyContent] = (identify andThen applicationAuth(id, enrich = true)).async {
+    implicit request =>
+      applicationApiBuilder.build(request.application).map {
+        case Right(applicationApis) => form.bindFromRequest().fold(
+          formWithErrors =>
+            Ok(view(formWithErrors, mode, request.application, applicationApis, Some(request.identifierRequest.user))),
+          value => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        case Left(result) => result
+      }
+  }
 }
