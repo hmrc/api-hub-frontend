@@ -18,8 +18,9 @@ package services
 
 import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
 import controllers.actions.FakeApplication
-import generators.ApiDetailGenerators
+import generators.{AccessRequestGenerator, ApiDetailGenerators}
 import models.AvailableEndpoint
+import models.accessRequest.{AccessRequestStatus, Rejected}
 import models.api.EndpointMethod
 import models.application._
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
@@ -28,6 +29,7 @@ import org.mockito.{ArgumentMatchers, MockitoSugar}
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
+import org.scalatest.prop.TableDrivenPropertyChecks
 import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.LocalDateTime
@@ -39,7 +41,9 @@ class ApiHubServiceSpec
     with MockitoSugar
     with OptionValues
     with ApplicationGetterBehaviours
-    with ApiDetailGenerators {
+    with ApiDetailGenerators
+    with AccessRequestGenerator
+    with TableDrivenPropertyChecks {
 
   "registerApplication" - {
     "must call the applications connector and return the saved application" in {
@@ -332,6 +336,34 @@ class ApiHubServiceSpec
       }
     }
   }
+
+  "getAccessRequests" - {
+    "must make the correct request to the applications connector and return the access requests" in {
+      val applicationsConnector = mock[ApplicationsConnector]
+      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+
+      val filters = Table(
+        ("Application Id", "Status"),
+        (Some("test-application-id"), Some(Rejected)),
+        (Some("test-application-id"), None),
+        (None, Some(Rejected)),
+        (None, None)
+      )
+
+      forAll(filters) {(applicationIdFilter: Option[String], statusFilter: Option[AccessRequestStatus]) =>
+        val expected = sampleAccessRequests()
+        when(applicationsConnector.getAccessRequests(any(), any())(any())).thenReturn(Future.successful(expected))
+
+        service.getAccessRequests(applicationIdFilter, statusFilter)(HeaderCarrier()).map {
+          result =>
+            verify(applicationsConnector).getAccessRequests(ArgumentMatchers.eq(applicationIdFilter), ArgumentMatchers.eq(statusFilter))(any())
+            result mustBe expected
+        }
+      }
+    }
+  }
+
 }
 
 trait ApplicationGetterBehaviours {
