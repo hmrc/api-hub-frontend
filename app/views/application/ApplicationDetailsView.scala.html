@@ -16,7 +16,7 @@
 
 @import models.application._
 @import models.user.UserModel
-@import viewmodels.application.{ApplicationApi, ApplicationPages}
+@import viewmodels.application.{ApplicationApi, ApplicationSideNavPages, ApplicationNavItems}
 @import views.ViewUtils
 
 @this(
@@ -47,7 +47,7 @@
 
 @layout(pageTitle = titleNoForm(messages("applicationDetails.title")), user = user, fullWidth = true) {
 
-    @views.html.application.ApplicationNav(application, ApplicationPages.DetailsPage) {
+    @views.html.templates.SideNav(application.name, ApplicationNavItems(application, ApplicationSideNavPages.DetailsPage)) {
 
         <h1 class="govuk-heading-l">@messages("applicationDetails.heading")</h1>
 

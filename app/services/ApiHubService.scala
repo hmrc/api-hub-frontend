@@ -19,7 +19,7 @@ package services
 import com.google.inject.{Inject, Singleton}
 import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
 import models.AvailableEndpoint
-import models.accessRequest.{AccessRequest, AccessRequestStatus}
+import models.accessrequest.{AccessRequest, AccessRequestStatus}
 import models.api.ApiDetail
 import models.application._
 import models.exception.ApplicationsException

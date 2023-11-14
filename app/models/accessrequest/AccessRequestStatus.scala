@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package models.accessRequest
+package models.accessrequest
 
 import models.{Enumerable, WithName}
 

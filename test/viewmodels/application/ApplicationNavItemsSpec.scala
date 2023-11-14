@@ -22,7 +22,8 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import viewmodels.application.ApplicationPages._
+import viewmodels.SideNavItem
+import viewmodels.application.ApplicationSideNavPages._
 
 class ApplicationNavItemsSpec extends SpecBase with Matchers with TableDrivenPropertyChecks {
 
@@ -35,43 +36,43 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TableDrivenPro
 
         val actual = ApplicationNavItems(FakeApplication, DetailsPage)
         val expected = Seq(
-          ApplicationNavItem(
+          SideNavItem(
             DetailsPage,
             "Application details",
             controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id),
             isCurrentPage = true
           ),
-          ApplicationNavItem(
+          SideNavItem(
             ApisPage,
             "Application APIs",
             controllers.application.routes.ApplicationApisController.onPageLoad(FakeApplication.id),
             isCurrentPage = false
           ),
-          ApplicationNavItem(
+          SideNavItem(
             EnvironmentsAndCredentialsPage,
             "Environments and credentials",
             controllers.application.routes.EnvironmentAndCredentialsController.onPageLoad(FakeApplication.id),
             isCurrentPage = false
           ),
-          ApplicationNavItem(
+          SideNavItem(
             ManageTeamMembersPage,
             "Manage team members",
             controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id),
             isCurrentPage = false
           ),
-          ApplicationNavItem(
+          SideNavItem(
             EditApplicationNamePage,
             "Edit application name",
             controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id),
             isCurrentPage = false
           ),
-          ApplicationNavItem(
+          SideNavItem(
             LeaveApplicationPage,
             "Leave application",
             controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id),
             isCurrentPage = false
           ),
-          ApplicationNavItem(
+          SideNavItem(
             DeleteApplicationPage,
             "Delete application",
             controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id),

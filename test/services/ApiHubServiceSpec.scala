@@ -20,7 +20,7 @@ import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
 import controllers.actions.FakeApplication
 import generators.{AccessRequestGenerator, ApiDetailGenerators}
 import models.AvailableEndpoint
-import models.accessRequest.{AccessRequestStatus, Rejected}
+import models.accessrequest.{AccessRequestStatus, Rejected}
 import models.api.EndpointMethod
 import models.application._
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}

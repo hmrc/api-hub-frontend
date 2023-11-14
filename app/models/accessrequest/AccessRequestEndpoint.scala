@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package models.accessRequest
+package models.accessrequest
 
 import play.api.libs.json.{Format, Json}
 
-import java.time.LocalDateTime
+case class AccessRequestEndpoint(httpMethod: String, path: String, scopes: Seq[String])
 
-case class AccessRequestDecision(decided: LocalDateTime, decidedBy: String, rejectedReason: Option[String])
+object AccessRequestEndpoint {
 
-object AccessRequestDecision {
-
-  implicit val formatAccessRequestDecision: Format[AccessRequestDecision] = Json.format[AccessRequestDecision]
+  implicit val formatAccessRequestEndpoint: Format[AccessRequestEndpoint] = Json.format[AccessRequestEndpoint]
 
 }

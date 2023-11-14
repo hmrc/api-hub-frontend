@@ -16,7 +16,7 @@
 
 package generators
 
-import models.accessRequest._
+import models.accessrequest._
 import org.scalacheck.rng.Seed
 import org.scalacheck.{Arbitrary, Gen}
 

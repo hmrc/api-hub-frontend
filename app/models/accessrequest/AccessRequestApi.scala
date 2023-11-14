@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package models.accessRequest
+package models.accessrequest
 
 import play.api.libs.json.{Format, Json}
 
-case class AccessRequestEndpoint(httpMethod: String, path: String, scopes: Seq[String])
+case class AccessRequestApi(
+  apiId: String,
+  apiName: String,
+  endpoints: Seq[AccessRequestEndpoint]
+)
 
-object AccessRequestEndpoint {
+object AccessRequestApi {
 
-  implicit val formatAccessRequestEndpoint: Format[AccessRequestEndpoint] = Json.format[AccessRequestEndpoint]
+  implicit val formatAccessRequestApi: Format[AccessRequestApi] = Json.format[AccessRequestApi]
 
 }

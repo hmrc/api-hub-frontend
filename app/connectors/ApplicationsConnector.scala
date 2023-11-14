@@ -19,7 +19,7 @@ package connectors
 import com.google.inject.{Inject, Singleton}
 import config.FrontendAppConfig
 import models.UserEmail
-import models.accessRequest.{AccessRequest, AccessRequestRequest, AccessRequestStatus}
+import models.accessrequest.{AccessRequest, AccessRequestRequest, AccessRequestStatus}
 import models.application.{Application, Credential, EnvironmentName, NewApplication, NewScope, Secret}
 import models.exception.{ApplicationCredentialLimitException, ApplicationsException}
 import models.requests.AddApiRequest

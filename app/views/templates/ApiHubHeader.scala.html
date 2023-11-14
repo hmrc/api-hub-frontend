@@ -93,9 +93,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     }
                 </a>
             </li>
-            @if(user.map(_.permissions.canApprove).getOrElse(false)) {
+            @if(user.map(user => user.permissions.canApprove || user.permissions.canSupport).getOrElse(false)) {
                 <li>
-                    <a class="govuk-link govuk-link--no-visited-state" style="margin-right: 30px;" href="@routes.PendingApprovalsController.onPageLoad().url">
+                    <a class="govuk-link govuk-link--no-visited-state" style="margin-right: 30px;" href="@controllers.accessrequest.routes.AccessRequestsController.onPageLoad().url">
                         @messages("site.approvals")
                     </a>
                 </li>

@@ -5,7 +5,7 @@ import com.typesafe.config.ConfigFactory
 import config.FrontendAppConfig
 import connectors.ApplicationsConnectorSpec.ApplicationGetterBehaviours
 import models.UserEmail
-import models.accessRequest.{AccessRequest, AccessRequestApi, AccessRequestEndpoint, AccessRequestRequest, AccessRequestStatus, Rejected}
+import models.accessrequest.{AccessRequest, AccessRequestApi, AccessRequestEndpoint, AccessRequestRequest, AccessRequestStatus, Rejected}
 import models.application._
 import models.exception.ApplicationCredentialLimitException
 import models.user.{LdapUser, UserModel}
