@@ -212,20 +212,19 @@
                 <div class="govuk-details__text">
                     @applicationApi.endpoints.map(endpoint => endpointDetails(endpoint, applicationApi.apiDetail))
 
-                <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-                <p>
-                    @messages("requestProductionAccess.scopes")
-                    @endpointScopes(applicationApi.endpoints.flatMap(endpoint => endpoint.scopes))
-                </p>
+                    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+                    <div>
+                        @messages("requestProductionAccess.scopes")
+                        @endpointScopes(applicationApi.endpoints.flatMap(endpoint => endpoint.scopes))
+                    </div>
                 </div>
 
             </details>
 
         }
-        </div>
-        <p>
+        <div>
             <h2 class="govuk-body-l">@messages("requestProductionAccess.instruction")</h2>
-        </p>
+        </div>
 
         @for(applicationApi <- applicationApis) {
             <details class="hip-details hip-expander">
@@ -233,7 +232,7 @@
                     <span class="hip-details__summary-text govuk-heading-s govuk-!-margin-bottom-0">
                         @{applicationApi.apiDetail.title} usage policy
                     </span>
-                    <span class="hip-details__summary-info govuk-body-s"/>
+                    <span class="hip-details__summary-info govuk-body-s"></span>
                 </summary>
                 <div class="hip-details__text">
 
