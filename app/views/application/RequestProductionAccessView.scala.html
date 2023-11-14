@@ -165,10 +165,10 @@
 }
 
 @endpointDetails(endpoint: ApplicationEndpoint, apiDetail: ApiDetail) = {
-    <p class="nhs-body govuk-!-margin-bottom-2">
+    <div class="nhs-body govuk-!-margin-bottom-2">
         @endpointName(endpoint)
         @endpointSummary(endpoint, apiDetail)
-    </p>
+    </div>
 }
 
 @descriptionOf(apiDetail: ApiDetail, applicationEndpoint: ApplicationEndpoint) = @{
@@ -191,7 +191,7 @@
 
             @{
                 if(applicationApi != applicationApis.head) {
-                            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible"/>
+                    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible"/>
                 }
             }
 
@@ -260,7 +260,6 @@
             </details>
         }
 
-
         @govukCheckboxes(
             CheckboxesViewModel(
                 form = form,
@@ -274,4 +273,6 @@
             ButtonViewModel(messages("requestProductionAccess.button.accept"))
         )
     }
+
+    </div>
 }
