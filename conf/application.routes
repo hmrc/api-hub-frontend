@@ -7,3 +7,5 @@ GET         /environment-and-credentials/:id                            controll
 GET         /add-credential-checklist/:id                               controllers.application.AddCredentialController.checklist(id: String)
 POST        /add-credential-success/:id                                 controllers.application.AddCredentialController.addProductionCredential(id: String)
 POST        /add-development-credential/:id                             controllers.application.AddCredentialController.addDevelopmentCredential(id: String)
+
+GET         /apis/request-production-access/:id                         controllers.application.RequestProductionAccessController.onPageLoad(id: String)

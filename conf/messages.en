@@ -137,6 +137,7 @@ applicationApis.apis.headings.scopes = Scopes
 applicationApis.apis.headings.dev = Dev
 applicationApis.apis.headings.prod = Prod
 applicationApis.apis.viewSpecification = View specification
+applicationApis.requestProductionAccess = Request production access
 
 environmentAndCredentials.title = Environments and Credentials
 environmentAndCredentials.heading = Environments and credentials
@@ -371,3 +372,11 @@ addAnApiSuccess.advice.body1 = You can now use the API within your application, 
 addAnApiSuccess.advice.body2 = View your application: {0}
 
 addAnApiComplete.failed = You should check this application''s details before trying again as it is possible that this action was partially successful.
+
+requestProductionAccess.title = Request production access for APIs
+requestProductionAccess.heading = You will be requesting access for the following APIs
+requestProductionAccess.instruction = Review and accept the policies for each API you plan to use in production.
+requestProductionAccess.declaration = I confirm that I have read and meet the requirements outlined in the usage policies.
+requestProductionAccess.apiName = API name:
+requestProductionAccess.viewDetails = View details
+requestProductionAccess.scopes = These end points use the following scopes:
