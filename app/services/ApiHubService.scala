@@ -19,6 +19,7 @@ package services
 import com.google.inject.{Inject, Singleton}
 import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
 import models.AvailableEndpoint
+import models.accessrequest.{AccessRequest, AccessRequestStatus}
 import models.api.ApiDetail
 import models.application._
 import models.exception.ApplicationsException
@@ -27,6 +28,7 @@ import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
+
 @Singleton
 class ApiHubService @Inject()(
   applicationsConnector: ApplicationsConnector,
@@ -97,6 +99,10 @@ class ApiHubService @Inject()(
 
   def addCredential(id: String, environmentName: EnvironmentName)(implicit hc: HeaderCarrier): Future[Either[ApplicationsException, Option[Credential]]] = {
     applicationsConnector.addCredential(id, environmentName)
+  }
+
+  def getAccessRequests(applicationId: Option[String], status: Option[AccessRequestStatus])(implicit hc:HeaderCarrier): Future[Seq[AccessRequest]] = {
+    applicationsConnector.getAccessRequests(applicationId, status)
   }
 
 }

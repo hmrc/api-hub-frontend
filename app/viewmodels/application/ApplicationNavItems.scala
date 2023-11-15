@@ -18,67 +18,63 @@ package viewmodels.application
 
 import models.application.Application
 import play.api.i18n.Messages
-import play.api.mvc.Call
+import viewmodels.{SideNavItem, SideNavPage}
 
-sealed trait ApplicationPage
+object ApplicationSideNavPages {
 
-object ApplicationPages {
-
-  case object DetailsPage extends ApplicationPage
-  case object ApisPage extends ApplicationPage
-  case object EnvironmentsAndCredentialsPage extends ApplicationPage
-  case object ManageTeamMembersPage extends ApplicationPage
-  case object EditApplicationNamePage extends ApplicationPage
-  case object LeaveApplicationPage extends ApplicationPage
-  case object DeleteApplicationPage extends ApplicationPage
+  case object DetailsPage extends SideNavPage
+  case object ApisPage extends SideNavPage
+  case object EnvironmentsAndCredentialsPage extends SideNavPage
+  case object ManageTeamMembersPage extends SideNavPage
+  case object EditApplicationNamePage extends SideNavPage
+  case object LeaveApplicationPage extends SideNavPage
+  case object DeleteApplicationPage extends SideNavPage
 
 }
 
-case class ApplicationNavItem(page: ApplicationPage, title: String, link: Call, isCurrentPage: Boolean)
-
 object ApplicationNavItems {
 
-  import ApplicationPages._
+  import ApplicationSideNavPages._
 
-  def apply(application: Application, currentPage: ApplicationPage)(implicit messages: Messages): Seq[ApplicationNavItem] = {
+  def apply(application: Application, currentPage: SideNavPage)(implicit messages: Messages): Seq[SideNavItem] = {
     Seq(
-      ApplicationNavItem(
+      SideNavItem(
         page = DetailsPage,
         title = messages("applicationNav.page.applicationDetails"),
         link = controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id),
         isCurrentPage = currentPage == DetailsPage
       ),
-      ApplicationNavItem(
+      SideNavItem(
         page = ApisPage,
         title = messages("applicationNav.page.applicationApis"),
         link = controllers.application.routes.ApplicationApisController.onPageLoad(application.id),
         isCurrentPage = currentPage == ApisPage
       ),
-      ApplicationNavItem(
+      SideNavItem(
         page = EnvironmentsAndCredentialsPage,
         title = messages("applicationNav.page.environmentsAndCredentials"),
         link = controllers.application.routes.EnvironmentAndCredentialsController.onPageLoad(application.id),
         isCurrentPage = currentPage == EnvironmentsAndCredentialsPage
       ),
-      ApplicationNavItem(
+      SideNavItem(
         page = ManageTeamMembersPage,
         title = messages("applicationNav.page.manageTeamMembers"),
         link = controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id),
         isCurrentPage = currentPage == ManageTeamMembersPage
       ),
-      ApplicationNavItem(
+      SideNavItem(
         page = EditApplicationNamePage,
         title = messages("applicationNav.page.editApplicationName"),
         link = controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id),
         isCurrentPage = currentPage == EditApplicationNamePage
       ),
-      ApplicationNavItem(
+      SideNavItem(
         page = LeaveApplicationPage,
         title = messages("applicationNav.page.leaveApplication"),
         link = controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id),
         isCurrentPage = currentPage == LeaveApplicationPage
       ),
-      ApplicationNavItem(
+      SideNavItem(
         page = DeleteApplicationPage,
         title = messages("applicationNav.page.deleteApplication"),
         link = controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id),

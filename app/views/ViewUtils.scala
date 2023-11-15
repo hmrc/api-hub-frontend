@@ -16,8 +16,10 @@
 
 package views
 
+import models.accessrequest.{AccessRequestStatus, Approved, Cancelled, Pending, Rejected}
 import play.api.data.Form
 import play.api.i18n.Messages
+import play.twirl.api.Html
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -39,6 +41,7 @@ object ViewUtils {
 
   private val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy HH:mm")
   private val shortDateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMM yyyy HH:mm")
+  private val shortestDateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yy - HH:mm")
   private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
 
   def formatLocalDateTime(value: LocalDateTime): String = {
@@ -49,9 +52,21 @@ object ViewUtils {
     value.format(shortDateTimeFormatter)
   }
 
+  def formatShortestLocalDateTime(value: LocalDateTime): String = {
+    value.format(shortestDateTimeFormatter)
+  }
+
   def formatDate(value: LocalDateTime): String = {
     s"${value.format(dateFormatter)}"
   }
 
+  def formatAccessRequestStatus(status: AccessRequestStatus): Html = {
+    status match {
+      case Pending => Html(s"<strong class='govuk-tag govuk-tag--yellow'>${status.toString}</strong>")
+      case Approved => Html(s"<strong class='govuk-tag govuk-tag--green'>${status.toString}</strong>")
+      case Rejected => Html(s"<strong class='govuk-tag govuk-tag--red'>${status.toString}</strong>")
+      case Cancelled => Html(s"<strong class='govuk-tag govuk-tag--grey'>${status.toString}</strong>")
+    }
+  }
 
 }

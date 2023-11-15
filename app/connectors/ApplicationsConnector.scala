@@ -19,6 +19,7 @@ package connectors
 import com.google.inject.{Inject, Singleton}
 import config.FrontendAppConfig
 import models.UserEmail
+import models.accessrequest.{AccessRequest, AccessRequestRequest, AccessRequestStatus}
 import models.application.{Application, Credential, EnvironmentName, NewApplication, NewScope, Secret}
 import models.exception.{ApplicationCredentialLimitException, ApplicationsException}
 import models.requests.AddApiRequest
@@ -200,6 +201,34 @@ class ApplicationsConnector @Inject()(
         case Left(e) if e.statusCode == 409 => Future.successful(Left(ApplicationCredentialLimitException.forId(id, environmentName)))
         case Left(e) => Future.failed(e)
       }
+  }
+
+  def createAccessRequest(request: AccessRequestRequest)(implicit hc:HeaderCarrier): Future[Unit] = {
+    httpClient
+      .post(url"$applicationsBaseUrl/api-hub-applications/access-requests")
+      .setHeader((ACCEPT, JSON))
+      .setHeader((CONTENT_TYPE, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .withBody(Json.toJson(request))
+      .execute[Unit]
+  }
+
+  def getAccessRequests(applicationId: Option[String], status: Option[AccessRequestStatus])(implicit hc:HeaderCarrier): Future[Seq[AccessRequest]] = {
+    val url = (applicationId, status) match {
+      case(Some(applicationId), Some(status)) =>
+        url"$applicationsBaseUrl/api-hub-applications/access-requests?applicationId=$applicationId&status=$status"
+      case(Some(applicationId), None) =>
+        url"$applicationsBaseUrl/api-hub-applications/access-requests?applicationId=$applicationId"
+      case(None, Some(status)) =>
+        url"$applicationsBaseUrl/api-hub-applications/access-requests?status=$status"
+      case _ =>
+        url"$applicationsBaseUrl/api-hub-applications/access-requests"
+    }
+
+    httpClient.get(url)
+      .setHeader((ACCEPT, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Seq[AccessRequest]]
   }
 
 }
