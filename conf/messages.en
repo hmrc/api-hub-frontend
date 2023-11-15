@@ -380,4 +380,4 @@ requestProductionAccess.declaration.accept = I confirm that I have read and meet
 requestProductionAccess.apiName = API name:
 requestProductionAccess.viewDetails = View details
 requestProductionAccess.scopes = These end points use the following scopes:
-requestProductionAccess.button.accept = Accept
+requestProductionAccess.button.accept = Continue
