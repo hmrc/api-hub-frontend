@@ -381,3 +381,13 @@ requestProductionAccess.apiName = API name:
 requestProductionAccess.viewDetails = View details
 requestProductionAccess.scopes = These end points use the following scopes:
 requestProductionAccess.button.accept = Continue
+
+accessRequests.title = API requests
+accessRequests.heading = API production access requests
+accessRequests.admin = API Hub admin
+accessRequests.headings.requestedBy = Requested by
+accessRequests.headings.supportingInformation = Supporting information
+accessRequests.headings.reviewRequest = Review request
+
+manageApplications.title = Manage applications
+

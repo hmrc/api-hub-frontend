@@ -5,18 +5,20 @@ import com.typesafe.config.ConfigFactory
 import config.FrontendAppConfig
 import connectors.ApplicationsConnectorSpec.ApplicationGetterBehaviours
 import models.UserEmail
+import models.accessrequest.{AccessRequest, AccessRequestApi, AccessRequestEndpoint, AccessRequestRequest, AccessRequestStatus, Rejected}
 import models.application._
 import models.exception.ApplicationCredentialLimitException
 import models.user.{LdapUser, UserModel}
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
+import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.Configuration
 import play.api.http.ContentTypes
 import play.api.http.Status._
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
-import play.api.test.Helpers.{AUTHORIZATION, CONTENT_TYPE}
+import play.api.test.Helpers.{ACCEPT, AUTHORIZATION, CONTENT_TYPE}
 import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
@@ -31,7 +33,8 @@ class ApplicationsConnectorSpec
   with Matchers
   with WireMockSupport
   with OptionValues
-  with ApplicationGetterBehaviours {
+  with ApplicationGetterBehaviours
+  with TableDrivenPropertyChecks {
 
   import ApplicationsConnectorSpec._
 
@@ -407,7 +410,7 @@ class ApplicationsConnectorSpec
       }
     }
 
-    "must Conflict???" in {
+    "must transform a 409 Conflict response into an ApplicationCredentialLimitException" in {
       stubFor(
         post(urlEqualTo(s"/api-hub-applications/applications/${FakeApplication.id}/environments/primary/credentials"))
           .withHeader("Accept", equalTo("application/json"))
@@ -421,6 +424,87 @@ class ApplicationsConnectorSpec
       buildConnector(this).addCredential(FakeApplication.id, Primary)(HeaderCarrier()) map {
         actual =>
           actual mustBe Left(ApplicationCredentialLimitException.forId(FakeApplication.id, Primary))
+      }
+    }
+  }
+
+  "ApplicationsConnector.createAccessRequest" - {
+    "must place the correct request and return the new access requests" in {
+      val request = AccessRequestRequest(
+        applicationId = "test-application-id",
+        supportingInformation = "test-supporting-information",
+        requestedBy = "test-requested-by",
+        apis = Seq(
+          AccessRequestApi(
+            apiId = "test-api-id",
+            apiName = "test-api-name",
+            endpoints = Seq(
+              AccessRequestEndpoint(
+                httpMethod = "test-http-method",
+                path = "test-path",
+                scopes = Seq("test-scope")
+              )
+            )
+          )
+        )
+      )
+
+      stubFor(
+        post(urlEqualTo("/api-hub-applications/access-requests"))
+          .withHeader(CONTENT_TYPE, equalTo("application/json"))
+          .withHeader(ACCEPT, equalTo("application/json"))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .withRequestBody(equalToJson(Json.toJson(request).toString()))
+          .willReturn(
+            aResponse()
+              .withStatus(CREATED)
+          )
+      )
+
+      buildConnector(this).createAccessRequest(request)(HeaderCarrier()).map {
+        actual =>
+          actual mustBe ()
+      }
+    }
+  }
+
+  "ApplicationsConnector.getAccessRequests" - {
+    "must place the correct request and return the access requests" in {
+      val accessRequest = AccessRequest(
+        id = "test-id",
+        applicationId = "test-application-id",
+        apiId = "test-api-id",
+        apiName = "test-api-name",
+        status = Rejected,
+        supportingInformation = "test-supporting-information",
+        requested = LocalDateTime.now(),
+        requestedBy = "test-requested-by"
+      )
+
+      val filters = Table(
+        ("Application Id", "Status", "Query"),
+        (Some("test-application-id"), Some(Rejected), "?applicationId=test-application-id&status=REJECTED"),
+        (Some("test-application-id"), None, "?applicationId=test-application-id"),
+        (None, Some(Rejected), "?status=REJECTED"),
+        (None, None, "")
+      )
+
+      forAll(filters) {(applicationIdFilter: Option[String], statusFilter: Option[AccessRequestStatus], query: String) =>
+        stubFor(
+          get(urlEqualTo(s"/api-hub-applications/access-requests$query"))
+            .withHeader(ACCEPT, equalTo("application/json"))
+            .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+            .willReturn(
+              aResponse()
+                .withStatus(OK)
+                .withBody(Json.toJson(Seq(accessRequest)).toString())
+            )
+        )
+
+        buildConnector(this).getAccessRequests(applicationIdFilter, statusFilter)(HeaderCarrier()).map {
+          result =>
+            result mustBe Seq(accessRequest)
+        }
       }
     }
   }

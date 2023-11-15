@@ -2,6 +2,7 @@
 
 ->          /hmrc-frontend                                                     hmrcfrontend.Routes
 ->          /application                                                       application.Routes
+->          /admin                                                             admin.Routes
 
 GET         /                                                                  controllers.IndexController.onPageLoad
 GET         /application/register/start                                        controllers.IndexController.createApplication

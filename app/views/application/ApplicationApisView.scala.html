@@ -148,7 +148,7 @@
 
 @layout(pageTitle = titleNoForm(messages("applicationApis.title")), user = user, fullWidth = true, customScriptsBlock = Some(scripts()), customStyles = Some(styles())) {
 
-    @views.html.application.ApplicationNav(application, ApplicationPages.ApisPage) {
+    @views.html.templates.SideNav(application.name, ApplicationNavItems(application, ApplicationSideNavPages.ApisPage)) {
 
         <h1 class="govuk-heading-l">@messages("applicationApis.heading")</h1>
 

@@ -14,22 +14,21 @@
  * limitations under the License.
  *@
 
-@import models.application._
-@import viewmodels.application.{ApplicationPage, ApplicationNavItems}
+@import viewmodels.SideNavItem
 @import views.html.helper.CSPNonce
 
-@(application: Application, currentPage: ApplicationPage)(contentBlock: Html)(implicit request: Request[_], messages: Messages)
+@(title: String, navItems: Seq[SideNavItem])(contentBlock: Html)(implicit request: Request[_], messages: Messages)
 
 <div class="govuk-grid-row">
     <div id="navContent" class="govuk-grid-column-one-quarter sidebar">
         <div class="theiaStickySidebar">
             <div class="side-nav">
                 <span class="govuk-heading-s govuk-!-margin-bottom-1 govuk-!-margin-top-2">
-                    @application.name
+                    @title
                 </span>
 
                 <ul class="side-nav__component">
-                    @for(navItem <- ApplicationNavItems(application, currentPage)) {
+                    @for(navItem <- navItems) {
                     <li class="side-nav__list  @if(navItem.isCurrentPage){side-nav__list--selected}">
                         <a class="side-nav__link" href="@navItem.link.url">
                             @navItem.title
