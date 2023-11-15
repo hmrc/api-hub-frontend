@@ -18,6 +18,7 @@ package controllers.accessrequest
 
 import com.google.inject.{Inject, Singleton}
 import controllers.actions.{AuthorisedApproverOrSupportAction, IdentifierAction}
+import models.accessrequest.AccessRequest
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
@@ -25,6 +26,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.accessrequest.AccessRequestsView
 
 import scala.concurrent.ExecutionContext
+import scala.math.Ordered.orderingToOrdered
 
 @Singleton
 class AccessRequestsController @Inject()(
@@ -35,12 +37,16 @@ class AccessRequestsController @Inject()(
   accessRequestsView: AccessRequestsView
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
+  private implicit val accessRequestOrdering: Ordering[AccessRequest] = (x: AccessRequest, y: AccessRequest) => {
+    (y.requested, x.applicationId, x.apiName) compare (x.requested, y.applicationId, y.apiName)
+  }
+
   def onPageLoad(): Action[AnyContent] = (identify andThen isApproverOrSupport).async {
     implicit request =>
-      apiHubService.getAccessRequests(None, None).map(
+      apiHubService.getAccessRequests(None, None).map {
         requests =>
-          Ok(accessRequestsView(requests, request.user))
-        )
+          Ok(accessRequestsView(requests.sorted, request.user))
+      }
   }
 
 }
