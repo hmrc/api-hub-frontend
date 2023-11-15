@@ -509,6 +509,54 @@ class ApplicationsConnectorSpec
     }
   }
 
+  "ApplicationsConnector.getAccessRequest" - {
+    "must place the correct request and return the access request when it exists" in {
+      val accessRequest = AccessRequest(
+        id = "test-id",
+        applicationId = "test-application-id",
+        apiId = "test-api-id",
+        apiName = "test-api-name",
+        status = Rejected,
+        supportingInformation = "test-supporting-information",
+        requested = LocalDateTime.now(),
+        requestedBy = "test-requested-by"
+      )
+
+      stubFor(
+        get(urlEqualTo(s"/api-hub-applications/access-requests/${accessRequest.id}"))
+          .withHeader(ACCEPT, equalTo("application/json"))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody(Json.toJson(accessRequest).toString())
+          )
+      )
+
+      buildConnector(this).getAccessRequest(accessRequest.id)(HeaderCarrier()).map(
+        result =>
+          result mustBe Some(accessRequest)
+      )
+    }
+
+    "must return None when the access request cannot be found" in {
+      val id = "test-id"
+
+      stubFor(
+        get(urlEqualTo(s"/api-hub-applications/access-requests/$id"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+          )
+      )
+
+      buildConnector(this).getAccessRequest(id)(HeaderCarrier()).map(
+        result =>
+          result mustBe None
+      )
+    }
+  }
+
 }
 
 object ApplicationsConnectorSpec extends HttpClientV2Support {
