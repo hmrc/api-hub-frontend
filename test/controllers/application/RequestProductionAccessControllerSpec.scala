@@ -19,8 +19,8 @@ package controllers.application
 import base.SpecBase
 import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
 import controllers.routes
-import forms.{ApiPolicyConditionsDeclarationPageFormProvider, RequestProductionAccessDeclarationFormProvider}
-import models.{Mode, NormalMode}
+import forms.RequestProductionAccessDeclarationFormProvider
+import models.NormalMode
 import models.api.{ApiDetail, Endpoint, EndpointMethod}
 import models.application.ApplicationLenses.ApplicationLensOps
 import models.application.{Api, Approved, Scope, SelectedEndpoint}
@@ -35,7 +35,7 @@ import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
 import viewmodels.application.{Accessible, ApplicationApi, ApplicationEndpoint, Inaccessible}
 import views.html.ErrorTemplate
-import views.html.application.{ApplicationApisView, RequestProductionAccessView}
+import views.html.application.RequestProductionAccessView
 
 import scala.concurrent.Future
 
