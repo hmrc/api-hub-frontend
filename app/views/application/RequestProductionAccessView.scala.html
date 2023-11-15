@@ -164,7 +164,13 @@
 }
 
 @descriptionOf(apiDetail: ApiDetail, applicationEndpoint: ApplicationEndpoint) = @{
-    apiDetail.endpoints.filter(endpoint => endpoint.path.equals(applicationEndpoint.path)).flatMap(endpoint => endpoint.methods).filter(endpointMethod => endpointMethod.httpMethod.equals(applicationEndpoint.httpMethod)).map(endpointMethod => endpointMethod.description)
+    apiDetail.endpoints.filter(endpoint => endpoint.path.equals(applicationEndpoint.path))
+            .flatMap(endpoint => endpoint.methods)
+            .filter(endpointMethod => endpointMethod.httpMethod.equals(applicationEndpoint.httpMethod))
+            .headOption
+            .map(endpointMethod => endpointMethod.summary.getOrElse(endpointMethod.description))
+            .getOrElse("")
+
 }
 
 @layout(pageTitle = titleNoForm(messages("requestProductionAccess.title")), user = user, fullWidth = true, customScriptsBlock = Some(scripts()), customStyles = Some(styles())) {

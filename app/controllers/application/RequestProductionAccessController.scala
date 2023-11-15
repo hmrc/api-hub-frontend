@@ -19,16 +19,14 @@ package controllers.application
 import com.google.inject.Inject
 import controllers.actions.{ApplicationAuthActionProvider, IdentifierAction}
 import controllers.helpers.ApplicationApiBuilder
-import forms.{ApiPolicyConditionsDeclarationPageFormProvider, RequestProductionAccessDeclarationFormProvider}
-import models.{ApiPolicyConditionsDeclaration, Mode}
-import pages.RequestProductionAccessPage
+import forms.RequestProductionAccessDeclarationFormProvider
+import models.Mode
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.application.RequestProductionAccessView
-import views.html.defaultpages.notFound
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class RequestProductionAccessController @Inject()(
   val controllerComponents: MessagesControllerComponents,
