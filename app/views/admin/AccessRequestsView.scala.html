@@ -41,11 +41,13 @@
 
     @views.html.templates.SideNav(messages("accessRequests.admin"), AdminNavItems(user, AdminSideNavPages.AccessRequestsPage)) {
 
-        <h1 class="govuk-heading-l">@messages("accessRequests.heading")</h1>
+        <h1 class="govuk-heading-m govuk-!-margin-bottom-7">
+            @messages("accessRequests.heading")
+        </h1>
 
         @for(accessRequest <- accessRequests) {
             <div class="api-panel">
-                <p class="call-out-type limit-call-out-length">
+                <p class="call-out-type">
                     @ViewUtils.formatAccessRequestStatus(accessRequest.status)
                     @accessRequest.apiName
                 </p>

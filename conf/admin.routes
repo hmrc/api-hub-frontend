@@ -1,1 +1,1 @@
-GET         /access-requests                                                        controllers.accessrequest.AccessRequestsController.onPageLoad()
+GET         /access-requests                                                        controllers.admin.AccessRequestsController.onPageLoad()

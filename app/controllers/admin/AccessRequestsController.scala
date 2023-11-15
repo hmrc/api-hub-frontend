@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.accessrequest
+package controllers.admin
 
 import com.google.inject.{Inject, Singleton}
 import controllers.actions.{AuthorisedApproverOrSupportAction, IdentifierAction}
@@ -23,7 +23,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.accessrequest.AccessRequestsView
+import views.html.admin.AccessRequestsView
 
 import scala.concurrent.ExecutionContext
 import scala.math.Ordered.orderingToOrdered

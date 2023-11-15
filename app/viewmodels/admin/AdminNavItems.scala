@@ -35,7 +35,7 @@ object AdminNavItems {
     val accessRequestsNavItem = SideNavItem(
       page = AccessRequestsPage,
       title = messages("accessRequests.title"),
-      link = controllers.accessrequest.routes.AccessRequestsController.onPageLoad(),
+      link = controllers.admin.routes.AccessRequestsController.onPageLoad(),
       isCurrentPage = currentPage == AccessRequestsPage
     )
 
@@ -44,7 +44,7 @@ object AdminNavItems {
         SideNavItem(
           page = ManageApplicationsPage,
           title = messages("manageApplications.title"),
-          link = controllers.accessrequest.routes.AccessRequestsController.onPageLoad(),
+          link = controllers.admin.routes.AccessRequestsController.onPageLoad(),
           isCurrentPage = currentPage == ManageApplicationsPage
         ),
         accessRequestsNavItem
