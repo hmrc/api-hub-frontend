@@ -125,7 +125,7 @@
 }
 
 
-@endpointScopes(scopes: Seq[String]) = {
+@endpointScopes(scopes: Set[String]) = {
     <ul class="govuk-list govuk-list-inline scopes-list">
     @for(scope <- scopes) {
         <li>
@@ -213,7 +213,7 @@
                     <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
                     <div>
                         @messages("requestProductionAccess.scopes")
-                        @endpointScopes(applicationApi.endpoints.flatMap(endpoint => endpoint.scopes))
+                        @endpointScopes(applicationApi.endpoints.flatMap(endpoint => endpoint.scopes).toSet)
                     </div>
                     </div>
 
