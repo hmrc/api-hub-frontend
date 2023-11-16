@@ -23,6 +23,7 @@ import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.admin.AccessRequestEndpointGroups
 import views.html.admin.AccessRequestView
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -42,7 +43,7 @@ class AccessRequestController @Inject()(
       apiHubService.getAccessRequest(id).flatMap {
         case Some(accessRequest) =>
           apiHubService.getApplication(accessRequest.applicationId, enrich = false).map {
-            case Some(application) => Ok(view(accessRequest, application, request.user))
+            case Some(application) => Ok(view(accessRequest, application, AccessRequestEndpointGroups.group(accessRequest), request.user))
             case _ => applicationNotFound(accessRequest.applicationId)
           }
         case None => Future.successful(accessRequestNotFound(id))
@@ -51,8 +52,8 @@ class AccessRequestController @Inject()(
 
   private def accessRequestNotFound(accessRequestId: String)(implicit request: Request[_]): Result = {
     errorResultBuilder.notFound(
-      heading = Messages("site.accessRequestNotFoundHeading"),
-      message = Messages("site.accessRequestNotFoundMessage", accessRequestId)
+      heading = Messages("site.accessRequestNotFound.heading"),
+      message = Messages("site.accessRequestNotFound.message", accessRequestId)
     )
   }
 

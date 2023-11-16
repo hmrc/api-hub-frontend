@@ -17,7 +17,7 @@
 package controllers.admin
 
 import base.SpecBase
-import controllers.actions.{FakeApprover, FakePrivilegedUser, FakeSupporter, FakeUser}
+import controllers.actions.{FakeApprover, UserTypes}
 import controllers.routes
 import generators.AccessRequestGenerator
 import models.accessrequest.{AccessRequest, Pending}
@@ -38,23 +38,12 @@ import views.html.admin.AccessRequestsView
 import java.time.LocalDateTime
 import scala.concurrent.Future
 
-class AccessRequestsControllerSpec extends SpecBase with MockitoSugar with HtmlValidation with TableDrivenPropertyChecks with AccessRequestGenerator {
-
-  private val authorisedUsers = Table(
-    "User",
-    FakeApprover,
-    FakeSupporter
-  )
-
-  private val unauthorisedUsers = Table(
-    "User",
-    FakeUser,
-    FakePrivilegedUser
-  )
+class AccessRequestsControllerSpec
+  extends SpecBase with MockitoSugar with HtmlValidation with TableDrivenPropertyChecks with AccessRequestGenerator with UserTypes {
 
   "AccessRequestsController" - {
     "must return Ok and the correct view for an approver or support" in {
-      forAll(authorisedUsers) {(user: UserModel) =>
+      forAll(usersWhoCanViewApprovals) { (user: UserModel) =>
         val fixture = buildFixture(user)
 
         val accessRequests = Seq(sampleAccessRequest())
@@ -142,7 +131,7 @@ class AccessRequestsControllerSpec extends SpecBase with MockitoSugar with HtmlV
     }
 
     "must redirect to the unauthorised page for a user who is not an approver or support" in {
-      forAll(unauthorisedUsers) {(user: UserModel) =>
+      forAll(usersWhoCannotViewApprovals) { (user: UserModel) =>
         val fixture = buildFixture(user)
 
         running(fixture.playApplication) {
