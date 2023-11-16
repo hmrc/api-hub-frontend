@@ -391,3 +391,8 @@ accessRequests.headings.reviewRequest = Review request
 
 manageApplications.title = Manage applications
 
+provideSupportingInformation.heading = Provide supporting information
+provideSupportingInformation.title = Provide supporting information
+provideSupportingInformation.hint = Provide any additional information you think will support your request. For example a link to any technical information about your service, or details of discussions with the producing team.
+provideSupportingInformation.continue = Continue
+provideSupportingInformation.error.required = Enter information to support your request
