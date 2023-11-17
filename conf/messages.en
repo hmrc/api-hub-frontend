@@ -22,6 +22,8 @@ site.apiNotFound.heading = API not found
 site.apiNotFound.message = Cannot find an API with Id {0}.
 site.neitherApiNorApplicationFound.heading = Neither Api nor application found
 site.neitherApiNorApplicationFound.message = Cannot find an API with Id {0} or an application with Id {1}.
+site.accessRequestNotFound.heading = Production access request not found
+site.accessRequestNotFound.message = Cannot find a production access request with Id {0}.
 
 date.day = Day
 date.month = Month
@@ -388,6 +390,19 @@ accessRequests.admin = API Hub admin
 accessRequests.headings.requestedBy = Requested by
 accessRequests.headings.supportingInformation = Supporting information
 accessRequests.headings.reviewRequest = Review request
+
+accessRequest.title = Review production API request
+accessRequest.heading = Review production API request
+accessRequest.applicationDetails = Application details
+accessRequest.headings.applicationName = Application name
+accessRequest.headings.status = Status
+accessRequest.headings.apiName = API name
+accessRequest.headings.applicationId = Application ID
+accessRequest.headings.requestedBy = Requested by
+accessRequest.headings.endpoints = Requested endpoints details
+accessRequest.headings.supportingInformation = Provided supporting information
+accessRequest.endpoints.scopes = These end points use the following scopes
+accessRequest.link.backToApprovalList = Back to approval list
 
 manageApplications.title = Manage applications
 

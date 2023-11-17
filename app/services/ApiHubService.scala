@@ -105,4 +105,8 @@ class ApiHubService @Inject()(
     applicationsConnector.getAccessRequests(applicationId, status)
   }
 
+  def getAccessRequest(id: String)(implicit hc:HeaderCarrier): Future[Option[AccessRequest]] = {
+    applicationsConnector.getAccessRequest(id)
+  }
+
 }

@@ -231,4 +231,16 @@ class ApplicationsConnector @Inject()(
       .execute[Seq[AccessRequest]]
   }
 
+  def getAccessRequest(id: String)(implicit hc:HeaderCarrier): Future[Option[AccessRequest]] = {
+    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/access-requests/$id")
+      .setHeader((ACCEPT, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Either[UpstreamErrorResponse, AccessRequest]]
+      .flatMap {
+        case Right(accessRequest) => Future.successful(Some(accessRequest))
+        case Left(e) if e.statusCode == NOT_FOUND => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
+  }
+
 }

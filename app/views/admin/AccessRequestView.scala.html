@@ -1,0 +1,132 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.application.Application
+@import models.accessrequest.AccessRequest
+@import models.user.UserModel
+@import viewmodels.admin.AccessRequestEndpointGroup
+@import views.ViewUtils
+
+@this(
+    layout: templates.Layout,
+    govukButton : GovukButton
+)
+
+@(accessRequest: AccessRequest, application: Application, endpointGroups: Seq[AccessRequestEndpointGroup], user: UserModel)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = titleNoForm(messages("accessRequest.title")), user = Some(user)) {
+
+    <h1 class="govuk-heading-l govuk-!-margin-bottom-7">
+        @messages("accessRequest.heading")
+    </h1>
+
+    <h2 class="govuk-heading-m">
+        @messages("accessRequest.applicationDetails")
+    </h2>
+
+    <dl class="govuk-summary-list">
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+                @messages("accessRequest.headings.applicationName")
+            </dt>
+            <dd class="govuk-summary-list__value">
+                @application.name
+            </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+                @messages("accessRequest.headings.status")
+            </dt>
+            <dd class="govuk-summary-list__value">
+                @ViewUtils.formatAccessRequestStatus(accessRequest.status)
+            </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+                @messages("accessRequest.headings.apiName")
+            </dt>
+            <dd class="govuk-summary-list__value">
+                @accessRequest.apiName
+            </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+                @messages("accessRequest.headings.applicationId")
+            </dt>
+            <dd class="govuk-summary-list__value">
+                @application.id
+            </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+                @messages("accessRequest.headings.requestedBy")
+            </dt>
+            <dd class="govuk-summary-list__value">
+                @accessRequest.requestedBy
+            </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+                @messages("accessRequest.headings.endpoints")
+            </dt>
+            <dd class="govuk-summary-list__value">
+                <ul class="govuk-list" style="padding-left: 20px">
+                    @for(endpointGroup <- endpointGroups) {
+                        @if(endpointGroup.index > 0) {
+                            <li>
+                                <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+                            </li>
+                        }
+                        <li>
+                            @for(endpoint <- endpointGroup.endpoints) {
+                                <p class="govuk-body govuk-!-margin-bottom-2 ">
+                                    <strong class="govuk-tag govuk-tag--blue ">
+                                        @endpoint.httpMethod
+                                    </strong>
+                                    <strong>@endpoint.path</strong>
+                                </p>
+                            }
+
+                            <p class="govuk-body govuk-!-font-size-16 govuk-!-margin-top-3 govuk-!-margin-bottom-1">@messages("accessRequest.endpoints.scopes"):</p>
+
+                            <ul class="govuk-list govuk-list-inline scopes-list">
+                                @for(scope <- endpointGroup.scopes) {
+                                    <li>
+                                        <strong class="govuk-tag govuk-tag--grey custom-normal-case govuk-!-margin-bottom-2">@scope</strong>
+                                    </li>
+                                }
+                            </ul>
+                        </li>
+                    }
+                </ul>
+            </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+                @messages("accessRequest.headings.supportingInformation")
+            </dt>
+            <dd class="govuk-summary-list__value">
+                @accessRequest.supportingInformation
+            </dd>
+        </div>
+    </dl>
+
+    @govukButton(Button(
+        content = Text(messages("accessRequest.link.backToApprovalList")),
+        href = Some(controllers.admin.routes.AccessRequestsController.onPageLoad().url)
+    ))
+
+}
