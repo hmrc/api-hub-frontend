@@ -404,5 +404,11 @@ accessRequest.headings.supportingInformation = Provided supporting information
 accessRequest.endpoints.scopes = These end points use the following scopes
 accessRequest.link.backToApprovalList = Back to approval list
 
+accessRequestApprovedSuccess.title = API production request successfully approved
+accessRequestApprovedSuccess.heading = API production request successfully approved
+accessRequestApprovedSuccess.guidance.heading = What you can do now
+accessRequestApprovedSuccess.guidance.content = Return to {0}.
+accessRequestApprovedSuccess.guidance.link = API approval requests
+
 manageApplications.title = Manage applications
 

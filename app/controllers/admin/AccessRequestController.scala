@@ -17,7 +17,7 @@
 package controllers.admin
 
 import com.google.inject.{Inject, Singleton}
-import controllers.actions.{AuthorisedApproverOrSupportAction, IdentifierAction}
+import controllers.actions.{AuthorisedApproverAction, AuthorisedApproverOrSupportAction, IdentifierAction}
 import controllers.helpers.ErrorResultBuilder
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
@@ -33,6 +33,7 @@ class AccessRequestController @Inject()(
   override val controllerComponents: MessagesControllerComponents,
   identify: IdentifierAction,
   isApproverOrSupport: AuthorisedApproverOrSupportAction,
+  isApprover: AuthorisedApproverAction,
   apiHubService: ApiHubService,
   errorResultBuilder: ErrorResultBuilder,
   view: AccessRequestView
@@ -50,6 +51,18 @@ class AccessRequestController @Inject()(
       }
   }
 
+  def approve(id: String): Action[AnyContent] = (identify andThen isApprover).async {
+    implicit request =>
+      request.user.email match {
+        case Some(email) =>
+          apiHubService.approveAccessRequest(id, email).map {
+            case Some(_) => Redirect(controllers.admin.routes.AccessRequestsController.onPageLoad())
+            case _ => accessRequestNotFound(id)
+          }
+        case _ => noEmail()
+      }
+  }
+
   private def accessRequestNotFound(accessRequestId: String)(implicit request: Request[_]): Result = {
     errorResultBuilder.notFound(
       heading = Messages("site.accessRequestNotFound.heading"),
@@ -61,6 +74,12 @@ class AccessRequestController @Inject()(
     errorResultBuilder.notFound(
       heading = Messages("site.applicationNotFoundHeading"),
       message = Messages("site.applicationNotFoundMessage", applicationId)
+    )
+  }
+
+  private def noEmail()(implicit request: Request[_]): Future[Result] = {
+    Future.successful(
+      errorResultBuilder.internalServerError("The current user does not have an email address")
     )
   }
 
