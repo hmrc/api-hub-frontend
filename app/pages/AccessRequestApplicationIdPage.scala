@@ -16,12 +16,13 @@
 
 package pages
 
-import models.ApiPolicyConditionsDeclaration
+import models.application.Application
 import play.api.libs.json.JsPath
 
-case object RequestProductionAccessPage extends QuestionPage[Boolean] {
+case object AccessRequestApplicationIdPage extends QuestionPage[Application] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "requestProductionAccess"
+  override def toString: String = "application"
+
 }

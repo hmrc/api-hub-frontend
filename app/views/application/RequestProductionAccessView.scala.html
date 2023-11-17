@@ -29,7 +29,7 @@
         formHelper: FormWithCSRF
 )
 
-@(form: Form[_], mode: Mode, application: Application, applicationApis: Seq[ApplicationApi], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+@(form: Form[_], application: Application, applicationApis: Seq[ApplicationApi], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
 @scripts() = {
     <link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css' media="all" rel="stylesheet" type="text/css"
@@ -175,7 +175,7 @@
 
 @layout(pageTitle = titleNoForm(messages("requestProductionAccess.title")), user = user, fullWidth = true, customScriptsBlock = Some(scripts()), customStyles = Some(styles())) {
 
-    @formHelper(action = controllers.application.routes.RequestProductionAccessController.onSubmit(application.id), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.application.routes.RequestProductionAccessController.onSubmit(), Symbol("autoComplete") -> "off") {
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
         }
@@ -265,7 +265,7 @@
                 @govukCheckboxes(
                     CheckboxesViewModel(
                         form = form,
-                        name = "value",
+                        name = "accept",
                         legend = Legend(""),
                         items = RequestProductionAccessDeclaration.checkboxItems
                     )

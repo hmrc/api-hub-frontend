@@ -103,6 +103,3 @@ POST        /apis/add-an-api/add-api                                            
 GET         /apis/view-specification/:apiId                                     controllers.OasRedocController.onPageLoad(apiId: String)
 GET         /apis/oas/:apiId                                                    controllers.OasRedocController.getOas(apiId: String)
 
-GET         /apis/provide-supporting-information                                controllers.ProvideSupportingInformationController.onPageLoad(mode: Mode = NormalMode)
-POST        /apis/provide-supporting-information                                controllers.ProvideSupportingInformationController.onSubmit(mode: Mode = NormalMode, wtf: Int = 999)
-

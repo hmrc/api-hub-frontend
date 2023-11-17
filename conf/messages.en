@@ -381,6 +381,7 @@ requestProductionAccess.apiName = API name:
 requestProductionAccess.viewDetails = View details
 requestProductionAccess.scopes = These end points use the following scopes:
 requestProductionAccess.button.accept = Continue
+requestProductionAccess.error.required = You must confirm that you have read and meet the requirements outlined in the usage policies.
 
 accessRequests.title = API requests
 accessRequests.heading = API production access requests

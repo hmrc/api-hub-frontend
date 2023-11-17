@@ -22,27 +22,35 @@
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukInput: GovukInput,
-    govukButton: GovukButton
+    govukButton: GovukButton,
+        govukTextarea: GovukTextarea
 )
 
-@(form: Form[_], mode: Mode, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+@(form: Form[_], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("provideSupportingInformation.title")), user = user) {
 
-    @formHelper(action = routes.ProvideSupportingInformationController.onSubmit(mode)) {
+    @formHelper(action = controllers.application.routes.ProvideSupportingInformationController.onSubmit()) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        @govukInput(
-            InputViewModel(
-                field = form("value"),
-                label = LabelViewModel(messages("provideSupportingInformation.heading")).asPageHeading()
-            )
-            .withWidth(Full)
-            .withHint(HintViewModel(messages("provideSupportingInformation.hint")))
-        )
+        @govukTextarea(Textarea(
+            id = "value",
+            name = "value",
+            label = Label(
+                isPageHeading = true,
+                classes = "govuk-label--l",
+                content = Text(messages("provideSupportingInformation.heading"))
+            ),
+            hint = Some(Hint(
+                content = Text(messages("provideSupportingInformation.hint"))
+            )),
+            value = form("value").value
+        ))
+
+
 
         @govukButton(
             ButtonViewModel(messages("provideSupportingInformation.continue"))

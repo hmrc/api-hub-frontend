@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.application
 
 import controllers.actions._
 import forms.ProvideSupportingInformationFormProvider
-import models.Mode
 import pages.ProvideSupportingInformationPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.ProvideSupportingInformationView
+import views.html.application.ProvideSupportingInformationView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -34,31 +33,31 @@ class ProvideSupportingInformationController @Inject()(
                                         override val messagesApi: MessagesApi,
                                         sessionRepository: SessionRepository,
                                         identify: IdentifierAction,
-                                        getData: DataRetrievalAction,
+                                        getData: AccessRequestDataRetrievalAction,
                                         requireData: DataRequiredAction,
                                         formProvider: ProvideSupportingInformationFormProvider,
                                         val controllerComponents: MessagesControllerComponents,
-                                        view: ProvideSupportingInformationView
+                                        provideSupportingInformationView: ProvideSupportingInformationView
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form: Form[String] = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
       val preparedForm = request.userAnswers.get(ProvideSupportingInformationPage) match {
         case None => form
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode, Some(request.user)))
+      Ok(provideSupportingInformationView(preparedForm, Some(request.user)))
   }
 
-  def onSubmit(mode: Mode, wtf: Int): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onSubmit: Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode, Some(request.user)))),
+          Future.successful(BadRequest(provideSupportingInformationView(formWithErrors, Some(request.user)))),
 
         value =>
           for {

@@ -17,16 +17,14 @@
 package forms
 
 import forms.mappings.Mappings
-import models.ApiPolicyConditionsDeclaration
 import play.api.data.Form
-import play.api.data.Forms.set
 
 import javax.inject.Inject
 
 class RequestProductionAccessDeclarationFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[Set[ApiPolicyConditionsDeclaration]] =
+  def apply(): Form[Boolean] =
     Form(
-      "value" -> set(enumerable[ApiPolicyConditionsDeclaration]("apiPolicyConditionsDeclarationPage.error.required")).verifying(nonEmptySet("apiPolicyConditionsDeclarationPage.error.required"))
+      "accept" -> boolean("requestProductionAccess.error.required")
     )
 }
