@@ -37,65 +37,41 @@ import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
 import viewmodels.application.{Accessible, ApplicationApi, ApplicationEndpoint, Inaccessible}
 import views.html.ErrorTemplate
-import views.html.application.RequestProductionAccessView
+import views.html.application.{ProvideSupportingInformationView, RequestProductionAccessView}
 
 import java.time.{Clock, Instant, ZoneId}
 import scala.concurrent.Future
 
-class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar with TestHelpers with HtmlValidation {
+class ProvideSupportingInformationControllerSpec extends SpecBase with MockitoSugar with TestHelpers with HtmlValidation {
 
   private val form = new RequestProductionAccessDeclarationFormProvider()()
   private val clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
 
-  "RequestProductionAccessController" - {
+  "ProvideSupportingInformationController" - {
     "must return OK and the correct view for a GET for a team member or supporter" in {
       forAll(teamMemberAndSupporterTable) {
         user: UserModel =>
-
           val application = anApplication
           val userAnswers = buildUserAnswers(application)
-
           val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
 
-          val applicationApis = Seq(
-            ApplicationApi(anApiDetail, Seq(ApplicationEndpoint("GET", "/test", Seq("test-scope"), Inaccessible, Accessible)))
-          )
+
+
+          when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), any())(any()))
+            .thenReturn(Future.successful(Some(application)))
 
           running(fixture.application) {
-            val request = FakeRequest(GET, controllers.application.routes.RequestProductionAccessController.onPageLoad.url)
+            val request = FakeRequest(GET, controllers.application.routes.ProvideSupportingInformationController.onPageLoad.url)
             val result = route(fixture.application, request).value
-            val view = fixture.application.injector.instanceOf[RequestProductionAccessView]
+            val view = fixture.application.injector.instanceOf[ProvideSupportingInformationView]
 
             status(result) mustEqual OK
-            contentAsString(result) mustBe view(form, FakeApplication, applicationApis, Some(user))(request, messages(fixture.application)).toString
+            contentAsString(result) mustBe view(form, Some(user))(request, messages(fixture.application)).toString
             contentAsString(result) must validateAsHtml
           }
       }
     }
 
-    "must return the correct view when the applications has APIs" in {
-      val application = anApplication
-      val userAnswers = buildUserAnswers(application)
-
-      val fixture = buildFixture(userAnswers = Some(userAnswers))
-
-      val applicationApis = Seq(
-        ApplicationApi(anApiDetail, Seq(ApplicationEndpoint("GET", "/test", Seq("test-scope"), Inaccessible, Accessible)))
-      )
-
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), ArgumentMatchers.eq(true))(any()))
-        .thenReturn(Future.successful(Some(application)))
-
-      running(fixture.application) {
-        val request = FakeRequest(GET, controllers.application.routes.RequestProductionAccessController.onPageLoad.url)
-        val result = route(fixture.application, request).value
-        val view = fixture.application.injector.instanceOf[RequestProductionAccessView]
-
-        status(result) mustEqual OK
-        contentAsString(result) mustBe view(form, application, applicationApis, Some(FakeUser))(request, messages(fixture.application)).toString
-        contentAsString(result) must validateAsHtml
-      }
-    }
 
     "must redirect to Unauthorised page for a GET when user is not a team member or supporter" in {
       val fixture = buildFixture(userModel = FakeUserNotTeamMember)
@@ -104,7 +80,7 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
         .thenReturn(Future.successful(Some(FakeApplication)))
 
       running(fixture.application) {
-        val request = FakeRequest(GET, controllers.application.routes.RequestProductionAccessController.onPageLoad.url)
+        val request = FakeRequest(GET, controllers.application.routes.ProvideSupportingInformationController.onPageLoad.url)
         val result = route(fixture.application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -139,7 +115,7 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
                               application: PlayApplication,
                               apiHubService: ApiHubService,
                               accessRequestSessionRepository: AccessRequestSessionRepository,
-                              requestProductionAccessController: RequestProductionAccessController
+                              provideSupportingInformationController: ProvideSupportingInformationController
                             )
 
   private def buildFixture(userModel: UserModel = FakeUser, userAnswers: Option[UserAnswers] = Some(emptyUserAnswers)): Fixture = {
@@ -154,7 +130,7 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
       )
       .build()
 
-    val controller = playApplication.injector.instanceOf[RequestProductionAccessController]
+    val controller = playApplication.injector.instanceOf[ProvideSupportingInformationController]
     Fixture(playApplication, apiHubService, accessRequestSessionRepository, controller)
   }
 

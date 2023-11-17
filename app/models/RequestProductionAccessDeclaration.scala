@@ -36,7 +36,7 @@ object RequestProductionAccessDeclaration extends Enumerable.Implicits {
       case (value, index) =>
         CheckboxItemViewModel(
           content = Text(messages(s"requestProductionAccess.declaration.${value.toString}")),
-          fieldId = "value",
+          fieldId = "accept",
           index   = index,
           value   = value.toString
         )
