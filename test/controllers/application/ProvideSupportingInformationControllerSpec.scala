@@ -17,17 +17,16 @@
 package controllers.application
 
 import base.SpecBase
-import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
-import controllers.routes
+import controllers.actions.{FakeApplication, FakeUser}
 import forms.RequestProductionAccessDeclarationFormProvider
-import models.{NormalMode, UserAnswers}
+import models.UserAnswers
 import models.api.{ApiDetail, Endpoint, EndpointMethod}
 import models.application.ApplicationLenses.ApplicationLensOps
-import models.application.{Api, Application, Approved, Scope, SelectedEndpoint}
+import models.application._
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
-import org.mockito.{ArgumentMatchers, MockitoSugar}
-import pages.AccessRequestApplicationIdPage
+import org.mockito.{ArgumentCaptor, ArgumentMatchers, MockitoSugar}
+import pages.{AccessRequestApplicationIdPage, ProvideSupportingInformationPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -35,9 +34,7 @@ import play.api.{Application => PlayApplication}
 import repositories.AccessRequestSessionRepository
 import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
-import viewmodels.application.{Accessible, ApplicationApi, ApplicationEndpoint, Inaccessible}
-import views.html.ErrorTemplate
-import views.html.application.{ProvideSupportingInformationView, RequestProductionAccessView}
+import views.html.application.ProvideSupportingInformationView
 
 import java.time.{Clock, Instant, ZoneId}
 import scala.concurrent.Future
@@ -55,8 +52,6 @@ class ProvideSupportingInformationControllerSpec extends SpecBase with MockitoSu
           val userAnswers = buildUserAnswers(application)
           val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
 
-
-
           when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), any())(any()))
             .thenReturn(Future.successful(Some(application)))
 
@@ -72,19 +67,28 @@ class ProvideSupportingInformationControllerSpec extends SpecBase with MockitoSu
       }
     }
 
+    "must set the user answers and navigate to next page on submit" in {
+      forAll(teamMemberAndSupporterTable) {
+        user: UserModel =>
 
-    "must redirect to Unauthorised page for a GET when user is not a team member or supporter" in {
-      val fixture = buildFixture(userModel = FakeUserNotTeamMember)
+          val application = anApplication
+          val userAnswers = buildUserAnswers(application)
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(true))(any()))
-        .thenReturn(Future.successful(Some(FakeApplication)))
+          val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
 
-      running(fixture.application) {
-        val request = FakeRequest(GET, controllers.application.routes.ProvideSupportingInformationController.onPageLoad.url)
-        val result = route(fixture.application, request).value
+          when(fixture.accessRequestSessionRepository.set(any())).thenReturn(Future.successful(true))
+          running(fixture.application) {
+            val request = FakeRequest(POST, controllers.application.routes.ProvideSupportingInformationController.onSubmit().url).withFormUrlEncodedBody(("value", "blah"))
+            val result = route(fixture.application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad.url)
+            status(result) mustEqual SEE_OTHER
+            val captor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+            verify(fixture.accessRequestSessionRepository).set(captor.capture())
+            val userAnswers: UserAnswers = captor.getValue
+            userAnswers.get(ProvideSupportingInformationPage) mustEqual Some("blah")
+            // TODO in HIP 870:
+            // redirectLocation(result) mustBe Some(controllers.application.routes.Whatever.onPageLoad().url)
+          }
       }
     }
   }
@@ -118,7 +122,7 @@ class ProvideSupportingInformationControllerSpec extends SpecBase with MockitoSu
                               provideSupportingInformationController: ProvideSupportingInformationController
                             )
 
-  private def buildFixture(userModel: UserModel = FakeUser, userAnswers: Option[UserAnswers] = Some(emptyUserAnswers)): Fixture = {
+  private def buildFixture(userModel: UserModel, userAnswers: Option[UserAnswers]): Fixture = {
     val apiHubService = mock[ApiHubService]
     val accessRequestSessionRepository = mock[AccessRequestSessionRepository]
 
@@ -137,5 +141,7 @@ class ProvideSupportingInformationControllerSpec extends SpecBase with MockitoSu
   private def buildUserAnswers(application: Application): UserAnswers = {
     UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
       .set(AccessRequestApplicationIdPage, application).toOption.value
+
+//    userAnswers.set(RequestProductionAccessPage, Set(Accept)).toOption.value
   }
 }

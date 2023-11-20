@@ -17,26 +17,25 @@
 package controllers.application
 
 import base.SpecBase
-import controllers.actions.{FakeApplication, FakeUser}
+import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
 import generators.ApiDetailGenerators
 import models.UserAnswers
 import models.api.{ApiDetail, Endpoint, EndpointMethod}
 import models.application.ApplicationLenses.ApplicationLensOps
-import models.application.{Api, Application, Approved, Scope, SelectedEndpoint}
-import navigation.{FakeNavigator, Navigator}
+import models.application._
+import models.user.UserModel
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{AccessRequestApplicationIdPage, AddAnApiApiIdPage}
+import pages.AccessRequestApplicationIdPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import repositories.{AccessRequestSessionRepository, AddAnApiSessionRepository}
+import play.api.{Application => PlayApplication}
+import repositories.AccessRequestSessionRepository
 import services.ApiHubService
 import utils.HtmlValidation
-import views.html.ErrorTemplate
-import play.api.{Application => PlayApplication}
 
 import java.time.{Clock, Instant, ZoneId}
 import scala.concurrent.Future
@@ -86,6 +85,22 @@ class RequestProductionAccessStartControllerSpec extends SpecBase with MockitoSu
         redirectLocation(result) mustBe Some(routes.RequestProductionAccessController.onPageLoad().url)
       }
     }
+
+    "must redirect to unauthorised" in {
+      val fixture = buildFixture(FakeUserNotTeamMember)
+      val application: Application = FakeApplication
+
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any())(any()))
+        .thenReturn(Future.successful(Some(application)))
+
+      running(fixture.application) {
+        val request = FakeRequest(GET, routes.RequestProductionAccessStartController.onPageLoad(application.id).url)
+        val result = route(fixture.application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(controllers.routes.UnauthorisedController.onPageLoad.url)
+      }
+    }
   }
 
   private def anApplication = {
@@ -112,11 +127,11 @@ class RequestProductionAccessStartControllerSpec extends SpecBase with MockitoSu
                               requestProductionAccessStartController: RequestProductionAccessStartController
                             )
 
-  private def buildFixture(): Fixture = {
+  private def buildFixture(userModel: UserModel = FakeUser): Fixture = {
     val apiHubService = mock[ApiHubService]
     val accessRequestSessionRepository = mock[AccessRequestSessionRepository]
 
-    val application = applicationBuilder()
+    val application = applicationBuilder(userAnswers = None, user = userModel)
       .overrides(
         bind[ApiHubService].toInstance(apiHubService),
         bind[AccessRequestSessionRepository].toInstance(accessRequestSessionRepository),

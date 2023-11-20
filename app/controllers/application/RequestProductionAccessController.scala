@@ -45,20 +45,26 @@ class RequestProductionAccessController @Inject()(
   val form = formProvider()
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
-      val preparedForm = request.userAnswers.get(RequestProductionAccessPage) match {
-        case None => form
-        case Some(value) => form.fill(value)
+    implicit request => {
+      request.userAnswers.get(AccessRequestApplicationIdPage) match {
+        case Some(_) =>
+          val previousAnswers = request.userAnswers.get(RequestProductionAccessPage)
+          previousAnswers match {
+            case None => showPage(form, OK)
+            case Some(value) => showPage(form.fill(value), OK)
+          }
+
+        case None => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
       }
-      showPage(preparedForm)
+    }
   }
 
 
-  private def showPage(form: Form[_])(implicit request: DataRequest[AnyContent]) = {
+  private def showPage(form: Form[_], status: Int)(implicit request: DataRequest[AnyContent]) = {
     request.userAnswers.get(AccessRequestApplicationIdPage) match {
       case Some(application) =>
         applicationApiBuilder.build(application).map {
-          case Right(applicationApis) => Ok(requestProductionAccessView(form, application, applicationApis, Some(request.user)))
+          case Right(applicationApis) => Status(status)(requestProductionAccessView(form, application, applicationApis, Some(request.user)))
           case Left(result) => result
         }
 
@@ -70,7 +76,7 @@ class RequestProductionAccessController @Inject()(
       form.bindFromRequest().fold(
           formWithErrors => {
             Console.println(s"formWithErrors: $formWithErrors")
-            showPage(formWithErrors)
+            showPage(formWithErrors, BAD_REQUEST)
           },
           value => {
             for {

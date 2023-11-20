@@ -17,26 +17,25 @@
 package controllers.application
 
 import base.SpecBase
-import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
+import controllers.actions.{FakeApplication, FakeUser}
 import controllers.routes
 import forms.RequestProductionAccessDeclarationFormProvider
-import models.{NormalMode, UserAnswers}
 import models.api.{ApiDetail, Endpoint, EndpointMethod}
 import models.application.ApplicationLenses.ApplicationLensOps
-import models.application.{Api, Application, Approved, Scope, SelectedEndpoint}
+import models.application._
 import models.user.UserModel
+import models.{RequestProductionAccessDeclaration, UserAnswers}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.{ArgumentMatchers, MockitoSugar}
-import pages.AccessRequestApplicationIdPage
+import org.mockito.{ArgumentCaptor, ArgumentMatchers, MockitoSugar}
+import pages.{AccessRequestApplicationIdPage, RequestProductionAccessPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.{running, _}
 import play.api.{Application => PlayApplication}
 import repositories.AccessRequestSessionRepository
 import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
 import viewmodels.application.{Accessible, ApplicationApi, ApplicationEndpoint, Inaccessible}
-import views.html.ErrorTemplate
 import views.html.application.RequestProductionAccessView
 
 import java.time.{Clock, Instant, ZoneId}
@@ -61,6 +60,8 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
             ApplicationApi(anApiDetail, Seq(ApplicationEndpoint("GET", "/test", Seq("test-scope"), Inaccessible, Accessible)))
           )
 
+          when(fixture.apiHubService.getApiDetail(any())(any())).thenReturn(Future.successful(Some(anApiDetail)))
+
           running(fixture.application) {
             val request = FakeRequest(GET, controllers.application.routes.RequestProductionAccessController.onPageLoad.url)
             val result = route(fixture.application, request).value
@@ -83,6 +84,8 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
         ApplicationApi(anApiDetail, Seq(ApplicationEndpoint("GET", "/test", Seq("test-scope"), Inaccessible, Accessible)))
       )
 
+      when(fixture.apiHubService.getApiDetail(any())(any())).thenReturn(Future.successful(Some(anApiDetail)))
+
       when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), ArgumentMatchers.eq(true))(any()))
         .thenReturn(Future.successful(Some(application)))
 
@@ -97,18 +100,41 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
       }
     }
 
-    "must redirect to Unauthorised page for a GET when user is not a team member or supporter" in {
-      val fixture = buildFixture(userModel = FakeUserNotTeamMember)
-
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(true))(any()))
-        .thenReturn(Future.successful(Some(FakeApplication)))
+    "must redirect to recovery page for a GET when there is no application in the session repository" in {
+      val fixture = buildFixture()
 
       running(fixture.application) {
         val request = FakeRequest(GET, controllers.application.routes.RequestProductionAccessController.onPageLoad.url)
         val result = route(fixture.application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad.url)
+        redirectLocation(result) mustBe Some(routes.JourneyRecoveryController.onPageLoad().url)
+      }
+    }
+
+    "must set the user answers and navigate to next page on submit" in {
+      forAll(teamMemberAndSupporterTable) {
+        user: UserModel =>
+
+          val application = anApplication
+          val userAnswers = buildUserAnswers(application)
+
+          val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
+
+          when(fixture.apiHubService.getApiDetail(any())(any())).thenReturn(Future.successful(Some(anApiDetail)))
+          when(fixture.accessRequestSessionRepository.set(any())) thenReturn Future.successful(true)
+          running(fixture.application) {
+            val request = FakeRequest(POST, controllers.application.routes.RequestProductionAccessController.onSubmit().url).withFormUrlEncodedBody(("accept[0]", "accept"))
+            val result = route(fixture.application, request).value
+
+            status(result) mustEqual SEE_OTHER
+
+            val captor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+            verify(fixture.accessRequestSessionRepository).set(captor.capture())
+            val userAnswers: UserAnswers = captor.getValue
+            userAnswers.get(RequestProductionAccessPage) mustEqual Some(Set(RequestProductionAccessDeclaration.Accept))
+            redirectLocation(result) mustBe Some(controllers.application.routes.ProvideSupportingInformationController.onPageLoad().url)
+          }
       }
     }
   }

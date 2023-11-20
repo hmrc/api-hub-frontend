@@ -18,7 +18,7 @@ package controllers.application
 
 import controllers.actions.{ApplicationAuthActionProvider, IdentifierAction}
 import models.UserAnswers
-import pages.{AccessRequestApplicationIdPage, RequestProductionAccessPage}
+import pages.AccessRequestApplicationIdPage
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.AccessRequestSessionRepository

@@ -22,7 +22,7 @@ import pages.ProvideSupportingInformationPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.SessionRepository
+import repositories.AccessRequestSessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.application.ProvideSupportingInformationView
 
@@ -31,7 +31,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ProvideSupportingInformationController @Inject()(
                                         override val messagesApi: MessagesApi,
-                                        sessionRepository: SessionRepository,
+                                        sessionRepository: AccessRequestSessionRepository,
                                         identify: IdentifierAction,
                                         getData: AccessRequestDataRetrievalAction,
                                         requireData: DataRequiredAction,
@@ -44,12 +44,10 @@ class ProvideSupportingInformationController @Inject()(
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
-      val preparedForm = request.userAnswers.get(ProvideSupportingInformationPage) match {
-        case None => form
-        case Some(value) => form.fill(value)
-      }
-
-      Ok(provideSupportingInformationView(preparedForm, Some(request.user)))
+        request.userAnswers.get(ProvideSupportingInformationPage) match {
+          case None => Ok(provideSupportingInformationView(form, Some(request.user)))
+          case Some(value) => Ok(provideSupportingInformationView(form.fill(value), Some(request.user)))
+        }
   }
 
   def onSubmit: Action[AnyContent] = (identify andThen getData andThen requireData).async {
