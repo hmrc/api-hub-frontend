@@ -74,10 +74,7 @@ class RequestProductionAccessController @Inject()(
   def onSubmit: Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       form.bindFromRequest().fold(
-          formWithErrors => {
-            Console.println(s"formWithErrors: $formWithErrors")
-            showPage(formWithErrors, BAD_REQUEST)
-          },
+          formWithErrors => showPage(formWithErrors, BAD_REQUEST),
           value => {
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(RequestProductionAccessPage, value))

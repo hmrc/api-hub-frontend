@@ -63,7 +63,7 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
           when(fixture.apiHubService.getApiDetail(any())(any())).thenReturn(Future.successful(Some(anApiDetail)))
 
           running(fixture.application) {
-            val request = FakeRequest(GET, controllers.application.routes.RequestProductionAccessController.onPageLoad.url)
+            val request = FakeRequest(GET, controllers.application.routes.RequestProductionAccessController.onPageLoad().url)
             val result = route(fixture.application, request).value
             val view = fixture.application.injector.instanceOf[RequestProductionAccessView]
 
@@ -90,7 +90,7 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
         .thenReturn(Future.successful(Some(application)))
 
       running(fixture.application) {
-        val request = FakeRequest(GET, controllers.application.routes.RequestProductionAccessController.onPageLoad.url)
+        val request = FakeRequest(GET, controllers.application.routes.RequestProductionAccessController.onPageLoad().url)
         val result = route(fixture.application, request).value
         val view = fixture.application.injector.instanceOf[RequestProductionAccessView]
 
@@ -104,7 +104,7 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
       val fixture = buildFixture()
 
       running(fixture.application) {
-        val request = FakeRequest(GET, controllers.application.routes.RequestProductionAccessController.onPageLoad.url)
+        val request = FakeRequest(GET, controllers.application.routes.RequestProductionAccessController.onPageLoad().url)
         val result = route(fixture.application, request).value
 
         status(result) mustEqual SEE_OTHER
