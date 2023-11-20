@@ -14,31 +14,14 @@
  * limitations under the License.
  */
 
-package controllers.actions
+package models.accessrequest
 
-import models.user.UserModel
-import org.scalatest.prop.{TableDrivenPropertyChecks, TableFor1}
+import play.api.libs.json.{Format, Json}
 
-trait UserTypes {
-  self: TableDrivenPropertyChecks =>
+case class AccessRequestDecisionRequest(decidedBy: String, rejectedReason: Option[String])
 
-  val usersWhoCanViewApprovals: TableFor1[UserModel] = Table(
-    "User",
-    FakeApprover,
-    FakeSupporter
-  )
+object AccessRequestDecisionRequest {
 
-  val usersWhoCannotViewApprovals: TableFor1[UserModel] = Table(
-    "User",
-    FakeUser,
-    FakePrivilegedUser
-  )
-
-  val usersWhoCannotApprove: TableFor1[UserModel] = Table(
-    "User",
-    FakeUser,
-    FakePrivilegedUser,
-    FakeSupporter
-  )
+  implicit val formatAccessRequestDecisionRequest: Format[AccessRequestDecisionRequest] = Json.format[AccessRequestDecisionRequest]
 
 }

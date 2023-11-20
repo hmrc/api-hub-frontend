@@ -14,31 +14,22 @@
  * limitations under the License.
  */
 
-package controllers.actions
+package forms.admin
 
-import models.user.UserModel
-import org.scalatest.prop.{TableDrivenPropertyChecks, TableFor1}
+import com.google.inject.Singleton
+import forms.mappings.Mappings
+import play.api.data.Form
 
-trait UserTypes {
-  self: TableDrivenPropertyChecks =>
+import javax.inject.Inject
 
-  val usersWhoCanViewApprovals: TableFor1[UserModel] = Table(
-    "User",
-    FakeApprover,
-    FakeSupporter
-  )
+@Singleton
+class AccessRequestDecisionFormProvider @Inject() extends Mappings {
 
-  val usersWhoCannotViewApprovals: TableFor1[UserModel] = Table(
-    "User",
-    FakeUser,
-    FakePrivilegedUser
-  )
-
-  val usersWhoCannotApprove: TableFor1[UserModel] = Table(
-    "User",
-    FakeUser,
-    FakePrivilegedUser,
-    FakeSupporter
-  )
+  def apply(): Form[String] = {
+    Form(
+      "value" -> text("accessRequest.decision.required")
+        .verifying("accessRequest.decision.required", value => Set("approve", "reject").contains(value))
+    )
+  }
 
 }

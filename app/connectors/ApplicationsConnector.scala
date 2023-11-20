@@ -19,7 +19,7 @@ package connectors
 import com.google.inject.{Inject, Singleton}
 import config.FrontendAppConfig
 import models.UserEmail
-import models.accessrequest.{AccessRequest, AccessRequestRequest, AccessRequestStatus}
+import models.accessrequest.{AccessRequest, AccessRequestDecisionRequest, AccessRequestRequest, AccessRequestStatus}
 import models.application.{Application, Credential, EnvironmentName, NewApplication, NewScope, Secret}
 import models.exception.{ApplicationCredentialLimitException, ApplicationsException}
 import models.requests.AddApiRequest
@@ -238,6 +238,21 @@ class ApplicationsConnector @Inject()(
       .execute[Either[UpstreamErrorResponse, AccessRequest]]
       .flatMap {
         case Right(accessRequest) => Future.successful(Some(accessRequest))
+        case Left(e) if e.statusCode == NOT_FOUND => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
+  }
+
+  def approveAccessRequest(id: String, decidedBy: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    val decisionRequest = AccessRequestDecisionRequest(decidedBy = decidedBy, rejectedReason = None)
+
+    httpClient.put(url"$applicationsBaseUrl/api-hub-applications/access-requests/$id/approve")
+      .setHeader((CONTENT_TYPE, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .withBody(Json.toJson(decisionRequest))
+      .execute[Either[UpstreamErrorResponse, Unit]]
+      .flatMap {
+        case Right(()) => Future.successful(Some(()))
         case Left(e) if e.statusCode == NOT_FOUND => Future.successful(None)
         case Left(e) => Future.failed(e)
       }

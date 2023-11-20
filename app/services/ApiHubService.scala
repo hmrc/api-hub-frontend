@@ -109,4 +109,8 @@ class ApiHubService @Inject()(
     applicationsConnector.getAccessRequest(id)
   }
 
+  def approveAccessRequest(id: String, decidedBy: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    applicationsConnector.approveAccessRequest(id, decidedBy)
+  }
+
 }

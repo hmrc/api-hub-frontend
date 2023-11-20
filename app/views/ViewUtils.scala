@@ -43,6 +43,7 @@ object ViewUtils {
   private val shortDateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMM yyyy HH:mm")
   private val shortestDateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yy - HH:mm")
   private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
+  private val shortDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yy")
 
   def formatLocalDateTime(value: LocalDateTime): String = {
     value.format(dateTimeFormatter)
@@ -58,6 +59,10 @@ object ViewUtils {
 
   def formatDate(value: LocalDateTime): String = {
     s"${value.format(dateFormatter)}"
+  }
+
+  def formatShortDate(value: LocalDateTime): String = {
+    s"${value.format(shortDateFormatter)}"
   }
 
   def formatAccessRequestStatus(status: AccessRequestStatus): Html = {

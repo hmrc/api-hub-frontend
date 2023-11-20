@@ -390,6 +390,24 @@ class ApiHubServiceSpec
     }
   }
 
+  "approveAccessRequest" - {
+    "must make the correct request to the applications connector and return the response" in {
+      val applicationsConnector = mock[ApplicationsConnector]
+      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+      val id = "test-id"
+      val decidedBy = "test-decided-by"
+
+      when(applicationsConnector.approveAccessRequest(any(), any())(any())).thenReturn(Future.successful(Some(())))
+
+      service.approveAccessRequest(id, decidedBy)(HeaderCarrier()).map {
+        result =>
+          verify(applicationsConnector).approveAccessRequest(ArgumentMatchers.eq(id), ArgumentMatchers.eq(decidedBy))(any())
+          result mustBe Some(())
+      }
+    }
+  }
+
 }
 
 trait ApplicationGetterBehaviours {
