@@ -22,7 +22,17 @@
 
 @(user: UserModel)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("accessRequestApprovedSuccess.title")), user = Some(user)) {
+@accessRequestsLink() = {
+    <a href='@accessRequestsLinkUrl()' class='govuk-link govuk-link--no-visited-state'>
+        @messages("accessRequestApprovedSuccess.guidance.link")
+    </a>
+}
+
+@accessRequestsLinkUrl() = @{
+    controllers.admin.routes.AccessRequestsController.onPageLoad().url
+}
+
+@layout(pageTitle = titleNoForm(messages("accessRequestApprovedSuccess.title")), user = Some(user), showBackLink = false) {
 
     <div class="govuk-panel govuk-panel--confirmation">
         <h1 class="govuk-panel__title">
@@ -35,7 +45,12 @@
     </h2>
 
     <p class="govuk-body">
-        Return to <a href="api-requests" class="govuk-link govuk-link--no-visited-state">API approval requests</a>.
+        @Html(
+            messages(
+                "accessRequestApprovedSuccess.guidance.content",
+                accessRequestsLink()
+            )
+        )
     </p>
 
 }

@@ -1,4 +1,3 @@
 GET         /access-requests                                                        controllers.admin.AccessRequestsController.onPageLoad()
-GET         /access-requests/approved-success                                       controllers.admin.AccessRequestApprovedSuccessController.onPageLoad()
-POST        /access-requests/:id/approve                                            controllers.admin.AccessRequestController.approve(id)
 GET         /access-requests/:id                                                    controllers.admin.AccessRequestController.onPageLoad(id)
+POST        /access-requests/:id                                                    controllers.admin.AccessRequestController.onSubmit(id)

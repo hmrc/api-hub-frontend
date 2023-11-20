@@ -391,11 +391,13 @@ accessRequests.headings.requestedBy = Requested by
 accessRequests.headings.supportingInformation = Supporting information
 accessRequests.headings.reviewRequest = Review request
 
-accessRequest.title = Review production API request
-accessRequest.heading = Review production API request
+accessRequest.title = Production API request
+accessRequest.heading = Production API request
 accessRequest.applicationDetails = Application details
 accessRequest.headings.applicationName = Application name
 accessRequest.headings.status = Status
+accessRequest.headings.decided = Decision date
+accessRequest.headings.decidedBy = Decided by
 accessRequest.headings.apiName = API name
 accessRequest.headings.applicationId = Application ID
 accessRequest.headings.requestedBy = Requested by
@@ -403,6 +405,10 @@ accessRequest.headings.endpoints = Requested endpoints details
 accessRequest.headings.supportingInformation = Provided supporting information
 accessRequest.endpoints.scopes = These end points use the following scopes
 accessRequest.link.backToApprovalList = Back to approval list
+accessRequest.decision.required = You must select an option to continue
+accessRequest.decision.legend = Select an option and continue
+accessRequest.decision.approve = Approve request
+accessRequest.decision.reject = Reject request
 
 accessRequestApprovedSuccess.title = API production request successfully approved
 accessRequestApprovedSuccess.heading = API production request successfully approved
@@ -411,4 +417,3 @@ accessRequestApprovedSuccess.guidance.content = Return to {0}.
 accessRequestApprovedSuccess.guidance.link = API approval requests
 
 manageApplications.title = Manage applications
-
