@@ -28,6 +28,7 @@ class AccessRequestDecisionFormProvider @Inject() extends Mappings {
   def apply(): Form[String] = {
     Form(
       "value" -> text("accessRequest.decision.required")
+        .verifying("accessRequest.decision.required", value => Set("approve", "reject").contains(value))
     )
   }
 
