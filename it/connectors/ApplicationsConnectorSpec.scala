@@ -5,7 +5,7 @@ import com.typesafe.config.ConfigFactory
 import config.FrontendAppConfig
 import connectors.ApplicationsConnectorSpec.ApplicationGetterBehaviours
 import models.UserEmail
-import models.accessrequest.{AccessRequest, AccessRequestApi, AccessRequestEndpoint, AccessRequestRequest, AccessRequestStatus, Rejected}
+import models.accessrequest.{AccessRequest, AccessRequestApi, AccessRequestDecisionRequest, AccessRequestEndpoint, AccessRequestRequest, AccessRequestStatus, Rejected}
 import models.application._
 import models.exception.ApplicationCredentialLimitException
 import models.user.{LdapUser, UserModel}
@@ -506,6 +506,95 @@ class ApplicationsConnectorSpec
             result mustBe Seq(accessRequest)
         }
       }
+    }
+  }
+
+  "ApplicationsConnector.getAccessRequest" - {
+    "must place the correct request and return the access request when it exists" in {
+      val accessRequest = AccessRequest(
+        id = "test-id",
+        applicationId = "test-application-id",
+        apiId = "test-api-id",
+        apiName = "test-api-name",
+        status = Rejected,
+        supportingInformation = "test-supporting-information",
+        requested = LocalDateTime.now(),
+        requestedBy = "test-requested-by"
+      )
+
+      stubFor(
+        get(urlEqualTo(s"/api-hub-applications/access-requests/${accessRequest.id}"))
+          .withHeader(ACCEPT, equalTo("application/json"))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody(Json.toJson(accessRequest).toString())
+          )
+      )
+
+      buildConnector(this).getAccessRequest(accessRequest.id)(HeaderCarrier()).map(
+        result =>
+          result mustBe Some(accessRequest)
+      )
+    }
+
+    "must return None when the access request cannot be found" in {
+      val id = "test-id"
+
+      stubFor(
+        get(urlEqualTo(s"/api-hub-applications/access-requests/$id"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+          )
+      )
+
+      buildConnector(this).getAccessRequest(id)(HeaderCarrier()).map(
+        result =>
+          result mustBe None
+      )
+    }
+  }
+
+  "ApplicationsConnector.approveAccessRequest" - {
+    "must place the correct request" in {
+      val id = "test-id"
+      val decisionRequest = AccessRequestDecisionRequest(decidedBy = "test-decided-by", rejectedReason = None)
+
+      stubFor(
+        put(urlEqualTo(s"/api-hub-applications/access-requests/$id/approve"))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .withHeader(CONTENT_TYPE, equalTo(ContentTypes.JSON))
+          .withRequestBody(equalToJson(Json.toJson(decisionRequest).toString()))
+          .willReturn(
+            aResponse()
+              .withStatus(NO_CONTENT)
+          )
+      )
+
+      buildConnector(this).approveAccessRequest(id, decisionRequest.decidedBy)(HeaderCarrier()).map(
+        result =>
+          result mustBe Some(())
+      )
+    }
+
+    "must return None when the access request does not exist" in {
+      val id = "test-id"
+      val decisionRequest = AccessRequestDecisionRequest(decidedBy = "test-decided-by", rejectedReason = None)
+
+      stubFor(
+        put(urlEqualTo(s"/api-hub-applications/access-requests/$id/approve"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+          )
+      )
+
+      buildConnector(this).approveAccessRequest(id, decisionRequest.decidedBy)(HeaderCarrier()).map(
+        result =>
+          result mustBe None
+      )
     }
   }
 

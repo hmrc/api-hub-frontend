@@ -1,1 +1,3 @@
 GET         /access-requests                                                        controllers.admin.AccessRequestsController.onPageLoad()
+GET         /access-requests/:id                                                    controllers.admin.AccessRequestController.onPageLoad(id)
+POST        /access-requests/:id                                                    controllers.admin.AccessRequestController.onSubmit(id)

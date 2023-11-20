@@ -20,7 +20,7 @@ import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
 import controllers.actions.FakeApplication
 import generators.{AccessRequestGenerator, ApiDetailGenerators}
 import models.AvailableEndpoint
-import models.accessrequest.{AccessRequestStatus, Rejected}
+import models.accessrequest.{AccessRequest, AccessRequestStatus, Rejected}
 import models.api.EndpointMethod
 import models.application._
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
@@ -360,6 +360,50 @@ class ApiHubServiceSpec
             verify(applicationsConnector).getAccessRequests(ArgumentMatchers.eq(applicationIdFilter), ArgumentMatchers.eq(statusFilter))(any())
             result mustBe expected
         }
+      }
+    }
+  }
+
+  "getAccessRequest" - {
+    "must make the correct request to the applications connector and return the response" in {
+      val applicationsConnector = mock[ApplicationsConnector]
+      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+
+      val accessRequest = sampleAccessRequest()
+
+      val accessRequests = Table(
+        ("Id", "Access Request"),
+        (accessRequest.id, Some(accessRequest)),
+        ("test-id", None)
+      )
+
+      forAll(accessRequests) {(id: String, accessRequest: Option[AccessRequest]) =>
+        when(applicationsConnector.getAccessRequest(any())(any())).thenReturn(Future.successful(accessRequest))
+
+        service.getAccessRequest(id)(HeaderCarrier()).map {
+          result =>
+            verify(applicationsConnector).getAccessRequest(ArgumentMatchers.eq(id))(any())
+            result mustBe accessRequest
+        }
+      }
+    }
+  }
+
+  "approveAccessRequest" - {
+    "must make the correct request to the applications connector and return the response" in {
+      val applicationsConnector = mock[ApplicationsConnector]
+      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+      val id = "test-id"
+      val decidedBy = "test-decided-by"
+
+      when(applicationsConnector.approveAccessRequest(any(), any())(any())).thenReturn(Future.successful(Some(())))
+
+      service.approveAccessRequest(id, decidedBy)(HeaderCarrier()).map {
+        result =>
+          verify(applicationsConnector).approveAccessRequest(ArgumentMatchers.eq(id), ArgumentMatchers.eq(decidedBy))(any())
+          result mustBe Some(())
       }
     }
   }
