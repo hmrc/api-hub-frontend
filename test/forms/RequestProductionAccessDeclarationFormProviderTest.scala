@@ -16,18 +16,30 @@
 
 package forms
 
-import forms.mappings.Mappings
+import forms.behaviours.CheckboxFieldBehaviours
 import models.RequestProductionAccessDeclaration
-import play.api.data.Form
-import play.api.data.Forms.set
+import play.api.data.FormError
 
-import javax.inject.Inject
+class RequestProductionAccessDeclarationFormProviderTest extends CheckboxFieldBehaviours {
 
-class RequestProductionAccessDeclarationFormProvider @Inject() extends Mappings {
+  val form = new RequestProductionAccessDeclarationFormProvider()()
 
-  def apply(): Form[Set[RequestProductionAccessDeclaration]] =
-    Form(
-      "accept" -> set(enumerable[RequestProductionAccessDeclaration]("requestProductionAccess.error.required"))
-        .verifying(nonEmptySet("requestProductionAccess.error.required"))
+  ".accept" - {
+
+    val fieldName = "accept"
+    val requiredKey = "requestProductionAccess.error.required"
+
+    behave like checkboxField[RequestProductionAccessDeclaration](
+      form,
+      fieldName,
+      validValues  = RequestProductionAccessDeclaration.values,
+      invalidError = FormError(s"$fieldName[0]", "error.invalid")
     )
+
+    behave like mandatoryCheckboxField(
+      form,
+      fieldName,
+      requiredKey
+    )
+  }
 }

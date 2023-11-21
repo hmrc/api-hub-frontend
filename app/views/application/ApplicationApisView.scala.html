@@ -167,7 +167,7 @@
             <div class="govuk-grid-column-one-half govuk-!-text-align-right">
                 @govukButton(
                     Button(
-                        href = Some(controllers.application.routes.RequestProductionAccessController.onPageLoad(application.id).url),
+                        href = Some(controllers.application.routes.RequestProductionAccessStartController.onPageLoad(application.id).url),
                         content = Text(messages("applicationApis.requestProductionAccess"))
                     )
                 )

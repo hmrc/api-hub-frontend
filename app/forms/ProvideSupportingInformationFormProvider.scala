@@ -17,17 +17,14 @@
 package forms
 
 import forms.mappings.Mappings
-import models.RequestProductionAccessDeclaration
 import play.api.data.Form
-import play.api.data.Forms.set
 
 import javax.inject.Inject
 
-class RequestProductionAccessDeclarationFormProvider @Inject() extends Mappings {
+class ProvideSupportingInformationFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[Set[RequestProductionAccessDeclaration]] =
+  def apply(): Form[String] =
     Form(
-      "accept" -> set(enumerable[RequestProductionAccessDeclaration]("requestProductionAccess.error.required"))
-        .verifying(nonEmptySet("requestProductionAccess.error.required"))
+      "value" -> text("provideSupportingInformation.error.required")
     )
 }

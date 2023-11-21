@@ -383,6 +383,7 @@ requestProductionAccess.apiName = API name:
 requestProductionAccess.viewDetails = View details
 requestProductionAccess.scopes = These end points use the following scopes:
 requestProductionAccess.button.accept = Continue
+requestProductionAccess.error.required = You must confirm that you have read and meet the requirements outlined in the usage policies.
 
 accessRequests.title = API requests
 accessRequests.heading = API production access requests
@@ -417,3 +418,9 @@ accessRequestApprovedSuccess.guidance.content = Return to {0}.
 accessRequestApprovedSuccess.guidance.link = API approval requests
 
 manageApplications.title = Manage applications
+
+provideSupportingInformation.heading = Provide supporting information
+provideSupportingInformation.title = Provide supporting information
+provideSupportingInformation.hint = Provide any additional information you think will support your request. For example a link to any technical information about your service, or details of discussions with the producing team.
+provideSupportingInformation.continue = Continue
+provideSupportingInformation.error.required = Enter information to support your request

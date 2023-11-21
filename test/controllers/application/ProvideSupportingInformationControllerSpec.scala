@@ -18,97 +18,101 @@ package controllers.application
 
 import base.SpecBase
 import controllers.actions.{FakeApplication, FakeUser}
-import controllers.routes
-import forms.RequestProductionAccessDeclarationFormProvider
+import forms.ProvideSupportingInformationFormProvider
+import models.UserAnswers
 import models.api.{ApiDetail, Endpoint, EndpointMethod}
 import models.application.ApplicationLenses.ApplicationLensOps
 import models.application._
 import models.user.UserModel
-import models.{RequestProductionAccessDeclaration, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentCaptor, ArgumentMatchers, MockitoSugar}
-import pages.{AccessRequestApplicationIdPage, RequestProductionAccessPage}
+import pages.{AccessRequestApplicationIdPage, ProvideSupportingInformationPage}
+import play.api.data.FormError
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{running, _}
+import play.api.test.Helpers.{status, _}
 import play.api.{Application => PlayApplication}
 import repositories.AccessRequestSessionRepository
 import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
-import viewmodels.application.{Accessible, ApplicationApi, ApplicationEndpoint, Inaccessible}
-import views.html.application.RequestProductionAccessView
+import views.html.application.ProvideSupportingInformationView
 
 import java.time.{Clock, Instant, ZoneId}
 import scala.concurrent.Future
 
-class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar with TestHelpers with HtmlValidation {
+class ProvideSupportingInformationControllerSpec extends SpecBase with MockitoSugar with TestHelpers with HtmlValidation {
 
-  private val form = new RequestProductionAccessDeclarationFormProvider()()
+  private val form = new ProvideSupportingInformationFormProvider()()
   private val clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
 
-  "RequestProductionAccessController" - {
+  "ProvideSupportingInformationController" - {
     "must return OK and the correct view for a GET for a team member or supporter" in {
       forAll(teamMemberAndSupporterTable) {
         user: UserModel =>
-
           val application = anApplication
           val userAnswers = buildUserAnswers(application)
-
           val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
 
-          val applicationApis = Seq(
-            ApplicationApi(anApiDetail, Seq(ApplicationEndpoint("GET", "/test", Seq("test-scope"), Inaccessible, Accessible)))
-          )
-
-          when(fixture.apiHubService.getApiDetail(any())(any())).thenReturn(Future.successful(Some(anApiDetail)))
+          when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), any())(any()))
+            .thenReturn(Future.successful(Some(application)))
 
           running(fixture.application) {
-            val request = FakeRequest(GET, controllers.application.routes.RequestProductionAccessController.onPageLoad().url)
+            val request = FakeRequest(GET, controllers.application.routes.ProvideSupportingInformationController.onPageLoad().url)
             val result = route(fixture.application, request).value
-            val view = fixture.application.injector.instanceOf[RequestProductionAccessView]
+            val view = fixture.application.injector.instanceOf[ProvideSupportingInformationView]
 
             status(result) mustEqual OK
-            contentAsString(result) mustBe view(form, FakeApplication, applicationApis, Some(user))(request, messages(fixture.application)).toString
+            contentAsString(result) mustBe view(form, Some(user))(request, messages(fixture.application)).toString
             contentAsString(result) must validateAsHtml
           }
       }
     }
 
-    "must return the correct view when the applications has APIs" in {
-      val application = anApplication
-      val userAnswers = buildUserAnswers(application)
+    "must return OK and the correct view for a GET for a team member or supporter when the question has already been answered" in {
+      forAll(teamMemberAndSupporterTable) {
+        user: UserModel =>
+          val application = anApplication
+          val userAnswers = buildUserAnswers(application).set(ProvideSupportingInformationPage, "blah").toOption.value
+          val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
 
-      val fixture = buildFixture(userAnswers = Some(userAnswers))
+          when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), any())(any()))
+            .thenReturn(Future.successful(Some(application)))
 
-      val applicationApis = Seq(
-        ApplicationApi(anApiDetail, Seq(ApplicationEndpoint("GET", "/test", Seq("test-scope"), Inaccessible, Accessible)))
-      )
+          running(fixture.application) {
+            val request = FakeRequest(GET, controllers.application.routes.ProvideSupportingInformationController.onPageLoad().url)
+            val result = route(fixture.application, request).value
+            val view = fixture.application.injector.instanceOf[ProvideSupportingInformationView]
 
-      when(fixture.apiHubService.getApiDetail(any())(any())).thenReturn(Future.successful(Some(anApiDetail)))
-
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), ArgumentMatchers.eq(true))(any()))
-        .thenReturn(Future.successful(Some(application)))
-
-      running(fixture.application) {
-        val request = FakeRequest(GET, controllers.application.routes.RequestProductionAccessController.onPageLoad().url)
-        val result = route(fixture.application, request).value
-        val view = fixture.application.injector.instanceOf[RequestProductionAccessView]
-
-        status(result) mustEqual OK
-        contentAsString(result) mustBe view(form, application, applicationApis, Some(FakeUser))(request, messages(fixture.application)).toString
-        contentAsString(result) must validateAsHtml
+            status(result) mustEqual OK
+            contentAsString(result) mustBe view(form.fill("blah"), Some(user))(request, messages(fixture.application)).toString
+            contentAsString(result) must validateAsHtml
+            contentAsString(result).contains("blah") mustBe(true)
+          }
       }
     }
 
-    "must redirect to recovery page for a GET when there is no application in the session repository" in {
-      val fixture = buildFixture()
+    "must return 400 Bad Request and the correct view for a GET for a team member or supporter when the form contains errors" in {
+      forAll(teamMemberAndSupporterTable) {
+        user: UserModel =>
+          val application = anApplication
+          val userAnswers = buildUserAnswers(application)
+          val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
 
-      running(fixture.application) {
-        val request = FakeRequest(GET, controllers.application.routes.RequestProductionAccessController.onPageLoad().url)
-        val result = route(fixture.application, request).value
+          when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), any())(any()))
+            .thenReturn(Future.successful(Some(application)))
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.JourneyRecoveryController.onPageLoad().url)
+          running(fixture.application) {
+            val request = FakeRequest(POST, controllers.application.routes.ProvideSupportingInformationController.onPageLoad().url)
+
+            val formWithError = form.withError(FormError("value", "Enter information to support your request"))
+            val result = route(fixture.application, request).value
+
+            val view = fixture.application.injector.instanceOf[ProvideSupportingInformationView]
+
+            status(result) mustEqual BAD_REQUEST
+            contentAsString(result) mustBe view(formWithError, Some(user))(request, messages(fixture.application)).toString
+            contentAsString(result) must validateAsHtml
+          }
       }
     }
 
@@ -121,19 +125,18 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
 
           val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
 
-          when(fixture.apiHubService.getApiDetail(any())(any())).thenReturn(Future.successful(Some(anApiDetail)))
-          when(fixture.accessRequestSessionRepository.set(any())) thenReturn Future.successful(true)
+          when(fixture.accessRequestSessionRepository.set(any())).thenReturn(Future.successful(true))
           running(fixture.application) {
-            val request = FakeRequest(POST, controllers.application.routes.RequestProductionAccessController.onSubmit().url).withFormUrlEncodedBody(("accept[0]", "accept"))
+            val request = FakeRequest(POST, controllers.application.routes.ProvideSupportingInformationController.onSubmit().url).withFormUrlEncodedBody(("value", "blah"))
             val result = route(fixture.application, request).value
 
             status(result) mustEqual SEE_OTHER
-
             val captor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
             verify(fixture.accessRequestSessionRepository).set(captor.capture())
             val userAnswers: UserAnswers = captor.getValue
-            userAnswers.get(RequestProductionAccessPage) mustEqual Some(Set(RequestProductionAccessDeclaration.Accept))
-            redirectLocation(result) mustBe Some(controllers.application.routes.ProvideSupportingInformationController.onPageLoad().url)
+            userAnswers.get(ProvideSupportingInformationPage) mustEqual Some("blah")
+            // TODO in HIP 870:
+            // redirectLocation(result) mustBe Some(controllers.application.routes.Whatever.onPageLoad().url)
           }
       }
     }
@@ -165,10 +168,10 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
                               application: PlayApplication,
                               apiHubService: ApiHubService,
                               accessRequestSessionRepository: AccessRequestSessionRepository,
-                              requestProductionAccessController: RequestProductionAccessController
+                              provideSupportingInformationController: ProvideSupportingInformationController
                             )
 
-  private def buildFixture(userModel: UserModel = FakeUser, userAnswers: Option[UserAnswers] = Some(emptyUserAnswers)): Fixture = {
+  private def buildFixture(userModel: UserModel, userAnswers: Option[UserAnswers]): Fixture = {
     val apiHubService = mock[ApiHubService]
     val accessRequestSessionRepository = mock[AccessRequestSessionRepository]
 
@@ -180,7 +183,7 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
       )
       .build()
 
-    val controller = playApplication.injector.instanceOf[RequestProductionAccessController]
+    val controller = playApplication.injector.instanceOf[ProvideSupportingInformationController]
     Fixture(playApplication, apiHubService, accessRequestSessionRepository, controller)
   }
 

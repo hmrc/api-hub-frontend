@@ -17,44 +17,70 @@
 package controllers.application
 
 import com.google.inject.Inject
-import controllers.actions.{ApplicationAuthActionProvider, IdentifierAction}
+import controllers.actions.{AccessRequestDataRetrievalAction, DataRequiredAction, IdentifierAction}
 import controllers.helpers.ApplicationApiBuilder
+import controllers.routes
 import forms.RequestProductionAccessDeclarationFormProvider
-import models.Mode
+import models.requests.DataRequest
+import pages.{AccessRequestApplicationIdPage, RequestProductionAccessPage}
+import play.api.data.Form
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.AccessRequestSessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.application.RequestProductionAccessView
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class RequestProductionAccessController @Inject()(
-  val controllerComponents: MessagesControllerComponents,
-  identify: IdentifierAction,
-  applicationAuth: ApplicationAuthActionProvider,
-  view: RequestProductionAccessView,
-  applicationApiBuilder: ApplicationApiBuilder,
-  formProvider: RequestProductionAccessDeclarationFormProvider)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                                   val controllerComponents: MessagesControllerComponents,
+                                                   identify: IdentifierAction,
+                                                   requestProductionAccessView: RequestProductionAccessView,
+                                                   applicationApiBuilder: ApplicationApiBuilder,
+                                                   formProvider: RequestProductionAccessDeclarationFormProvider,
+                                                   sessionRepository: AccessRequestSessionRepository,
+                                                   getData: AccessRequestDataRetrievalAction,
+                                                   requireData: DataRequiredAction)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form = formProvider()
 
-  def onPageLoad(id: String, mode: Mode): Action[AnyContent] = (identify andThen applicationAuth(id, enrich = true)).async {
-    implicit request =>
-      applicationApiBuilder.build(request.application).map {
-        case Right(applicationApis) => Ok(view(form, mode, request.application, applicationApis, Some(request.identifierRequest.user)))
-        case Left(result) => result
-      }
+  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request => {
+      request.userAnswers.get(AccessRequestApplicationIdPage) match {
+        case Some(_) =>
+          val previousAnswers = request.userAnswers.get(RequestProductionAccessPage)
+          previousAnswers match {
+            case None => showPage(form, OK)
+            case Some(value) => showPage(form.fill(value), OK)
+          }
 
+        case None => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+      }
+    }
   }
 
-  def onSubmit(id: String, mode: Mode): Action[AnyContent] = (identify andThen applicationAuth(id, enrich = true)).async {
+
+  private def showPage(form: Form[_], status: Int)(implicit request: DataRequest[AnyContent]) = {
+    request.userAnswers.get(AccessRequestApplicationIdPage) match {
+      case Some(application) =>
+        applicationApiBuilder.build(application).map {
+          case Right(applicationApis) => Status(status)(requestProductionAccessView(form, application, applicationApis, Some(request.user)))
+          case Left(result) => result
+        }
+
+      case _ => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+    }
+  }
+  def onSubmit: Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      applicationApiBuilder.build(request.application).map {
-        case Right(applicationApis) => form.bindFromRequest().fold(
-          formWithErrors =>
-            Ok(view(formWithErrors, mode, request.application, applicationApis, Some(request.identifierRequest.user))),
-          value => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-        case Left(result) => result
-      }
+      form.bindFromRequest().fold(
+          formWithErrors => showPage(formWithErrors, BAD_REQUEST),
+          value => {
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(RequestProductionAccessPage, value))
+              _ <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(controllers.application.routes.ProvideSupportingInformationController.onPageLoad())
+          })
+
   }
 }
