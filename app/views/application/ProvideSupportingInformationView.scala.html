@@ -47,10 +47,11 @@
             hint = Some(Hint(
                 content = Text(messages("provideSupportingInformation.hint"))
             )),
-            value = form("value").value
+            value = form("value").value,
+            errorMessage = form("value").error.map(
+                error =>
+                    ErrorMessage(content = Text(messages(error.message, error.args: _*))))
         ))
-
-
 
         @govukButton(
             ButtonViewModel(messages("provideSupportingInformation.continue"))
