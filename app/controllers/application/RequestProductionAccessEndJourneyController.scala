@@ -71,7 +71,7 @@ class RequestProductionAccessEndJourneyController @Inject()(
             case Right(accessRequest) =>
               apiHubService.requestProductionAccess(accessRequest)
                 .flatMap(_ => sessionRepository.clear(request.user.userId))
-                .flatMap(_ => Future.successful(Ok(requestProductionAccessSuccessView(validated._1, Some(request.user)))))
+                .flatMap(_ => Future.successful(Ok(requestProductionAccessSuccessView(validated._1, Some(request.user), accessRequest.apis))))
                 .recoverWith {
                   case e: UpstreamErrorResponse if e.statusCode == BAD_GATEWAY => Future.successful(badGateway(e))
                 }

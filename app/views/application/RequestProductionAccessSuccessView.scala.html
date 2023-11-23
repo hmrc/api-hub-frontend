@@ -16,13 +16,29 @@
 
 @import models.application.Application
 @import models.user.UserModel
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import models.accessrequest.AccessRequestApi
+@import views.html.helper.CSPNonce
+
 
 @this(
-  layout: templates.Layout,
-  govukPanel: GovukPanel
+layout: templates.Layout,
+govukPanel: GovukPanel,
+govukSummaryList: GovukSummaryList
+
 )
 
-@(app:Application, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+@(app:Application, user: Option[UserModel], apis: Seq[AccessRequestApi])(implicit request: Request[_], messages: Messages)
+
+@scripts() = {
+    <link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css' media="all" rel="stylesheet" type="text/css" @{CSPNonce.attr}/>
+}
+
+@styles() = {
+    .govuk-panel--warning {
+    background-color: #505a5f !important;
+    }
+}
 
 @applicationLink(application: Application) = {
     <a href='@applicationLinkUrl(application)' class='govuk-link govuk-link--no-visited-state'>
@@ -34,10 +50,33 @@
     controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url
 }
 
-@layout(pageTitle = titleNoForm(messages("requestProductionAccessSuccess.title")), user = user, showBackLink = false) {
-  @govukPanel(Panel(
-    title = Text(messages("requestProductionAccessSuccess.heading")
-  )))
+@layout(pageTitle = titleNoForm(messages("requestProductionAccessSuccess.title")), user = user, showBackLink = false, customStyles = Some(styles())) {
+  <div class="govuk-panel--warning">
+    @govukPanel(Panel(
+    title = Text(messages("requestProductionAccessSuccess.heading")),
+    classes = "govuk-panel--warning"
+  ))
+  </div>
+
+    @govukSummaryList(SummaryList(
+        rows = Seq(
+            SummaryListRow(
+                key = Key(
+                    content = Text(messages("requestProductionAccessSuccess.applicationName"))
+                ),
+                value = Value(
+                    content = HtmlContent(app.name)
+                ),
+            ),
+            SummaryListRow(
+                key = Key(
+                    content = Text(messages("requestProductionAccessSuccess.apiName"))
+                ),
+                value = Value(
+                    content = Text(apis.head.apiName)
+                )
+            ))))
+
  <h2 class="govuk-heading-m">@messages("requestProductionAccessSuccess.h2")</h2>
  <p class="govuk-body">
     @Html(
