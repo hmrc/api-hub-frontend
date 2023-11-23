@@ -15,3 +15,5 @@ POST        /request-production-access                                  controll
 
 GET         /provide-supporting-information                             controllers.application.ProvideSupportingInformationController.onPageLoad()
 POST        /provide-supporting-information                             controllers.application.ProvideSupportingInformationController.onSubmit()
+GET         /request-production-access/success                          controllers.application.RequestProductionAccessEndJourneyController.submitRequest()
+

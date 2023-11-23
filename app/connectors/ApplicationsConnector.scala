@@ -211,6 +211,7 @@ class ApplicationsConnector @Inject()(
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .withBody(Json.toJson(request))
       .execute[Unit]
+
   }
 
   def getAccessRequests(applicationId: Option[String], status: Option[AccessRequestStatus])(implicit hc:HeaderCarrier): Future[Seq[AccessRequest]] = {
