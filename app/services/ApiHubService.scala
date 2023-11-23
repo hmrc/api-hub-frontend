@@ -113,7 +113,7 @@ class ApiHubService @Inject()(
     applicationsConnector.approveAccessRequest(id, decidedBy)
   }
 
-  def requestProductionAccess(accessRequest: AccessRequestRequest)(implicit hc: HeaderCarrier, request: DataRequest[AnyContent]): Future[Unit] = {
+  def requestProductionAccess(accessRequest: AccessRequestRequest)(implicit hc: HeaderCarrier): Future[Unit] = {
     applicationsConnector.createAccessRequest(accessRequest)
   }
 }

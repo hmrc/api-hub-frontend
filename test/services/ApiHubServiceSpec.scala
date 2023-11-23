@@ -20,7 +20,7 @@ import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
 import controllers.actions.FakeApplication
 import generators.{AccessRequestGenerator, ApiDetailGenerators}
 import models.AvailableEndpoint
-import models.accessrequest.{AccessRequest, AccessRequestStatus, Rejected}
+import models.accessrequest.{AccessRequest, AccessRequestRequest, AccessRequestStatus, Rejected}
 import models.api.EndpointMethod
 import models.application._
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
@@ -407,6 +407,25 @@ class ApiHubServiceSpec
       }
     }
   }
+
+  "requestProductionAccess" - {
+    "must make the correct request to the applications connector and return the response" in {
+      val applicationsConnector = mock[ApplicationsConnector]
+      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+      val id = "test-id"
+      val decidedBy = "test-decided-by"
+
+      when(applicationsConnector.createAccessRequest(any())(any())).thenReturn(Future.successful(Some(())))
+
+      val anAccessRequest = AccessRequestRequest("appId", "blah", "me@here", Seq.empty)
+
+      service.requestProductionAccess(anAccessRequest)(HeaderCarrier()).map {
+        result =>
+          verify(applicationsConnector).approveAccessRequest(ArgumentMatchers.eq(id), ArgumentMatchers.eq(decidedBy))(any())
+          result mustBe Some(())
+      }
+    }
 
 }
 
