@@ -68,7 +68,7 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
             status(result) mustEqual OK
             contentAsString(result) mustBe view(application, Some(user), accessRequestApis)(request, messages(fixture.application)).toString
             contentAsString(result) must validateAsHtml
-            verify(fixture.apiHubService).requestProductionAccess(ArgumentMatchers.eq(expectedAccessRequest))(any(), any())
+            verify(fixture.apiHubService).requestProductionAccess(ArgumentMatchers.eq(expectedAccessRequest))(any())
             verify(fixture.accessRequestSessionRepository).clear(ArgumentMatchers.eq(user.userId))
           }
       }

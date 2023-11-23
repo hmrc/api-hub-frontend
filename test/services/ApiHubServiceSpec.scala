@@ -426,7 +426,7 @@ class ApiHubServiceSpec
           result mustBe Some(())
       }
     }
-
+  }
 }
 
 trait ApplicationGetterBehaviours {
