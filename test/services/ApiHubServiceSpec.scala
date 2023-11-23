@@ -422,7 +422,7 @@ class ApiHubServiceSpec
 
       service.requestProductionAccess(anAccessRequest)(HeaderCarrier()).map {
         result =>
-          verify(applicationsConnector).approveAccessRequest(ArgumentMatchers.eq(id), ArgumentMatchers.eq(decidedBy))(any())
+          verify(applicationsConnector).createAccessRequest(ArgumentMatchers.eq(anAccessRequest))(any())
           result mustBe Some(())
       }
     }
