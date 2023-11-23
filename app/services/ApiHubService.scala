@@ -18,15 +18,14 @@ package services
 
 import com.google.inject.{Inject, Singleton}
 import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
-import controllers.helpers.ApplicationApiBuilder
 import models.AvailableEndpoint
-import models.accessrequest.{AccessRequest, AccessRequestApi, AccessRequestEndpoint, AccessRequestRequest, AccessRequestStatus}
+import models.accessrequest.{AccessRequest, AccessRequestRequest, AccessRequestStatus}
 import models.api.ApiDetail
 import models.application._
 import models.exception.ApplicationsException
 import models.requests.{AddApiRequest, AddApiRequestEndpoint, DataRequest}
 import play.api.Logging
-import play.api.mvc.{AnyContent, Result}
+import play.api.mvc.AnyContent
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
