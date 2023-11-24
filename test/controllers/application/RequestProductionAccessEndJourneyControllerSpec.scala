@@ -54,8 +54,11 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
           val userAnswers = buildUserAnswers(application)
           val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
           val apiDetail = anApiDetail
+
+          // 2 endpoints for the API, because the application currently holds neither scope
           val accessRequestApis = Seq(
-            AccessRequestApi(apiDetail.id, apiDetail.title, Seq(AccessRequestEndpoint("GET", "/test", Seq("test-scope"))))
+            AccessRequestApi(apiDetail.id, apiDetail.title, Seq(AccessRequestEndpoint("GET", "/test", Seq("test-scope")))),
+            AccessRequestApi(apiDetail.id, apiDetail.title, Seq(AccessRequestEndpoint("GET", "/anothertest", Seq("another-test-scope"))))
           )
           val expectedAccessRequest: AccessRequestRequest = AccessRequestRequest(application.id, "blah", user.email.get, accessRequestApis)
 
@@ -77,6 +80,37 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
       }
     }
 
+    "will not request access for API endpoints whose scope is already held by the application " in {
+      forAll(teamMemberAndSupporterTable) {
+        user: UserModel =>
+          val application = anApplication.setPrimaryScopes(Seq(Scope("test-scope", Approved))) //decorate application with primary scope test-scope
+          val userAnswers = buildUserAnswers(application)
+          val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
+          val apiDetail = anApiDetail
+
+          // Only one endpoint, because we already hold test-scope
+          val accessRequestApis = Seq(
+            AccessRequestApi(apiDetail.id, apiDetail.title, Seq(AccessRequestEndpoint("GET", "/anothertest", Seq("another-test-scope"))))
+          )
+          val expectedAccessRequest: AccessRequestRequest = AccessRequestRequest(application.id, "blah", user.email.get, accessRequestApis)
+
+          when(fixture.apiHubService.getApiDetail(any())(any())).thenReturn(Future.successful(Some(anApiDetail)))
+          when(fixture.apiHubService.requestProductionAccess(ArgumentMatchers.eq(expectedAccessRequest))(any())).thenReturn(Future.successful(()))
+          when(fixture.accessRequestSessionRepository.clear(user.userId)).thenReturn(Future.successful(true))
+
+          running(fixture.application) {
+            val request = FakeRequest(GET, controllers.application.routes.RequestProductionAccessEndJourneyController.submitRequest().url)
+            val result = route(fixture.application, request).value
+
+            val view = fixture.application.injector.instanceOf[RequestProductionAccessSuccessView]
+            status(result) mustEqual OK
+            contentAsString(result) mustBe view(application, Some(user), accessRequestApis)(request, messages(fixture.application)).toString
+            contentAsString(result) must validateAsHtml
+            verify(fixture.apiHubService).requestProductionAccess(ArgumentMatchers.eq(expectedAccessRequest))(any())
+            verify(fixture.accessRequestSessionRepository).clear(ArgumentMatchers.eq(user.userId))
+          }
+      }
+    }
 
     "must redirect to journey recovery when no application in user answers" in {
       forAll(teamMemberAndSupporterTable) {
@@ -155,7 +189,6 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
     val application = FakeApplication
       .addApi(Api(apiDetail.id, Seq(SelectedEndpoint("GET", "/test"))))
       .setSecondaryScopes(Seq(Scope("test-scope", Approved)))
-
     application
   }
 
@@ -165,7 +198,9 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
       title = "test-title",
       description = "test-description",
       version = "test-version",
-      endpoints = Seq(Endpoint(path = "/test", methods = Seq(EndpointMethod("GET", Some("A summary"), Some("A description"), Seq("test-scope"))))),
+      endpoints = Seq(
+        Endpoint(path = "/test", methods = Seq(EndpointMethod("GET", Some("A summary"), Some("A description"), Seq("test-scope")))),
+        Endpoint(path = "/anothertest", methods = Seq(EndpointMethod("GET", Some("A summary"), Some("A description"), Seq("another-test-scope"))))),
       shortDescription = None,
       openApiSpecification = "test-oas-spec"
     )

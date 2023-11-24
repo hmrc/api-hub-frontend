@@ -14,22 +14,6 @@
  * limitations under the License.
  */
 
-/*
- * Copyright 2023 HM Revenue & Customs
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package controllers.application
 
 import com.google.inject.{Inject, Singleton}
@@ -46,6 +30,7 @@ import repositories.AccessRequestSessionRepository
 import services.ApiHubService
 import uk.gov.hmrc.http.UpstreamErrorResponse
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.application.Inaccessible
 import views.html.application.RequestProductionAccessSuccessView
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -118,8 +103,8 @@ class RequestProductionAccessEndJourneyController @Inject()(
   private def buildAccessRequest(application: Application, supportingInformation: String, requestedBy: String)(implicit request: DataRequest[AnyContent]): Future[Either[Result, AccessRequestRequest]] = {
     applicationApiBuilder.build(application).map {
       case Right(applicationApis) =>
-        val accessRequestApis = applicationApis.map(applicationApi => {
-          val accessRequestEndpoints = applicationApi.endpoints.map(endpoint => AccessRequestEndpoint(endpoint.httpMethod, endpoint.path, endpoint.scopes))
+        val accessRequestApis = applicationApis.filter(_.endpoints.exists(_.primaryAccess == Inaccessible)).map(applicationApi => {
+          val accessRequestEndpoints = applicationApi.endpoints.filter(_.primaryAccess == Inaccessible).map(endpoint => AccessRequestEndpoint(endpoint.httpMethod, endpoint.path, endpoint.scopes))
           AccessRequestApi(
             applicationApi.apiDetail.id,
             applicationApi.apiDetail.title,

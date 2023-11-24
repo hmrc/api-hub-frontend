@@ -28,6 +28,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.AccessRequestSessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.application.Inaccessible
 import views.html.application.RequestProductionAccessView
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -63,8 +64,12 @@ class RequestProductionAccessController @Inject()(
   private def showPage(form: Form[_], status: Int)(implicit request: DataRequest[AnyContent]) = {
     request.userAnswers.get(AccessRequestApplicationIdPage) match {
       case Some(application) =>
-        applicationApiBuilder.build(application).map {
-          case Right(applicationApis) => Status(status)(requestProductionAccessView(form, application, applicationApis, Some(request.user)))
+        applicationApiBuilder.build(application)
+          .map {
+          case Right(applicationApis) => Status(status)(requestProductionAccessView(
+            form,
+            application,
+            applicationApis.filter(_.endpoints.exists(_.primaryAccess == Inaccessible)), Some(request.user)))
           case Left(result) => result
         }
 
