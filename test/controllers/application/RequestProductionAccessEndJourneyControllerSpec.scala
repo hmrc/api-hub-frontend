@@ -57,8 +57,8 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
 
           // 2 endpoints for the API, because the application currently holds neither scope
           val accessRequestApis = Seq(
-            AccessRequestApi(apiDetail.id, apiDetail.title, Seq(AccessRequestEndpoint("GET", "/test", Seq("test-scope")))),
-            AccessRequestApi(apiDetail.id, apiDetail.title, Seq(AccessRequestEndpoint("GET", "/anothertest", Seq("another-test-scope"))))
+            AccessRequestApi(apiDetail.id, apiDetail.title, Seq(AccessRequestEndpoint("GET", "/test", Seq("test-scope")),
+            AccessRequestEndpoint("POST", "/anothertest", Seq("another-test-scope"))))
           )
           val expectedAccessRequest: AccessRequestRequest = AccessRequestRequest(application.id, "blah", user.email.get, accessRequestApis)
 
@@ -90,7 +90,7 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
 
           // Only one endpoint, because we already hold test-scope
           val accessRequestApis = Seq(
-            AccessRequestApi(apiDetail.id, apiDetail.title, Seq(AccessRequestEndpoint("GET", "/anothertest", Seq("another-test-scope"))))
+            AccessRequestApi(apiDetail.id, apiDetail.title, Seq(AccessRequestEndpoint("POST", "/anothertest", Seq("another-test-scope"))))
           )
           val expectedAccessRequest: AccessRequestRequest = AccessRequestRequest(application.id, "blah", user.email.get, accessRequestApis)
 
@@ -187,7 +187,7 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
     val apiDetail = anApiDetail
 
     val application = FakeApplication
-      .addApi(Api(apiDetail.id, Seq(SelectedEndpoint("GET", "/test"))))
+      .addApi(Api(apiDetail.id, Seq(SelectedEndpoint("GET", "/test"), SelectedEndpoint("POST", "/anothertest"))))
       .setSecondaryScopes(Seq(Scope("test-scope", Approved)))
     application
   }
@@ -200,7 +200,7 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
       version = "test-version",
       endpoints = Seq(
         Endpoint(path = "/test", methods = Seq(EndpointMethod("GET", Some("A summary"), Some("A description"), Seq("test-scope")))),
-        Endpoint(path = "/anothertest", methods = Seq(EndpointMethod("GET", Some("A summary"), Some("A description"), Seq("another-test-scope"))))),
+        Endpoint(path = "/anothertest", methods = Seq(EndpointMethod("POST", Some("A summary"), Some("A description"), Seq("another-test-scope"))))),
       shortDescription = None,
       openApiSpecification = "test-oas-spec"
     )
