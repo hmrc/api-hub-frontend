@@ -20,7 +20,7 @@ import com.google.inject.{Inject, Singleton}
 import config.FrontendAppConfig
 import models.UserEmail
 import models.accessrequest.{AccessRequest, AccessRequestDecisionRequest, AccessRequestRequest, AccessRequestStatus}
-import models.application.{Application, Credential, EnvironmentName, NewApplication, NewScope, Secret}
+import models.application._
 import models.exception.{ApplicationCredentialLimitException, ApplicationsException}
 import models.requests.AddApiRequest
 import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION, CONTENT_TYPE}
@@ -211,6 +211,7 @@ class ApplicationsConnector @Inject()(
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .withBody(Json.toJson(request))
       .execute[Unit]
+
   }
 
   def getAccessRequests(applicationId: Option[String], status: Option[AccessRequestStatus])(implicit hc:HeaderCarrier): Future[Seq[AccessRequest]] = {

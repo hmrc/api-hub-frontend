@@ -28,6 +28,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.AccessRequestSessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.application.Inaccessible
 import views.html.application.RequestProductionAccessView
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -63,24 +64,36 @@ class RequestProductionAccessController @Inject()(
   private def showPage(form: Form[_], status: Int)(implicit request: DataRequest[AnyContent]) = {
     request.userAnswers.get(AccessRequestApplicationIdPage) match {
       case Some(application) =>
-        applicationApiBuilder.build(application).map {
-          case Right(applicationApis) => Status(status)(requestProductionAccessView(form, application, applicationApis, Some(request.user)))
-          case Left(result) => result
-        }
+        applicationApiBuilder.build(application)
+          .map {
+            case Right(applicationApis) =>
+              val filteredApis = applicationApis.filter(_.endpoints.exists(_.primaryAccess == Inaccessible))
+                .map(applicationApi => {
+                  val filteredEndpoints = applicationApi.endpoints.filter(_.primaryAccess == Inaccessible)
+                  val prunedApi = applicationApi.copy(endpoints = filteredEndpoints)
+                  prunedApi
+                })
+
+              Status(status)(requestProductionAccessView(
+                form,
+                application, filteredApis, Some(request.user)))
+            case Left(result) => result
+          }
 
       case _ => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
     }
   }
+
   def onSubmit: Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       form.bindFromRequest().fold(
-          formWithErrors => showPage(formWithErrors, BAD_REQUEST),
-          value => {
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(RequestProductionAccessPage, value))
-              _ <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(controllers.application.routes.ProvideSupportingInformationController.onPageLoad())
-          })
+        formWithErrors => showPage(formWithErrors, BAD_REQUEST),
+        value => {
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(RequestProductionAccessPage, value))
+            _ <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(controllers.application.routes.ProvideSupportingInformationController.onPageLoad())
+        })
 
   }
 }

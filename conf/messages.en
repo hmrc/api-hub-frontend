@@ -424,3 +424,11 @@ provideSupportingInformation.title = Provide supporting information
 provideSupportingInformation.hint = Provide any additional information you think will support your request. For example a link to any technical information about your service, or details of discussions with the producing team.
 provideSupportingInformation.continue = Continue
 provideSupportingInformation.error.required = Enter information to support your request
+
+requestProductionAccessSuccess.title = Request Production Access Success
+requestProductionAccessSuccess.heading = Request for production access has been submitted
+requestProductionAccessSuccess.applicationName = Application name
+requestProductionAccessSuccess.apiName = Api name
+requestProductionAccessSuccess.h2 = What you can do now
+requestProductionAccessSuccess.text.line1 = View and manage your {0} application.
+requestProductionAccessSuccess.text.line2 = You will receive and email once a decision on access has been made.

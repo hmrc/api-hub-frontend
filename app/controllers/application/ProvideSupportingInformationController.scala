@@ -61,7 +61,7 @@ class ProvideSupportingInformationController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(ProvideSupportingInformationPage, value))
             _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          } yield Redirect(controllers.application.routes.RequestProductionAccessEndJourneyController.submitRequest())
       )
   }
 }

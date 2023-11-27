@@ -19,12 +19,13 @@ package services
 import com.google.inject.{Inject, Singleton}
 import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
 import models.AvailableEndpoint
-import models.accessrequest.{AccessRequest, AccessRequestStatus}
+import models.accessrequest.{AccessRequest, AccessRequestRequest, AccessRequestStatus}
 import models.api.ApiDetail
 import models.application._
 import models.exception.ApplicationsException
-import models.requests.{AddApiRequest, AddApiRequestEndpoint}
+import models.requests.{AddApiRequest, AddApiRequestEndpoint, DataRequest}
 import play.api.Logging
+import play.api.mvc.AnyContent
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
@@ -32,8 +33,7 @@ import scala.concurrent.Future
 @Singleton
 class ApiHubService @Inject()(
   applicationsConnector: ApplicationsConnector,
-  integrationCatalogueConnector: IntegrationCatalogueConnector
-) extends Logging {
+  integrationCatalogueConnector: IntegrationCatalogueConnector) extends Logging {
 
   def registerApplication(newApplication: NewApplication)(implicit hc: HeaderCarrier): Future[Application] = {
     logger.debug(s"Registering application named '${newApplication.name}', created by user with email '${newApplication.createdBy.email}''")
@@ -113,4 +113,7 @@ class ApiHubService @Inject()(
     applicationsConnector.approveAccessRequest(id, decidedBy)
   }
 
+  def requestProductionAccess(accessRequest: AccessRequestRequest)(implicit hc: HeaderCarrier): Future[Unit] = {
+    applicationsConnector.createAccessRequest(accessRequest)
+  }
 }
