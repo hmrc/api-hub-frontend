@@ -35,7 +35,7 @@ class RequestProductionAccessStartController @Inject()(
     clock: Clock,
     applicationAuth: ApplicationAuthActionProvider)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id, enrich = false)).async {
+  def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id, enrich = true)).async {
     implicit request =>
       for {
         userAnswers <- Future.fromTry(UserAnswers(
