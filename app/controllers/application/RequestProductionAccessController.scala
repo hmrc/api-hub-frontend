@@ -66,26 +66,34 @@ class RequestProductionAccessController @Inject()(
       case Some(application) =>
         applicationApiBuilder.build(application)
           .map {
-          case Right(applicationApis) => Status(status)(requestProductionAccessView(
-            form,
-            application,
-            applicationApis.filter(_.endpoints.exists(_.primaryAccess == Inaccessible)), Some(request.user)))
-          case Left(result) => result
-        }
+            case Right(applicationApis) =>
+              val filteredApis = applicationApis.filter(_.endpoints.exists(_.primaryAccess == Inaccessible))
+                .map(applicationApi => {
+                  val filteredEndpoints = applicationApi.endpoints.filter(_.primaryAccess == Inaccessible)
+                  val prunedApi = applicationApi.copy(endpoints = filteredEndpoints)
+                  prunedApi
+                })
+
+              Status(status)(requestProductionAccessView(
+                form,
+                application, filteredApis, Some(request.user)))
+            case Left(result) => result
+          }
 
       case _ => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
     }
   }
+
   def onSubmit: Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       form.bindFromRequest().fold(
-          formWithErrors => showPage(formWithErrors, BAD_REQUEST),
-          value => {
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(RequestProductionAccessPage, value))
-              _ <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(controllers.application.routes.ProvideSupportingInformationController.onPageLoad())
-          })
+        formWithErrors => showPage(formWithErrors, BAD_REQUEST),
+        value => {
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(RequestProductionAccessPage, value))
+            _ <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(controllers.application.routes.ProvideSupportingInformationController.onPageLoad())
+        })
 
   }
 }
