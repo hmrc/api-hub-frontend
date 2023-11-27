@@ -73,7 +73,7 @@ govukSummaryList: GovukSummaryList
                     content = Text(messages("requestProductionAccessSuccess.apiName"))
                 ),
                 value = Value(
-                    content = Text(apis.head.apiName)
+                    content = Text(apis.mkString(","))
                 )
             ))))
 
