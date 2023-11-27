@@ -38,7 +38,13 @@ case object Requested extends ApplicationEndpointAccess {
 
 object ApplicationEndpointAccess {
 
-  def apply(application: Application, endpointMethod: EndpointMethod, environmentName: EnvironmentName): ApplicationEndpointAccess = {
+  def apply(
+    application: Application,
+    hasPendingAccessRequest: Boolean,
+    endpointMethod: EndpointMethod,
+    environmentName: EnvironmentName
+  ): ApplicationEndpointAccess = {
+
     val scopes = environmentName match {
       case Primary => application.getPrimaryScopes
       case Secondary => application.getSecondaryScopes
@@ -46,9 +52,14 @@ object ApplicationEndpointAccess {
 
     if (endpointMethod.scopes.toSet.subsetOf(scopes.map(_.name).toSet)) {
       Accessible
-    } else {
+    }
+    else if (hasPendingAccessRequest) {
+      Requested
+    }
+    else {
       Inaccessible
     }
+
   }
 
 }
@@ -61,11 +72,12 @@ case class ApplicationEndpoint(
   secondaryAccess: ApplicationEndpointAccess
 )
 
-case class ApplicationApi(apiDetail: ApiDetail, endpoints: Seq[ApplicationEndpoint]) {
+case class ApplicationApi(apiDetail: ApiDetail, endpoints: Seq[ApplicationEndpoint], hasPendingAccessRequest: Boolean) {
 
   def selectedEndpoints: Int = endpoints.size
   def totalEndpoints: Int = apiDetail.endpoints.flatMap(_.methods).size
   def availablePrimaryEndpoints: Int = endpoints.count(_.primaryAccess.isAccessible)
   def availableSecondaryEndpoints: Int = endpoints.count(_.secondaryAccess.isAccessible)
+  def needsProductionAccessRequest: Boolean = !hasPendingAccessRequest && (endpoints.exists(_.primaryAccess == Inaccessible))
 
 }
