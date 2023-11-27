@@ -32,10 +32,7 @@
 @(form: Form[_], application: Application, applicationApis: Seq[ApplicationApi], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
 @scripts() = {
-    <link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css' media="all" rel="stylesheet" type="text/css"
-@{
-    CSPNonce.attr
-}/>
+    <link href='@routes.Assets.versioned("fontawesome6/css/all.min.css")' media="all" rel="stylesheet" type="text/css" @{CSPNonce.attr}/>
 }
 
     @styles() = {
