@@ -53,6 +53,7 @@ class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
 
       when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiId1))(any())).thenReturn(Future.successful(Some(apiDetail1)))
       when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiId2))(any())).thenReturn(Future.successful(Some(apiDetail2)))
+      when(fixture.apiHubService.hasPendingAccessRequest(any())(any())).thenReturn(Future.successful(false))
 
       running(fixture.application) {
         implicit val request: Request[_] = FakeRequest()
@@ -66,13 +67,15 @@ class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
               ApplicationEndpoint("GET", "/test1/1", Seq("all:test-scope-1", "get:test-scope-1-1"), Accessible, Accessible),
               ApplicationEndpoint("POST", "/test1/1", Seq("all:test-scope-1", "post:test-scope-1-1"), Inaccessible, Accessible),
               ApplicationEndpoint("GET", "/test1/2", Seq("all:test-scope-1", "get:test-scope-1-2"), Accessible, Accessible)
-            )
+            ),
+            false
           ),
           ApplicationApi(
             apiDetail2,
             Seq(
               ApplicationEndpoint("GET", "/test2/1", Seq("get:test-scope-2-1"), Inaccessible, Inaccessible)
-            )
+            ),
+            false
           )
         )
 
@@ -83,6 +86,8 @@ class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
     "must return an empty sequence of stitched data when the application has no APIs added" in {
       val fixture = buildFixture()
       val application = FakeApplication
+
+      when(fixture.apiHubService.hasPendingAccessRequest(any())(any())).thenReturn(Future.successful(false))
 
       running(fixture.application) {
         implicit val request: Request[_] = FakeRequest()
@@ -98,6 +103,7 @@ class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
       val apiId = "test-id"
       val application = FakeApplication.addApi(Api(apiId, Seq.empty))
 
+      when(fixture.apiHubService.hasPendingAccessRequest(any())(any())).thenReturn(Future.successful(false))
       when(fixture.apiHubService.getApiDetail(any())(any())).thenReturn(Future.successful(None))
 
       running(fixture.application) {

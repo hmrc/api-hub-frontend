@@ -57,10 +57,12 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
           val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
 
           val applicationApis = Seq(
-            ApplicationApi(anApiDetail, Seq(ApplicationEndpoint("GET", "/test", Seq("test-scope"), Inaccessible, Accessible)))
+            ApplicationApi(anApiDetail, Seq(ApplicationEndpoint("GET", "/test", Seq("test-scope"), Inaccessible, Accessible)), false)
           )
 
           when(fixture.apiHubService.getApiDetail(any())(any())).thenReturn(Future.successful(Some(anApiDetail)))
+
+          when(fixture.apiHubService.hasPendingAccessRequest(any())(any())).thenReturn(Future.successful(false))
 
           running(fixture.application) {
             val request = FakeRequest(GET, controllers.application.routes.RequestProductionAccessController.onPageLoad().url)
@@ -81,13 +83,15 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
       val fixture = buildFixture(userAnswers = Some(userAnswers))
 
       val applicationApis = Seq(
-        ApplicationApi(anApiDetail, Seq(ApplicationEndpoint("GET", "/test", Seq("test-scope"), Inaccessible, Accessible)))
+        ApplicationApi(anApiDetail, Seq(ApplicationEndpoint("GET", "/test", Seq("test-scope"), Inaccessible, Accessible)), false)
       )
 
       when(fixture.apiHubService.getApiDetail(any())(any())).thenReturn(Future.successful(Some(anApiDetail)))
 
       when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), ArgumentMatchers.eq(true))(any()))
         .thenReturn(Future.successful(Some(application)))
+
+      when(fixture.apiHubService.hasPendingAccessRequest(any())(any())).thenReturn(Future.successful(false))
 
       running(fixture.application) {
         val request = FakeRequest(GET, controllers.application.routes.RequestProductionAccessController.onPageLoad().url)

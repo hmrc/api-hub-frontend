@@ -48,6 +48,8 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
           when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(true))(any()))
             .thenReturn(Future.successful(Some(FakeApplication)))
 
+          when(fixture.apiHubService.hasPendingAccessRequest(any())(any())).thenReturn(Future.successful(false))
+
           running(fixture.playApplication) {
             val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id).url)
             val result = route(fixture.playApplication, request).value
@@ -88,6 +90,8 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
       when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any())(any()))
         .thenReturn(Future.successful(Some(application)))
 
+      when(fixture.apiHubService.hasPendingAccessRequest(any())(any())).thenReturn(Future.successful(false))
+
       running(fixture.playApplication) {
         val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url)
         val result = route(fixture.playApplication, request).value
@@ -116,11 +120,14 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         .setSecondaryScopes(Seq(Scope("test-scope", Approved)))
 
       val applicationApis = Seq(
-        ApplicationApi(apiDetail, Seq(ApplicationEndpoint("GET", "/test", Seq("test-scope"), Inaccessible, Accessible)))
+        ApplicationApi(apiDetail, Seq(ApplicationEndpoint("GET", "/test", Seq("test-scope"), Inaccessible, Accessible)), false)
       )
 
       when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), ArgumentMatchers.eq(true))(any()))
         .thenReturn(Future.successful(Some(application)))
+
+      when(fixture.apiHubService.hasPendingAccessRequest(any())(any()))
+        .thenReturn(Future.successful(false))
 
       when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))

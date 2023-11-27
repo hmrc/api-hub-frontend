@@ -34,13 +34,16 @@ class ApplicationApiBuilder @Inject()(
 )(implicit ec: ExecutionContext) extends FrontendHeaderCarrierProvider with I18nSupport {
 
   def build(application: Application)(implicit request: Request[_]): Future[Either[Result, Seq[ApplicationApi]]] = {
-    fetchApiDetails(application).map {
-      case Right(apiDetails) => Right(build(application, apiDetails))
-      case Left(result) => Left(result)
-    }
+    apiHubService.hasPendingAccessRequest(application.id).flatMap(
+      hasPendingAccessRequest =>
+        fetchApiDetails(application).map {
+          case Right(apiDetails) => Right(build(application, apiDetails, hasPendingAccessRequest))
+          case Left(result) => Left(result)
+        }
+    )
   }
 
-  private def build(application: Application, apiDetails: Seq[ApiDetail]): Seq[ApplicationApi] = {
+  private def build(application: Application, apiDetails: Seq[ApiDetail], hasPendingAccessRequest: Boolean): Seq[ApplicationApi] = {
     application.apis.flatMap(
       api =>
         apiDetails.find(_.id == api.id).map {
@@ -56,12 +59,12 @@ class ApplicationApiBuilder @Inject()(
                         endpoint.httpMethod,
                         endpoint.path,
                         endpointMethod.scopes,
-                        ApplicationEndpointAccess(application, endpointMethod, Primary),
-                        ApplicationEndpointAccess(application, endpointMethod, Secondary)
+                        ApplicationEndpointAccess(application, hasPendingAccessRequest, endpointMethod, Primary),
+                        ApplicationEndpointAccess(application, hasPendingAccessRequest, endpointMethod, Secondary)
                       )
                   )
             }
-            ApplicationApi(apiDetail, endpoints)
+            ApplicationApi(apiDetail, endpoints, hasPendingAccessRequest)
         }
     )
   }
