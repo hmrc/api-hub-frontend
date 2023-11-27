@@ -50,6 +50,17 @@ govukSummaryList: GovukSummaryList
     controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url
 }
 
+@apiListItem(api: AccessRequestApi) = {
+    <li>@api.apiName</li>
+}
+
+@apiList(apis: Seq[AccessRequestApi]) = {
+    <br>
+    <ul class=“govuk-list govuk-list--bullet govuk-!-margin-top-0”>
+    @{apis.map(api => apiListItem(api))}
+    </ul>
+}
+
 @layout(pageTitle = titleNoForm(messages("requestProductionAccessSuccess.title")), user = user, showBackLink = false, customStyles = Some(styles())) {
   <div class="govuk-panel--warning">
     @govukPanel(Panel(
@@ -73,7 +84,7 @@ govukSummaryList: GovukSummaryList
                     content = Text(messages("requestProductionAccessSuccess.apiName"))
                 ),
                 value = Value(
-                    content = Text(apis.mkString(","))
+                    content = HtmlContent(apiList(apis))
                 )
             ))))
 
