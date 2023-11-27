@@ -56,7 +56,7 @@ govukSummaryList: GovukSummaryList
 
 @apiList(apis: Seq[AccessRequestApi]) = {
     <br>
-    <ul class=“govuk-list govuk-list--bullet govuk-!-margin-top-0”>
+    <ul class="govuk-list govuk-list--bullet govuk-!-margin-top-0">
     @{apis.map(api => apiListItem(api))}
     </ul>
 }
