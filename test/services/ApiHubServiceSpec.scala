@@ -408,13 +408,30 @@ class ApiHubServiceSpec
     }
   }
 
-  "requestProductionAccess" - {
+  "rejectAccessRequest" - {
     "must make the correct request to the applications connector and return the response" in {
       val applicationsConnector = mock[ApplicationsConnector]
       val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
       val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
       val id = "test-id"
       val decidedBy = "test-decided-by"
+      val rejectedReason = "test-rejected-reason"
+
+      when(applicationsConnector.rejectAccessRequest(any(), any(), any())(any())).thenReturn(Future.successful(Some(())))
+
+      service.rejectAccessRequest(id, decidedBy, rejectedReason)(HeaderCarrier()).map {
+        result =>
+          verify(applicationsConnector).rejectAccessRequest(ArgumentMatchers.eq(id), ArgumentMatchers.eq(decidedBy), ArgumentMatchers.eq(rejectedReason))(any())
+          result mustBe Some(())
+      }
+    }
+  }
+
+  "requestProductionAccess" - {
+    "must make the correct request to the applications connector and return the response" in {
+      val applicationsConnector = mock[ApplicationsConnector]
+      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
 
       when(applicationsConnector.createAccessRequest(any())(any())).thenReturn(Future.successful(Some(())))
 
