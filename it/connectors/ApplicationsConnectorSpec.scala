@@ -598,6 +598,50 @@ class ApplicationsConnectorSpec
     }
   }
 
+  "ApplicationsConnector.rejectAccessRequest" - {
+    "must place the correct request" in {
+      val id = "test-id"
+      val decidedBy = "test-decided-by"
+      val rejectedReason = "test-rejected-reason"
+      val decisionRequest = AccessRequestDecisionRequest(decidedBy, Some(rejectedReason))
+
+      stubFor(
+        put(urlEqualTo(s"/api-hub-applications/access-requests/$id/reject"))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .withHeader(CONTENT_TYPE, equalTo(ContentTypes.JSON))
+          .withRequestBody(equalToJson(Json.toJson(decisionRequest).toString()))
+          .willReturn(
+            aResponse()
+              .withStatus(NO_CONTENT)
+          )
+      )
+
+      buildConnector(this).rejectAccessRequest(id, decidedBy, rejectedReason)(HeaderCarrier()).map(
+        result =>
+          result mustBe Some(())
+      )
+    }
+
+    "must return None when the access request does not exist" in {
+      val id = "test-id"
+      val decidedBy = "test-decided-by"
+      val rejectedReason = "test-rejected-reason"
+
+      stubFor(
+        put(urlEqualTo(s"/api-hub-applications/access-requests/$id/approve"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+          )
+      )
+
+      buildConnector(this).rejectAccessRequest(id, decidedBy, rejectedReason)(HeaderCarrier()).map(
+        result =>
+          result mustBe None
+      )
+    }
+  }
+
 }
 
 object ApplicationsConnectorSpec extends HttpClientV2Support {
@@ -646,10 +690,14 @@ object ApplicationsConnectorSpec extends HttpClientV2Support {
     def successfulApplicationGetter(enrich: Boolean): Unit = {
       s"must place the correct request and return the application when enrich = $enrich" in {
         val api = Api("api_id", Seq(SelectedEndpoint("GET", "/foo/bar")))
-        val applicationWithApis = Application("id-1", "test-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1"))).copy(apis = Seq(api))
-        val expected = applicationWithApis
+        val applicationWithApis = Application(
+          "id-1",
+          "test-name-1",
+          Creator("test-creator-email-1"),
+          Seq(TeamMember("test-creator-email-1"))).copy(apis = Seq(api)
+        )
 
-        val expectedJson = toJsonString(expected)
+        val expectedJson = toJsonString(applicationWithApis)
 
         stubFor(
           get(urlEqualTo(s"/api-hub-applications/applications/id-1?enrich=$enrich"))
@@ -663,7 +711,7 @@ object ApplicationsConnectorSpec extends HttpClientV2Support {
 
         buildConnector(this).getApplication("id-1", enrich)(HeaderCarrier()) map {
           actual =>
-            actual mustBe Some(expected)
+            actual mustBe Some(applicationWithApis)
         }
       }
 
