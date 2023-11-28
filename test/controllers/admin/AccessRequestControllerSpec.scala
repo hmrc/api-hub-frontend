@@ -19,12 +19,13 @@ package controllers.admin
 import base.SpecBase
 import controllers.actions.{FakeApplication, FakeApprover, UserTypes}
 import controllers.routes
-import forms.admin.AccessRequestDecisionFormProvider
+import forms.admin.ApprovalDecisionFormProvider
 import generators.AccessRequestGenerator
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
 import org.scalatest.prop.TableDrivenPropertyChecks
+import play.api.data.FormError
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded}
@@ -34,15 +35,16 @@ import play.api.{Application => PlayApplication}
 import services.ApiHubService
 import utils.HtmlValidation
 import viewmodels.admin.AccessRequestEndpointGroups
+import viewmodels.admin.Decision.{Approve, Reject}
 import views.html.ErrorTemplate
-import views.html.admin.{AccessRequestApprovedSuccessView, AccessRequestView}
+import views.html.admin.{AccessRequestApprovedSuccessView, AccessRequestRejectedSuccessView, AccessRequestView}
 
 import scala.concurrent.Future
 
 class AccessRequestControllerSpec
   extends SpecBase with MockitoSugar with HtmlValidation with TableDrivenPropertyChecks with UserTypes with AccessRequestGenerator {
 
-  private val form = new AccessRequestDecisionFormProvider()()
+  private val form = new ApprovalDecisionFormProvider()()
 
   "AccessRequestController" - {
     "must return Ok and the correct view for an approver or support" in {
@@ -141,7 +143,7 @@ class AccessRequestControllerSpec
 
       running(fixture.playApplication) {
         implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, controllers.admin.routes.AccessRequestController.onSubmit(id).url)
-          .withFormUrlEncodedBody(("value", "approve"))
+          .withFormUrlEncodedBody(("decision", "approve"))
         implicit val msgs: Messages = messages(fixture.playApplication)
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[AccessRequestApprovedSuccessView]
@@ -150,6 +152,31 @@ class AccessRequestControllerSpec
         contentAsString(result) mustBe view(FakeApprover).toString()
         contentAsString(result) must validateAsHtml
         verify(fixture.apiHubService).approveAccessRequest(ArgumentMatchers.eq(id), ArgumentMatchers.eq(FakeApprover.email.value))(any())
+      }
+    }
+
+    "on submission must reject an access request and return the success view" in {
+      val fixture = buildFixture(FakeApprover)
+      val id = "test-id"
+      val rejectedReason = "test-rejection-reason"
+
+      when(fixture.apiHubService.rejectAccessRequest(any(), any(), any())(any())).thenReturn(Future.successful(Some(())))
+
+      running(fixture.playApplication) {
+        implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, controllers.admin.routes.AccessRequestController.onSubmit(id).url)
+          .withFormUrlEncodedBody(("decision", "reject"), ("rejectedReason", rejectedReason))
+        implicit val msgs: Messages = messages(fixture.playApplication)
+        val result = route(fixture.playApplication, request).value
+        val view = fixture.playApplication.injector.instanceOf[AccessRequestRejectedSuccessView]
+
+        status(result) mustBe OK
+        contentAsString(result) mustBe view(FakeApprover).toString()
+        contentAsString(result) must validateAsHtml
+        verify(fixture.apiHubService).rejectAccessRequest(
+          ArgumentMatchers.eq(id),
+          ArgumentMatchers.eq(FakeApprover.email.value),
+          ArgumentMatchers.eq(rejectedReason)
+        )(any())
       }
     }
 
@@ -163,11 +190,35 @@ class AccessRequestControllerSpec
       running(fixture.playApplication) {
         implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
           FakeRequest(POST, controllers.admin.routes.AccessRequestController.onSubmit(accessRequest.id).url)
-            .withFormUrlEncodedBody(("value", ""))
+            .withFormUrlEncodedBody(("decision", ""))
         implicit val msgs: Messages = messages(fixture.playApplication)
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[AccessRequestView]
-        val formWithErrors = form.bind(Map("value" -> ""))
+        val formWithErrors = form.bind(Map("decision" -> ""))
+
+        status(result) mustBe BAD_REQUEST
+        contentAsString(result) mustBe
+          view(accessRequest, FakeApplication, AccessRequestEndpointGroups.group(accessRequest), formWithErrors, FakeApprover).toString()
+        contentAsString(result) must validateAsHtml
+      }
+    }
+
+    "on submission must return a Bad Request and errors when rejected without a rejection reason" in {
+      val fixture = buildFixture(FakeApprover)
+      val accessRequest = sampleAccessRequest()
+
+      when(fixture.apiHubService.getAccessRequest(any())(any())).thenReturn(Future.successful(Some(accessRequest)))
+      when(fixture.apiHubService.getApplication(any(), any())(any())).thenReturn(Future.successful(Some(FakeApplication)))
+
+      running(fixture.playApplication) {
+        implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
+          FakeRequest(POST, controllers.admin.routes.AccessRequestController.onSubmit(accessRequest.id).url)
+            .withFormUrlEncodedBody(("decision", Reject.toString), ("rejectedReason", ""))
+        implicit val msgs: Messages = messages(fixture.playApplication)
+        val result = route(fixture.playApplication, request).value
+        val view = fixture.playApplication.injector.instanceOf[AccessRequestView]
+        val formWithErrors = form.bind(Map("decision" -> Reject.toString, "rejectedReason" -> ""))
+          .withError(FormError("rejectedReason", "accessRequest.rejectedReason.required"))
 
         status(result) mustBe BAD_REQUEST
         contentAsString(result) mustBe
@@ -183,7 +234,7 @@ class AccessRequestControllerSpec
 
         running(fixture.playApplication) {
           val request = FakeRequest(POST, controllers.admin.routes.AccessRequestController.onSubmit(id).url)
-            .withFormUrlEncodedBody(("value", "approve"))
+            .withFormUrlEncodedBody(("decision", Approve.toString))
           val result = route(fixture.playApplication, request).value
 
           status(result) mustBe SEE_OTHER

@@ -19,15 +19,16 @@ package controllers.admin
 import com.google.inject.{Inject, Singleton}
 import controllers.actions.{AuthorisedApproverAction, AuthorisedApproverOrSupportAction, IdentifierAction}
 import controllers.helpers.ErrorResultBuilder
-import forms.admin.AccessRequestDecisionFormProvider
+import forms.admin.ApprovalDecisionFormProvider
 import models.requests.IdentifierRequest
-import play.api.data.Form
+import play.api.data.{Form, FormError}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.admin.AccessRequestEndpointGroups
-import views.html.admin.{AccessRequestApprovedSuccessView, AccessRequestView}
+import viewmodels.admin.Decision.{Approve, Reject}
+import viewmodels.admin.{AccessRequestEndpointGroups, ApprovalDecision}
+import views.html.admin.{AccessRequestApprovedSuccessView, AccessRequestRejectedSuccessView, AccessRequestView}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -39,9 +40,10 @@ class AccessRequestController @Inject()(
   isApprover: AuthorisedApproverAction,
   apiHubService: ApiHubService,
   errorResultBuilder: ErrorResultBuilder,
-  formProvider: AccessRequestDecisionFormProvider,
+  formProvider: ApprovalDecisionFormProvider,
   view: AccessRequestView,
-  successView: AccessRequestApprovedSuccessView
+  approvedSuccessView: AccessRequestApprovedSuccessView,
+  rejectedSuccessView: AccessRequestRejectedSuccessView
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
@@ -53,18 +55,19 @@ class AccessRequestController @Inject()(
 
   def onSubmit(id: String): Action[AnyContent] = (identify andThen isApprover).async {
     implicit request =>
-      form.bindFromRequest().fold(
+      val boundForm = form.bindFromRequest()
+      boundForm.fold(
         formWithErrors => buildView(id, BAD_REQUEST, formWithErrors),
-        value => if (value == "approve") {
-          approve(id)
-        }
-        else {
-          reject(id)
+        {
+          case ApprovalDecision(Approve, _) => approve(id)
+          case ApprovalDecision(Reject, Some(rejectedReason)) if rejectedReason.trim.nonEmpty => reject(id, rejectedReason)
+          case _ =>
+            buildView(id, BAD_REQUEST, boundForm.withError(FormError("rejectedReason", "accessRequest.rejectedReason.required")))
         }
       )
   }
 
-  private def buildView(id: String, status: Int, form: Form[String])(implicit request: IdentifierRequest[AnyContent]): Future[Result] = {
+  private def buildView(id: String, status: Int, form: Form[ApprovalDecision])(implicit request: IdentifierRequest[AnyContent]): Future[Result] = {
     apiHubService.getAccessRequest(id).flatMap {
       case Some(accessRequest) =>
         apiHubService.getApplication(accessRequest.applicationId, enrich = false).map {
@@ -79,15 +82,22 @@ class AccessRequestController @Inject()(
     request.user.email match {
       case Some(email) =>
         apiHubService.approveAccessRequest(id, email).map {
-          case Some(_) => Ok(successView(request.user))
+          case Some(_) => Ok(approvedSuccessView(request.user))
           case _ => accessRequestNotFound(id)
         }
       case _ => noEmail()
     }
   }
 
-  private def reject(id: String)(implicit request: IdentifierRequest[AnyContent]): Future[Result] = {
-    buildView(id, OK, form)
+  private def reject(id: String, rejectedReason: String)(implicit request: IdentifierRequest[AnyContent]): Future[Result] = {
+    request.user.email match {
+      case Some(email) =>
+        apiHubService.rejectAccessRequest(id, email, rejectedReason).map {
+          case Some(_) => Ok(rejectedSuccessView(request.user))
+          case _ => accessRequestNotFound(id)
+        }
+      case _ => noEmail()
+    }
   }
 
   private def accessRequestNotFound(accessRequestId: String)(implicit request: Request[_]): Result = {
