@@ -92,7 +92,7 @@ class AccessRequestController @Inject()(
   private def reject(id: String, rejectedReason: String)(implicit request: IdentifierRequest[AnyContent]): Future[Result] = {
     request.user.email match {
       case Some(email) =>
-        apiHubService.rejectAccessRequest(id, email, rejectedReason).map {
+        apiHubService.rejectAccessRequest(id, email, rejectedReason.trim).map {
           case Some(_) => Ok(rejectedSuccessView(request.user))
           case _ => accessRequestNotFound(id)
         }
