@@ -18,6 +18,8 @@
 @import models.accessrequest._
 @import models.user.UserModel
 @import viewmodels.admin.AccessRequestEndpointGroup
+@import viewmodels.admin.Decision.{Approve, Reject}
+@import viewmodels.govuk.textarea._
 @import views.ViewUtils
 
 @this(
@@ -25,7 +27,8 @@
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukButton : GovukButton,
-    govukRadios : GovukRadios
+    govukRadios : GovukRadios,
+    govukTextarea : GovukTextarea
 )
 
 @(accessRequest: AccessRequest, application: Application, endpointGroups: Seq[AccessRequestEndpointGroup], form: Form[_], user: UserModel)(implicit request: Request[_], messages: Messages)
@@ -78,6 +81,17 @@
                     @decision.decidedBy
                 </dd>
             </div>
+
+            @for(rejectedReason <- decision.rejectedReason) {
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        @messages("accessRequest.headings.rejectedReason")
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        @rejectedReason
+                    </dd>
+                </div>
+            }
         }
 
         <div class="govuk-summary-list__row">
@@ -164,15 +178,24 @@
 
             @govukRadios(
                 RadiosViewModel(
-                    field = form("value"),
+                    field = form("decision"),
                     items = Seq(
                       RadioItem(
                         content = Text(messages("accessRequest.decision.approve")),
-                        value = Some("approve")
+                        value = Some(Approve.toString)
                       ),
                       RadioItem(
                         content = Text(messages("accessRequest.decision.reject")),
-                        value = Some("reject")
+                        value = Some(Reject.toString),
+                        conditionalHtml = Some(
+                            govukTextarea(
+                                TextareaViewModel(
+                                    field = form("rejectedReason"),
+                                    label = LabelViewModel(messages("accessRequest.rejectedReason"))
+                                )
+                                .withHint(HintViewModel(messages("accessRequest.rejectedReason.hint")))
+                            )
+                        )
                       )
                     ),
                     fieldset = Fieldset(

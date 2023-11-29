@@ -113,6 +113,10 @@ class ApiHubService @Inject()(
     applicationsConnector.approveAccessRequest(id, decidedBy)
   }
 
+  def rejectAccessRequest(id: String, decidedBy: String, rejectedReason: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    applicationsConnector.rejectAccessRequest(id, decidedBy, rejectedReason)
+  }
+
   def requestProductionAccess(accessRequest: AccessRequestRequest)(implicit hc: HeaderCarrier): Future[Unit] = {
     applicationsConnector.createAccessRequest(accessRequest)
   }

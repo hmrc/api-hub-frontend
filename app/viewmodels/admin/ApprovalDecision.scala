@@ -14,22 +14,23 @@
  * limitations under the License.
  */
 
-package forms.admin
+package viewmodels.admin
 
-import com.google.inject.Singleton
-import forms.mappings.Mappings
-import play.api.data.Form
+import models.Enumerable
+import viewmodels.WithName
 
-import javax.inject.Inject
+sealed trait Decision
 
-@Singleton
-class AccessRequestDecisionFormProvider @Inject() extends Mappings {
+object Decision extends Enumerable.Implicits {
 
-  def apply(): Form[String] = {
-    Form(
-      "value" -> text("accessRequest.decision.required")
-        .verifying("accessRequest.decision.required", value => Set("approve", "reject").contains(value))
-    )
-  }
+  case object Approve extends WithName("approve") with Decision
+  case object Reject extends WithName("reject") with Decision
+
+  val values: Seq[Decision] = Seq(Approve, Reject)
+
+  implicit val enumerable: Enumerable[Decision] =
+    Enumerable(values.map(v => v.toString -> v): _*)
 
 }
+
+case class ApprovalDecision(decision: Decision, rejectedReason: Option[String])

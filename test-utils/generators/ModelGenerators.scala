@@ -19,6 +19,8 @@ package generators
 import models.application.TeamMember
 import models.{ApiPolicyConditionsDeclaration, ProductionCredentialsChecklist}
 import org.scalacheck.{Arbitrary, Gen}
+import viewmodels.admin.Decision
+import viewmodels.admin.Decision.{Approve, Reject}
 
 trait ModelGenerators {
 
@@ -66,5 +68,12 @@ trait ModelGenerators {
   )
 
   lazy val genLegalUnicodeString: Gen[String] = Gen.nonEmptyListOf(genLegalUnicodeChar).map(_.mkString)
+
+  lazy val arbitraryApproval: Arbitrary[Decision] =
+    Arbitrary {
+      for {
+        approval <- Gen.oneOf(Approve, Reject)
+      } yield approval
+    }
 
 }

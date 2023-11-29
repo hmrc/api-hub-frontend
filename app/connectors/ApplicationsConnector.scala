@@ -259,4 +259,19 @@ class ApplicationsConnector @Inject()(
       }
   }
 
+  def rejectAccessRequest(id: String, decidedBy: String, rejectedReason: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    val decisionRequest = AccessRequestDecisionRequest(decidedBy = decidedBy, rejectedReason = Some(rejectedReason))
+
+    httpClient.put(url"$applicationsBaseUrl/api-hub-applications/access-requests/$id/reject")
+      .setHeader((CONTENT_TYPE, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .withBody(Json.toJson(decisionRequest))
+      .execute[Either[UpstreamErrorResponse, Unit]]
+      .flatMap {
+        case Right(()) => Future.successful(Some(()))
+        case Left(e) if e.statusCode == NOT_FOUND => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
+  }
+
 }

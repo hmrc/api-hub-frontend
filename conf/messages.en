@@ -403,6 +403,7 @@ accessRequest.headings.applicationName = Application name
 accessRequest.headings.status = Status
 accessRequest.headings.decided = Decision date
 accessRequest.headings.decidedBy = Decided by
+accessRequest.headings.rejectedReason = Rejected reason
 accessRequest.headings.apiName = API name
 accessRequest.headings.applicationId = Application ID
 accessRequest.headings.requestedBy = Requested by
@@ -411,15 +412,25 @@ accessRequest.headings.supportingInformation = Provided supporting information
 accessRequest.endpoints.scopes = These end points use the following scopes
 accessRequest.link.backToApprovalList = Back to approval list
 accessRequest.decision.required = You must select an option to continue
+accessRequest.decision.invalid = You must select a valid option to continue
 accessRequest.decision.legend = Select an option and continue
 accessRequest.decision.approve = Approve request
 accessRequest.decision.reject = Reject request
+accessRequest.rejectedReason = Specify a reason for rejection
+accessRequest.rejectedReason.hint = The reason will be included in the email response to the user.
+accessRequest.rejectedReason.required = You must enter a rejection reason
 
 accessRequestApprovedSuccess.title = API production request successfully approved
 accessRequestApprovedSuccess.heading = API production request successfully approved
 accessRequestApprovedSuccess.guidance.heading = What you can do now
 accessRequestApprovedSuccess.guidance.content = Return to {0}.
 accessRequestApprovedSuccess.guidance.link = API approval requests
+
+accessRequestRejectedSuccess.title = API production request successfully rejected
+accessRequestRejectedSuccess.heading = API production request successfully rejected
+accessRequestRejectedSuccess.guidance.heading = What you can do now
+accessRequestRejectedSuccess.guidance.content = Return to {0}.
+accessRequestRejectedSuccess.guidance.link = API approval requests
 
 manageApplications.title = Manage applications
 
