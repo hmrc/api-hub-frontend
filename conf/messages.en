@@ -343,6 +343,8 @@ addAnApiSelectApplication.whichApplication = Which application would you like to
 addAnApiSelectApplication.returnTo = Return to {0}
 addAnApiSelectApplication.checkYourAnswersLabel = Application
 addAnApiSelectApplication.change.hidden = Select application
+addAnApiSelectApplication.alreadyHaveAccess = The following applications already have access to the {0}:
+addAnApiSelectApplication.availableInAll = This API is available in all of your applications.
 
 apiPolicyConditionsDeclarationPage.title = Review the usage policy for {0}
 apiPolicyConditionsDeclarationPage.heading = Review the usage policy for {0}

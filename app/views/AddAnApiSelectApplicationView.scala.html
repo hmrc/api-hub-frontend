@@ -45,7 +45,7 @@
         <p class="govuk-body information-tag">
             <i class="fa-solid fa-circle-info information"></i>
             <span class="call-out-type information">
-                The following applications already have access to the weighting API:
+                @messages("addAnApiSelectApplication.alreadyHaveAccess", apiDetail.title)
             </span>
         </p>
 
@@ -56,7 +56,9 @@
         </ul>
 
         @if(applicationsWithoutAccess.isEmpty) {
-            <p class="govuk-body additional-message">This API is available in all of your applications.</p>
+            <p class="govuk-body additional-message">
+                @messages("addAnApiSelectApplication.availableInAll")
+            </p>
         }
     </div>
 }
