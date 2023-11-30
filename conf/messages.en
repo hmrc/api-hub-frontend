@@ -396,6 +396,7 @@ accessRequests.heading = API production access requests
 accessRequests.admin = API Hub admin
 accessRequests.headings.requestedBy = Requested by
 accessRequests.headings.supportingInformation = Supporting information
+accessRequests.headings.rejectedReason = Rejected reason
 accessRequests.headings.reviewRequest = Review request
 
 accessRequest.title = Production API request
