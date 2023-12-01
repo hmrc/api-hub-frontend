@@ -144,6 +144,13 @@ object ApplicationLenses {
         applicationSecondaryCredentials.get(application) :+ credential
       )
 
+    def getCredentialsFor(environmentName: EnvironmentName): Seq[Credential] = {
+      environmentName match {
+        case Primary => application.getPrimaryCredentials
+        case Secondary => application.getSecondaryCredentials
+      }
+    }
+
     def hasTeamMember(email: String): Boolean =
       applicationTeamMembers.get(application)
         .exists(teamMember => teamMember.email.equalsIgnoreCase(email))

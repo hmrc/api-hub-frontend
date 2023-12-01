@@ -17,3 +17,5 @@ GET         /provide-supporting-information                             controll
 POST        /provide-supporting-information                             controllers.application.ProvideSupportingInformationController.onSubmit()
 GET         /request-production-access/success                          controllers.application.RequestProductionAccessEndJourneyController.submitRequest()
 
+GET         /delete-primary-credential/:id/:clientId                    controllers.application.EnvironmentAndCredentialsController.deletePrimaryCredential(id: String ,clientId: String)
+GET         /delete-secondary-credential/:id/:clientId                  controllers.application.EnvironmentAndCredentialsController.deleteSecondaryCredential(id: String ,clientId: String)

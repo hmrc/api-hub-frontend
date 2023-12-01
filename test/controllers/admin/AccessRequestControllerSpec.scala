@@ -17,14 +17,13 @@
 package controllers.admin
 
 import base.SpecBase
-import controllers.actions.{FakeApplication, FakeApprover, UserTypes}
+import controllers.actions.{FakeApplication, FakeApprover}
 import controllers.routes
 import forms.admin.ApprovalDecisionFormProvider
 import generators.AccessRequestGenerator
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
-import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.data.FormError
 import play.api.i18n.Messages
 import play.api.inject.bind
@@ -33,7 +32,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Application => PlayApplication}
 import services.ApiHubService
-import utils.HtmlValidation
+import utils.{HtmlValidation, TestHelpers}
 import viewmodels.admin.AccessRequestEndpointGroups
 import viewmodels.admin.Decision.{Approve, Reject}
 import views.html.ErrorTemplate
@@ -42,7 +41,7 @@ import views.html.admin.{AccessRequestApprovedSuccessView, AccessRequestRejected
 import scala.concurrent.Future
 
 class AccessRequestControllerSpec
-  extends SpecBase with MockitoSugar with HtmlValidation with TableDrivenPropertyChecks with UserTypes with AccessRequestGenerator {
+  extends SpecBase with MockitoSugar with HtmlValidation with TestHelpers with AccessRequestGenerator {
 
   private val form = new ApprovalDecisionFormProvider()()
 

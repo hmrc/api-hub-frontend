@@ -101,6 +101,14 @@ class ApiHubService @Inject()(
     applicationsConnector.addCredential(id, environmentName)
   }
 
+  def deleteCredential(
+    id: String,
+    environmentName: EnvironmentName,
+    clientId: String
+  )(implicit hc: HeaderCarrier): Future[Either[ApplicationsException, Option[Unit]]] = {
+    applicationsConnector.deleteCredential(id, environmentName, clientId)
+  }
+
   def getAccessRequests(applicationId: Option[String], status: Option[AccessRequestStatus])(implicit hc:HeaderCarrier): Future[Seq[AccessRequest]] = {
     applicationsConnector.getAccessRequests(applicationId, status)
   }

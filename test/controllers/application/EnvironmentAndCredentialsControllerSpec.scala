@@ -17,8 +17,11 @@
 package controllers.application
 
 import base.SpecBase
-import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
+import controllers.actions.{FakeApplication, FakePrivilegedUser, FakeUser, FakeUserNotTeamMember}
 import controllers.routes
+import models.application.{Primary, Secondary}
+import models.application.ApplicationLenses._
+import models.exception.ApplicationCredentialLimitException
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
@@ -91,6 +94,229 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad.url)
+      }
+    }
+  }
+
+  "deletePrimaryCredential" - {
+    "must delete the credential and redirect to the production tab" in {
+      val clientId = "test-client-id"
+
+      forAll(usersWhoCanDeletePrimaryCredentials) {(user: UserModel) =>
+        val application = FakeApplication.addTeamMember(user.email.value)
+        val fixture = buildFixture(user)
+
+        when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any())(any()))
+          .thenReturn(Future.successful(Some(application)))
+
+        when(fixture.apiHubService.deleteCredential(any(), any(), any())(any())).thenReturn(Future.successful(Right(Some(()))))
+
+        running(fixture.playApplication) {
+          val url = controllers.application.routes.EnvironmentAndCredentialsController.deletePrimaryCredential(application.id, clientId) .url
+          val request = FakeRequest(GET, url)
+          val result = route(fixture.playApplication, request).value
+
+          val expectedUrl = controllers.application.routes.EnvironmentAndCredentialsController.onPageLoad(application.id).url + "#hip-production"
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(expectedUrl)
+          verify(fixture.apiHubService).deleteCredential(
+            ArgumentMatchers.eq(application.id),
+            ArgumentMatchers.eq(Primary),
+            ArgumentMatchers.eq(clientId))(any()
+          )
+        }
+      }
+    }
+
+    "must redirect to the unauthorised page for users who cannot delete production credentials" in {
+      forAll(usersWhoCannotDeletePrimaryCredentials){(user: UserModel) =>
+        val application = FakeApplication.addTeamMember(user.email.value)
+        val fixture = buildFixture(user)
+
+        when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any())(any()))
+          .thenReturn(Future.successful(Some(application)))
+
+        running(fixture.playApplication) {
+          val url = controllers.application.routes.EnvironmentAndCredentialsController.deletePrimaryCredential(application.id, "test-client-id").url
+          val request = FakeRequest(GET, url)
+          val result = route(fixture.playApplication, request).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad.url)
+        }
+      }
+    }
+
+    "must display a Not Found page when the credential does not exist" in {
+      val clientId = "test-client-id"
+
+      val application = FakeApplication.addTeamMember(FakePrivilegedUser.email.value)
+      val fixture = buildFixture(FakePrivilegedUser)
+
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any())(any()))
+        .thenReturn(Future.successful(Some(application)))
+
+      when(fixture.apiHubService.deleteCredential(any(), any(), any())(any())).thenReturn(Future.successful(Right(None)))
+
+      running(fixture.playApplication) {
+        val url = controllers.application.routes.EnvironmentAndCredentialsController.deletePrimaryCredential(application.id, clientId) .url
+        val request = FakeRequest(GET, url)
+        val result = route(fixture.playApplication, request).value
+        val view = fixture.playApplication.injector.instanceOf[ErrorTemplate]
+
+        status(result) mustBe NOT_FOUND
+        contentAsString(result) mustBe
+          view(
+            "Page not found - 404",
+            "Credential not found",
+            s"Cannot find credential with Id $clientId for application ${application.id}."
+          )(request, messages(fixture.playApplication))
+            .toString()
+
+        contentAsString(result) must validateAsHtml
+      }
+    }
+
+    "must display a Bad Request page when the user attempts to delete the last credential" in {
+      val clientId = "test-client-id"
+
+      val application = FakeApplication.addTeamMember(FakePrivilegedUser.email.value)
+      val fixture = buildFixture(FakePrivilegedUser)
+
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any())(any()))
+        .thenReturn(Future.successful(Some(application)))
+
+      when(fixture.apiHubService.deleteCredential(any(), any(), any())(any()))
+        .thenReturn(Future.successful(Left(ApplicationCredentialLimitException.forId(FakeApplication.id, Primary))))
+
+      running(fixture.playApplication) {
+        val url = controllers.application.routes.EnvironmentAndCredentialsController.deletePrimaryCredential(application.id, clientId) .url
+        val request = FakeRequest(GET, url)
+        val result = route(fixture.playApplication, request).value
+        val view = fixture.playApplication.injector.instanceOf[ErrorTemplate]
+
+        status(result) mustBe BAD_REQUEST
+        contentAsString(result) mustBe
+          view(
+            "Bad request - 400",
+            "Cannot delete last credential",
+            "You cannot delete the last credential for an application."
+          )(request, messages(fixture.playApplication))
+            .toString()
+
+        contentAsString(result) must validateAsHtml
+      }
+    }
+  }
+
+  "deleteSecondaryCredential" - {
+    "must delete the credential and redirect to the development tab" in {
+      val clientId = "test-client-id"
+
+      forAll(usersWhoCanDeleteSecondaryCredentials) {(user: UserModel) =>
+        val application = FakeApplication.addTeamMember(user.email.value)
+        val fixture = buildFixture(user)
+
+        when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any())(any()))
+          .thenReturn(Future.successful(Some(application)))
+
+        when(fixture.apiHubService.deleteCredential(any(), any(), any())(any())).thenReturn(Future.successful(Right(Some(()))))
+
+        running(fixture.playApplication) {
+          val url = controllers.application.routes.EnvironmentAndCredentialsController.deleteSecondaryCredential(application.id, clientId) .url
+          val request = FakeRequest(GET, url)
+          val result = route(fixture.playApplication, request).value
+
+          val expectedUrl = controllers.application.routes.EnvironmentAndCredentialsController.onPageLoad(application.id).url + "#hip-development"
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(expectedUrl)
+          verify(fixture.apiHubService).deleteCredential(
+            ArgumentMatchers.eq(application.id),
+            ArgumentMatchers.eq(Secondary),
+            ArgumentMatchers.eq(clientId))(any()
+          )
+        }
+      }
+    }
+
+    "must redirect to the unauthorised page for users who cannot delete development credentials" in {
+      forAll(usersWhoCannotDeleteSecondaryCredentials){(user: UserModel) =>
+        val fixture = buildFixture(user)
+
+        when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), any())(any()))
+          .thenReturn(Future.successful(Some(FakeApplication)))
+
+        running(fixture.playApplication) {
+          val url = controllers.application.routes.EnvironmentAndCredentialsController.deleteSecondaryCredential(FakeApplication.id, "test-client-id").url
+          val request = FakeRequest(GET, url)
+          val result = route(fixture.playApplication, request).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad.url)
+        }
+      }
+    }
+
+    "must display a Not Found page when the credential does not exist" in {
+      val clientId = "test-client-id"
+
+      val application = FakeApplication.addTeamMember(FakePrivilegedUser.email.value)
+      val fixture = buildFixture(FakePrivilegedUser)
+
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any())(any()))
+        .thenReturn(Future.successful(Some(application)))
+
+      when(fixture.apiHubService.deleteCredential(any(), any(), any())(any())).thenReturn(Future.successful(Right(None)))
+
+      running(fixture.playApplication) {
+        val url = controllers.application.routes.EnvironmentAndCredentialsController.deleteSecondaryCredential(application.id, clientId) .url
+        val request = FakeRequest(GET, url)
+        val result = route(fixture.playApplication, request).value
+        val view = fixture.playApplication.injector.instanceOf[ErrorTemplate]
+
+        status(result) mustBe NOT_FOUND
+        contentAsString(result) mustBe
+          view(
+            "Page not found - 404",
+            "Credential not found",
+            s"Cannot find credential with Id $clientId for application ${application.id}."
+          )(request, messages(fixture.playApplication))
+            .toString()
+
+        contentAsString(result) must validateAsHtml
+      }
+    }
+
+    "must display a Bad Request page when the user attempts to delete the last credential" in {
+      val clientId = "test-client-id"
+
+      val application = FakeApplication.addTeamMember(FakePrivilegedUser.email.value)
+      val fixture = buildFixture(FakePrivilegedUser)
+
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any())(any()))
+        .thenReturn(Future.successful(Some(application)))
+
+      when(fixture.apiHubService.deleteCredential(any(), any(), any())(any()))
+        .thenReturn(Future.successful(Left(ApplicationCredentialLimitException.forId(FakeApplication.id, Primary))))
+
+      running(fixture.playApplication) {
+        val url = controllers.application.routes.EnvironmentAndCredentialsController.deleteSecondaryCredential(application.id, clientId) .url
+        val request = FakeRequest(GET, url)
+        val result = route(fixture.playApplication, request).value
+        val view = fixture.playApplication.injector.instanceOf[ErrorTemplate]
+
+        status(result) mustBe BAD_REQUEST
+        contentAsString(result) mustBe
+          view(
+            "Bad request - 400",
+            "Cannot delete last credential",
+            "You cannot delete the last credential for an application."
+          )(request, messages(fixture.playApplication))
+            .toString()
+
+        contentAsString(result) must validateAsHtml
       }
     }
   }
