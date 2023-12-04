@@ -17,14 +17,13 @@
 package controllers.admin
 
 import base.SpecBase
-import controllers.actions.{FakeApprover, UserTypes}
+import controllers.actions.FakeApprover
 import controllers.routes
 import generators.AccessRequestGenerator
 import models.accessrequest.{AccessRequest, Pending}
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
-import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.mvc.AnyContentAsEmpty
@@ -32,14 +31,14 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Application => PlayApplication}
 import services.ApiHubService
-import utils.HtmlValidation
+import utils.{HtmlValidation, TestHelpers}
 import views.html.admin.AccessRequestsView
 
 import java.time.LocalDateTime
 import scala.concurrent.Future
 
 class AccessRequestsControllerSpec
-  extends SpecBase with MockitoSugar with HtmlValidation with TableDrivenPropertyChecks with AccessRequestGenerator with UserTypes {
+  extends SpecBase with MockitoSugar with HtmlValidation with TestHelpers with AccessRequestGenerator {
 
   "AccessRequestsController" - {
     "must return Ok and the correct view for an approver or support" in {

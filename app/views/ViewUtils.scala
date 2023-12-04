@@ -16,7 +16,7 @@
 
 package views
 
-import models.accessrequest.{AccessRequestStatus, Approved, Cancelled, Pending, Rejected}
+import models.accessrequest._
 import play.api.data.Form
 import play.api.i18n.Messages
 import play.twirl.api.Html

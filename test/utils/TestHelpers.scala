@@ -16,11 +16,30 @@
 
 package utils
 
-import controllers.actions.{FakeSupporter, FakeUser}
+import controllers.actions.{FakeApprover, FakePrivilegedUser, FakeSupporter, FakeUser}
 import models.user.UserModel
 import org.scalatest.prop.{TableDrivenPropertyChecks, TableFor1}
 
 trait TestHelpers extends TableDrivenPropertyChecks {
+
+  val usersWhoCanViewApprovals: TableFor1[UserModel] = Table(
+    "User",
+    FakeApprover,
+    FakeSupporter
+  )
+
+  val usersWhoCannotViewApprovals: TableFor1[UserModel] = Table(
+    "User",
+    FakeUser,
+    FakePrivilegedUser
+  )
+
+  val usersWhoCannotApprove: TableFor1[UserModel] = Table(
+    "User",
+    FakeUser,
+    FakePrivilegedUser,
+    FakeSupporter
+  )
 
   val teamMemberAndSupporterTable: TableFor1[UserModel] = Table(
     "User",
@@ -32,6 +51,30 @@ trait TestHelpers extends TableDrivenPropertyChecks {
     "User",
     FakeUser.copy(permissions = FakeUser.permissions.copy(isPrivileged = true)),
     FakeSupporter.copy(permissions = FakeSupporter.permissions.copy(isPrivileged = true))
+  )
+
+  val usersWhoCanDeleteSecondaryCredentials: TableFor1[UserModel] = Table(
+    "User",
+    FakeUser,
+    FakePrivilegedUser,
+    FakeSupporter
+  )
+
+  val usersWhoCannotDeleteSecondaryCredentials: TableFor1[UserModel] = Table(
+    "User",
+    FakeApprover
+  )
+
+  val usersWhoCanDeletePrimaryCredentials: TableFor1[UserModel] = Table(
+    "User",
+    FakePrivilegedUser,
+    FakeSupporter
+  )
+
+  val usersWhoCannotDeletePrimaryCredentials: TableFor1[UserModel] = Table(
+    "User",
+    FakeUser,
+    FakeApprover
   )
 
 }

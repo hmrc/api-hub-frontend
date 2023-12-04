@@ -17,6 +17,7 @@
 package models.application
 
 import models.Lens
+import models.user.UserModel
 
 object ApplicationLenses {
 
@@ -144,9 +145,19 @@ object ApplicationLenses {
         applicationSecondaryCredentials.get(application) :+ credential
       )
 
+    def getCredentialsFor(environmentName: EnvironmentName): Seq[Credential] = {
+      environmentName match {
+        case Primary => application.getPrimaryCredentials
+        case Secondary => application.getSecondaryCredentials
+      }
+    }
+
     def hasTeamMember(email: String): Boolean =
       applicationTeamMembers.get(application)
         .exists(teamMember => teamMember.email.equalsIgnoreCase(email))
+
+    def hasTeamMember(user: UserModel): Boolean =
+      user.email.exists(application.hasTeamMember)
 
     def addTeamMember(email: String): Application =
       applicationTeamMembers.set(

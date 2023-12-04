@@ -428,6 +428,60 @@ class ApplicationsConnectorSpec
     }
   }
 
+  "ApplicationsConnector.deleteCredential" - {
+    "must place the correct request" in {
+      val clientId = "test-client-id"
+
+      stubFor(
+        delete(urlEqualTo(s"/api-hub-applications/applications/${FakeApplication.id}/environments/primary/credentials/$clientId"))
+          .withHeader("Authorization", equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withStatus(NO_CONTENT)
+          )
+      )
+
+      buildConnector(this).deleteCredential(FakeApplication.id, Primary, clientId)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe Right(Some(()))
+      }
+    }
+
+    "must return None when the application does not exist" in {
+      val clientId = "test-client-id"
+
+      stubFor(
+        delete(urlEqualTo(s"/api-hub-applications/applications/${FakeApplication.id}/environments/primary/credentials/$clientId"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+          )
+      )
+
+      buildConnector(this).deleteCredential(FakeApplication.id, Primary, clientId)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe Right(None)
+      }
+    }
+
+    "must return ApplicationCredentialLimitException when an attempt is made to delete the last credential" in {
+      val clientId = "test-client-id"
+
+      stubFor(
+        delete(urlEqualTo(s"/api-hub-applications/applications/${FakeApplication.id}/environments/primary/credentials/$clientId"))
+          .willReturn(
+            aResponse()
+              .withStatus(CONFLICT)
+          )
+      )
+
+      buildConnector(this).deleteCredential(FakeApplication.id, Primary, clientId)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe Left(ApplicationCredentialLimitException.forId(FakeApplication.id, Primary))
+      }
+    }
+  }
+
   "ApplicationsConnector.createAccessRequest" - {
     "must place the correct request and return the new access requests" in {
       val request = AccessRequestRequest(

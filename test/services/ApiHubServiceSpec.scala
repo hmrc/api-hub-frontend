@@ -337,6 +337,29 @@ class ApiHubServiceSpec
     }
   }
 
+  "deleteCredential" - {
+    "must call the applications connector with the correct request and return the response" in {
+      val applicationsConnector = mock[ApplicationsConnector]
+      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+      val clientId = "test-client-id"
+
+      when(applicationsConnector.deleteCredential(any(), any(), any())(any()))
+        .thenReturn(Future.successful(Right(Some(()))))
+
+      service.deleteCredential(FakeApplication.id, Primary, clientId)(HeaderCarrier()).map {
+        actual =>
+          verify(applicationsConnector).deleteCredential(
+            ArgumentMatchers.eq(FakeApplication.id),
+            ArgumentMatchers.eq(Primary),
+            ArgumentMatchers.eq(clientId))(any()
+          )
+
+          actual mustBe Right(Some(()))
+      }
+    }
+  }
+
   "getAccessRequests" - {
     "must make the correct request to the applications connector and return the access requests" in {
       val applicationsConnector = mock[ApplicationsConnector]
