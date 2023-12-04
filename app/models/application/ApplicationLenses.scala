@@ -17,6 +17,7 @@
 package models.application
 
 import models.Lens
+import models.user.UserModel
 
 object ApplicationLenses {
 
@@ -154,6 +155,9 @@ object ApplicationLenses {
     def hasTeamMember(email: String): Boolean =
       applicationTeamMembers.get(application)
         .exists(teamMember => teamMember.email.equalsIgnoreCase(email))
+
+    def hasTeamMember(user: UserModel): Boolean =
+      user.email.exists(application.hasTeamMember)
 
     def addTeamMember(email: String): Application =
       applicationTeamMembers.set(

@@ -21,6 +21,7 @@ import controllers.actions.{ApplicationAuthActionProvider, IdentifierAction}
 import controllers.helpers.ErrorResultBuilder
 import models.application.{EnvironmentName, Primary, Secondary}
 import models.exception.ApplicationCredentialLimitException
+import models.user.Permissions
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc._
 import services.ApiHubService
@@ -40,17 +41,17 @@ class EnvironmentAndCredentialsController @Inject()(
 
   def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id, enrich = true)) {
     implicit request =>
-      Ok(view(request.application, Some(request.identifierRequest.user)))
+      Ok(view(request.application, request.identifierRequest.user))
   }
 
   def deletePrimaryCredential(id: String, clientId: String): Action[AnyContent] = (identify andThen applicationAuth(id, enrich = true)).async {
     implicit request =>
-      if (request.identifierRequest.user.permissions.canSupport || request.identifierRequest.user.permissions.isPrivileged) {
-        val url = s"${controllers.application.routes.EnvironmentAndCredentialsController.onPageLoad(id).url}#hip-production"
-        deleteCredential(id, clientId, Primary, url)
-      }
-      else {
-        Future.successful(Redirect(controllers.routes.UnauthorisedController.onPageLoad))
+      request.identifierRequest.user.permissions match {
+        case Permissions(_, true, _) | Permissions(_, _, true) =>
+          val url = s"${controllers.application.routes.EnvironmentAndCredentialsController.onPageLoad(id).url}#hip-production"
+          deleteCredential(id, clientId, Primary, url)
+        case _ =>
+          Future.successful(Redirect(controllers.routes.UnauthorisedController.onPageLoad))
       }
   }
 

@@ -16,10 +16,7 @@
 
 package views
 
-import models.accessrequest.{AccessRequestStatus, Approved, Cancelled, Pending, Rejected}
-import models.application.Application
-import models.application.ApplicationLenses._
-import models.user.UserModel
+import models.accessrequest._
 import play.api.data.Form
 import play.api.i18n.Messages
 import play.twirl.api.Html
@@ -75,12 +72,6 @@ object ViewUtils {
       case Rejected => Html(s"<strong class='govuk-tag govuk-tag--red'>${status.toString}</strong>")
       case Cancelled => Html(s"<strong class='govuk-tag govuk-tag--grey'>${status.toString}</strong>")
     }
-  }
-
-  def isTeamMember(user: Option[UserModel], application: Application): Boolean = {
-    user.flatMap(
-      _.email.map(application.hasTeamMember)
-    ).getOrElse(false)
   }
 
 }

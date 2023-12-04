@@ -53,7 +53,7 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
             val view = fixture.playApplication.injector.instanceOf[EnvironmentAndCredentialsView]
 
             status(result) mustEqual OK
-            contentAsString(result) mustBe view(FakeApplication, Some(user))(request, messages(fixture.playApplication)).toString
+            contentAsString(result) mustBe view(FakeApplication, user)(request, messages(fixture.playApplication)).toString
             contentAsString(result) must validateAsHtml
           }
       }
