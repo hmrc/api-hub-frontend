@@ -20,7 +20,7 @@ import controllers.actions.FakeUser
 import controllers.routes
 import models.api.ApiDetailLensesSpec.sampleOas
 import models.api.{ApiDetail, Endpoint, EndpointMethod}
-import models.{CheckMode, UserAnswers}
+import models.{AddAnApi, CheckMode, UserAnswers}
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -69,7 +69,8 @@ class AddAnApiSelectEndpointsSummarySpec extends AnyFreeSpec with Matchers with 
 
       val actual = AddAnApiSelectEndpointsSummary.row(
         userAnswers,
-        apiDetail
+        apiDetail,
+        AddAnApi
       )
 
       val endpoint1 = "<li><strong class='govuk-tag govuk-tag--blue'>GET</strong> /path1</li>"
@@ -82,7 +83,7 @@ class AddAnApiSelectEndpointsSummarySpec extends AnyFreeSpec with Matchers with 
         actions = Some(Actions(
           items = Seq(
             ActionItem(
-              href = routes.AddAnApiSelectEndpointsController.onPageLoad(CheckMode).url,
+              href = routes.AddAnApiSelectEndpointsController.onPageLoad(CheckMode, AddAnApi).url,
               content = Text("site.change"),
               visuallyHiddenText = Some("addAnApiSelectEndpoints.change.hidden")
             )
@@ -96,7 +97,8 @@ class AddAnApiSelectEndpointsSummarySpec extends AnyFreeSpec with Matchers with 
     "must return the correct summary list when the question has not been answered" in {
       val actual = AddAnApiSelectEndpointsSummary.row(
         UserAnswers(FakeUser.userId, Json.obj(), Instant.now()),
-        apiDetail
+        apiDetail,
+        AddAnApi
       )
 
       actual mustBe None

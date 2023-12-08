@@ -16,10 +16,10 @@
 
 package controllers
 
-import controllers.actions.{AddAnApiDataRetrievalAction, DataRequiredAction, IdentifierAction}
+import controllers.actions.{AddAnApiCheckContextActionProvider, AddAnApiDataRetrievalAction, DataRequiredAction, IdentifierAction}
 import controllers.helpers.ErrorResultBuilder
 import forms.AddAnApiSelectApplicationFormProvider
-import models.Mode
+import models.{AddAnApi, Mode}
 import models.api.ApiDetail
 import models.api.ApiDetailLenses.ApiDetailLensOps
 import models.application.Application
@@ -49,12 +49,13 @@ class AddAnApiSelectApplicationController @Inject()(
   apiHubService: ApiHubService,
   errorResultBuilder: ErrorResultBuilder,
   formProvider: AddAnApiSelectApplicationFormProvider,
-  view: AddAnApiSelectApplicationView
+  view: AddAnApiSelectApplicationView,
+  checkContext: AddAnApiCheckContextActionProvider
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport{
 
   private val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData andThen checkContext(AddAnApi)).async {
     implicit request =>
       val preparedForm = request.userAnswers.get(AddAnApiSelectApplicationPage) match {
         case None => form
@@ -64,7 +65,7 @@ class AddAnApiSelectApplicationController @Inject()(
       buildView(mode, preparedForm, Ok)
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData andThen checkContext(AddAnApi)).async {
     implicit request =>
       form.bindFromRequest().fold(
         formWithErrors =>

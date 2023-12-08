@@ -19,12 +19,12 @@ package controllers
 import base.SpecBase
 import controllers.actions.{FakeApplication, FakeUser}
 import models.api.{ApiDetail, Endpoint, EndpointMethod}
-import models.{ApiPolicyConditionsDeclaration, AvailableEndpoint, CheckMode, UserAnswers}
+import models.{AddAnApi, ApiPolicyConditionsDeclaration, AvailableEndpoint, CheckMode, UserAnswers}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import org.mockito.MockitoSugar.mock
-import pages.{AddAnApiApiIdPage, AddAnApiSelectApplicationPage, AddAnApiSelectEndpointsPage, ApiPolicyConditionsDeclarationPage}
+import pages.{AddAnApiApiIdPage, AddAnApiContextPage, AddAnApiSelectApplicationPage, AddAnApiSelectEndpointsPage, ApiPolicyConditionsDeclarationPage}
 import play.api.Application
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -45,6 +45,7 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation {
   private val acceptedPolicyConditions: Set[ApiPolicyConditionsDeclaration] = Set(ApiPolicyConditionsDeclaration.Accept)
   private val apiId = "test-api-id"
   private val fullUserAnswers = emptyUserAnswers
+    .set(AddAnApiContextPage, AddAnApi).toOption.value
     .set(AddAnApiApiIdPage, apiId).toOption.value
     .set(AddAnApiSelectApplicationPage, FakeApplication.id).toOption.value
     .set(AddAnApiSelectEndpointsPage, selectedScopes).toOption.value
@@ -75,7 +76,7 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation {
       when(fixture.addAnApiSessionRepository.clear(any())).thenReturn(Future.successful(true))
 
       running(fixture.application) {
-        val request = FakeRequest(POST, routes.AddAnApiCompleteController.addApi().url)
+        val request = FakeRequest(POST, routes.AddAnApiCompleteController.addApi(AddAnApi).url)
         val result = route(fixture.application, request).value
 
         status(result) mustBe SEE_OTHER
@@ -94,7 +95,7 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation {
       when(fixture.addAnApiSessionRepository.clear(any())).thenReturn(Future.successful(true))
 
       running(fixture.application) {
-        val request = FakeRequest(POST, routes.AddAnApiCompleteController.addApi().url)
+        val request = FakeRequest(POST, routes.AddAnApiCompleteController.addApi(AddAnApi).url)
         val result = route(fixture.application, request).value
 
         status(result) mustBe SEE_OTHER
@@ -112,7 +113,7 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation {
         .thenReturn(Future.successful(None))
 
       running(fixture.application) {
-        val request = FakeRequest(POST, routes.AddAnApiCompleteController.addApi().url)
+        val request = FakeRequest(POST, routes.AddAnApiCompleteController.addApi(AddAnApi).url)
         val result = route(fixture.application, request).value
         val view = fixture.application.injector.instanceOf[ErrorTemplate]
 
@@ -134,7 +135,7 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation {
       when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiId))(any())).thenReturn(Future.successful(None))
 
       running(fixture.application) {
-        val request = FakeRequest(POST, routes.AddAnApiCompleteController.addApi().url)
+        val request = FakeRequest(POST, routes.AddAnApiCompleteController.addApi(AddAnApi).url)
         val result = route(fixture.application, request).value
         val view = fixture.application.injector.instanceOf[ErrorTemplate]
 
@@ -157,7 +158,7 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation {
       when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiId))(any())).thenReturn(Future.successful(Some(apiDetail)))
 
       running(fixture.application) {
-        val request = FakeRequest(POST, routes.AddAnApiCompleteController.addApi().url)
+        val request = FakeRequest(POST, routes.AddAnApiCompleteController.addApi(AddAnApi).url)
         val result = route(fixture.application, request).value
 
         status(result) mustBe SEE_OTHER
@@ -172,7 +173,7 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation {
       when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiId))(any())).thenReturn(Future.successful(Some(apiDetail)))
 
       running(fixture.application) {
-        val request = FakeRequest(POST, routes.AddAnApiCompleteController.addApi().url)
+        val request = FakeRequest(POST, routes.AddAnApiCompleteController.addApi(AddAnApi).url)
         val result = route(fixture.application, request).value
 
         status(result) mustBe SEE_OTHER
@@ -187,11 +188,11 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation {
       when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiId))(any())).thenReturn(Future.successful(Some(apiDetail)))
 
       running(fixture.application) {
-        val request = FakeRequest(POST, routes.AddAnApiCompleteController.addApi().url)
+        val request = FakeRequest(POST, routes.AddAnApiCompleteController.addApi(AddAnApi).url)
         val result = route(fixture.application, request).value
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.AddAnApiSelectEndpointsController.onPageLoad(CheckMode).url)
+        redirectLocation(result) mustBe Some(routes.AddAnApiSelectEndpointsController.onPageLoad(CheckMode, AddAnApi).url)
       }
     }
 
@@ -202,11 +203,11 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation {
       when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiId))(any())).thenReturn(Future.successful(Some(apiDetail)))
 
       running(fixture.application) {
-        val request = FakeRequest(POST, routes.AddAnApiCompleteController.addApi().url)
+        val request = FakeRequest(POST, routes.AddAnApiCompleteController.addApi(AddAnApi).url)
         val result = route(fixture.application, request).value
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.ApiPolicyConditionsDeclarationPageController.onPageLoad(CheckMode).url)
+        redirectLocation(result) mustBe Some(routes.ApiPolicyConditionsDeclarationPageController.onPageLoad(CheckMode, AddAnApi).url)
       }
     }
 
@@ -214,7 +215,7 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation {
       val fixture = buildFixture(None)
 
       running(fixture.application) {
-        val request = FakeRequest(POST, routes.AddAnApiCompleteController.addApi().url)
+        val request = FakeRequest(POST, routes.AddAnApiCompleteController.addApi(AddAnApi).url)
         val result = route(fixture.application, request).value
 
         status(result) mustBe SEE_OTHER
@@ -231,7 +232,7 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation {
         .thenReturn(Future.failed(UpstreamErrorResponse.apply("test-message", BAD_GATEWAY)))
 
       running(fixture.application) {
-        val request = FakeRequest(POST, routes.AddAnApiCompleteController.addApi().url)
+        val request = FakeRequest(POST, routes.AddAnApiCompleteController.addApi(AddAnApi).url)
         val result = route(fixture.application, request).value
         val view = fixture.application.injector.instanceOf[ErrorTemplate]
 

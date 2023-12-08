@@ -18,9 +18,8 @@ package controllers
 
 import controllers.actions.IdentifierAction
 import controllers.helpers.ErrorResultBuilder
-import models.AddAnApiContext.{AddAnApi, AddEndpoints}
 import models.requests.IdentifierRequest
-import models.{AddAnApiContext, NormalMode, UserAnswers}
+import models.{AddAnApi, AddAnApiContext, AddEndpoints, NormalMode, UserAnswers}
 import navigation.Navigator
 import pages.{AddAnApiApiIdPage, AddAnApiContextPage, AddAnApiSelectApplicationPage}
 import play.api.i18n.{I18nSupport, Messages}

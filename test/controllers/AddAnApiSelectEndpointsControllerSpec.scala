@@ -21,13 +21,13 @@ import controllers.actions.FakeUser
 import forms.AddAnApiSelectEndpointsFormProvider
 import generators.ApiDetailGenerators
 import models.api.ApiDetail
-import models.{AvailableEndpoints, NormalMode, UserAnswers}
+import models.{AddAnApi, AvailableEndpoints, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{AddAnApiApiIdPage, AddAnApiSelectEndpointsPage}
+import pages.{AddAnApiApiIdPage, AddAnApiContextPage, AddAnApiSelectEndpointsPage}
 import play.api.Application
 import play.api.inject.bind
 import play.api.mvc.Call
@@ -45,7 +45,7 @@ class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar w
 
   private def nextPage = Call("GET", "/foo")
   private val clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
-  private lazy val addAnApiSelectEndpointsRoute = routes.AddAnApiSelectEndpointsController.onPageLoad(NormalMode).url
+  private lazy val addAnApiSelectEndpointsRoute = routes.AddAnApiSelectEndpointsController.onPageLoad(NormalMode, AddAnApi).url
 
   private val apiDetail = sampleApiDetail()
   private val formProvider = new AddAnApiSelectEndpointsFormProvider()
@@ -66,7 +66,7 @@ class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar w
 
         status(result) mustEqual OK
 
-        contentAsString(result) mustEqual view(form, NormalMode, Some(FakeUser), apiDetail)(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, AddAnApi, Some(FakeUser), apiDetail)(request, messages(fixture.application)).toString
         contentAsString(result) must validateAsHtml
       }
     }
@@ -87,7 +87,7 @@ class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar w
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual
-          view(form.fill(AvailableEndpoints(apiDetail).keySet), NormalMode, Some(FakeUser), apiDetail)(request, messages(fixture.application)).toString
+          view(form.fill(AvailableEndpoints(apiDetail).keySet), NormalMode, AddAnApi, Some(FakeUser), apiDetail)(request, messages(fixture.application)).toString
         contentAsString(result) must validateAsHtml
       }
     }
@@ -130,6 +130,7 @@ class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar w
         status(result) mustEqual SEE_OTHER
 
         val expected = UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
+          .set(AddAnApiContextPage, AddAnApi).toOption.value
           .set(AddAnApiApiIdPage, apiDetail.id).toOption.value
           .set(AddAnApiSelectEndpointsPage, Set(AvailableEndpoints(apiDetail).keySet.head)).toOption.value
 
@@ -155,7 +156,7 @@ class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar w
         val result = route(fixture.application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, Some(FakeUser), apiDetail)(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, AddAnApi, Some(FakeUser), apiDetail)(request, messages(fixture.application)).toString
         contentAsString(result) must validateAsHtml
       }
     }
@@ -214,6 +215,7 @@ class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar w
   private def buildUserAnswers(apiDetail: ApiDetail): UserAnswers = {
     UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
       .set(AddAnApiApiIdPage, apiDetail.id).toOption.value
+      .set(AddAnApiContextPage, AddAnApi).toOption.value
   }
 
 }

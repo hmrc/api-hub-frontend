@@ -19,7 +19,7 @@ package controllers
 import controllers.actions._
 import controllers.helpers.ErrorResultBuilder
 import forms.AddAnApiSelectEndpointsFormProvider
-import models.Mode
+import models.{AddAnApiContext, Mode}
 import navigation.Navigator
 import pages.{AddAnApiApiIdPage, AddAnApiSelectEndpointsPage}
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
@@ -43,10 +43,14 @@ class AddAnApiSelectEndpointsController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   view: AddAnApiSelectEndpointsView,
   apiHubService: ApiHubService,
-  errorResultBuilder: ErrorResultBuilder
+  errorResultBuilder: ErrorResultBuilder,
+  checkContext: AddAnApiCheckContextActionProvider
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onPageLoad(
+    mode: Mode,
+    context: AddAnApiContext
+  ): Action[AnyContent] = (identify andThen getData andThen requireData andThen checkContext(context)).async {
     implicit request =>
       request.userAnswers.get(AddAnApiApiIdPage) match {
         case Some(apiId) =>
@@ -59,14 +63,14 @@ class AddAnApiSelectEndpointsController @Inject()(
                 case Some(value) => form.fill(value)
               }
 
-              Future.successful(Ok(view(preparedForm, mode, Some(request.user), apiDetail)))
+              Future.successful(Ok(view(preparedForm, mode, context, Some(request.user), apiDetail)))
             case None => apiNotFound(apiId)
           }
         case _ => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
       }
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onSubmit(mode: Mode, context: AddAnApiContext): Action[AnyContent] = (identify andThen getData andThen requireData andThen checkContext(context)).async {
     implicit request =>
       request.userAnswers.get(AddAnApiApiIdPage) match {
         case Some(apiId) =>
@@ -76,7 +80,7 @@ class AddAnApiSelectEndpointsController @Inject()(
 
               form.bindFromRequest().fold(
                 formWithErrors =>
-                  Future.successful(BadRequest(view(formWithErrors, mode, Some(request.user), apiDetail))),
+                  Future.successful(BadRequest(view(formWithErrors, mode, context, Some(request.user), apiDetail))),
                 value =>
                   for {
                     updatedAnswers <- Future.fromTry(request.userAnswers.set(AddAnApiSelectEndpointsPage, value))

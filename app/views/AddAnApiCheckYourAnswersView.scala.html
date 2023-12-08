@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import models.AddAnApiContext
 @import models.user.UserModel
 
 @this(
@@ -23,7 +24,7 @@
     govukButton: GovukButton
 )
 
-@(summaryList: SummaryList, user: Some[UserModel])(implicit request: Request[_], messages: Messages)
+@(summaryList: SummaryList, user: Some[UserModel], context: AddAnApiContext)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("addAnApiCheckYourAnswers.title")), user = user, fullWidth = true) {
 
@@ -37,7 +38,7 @@
     <p class="govuk-body">@messages("addAnApiCheckYourAnswers.guidance.p1")</p>
     <p class="govuk-body">@messages("addAnApiCheckYourAnswers.guidance.p2")</p>
 
-    @formHelper(action = routes.AddAnApiCompleteController.addApi()) {
+    @formHelper(action = routes.AddAnApiCompleteController.addApi(context)) {
         @govukButton(
             ButtonViewModel(messages("site.continue")).withCssClass("govuk-!-margin-top-5")
         )

@@ -19,8 +19,7 @@ package controllers
 import base.SpecBase
 import controllers.actions.FakeUser
 import generators.ApiDetailGenerators
-import models.AddAnApiContext.AddAnApi
-import models.UserAnswers
+import models.{AddAnApi, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any

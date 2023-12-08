@@ -16,8 +16,8 @@
 
 package controllers
 
-import controllers.actions.{AddAnApiDataRetrievalAction, DataRequiredAction, IdentifierAction}
-import models.UserAnswers
+import controllers.actions.{AddAnApiCheckContextActionProvider, AddAnApiDataRetrievalAction, DataRequiredAction, IdentifierAction}
+import models.{AddAnApiContext, UserAnswers}
 import models.api.ApiDetail
 import models.application.Application
 import pages.{AddAnApiApiIdPage, AddAnApiSelectApplicationPage}
@@ -40,20 +40,21 @@ class AddAnApiCheckYourAnswersController @Inject()(
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: AddAnApiCheckYourAnswersView,
-  apiHubService: ApiHubService
+  apiHubService: ApiHubService,
+  checkContext: AddAnApiCheckContextActionProvider
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onPageLoad(context: AddAnApiContext): Action[AnyContent] = (identify andThen getData andThen requireData andThen checkContext(context)).async {
     implicit request =>
       (for {
         application <- fetchApplication(request.userAnswers)
         applicationSummary <- buildApplicationSummary(application)
         apiDetail <- fetchApiDetail(request.userAnswers)
         apiDetailSummary <- buildApiDetailSummary(apiDetail)
-        endpointsSummary <- buildEndpointsSummary(request.userAnswers, apiDetail)
+        endpointsSummary <- buildEndpointsSummary(request.userAnswers, apiDetail, context)
       } yield SummaryListViewModel(
         rows = Seq(applicationSummary, apiDetailSummary, endpointsSummary).flatten
-      )).map(summaryList => Ok(view(summaryList, Some(request.user))))
+      )).map(summaryList => Ok(view(summaryList, Some(request.user), context)))
   }
 
   private def fetchApplication(userAnswers: UserAnswers)(implicit request: Request[_]): Future[Option[Application]] = {
@@ -78,9 +79,13 @@ class AddAnApiCheckYourAnswersController @Inject()(
     Future.successful(AddAnApiApiIdSummary.row(apiDetail))
   }
 
-  private def buildEndpointsSummary(userAnswers: UserAnswers, apiDetail: Option[ApiDetail])(implicit request: Request[_]): Future[Option[SummaryListRow]] = {
+  private def buildEndpointsSummary(
+    userAnswers: UserAnswers,
+    apiDetail: Option[ApiDetail],
+    context: AddAnApiContext
+  )(implicit request: Request[_]): Future[Option[SummaryListRow]] = {
     Future.successful(
-      apiDetail.flatMap(AddAnApiSelectEndpointsSummary.row(userAnswers, _))
+      apiDetail.flatMap(AddAnApiSelectEndpointsSummary.row(userAnswers, _, context))
     )
   }
 
