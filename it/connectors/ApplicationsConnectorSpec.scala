@@ -8,6 +8,7 @@ import models.UserEmail
 import models.accessrequest.{AccessRequest, AccessRequestApi, AccessRequestDecisionRequest, AccessRequestEndpoint, AccessRequestRequest, AccessRequestStatus, Rejected}
 import models.application._
 import models.exception.ApplicationCredentialLimitException
+import models.requests.{AddApiRequest, AddApiRequestEndpoint}
 import models.user.{LdapUser, UserModel}
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AsyncFreeSpec
@@ -690,6 +691,47 @@ class ApplicationsConnectorSpec
       )
 
       buildConnector(this).rejectAccessRequest(id, decidedBy, rejectedReason)(HeaderCarrier()).map(
+        result =>
+          result mustBe None
+      )
+    }
+  }
+
+  "ApplicationsConnector.addApi" - {
+    "must place the correct request" in {
+      val applicationId = "test-id"
+      val newApi = AddApiRequest("test-api-id", Seq(AddApiRequestEndpoint("GET", "test-path")), Seq("test-scope"))
+
+      stubFor(
+        put(urlEqualTo(s"/api-hub-applications/applications/$applicationId/apis"))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .withHeader(CONTENT_TYPE, equalTo(ContentTypes.JSON))
+          .withRequestBody(equalToJson(Json.toJson(newApi).toString()))
+          .willReturn(
+            aResponse()
+              .withStatus(NO_CONTENT)
+          )
+      )
+
+      buildConnector(this).addApi(applicationId, newApi)(HeaderCarrier()).map(
+        result =>
+          result mustBe Some(())
+      )
+    }
+
+    "must return None when the application cannot be found" in {
+      val applicationId = "test-id"
+      val newApi = AddApiRequest("test-api-id", Seq(AddApiRequestEndpoint("GET", "test-path")), Seq("test-scope"))
+
+      stubFor(
+        put(urlEqualTo(s"/api-hub-applications/applications/$applicationId/apis"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+          )
+      )
+
+      buildConnector(this).addApi(applicationId, newApi)(HeaderCarrier()).map(
         result =>
           result mustBe None
       )

@@ -18,6 +18,7 @@ package navigation
 
 import base.SpecBase
 import controllers.routes
+import models.AddAnApiContext.AddAnApi
 import pages._
 import models._
 import org.scalatest.TryValues
@@ -71,7 +72,7 @@ class NavigatorSpec extends SpecBase with TryValues {
       }
 
       "must go from the Add An API API Id (start) page to the Select Application page" in {
-        navigator.nextPage(AddAnApiApiIdPage, NormalMode, UserAnswers("id")) mustBe routes.AddAnApiSelectApplicationController.onPageLoad(NormalMode)
+        navigator.nextPage(AddAnApiApiIdPage, NormalMode, UserAnswers("id").set(AddAnApiContextPage, AddAnApi).toOption.value) mustBe routes.AddAnApiSelectApplicationController.onPageLoad(NormalMode)
       }
 
       "must go from the Add An API Select Application page to the Select Endpoints page" in {

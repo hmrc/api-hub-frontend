@@ -17,9 +17,9 @@
 package navigation
 
 import javax.inject.{Inject, Singleton}
-
 import play.api.mvc.Call
 import controllers.routes
+import models.AddAnApiContext.{AddAnApi, AddEndpoints}
 import pages._
 import models._
 
@@ -31,7 +31,7 @@ class Navigator @Inject()() {
     case QuestionAddTeamMembersPage => questionAddTeamMembersNextPage(NormalMode)
     case TeamMembersPage => _ => routes.ConfirmAddTeamMemberController.onPageLoad(NormalMode)
     case ConfirmAddTeamMemberPage => confirmAddTeamMemberNextPage(NormalMode)
-    case AddAnApiApiIdPage => _ => routes.AddAnApiSelectApplicationController.onPageLoad(NormalMode)
+    case AddAnApiApiIdPage => addAnApiApiIdNextPage
     case AddAnApiSelectApplicationPage => _ => routes.AddAnApiSelectEndpointsController.onPageLoad(NormalMode)
     case AddAnApiSelectEndpointsPage => _ => routes.ApiPolicyConditionsDeclarationPageController.onPageLoad(NormalMode)
     case ApiPolicyConditionsDeclarationPage => _ => routes.AddAnApiCheckYourAnswersController.onPageLoad()
@@ -74,4 +74,13 @@ class Navigator @Inject()() {
       case _ => routes.CheckYourAnswersController.onPageLoad()
     }
   }
+
+  private def addAnApiApiIdNextPage(userAnswers: UserAnswers): Call = {
+    userAnswers.get(AddAnApiContextPage) match {
+      case Some(AddAnApi) => routes.AddAnApiSelectApplicationController.onPageLoad(NormalMode)
+      case Some(AddEndpoints) => routes.AddAnApiSelectEndpointsController.onPageLoad(NormalMode)
+      case _ => routes.JourneyRecoveryController.onPageLoad()
+    }
+  }
+
 }

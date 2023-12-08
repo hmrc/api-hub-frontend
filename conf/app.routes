@@ -74,7 +74,8 @@ GET         /test-connectivity                                                 c
 
 GET         /apis/details/:id                                                  controllers.ApiDetailsController.onPageLoad(id: String)
 
-GET         /apis/add-an-api/start/:id                                         controllers.AddAnApiStartController.onPageLoad(id: String)
+GET         /apis/add-an-api/start/:id                                         controllers.AddAnApiStartController.addAnApi(id: String)
+GET         /apis/add-an-api/start/:applicationId/:apiId                       controllers.AddAnApiStartController.addEndpoints(applicationId: String, apiId: String)
 
 GET         /apis/add-an-api/select-application                                controllers.AddAnApiSelectApplicationController.onPageLoad(mode: Mode = NormalMode)
 POST        /apis/add-an-api/select-application                                controllers.AddAnApiSelectApplicationController.onSubmit(mode: Mode = NormalMode)

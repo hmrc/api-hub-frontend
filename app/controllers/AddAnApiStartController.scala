@@ -18,9 +18,11 @@ package controllers
 
 import controllers.actions.IdentifierAction
 import controllers.helpers.ErrorResultBuilder
-import models.{NormalMode, UserAnswers}
+import models.AddAnApiContext.{AddAnApi, AddEndpoints}
+import models.requests.IdentifierRequest
+import models.{AddAnApiContext, NormalMode, UserAnswers}
 import navigation.Navigator
-import pages.AddAnApiApiIdPage
+import pages.{AddAnApiApiIdPage, AddAnApiContextPage, AddAnApiSelectApplicationPage}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.AddAnApiSessionRepository
@@ -30,6 +32,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import java.time.Clock
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 class AddAnApiStartController @Inject()(
   override val controllerComponents: MessagesControllerComponents,
@@ -41,26 +44,44 @@ class AddAnApiStartController @Inject()(
   errorResultBuilder: ErrorResultBuilder
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(id: String): Action[AnyContent] = identify.async {
+  def addAnApi(apiId: String): Action[AnyContent] = identify.async {
     implicit request =>
-      apiHubService.getApiDetail(id).flatMap {
-        case Some(_) =>
-          for {
-            userAnswers <- Future.fromTry(
-                            UserAnswers(
-                              id = request.user.userId,
-                              lastUpdated = clock.instant()
-                            ).set(AddAnApiApiIdPage, id))
-            _           <- addAnApiSessionRepository.set(userAnswers)
-          } yield Redirect(navigator.nextPage(AddAnApiApiIdPage, NormalMode, userAnswers))
-        case None =>
-          Future.successful(
-            errorResultBuilder.notFound(
-              Messages("site.apiNotFound.heading"),
-              Messages("site.apiNotFound.message", id)
-            )
+      startJourney(apiId, commonUserAnswers(apiId, AddAnApi))
+  }
+
+  def addEndpoints(applicationId: String, apiId: String): Action[AnyContent] = identify.async {
+    implicit request =>
+      startJourney(
+        apiId,
+        commonUserAnswers(apiId, AddEndpoints)
+          .flatMap(_.set(AddAnApiSelectApplicationPage, applicationId))
+      )
+  }
+
+  private def commonUserAnswers(apiId: String, context: AddAnApiContext)(implicit request: IdentifierRequest[_]): Try[UserAnswers] = {
+    UserAnswers(
+      id = request.user.userId,
+      lastUpdated = clock.instant()
+    )
+      .set(AddAnApiApiIdPage, apiId)
+      .flatMap(_.set(AddAnApiContextPage, context))
+  }
+
+  private def startJourney(id: String, userAnswers: Try[UserAnswers])(implicit request: IdentifierRequest[_]) = {
+    apiHubService.getApiDetail(id).flatMap {
+      case Some(_) =>
+        for {
+          userAnswers <- Future.fromTry(userAnswers)
+          _           <- addAnApiSessionRepository.set(userAnswers)
+        } yield Redirect(navigator.nextPage(AddAnApiApiIdPage, NormalMode, userAnswers))
+      case None =>
+        Future.successful(
+          errorResultBuilder.notFound(
+            Messages("site.apiNotFound.heading"),
+            Messages("site.apiNotFound.message", id)
           )
-      }
+        )
+    }
   }
 
 }

@@ -126,7 +126,7 @@ class ApplicationsConnector @Inject()(
 
   def addApi(applicationId: String, addApiRequest: AddApiRequest)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
     httpClient
-      .post(url"$applicationsBaseUrl/api-hub-applications/applications/$applicationId/apis")
+      .put(url"$applicationsBaseUrl/api-hub-applications/applications/$applicationId/apis")
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .withBody(Json.toJson(addApiRequest))
       .execute[Either[UpstreamErrorResponse, Unit]]
@@ -136,6 +136,7 @@ class ApplicationsConnector @Inject()(
         case Left(e) => Future.failed(e)
       }
   }
+
   def pendingPrimaryScopes()(implicit hc: HeaderCarrier): Future[Seq[Application]] = {
     httpClient
       .get(url"$applicationsBaseUrl/api-hub-applications/applications/pending-primary-scopes")
