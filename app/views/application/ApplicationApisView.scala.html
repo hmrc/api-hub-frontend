@@ -232,6 +232,15 @@
                         )
 
                         <div class="govuk-button-group">
+                            @if(!applicationApi.hasPendingAccessRequest) {
+                                @govukButton(
+                                    Button(
+                                        href = Some(routes.AddAnApiStartController.addEndpoints(application.id, applicationApi.apiDetail.id).url),
+                                        content = Text(messages("applicationApis.addEndpoints")),
+                                        classes = "govuk-button--secondary"
+                                    )
+                                )
+                            }
                             <a class="govuk-link govuk-link--no-visited-state" href="@routes.ApiDetailsController.onPageLoad(applicationApi.apiDetail.id)">
                                 @messages("applicationApis.apis.viewSpecification")
                             </a>

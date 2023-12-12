@@ -17,7 +17,7 @@ lazy val root = (project in file("."))
     scalaVersion := "2.13.8",
     name := appName,
     RoutesKeys.routesImport ++= Seq(
-      "models.{CheckMode, Mode, NormalMode}",
+      "models.{CheckMode, Mode, NormalMode, AddAnApiContext, AddAnApi, AddEndpoints}",
       "uk.gov.hmrc.play.bootstrap.binders.RedirectUrl"
     ),
     TwirlKeys.templateImports ++= Seq(

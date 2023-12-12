@@ -18,14 +18,14 @@ package controllers
 
 import base.SpecBase
 import controllers.actions.{FakeApplication, FakeUser}
-import models.UserAnswers
+import models.{AddAnApi, UserAnswers}
 import models.api.ApiDetailLensesSpec.sampleOas
 import models.api.{ApiDetail, Endpoint, EndpointMethod}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.mockito.MockitoSugar.mock
-import pages.{AddAnApiApiIdPage, AddAnApiSelectApplicationPage, AddAnApiSelectEndpointsPage}
+import pages.{AddAnApiApiIdPage, AddAnApiContextPage, AddAnApiSelectApplicationPage, AddAnApiSelectEndpointsPage}
 import play.api.Application
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -45,15 +45,17 @@ class AddAnApiCheckYourAnswersControllerSpec extends SpecBase with SummaryListFl
 
   "AddAnApiCheckYourAnswersController" - {
     "must return OK and the correct view for a GET with empty user answers" in {
-      val fixture = buildFixture(Some(emptyUserAnswers))
+      val userAnswers = emptyUserAnswers
+        .set(AddAnApiContextPage, AddAnApi).toOption.value
+      val fixture = buildFixture(Some(userAnswers))
 
       running(fixture.application) {
-        val request = FakeRequest(GET, routes.AddAnApiCheckYourAnswersController.onPageLoad().url)
+        val request = FakeRequest(GET, routes.AddAnApiCheckYourAnswersController.onPageLoad(AddAnApi).url)
         val result = route(fixture.application, request).value
         val view = fixture.application.injector.instanceOf[AddAnApiCheckYourAnswersView]
 
         status(result) mustBe OK
-        contentAsString(result) mustBe view(SummaryListViewModel(Seq.empty), Some(FakeUser))(request, messages(fixture.application)).toString()
+        contentAsString(result) mustBe view(SummaryListViewModel(Seq.empty), Some(FakeUser), AddAnApi)(request, messages(fixture.application)).toString()
         contentAsString(result) must validateAsHtml
       }
     }
@@ -77,6 +79,7 @@ class AddAnApiCheckYourAnswersControllerSpec extends SpecBase with SummaryListFl
       )
 
       val userAnswers = emptyUserAnswers
+        .set(AddAnApiContextPage, AddAnApi).toOption.value
         .set(AddAnApiApiIdPage, apiDetail.id).toOption.value
         .set(AddAnApiSelectApplicationPage, FakeApplication.id).toOption.value
         .set(AddAnApiSelectEndpointsPage, Set(Set("test-scope-1"))).toOption.value
@@ -90,7 +93,7 @@ class AddAnApiCheckYourAnswersControllerSpec extends SpecBase with SummaryListFl
         .thenReturn(Future.successful(Some(apiDetail)))
 
       running(fixture.application) {
-        val request = FakeRequest(GET, routes.AddAnApiCheckYourAnswersController.onPageLoad().url)
+        val request = FakeRequest(GET, routes.AddAnApiCheckYourAnswersController.onPageLoad(AddAnApi).url)
         val result = route(fixture.application, request).value
         val view = fixture.application.injector.instanceOf[AddAnApiCheckYourAnswersView]
 
@@ -98,12 +101,12 @@ class AddAnApiCheckYourAnswersControllerSpec extends SpecBase with SummaryListFl
           Seq(
             AddAnApiSelectApplicationSummary.row(Some(FakeApplication))(messages(fixture.application)).value,
             AddAnApiApiIdSummary.row(Some(apiDetail))(messages(fixture.application)).value,
-            AddAnApiSelectEndpointsSummary.row(userAnswers, apiDetail)(messages(fixture.application)).value
+            AddAnApiSelectEndpointsSummary.row(userAnswers, apiDetail, AddAnApi)(messages(fixture.application)).value
           )
         )
 
         status(result) mustBe OK
-        contentAsString(result) mustBe view(summaryList, Some(FakeUser))(request, messages(fixture.application)).toString()
+        contentAsString(result) mustBe view(summaryList, Some(FakeUser), AddAnApi)(request, messages(fixture.application)).toString()
         contentAsString(result) must validateAsHtml
       }
     }
@@ -112,7 +115,7 @@ class AddAnApiCheckYourAnswersControllerSpec extends SpecBase with SummaryListFl
       val fixture = buildFixture(None)
 
       running(fixture.application) {
-        val request = FakeRequest(GET, routes.AddAnApiCheckYourAnswersController.onPageLoad().url)
+        val request = FakeRequest(GET, routes.AddAnApiCheckYourAnswersController.onPageLoad(AddAnApi).url)
         val result = route(fixture.application, request).value
 
         status(result) mustEqual SEE_OTHER

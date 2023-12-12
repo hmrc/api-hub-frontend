@@ -74,7 +74,8 @@ GET         /test-connectivity                                                 c
 
 GET         /apis/details/:id                                                  controllers.ApiDetailsController.onPageLoad(id: String)
 
-GET         /apis/add-an-api/start/:id                                         controllers.AddAnApiStartController.onPageLoad(id: String)
+GET         /apis/add-an-api/start/:id                                         controllers.AddAnApiStartController.addAnApi(id: String)
+GET         /apis/add-endpoints/start/:applicationId/:apiId                    controllers.AddAnApiStartController.addEndpoints(applicationId: String, apiId: String)
 
 GET         /apis/add-an-api/select-application                                controllers.AddAnApiSelectApplicationController.onPageLoad(mode: Mode = NormalMode)
 POST        /apis/add-an-api/select-application                                controllers.AddAnApiSelectApplicationController.onSubmit(mode: Mode = NormalMode)
@@ -84,22 +85,33 @@ POST        /apis/add-an-api/change-select-application                         c
 GET         /apis                                                              controllers.HipApisController.onPageLoad()
 POST        /apis                                                              controllers.HipApisController.onSubmit()
 
-GET         /apis/add-an-api/review-policy                                      controllers.ApiPolicyConditionsDeclarationPageController.onPageLoad(mode: Mode = NormalMode)
-POST        /apis/add-an-api/review-policy                                      controllers.ApiPolicyConditionsDeclarationPageController.onSubmit(mode: Mode = NormalMode)
-GET         /apis/add-an-api/change-review-policy                               controllers.ApiPolicyConditionsDeclarationPageController.onPageLoad(mode: Mode = CheckMode)
-POST        /apis/add-an-api/change-review-policy                               controllers.ApiPolicyConditionsDeclarationPageController.onSubmit(mode: Mode = CheckMode)
+GET         /apis/add-an-api/review-policy                                     controllers.ApiPolicyConditionsDeclarationPageController.onPageLoad(mode: Mode = NormalMode, context: AddAnApiContext = AddAnApi)
+POST        /apis/add-an-api/review-policy                                     controllers.ApiPolicyConditionsDeclarationPageController.onSubmit(mode: Mode = NormalMode, context: AddAnApiContext = AddAnApi)
+GET         /apis/add-an-api/change-review-policy                              controllers.ApiPolicyConditionsDeclarationPageController.onPageLoad(mode: Mode = CheckMode, context: AddAnApiContext = AddAnApi)
+POST        /apis/add-an-api/change-review-policy                              controllers.ApiPolicyConditionsDeclarationPageController.onSubmit(mode: Mode = CheckMode, context: AddAnApiContext = AddAnApi)
 
-GET         /apis/add-an-api/select-endpoints                                  controllers.AddAnApiSelectEndpointsController.onPageLoad(mode: Mode = NormalMode)
-POST        /apis/add-an-api/select-endpoints                                  controllers.AddAnApiSelectEndpointsController.onSubmit(mode: Mode = NormalMode)
-GET         /apis/add-an-api/change-select-endpoints                           controllers.AddAnApiSelectEndpointsController.onPageLoad(mode: Mode = CheckMode)
-POST        /apis/add-an-api/change-select-endpoints                           controllers.AddAnApiSelectEndpointsController.onSubmit(mode: Mode = CheckMode)
+GET         /apis/add-endpoints/review-policy                                  controllers.ApiPolicyConditionsDeclarationPageController.onPageLoad(mode: Mode = NormalMode, context: AddAnApiContext = AddEndpoints)
+POST        /apis/add-endpoints/review-policy                                  controllers.ApiPolicyConditionsDeclarationPageController.onSubmit(mode: Mode = NormalMode, context: AddAnApiContext = AddEndpoints)
+GET         /apis/add-endpoints/change-review-policy                           controllers.ApiPolicyConditionsDeclarationPageController.onPageLoad(mode: Mode = CheckMode, context: AddAnApiContext = AddEndpoints)
+POST        /apis/add-endpoints/change-review-policy                           controllers.ApiPolicyConditionsDeclarationPageController.onSubmit(mode: Mode = CheckMode, context: AddAnApiContext = AddEndpoints)
+
+GET         /apis/add-an-api/select-endpoints                                  controllers.AddAnApiSelectEndpointsController.onPageLoad(mode: Mode = NormalMode, context: AddAnApiContext = AddAnApi)
+POST        /apis/add-an-api/select-endpoints                                  controllers.AddAnApiSelectEndpointsController.onSubmit(mode: Mode = NormalMode, context: AddAnApiContext = AddAnApi)
+GET         /apis/add-an-api/change-select-endpoints                           controllers.AddAnApiSelectEndpointsController.onPageLoad(mode: Mode = CheckMode, context: AddAnApiContext = AddAnApi)
+POST        /apis/add-an-api/change-select-endpoints                           controllers.AddAnApiSelectEndpointsController.onSubmit(mode: Mode = CheckMode, context: AddAnApiContext = AddAnApi)
+
+GET         /apis/add-endpoints/select-endpoints                               controllers.AddAnApiSelectEndpointsController.onPageLoad(mode: Mode = NormalMode, context: AddAnApiContext = AddEndpoints)
+POST        /apis/add-endpoints/select-endpoints                               controllers.AddAnApiSelectEndpointsController.onSubmit(mode: Mode = NormalMode, context: AddAnApiContext = AddEndpoints)
+GET         /apis/add-endpoints/change-select-endpoints                        controllers.AddAnApiSelectEndpointsController.onPageLoad(mode: Mode = CheckMode, context: AddAnApiContext = AddEndpoints)
+POST        /apis/add-endpoints/change-select-endpoints                        controllers.AddAnApiSelectEndpointsController.onSubmit(mode: Mode = CheckMode, context: AddAnApiContext = AddEndpoints)
 
 GET         /apis/add-an-api/success/:applicationId/:apiId                      controllers.AddAnApiSuccessController.onPageLoad(applicationId: String, apiId: String)
 
-GET         /apis/add-an-api/check-your-answers                                 controllers.AddAnApiCheckYourAnswersController.onPageLoad()
+GET         /apis/add-an-api/check-your-answers                                 controllers.AddAnApiCheckYourAnswersController.onPageLoad(context: AddAnApiContext = AddAnApi)
+GET         /apis/add-endpoints/check-your-answers                              controllers.AddAnApiCheckYourAnswersController.onPageLoad(context: AddAnApiContext = AddEndpoints)
 
-POST        /apis/add-an-api/add-api                                            controllers.AddAnApiCompleteController.addApi()
+POST        /apis/add-an-api/add-api                                            controllers.AddAnApiCompleteController.addApi(context: AddAnApiContext = AddAnApi)
+POST        /apis/add-endpoints/add-endpoints                                   controllers.AddAnApiCompleteController.addApi(context: AddAnApiContext = AddEndpoints)
 
 GET         /apis/view-specification/:apiId                                     controllers.OasRedocController.onPageLoad(apiId: String)
 GET         /apis/oas/:apiId                                                    controllers.OasRedocController.getOas(apiId: String)
-

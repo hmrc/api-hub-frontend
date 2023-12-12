@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import models.AvailableEndpoint
+@import models.{AvailableEndpoint, AddAnApiContext}
 @import models.api.ApiDetail
 @import models.user.UserModel
 
@@ -25,7 +25,7 @@
     govukButton: GovukButton
 )
 
-@(form: Form[Set[Set[String]]], mode: Mode, user: Option[UserModel], apiDetail: ApiDetail)(implicit request: Request[_], messages: Messages)
+@(form: Form[Set[Set[String]]], mode: Mode, context: AddAnApiContext, user: Option[UserModel], apiDetail: ApiDetail)(implicit request: Request[_], messages: Messages)
 
 @checked(value: Set[String]) = {
     @if(form.value.getOrElse(Set.empty).contains(value)) {
@@ -35,7 +35,7 @@
 
 @layout(pageTitle = title(form, messages("addAnApiSelectEndpoints.title")), user = user) {
 
-    @formHelper(action = routes.AddAnApiSelectEndpointsController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = routes.AddAnApiSelectEndpointsController.onSubmit(mode, context), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))

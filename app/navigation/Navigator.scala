@@ -17,9 +17,9 @@
 package navigation
 
 import javax.inject.{Inject, Singleton}
-
 import play.api.mvc.Call
 import controllers.routes
+import models.AddEndpoints
 import pages._
 import models._
 
@@ -31,10 +31,10 @@ class Navigator @Inject()() {
     case QuestionAddTeamMembersPage => questionAddTeamMembersNextPage(NormalMode)
     case TeamMembersPage => _ => routes.ConfirmAddTeamMemberController.onPageLoad(NormalMode)
     case ConfirmAddTeamMemberPage => confirmAddTeamMemberNextPage(NormalMode)
-    case AddAnApiApiIdPage => _ => routes.AddAnApiSelectApplicationController.onPageLoad(NormalMode)
-    case AddAnApiSelectApplicationPage => _ => routes.AddAnApiSelectEndpointsController.onPageLoad(NormalMode)
-    case AddAnApiSelectEndpointsPage => _ => routes.ApiPolicyConditionsDeclarationPageController.onPageLoad(NormalMode)
-    case ApiPolicyConditionsDeclarationPage => _ => routes.AddAnApiCheckYourAnswersController.onPageLoad()
+    case AddAnApiApiIdPage => addAnApiApiIdNextPage
+    case AddAnApiSelectApplicationPage => addAnApiSelectApplicationNextPage(NormalMode)
+    case AddAnApiSelectEndpointsPage => addAnApiSelectEndpointsNextPage(NormalMode)
+    case ApiPolicyConditionsDeclarationPage => apiPolicyConditionsDeclarationNextPage(NormalMode)
     case _ => _ => routes.IndexController.onPageLoad
   }
 
@@ -42,9 +42,9 @@ class Navigator @Inject()() {
     case QuestionAddTeamMembersPage => questionAddTeamMembersNextPage(CheckMode)
     case ConfirmAddTeamMemberPage => confirmAddTeamMemberNextPage(CheckMode)
     case TeamMembersPage => _ => routes.ConfirmAddTeamMemberController.onPageLoad(CheckMode)
-    case AddAnApiSelectApplicationPage => _ => routes.AddAnApiCheckYourAnswersController.onPageLoad()
-    case AddAnApiSelectEndpointsPage => _ => routes.AddAnApiCheckYourAnswersController.onPageLoad()
-    case ApiPolicyConditionsDeclarationPage => _ => routes.AddAnApiCheckYourAnswersController.onPageLoad()
+    case AddAnApiSelectApplicationPage => addAnApiSelectApplicationNextPage(CheckMode)
+    case AddAnApiSelectEndpointsPage => addAnApiSelectEndpointsNextPage(CheckMode)
+    case ApiPolicyConditionsDeclarationPage => apiPolicyConditionsDeclarationNextPage(CheckMode)
     case _ => _ => routes.CheckYourAnswersController.onPageLoad()
   }
 
@@ -74,4 +74,36 @@ class Navigator @Inject()() {
       case _ => routes.CheckYourAnswersController.onPageLoad()
     }
   }
+
+  private def addAnApiApiIdNextPage(userAnswers: UserAnswers): Call = {
+    userAnswers.get(AddAnApiContextPage) match {
+      case Some(AddAnApi) => routes.AddAnApiSelectApplicationController.onPageLoad(NormalMode)
+      case Some(AddEndpoints) => routes.AddAnApiSelectEndpointsController.onPageLoad(NormalMode, AddEndpoints)
+      case _ => routes.JourneyRecoveryController.onPageLoad()
+    }
+  }
+
+  private def addAnApiSelectApplicationNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
+    (mode, userAnswers.get(AddAnApiContextPage)) match {
+      case (NormalMode, Some(AddAnApi)) => routes.AddAnApiSelectEndpointsController.onPageLoad(NormalMode, AddAnApi)
+      case (CheckMode, Some(AddAnApi)) => routes.AddAnApiCheckYourAnswersController.onPageLoad(AddAnApi)
+      case _ => routes.JourneyRecoveryController.onPageLoad()
+    }
+  }
+
+  private def addAnApiSelectEndpointsNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
+    (mode, userAnswers.get(AddAnApiContextPage)) match {
+      case (NormalMode, Some(context)) => routes.ApiPolicyConditionsDeclarationPageController.onPageLoad(NormalMode, context)
+      case (CheckMode, Some(context)) => routes.AddAnApiCheckYourAnswersController.onPageLoad(context)
+      case _ => routes.JourneyRecoveryController.onPageLoad()
+    }
+  }
+
+  private def apiPolicyConditionsDeclarationNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
+    (mode, userAnswers.get(AddAnApiContextPage)) match {
+      case (_, Some(context)) => routes.AddAnApiCheckYourAnswersController.onPageLoad(context)
+      case _ => routes.JourneyRecoveryController.onPageLoad()
+    }
+  }
+
 }

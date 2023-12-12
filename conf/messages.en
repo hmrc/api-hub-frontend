@@ -144,6 +144,7 @@ applicationApis.apis.viewSpecification = View specification
 applicationApis.requestProductionAccess = Request production access
 applicationApis.pending.heading = Production request for APIs is pending approval
 applicationApis.pending.message = When a decision is made for your production request for APIs you will be notified via email.
+applicationApis.addEndpoints = Add endpoints
 
 environmentAndCredentials.title = Environments and Credentials
 environmentAndCredentials.heading = Environments and credentials

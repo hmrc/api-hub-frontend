@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers
 
 import controllers.routes
-import models.{CheckMode, UserAnswers}
+import models.{AddAnApi, CheckMode, UserAnswers}
 import pages.ApiPolicyConditionsDeclarationPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -45,7 +45,7 @@ object ApiPolicyConditionsDeclarationPageSummary  {
           key     = "apiPolicyConditionsDeclarationPage.checkYourAnswersLabel",
           value   = value,
           actions = Seq(
-            ActionItemViewModel("site.change", routes.ApiPolicyConditionsDeclarationPageController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", routes.ApiPolicyConditionsDeclarationPageController.onPageLoad(CheckMode, AddAnApi).url)
               .withVisuallyHiddenText(messages("apiPolicyConditionsDeclarationPage.change.hidden"))
           )
         )

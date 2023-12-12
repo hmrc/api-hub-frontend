@@ -21,13 +21,13 @@ import controllers.actions.{FakeApplication, FakeUser}
 import forms.ApiPolicyConditionsDeclarationPageFormProvider
 import generators.ApiDetailGenerators
 import models.api.ApiDetail
-import models.{ApiPolicyConditionsDeclaration, Mode, NormalMode, UserAnswers}
+import models.{AddAnApi, ApiPolicyConditionsDeclaration, Mode, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.{ArgumentCaptor, ArgumentMatchers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{AddAnApiApiIdPage, AddAnApiSelectApplicationPage, ApiPolicyConditionsDeclarationPage}
+import pages.{AddAnApiApiIdPage, AddAnApiContextPage, AddAnApiSelectApplicationPage, ApiPolicyConditionsDeclarationPage}
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.mvc.Request
@@ -58,7 +58,7 @@ class ApiPolicyConditionsDeclarationPageControllerSpec extends SpecBase with Moc
         .thenReturn(Future.successful(Some(apiDetail)))
 
       running(fixture.application) {
-        val request = FakeRequest(GET, routes.ApiPolicyConditionsDeclarationPageController.onPageLoad(NormalMode).url)
+        val request = FakeRequest(GET, routes.ApiPolicyConditionsDeclarationPageController.onPageLoad(NormalMode, AddAnApi).url)
         val result = route(fixture.application, request).value
         val view = buildView(fixture.application, request, form, NormalMode, apiDetail)
 
@@ -78,7 +78,7 @@ class ApiPolicyConditionsDeclarationPageControllerSpec extends SpecBase with Moc
         .thenReturn(Future.successful(Some(apiDetail)))
 
       running(fixture.application) {
-        val request = FakeRequest(GET, routes.ApiPolicyConditionsDeclarationPageController.onPageLoad(NormalMode).url)
+        val request = FakeRequest(GET, routes.ApiPolicyConditionsDeclarationPageController.onPageLoad(NormalMode, AddAnApi).url)
         val result = route(fixture.application, request).value
         val view = buildView(fixture.application, request, form, NormalMode, apiDetail)
 
@@ -98,7 +98,7 @@ class ApiPolicyConditionsDeclarationPageControllerSpec extends SpecBase with Moc
       when(fixture.addAnApiSessionRepository.set(any())).thenReturn(Future.successful(true))
 
       running(fixture.application) {
-        val request = FakeRequest(POST, routes.ApiPolicyConditionsDeclarationPageController.onSubmit(NormalMode).url)
+        val request = FakeRequest(POST, routes.ApiPolicyConditionsDeclarationPageController.onSubmit(NormalMode, AddAnApi).url)
           .withFormUrlEncodedBody(("value[0]", "accept"))
         val result = route(fixture.application, request).value
 
@@ -112,7 +112,7 @@ class ApiPolicyConditionsDeclarationPageControllerSpec extends SpecBase with Moc
       val fixture = buildFixture(None)
 
       running(fixture.application) {
-        val request = FakeRequest(GET, routes.ApiPolicyConditionsDeclarationPageController.onPageLoad(NormalMode).url)
+        val request = FakeRequest(GET, routes.ApiPolicyConditionsDeclarationPageController.onPageLoad(NormalMode, AddAnApi).url)
         val result = route(fixture.application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -124,7 +124,7 @@ class ApiPolicyConditionsDeclarationPageControllerSpec extends SpecBase with Moc
       val fixture = buildFixture(None)
 
       running(fixture.application) {
-        val request = FakeRequest(POST, routes.ApiPolicyConditionsDeclarationPageController.onSubmit(NormalMode).url)
+        val request = FakeRequest(POST, routes.ApiPolicyConditionsDeclarationPageController.onSubmit(NormalMode, AddAnApi).url)
           .withFormUrlEncodedBody(("value", "answer"))
         val result = route(fixture.application, request).value
 
@@ -144,7 +144,7 @@ class ApiPolicyConditionsDeclarationPageControllerSpec extends SpecBase with Moc
 
       running(fixture.application) {
         val request =
-          FakeRequest(POST, routes.ApiPolicyConditionsDeclarationPageController.onSubmit(NormalMode).url)
+          FakeRequest(POST, routes.ApiPolicyConditionsDeclarationPageController.onSubmit(NormalMode, AddAnApi).url)
             .withFormUrlEncodedBody(("value[0]", "accept"))
 
         val result = route(fixture.application, request).value
@@ -194,6 +194,7 @@ class ApiPolicyConditionsDeclarationPageControllerSpec extends SpecBase with Moc
       .apply(
         form = form,
         mode = mode,
+        context = AddAnApi,
         apiDetail = apiDetail
       )(request, messages(application))
       .toString()
@@ -201,6 +202,7 @@ class ApiPolicyConditionsDeclarationPageControllerSpec extends SpecBase with Moc
 
   private def buildUserAnswers(apiDetail: ApiDetail): UserAnswers = {
     UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
+      .set(AddAnApiContextPage, AddAnApi).toOption.value
       .set(AddAnApiApiIdPage, apiDetail.id).toOption.value
   }
 

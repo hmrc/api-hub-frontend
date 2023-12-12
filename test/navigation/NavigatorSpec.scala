@@ -70,20 +70,36 @@ class NavigatorSpec extends SpecBase with TryValues {
         navigator.nextPage(QuestionAddTeamMembersPage, NormalMode, UserAnswers("id")) mustBe routes.JourneyRecoveryController.onPageLoad()
       }
 
-      "must go from the Add An API API Id (start) page to the Select Application page" in {
-        navigator.nextPage(AddAnApiApiIdPage, NormalMode, UserAnswers("id")) mustBe routes.AddAnApiSelectApplicationController.onPageLoad(NormalMode)
+      "during the Add an API journey" - {
+        "must go from the Add An API API Id (start) page to the Select Application page" in {
+          navigator.nextPage(AddAnApiApiIdPage, NormalMode, buildUserAnswers(AddAnApi)) mustBe routes.AddAnApiSelectApplicationController.onPageLoad(NormalMode)
+        }
+
+        "must go from the Add An API Select Application page to the Select Endpoints page" in {
+          navigator.nextPage(AddAnApiSelectApplicationPage, NormalMode, buildUserAnswers(AddAnApi)) mustBe routes.AddAnApiSelectEndpointsController.onPageLoad(NormalMode, AddAnApi)
+        }
+
+        "must go from the Add An API Select Endpoints page to the Accept Policy Conditions page" in {
+          navigator.nextPage(AddAnApiSelectEndpointsPage, NormalMode, buildUserAnswers(AddAnApi)) mustBe routes.ApiPolicyConditionsDeclarationPageController.onPageLoad(NormalMode, AddAnApi)
+        }
+
+        "must go from the Add An API Accept Policy Conditions page to the Check Your Answers page" in {
+          navigator.nextPage(ApiPolicyConditionsDeclarationPage, NormalMode, buildUserAnswers(AddAnApi)) mustBe routes.AddAnApiCheckYourAnswersController.onPageLoad(AddAnApi)
+        }
       }
 
-      "must go from the Add An API Select Application page to the Select Endpoints page" in {
-        navigator.nextPage(AddAnApiSelectApplicationPage, NormalMode, UserAnswers("id")) mustBe routes.AddAnApiSelectEndpointsController.onPageLoad(NormalMode)
-      }
+      "during the Add Endpoints journey" - {
+        "must go from the Add An API API Id (start) page to the Select Endpoints page" in {
+          navigator.nextPage(AddAnApiApiIdPage, NormalMode, buildUserAnswers(AddEndpoints)) mustBe routes.AddAnApiSelectEndpointsController.onPageLoad(NormalMode, AddEndpoints)
+        }
 
-      "must go from the Add An API Select Endpoints page to the Accept Policy Conditions page" in {
-        navigator.nextPage(AddAnApiSelectEndpointsPage, NormalMode, UserAnswers("id")) mustBe routes.ApiPolicyConditionsDeclarationPageController.onPageLoad(NormalMode)
-      }
+        "must go from the Add An API Select Endpoints page to the Accept Policy Conditions page" in {
+          navigator.nextPage(AddAnApiSelectEndpointsPage, NormalMode, buildUserAnswers(AddEndpoints)) mustBe routes.ApiPolicyConditionsDeclarationPageController.onPageLoad(NormalMode, AddEndpoints)
+        }
 
-      "must go from the Add An API Accept Policy Conditions page to the Check Your Answers page" in {
-        navigator.nextPage(ApiPolicyConditionsDeclarationPage, NormalMode, UserAnswers("id")) mustBe routes.AddAnApiCheckYourAnswersController.onPageLoad()
+        "must go from the Add An API Accept Policy Conditions page to the Check Your Answers page" in {
+          navigator.nextPage(ApiPolicyConditionsDeclarationPage, NormalMode, buildUserAnswers(AddEndpoints)) mustBe routes.AddAnApiCheckYourAnswersController.onPageLoad(AddEndpoints)
+        }
       }
     }
 
@@ -111,17 +127,34 @@ class NavigatorSpec extends SpecBase with TryValues {
         navigator.nextPage(TeamMembersPage, CheckMode, UserAnswers("id")) mustBe routes.ConfirmAddTeamMemberController.onPageLoad(CheckMode)
       }
 
-      "must go from the Add An API Select Application page to the Check Your Answers page" in {
-        navigator.nextPage(AddAnApiSelectApplicationPage, CheckMode, UserAnswers("id")) mustBe routes.AddAnApiCheckYourAnswersController.onPageLoad()
+      "during the Add An Api journey" - {
+        "must go from the Add An API Select Application page to the Check Your Answers page" in {
+          navigator.nextPage(AddAnApiSelectApplicationPage, CheckMode, buildUserAnswers(AddAnApi)) mustBe routes.AddAnApiCheckYourAnswersController.onPageLoad(AddAnApi)
+        }
+
+        "must go from the Add An API Select Endpoints page to the Check Your Answers page" in {
+          navigator.nextPage(AddAnApiSelectEndpointsPage, CheckMode, buildUserAnswers(AddAnApi)) mustBe routes.AddAnApiCheckYourAnswersController.onPageLoad(AddAnApi)
+        }
+
+        "must go from the Add An API Accept Policy Conditions page to the Check Your Answers page" in {
+          navigator.nextPage(ApiPolicyConditionsDeclarationPage, CheckMode, buildUserAnswers(AddAnApi)) mustBe routes.AddAnApiCheckYourAnswersController.onPageLoad(AddAnApi)
+        }
       }
 
-      "must go from the Add An API Select Endpoints page to the Check Your Answers page" in {
-        navigator.nextPage(AddAnApiSelectEndpointsPage, CheckMode, UserAnswers("id")) mustBe routes.AddAnApiCheckYourAnswersController.onPageLoad()
-      }
+      "during the Add Endpoints journey" - {
+        "must go from the Add An API Select Endpoints page to the Check Your Answers page" in {
+          navigator.nextPage(AddAnApiSelectEndpointsPage, CheckMode, buildUserAnswers(AddEndpoints)) mustBe routes.AddAnApiCheckYourAnswersController.onPageLoad(AddEndpoints)
+        }
 
-      "must go from the Add An API Accept Policy Conditions page to the Check Your Answers page" in {
-        navigator.nextPage(ApiPolicyConditionsDeclarationPage, CheckMode, UserAnswers("id")) mustBe routes.AddAnApiCheckYourAnswersController.onPageLoad()
+        "must go from the Add An API Accept Policy Conditions page to the Check Your Answers page" in {
+          navigator.nextPage(ApiPolicyConditionsDeclarationPage, CheckMode, buildUserAnswers(AddEndpoints)) mustBe routes.AddAnApiCheckYourAnswersController.onPageLoad(AddEndpoints)
+        }
       }
     }
   }
+
+  private def buildUserAnswers(context: AddAnApiContext): UserAnswers = {
+    UserAnswers("id").set(AddAnApiContextPage, context).toOption.value
+  }
+
 }

@@ -19,13 +19,13 @@ package controllers
 import base.SpecBase
 import controllers.actions.FakeUser
 import generators.ApiDetailGenerators
-import models.UserAnswers
+import models.{AddAnApi, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.AddAnApiApiIdPage
+import pages.{AddAnApiApiIdPage, AddAnApiContextPage}
 import play.api.Application
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -54,13 +54,15 @@ class AddAnApiStartControllerSpec extends SpecBase with MockitoSugar with HtmlVa
       when(fixture.addAnApiSessionRepository.set(any())).thenReturn(Future.successful(true))
 
       running(fixture.application) {
-        val request = FakeRequest(GET, routes.AddAnApiStartController.onPageLoad(apiDetail.id).url)
+        val request = FakeRequest(GET, routes.AddAnApiStartController.addAnApi(apiDetail.id).url)
         val result = route(fixture.application, request).value
 
         status(result) mustBe SEE_OTHER
 
         val expected = UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
-          .set(AddAnApiApiIdPage, apiDetail.id).toOption.value
+          .set(AddAnApiApiIdPage, apiDetail.id)
+          .flatMap(_.set(AddAnApiContextPage, AddAnApi))
+          .toOption.value
 
         verify(fixture.addAnApiSessionRepository).set(ArgumentMatchers.eq(expected))
       }
@@ -76,7 +78,7 @@ class AddAnApiStartControllerSpec extends SpecBase with MockitoSugar with HtmlVa
       when(fixture.addAnApiSessionRepository.set(any())).thenReturn(Future.successful(true))
 
       running(fixture.application) {
-        val request = FakeRequest(GET, routes.AddAnApiStartController.onPageLoad(apiDetail.id).url)
+        val request = FakeRequest(GET, routes.AddAnApiStartController.addAnApi(apiDetail.id).url)
         val result = route(fixture.application, request).value
 
         status(result) mustBe SEE_OTHER
@@ -92,7 +94,7 @@ class AddAnApiStartControllerSpec extends SpecBase with MockitoSugar with HtmlVa
         .thenReturn(Future.successful(None))
 
       running(fixture.application) {
-        val request = FakeRequest(GET, routes.AddAnApiStartController.onPageLoad(apiDetail.id).url)
+        val request = FakeRequest(GET, routes.AddAnApiStartController.addAnApi(apiDetail.id).url)
         val result = route(fixture.application, request).value
         val view = fixture.application.injector.instanceOf[ErrorTemplate]
 

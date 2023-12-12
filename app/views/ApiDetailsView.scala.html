@@ -96,7 +96,7 @@
                 @if(user.isDefined) {
                     @govukButton(
                         Button(
-                            href = Some(routes.AddAnApiStartController.onPageLoad(apiDetail.id).url),
+                            href = Some(routes.AddAnApiStartController.addAnApi(apiDetail.id).url),
                             content = Text(messages("apiDetails.addToAnApplication"))
                         )
                     )

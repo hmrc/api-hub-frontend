@@ -24,13 +24,13 @@ import models.api.ApiDetail
 import models.api.ApiDetailLenses.ApiDetailLensOps
 import models.application.{Application, Approved, Scope}
 import models.application.ApplicationLenses.ApplicationLensOps
-import models.{Mode, NormalMode, UserAnswers}
+import models.{AddAnApi, Mode, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{AddAnApiApiIdPage, AddAnApiSelectApplicationPage}
+import pages.{AddAnApiApiIdPage, AddAnApiContextPage, AddAnApiSelectApplicationPage}
 import play.api.data.Form
 import play.api.{Application => PlayApplication}
 import play.api.inject.bind
@@ -196,6 +196,7 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
         status(result) mustBe SEE_OTHER
 
         val expected = UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
+          .set(AddAnApiContextPage, AddAnApi).toOption.value
           .set(AddAnApiApiIdPage, apiDetail.id).toOption.value
           .set(AddAnApiSelectApplicationPage, application.id).toOption.value
 
@@ -316,6 +317,7 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
 
   private def buildUserAnswers(apiDetail: ApiDetail): UserAnswers = {
     UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
+      .set(AddAnApiContextPage, AddAnApi).toOption.value
       .set(AddAnApiApiIdPage, apiDetail.id).toOption.value
   }
 

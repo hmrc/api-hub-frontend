@@ -18,7 +18,7 @@ package viewmodels.checkAnswers
 
 import controllers.routes
 import models.api.ApiDetail
-import models.{AvailableEndpoint, AvailableEndpoints, CheckMode, UserAnswers}
+import models.{AddAnApiContext, AvailableEndpoint, AvailableEndpoints, CheckMode, UserAnswers}
 import pages.AddAnApiSelectEndpointsPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
@@ -28,7 +28,7 @@ import viewmodels.implicits._
 
 object AddAnApiSelectEndpointsSummary  {
 
-  def row(answers: UserAnswers, apiDetail: ApiDetail)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, apiDetail: ApiDetail, context: AddAnApiContext)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(AddAnApiSelectEndpointsPage).map {
       answers =>
 
@@ -48,7 +48,7 @@ object AddAnApiSelectEndpointsSummary  {
           key     = "addAnApiSelectEndpoints.checkYourAnswersLabel",
           value   = value,
           actions = Seq(
-            ActionItemViewModel("site.change", routes.AddAnApiSelectEndpointsController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", routes.AddAnApiSelectEndpointsController.onPageLoad(CheckMode, context).url)
               .withVisuallyHiddenText(messages("addAnApiSelectEndpoints.change.hidden"))
           )
         )
