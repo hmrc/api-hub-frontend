@@ -18,6 +18,7 @@ package viewmodels.checkAnswers
 
 import controllers.routes
 import models.api.ApiDetail
+import models.application.Application
 import models.{AddAnApiContext, AvailableEndpoint, AvailableEndpoints, CheckMode, UserAnswers}
 import pages.AddAnApiSelectEndpointsPage
 import play.api.i18n.Messages
@@ -28,11 +29,11 @@ import viewmodels.implicits._
 
 object AddAnApiSelectEndpointsSummary  {
 
-  def row(answers: UserAnswers, apiDetail: ApiDetail, context: AddAnApiContext)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, apiDetail: ApiDetail, application: Application, context: AddAnApiContext)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(AddAnApiSelectEndpointsPage).map {
       answers =>
 
-        val endpoints = AvailableEndpoints.selectedEndpoints(apiDetail, answers)
+        val endpoints = AvailableEndpoints.selectedEndpoints(apiDetail, application, answers)
           .values
           .flatten
           .map(endpoint => s"<li>${httpMethod(endpoint)} ${endpoint.path}</li>")

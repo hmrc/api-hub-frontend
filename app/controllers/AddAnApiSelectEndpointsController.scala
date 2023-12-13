@@ -17,15 +17,17 @@
 package controllers
 
 import controllers.actions._
-import controllers.helpers.ErrorResultBuilder
 import forms.AddAnApiSelectEndpointsFormProvider
-import models.{AddAnApiContext, Mode}
+import models.api.ApiDetail
+import models.application.Application
+import models.requests.DataRequest
+import models.{AddAnApiContext, AvailableEndpoints, Mode}
 import navigation.Navigator
-import pages.{AddAnApiApiIdPage, AddAnApiSelectEndpointsPage}
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import pages.{AddAnApiApiPage, AddAnApiSelectApplicationPage, AddAnApiSelectEndpointsPage}
+import play.api.Logging
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
 import repositories.AddAnApiSessionRepository
-import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.AddAnApiSelectEndpointsView
 
@@ -42,64 +44,62 @@ class AddAnApiSelectEndpointsController @Inject()(
   formProvider: AddAnApiSelectEndpointsFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: AddAnApiSelectEndpointsView,
-  apiHubService: ApiHubService,
-  errorResultBuilder: ErrorResultBuilder,
   checkContext: AddAnApiCheckContextActionProvider
-)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   def onPageLoad(
     mode: Mode,
     context: AddAnApiContext
   ): Action[AnyContent] = (identify andThen getData andThen requireData andThen checkContext(context)).async {
     implicit request =>
-      request.userAnswers.get(AddAnApiApiIdPage) match {
-        case Some(apiId) =>
-          apiHubService.getApiDetail(apiId).flatMap {
-            case Some(apiDetail) =>
-              val form = formProvider.apply(apiDetail)
+      (request.userAnswers.get(AddAnApiApiPage), request.userAnswers.get(AddAnApiSelectApplicationPage)) match {
+        case (Some(apiDetail), Some(application)) =>
+          val form = formProvider.apply(apiDetail, application)
 
-              val preparedForm = request.userAnswers.get(AddAnApiSelectEndpointsPage) match {
-                case None => form
-                case Some(value) => form.fill(value)
-              }
-
-              Future.successful(Ok(view(preparedForm, mode, context, Some(request.user), apiDetail)))
-            case None => apiNotFound(apiId)
+          val preparedForm = request.userAnswers.get(AddAnApiSelectEndpointsPage) match {
+            case None => form
+            case Some(value) => form.fill(value)
           }
+
+          Future.successful(Ok(view(preparedForm, mode, context, Some(request.user), apiDetail, application)))
         case _ => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
       }
   }
 
   def onSubmit(mode: Mode, context: AddAnApiContext): Action[AnyContent] = (identify andThen getData andThen requireData andThen checkContext(context)).async {
     implicit request =>
-      request.userAnswers.get(AddAnApiApiIdPage) match {
-        case Some(apiId) =>
-          apiHubService.getApiDetail(apiId).flatMap {
-            case Some(apiDetail) =>
-              val form = formProvider.apply(apiDetail)
+      (request.userAnswers.get(AddAnApiApiPage), request.userAnswers.get(AddAnApiSelectApplicationPage)) match {
+        case (Some(apiDetail), Some(application)) =>
+          val form = formProvider.apply(apiDetail, application)
 
-              form.bindFromRequest().fold(
-                formWithErrors =>
-                  Future.successful(BadRequest(view(formWithErrors, mode, context, Some(request.user), apiDetail))),
-                value =>
-                  for {
-                    updatedAnswers <- Future.fromTry(request.userAnswers.set(AddAnApiSelectEndpointsPage, value))
-                    _              <- sessionRepository.set(updatedAnswers)
-                  } yield Redirect(navigator.nextPage(AddAnApiSelectEndpointsPage, mode, updatedAnswers))
-              )
-            case None => apiNotFound(apiId)
-          }
+          form.bindFromRequest(formDataWithExistingEndpoints(request, apiDetail, application)).fold(
+            formWithErrors =>
+              Future.successful(BadRequest(view(formWithErrors, mode, context, Some(request.user), apiDetail, application))),
+            selectedScopes =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(AddAnApiSelectEndpointsPage, selectedScopes))
+                _              <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(navigator.nextPage(AddAnApiSelectEndpointsPage, mode, updatedAnswers))
+          )
         case _ => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
       }
   }
 
-  private def apiNotFound(apiId: String)(implicit request: Request[_]): Future[Result] = {
-    Future.successful(
-      errorResultBuilder.notFound(
-        Messages("site.apiNotFound.heading"),
-        Messages("site.apiNotFound.message", apiId)
-      )
-    )
+  private def formDataWithExistingEndpoints(request: DataRequest[AnyContent], apiDetail: ApiDetail, application: Application): Map[String, Seq[String]] = {
+
+    // We are disabling the checkboxes for endpoints that have already been
+    // added. Disabled inputs are not submitted with the other form data so we
+    // lose the data associated with them when this is posted back to us.
+    // So we need to add the already-added endpoints into the form data.
+
+    request.request.body.asFormUrlEncoded.getOrElse(Map.empty) ++
+      AvailableEndpoints(apiDetail, application)
+        .toSeq
+        .zipWithIndex
+        .filter(_._1._2.exists(_.added))
+        .map(etc => s"value[${etc._2}]" -> Seq(etc._1._1.toString()))
+        .toMap
+
   }
 
 }

@@ -27,7 +27,7 @@ import org.mockito.{ArgumentCaptor, ArgumentMatchers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{AddAnApiApiIdPage, AddAnApiContextPage, AddAnApiSelectApplicationPage, ApiPolicyConditionsDeclarationPage}
+import pages.{AddAnApiApiPage, AddAnApiContextPage, AddAnApiSelectApplicationPage, ApiPolicyConditionsDeclarationPage}
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.mvc.Request
@@ -71,7 +71,7 @@ class ApiPolicyConditionsDeclarationPageControllerSpec extends SpecBase with Moc
     "must populate the view correctly on a GET" in {
       val apiDetail = sampleApiDetail()
       val application = FakeApplication
-      val userAnswers = buildUserAnswers(apiDetail).set(AddAnApiSelectApplicationPage, application.id).toOption.value
+      val userAnswers = buildUserAnswers(apiDetail).set(AddAnApiSelectApplicationPage, application).toOption.value
       val fixture = buildFixture(Some(userAnswers))
 
       when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
@@ -203,7 +203,7 @@ class ApiPolicyConditionsDeclarationPageControllerSpec extends SpecBase with Moc
   private def buildUserAnswers(apiDetail: ApiDetail): UserAnswers = {
     UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
       .set(AddAnApiContextPage, AddAnApi).toOption.value
-      .set(AddAnApiApiIdPage, apiDetail.id).toOption.value
+      .set(AddAnApiApiPage, apiDetail).toOption.value
   }
 
 }

@@ -17,17 +17,15 @@
 package controllers
 
 import controllers.actions._
-import controllers.helpers.ErrorResultBuilder
 import forms.ApiPolicyConditionsDeclarationPageFormProvider
-import models.{AddAnApiContext, ApiPolicyConditionsDeclaration, Mode}
 import models.requests.DataRequest
+import models.{AddAnApiContext, ApiPolicyConditionsDeclaration, Mode}
 import navigation.Navigator
-import pages.{AddAnApiApiIdPage, ApiPolicyConditionsDeclarationPage}
+import pages.{AddAnApiApiPage, ApiPolicyConditionsDeclarationPage}
 import play.api.data.Form
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
+import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.AddAnApiSessionRepository
-import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.ApiPolicyConditionsDeclarationPageView
 
@@ -44,8 +42,6 @@ class ApiPolicyConditionsDeclarationPageController @Inject()(
   formProvider: ApiPolicyConditionsDeclarationPageFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: ApiPolicyConditionsDeclarationPageView,
-  apiHubService: ApiHubService,
-  errorResultBuilder: ErrorResultBuilder,
   checkContext: AddAnApiCheckContextActionProvider
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
@@ -86,33 +82,19 @@ class ApiPolicyConditionsDeclarationPageController @Inject()(
     form: Form[Set[ApiPolicyConditionsDeclaration]],
     status: Status
   )(implicit request: DataRequest[AnyContent]):Future[Result] = {
-    request.userAnswers.get(AddAnApiApiIdPage) match {
-      case Some(apiId) =>
-        apiHubService.getApiDetail(apiId).flatMap {
-          case Some(apiDetail) =>
-            Future.successful(status(
-              view(
-                form,
-                mode,
-                context,
-                apiDetail
-              )
-            ))
-
-          case None => apiNotFound(apiId)
-      }
+    request.userAnswers.get(AddAnApiApiPage) match {
+      case Some(apiDetail) =>
+        Future.successful(status(
+          view(
+            form,
+            mode,
+            context,
+            apiDetail
+          )
+        ))
       case _ => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
 
     }
-  }
-
-  private def apiNotFound(apiId: String)(implicit request: Request[_]): Future[Result] = {
-    Future.successful(
-      errorResultBuilder.notFound(
-        Messages("site.apiNotFound.heading"),
-        Messages("site.apiNotFound.message", apiId)
-      )
-    )
   }
 
 }

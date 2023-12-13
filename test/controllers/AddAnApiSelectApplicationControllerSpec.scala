@@ -30,7 +30,7 @@ import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{AddAnApiApiIdPage, AddAnApiContextPage, AddAnApiSelectApplicationPage}
+import pages.{AddAnApiApiPage, AddAnApiContextPage, AddAnApiSelectApplicationPage}
 import play.api.data.Form
 import play.api.{Application => PlayApplication}
 import play.api.inject.bind
@@ -143,7 +143,7 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
     "must populate the view correctly on a GET when the question has previously been answered" in {
       val apiDetail = sampleApiDetail()
       val application = buildApplicationWithoutAccess()
-      val userAnswers = buildUserAnswers(apiDetail).set(AddAnApiSelectApplicationPage, application.id).toOption.value
+      val userAnswers = buildUserAnswers(apiDetail).set(AddAnApiSelectApplicationPage, application).toOption.value
       val fixture = buildFixture(Some(userAnswers))
       val filledForm = form.fill(application.id)
 
@@ -169,7 +169,10 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
       val application = buildApplicationWithoutAccess()
       val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
 
-      when(fixture.addAnApiSessionRepository.set(any())).thenReturn(Future.successful(true))
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any())(any()))
+        .thenReturn(Future.successful(Some(application)))
+      when(fixture.addAnApiSessionRepository.set(any()))
+        .thenReturn(Future.successful(true))
 
       running(fixture.application) {
         val request = FakeRequest(POST, routes.AddAnApiSelectApplicationController.onSubmit(NormalMode).url)
@@ -186,7 +189,10 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
       val application = buildApplicationWithoutAccess()
       val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
 
-      when(fixture.addAnApiSessionRepository.set(any())).thenReturn(Future.successful(true))
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any())(any()))
+        .thenReturn(Future.successful(Some(application)))
+      when(fixture.addAnApiSessionRepository.set(any()))
+        .thenReturn(Future.successful(true))
 
       running(fixture.application) {
         val request = FakeRequest(POST, routes.AddAnApiSelectApplicationController.onSubmit(NormalMode).url)
@@ -197,8 +203,8 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
 
         val expected = UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
           .set(AddAnApiContextPage, AddAnApi).toOption.value
-          .set(AddAnApiApiIdPage, apiDetail.id).toOption.value
-          .set(AddAnApiSelectApplicationPage, application.id).toOption.value
+          .set(AddAnApiApiPage, apiDetail).toOption.value
+          .set(AddAnApiSelectApplicationPage, application).toOption.value
 
         verify(fixture.addAnApiSessionRepository).set(ArgumentMatchers.eq(expected))
       }
@@ -318,7 +324,7 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
   private def buildUserAnswers(apiDetail: ApiDetail): UserAnswers = {
     UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
       .set(AddAnApiContextPage, AddAnApi).toOption.value
-      .set(AddAnApiApiIdPage, apiDetail.id).toOption.value
+      .set(AddAnApiApiPage, apiDetail).toOption.value
   }
 
 }

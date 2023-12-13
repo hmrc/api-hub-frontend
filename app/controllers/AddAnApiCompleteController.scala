@@ -18,8 +18,10 @@ package controllers
 
 import controllers.actions.{AddAnApiCheckContextActionProvider, AddAnApiDataRetrievalAction, DataRequiredAction, IdentifierAction}
 import controllers.helpers.ErrorResultBuilder
+import models.api.ApiDetail
+import models.application.Application
 import models.{AddAnApi, AddAnApiContext, AddEndpoints, ApiPolicyConditionsDeclaration, AvailableEndpoints, CheckMode, UserAnswers}
-import pages.{AddAnApiApiIdPage, AddAnApiSelectApplicationPage, AddAnApiSelectEndpointsPage, ApiPolicyConditionsDeclarationPage}
+import pages.{AddAnApiApiPage, AddAnApiSelectApplicationPage, AddAnApiSelectEndpointsPage, ApiPolicyConditionsDeclarationPage}
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc._
 import repositories.AddAnApiSessionRepository
@@ -48,27 +50,23 @@ class AddAnApiCompleteController @Inject()(
     implicit request =>
       context match {
         case AddAnApi =>
-          request.userAnswers.get(AddAnApiApiIdPage) match {
-            case Some(apiId) =>
-              apiHubService.getApiDetail(apiId).flatMap {
-                case Some(apiDetail) =>
-                  validate(request.userAnswers, context).fold(
-                    call => Future.successful(Redirect(call)),
-                    addAnApiRequest => {
-                      val selectedEndpoints = AvailableEndpoints.selectedEndpoints(apiDetail, request.userAnswers).flatten(_._2).toSeq
-                      apiHubService.addApi(addAnApiRequest.applicationId, addAnApiRequest.apiId, selectedEndpoints)
-                    } flatMap {
-                      case Some(_) =>
-                        addAnApiSessionRepository.clear(request.user.userId).map(_ =>
-                          Redirect(routes.AddAnApiSuccessController.onPageLoad(addAnApiRequest.applicationId, addAnApiRequest.apiId))
-                        )
-                      case None => Future.successful(applicationNotFound(addAnApiRequest.applicationId))
-                    } recoverWith {
-                      case e: UpstreamErrorResponse if e.statusCode == BAD_GATEWAY => Future.successful(badGateway(e))
-                    }
-                  )
-                case None => apiNotFound(apiId)
-              }
+          request.userAnswers.get(AddAnApiApiPage) match {
+            case Some(apiDetail) =>
+              validate(request.userAnswers, context).fold(
+                call => Future.successful(Redirect(call)),
+                addAnApiRequest => {
+                  val selectedEndpoints = AvailableEndpoints.selectedEndpoints(apiDetail, addAnApiRequest.application, request.userAnswers).flatten(_._2).toSeq
+                  apiHubService.addApi(addAnApiRequest.application.id, addAnApiRequest.apiId, selectedEndpoints)
+                } flatMap {
+                  case Some(_) =>
+                    addAnApiSessionRepository.clear(request.user.userId).map(_ =>
+                      Redirect(routes.AddAnApiSuccessController.onPageLoad(addAnApiRequest.application.id, addAnApiRequest.apiId))
+                    )
+                  case None => Future.successful(applicationNotFound(addAnApiRequest.application.id))
+                } recoverWith {
+                  case e: UpstreamErrorResponse if e.statusCode == BAD_GATEWAY => Future.successful(badGateway(e))
+                }
+              )
             case _ => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
           }
         case AddEndpoints =>
@@ -76,34 +74,25 @@ class AddAnApiCompleteController @Inject()(
       }
   }
 
-  private def apiNotFound(apiId: String)(implicit request: Request[_]): Future[Result] = {
-    Future.successful(
-      errorResultBuilder.notFound(
-        Messages("site.apiNotFound.heading"),
-        Messages("site.apiNotFound.message", apiId)
-      )
-    )
-  }
-
   private def validate(userAnswers: UserAnswers, context: AddAnApiContext): Either[Call, AddAnApiRequest] = {
     for {
-      apiId <- validateApiId(userAnswers)
-      applicationId <- validateSelectedApplication(userAnswers)
+      apiDetail <- validateApiId(userAnswers)
+      application <- validateSelectedApplication(userAnswers)
       endpoints <- validateSelectedEndpoints(userAnswers, context)
       _ <- validatePolicyConditions(userAnswers, context)
-    } yield AddAnApiRequest(applicationId, apiId, endpoints)
+    } yield AddAnApiRequest(application, apiDetail.id, endpoints)
   }
 
-  private def validateApiId(userAnswers: UserAnswers): Either[Call, String] = {
-    userAnswers.get(AddAnApiApiIdPage) match {
-      case Some(apiId) => Right(apiId)
+  private def validateApiId(userAnswers: UserAnswers): Either[Call, ApiDetail] = {
+    userAnswers.get(AddAnApiApiPage) match {
+      case Some(apiDetail) => Right(apiDetail)
       case None => Left(routes.JourneyRecoveryController.onPageLoad())
     }
   }
 
-  private def validateSelectedApplication(userAnswers: UserAnswers): Either[Call, String] = {
+  private def validateSelectedApplication(userAnswers: UserAnswers): Either[Call, Application] = {
     userAnswers.get(AddAnApiSelectApplicationPage) match {
-      case Some(applicationId) => Right(applicationId)
+      case Some(application) => Right(application)
       case None => Left(routes.AddAnApiSelectApplicationController.onPageLoad(CheckMode))
     }
   }
@@ -137,6 +126,6 @@ class AddAnApiCompleteController @Inject()(
 
 object AddAnApiCompleteController {
 
-  case class AddAnApiRequest(applicationId: String, apiId: String, scopes: Set[String])
+  case class AddAnApiRequest(application: Application, apiId: String, scopes: Set[String])
 
 }

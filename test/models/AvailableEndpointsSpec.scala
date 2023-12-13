@@ -16,6 +16,7 @@
 
 package models
 
+import controllers.actions.FakeApplication
 import models.api.ApiDetailLensesSpec.sampleOas
 import models.api.{ApiDetail, Endpoint, EndpointMethod}
 import org.scalatest.freespec.AnyFreeSpec
@@ -84,13 +85,13 @@ class AvailableEndpointsSpec extends AnyFreeSpec with Matchers with TableDrivenP
 
         val expected = Map(
           scopes.toSet -> Seq(
-            AvailableEndpoint(path1, endpoint1method1),
-            AvailableEndpoint(path1, endpoint1method2),
-            AvailableEndpoint(path2, endpoint2method1)
+            AvailableEndpoint(path1, endpoint1method1, false),
+            AvailableEndpoint(path1, endpoint1method2, false),
+            AvailableEndpoint(path2, endpoint2method1, false)
           )
         )
 
-        val actual = AvailableEndpoints(apiDetail)
+        val actual = AvailableEndpoints(apiDetail, FakeApplication)
 
         actual mustBe expected
       }
@@ -157,16 +158,16 @@ class AvailableEndpointsSpec extends AnyFreeSpec with Matchers with TableDrivenP
 
         val expected = Map(
           scopes1.toSet -> Seq(
-            AvailableEndpoint(path1, endpoint1method1),
-            AvailableEndpoint(path2, endpoint2method1)
+            AvailableEndpoint(path1, endpoint1method1, false),
+            AvailableEndpoint(path2, endpoint2method1, false)
           ),
           scopes2.toSet -> Seq(
-            AvailableEndpoint(path1, endpoint1method2),
-            AvailableEndpoint(path3, endpoint3method1)
+            AvailableEndpoint(path1, endpoint1method2, false),
+            AvailableEndpoint(path3, endpoint3method1, false)
           )
         )
 
-        val actual = AvailableEndpoints(apiDetail)
+        val actual = AvailableEndpoints(apiDetail, FakeApplication)
 
         actual mustBe expected
       }
@@ -246,11 +247,11 @@ class AvailableEndpointsSpec extends AnyFreeSpec with Matchers with TableDrivenP
         )
       )
 
-      val actual = AvailableEndpoints.selectedEndpoints(apiDetail, Set(scopes1.toSet, scopes2.toSet))
+      val actual = AvailableEndpoints.selectedEndpoints(apiDetail, FakeApplication, Set(scopes1.toSet, scopes2.toSet))
 
       val expected = Map(
-        scopes1.toSet -> Seq(AvailableEndpoint(path1, endpoint1method1), AvailableEndpoint(path2, endpoint2method1)),
-        scopes2.toSet -> Seq(AvailableEndpoint(path1, endpoint1method2), AvailableEndpoint(path3, endpoint3method1))
+        scopes1.toSet -> Seq(AvailableEndpoint(path1, endpoint1method1, false), AvailableEndpoint(path2, endpoint2method1, false)),
+        scopes2.toSet -> Seq(AvailableEndpoint(path1, endpoint1method2, false), AvailableEndpoint(path3, endpoint3method1, false))
       )
 
       actual mustBe expected
@@ -277,7 +278,7 @@ class AvailableEndpointsSpec extends AnyFreeSpec with Matchers with TableDrivenP
         )
       )
 
-      val actual = AvailableEndpoints.selectedEndpoints(apiDetail, Set(Set("no-match")))
+      val actual = AvailableEndpoints.selectedEndpoints(apiDetail, FakeApplication, Set(Set("no-match")))
 
       actual mustBe empty
     }
@@ -303,7 +304,7 @@ class AvailableEndpointsSpec extends AnyFreeSpec with Matchers with TableDrivenP
         )
       )
 
-      val actual = AvailableEndpoints.selectedEndpoints(apiDetail, Set.empty[Set[String]])
+      val actual = AvailableEndpoints.selectedEndpoints(apiDetail, FakeApplication, Set.empty[Set[String]])
 
       actual mustBe empty
     }

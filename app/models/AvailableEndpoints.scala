@@ -17,35 +17,63 @@
 package models
 
 import models.api.{ApiDetail, EndpointMethod}
+import models.application.Application
 import pages.AddAnApiSelectEndpointsPage
 
-case class AvailableEndpoint(path: String, endpointMethod: EndpointMethod)
+case class AvailableEndpoint(path: String, endpointMethod: EndpointMethod, added: Boolean)
+
+object AvailableEndpoint {
+
+  def apply(path: String, endpointMethod: EndpointMethod, apiDetail: ApiDetail, application: Application): AvailableEndpoint = {
+    AvailableEndpoint(
+      path,
+      endpointMethod,
+      application.apis.exists(
+        api =>
+          api.id == apiDetail.id &&
+            api.endpoints.exists(
+              selectedEndpoint =>
+                selectedEndpoint.path == path &&
+                  selectedEndpoint.httpMethod == endpointMethod.httpMethod
+            )
+      )
+    )
+  }
+
+}
 
 object AvailableEndpoints {
 
-  def apply(apiDetail: ApiDetail): Map[Set[String], Seq[AvailableEndpoint]] = {
+  def apply(apiDetail: ApiDetail, application: Application): Map[Set[String], Seq[AvailableEndpoint]] = {
     apiDetail
       .endpoints
       .flatMap(
         endpoint =>
           endpoint.methods.map(
             endpointMethod =>
-              (AvailableEndpoint(endpoint.path, endpointMethod), endpointMethod.scopes.toSet)
+              (AvailableEndpoint(endpoint.path, endpointMethod, apiDetail, application), endpointMethod.scopes.toSet)
           )
       )
       .groupMap(_._2)(_._1)
   }
 
-  def selectedEndpoints(apiDetail: ApiDetail, selectedScopes: Set[Set[String]]): Map[Set[String], Seq[AvailableEndpoint]] = {
-    AvailableEndpoints(apiDetail)
+  def selectedEndpoints(apiDetail: ApiDetail, application: Application, selectedScopes: Set[Set[String]]): Map[Set[String], Seq[AvailableEndpoint]] = {
+    AvailableEndpoints(apiDetail, application)
       .filter(row => selectedScopes.contains(row._1))
   }
 
-  def selectedEndpoints(apiDetail: ApiDetail, userAnswers: UserAnswers): Map[Set[String], Seq[AvailableEndpoint]] = {
+  def selectedEndpoints(apiDetail: ApiDetail, application: Application, userAnswers: UserAnswers): Map[Set[String], Seq[AvailableEndpoint]] = {
     selectedEndpoints(
       apiDetail,
+      application,
       userAnswers.get(AddAnApiSelectEndpointsPage).getOrElse(Set.empty)
     )
+  }
+
+  def addedScopes(apiDetail: ApiDetail, application: Application): Set[Set[String]] = {
+    AvailableEndpoints(apiDetail, application)
+      .filter(_._2.exists(_.added))
+      .keySet
   }
 
 }

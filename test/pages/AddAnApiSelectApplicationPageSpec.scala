@@ -16,17 +16,19 @@
 
 package pages
 
+import generators.ApplicationGenerator
+import models.application.Application
 import pages.behaviours.PageBehaviours
 
-class AddAnApiSelectApplicationPageSpec extends PageBehaviours {
+class AddAnApiSelectApplicationPageSpec extends PageBehaviours with ApplicationGenerator {
 
   "AddAnApiSelectApplicationPage" - {
 
-    beRetrievable[String](AddAnApiSelectApplicationPage)
+    beRetrievable[Application](AddAnApiSelectApplicationPage)
 
-    beSettable[String](AddAnApiSelectApplicationPage)
+    beSettable[Application](AddAnApiSelectApplicationPage)
 
-    beRemovable[String](AddAnApiSelectApplicationPage)
+    beRemovable[Application](AddAnApiSelectApplicationPage)
   }
 
 }

@@ -18,6 +18,7 @@ package forms
 
 import forms.mappings.Mappings
 import models.api.ApiDetail
+import models.application.Application
 import models.{AvailableEndpoints, Enumerable}
 import play.api.data.Form
 import play.api.data.Forms.set
@@ -26,8 +27,8 @@ import javax.inject.Inject
 
 class AddAnApiSelectEndpointsFormProvider @Inject() extends Mappings {
 
-  def apply(apiDetail: ApiDetail): Form[Set[Set[String]]] = {
-    val availableEndpoints = AvailableEndpoints(apiDetail)
+  def apply(apiDetail: ApiDetail, application: Application): Form[Set[Set[String]]] = {
+    val availableEndpoints = AvailableEndpoints(apiDetail, application)
 
     implicit val enumerableScopes: Enumerable[Set[String]] = (str: String) => {
       availableEndpoints.keySet.find(_.toString() == str)

@@ -16,12 +16,13 @@
 
 package pages
 
+import models.application.Application
 import play.api.libs.json.JsPath
 
-case object AddAnApiSelectApplicationPage extends QuestionPage[String] {
+case object AddAnApiSelectApplicationPage extends QuestionPage[Application] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "applicationId"
+  override def toString: String = "application"
 
 }

@@ -17,13 +17,12 @@
 package controllers
 
 import controllers.actions.{AddAnApiCheckContextActionProvider, AddAnApiDataRetrievalAction, DataRequiredAction, IdentifierAction}
-import models.{AddAnApiContext, UserAnswers}
 import models.api.ApiDetail
 import models.application.Application
-import pages.{AddAnApiApiIdPage, AddAnApiSelectApplicationPage}
+import models.{AddAnApiContext, UserAnswers}
+import pages.{AddAnApiApiPage, AddAnApiSelectApplicationPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
-import services.ApiHubService
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.{AddAnApiApiIdSummary, AddAnApiSelectApplicationSummary, AddAnApiSelectEndpointsSummary}
@@ -40,7 +39,6 @@ class AddAnApiCheckYourAnswersController @Inject()(
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: AddAnApiCheckYourAnswersView,
-  apiHubService: ApiHubService,
   checkContext: AddAnApiCheckContextActionProvider
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
@@ -51,22 +49,22 @@ class AddAnApiCheckYourAnswersController @Inject()(
         applicationSummary <- buildApplicationSummary(application)
         apiDetail <- fetchApiDetail(request.userAnswers)
         apiDetailSummary <- buildApiDetailSummary(apiDetail)
-        endpointsSummary <- buildEndpointsSummary(request.userAnswers, apiDetail, context)
+        endpointsSummary <- buildEndpointsSummary(request.userAnswers, apiDetail, application, context)
       } yield SummaryListViewModel(
         rows = Seq(applicationSummary, apiDetailSummary, endpointsSummary).flatten
       )).map(summaryList => Ok(view(summaryList, Some(request.user), context)))
   }
 
-  private def fetchApplication(userAnswers: UserAnswers)(implicit request: Request[_]): Future[Option[Application]] = {
+  private def fetchApplication(userAnswers: UserAnswers): Future[Option[Application]] = {
     userAnswers.get(AddAnApiSelectApplicationPage) match {
-      case Some(applicationId) => apiHubService.getApplication(applicationId, enrich = false)
+      case Some(application) => Future.successful(Some(application))
       case None => Future.successful(None)
     }
   }
 
-  private def fetchApiDetail(userAnswers: UserAnswers)(implicit request: Request[_]): Future[Option[ApiDetail]] = {
-    userAnswers.get(AddAnApiApiIdPage) match {
-      case Some(apiId) => apiHubService.getApiDetail(apiId)
+  private def fetchApiDetail(userAnswers: UserAnswers): Future[Option[ApiDetail]] = {
+    userAnswers.get(AddAnApiApiPage) match {
+      case Some(apiDetail) => Future.successful(Some(apiDetail))
       case None => Future.successful(None)
     }
   }
@@ -82,10 +80,14 @@ class AddAnApiCheckYourAnswersController @Inject()(
   private def buildEndpointsSummary(
     userAnswers: UserAnswers,
     apiDetail: Option[ApiDetail],
+    application: Option[Application],
     context: AddAnApiContext
   )(implicit request: Request[_]): Future[Option[SummaryListRow]] = {
     Future.successful(
-      apiDetail.flatMap(AddAnApiSelectEndpointsSummary.row(userAnswers, _, context))
+      (apiDetail, application) match {
+        case (Some(api), Some(app)) => AddAnApiSelectEndpointsSummary.row(userAnswers, api, app, context)
+        case _ => None
+      }
     )
   }
 

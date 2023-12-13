@@ -306,7 +306,7 @@ class ApiHubServiceSpec
       val verb = "GET"
       val path = "/foo/bar"
       val scopes = Seq("test-scope-1", "test-scope-2")
-      val availableEndpoints = Seq(AvailableEndpoint(path, EndpointMethod(verb, None, None, scopes)))
+      val availableEndpoints = Seq(AvailableEndpoint(path, EndpointMethod(verb, None, None, scopes), false))
 
       val apiRequest = AddApiRequest(apiId, Seq(AddApiRequestEndpoint(verb, path)), scopes)
 

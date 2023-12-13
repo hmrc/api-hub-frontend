@@ -16,6 +16,7 @@
 
 package forms
 
+import controllers.actions.FakeApplication
 import forms.behaviours.CheckboxFieldBehaviours
 import generators.ApiDetailGenerators
 import models.AvailableEndpoints
@@ -24,7 +25,7 @@ import play.api.data.FormError
 class AddAnApiSelectEndpointsFormProviderSpec extends CheckboxFieldBehaviours with ApiDetailGenerators {
 
   private val apiDetail = sampleApiDetail()
-  private val form = new AddAnApiSelectEndpointsFormProvider()(apiDetail)
+  private val form = new AddAnApiSelectEndpointsFormProvider()(apiDetail, FakeApplication)
 
   ".value" - {
 
@@ -34,7 +35,7 @@ class AddAnApiSelectEndpointsFormProviderSpec extends CheckboxFieldBehaviours wi
     behave like checkboxField[Set[String]](
       form,
       fieldName,
-      validValues  = AvailableEndpoints(apiDetail).keySet.toSeq,
+      validValues  = AvailableEndpoints(apiDetail, FakeApplication).keySet.toSeq,
       invalidError = FormError(s"$fieldName[0]", "error.invalid")
     )
 

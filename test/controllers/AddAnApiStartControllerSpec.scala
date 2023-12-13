@@ -25,7 +25,7 @@ import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{AddAnApiApiIdPage, AddAnApiContextPage}
+import pages.{AddAnApiApiPage, AddAnApiContextPage}
 import play.api.Application
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -60,7 +60,7 @@ class AddAnApiStartControllerSpec extends SpecBase with MockitoSugar with HtmlVa
         status(result) mustBe SEE_OTHER
 
         val expected = UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
-          .set(AddAnApiApiIdPage, apiDetail.id)
+          .set(AddAnApiApiPage, apiDetail)
           .flatMap(_.set(AddAnApiContextPage, AddAnApi))
           .toOption.value
 

@@ -19,17 +19,17 @@ package controllers
 import controllers.actions.{AddAnApiCheckContextActionProvider, AddAnApiDataRetrievalAction, DataRequiredAction, IdentifierAction}
 import controllers.helpers.ErrorResultBuilder
 import forms.AddAnApiSelectApplicationFormProvider
-import models.{AddAnApi, Mode}
 import models.api.ApiDetail
 import models.api.ApiDetailLenses.ApiDetailLensOps
 import models.application.Application
 import models.application.ApplicationLenses.ApplicationLensOps
 import models.requests.DataRequest
+import models.{AddAnApi, Mode}
 import navigation.Navigator
-import pages.{AddAnApiApiIdPage, AddAnApiSelectApplicationPage}
+import pages.{AddAnApiApiPage, AddAnApiSelectApplicationPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
+import play.api.mvc._
 import repositories.AddAnApiSessionRepository
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -59,7 +59,7 @@ class AddAnApiSelectApplicationController @Inject()(
     implicit request =>
       val preparedForm = request.userAnswers.get(AddAnApiSelectApplicationPage) match {
         case None => form
-        case Some(value) => form.fill(value)
+        case Some(application) => form.fill(application.id)
       }
 
       buildView(mode, preparedForm, Ok)
@@ -70,35 +70,35 @@ class AddAnApiSelectApplicationController @Inject()(
       form.bindFromRequest().fold(
         formWithErrors =>
           buildView(mode, formWithErrors, BadRequest),
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(AddAnApiSelectApplicationPage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(AddAnApiSelectApplicationPage, mode, updatedAnswers))
+        applicationId =>
+          apiHubService.getApplication(applicationId, false).flatMap {
+            case Some(application) =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(AddAnApiSelectApplicationPage, application))
+                _              <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(navigator.nextPage(AddAnApiSelectApplicationPage, mode, updatedAnswers))
+            case _ => applicationNotFound(applicationId)
+          }
       )
   }
 
   private def buildView(mode: Mode, form: Form[String], status: Status)(implicit request: DataRequest[AnyContent]) = {
     request.user.email.fold(noEmail())(
       email =>
-        request.userAnswers.get(AddAnApiApiIdPage) match {
-          case Some(apiId) =>
-            apiHubService.getApiDetail(apiId).flatMap {
-              case Some(apiDetail) =>
-                apiHubService.getUserApplications(email, enrich = true).map {
-                  applications =>
-                    status(
-                      view(
-                        form,
-                        mode,
-                        Some(request.user),
-                        apiDetail,
-                        applicationsWithAccess(apiDetail, applications),
-                        applicationsWithoutAccess(apiDetail, applications)
-                      )
-                    )
-                }
-              case None => apiNotFound(apiId)
+        request.userAnswers.get(AddAnApiApiPage) match {
+          case Some(apiDetail) =>
+            apiHubService.getUserApplications(email, enrich = true).map {
+              applications =>
+                status(
+                  view(
+                    form,
+                    mode,
+                    Some(request.user),
+                    apiDetail,
+                    applicationsWithAccess(apiDetail, applications),
+                    applicationsWithoutAccess(apiDetail, applications)
+                  )
+                )
             }
           case _ => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
         }
@@ -111,11 +111,11 @@ class AddAnApiSelectApplicationController @Inject()(
     )
   }
 
-  private def apiNotFound(apiId: String)(implicit request: Request[_]): Future[Result] = {
+  private def applicationNotFound(applicationId: String)(implicit request: Request[_]): Future[Result] = {
     Future.successful(
       errorResultBuilder.notFound(
-        Messages("site.apiNotFound.heading"),
-        Messages("site.apiNotFound.message", apiId)
+        heading = Messages("site.applicationNotFoundHeading"),
+        message = Messages("site.applicationNotFoundMessage", applicationId)
       )
     )
   }
