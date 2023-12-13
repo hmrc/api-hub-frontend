@@ -17,18 +17,15 @@
 package controllers
 
 import base.SpecBase
-import controllers.actions.{FakeApplication, FakeUser}
+import controllers.actions.FakeUser
 import generators.ApiDetailGenerators
-import models.api.{Endpoint, EndpointMethod}
-import models.application.{Api, SelectedEndpoint}
-import models.{AddAnApi, AddEndpoints, UserAnswers}
-import models.application.ApplicationLenses._
+import models.{AddAnApi, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{AddAnApiApiPage, AddAnApiContextPage, AddAnApiSelectApplicationPage, AddAnApiSelectEndpointsPage}
+import pages.{AddAnApiApiPage, AddAnApiContextPage}
 import play.api.Application
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -47,7 +44,7 @@ class AddAnApiStartControllerSpec extends SpecBase with MockitoSugar with HtmlVa
   private val clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
 
   "AddAnApiStartController" - {
-    "must initiate user answers with the context and Api Id and persist this in the session repository (add an API journey)" in {
+    "must initiate user answers with the Api Id and persist this in the session repository" in {
       val fixture = buildFixture()
       val apiDetail = sampleApiDetail()
 
@@ -65,43 +62,6 @@ class AddAnApiStartControllerSpec extends SpecBase with MockitoSugar with HtmlVa
         val expected = UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
           .set(AddAnApiApiPage, apiDetail)
           .flatMap(_.set(AddAnApiContextPage, AddAnApi))
-          .toOption.value
-
-        verify(fixture.addAnApiSessionRepository).set(ArgumentMatchers.eq(expected))
-      }
-    }
-
-    "must initiate user answers with the context and Api Id and persist this in the session repository (add endpoints journey)" in {
-      val fixture = buildFixture()
-      val apiDetail = sampleApiDetail()
-        .copy(
-          endpoints = Seq(
-            Endpoint("/test-path-1", Seq(EndpointMethod("GET", None, None, Seq("test-scope-1"))))
-          )
-        )
-      val application = FakeApplication
-        .addApi(
-          Api(apiDetail.id, Seq(SelectedEndpoint("GET", "/test-path-1")))
-        )
-
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any())(any()))
-        .thenReturn(Future.successful(Some(application)))
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
-        .thenReturn(Future.successful(Some(apiDetail)))
-
-      when(fixture.addAnApiSessionRepository.set(any())).thenReturn(Future.successful(true))
-
-      running(fixture.application) {
-        val request = FakeRequest(GET, routes.AddAnApiStartController.addEndpoints(application.id, apiDetail.id).url)
-        val result = route(fixture.application, request).value
-
-        status(result) mustBe SEE_OTHER
-
-        val expected = UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
-          .set(AddAnApiApiPage, apiDetail)
-          .flatMap(_.set(AddAnApiContextPage, AddEndpoints))
-          .flatMap(_.set(AddAnApiSelectApplicationPage, application))
-          .flatMap(_.set(AddAnApiSelectEndpointsPage, Set(Set("test-scope-1"))))
           .toOption.value
 
         verify(fixture.addAnApiSessionRepository).set(ArgumentMatchers.eq(expected))

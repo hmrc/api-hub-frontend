@@ -24,6 +24,7 @@ import models.requests.DataRequest
 import models.{AddAnApiContext, AvailableEndpoints, Mode}
 import navigation.Navigator
 import pages.{AddAnApiApiPage, AddAnApiSelectApplicationPage, AddAnApiSelectEndpointsPage}
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
 import repositories.AddAnApiSessionRepository
@@ -44,7 +45,7 @@ class AddAnApiSelectEndpointsController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   view: AddAnApiSelectEndpointsView,
   checkContext: AddAnApiCheckContextActionProvider
-)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   def onPageLoad(
     mode: Mode,
@@ -96,7 +97,7 @@ class AddAnApiSelectEndpointsController @Inject()(
         .toSeq
         .zipWithIndex
         .filter(_._1._2.exists(_.added))
-        .map(data => s"value[${data._2}]" -> Seq(data._1._1.toString()))
+        .map(etc => s"value[${etc._2}]" -> Seq(etc._1._1.toString()))
         .toMap
 
   }

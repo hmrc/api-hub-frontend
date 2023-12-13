@@ -49,7 +49,7 @@ class AddAnApiStartController @Inject()(
     implicit request =>
       fetchApiDetail(apiId).flatMap {
         case Right(apiDetail) =>
-          startJourney(commonUserAnswers(apiDetail, AddAnApi, request))
+          startJourney(apiId, commonUserAnswers(apiDetail, AddAnApi, request))
         case Left(result) => Future.successful(result)
       }
   }
@@ -59,6 +59,7 @@ class AddAnApiStartController @Inject()(
       fetchApiDetail(apiId).flatMap {
         case Right(apiDetail) =>
           startJourney(
+            apiId,
             commonUserAnswers(apiDetail, AddEndpoints, request.identifierRequest)
               .flatMap(_.set(AddAnApiSelectApplicationPage, request.application))
               .flatMap(_.set(AddAnApiSelectEndpointsPage, AvailableEndpoints.addedScopes(apiDetail, request.application)))
@@ -83,11 +84,21 @@ class AddAnApiStartController @Inject()(
       .flatMap(_.set(AddAnApiContextPage, context))
   }
 
-  private def startJourney(userAnswers: Try[UserAnswers]) = {
-    for {
-      userAnswers <- Future.fromTry(userAnswers)
-      _           <- addAnApiSessionRepository.set(userAnswers)
-    } yield Redirect(navigator.nextPage(AddAnApiApiPage, NormalMode, userAnswers))
+  private def startJourney(id: String, userAnswers: Try[UserAnswers])(implicit request: Request[_]) = {
+    apiHubService.getApiDetail(id).flatMap {
+      case Some(_) =>
+        for {
+          userAnswers <- Future.fromTry(userAnswers)
+          _           <- addAnApiSessionRepository.set(userAnswers)
+        } yield Redirect(navigator.nextPage(AddAnApiApiPage, NormalMode, userAnswers))
+      case None =>
+        Future.successful(
+          errorResultBuilder.notFound(
+            Messages("site.apiNotFound.heading"),
+            Messages("site.apiNotFound.message", id)
+          )
+        )
+    }
   }
 
   private def apiNotFound(apiId: String)(implicit request: Request[_]): Result = {
