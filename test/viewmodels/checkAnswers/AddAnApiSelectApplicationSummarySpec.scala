@@ -18,7 +18,7 @@ package viewmodels.checkAnswers
 
 import controllers.actions.FakeApplication
 import controllers.routes
-import models.CheckMode
+import models.{AddAnApi, AddEndpoints, CheckMode}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.i18n.Messages
@@ -31,8 +31,8 @@ class AddAnApiSelectApplicationSummarySpec extends AnyFreeSpec with Matchers {
   private implicit val messages: Messages = play.api.test.Helpers.stubMessages()
 
   "row" - {
-    "must return the correct summary list row when an application exists" in {
-      val actual = AddAnApiSelectApplicationSummary.row(Some(FakeApplication))
+    "must return the correct summary list row when an application exists (add an API journey)" in {
+      val actual = AddAnApiSelectApplicationSummary.row(Some(FakeApplication), AddAnApi)
 
       val expected = SummaryListRow(
         key = Key(Text("addAnApiSelectApplication.checkYourAnswersLabel")),
@@ -51,8 +51,20 @@ class AddAnApiSelectApplicationSummarySpec extends AnyFreeSpec with Matchers {
       actual mustBe Some(expected)
     }
 
+    "must return the correct summary list row when an application exists (add endpoints journey)" in {
+      val actual = AddAnApiSelectApplicationSummary.row(Some(FakeApplication), AddEndpoints)
+
+      val expected = SummaryListRow(
+        key = Key(Text("addAnApiSelectApplication.checkYourAnswersLabel")),
+        value = Value(Text(FakeApplication.name)),
+        actions = Some(Actions(items = Seq.empty))
+      )
+
+      actual mustBe Some(expected)
+    }
+
     "must return the correct summary list row when an application does not exist" in {
-      AddAnApiSelectApplicationSummary.row(None) mustBe None
+      AddAnApiSelectApplicationSummary.row(None, AddAnApi) mustBe None
     }
   }
 
