@@ -40,7 +40,7 @@ import play.api.test.Helpers._
 import repositories.AddAnApiSessionRepository
 import services.ApiHubService
 import utils.HtmlValidation
-import views.html.AddAnApiSelectApplicationView
+import views.html.{AddAnApiSelectApplicationView, ErrorTemplate}
 
 import java.time.{Clock, Instant, ZoneId}
 import scala.concurrent.Future
@@ -256,6 +256,32 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must return 404 Not Found page with suitable message when the selected application does not exist" in {
+      val apiDetail = sampleApiDetail()
+      val application = buildApplicationWithoutAccess()
+      val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
+
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any())(any()))
+        .thenReturn(Future.successful(None))
+
+      running(fixture.application) {
+        val request = FakeRequest(POST, routes.AddAnApiSelectApplicationController.onSubmit(NormalMode).url)
+          .withFormUrlEncodedBody(("value", application.id))
+        val result = route(fixture.application, request).value
+        val view = fixture.application.injector.instanceOf[ErrorTemplate]
+
+        status(result) mustBe NOT_FOUND
+        contentAsString(result) mustBe
+          view(
+            "Page not found - 404",
+            "Application not found",
+            s"Cannot find an application with Id ${application.id}."
+          )(request, messages(fixture.application))
+            .toString()
+        contentAsString(result) must validateAsHtml
       }
     }
   }
