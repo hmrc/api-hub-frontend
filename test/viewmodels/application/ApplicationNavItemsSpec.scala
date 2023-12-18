@@ -75,7 +75,7 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TableDrivenPro
           SideNavItem(
             DeleteApplicationPage,
             "Delete application",
-            controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id),
+            controllers.application.routes.DeleteApplicationConfirmationController.onPageLoad(FakeApplication.id),
             isCurrentPage = false
           )
         )

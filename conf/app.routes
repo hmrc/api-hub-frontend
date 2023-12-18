@@ -115,5 +115,3 @@ POST        /apis/add-endpoints/add-endpoints                                   
 
 GET         /apis/view-specification/:apiId                                     controllers.OasRedocController.onPageLoad(apiId: String)
 GET         /apis/oas/:apiId                                                    controllers.OasRedocController.getOas(apiId: String)
-
-GET         /application/delete-application-success                             controllers.DeleteApplicationSuccessController.onPageLoad()

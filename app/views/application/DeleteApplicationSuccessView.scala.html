@@ -19,16 +19,16 @@
 @import models.user.UserModel
 
 @this(
-layout: templates.Layout,
-govukButton: GovukButton,
-govukPanel: GovukPanel
+    layout: templates.Layout,
+    govukButton: GovukButton,
+    govukPanel: GovukPanel
 )
 
-@(user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+@(user: UserModel)(implicit request: Request[_], messages: Messages)
 
-@applicationsLink(user: Option[UserModel]) = {
+@applicationsLink(user: UserModel) = {
     <a href='@controllers.routes.IndexController.onPageLoad.url' class='govuk-link govuk-link--no-visited-state'>
-    @if(user.map(_.permissions.canSupport).getOrElse(false)) {
+    @if(user.permissions.canSupport) {
         @messages("applicationDeletedSuccess.advice.allApplications")
     } else {
         @messages("applicationDeletedSuccess.advice.yourApplications")
@@ -42,8 +42,7 @@ govukPanel: GovukPanel
     </a>
 }
 
-
-@layout(pageTitle = titleNoForm(messages("applicationDeletedSuccess.title")), showBackLink = false, user = user) {
+@layout(pageTitle = titleNoForm(messages("applicationDeletedSuccess.title")), showBackLink = false, user = Some(user)) {
 
     @govukPanel(Panel(
         classes = "govuk-!-margin-bottom-9",
@@ -51,6 +50,7 @@ govukPanel: GovukPanel
     ))
 
     <h2 class="govuk-heading-m">@messages("applicationDeletedSuccess.advice.heading")</h2>
+
     <p class="govuk-body">
     @Html(
         messages(
@@ -59,9 +59,9 @@ govukPanel: GovukPanel
         )
     )
     </p>
-    <p class="govuk-body">
-    @newApplicationLink
-    </p>
 
+    <p class="govuk-body">
+        @newApplicationLink
+    </p>
 
 }

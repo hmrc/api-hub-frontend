@@ -464,3 +464,13 @@ applicationDeletedSuccess.advice.returnTo = Return to {0}
 applicationDeletedSuccess.advice.yourApplications = Your applications
 applicationDeletedSuccess.advice.allApplications = All applications
 applicationDeletedSuccess.advice.newApplication = Register a new application
+
+deleteApplicationConfirmation.title = Delete application
+deleteApplicationConfirmation.heading = You are about to permanently delete the following application
+deleteApplicationConfirmation.error = Please make a selection
+deleteApplicationConfirmation.applicationName = Name
+deleteApplicationConfirmation.guidance1 = The application will be permanently deleted.
+deleteApplicationConfirmation.guidance2 = All credentials will be deleted and you will no longer have access to it.
+deleteApplicationConfirmation.legend = Continue and remove this application?
+deleteApplicationConfirmation.confirm = I confirm that I want to permanently delete this application.
+deleteApplicationConfirmation.accept = Accept and continue
