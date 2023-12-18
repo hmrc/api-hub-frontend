@@ -46,7 +46,7 @@ class AddAnApiCheckYourAnswersController @Inject()(
     implicit request =>
       (for {
         application <- fetchApplication(request.userAnswers)
-        applicationSummary <- buildApplicationSummary(application)
+        applicationSummary <- buildApplicationSummary(application, context)
         apiDetail <- fetchApiDetail(request.userAnswers)
         apiDetailSummary <- buildApiDetailSummary(apiDetail)
         endpointsSummary <- buildEndpointsSummary(request.userAnswers, apiDetail, application, context)
@@ -69,8 +69,11 @@ class AddAnApiCheckYourAnswersController @Inject()(
     }
   }
 
-  private def buildApplicationSummary(application: Option[Application])(implicit request: Request[_]): Future[Option[SummaryListRow]] = {
-    Future.successful(AddAnApiSelectApplicationSummary.row(application))
+  private def buildApplicationSummary(
+    application: Option[Application],
+    context: AddAnApiContext
+  )(implicit request: Request[_]): Future[Option[SummaryListRow]] = {
+    Future.successful(AddAnApiSelectApplicationSummary.row(application, context))
   }
 
   private def buildApiDetailSummary(apiDetail: Option[ApiDetail])(implicit request: Request[_]): Future[Option[SummaryListRow]] = {

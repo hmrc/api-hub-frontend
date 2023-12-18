@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers
 
 import controllers.routes
-import models.CheckMode
+import models.{AddAnApi, AddAnApiContext, AddEndpoints, CheckMode}
 import models.application.Application
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -27,16 +27,21 @@ import viewmodels.implicits._
 
 object AddAnApiSelectApplicationSummary {
 
-  def row(application: Option[Application])(implicit messages: Messages): Option[SummaryListRow] = {
+  def row(application: Option[Application], context: AddAnApiContext)(implicit messages: Messages): Option[SummaryListRow] = {
     application.map {
       app =>
         SummaryListRowViewModel(
           key = "addAnApiSelectApplication.checkYourAnswersLabel",
           value = ValueViewModel(HtmlFormat.escape(app.name).toString),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.AddAnApiSelectApplicationController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("addAnApiSelectApplication.change.hidden"))
-          )
+          actions = context match {
+            case AddAnApi =>
+              Seq(
+                ActionItemViewModel("site.change", routes.AddAnApiSelectApplicationController.onPageLoad(CheckMode).url)
+                  .withVisuallyHiddenText(messages("addAnApiSelectApplication.change.hidden"))
+              )
+            case AddEndpoints => Seq.empty
+          }
+
         )
     }
   }

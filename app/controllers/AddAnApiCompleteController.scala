@@ -20,7 +20,7 @@ import controllers.actions.{AddAnApiCheckContextActionProvider, AddAnApiDataRetr
 import controllers.helpers.ErrorResultBuilder
 import models.api.ApiDetail
 import models.application.Application
-import models.{AddAnApi, AddAnApiContext, AddEndpoints, ApiPolicyConditionsDeclaration, AvailableEndpoints, CheckMode, UserAnswers}
+import models.{AddAnApiContext, ApiPolicyConditionsDeclaration, AvailableEndpoints, CheckMode, UserAnswers}
 import pages.{AddAnApiApiPage, AddAnApiSelectApplicationPage, AddAnApiSelectEndpointsPage, ApiPolicyConditionsDeclarationPage}
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc._
@@ -48,29 +48,24 @@ class AddAnApiCompleteController @Inject()(
 
   def addApi(context: AddAnApiContext): Action[AnyContent] = (identify andThen getData andThen requireData andThen checkContext(context)).async {
     implicit request =>
-      context match {
-        case AddAnApi =>
-          request.userAnswers.get(AddAnApiApiPage) match {
-            case Some(apiDetail) =>
-              validate(request.userAnswers, context).fold(
-                call => Future.successful(Redirect(call)),
-                addAnApiRequest => {
-                  val selectedEndpoints = AvailableEndpoints.selectedEndpoints(apiDetail, addAnApiRequest.application, request.userAnswers).flatten(_._2).toSeq
-                  apiHubService.addApi(addAnApiRequest.application.id, addAnApiRequest.apiId, selectedEndpoints)
-                } flatMap {
-                  case Some(_) =>
-                    addAnApiSessionRepository.clear(request.user.userId).map(_ =>
-                      Redirect(routes.AddAnApiSuccessController.onPageLoad(addAnApiRequest.application.id, addAnApiRequest.apiId))
-                    )
-                  case None => Future.successful(applicationNotFound(addAnApiRequest.application.id))
-                } recoverWith {
-                  case e: UpstreamErrorResponse if e.statusCode == BAD_GATEWAY => Future.successful(badGateway(e))
-                }
-              )
-            case _ => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
-          }
-        case AddEndpoints =>
-          Future.successful(Redirect(routes.AddAnApiCheckYourAnswersController.onPageLoad(AddEndpoints)))
+      request.userAnswers.get(AddAnApiApiPage) match {
+        case Some(apiDetail) =>
+          validate(request.userAnswers, context).fold(
+            call => Future.successful(Redirect(call)),
+            addAnApiRequest => {
+              val selectedEndpoints = AvailableEndpoints.selectedEndpoints(apiDetail, addAnApiRequest.application, request.userAnswers).flatten(_._2).toSeq
+              apiHubService.addApi(addAnApiRequest.application.id, addAnApiRequest.apiId, selectedEndpoints)
+            } flatMap {
+              case Some(_) =>
+                addAnApiSessionRepository.clear(request.user.userId).map(_ =>
+                  Redirect(routes.AddAnApiSuccessController.onPageLoad(addAnApiRequest.application.id, addAnApiRequest.apiId))
+                )
+              case None => Future.successful(applicationNotFound(addAnApiRequest.application.id))
+            } recoverWith {
+              case e: UpstreamErrorResponse if e.statusCode == BAD_GATEWAY => Future.successful(badGateway(e))
+            }
+          )
+        case _ => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
       }
   }
 

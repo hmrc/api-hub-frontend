@@ -99,7 +99,7 @@ class AddAnApiCheckYourAnswersControllerSpec extends SpecBase with SummaryListFl
 
         val summaryList = SummaryListViewModel(
           Seq(
-            AddAnApiSelectApplicationSummary.row(Some(FakeApplication))(messages(fixture.application)).value,
+            AddAnApiSelectApplicationSummary.row(Some(FakeApplication), AddAnApi)(messages(fixture.application)).value,
             AddAnApiApiIdSummary.row(Some(apiDetail))(messages(fixture.application)).value,
             AddAnApiSelectEndpointsSummary.row(userAnswers, apiDetail, FakeApplication, AddAnApi)(messages(fixture.application)).value
           )
