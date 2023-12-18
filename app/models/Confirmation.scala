@@ -16,6 +16,7 @@
 
 package models
 
+import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import viewmodels.govuk.checkbox._
@@ -28,11 +29,11 @@ object Confirmation extends Enumerable.Implicits {
 
   val values: Seq[Confirmation] = Seq(Confirm)
 
-  def checkboxItems(content: String): Seq[CheckboxItem] =
+  def checkboxItems(key: String)(implicit messages: Messages): Seq[CheckboxItem] =
     values.zipWithIndex.map {
       case (value, index) =>
         CheckboxItemViewModel(
-          content = Text(content),
+          content = Text(messages(key)),
           fieldId = "value",
           index   = index,
           value   = value.toString

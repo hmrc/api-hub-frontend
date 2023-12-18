@@ -77,7 +77,7 @@ object ApplicationNavItems {
       SideNavItem(
         page = DeleteApplicationPage,
         title = messages("applicationNav.page.deleteApplication"),
-        link = controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id),
+        link = controllers.application.routes.DeleteApplicationConfirmationController.onPageLoad(application.id),
         isCurrentPage = currentPage == DeleteApplicationPage
       )
     )

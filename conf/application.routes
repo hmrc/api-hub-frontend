@@ -19,3 +19,6 @@ GET         /request-production-access/success                          controll
 
 GET         /delete-primary-credential/:id/:clientId                    controllers.application.EnvironmentAndCredentialsController.deletePrimaryCredential(id: String ,clientId: String)
 GET         /delete-secondary-credential/:id/:clientId                  controllers.application.EnvironmentAndCredentialsController.deleteSecondaryCredential(id: String ,clientId: String)
+
+GET         /delete/:id                                                 controllers.application.DeleteApplicationConfirmationController.onPageLoad(id: String)
+POST        /delete/:id                                                 controllers.application.DeleteApplicationConfirmationController.onSubmit(id: String)
