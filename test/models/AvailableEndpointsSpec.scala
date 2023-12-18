@@ -16,8 +16,11 @@
 
 package models
 
+import controllers.actions.FakeApplication
 import models.api.ApiDetailLensesSpec.sampleOas
 import models.api.{ApiDetail, Endpoint, EndpointMethod}
+import models.application.{Api, SelectedEndpoint}
+import models.application.ApplicationLenses._
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
@@ -34,7 +37,7 @@ class AvailableEndpointsSpec extends AnyFreeSpec with Matchers with TableDrivenP
     openApiSpecification = sampleOas
   )
 
-  "apply" - {
+  "AvailableEndpoints.apply" - {
     "must group endpoint methods by the same set of scopes" in {
       val scopeSets = Table(
         "Scopes",
@@ -84,13 +87,13 @@ class AvailableEndpointsSpec extends AnyFreeSpec with Matchers with TableDrivenP
 
         val expected = Map(
           scopes.toSet -> Seq(
-            AvailableEndpoint(path1, endpoint1method1),
-            AvailableEndpoint(path1, endpoint1method2),
-            AvailableEndpoint(path2, endpoint2method1)
+            AvailableEndpoint(path1, endpoint1method1, false),
+            AvailableEndpoint(path1, endpoint1method2, false),
+            AvailableEndpoint(path2, endpoint2method1, false)
           )
         )
 
-        val actual = AvailableEndpoints(apiDetail)
+        val actual = AvailableEndpoints(apiDetail, FakeApplication)
 
         actual mustBe expected
       }
@@ -157,16 +160,16 @@ class AvailableEndpointsSpec extends AnyFreeSpec with Matchers with TableDrivenP
 
         val expected = Map(
           scopes1.toSet -> Seq(
-            AvailableEndpoint(path1, endpoint1method1),
-            AvailableEndpoint(path2, endpoint2method1)
+            AvailableEndpoint(path1, endpoint1method1, false),
+            AvailableEndpoint(path2, endpoint2method1, false)
           ),
           scopes2.toSet -> Seq(
-            AvailableEndpoint(path1, endpoint1method2),
-            AvailableEndpoint(path3, endpoint3method1)
+            AvailableEndpoint(path1, endpoint1method2, false),
+            AvailableEndpoint(path3, endpoint3method1, false)
           )
         )
 
-        val actual = AvailableEndpoints(apiDetail)
+        val actual = AvailableEndpoints(apiDetail, FakeApplication)
 
         actual mustBe expected
       }
@@ -246,11 +249,11 @@ class AvailableEndpointsSpec extends AnyFreeSpec with Matchers with TableDrivenP
         )
       )
 
-      val actual = AvailableEndpoints.selectedEndpoints(apiDetail, Set(scopes1.toSet, scopes2.toSet))
+      val actual = AvailableEndpoints.selectedEndpoints(apiDetail, FakeApplication, Set(scopes1.toSet, scopes2.toSet))
 
       val expected = Map(
-        scopes1.toSet -> Seq(AvailableEndpoint(path1, endpoint1method1), AvailableEndpoint(path2, endpoint2method1)),
-        scopes2.toSet -> Seq(AvailableEndpoint(path1, endpoint1method2), AvailableEndpoint(path3, endpoint3method1))
+        scopes1.toSet -> Seq(AvailableEndpoint(path1, endpoint1method1, false), AvailableEndpoint(path2, endpoint2method1, false)),
+        scopes2.toSet -> Seq(AvailableEndpoint(path1, endpoint1method2, false), AvailableEndpoint(path3, endpoint3method1, false))
       )
 
       actual mustBe expected
@@ -277,7 +280,7 @@ class AvailableEndpointsSpec extends AnyFreeSpec with Matchers with TableDrivenP
         )
       )
 
-      val actual = AvailableEndpoints.selectedEndpoints(apiDetail, Set(Set("no-match")))
+      val actual = AvailableEndpoints.selectedEndpoints(apiDetail, FakeApplication, Set(Set("no-match")))
 
       actual mustBe empty
     }
@@ -303,9 +306,40 @@ class AvailableEndpointsSpec extends AnyFreeSpec with Matchers with TableDrivenP
         )
       )
 
-      val actual = AvailableEndpoints.selectedEndpoints(apiDetail, Set.empty[Set[String]])
+      val actual = AvailableEndpoints.selectedEndpoints(apiDetail, FakeApplication, Set.empty[Set[String]])
 
       actual mustBe empty
+    }
+  }
+
+  "AvailableEndpoint.apply" - {
+    val endpointMethod1 = EndpointMethod("GET", None, None, Seq("test-scope-1"))
+    val endpointMethod2 = EndpointMethod("GET", None, None, Seq("test-scope-2"))
+
+    val endpoint1 = Endpoint("/test-path-1", Seq(endpointMethod1))
+    val endpoint2 = Endpoint("/test-path-2", Seq(endpointMethod2))
+
+    val apiDetail = testApiDetail.copy(
+      endpoints = Seq(
+        endpoint1,
+        endpoint2
+      )
+    )
+
+    val application = FakeApplication.addApi(
+      Api(apiDetail.id, Seq(SelectedEndpoint("GET", "/test-path-1")))
+    )
+
+    "must set the added attribute correctly when the endpoint has been added to the application" in {
+      val actual = AvailableEndpoint.apply("/test-path-1", endpointMethod1, apiDetail, application)
+
+      actual mustBe AvailableEndpoint("/test-path-1", endpointMethod1, true)
+    }
+
+    "must set the added attribute correctly when the endpoint has not been added to the application" in {
+      val actual = AvailableEndpoint.apply("/test-path-2", endpointMethod2, apiDetail, application)
+
+      actual mustBe AvailableEndpoint("/test-path-2", endpointMethod2, false)
     }
   }
 

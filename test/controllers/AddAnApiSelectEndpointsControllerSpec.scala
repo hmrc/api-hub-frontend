@@ -17,20 +17,23 @@
 package controllers
 
 import base.SpecBase
-import controllers.actions.FakeUser
+import controllers.actions.{FakeApplication, FakeUser}
 import forms.AddAnApiSelectEndpointsFormProvider
 import generators.ApiDetailGenerators
-import models.api.ApiDetail
+import models.api.{ApiDetail, Endpoint, EndpointMethod}
+import models.application.{Api, Application, SelectedEndpoint}
 import models.{AddAnApi, AvailableEndpoints, NormalMode, UserAnswers}
+import models.application.ApplicationLenses._
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{AddAnApiApiIdPage, AddAnApiContextPage, AddAnApiSelectEndpointsPage}
-import play.api.Application
+import pages.{AddAnApiApiPage, AddAnApiContextPage, AddAnApiSelectApplicationPage, AddAnApiSelectEndpointsPage}
+import play.api.{Application => PlayApplication}
+import play.api.i18n.Messages
 import play.api.inject.bind
-import play.api.mvc.Call
+import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Call}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AddAnApiSessionRepository
@@ -49,7 +52,7 @@ class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar w
 
   private val apiDetail = sampleApiDetail()
   private val formProvider = new AddAnApiSelectEndpointsFormProvider()
-  private val form = formProvider(apiDetail)
+  private val form = formProvider(apiDetail, FakeApplication)
 
   "AddAnApiSelectEndpoints Controller" - {
 
@@ -60,20 +63,21 @@ class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar w
         .thenReturn(Future.successful(Some(apiDetail)))
 
       running(fixture.application) {
-        val request = FakeRequest(GET, addAnApiSelectEndpointsRoute)
+        implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, addAnApiSelectEndpointsRoute)
+        implicit val msgs: Messages = messages(fixture.application)
         val result = route(fixture.application, request).value
         val view = fixture.application.injector.instanceOf[AddAnApiSelectEndpointsView]
 
         status(result) mustEqual OK
 
-        contentAsString(result) mustEqual view(form, NormalMode, AddAnApi, Some(FakeUser), apiDetail)(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, AddAnApi, Some(FakeUser), apiDetail, FakeApplication).toString
         contentAsString(result) must validateAsHtml
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
       val userAnswers = buildUserAnswers(apiDetail)
-        .set(AddAnApiSelectEndpointsPage, AvailableEndpoints(apiDetail).keySet).success.value
+        .set(AddAnApiSelectEndpointsPage, AvailableEndpoints(apiDetail, FakeApplication).keySet).success.value
 
       val fixture = buildFixture(Some(userAnswers))
 
@@ -81,13 +85,14 @@ class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar w
         .thenReturn(Future.successful(Some(apiDetail)))
 
       running(fixture.application) {
-        val request = FakeRequest(GET, addAnApiSelectEndpointsRoute)
+        implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, addAnApiSelectEndpointsRoute)
+        implicit val msgs: Messages = messages(fixture.application)
         val view = fixture.application.injector.instanceOf[AddAnApiSelectEndpointsView]
         val result = route(fixture.application, request).value
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual
-          view(form.fill(AvailableEndpoints(apiDetail).keySet), NormalMode, AddAnApi, Some(FakeUser), apiDetail)(request, messages(fixture.application)).toString
+          view(form.fill(AvailableEndpoints(apiDetail, FakeApplication).keySet), NormalMode, AddAnApi, Some(FakeUser), apiDetail, FakeApplication).toString
         contentAsString(result) must validateAsHtml
       }
     }
@@ -103,7 +108,7 @@ class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar w
       running(fixture.application) {
         val request =
           FakeRequest(POST, addAnApiSelectEndpointsRoute)
-            .withFormUrlEncodedBody(("value[0]", AvailableEndpoints(apiDetail).keySet.head.toString()))
+            .withFormUrlEncodedBody(("value[0]", AvailableEndpoints(apiDetail, FakeApplication).keySet.head.toString()))
 
         val result = route(fixture.application, request).value
 
@@ -123,16 +128,52 @@ class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar w
       running(fixture.application) {
         val request =
           FakeRequest(POST, addAnApiSelectEndpointsRoute)
-            .withFormUrlEncodedBody(("value[0]", AvailableEndpoints(apiDetail).keySet.head.toString()))
+            .withFormUrlEncodedBody(("value[0]", AvailableEndpoints(apiDetail, FakeApplication).keySet.head.toString()))
 
         val result = route(fixture.application, request).value
 
         status(result) mustEqual SEE_OTHER
 
-        val expected = UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
-          .set(AddAnApiContextPage, AddAnApi).toOption.value
-          .set(AddAnApiApiIdPage, apiDetail.id).toOption.value
-          .set(AddAnApiSelectEndpointsPage, Set(AvailableEndpoints(apiDetail).keySet.head)).toOption.value
+        val expected = buildUserAnswers(apiDetail)
+          .set(AddAnApiSelectEndpointsPage, Set(AvailableEndpoints(apiDetail, FakeApplication).keySet.head)).toOption.value
+
+        verify(fixture.addAnApiSessionRepository).set(ArgumentMatchers.eq(expected))
+      }
+    }
+
+    "must add further endpoints to an existing answer (add endpoints journey)" in {
+      val apiDetail = sampleApiDetail()
+        .copy(
+          endpoints = Seq(
+            Endpoint("/test-path-1", Seq(EndpointMethod("GET", None, None, Seq("test-scope-1")))),
+            Endpoint("/test-path-2", Seq(EndpointMethod("GET", None, None, Seq("test-scope-2")))),
+            Endpoint("/test-path-3", Seq(EndpointMethod("GET", None, None, Seq("test-scope-3"))))
+          )
+        )
+
+      val application = FakeApplication
+        .addApi(
+          Api(apiDetail.id, Seq(SelectedEndpoint("GET", "/test-path-2")))
+        )
+
+      val fixture = buildFixture(Some(buildUserAnswers(apiDetail, application)))
+
+      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+        .thenReturn(Future.successful(Some(apiDetail)))
+
+      when(fixture.addAnApiSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      running(fixture.application) {
+        val request =
+          FakeRequest(POST, addAnApiSelectEndpointsRoute)
+            .withFormUrlEncodedBody(("value[0]", Set("test-scope-1").toString()))
+
+        val result = route(fixture.application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        val expected = buildUserAnswers(apiDetail, application)
+          .set(AddAnApiSelectEndpointsPage, Set(Set("test-scope-1"), Set("test-scope-2"))).toOption.value
 
         verify(fixture.addAnApiSessionRepository).set(ArgumentMatchers.eq(expected))
       }
@@ -145,9 +186,10 @@ class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar w
         .thenReturn(Future.successful(Some(apiDetail)))
 
       running(fixture.application) {
-        val request =
+        implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
           FakeRequest(POST, addAnApiSelectEndpointsRoute)
             .withFormUrlEncodedBody(("value", "invalid value"))
+        implicit val msgs: Messages = messages(fixture.application)
 
         val boundForm = form.bind(Map("value" -> "invalid value"))
 
@@ -156,7 +198,7 @@ class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar w
         val result = route(fixture.application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, AddAnApi, Some(FakeUser), apiDetail)(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, AddAnApi, Some(FakeUser), apiDetail, FakeApplication).toString
         contentAsString(result) must validateAsHtml
       }
     }
@@ -191,7 +233,7 @@ class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar w
   }
 
   private case class Fixture(
-    application: Application,
+    application: PlayApplication,
     apiHubService: ApiHubService,
     addAnApiSessionRepository: AddAnApiSessionRepository
   )
@@ -212,10 +254,11 @@ class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar w
     Fixture(application, apiHubService, addAnApiSessionRepository)
   }
 
-  private def buildUserAnswers(apiDetail: ApiDetail): UserAnswers = {
+  private def buildUserAnswers(apiDetail: ApiDetail, application: Application = FakeApplication): UserAnswers = {
     UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
-      .set(AddAnApiApiIdPage, apiDetail.id).toOption.value
+      .set(AddAnApiApiPage, apiDetail).toOption.value
       .set(AddAnApiContextPage, AddAnApi).toOption.value
+      .set(AddAnApiSelectApplicationPage, application).toOption.value
   }
 
 }

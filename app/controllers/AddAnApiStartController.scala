@@ -16,14 +16,15 @@
 
 package controllers
 
-import controllers.actions.IdentifierAction
+import controllers.actions.{ApplicationAuthActionProvider, IdentifierAction}
 import controllers.helpers.ErrorResultBuilder
+import models.api.ApiDetail
 import models.requests.IdentifierRequest
-import models.{AddAnApi, AddAnApiContext, AddEndpoints, NormalMode, UserAnswers}
+import models.{AddAnApi, AddAnApiContext, AddEndpoints, AvailableEndpoints, NormalMode, UserAnswers}
 import navigation.Navigator
-import pages.{AddAnApiApiIdPage, AddAnApiContextPage, AddAnApiSelectApplicationPage}
+import pages.{AddAnApiApiPage, AddAnApiContextPage, AddAnApiSelectApplicationPage, AddAnApiSelectEndpointsPage}
 import play.api.i18n.{I18nSupport, Messages}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc._
 import repositories.AddAnApiSessionRepository
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -40,47 +41,60 @@ class AddAnApiStartController @Inject()(
   addAnApiSessionRepository: AddAnApiSessionRepository,
   clock: Clock,
   navigator: Navigator,
-  errorResultBuilder: ErrorResultBuilder
+  errorResultBuilder: ErrorResultBuilder,
+  applicationAuth: ApplicationAuthActionProvider
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def addAnApi(apiId: String): Action[AnyContent] = identify.async {
     implicit request =>
-      startJourney(apiId, commonUserAnswers(apiId, AddAnApi))
+      fetchApiDetail(apiId).flatMap {
+        case Right(apiDetail) =>
+          startJourney(commonUserAnswers(apiDetail, AddAnApi, request))
+        case Left(result) => Future.successful(result)
+      }
   }
 
-  def addEndpoints(applicationId: String, apiId: String): Action[AnyContent] = identify.async {
+  def addEndpoints(applicationId: String, apiId: String): Action[AnyContent] = (identify andThen applicationAuth(applicationId)).async {
     implicit request =>
-      startJourney(
-        apiId,
-        commonUserAnswers(apiId, AddEndpoints)
-          .flatMap(_.set(AddAnApiSelectApplicationPage, applicationId))
-      )
+      fetchApiDetail(apiId).flatMap {
+        case Right(apiDetail) =>
+          startJourney(
+            commonUserAnswers(apiDetail, AddEndpoints, request.identifierRequest)
+              .flatMap(_.set(AddAnApiSelectApplicationPage, request.application))
+              .flatMap(_.set(AddAnApiSelectEndpointsPage, AvailableEndpoints.addedScopes(apiDetail, request.application)))
+          )
+        case Left(result) => Future.successful(result)
+      }
   }
 
-  private def commonUserAnswers(apiId: String, context: AddAnApiContext)(implicit request: IdentifierRequest[_]): Try[UserAnswers] = {
+  private def fetchApiDetail(apiId: String)(implicit request: Request[_]): Future[Either[Result, ApiDetail]] = {
+    apiHubService.getApiDetail(apiId).map {
+      case Some(apiDetail) => Right(apiDetail)
+      case _ => Left(apiNotFound(apiId))
+    }
+  }
+
+  private def commonUserAnswers(apiDetail: ApiDetail, context: AddAnApiContext, request: IdentifierRequest[_]): Try[UserAnswers] = {
     UserAnswers(
       id = request.user.userId,
       lastUpdated = clock.instant()
     )
-      .set(AddAnApiApiIdPage, apiId)
+      .set(AddAnApiApiPage, apiDetail)
       .flatMap(_.set(AddAnApiContextPage, context))
   }
 
-  private def startJourney(id: String, userAnswers: Try[UserAnswers])(implicit request: IdentifierRequest[_]) = {
-    apiHubService.getApiDetail(id).flatMap {
-      case Some(_) =>
-        for {
-          userAnswers <- Future.fromTry(userAnswers)
-          _           <- addAnApiSessionRepository.set(userAnswers)
-        } yield Redirect(navigator.nextPage(AddAnApiApiIdPage, NormalMode, userAnswers))
-      case None =>
-        Future.successful(
-          errorResultBuilder.notFound(
-            Messages("site.apiNotFound.heading"),
-            Messages("site.apiNotFound.message", id)
-          )
-        )
-    }
+  private def startJourney(userAnswers: Try[UserAnswers]) = {
+    for {
+      userAnswers <- Future.fromTry(userAnswers)
+      _           <- addAnApiSessionRepository.set(userAnswers)
+    } yield Redirect(navigator.nextPage(AddAnApiApiPage, NormalMode, userAnswers))
+  }
+
+  private def apiNotFound(apiId: String)(implicit request: Request[_]): Result = {
+    errorResultBuilder.notFound(
+      Messages("site.apiNotFound.heading"),
+      Messages("site.apiNotFound.message", apiId)
+    )
   }
 
 }

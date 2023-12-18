@@ -25,7 +25,7 @@ import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.mockito.MockitoSugar.mock
-import pages.{AddAnApiApiIdPage, AddAnApiContextPage, AddAnApiSelectApplicationPage, AddAnApiSelectEndpointsPage}
+import pages.{AddAnApiApiPage, AddAnApiContextPage, AddAnApiSelectApplicationPage, AddAnApiSelectEndpointsPage}
 import play.api.Application
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -80,8 +80,8 @@ class AddAnApiCheckYourAnswersControllerSpec extends SpecBase with SummaryListFl
 
       val userAnswers = emptyUserAnswers
         .set(AddAnApiContextPage, AddAnApi).toOption.value
-        .set(AddAnApiApiIdPage, apiDetail.id).toOption.value
-        .set(AddAnApiSelectApplicationPage, FakeApplication.id).toOption.value
+        .set(AddAnApiApiPage, apiDetail).toOption.value
+        .set(AddAnApiSelectApplicationPage, FakeApplication).toOption.value
         .set(AddAnApiSelectEndpointsPage, Set(Set("test-scope-1"))).toOption.value
 
       val fixture = buildFixture(Some(userAnswers))
@@ -101,7 +101,7 @@ class AddAnApiCheckYourAnswersControllerSpec extends SpecBase with SummaryListFl
           Seq(
             AddAnApiSelectApplicationSummary.row(Some(FakeApplication))(messages(fixture.application)).value,
             AddAnApiApiIdSummary.row(Some(apiDetail))(messages(fixture.application)).value,
-            AddAnApiSelectEndpointsSummary.row(userAnswers, apiDetail, AddAnApi)(messages(fixture.application)).value
+            AddAnApiSelectEndpointsSummary.row(userAnswers, apiDetail, FakeApplication, AddAnApi)(messages(fixture.application)).value
           )
         )
 

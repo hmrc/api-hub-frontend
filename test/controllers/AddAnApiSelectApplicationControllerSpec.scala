@@ -30,7 +30,7 @@ import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{AddAnApiApiIdPage, AddAnApiContextPage, AddAnApiSelectApplicationPage}
+import pages.{AddAnApiApiPage, AddAnApiContextPage, AddAnApiSelectApplicationPage}
 import play.api.data.Form
 import play.api.{Application => PlayApplication}
 import play.api.inject.bind
@@ -40,7 +40,7 @@ import play.api.test.Helpers._
 import repositories.AddAnApiSessionRepository
 import services.ApiHubService
 import utils.HtmlValidation
-import views.html.AddAnApiSelectApplicationView
+import views.html.{AddAnApiSelectApplicationView, ErrorTemplate}
 
 import java.time.{Clock, Instant, ZoneId}
 import scala.concurrent.Future
@@ -143,7 +143,7 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
     "must populate the view correctly on a GET when the question has previously been answered" in {
       val apiDetail = sampleApiDetail()
       val application = buildApplicationWithoutAccess()
-      val userAnswers = buildUserAnswers(apiDetail).set(AddAnApiSelectApplicationPage, application.id).toOption.value
+      val userAnswers = buildUserAnswers(apiDetail).set(AddAnApiSelectApplicationPage, application).toOption.value
       val fixture = buildFixture(Some(userAnswers))
       val filledForm = form.fill(application.id)
 
@@ -169,7 +169,10 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
       val application = buildApplicationWithoutAccess()
       val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
 
-      when(fixture.addAnApiSessionRepository.set(any())).thenReturn(Future.successful(true))
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any())(any()))
+        .thenReturn(Future.successful(Some(application)))
+      when(fixture.addAnApiSessionRepository.set(any()))
+        .thenReturn(Future.successful(true))
 
       running(fixture.application) {
         val request = FakeRequest(POST, routes.AddAnApiSelectApplicationController.onSubmit(NormalMode).url)
@@ -186,7 +189,10 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
       val application = buildApplicationWithoutAccess()
       val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
 
-      when(fixture.addAnApiSessionRepository.set(any())).thenReturn(Future.successful(true))
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any())(any()))
+        .thenReturn(Future.successful(Some(application)))
+      when(fixture.addAnApiSessionRepository.set(any()))
+        .thenReturn(Future.successful(true))
 
       running(fixture.application) {
         val request = FakeRequest(POST, routes.AddAnApiSelectApplicationController.onSubmit(NormalMode).url)
@@ -197,8 +203,8 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
 
         val expected = UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
           .set(AddAnApiContextPage, AddAnApi).toOption.value
-          .set(AddAnApiApiIdPage, apiDetail.id).toOption.value
-          .set(AddAnApiSelectApplicationPage, application.id).toOption.value
+          .set(AddAnApiApiPage, apiDetail).toOption.value
+          .set(AddAnApiSelectApplicationPage, application).toOption.value
 
         verify(fixture.addAnApiSessionRepository).set(ArgumentMatchers.eq(expected))
       }
@@ -250,6 +256,32 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must return 404 Not Found page with suitable message when the selected application does not exist" in {
+      val apiDetail = sampleApiDetail()
+      val application = buildApplicationWithoutAccess()
+      val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
+
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any())(any()))
+        .thenReturn(Future.successful(None))
+
+      running(fixture.application) {
+        val request = FakeRequest(POST, routes.AddAnApiSelectApplicationController.onSubmit(NormalMode).url)
+          .withFormUrlEncodedBody(("value", application.id))
+        val result = route(fixture.application, request).value
+        val view = fixture.application.injector.instanceOf[ErrorTemplate]
+
+        status(result) mustBe NOT_FOUND
+        contentAsString(result) mustBe
+          view(
+            "Page not found - 404",
+            "Application not found",
+            s"Cannot find an application with Id ${application.id}."
+          )(request, messages(fixture.application))
+            .toString()
+        contentAsString(result) must validateAsHtml
       }
     }
   }
@@ -318,7 +350,7 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
   private def buildUserAnswers(apiDetail: ApiDetail): UserAnswers = {
     UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
       .set(AddAnApiContextPage, AddAnApi).toOption.value
-      .set(AddAnApiApiIdPage, apiDetail.id).toOption.value
+      .set(AddAnApiApiPage, apiDetail).toOption.value
   }
 
 }

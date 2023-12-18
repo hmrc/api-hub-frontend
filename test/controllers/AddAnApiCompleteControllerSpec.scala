@@ -24,7 +24,7 @@ import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import org.mockito.MockitoSugar.mock
-import pages.{AddAnApiApiIdPage, AddAnApiContextPage, AddAnApiSelectApplicationPage, AddAnApiSelectEndpointsPage, ApiPolicyConditionsDeclarationPage}
+import pages.{AddAnApiApiPage, AddAnApiContextPage, AddAnApiSelectApplicationPage, AddAnApiSelectEndpointsPage, ApiPolicyConditionsDeclarationPage}
 import play.api.Application
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -44,21 +44,21 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation {
   private val selectedScopes = Set(Set("test-scope-1", "test-scope-2"))
   private val acceptedPolicyConditions: Set[ApiPolicyConditionsDeclaration] = Set(ApiPolicyConditionsDeclaration.Accept)
   private val apiId = "test-api-id"
-  private val fullUserAnswers = emptyUserAnswers
-    .set(AddAnApiContextPage, AddAnApi).toOption.value
-    .set(AddAnApiApiIdPage, apiId).toOption.value
-    .set(AddAnApiSelectApplicationPage, FakeApplication.id).toOption.value
-    .set(AddAnApiSelectEndpointsPage, selectedScopes).toOption.value
-    .set(ApiPolicyConditionsDeclarationPage, acceptedPolicyConditions).toOption.value
-
-  val expectedScopes = Set("test-scope-1", "test-scope-2")
-  private val apiDetail = ApiDetail("api_id",
+  private val expectedScopes = Set("test-scope-1", "test-scope-2")
+  private val apiDetail = ApiDetail(apiId,
     "API title",
     "",
     "",
     Seq(Endpoint("/foo/bar", Seq(EndpointMethod("GET", None, None, expectedScopes.toSeq)))),
     None,
     "")
+
+  private val fullUserAnswers = emptyUserAnswers
+    .set(AddAnApiContextPage, AddAnApi).toOption.value
+    .set(AddAnApiApiPage, apiDetail).toOption.value
+    .set(AddAnApiSelectApplicationPage, FakeApplication).toOption.value
+    .set(AddAnApiSelectEndpointsPage, selectedScopes).toOption.value
+    .set(ApiPolicyConditionsDeclarationPage, acceptedPolicyConditions).toOption.value
 
   "AddAnApiCompleteController" - {
     "must place the correct request when a valid set of answers is submitted and redirect to the success page" in {
@@ -69,8 +69,16 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation {
 
       when(fixture.apiHubService.addApi(ArgumentMatchers.eq(FakeApplication.id),
         ArgumentMatchers.eq(apiId),
-        ArgumentMatchers.eq(Seq(AvailableEndpoint("/foo/bar",
-          EndpointMethod("GET", None, None, expectedScopes.toSeq)))))(any()))
+        ArgumentMatchers.eq(
+          Seq(
+            AvailableEndpoint(
+              "/foo/bar",
+              EndpointMethod("GET", None, None, expectedScopes.toSeq),
+              false
+            )
+          )
+        )
+      )(any()))
         .thenReturn(Future.successful(Some(())))
 
       when(fixture.addAnApiSessionRepository.clear(any())).thenReturn(Future.successful(true))
@@ -129,30 +137,8 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation {
       }
     }
 
-    "must return a Not Found page when the application detail does not exist" in {
-      val fixture = buildFixture(Some(fullUserAnswers))
-
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiId))(any())).thenReturn(Future.successful(None))
-
-      running(fixture.application) {
-        val request = FakeRequest(POST, routes.AddAnApiCompleteController.addApi(AddAnApi).url)
-        val result = route(fixture.application, request).value
-        val view = fixture.application.injector.instanceOf[ErrorTemplate]
-
-        status(result) mustBe NOT_FOUND
-        contentAsString(result) mustBe
-          view(
-            "Page not found - 404",
-            "API not found",
-            s"Cannot find an API with Id $apiId."
-          )(request, messages(fixture.application))
-            .toString()
-        contentAsString(result) must validateAsHtml
-      }
-    }
-
     "must redirect to the journey recovery page when no API Id answer exists" in {
-      val userAnswers = fullUserAnswers.remove(AddAnApiApiIdPage).toOption.value
+      val userAnswers = fullUserAnswers.remove(AddAnApiApiPage).toOption.value
       val fixture = buildFixture(Some(userAnswers))
 
       when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiId))(any())).thenReturn(Future.successful(Some(apiDetail)))

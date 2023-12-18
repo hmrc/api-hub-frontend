@@ -16,17 +16,13 @@
 
 package pages
 
-import pages.behaviours.PageBehaviours
+import models.api.ApiDetail
+import play.api.libs.json.JsPath
 
-class AddAnApiApiIdPageSpec extends PageBehaviours {
+case object AddAnApiApiPage extends QuestionPage[ApiDetail] {
 
-  "AddAnApiApiIdPage" - {
+  override def path: JsPath = JsPath \ toString
 
-    beRetrievable[String](AddAnApiApiIdPage)
-
-    beSettable[String](AddAnApiApiIdPage)
-
-    beRemovable[String](AddAnApiApiIdPage)
-  }
+  override def toString: String = "api"
 
 }

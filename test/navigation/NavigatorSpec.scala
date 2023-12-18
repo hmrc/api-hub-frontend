@@ -72,7 +72,7 @@ class NavigatorSpec extends SpecBase with TryValues {
 
       "during the Add an API journey" - {
         "must go from the Add An API API Id (start) page to the Select Application page" in {
-          navigator.nextPage(AddAnApiApiIdPage, NormalMode, buildUserAnswers(AddAnApi)) mustBe routes.AddAnApiSelectApplicationController.onPageLoad(NormalMode)
+          navigator.nextPage(AddAnApiApiPage, NormalMode, buildUserAnswers(AddAnApi)) mustBe routes.AddAnApiSelectApplicationController.onPageLoad(NormalMode)
         }
 
         "must go from the Add An API Select Application page to the Select Endpoints page" in {
@@ -90,7 +90,7 @@ class NavigatorSpec extends SpecBase with TryValues {
 
       "during the Add Endpoints journey" - {
         "must go from the Add An API API Id (start) page to the Select Endpoints page" in {
-          navigator.nextPage(AddAnApiApiIdPage, NormalMode, buildUserAnswers(AddEndpoints)) mustBe routes.AddAnApiSelectEndpointsController.onPageLoad(NormalMode, AddEndpoints)
+          navigator.nextPage(AddAnApiApiPage, NormalMode, buildUserAnswers(AddEndpoints)) mustBe routes.AddAnApiSelectEndpointsController.onPageLoad(NormalMode, AddEndpoints)
         }
 
         "must go from the Add An API Select Endpoints page to the Accept Policy Conditions page" in {

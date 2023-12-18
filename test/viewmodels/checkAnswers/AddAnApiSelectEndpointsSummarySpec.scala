@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers
 
-import controllers.actions.FakeUser
+import controllers.actions.{FakeApplication, FakeUser}
 import controllers.routes
 import models.api.ApiDetailLensesSpec.sampleOas
 import models.api.{ApiDetail, Endpoint, EndpointMethod}
@@ -70,6 +70,7 @@ class AddAnApiSelectEndpointsSummarySpec extends AnyFreeSpec with Matchers with 
       val actual = AddAnApiSelectEndpointsSummary.row(
         userAnswers,
         apiDetail,
+        FakeApplication,
         AddAnApi
       )
 
@@ -98,6 +99,7 @@ class AddAnApiSelectEndpointsSummarySpec extends AnyFreeSpec with Matchers with 
       val actual = AddAnApiSelectEndpointsSummary.row(
         UserAnswers(FakeUser.userId, Json.obj(), Instant.now()),
         apiDetail,
+        FakeApplication,
         AddAnApi
       )
 
