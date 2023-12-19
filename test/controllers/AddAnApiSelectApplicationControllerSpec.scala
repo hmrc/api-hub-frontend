@@ -22,7 +22,7 @@ import forms.AddAnApiSelectApplicationFormProvider
 import generators.ApiDetailGenerators
 import models.api.ApiDetail
 import models.api.ApiDetailLenses.ApiDetailLensOps
-import models.application.{Application, Approved, Scope}
+import models.application.{Application, Scope}
 import models.application.ApplicationLenses.ApplicationLensOps
 import models.{AddAnApi, Mode, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
@@ -337,7 +337,7 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
       .setSecondaryScopes(
         apiDetail.getRequiredScopeNames
           .toSeq
-          .map(scopeName => Scope(scopeName, Approved))
+          .map(scopeName => Scope(scopeName))
       )
   }
 

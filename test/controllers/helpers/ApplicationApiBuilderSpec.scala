@@ -19,7 +19,7 @@ package controllers.helpers
 import base.SpecBase
 import controllers.actions.FakeApplication
 import models.api.{ApiDetail, Endpoint, EndpointMethod}
-import models.application.{Api, Approved, Scope, SelectedEndpoint}
+import models.application.{Api, Scope, SelectedEndpoint}
 import models.application.ApplicationLenses.ApplicationLensOps
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
@@ -204,7 +204,7 @@ object ApplicationApiBuilderSpec {
     )
 
   private def scope(name: String): Scope = {
-    Scope(name, Approved)
+    Scope(name)
   }
 
   private def scopes(name: String *): Seq[Scope] = {

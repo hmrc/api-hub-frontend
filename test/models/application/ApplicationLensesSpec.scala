@@ -210,22 +210,6 @@ class ApplicationLensesSpec extends AnyFreeSpec with Matchers with LensBehaviour
       }
     }
 
-    "hasPrimaryPendingScope" - {
-      "must return true when the application has a primary pending scope" in {
-        val application = testApplication.addPrimaryScope(Scope("test-scope", Pending))
-        application.hasPrimaryPendingScope mustBe true
-      }
-
-      "must return false when the application does not have a primary pending scope" in {
-        val application = testApplication
-          .addPrimaryScope(Scope(randomString(), Approved))
-          .addPrimaryScope(Scope(randomString(), Denied))
-          .addSecondaryScope(Scope(randomString(), Pending))
-
-        application.hasPrimaryPendingScope mustBe false
-      }
-    }
-
     "getPrimaryMasterCredential" - {
       "must return the most recently created credential" in {
         val master = randomCredential().copy(created = LocalDateTime.now())
@@ -375,9 +359,9 @@ class ApplicationLensesSpec extends AnyFreeSpec with Matchers with LensBehaviour
     "getRequiredScopeNames" - {
       "must return the set of all secondary scopes" in {
         val scopes = Seq(
-          Scope("test-scope-1", Approved),
-          Scope("test-scope-1", Approved),
-          Scope("test-scope-2", Approved)
+          Scope("test-scope-1"),
+          Scope("test-scope-1"),
+          Scope("test-scope-2")
         )
 
         val application = testApplication.setSecondaryScopes(scopes)
@@ -444,16 +428,8 @@ object ApplicationLensesSpec {
 
   private def randomScope(): Scope =
     Scope(
-      name = s"test-scope${randomString()}",
-      status = randomScopeStatus()
+      name = s"test-scope${randomString()}"
     )
-
-  private def randomScopeStatus(): ScopeStatus =
-    Random.nextInt(3) match {
-      case 0 => Pending
-      case 1 => Denied
-      case _ => Approved
-    }
 
   private def randomTeamMember(): TeamMember =
     TeamMember(email = randomString())

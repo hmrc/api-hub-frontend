@@ -55,8 +55,7 @@ trait ApplicationGenerator {
   val scopeGenerator: Gen[Scope] = {
     for {
       name <- Gen.alphaStr
-      status <- Gen.oneOf(ScopeStatus.values)
-    } yield Scope(name, status)
+    } yield Scope(name)
   }
 
   val credentialGenerator: Gen[Credential] = {
@@ -116,18 +115,5 @@ trait ApplicationGenerator {
           teamMembers
         )
     }
-
-  val newScopeGenerator: Gen[NewScope] = {
-    for {
-      name <- Gen.alphaStr.suchThat(_.nonEmpty)
-      environments <- Gen.atLeastOne(EnvironmentName.values)
-    } yield NewScope(name, environments.toSeq)
-  }
-
-  implicit val newScopesGenerator: Arbitrary[Seq[NewScope]] =
-    Arbitrary {
-      Gen.listOf(newScopeGenerator)
-    }
-
 
 }

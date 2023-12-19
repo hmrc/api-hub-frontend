@@ -21,7 +21,7 @@ import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
 import models.AvailableEndpoint
 import models.accessrequest.{AccessRequest, AccessRequestRequest, AccessRequestStatus, Pending}
 import models.api.ApiDetail
-import models.application.{Application, Credential, EnvironmentName, NewApplication, NewScope, Secondary, Secret}
+import models.application.{Application, Credential, EnvironmentName, NewApplication}
 import models.exception.ApplicationsException
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
 import play.api.Logging
@@ -53,37 +53,14 @@ class ApiHubService @Inject()(
     applicationsConnector.deleteApplication(id, userEmail)
   }
 
-  def requestAdditionalScope(id:String, newScope:NewScope)(implicit hc:HeaderCarrier): Future[Option[NewScope]] = {
-    logger.debug(s"Requesting scope named '${newScope.name}' for application id '$id' in environments ${newScope.environments}")
-    applicationsConnector.requestAdditionalScope(id, newScope)
-  }
-
-  def addScopes(id: String, scopeNames: Set[String])(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
-    applicationsConnector.addScopes(id, scopeNames.map(name => NewScope(name, Seq(Secondary))).toSeq)
-  }
-
   def addApi(applicationId: String, apiId: String, availableEndpoints: Seq[AvailableEndpoint])(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
     val scopes = availableEndpoints.flatMap(ae => ae.endpointMethod.scopes)
     val endpoints = availableEndpoints.map(ae => AddApiRequestEndpoint(ae.endpointMethod.httpMethod, ae.path))
     applicationsConnector.addApi(applicationId, AddApiRequest(apiId, endpoints, scopes))
   }
 
-  def pendingPrimaryScopes()(implicit hc: HeaderCarrier): Future[Seq[Application]] = {
-    applicationsConnector.pendingPrimaryScopes()
-  }
-
-  def approvePrimaryScope(appId: String, scopeName: String)(implicit hc:HeaderCarrier): Future[Boolean] = {
-    logger.debug(s"Approving scope named '$scopeName' for application id '$appId' in primary environment")
-    applicationsConnector.approvePrimaryScope(appId, scopeName)
-  }
-
   def getUserApplications(email:String, enrich: Boolean = false)(implicit hc:HeaderCarrier): Future[Seq[Application]] =
     applicationsConnector.getUserApplications(email, enrich)
-
-  def createPrimarySecret(id: String)(implicit hc:HeaderCarrier): Future[Option[Secret]] = {
-    logger.debug(s"Creating primary secret for application $id")
-    applicationsConnector.createPrimarySecret(id)
-  }
 
   def testConnectivity()(implicit hc: HeaderCarrier): Future[String] = {
     applicationsConnector.testConnectivity()
