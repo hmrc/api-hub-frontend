@@ -96,12 +96,9 @@ registerApplicationSuccess.text.line2 = Your Application ID will be available on
 
 applicationDetails.title = Application Details
 applicationDetails.heading = Application details
-applicationDetails.application.name = Name
-applicationDetails.application.id = Id
 applicationDetails.application.application = Application
 applicationDetails.application.applicationId = Application ID
 applicationDetails.application.created = Created
-applicationDetails.application.createdBy = Created by
 applicationDetails.apis.heading.noApis = Application APIs
 applicationDetails.apis.heading = Application APIs ({0})
 applicationDetails.apis.hipApis = add APIs
@@ -110,22 +107,9 @@ applicationDetails.apis.endpointsAvailable = {0} of {1} endpoints available
 applicationDetails.apis.apiName = API name
 applicationDetails.apis.devEnv = Dev env
 applicationDetails.apis.prodEnv = Prod env
-
 applicationDetails.teamMembers.heading = Team members ({0})
 applicationDetails.teamMembers.emailAddress = Email address
-applicationDetails.addScope = Add scope
-applicationDetails.credentials = Credentials
-applicationDetails.credentials.clientSecret = Client secret
-applicationDetails.credentials.clientId = Client ID
 applicationDetails.teamMembers = Team members
-applicationDetails.scopes = Scopes
-applicationDetails.noScopes = You have no scopes
-applicationDetails.noCredentials = You have no credentials
-applicationDetails.scope.name = Name
-applicationDetails.scope.status = Status
-applicationDetails.generateSecret = Generate secret
-applicationDetails.deleteApplication = Delete application
-applicationDetails.thereWereIssues = There were issues fetching elements of this application
 applicationDetails.pending.heading = Production request for APIs is pending approval
 applicationDetails.pending.message = When a decision is made for your production request for APIs you will be notified via email.
 
@@ -200,11 +184,6 @@ applicationNav.page.editApplicationName = Edit application name
 applicationNav.page.leaveApplication = Leave application
 applicationNav.page.deleteApplication = Delete application
 
-requestScopeSuccess.title = Scope requested successfully
-requestScopeSuccess.heading = Scope requested successfully
-requestScopeSuccess.guidance.heading = What you can do now
-requestScopeSuccess.guidance.content = View your {0} application and manage credentials for your scopes.
-
 fake-sign-in.username.error.required = Enter a principal
 fake-sign-in.title.lbl = Create test sign in
 fake-sign-in.header.lbl = Create test sign in
@@ -216,39 +195,6 @@ fake-sign-in.redirectUrl.error.absolute = Redirect URL must be absolute e.g. htt
 fake-sign-in.token.lbl = Token (optional)
 fake-sign-in.permissions.lbl = Permissions
 fake-sign-in.button = Sign in
-
-addScope.title = Add a Scope
-addScope.heading = Add a scope
-addScope.scopeName.heading = Scope name
-addScope.scopeName.hint = Add the exact name of the scope you want to use
-addScope.environments.heading = Which environments do you want to enable?
-
-addScope.error.required = Enter a scope name and select at least one environment
-addScope.error.length = Scope name must be 100 characters or less
-
-pendingApprovals.title = Pending approvals
-pendingApprovals.heading = Pending approvals
-
-scopeApproved.title = Scope approved successfully
-scopeApproved.heading = Scope approved successfully
-scopeApproved.guidance.heading = What you can do now
-scopeApproved.guidance.content = Return to {0}.
-
-approveScope.title = Review scope requests
-approveScope.heading = Review scope requests
-approveScope.applicationDetails.pendingScopeRequests = Pending scope requests for
-approveScope.notFound.heading = Scope request not found
-approveScope.notFound.message = Cannot find a request for scope {0} for an application with Id {1}.
-
-addScope.applicationDetails.heading = Application details
-addScope.applicationDetails.applicationName = Application name
-addScope.applicationDetails.id = Id
-addScope.applicationDetails.requestedScope = Requested scope
-addScope.requesterDetails.heading = Requester details
-addScope.requesterDetails.name = Name
-addScope.requesterDetails.requestedOn = Requested on
-addScope.approveButton.text = Approve
-addScope.declineButton.text = Decline
 
 questionAddTeamMembers.title = Do you want to add team members?
 questionAddTeamMembers.heading = Do you want to add team members?
@@ -283,33 +229,6 @@ signIn.stride.instructions = Use your @hmrc.gov.uk email to sign in.
 signIn.stride.guidance = If you are on a corporate device you will automatically be signed in and taken to The API Hub.
 signIn.stride.help = To sign in via STRIDE you will need the "The API Hub user" role assigned in the Service Request System.
 signIn.stride.helpLink = Find out how to self serve the role (opens in new tab)
-
-generatePrimarySecretSuccess.title = Client secret successfully created
-generatePrimarySecretSuccess.heading = Client secret successfully created
-generatePrimarySecretSuccess.applicationName = Application name
-generatePrimarySecretSuccess.environment = Environment
-generatePrimarySecretSuccess.scopes = Scopes
-generatePrimarySecretSuccess.clientId = Client ID
-generatePrimarySecretSuccess.clientSecret = Client secret
-generatePrimarySecretSuccess.onceOnlyWarning = You client secret will only be displayed on this page, you will not be able to retrieve it after this.
-generatePrimarySecretSuccess.guidance.heading = What you can do now
-generatePrimarySecretSuccess.guidance.content = Return to your application and manage your {0}.
-generatePrimarySecretSuccess.guidance.link = client secrets
-generatePrimarySecretSuccess.notFound.heading = Primary credential not found
-generatePrimarySecretSuccess.notFound.message = This application''s primary credential cannot be found in IDMS.
-generatePrimarySecretSuccess.invalidCredential.heading = Invalid primary credential
-generatePrimarySecretSuccess.invalidCredential.message = This application does not have a valid primary credential to generate a secret for.
-generatePrimarySecretSuccess.alreadyGenerated.heading = Secret already generated
-generatePrimarySecretSuccess.alreadyGenerated.message = A primary credential secret has already been generated for this application.
-
-productionCredentialsChecklist.title = Generating production credentials
-productionCredentialsChecklist.heading = Generating production credentials
-productionCredentialsChecklist.error.required = You must confirm you meet the conditions to continue
-productionCredentialsChecklist.guidance = To generate production credentials, you must satisfy the following conditions:
-productionCredentialsChecklist.condition1 = You must have Security Check (SC) Clearance
-productionCredentialsChecklist.condition2 = You must have a secure mechanism for storing production credentials
-productionCredentialsChecklist.condition3 = You must agree that if your credentials are compromised or there is suspicion of compromise by an intruder or unauthorised user, you will notify the API Hub immediately
-productionCredentialsChecklist.confirm = I confirm that the above conditions are satisfied
 
 testConnectivity.heading = Test Connectivity
 testConnectivity.title = Test Connectivity

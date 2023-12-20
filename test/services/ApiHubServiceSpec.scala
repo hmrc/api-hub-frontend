@@ -20,9 +20,9 @@ import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
 import controllers.actions.FakeApplication
 import generators.{AccessRequestGenerator, ApiDetailGenerators}
 import models.AvailableEndpoint
-import models.accessrequest.{AccessRequest, AccessRequestRequest, AccessRequestStatus, Pending, Rejected}
+import models.accessrequest._
 import models.api.EndpointMethod
-import models.application.{Application, Creator, Credential, NewApplication, NewScope, Primary, Secondary, Secret, TeamMember}
+import models.application.{Application, Creator, Credential, NewApplication, Primary, TeamMember}
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
@@ -138,106 +138,6 @@ class ApiHubServiceSpec
       service.deleteApplication(id, None)(HeaderCarrier()) map {
         actual =>
           actual mustBe None
-      }
-    }
-  }
-
-  "requestAdditionalScope" - {
-    "must call the applications connector and return the new scope" in {
-      val applicationId = "app-id"
-      val newScope = NewScope(applicationId, Seq(Primary))
-
-      val applicationsConnector = mock[ApplicationsConnector]
-      when(applicationsConnector.requestAdditionalScope(ArgumentMatchers.eq(applicationId), ArgumentMatchers.eq(newScope))(any()))
-        .thenReturn(Future.successful(Some(newScope)))
-
-      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
-
-      service.requestAdditionalScope(applicationId, newScope)(HeaderCarrier()) map {
-        actual =>
-          actual mustBe Some(newScope)
-          verify(applicationsConnector).requestAdditionalScope(ArgumentMatchers.eq(applicationId), ArgumentMatchers.eq(newScope))(any())
-          succeed
-      }
-    }
-  }
-
-  "addScopes" - {
-    "must call the applications connector with the correct request" in {
-      val applicationId = "app-id"
-      val scopes = Set("test-scope-1", "test-scope-2")
-      val newScopes = scopes.map(NewScope(_, Seq(Secondary))).toSeq
-
-      val applicationsConnector = mock[ApplicationsConnector]
-      when(applicationsConnector.addScopes(ArgumentMatchers.eq(applicationId), ArgumentMatchers.eq(newScopes))(any()))
-        .thenReturn(Future.successful(Some(())))
-
-      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
-
-      service.addScopes(applicationId, scopes)(HeaderCarrier()) map {
-        actual =>
-          actual mustBe Some(())
-      }
-    }
-  }
-
-  "pendingScopes" - {
-    "must call the applications connectors and return the applications" in {
-      val application1 = Application("id-1", "test-app-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1")))
-      val application2 = Application("id-2", "test-app-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2")))
-      val expected = Seq(application1, application2)
-
-      val applicationsConnector = mock[ApplicationsConnector]
-      when(applicationsConnector.pendingPrimaryScopes()(any())).thenReturn(Future.successful(expected))
-
-      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
-
-      service.pendingPrimaryScopes()(HeaderCarrier()) map {
-        actual =>
-          actual mustBe expected
-          verify(applicationsConnector).pendingPrimaryScopes()(any())
-          succeed
-      }
-    }
-  }
-
-  "approveScope" - {
-    "must call the applications connectors and return APPROVED" in {
-      val appId = "app_id"
-      val scope = "a_scope"
-      val applicationsConnector = mock[ApplicationsConnector]
-      when(applicationsConnector.approvePrimaryScope(ArgumentMatchers.eq(appId),ArgumentMatchers.eq(scope))(any()))
-        .thenReturn(Future.successful(true))
-
-      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
-
-      service.approvePrimaryScope(appId,scope)(HeaderCarrier()) map {
-        actual =>
-          actual mustBe true
-          verify(applicationsConnector).approvePrimaryScope(ArgumentMatchers.eq(appId),ArgumentMatchers.eq(scope))(any())
-          succeed
-      }
-    }
-  }
-
-  "createPrimarySecret" - {
-    "must call the applications connector and return the secret" in {
-      val applicationId = "test-application-id"
-      val expected = Secret("test-secret")
-      val applicationsConnector = mock[ApplicationsConnector]
-      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
-
-      when(applicationsConnector.createPrimarySecret(ArgumentMatchers.eq(applicationId))(any()))
-        .thenReturn(Future.successful(Some(expected)))
-
-      service.createPrimarySecret(applicationId)(HeaderCarrier()) map {
-        actual =>
-          actual.value mustBe expected
       }
     }
   }

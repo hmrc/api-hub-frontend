@@ -33,21 +33,6 @@ POST        /application/register/register-application                         c
 
 GET         /register-application-success/:id                                  controllers.RegisterApplicationSuccessController.onPageLoad(id:String)
 
-GET         /application-details/:id                                           controllers.ApplicationDetailsController.onPageLoad(id: String)
-POST        /delete-application/:id                                            controllers.ApplicationDetailsController.delete(id: String)
-
-GET         /request-scope-success/:id                                         controllers.RequestScopeSuccessController.onPageLoad(id: String)
-
-GET         /add-scope/:id                                                     controllers.AddScopeController.onPageLoad(id: String)
-POST        /add-scope/:id                                                     controllers.AddScopeController.onSubmit(id: String)
-
-GET         /approvals/pending                                                 controllers.PendingApprovalsController.onPageLoad()
-
-GET         /approvals/scope-approved                                          controllers.ScopeApprovedController.onPageLoad()
-
-GET         /approvals/approve-scope/:id                                       controllers.ApproveScopeController.onPageLoad(id: String)
-GET         /approvals/approve-scope/:id/approve/scopes/:scopeName             controllers.ApproveScopeController.onApprove(id: String, scopeName:String)
-
 GET         /application/register/add-team-members                             controllers.QuestionAddTeamMembersController.onPageLoad(mode: Mode = NormalMode)
 POST        /application/register/add-team-members                             controllers.QuestionAddTeamMembersController.onSubmit(mode: Mode = NormalMode)
 GET         /application/register/change-add-team-members                      controllers.QuestionAddTeamMembersController.onPageLoad(mode: Mode = CheckMode)
@@ -66,9 +51,6 @@ POST        /application/register/change-team-members-overview                 c
 GET         /application/register/remove-team-member/:index                    controllers.RemoveTeamMemberController.removeTeamMember(mode: Mode = NormalMode, index: Int)
 
 GET         /sign-in                                                           controllers.auth.SignInController.onPageLoad()
-
-GET         /generating-credentials/:id                                        controllers.ProductionCredentialsChecklistController.onPageLoad(id: String)
-POST        /generating-credentials/:id                                        controllers.ProductionCredentialsChecklistController.onSubmit(id: String)
 
 GET         /test-connectivity                                                 controllers.TestConnectivityController.onPageLoad()
 

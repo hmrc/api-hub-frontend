@@ -98,32 +98,6 @@ class ApplicationsConnector @Inject()(
       }
   }
 
-  def requestAdditionalScope(id: String, newScope: NewScope)(implicit hc: HeaderCarrier): Future[Option[NewScope]] = {
-    httpClient
-      .post(url"$applicationsBaseUrl/api-hub-applications/applications/$id/environments/scopes")
-      .setHeader(AUTHORIZATION -> clientAuthToken)
-      .withBody(Json.toJson(Seq(newScope)))
-      .execute[Either[UpstreamErrorResponse, Unit]]
-      .flatMap {
-        case Right(_) => Future.successful(Some(newScope))
-        case Left(e) if e.statusCode==404 => Future.successful(None)
-        case Left(e) => Future.failed(e)
-      }
-  }
-
-  def addScopes(id: String, newScopes: Seq[NewScope])(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
-    httpClient
-      .post(url"$applicationsBaseUrl/api-hub-applications/applications/$id/environments/scopes")
-      .setHeader(AUTHORIZATION -> clientAuthToken)
-      .withBody(Json.toJson(newScopes))
-      .execute[Either[UpstreamErrorResponse, Unit]]
-      .flatMap {
-        case Right(_) => Future.successful(Some(()))
-        case Left(e) if e.statusCode==404 => Future.successful(None)
-        case Left(e) => Future.failed(e)
-      }
-  }
-
   def addApi(applicationId: String, addApiRequest: AddApiRequest)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
     httpClient
       .put(url"$applicationsBaseUrl/api-hub-applications/applications/$applicationId/apis")
@@ -132,41 +106,6 @@ class ApplicationsConnector @Inject()(
       .execute[Either[UpstreamErrorResponse, Unit]]
       .flatMap {
         case Right(_) => Future.successful(Some(()))
-        case Left(e) if e.statusCode == 404 => Future.successful(None)
-        case Left(e) => Future.failed(e)
-      }
-  }
-
-  def pendingPrimaryScopes()(implicit hc: HeaderCarrier): Future[Seq[Application]] = {
-    httpClient
-      .get(url"$applicationsBaseUrl/api-hub-applications/applications/pending-primary-scopes")
-      .setHeader((ACCEPT, JSON))
-      .setHeader(AUTHORIZATION -> clientAuthToken)
-      .execute[Seq[Application]]
-  }
-
-  def approvePrimaryScope(appId: String, scopeName: String)(implicit hc: HeaderCarrier): Future[Boolean] = {
-    httpClient
-      .put(url"$applicationsBaseUrl/api-hub-applications/applications/$appId/environments/primary/scopes/$scopeName")
-      .setHeader((CONTENT_TYPE, JSON))
-      .setHeader(AUTHORIZATION -> clientAuthToken)
-      .withBody("{\"status\":\"APPROVED\"}")
-      .execute[Either[UpstreamErrorResponse, Unit]]
-      .flatMap {
-        case Right(_) => Future.successful(true)
-        case Left(e) if e.statusCode == 404 => Future.successful(false)
-        case Left(e) => Future.failed(e)
-      }
-  }
-
-  def createPrimarySecret(id: String)(implicit hc: HeaderCarrier): Future[Option[Secret]] = {
-    httpClient
-      .post(url"$applicationsBaseUrl/api-hub-applications/applications/$id/environments/primary/credentials/secret")
-      .setHeader((ACCEPT, JSON))
-      .setHeader(AUTHORIZATION -> clientAuthToken)
-      .execute[Either[UpstreamErrorResponse, Secret]]
-      .flatMap {
-        case Right(secret) => Future.successful(Some(secret))
         case Left(e) if e.statusCode == 404 => Future.successful(None)
         case Left(e) => Future.failed(e)
       }

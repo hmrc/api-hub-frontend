@@ -19,7 +19,7 @@ package viewmodels.application
 import controllers.actions.FakeApplication
 import models.api.{ApiDetail, Endpoint, EndpointMethod}
 import models.application.ApplicationLenses.ApplicationLensOps
-import models.application.{Approved, Primary, Scope, Secondary}
+import models.application.{Primary, Scope, Secondary}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
@@ -156,7 +156,7 @@ object ApplicationApiSpec {
   private val testScope3 = "test-scope-3"
 
   private def scope(name: String): Scope = {
-    Scope(name, Approved)
+    Scope(name)
   }
 
   private def scopes(name: String *): Seq[Scope] = {

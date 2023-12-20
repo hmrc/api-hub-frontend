@@ -147,7 +147,7 @@ class ProvideSupportingInformationControllerSpec extends SpecBase with MockitoSu
 
     val application = FakeApplication
       .addApi(Api(apiDetail.id, Seq(SelectedEndpoint("GET", "/test"))))
-      .setSecondaryScopes(Seq(Scope("test-scope", Approved)))
+      .setSecondaryScopes(Seq(Scope("test-scope")))
 
     application
   }

@@ -84,7 +84,7 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
     "will not request access for API endpoints whose scope is already held by the application " in {
       forAll(teamMemberAndSupporterTable) {
         user: UserModel =>
-          val application = anApplication.setPrimaryScopes(Seq(Scope("test-scope", Approved))) //decorate application with primary scope test-scope
+          val application = anApplication.setPrimaryScopes(Seq(Scope("test-scope"))) //decorate application with primary scope test-scope
           val userAnswers = buildUserAnswers(application)
           val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
           val apiDetail = anApiDetail
@@ -190,7 +190,7 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
 
     val application = FakeApplication
       .addApi(Api(apiDetail.id, Seq(SelectedEndpoint("GET", "/test"), SelectedEndpoint("POST", "/anothertest"))))
-      .setSecondaryScopes(Seq(Scope("test-scope", Approved)))
+      .setSecondaryScopes(Seq(Scope("test-scope")))
     application
   }
 

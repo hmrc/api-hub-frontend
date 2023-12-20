@@ -17,7 +17,7 @@
 package generators
 
 import models.application.TeamMember
-import models.{ApiPolicyConditionsDeclaration, ProductionCredentialsChecklist}
+import models.ApiPolicyConditionsDeclaration
 import org.scalacheck.{Arbitrary, Gen}
 import viewmodels.admin.Decision
 import viewmodels.admin.Decision.{Approve, Reject}
@@ -27,11 +27,6 @@ trait ModelGenerators {
   implicit lazy val arbitraryApiPolicyConditionsDeclaration: Arbitrary[ApiPolicyConditionsDeclaration] =
     Arbitrary {
       Gen.oneOf(ApiPolicyConditionsDeclaration.values)
-    }
-
-  implicit lazy val arbitraryProductionCredentialsChecklist: Arbitrary[ProductionCredentialsChecklist] =
-    Arbitrary {
-      Gen.oneOf(ProductionCredentialsChecklist.values)
     }
 
   implicit lazy val arbitraryTeamMember: Arbitrary[TeamMember] =

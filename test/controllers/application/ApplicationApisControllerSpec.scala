@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
 import controllers.routes
 import models.api.{ApiDetail, Endpoint, EndpointMethod}
-import models.application.{Api, Approved, Scope, SelectedEndpoint}
+import models.application.{Api, Scope, SelectedEndpoint}
 import models.application.ApplicationLenses.ApplicationLensOps
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
@@ -77,7 +77,7 @@ class ApplicationApisControllerSpec extends SpecBase with MockitoSugar with Test
 
       val application = FakeApplication
         .addApi(Api(apiDetail.id, Seq(SelectedEndpoint("GET", "/test"))))
-        .setSecondaryScopes(Seq(Scope("test-scope", Approved)))
+        .setSecondaryScopes(Seq(Scope("test-scope")))
 
       val applicationApis = Seq(
         ApplicationApi(apiDetail, Seq(ApplicationEndpoint("GET", "/test", Seq("test-scope"), Inaccessible, Accessible)), false)
