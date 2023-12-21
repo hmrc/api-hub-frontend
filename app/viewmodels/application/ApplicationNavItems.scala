@@ -57,24 +57,6 @@ object ApplicationNavItems {
         isCurrentPage = currentPage == EnvironmentsAndCredentialsPage
       ),
       SideNavItem(
-        page = ManageTeamMembersPage,
-        title = messages("applicationNav.page.manageTeamMembers"),
-        link = controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id),
-        isCurrentPage = currentPage == ManageTeamMembersPage
-      ),
-      SideNavItem(
-        page = EditApplicationNamePage,
-        title = messages("applicationNav.page.editApplicationName"),
-        link = controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id),
-        isCurrentPage = currentPage == EditApplicationNamePage
-      ),
-      SideNavItem(
-        page = LeaveApplicationPage,
-        title = messages("applicationNav.page.leaveApplication"),
-        link = controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id),
-        isCurrentPage = currentPage == LeaveApplicationPage
-      ),
-      SideNavItem(
         page = DeleteApplicationPage,
         title = messages("applicationNav.page.deleteApplication"),
         link = controllers.application.routes.DeleteApplicationConfirmationController.onPageLoad(application.id),
