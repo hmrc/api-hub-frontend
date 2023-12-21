@@ -18,7 +18,7 @@ package controllers.application
 
 import base.SpecBase
 import controllers.actions.{FakeApplication, FakeUser}
-import models.accessrequest.{AccessRequestApi, AccessRequestEndpoint, AccessRequestRequest}
+import models.accessrequest.{AccessRequestApi, AccessRequestEndpoint, AccessRequestRequest, Pending}
 import models.api.{ApiDetail, Endpoint, EndpointMethod}
 import models.application.ApplicationLenses.ApplicationLensOps
 import models.application._
@@ -62,7 +62,8 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
           )
           val expectedAccessRequest: AccessRequestRequest = AccessRequestRequest(application.id, "blah", user.email.get, accessRequestApis)
 
-          when(fixture.apiHubService.hasPendingAccessRequest(any())(any())).thenReturn(Future.successful(false))
+          when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(application.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
+            .thenReturn(Future.successful(Seq.empty))
           when(fixture.apiHubService.getApiDetail(any())(any())).thenReturn(Future.successful(Some(anApiDetail)))
           when(fixture.apiHubService.requestProductionAccess(ArgumentMatchers.eq(expectedAccessRequest))(any())).thenReturn(Future.successful(()))
           when(fixture.accessRequestSessionRepository.clear(user.userId)).thenReturn(Future.successful(true))
@@ -95,7 +96,8 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
           )
           val expectedAccessRequest: AccessRequestRequest = AccessRequestRequest(application.id, "blah", user.email.get, accessRequestApis)
 
-          when(fixture.apiHubService.hasPendingAccessRequest(any())(any())).thenReturn(Future.successful(false))
+          when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(application.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
+            .thenReturn(Future.successful(Seq.empty))
           when(fixture.apiHubService.getApiDetail(any())(any())).thenReturn(Future.successful(Some(anApiDetail)))
           when(fixture.apiHubService.requestProductionAccess(ArgumentMatchers.eq(expectedAccessRequest))(any())).thenReturn(Future.successful(()))
           when(fixture.accessRequestSessionRepository.clear(user.userId)).thenReturn(Future.successful(true))

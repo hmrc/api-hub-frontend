@@ -19,6 +19,7 @@ package controllers.application
 import base.SpecBase
 import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
 import controllers.routes
+import models.accessrequest.Pending
 import models.api.{ApiDetail, Endpoint, EndpointMethod}
 import models.application.{Api, Scope, SelectedEndpoint, TeamMember}
 import models.application.ApplicationLenses.ApplicationLensOps
@@ -48,7 +49,8 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
           when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(true))(any()))
             .thenReturn(Future.successful(Some(FakeApplication)))
 
-          when(fixture.apiHubService.hasPendingAccessRequest(any())(any())).thenReturn(Future.successful(false))
+          when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(FakeApplication.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
+            .thenReturn(Future.successful(Seq.empty))
 
           running(fixture.playApplication) {
             val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id).url)
@@ -90,7 +92,8 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
       when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any())(any()))
         .thenReturn(Future.successful(Some(application)))
 
-      when(fixture.apiHubService.hasPendingAccessRequest(any())(any())).thenReturn(Future.successful(false))
+      when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(application.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
+        .thenReturn(Future.successful(Seq.empty))
 
       running(fixture.playApplication) {
         val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url)
@@ -126,8 +129,8 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
       when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), ArgumentMatchers.eq(true))(any()))
         .thenReturn(Future.successful(Some(application)))
 
-      when(fixture.apiHubService.hasPendingAccessRequest(any())(any()))
-        .thenReturn(Future.successful(false))
+      when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(application.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
+        .thenReturn(Future.successful(Seq.empty))
 
       when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))

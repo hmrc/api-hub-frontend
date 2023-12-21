@@ -17,6 +17,7 @@
 package controllers.helpers
 
 import com.google.inject.Inject
+import models.accessrequest.{AccessRequest, Pending}
 import models.api.ApiDetail
 import models.application._
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
@@ -34,16 +35,16 @@ class ApplicationApiBuilder @Inject()(
 )(implicit ec: ExecutionContext) extends FrontendHeaderCarrierProvider with I18nSupport {
 
   def build(application: Application)(implicit request: Request[_]): Future[Either[Result, Seq[ApplicationApi]]] = {
-    apiHubService.hasPendingAccessRequest(application.id).flatMap(
-      hasPendingAccessRequest =>
+    apiHubService.getAccessRequests(Some(application.id), Some(Pending)).flatMap (
+      pendingAccessRequests =>
         fetchApiDetails(application).map {
-          case Right(apiDetails) => Right(build(application, apiDetails, hasPendingAccessRequest))
+          case Right(apiDetails) => Right(build(application, apiDetails, pendingAccessRequests))
           case Left(result) => Left(result)
         }
     )
   }
 
-  private def build(application: Application, apiDetails: Seq[ApiDetail], hasPendingAccessRequest: Boolean): Seq[ApplicationApi] = {
+  private def build(application: Application, apiDetails: Seq[ApiDetail], pendingAccessRequests: Seq[AccessRequest]): Seq[ApplicationApi] = {
     application.apis.flatMap(
       api =>
         apiDetails.find(_.id == api.id).map {
@@ -59,14 +60,18 @@ class ApplicationApiBuilder @Inject()(
                         endpoint.httpMethod,
                         endpoint.path,
                         endpointMethod.scopes,
-                        ApplicationEndpointAccess(application, hasPendingAccessRequest, endpointMethod, Primary),
-                        ApplicationEndpointAccess(application, hasPendingAccessRequest, endpointMethod, Secondary)
+                        ApplicationEndpointAccess(application, hasPendingAccessRequest(apiDetail.id, pendingAccessRequests), endpointMethod, Primary),
+                        ApplicationEndpointAccess(application, hasPendingAccessRequest(apiDetail.id, pendingAccessRequests), endpointMethod, Secondary)
                       )
                   )
             }
-            ApplicationApi(apiDetail, endpoints, hasPendingAccessRequest)
+            ApplicationApi(apiDetail, endpoints, hasPendingAccessRequest(apiDetail.id, pendingAccessRequests))
         }
     )
+  }
+
+  private def hasPendingAccessRequest(apiId: String, pendingAccessRequests: Seq[AccessRequest]): Boolean = {
+    pendingAccessRequests.exists(_.apiId == apiId)
   }
 
   private def fetchApiDetails(application: Application)(implicit request: Request[_]): Future[Either[Result, Seq[ApiDetail]]] = {
