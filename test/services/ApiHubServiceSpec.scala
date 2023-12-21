@@ -368,37 +368,6 @@ class ApiHubServiceSpec
     }
   }
 
-  "hasPendingAccessRequest" - {
-    "must return true when the application has pending access requests" in {
-      val applicationsConnector = mock[ApplicationsConnector]
-      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
-      val applicationId = "test-application-id"
-
-      when(applicationsConnector.getAccessRequests(any(), any())(any())).thenReturn(Future.successful(sampleAccessRequests()))
-
-      service.hasPendingAccessRequest(applicationId)(HeaderCarrier()).map {
-        result =>
-          verify(applicationsConnector).getAccessRequests(ArgumentMatchers.eq(Some(applicationId)), ArgumentMatchers.eq(Some(Pending)))(any())
-          result mustBe true
-      }
-    }
-
-    "must return false when the application does not have pending access requests" in {
-      val applicationsConnector = mock[ApplicationsConnector]
-      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
-      val applicationId = "test-application-id"
-
-      when(applicationsConnector.getAccessRequests(any(), any())(any())).thenReturn(Future.successful(Seq.empty))
-
-      service.hasPendingAccessRequest(applicationId)(HeaderCarrier()).map {
-        result =>
-          result mustBe false
-      }
-    }
-  }
-
 }
 
 trait ApplicationGetterBehaviours {

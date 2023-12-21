@@ -18,6 +18,7 @@ package controllers.helpers
 
 import base.SpecBase
 import controllers.actions.FakeApplication
+import models.accessrequest.{AccessRequest, Pending}
 import models.api.{ApiDetail, Endpoint, EndpointMethod}
 import models.application.{Api, Scope, SelectedEndpoint}
 import models.application.ApplicationLenses.ApplicationLensOps
@@ -33,9 +34,10 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Application => PlayApplication}
 import services.ApiHubService
-import viewmodels.application.{Accessible, ApplicationApi, ApplicationEndpoint, Inaccessible}
+import viewmodels.application.{Accessible, ApplicationApi, ApplicationEndpoint, Inaccessible, Requested}
 import views.html.ErrorTemplate
 
+import java.time.LocalDateTime
 import scala.concurrent.Future
 
 class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
@@ -48,12 +50,18 @@ class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
       val application = FakeApplication
         .addApi(Api(apiId1, Seq(SelectedEndpoint("GET", "/test1/1"), SelectedEndpoint("POST", "/test1/1"), SelectedEndpoint("GET", "/test1/2"))))
         .addApi(Api(apiId2, Seq(SelectedEndpoint("GET", "/test2/1"))))
+        .addApi(Api(apiId3, Seq(SelectedEndpoint("GET", "/test3/1"))))
         .setPrimaryScopes(scopes("all:test-scope-1", "get:test-scope-1-1", "get:test-scope-1-2"))
-        .setSecondaryScopes(scopes("all:test-scope-1", "get:test-scope-1-1", "post:test-scope-1-1", "get:test-scope-1-2"))
+        .setSecondaryScopes(scopes("all:test-scope-1", "get:test-scope-1-1", "post:test-scope-1-1", "get:test-scope-1-2", "get:test-scope-3-1"))
 
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiId1))(any())).thenReturn(Future.successful(Some(apiDetail1)))
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiId2))(any())).thenReturn(Future.successful(Some(apiDetail2)))
-      when(fixture.apiHubService.hasPendingAccessRequest(any())(any())).thenReturn(Future.successful(false))
+      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiId1))(any()))
+        .thenReturn(Future.successful(Some(apiDetail1)))
+      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiId2))(any()))
+        .thenReturn(Future.successful(Some(apiDetail2)))
+      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiId3))(any()))
+        .thenReturn(Future.successful(Some(apiDetail3)))
+      when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(FakeApplication.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
+        .thenReturn(Future.successful(Seq(accessRequest)))
 
       running(fixture.application) {
         implicit val request: Request[_] = FakeRequest()
@@ -76,6 +84,13 @@ class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
               ApplicationEndpoint("GET", "/test2/1", Seq("get:test-scope-2-1"), Inaccessible, Inaccessible)
             ),
             false
+          ),
+          ApplicationApi(
+            apiDetail3,
+            Seq(
+              ApplicationEndpoint("GET", "/test3/1", Seq("get:test-scope-3-1"), Requested, Accessible)
+            ),
+            true
           )
         )
 
@@ -87,7 +102,8 @@ class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
       val fixture = buildFixture()
       val application = FakeApplication
 
-      when(fixture.apiHubService.hasPendingAccessRequest(any())(any())).thenReturn(Future.successful(false))
+      when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(FakeApplication.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
+        .thenReturn(Future.successful(Seq.empty))
 
       running(fixture.application) {
         implicit val request: Request[_] = FakeRequest()
@@ -103,8 +119,10 @@ class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
       val apiId = "test-id"
       val application = FakeApplication.addApi(Api(apiId, Seq.empty))
 
-      when(fixture.apiHubService.hasPendingAccessRequest(any())(any())).thenReturn(Future.successful(false))
-      when(fixture.apiHubService.getApiDetail(any())(any())).thenReturn(Future.successful(None))
+      when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(FakeApplication.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
+        .thenReturn(Future.successful(Seq.empty))
+      when(fixture.apiHubService.getApiDetail(any())(any()))
+        .thenReturn(Future.successful(None))
 
       running(fixture.application) {
         implicit val request: Request[_] = FakeRequest()
@@ -152,6 +170,7 @@ object ApplicationApiBuilderSpec {
 
   private val apiId1 = "test-id-1"
   private val apiId2 = "test-id-2"
+  private val apiId3 = "test-id-3"
 
   private val apiDetail1 =
     ApiDetail(
@@ -202,6 +221,35 @@ object ApplicationApiBuilderSpec {
       shortDescription = None,
       openApiSpecification = "test-oas-spec-2"
     )
+
+  private val apiDetail3 =
+    ApiDetail(
+      id = apiId3,
+      title = "test-title-3",
+      description = "test-description-3",
+      version = "test-version-3",
+      endpoints = Seq(
+        Endpoint(
+          path = "/test3/1",
+          methods = Seq(
+            EndpointMethod("GET", None, None, Seq("get:test-scope-3-1"))
+          )
+        )
+      ),
+      shortDescription = None,
+      openApiSpecification = "test-oas-spec-3"
+    )
+
+  private def accessRequest = AccessRequest(
+    id = "test-access-request-id",
+    applicationId = FakeApplication.id,
+    apiId = apiDetail3.id,
+    apiName = apiDetail3.title,
+    status = Pending,
+    supportingInformation = "test-supporting-information",
+    requested = LocalDateTime.now,
+    requestedBy = "test-requested-by"
+  )
 
   private def scope(name: String): Scope = {
     Scope(name)

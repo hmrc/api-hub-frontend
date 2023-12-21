@@ -20,6 +20,7 @@ import base.SpecBase
 import controllers.actions.{FakeApplication, FakeUser}
 import controllers.routes
 import forms.RequestProductionAccessDeclarationFormProvider
+import models.accessrequest.Pending
 import models.api.{ApiDetail, Endpoint, EndpointMethod}
 import models.application.ApplicationLenses.ApplicationLensOps
 import models.application._
@@ -62,7 +63,8 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
 
           when(fixture.apiHubService.getApiDetail(any())(any())).thenReturn(Future.successful(Some(anApiDetail)))
 
-          when(fixture.apiHubService.hasPendingAccessRequest(any())(any())).thenReturn(Future.successful(false))
+          when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(FakeApplication.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
+            .thenReturn(Future.successful(Seq.empty))
 
           running(fixture.application) {
             val request = FakeRequest(GET, controllers.application.routes.RequestProductionAccessController.onPageLoad().url)
@@ -91,7 +93,8 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
       when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), ArgumentMatchers.eq(true))(any()))
         .thenReturn(Future.successful(Some(application)))
 
-      when(fixture.apiHubService.hasPendingAccessRequest(any())(any())).thenReturn(Future.successful(false))
+      when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(application.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
+        .thenReturn(Future.successful(Seq.empty))
 
       running(fixture.application) {
         val request = FakeRequest(GET, controllers.application.routes.RequestProductionAccessController.onPageLoad().url)

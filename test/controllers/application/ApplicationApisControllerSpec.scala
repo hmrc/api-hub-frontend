@@ -19,9 +19,10 @@ package controllers.application
 import base.SpecBase
 import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
 import controllers.routes
+import models.accessrequest.Pending
 import models.api.{ApiDetail, Endpoint, EndpointMethod}
-import models.application.{Api, Scope, SelectedEndpoint}
 import models.application.ApplicationLenses.ApplicationLensOps
+import models.application.{Api, Scope, SelectedEndpoint}
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
@@ -48,7 +49,8 @@ class ApplicationApisControllerSpec extends SpecBase with MockitoSugar with Test
           when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(true))(any()))
             .thenReturn(Future.successful(Some(FakeApplication)))
 
-          when(fixture.apiHubService.hasPendingAccessRequest(ArgumentMatchers.eq(FakeApplication.id))(any())).thenReturn(Future.successful(false))
+          when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(FakeApplication.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
+            .thenReturn(Future.successful(Seq.empty))
 
           running(fixture.playApplication) {
             val request = FakeRequest(GET, controllers.application.routes.ApplicationApisController.onPageLoad(FakeApplication.id).url)
@@ -86,7 +88,8 @@ class ApplicationApisControllerSpec extends SpecBase with MockitoSugar with Test
       when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), ArgumentMatchers.eq(true))(any()))
         .thenReturn(Future.successful(Some(application)))
 
-      when(fixture.apiHubService.hasPendingAccessRequest(ArgumentMatchers.eq(application.id))(any())).thenReturn(Future.successful(false))
+      when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(FakeApplication.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
+        .thenReturn(Future.successful(Seq.empty))
 
       when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
