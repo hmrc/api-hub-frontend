@@ -13,7 +13,9 @@ object AppDependencies {
     "uk.gov.hmrc"       %% "bootstrap-frontend-play-28"     % bootstrapPlayVersion,
     "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-28"             % hmrcMongoVersion,
     "uk.gov.hmrc"       %% "internal-auth-client-play-28"   % "1.6.0",
-    "uk.gov.hmrc"       %% "crypto-json-play-28"            % "7.3.0"
+    "uk.gov.hmrc"       %% "crypto-json-play-28"            % "7.3.0",
+    "org.commonmark"    %  "commonmark"                     % "0.21.0",
+    "org.commonmark"    %  "commonmark-ext-gfm-tables"      % "0.21.0"
   )
 
   val test = Seq(
