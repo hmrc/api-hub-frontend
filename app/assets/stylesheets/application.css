@@ -15,6 +15,7 @@
     justify-content: space-between;
     padding-left: 7%;
     padding-right: 7%;
+    flex-wrap: wrap;
 }
 
 .hip-card-container {
@@ -33,6 +34,7 @@
     width: 30%;
     min-width: 300px;
     height: 380px;
+    margin-top: 16px;
 }
 .hip-card-header {
     margin-top: 20px;
@@ -53,6 +55,8 @@
     border-left: solid 1px #b1b4b6;
     border-right: solid 1px #b1b4b6;
     margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
 }
 .hip-inner-card-title {
     width: 350px;
