@@ -34,7 +34,7 @@ lazy val root = (project in file("."))
     ),
     PlayKeys.playDefaultPort := 9000,
     PlayKeys.devSettings ++= Seq(
-      "play.http.router" -> "testOnlyDoNotUseInAppConf.Routes",
+      "play.http.router" -> "shutter.Routes",
       "microservice.services.internal-auth.url" -> "http://localhost:9000/api-hub/test-only",
       "urls.loginWithLdap" -> "http://localhost:9000/api-hub/test-only/sign-in"
     ),
