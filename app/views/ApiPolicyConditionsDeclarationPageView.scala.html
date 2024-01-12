@@ -22,8 +22,7 @@
         formHelper: FormWithCSRF,
         govukErrorSummary: GovukErrorSummary,
         govukCheckboxes: GovukCheckboxes,
-        govukButton: GovukButton,
-        govukInsetText: GovukInsetText
+        govukButton: GovukButton
 )
 
 @(form: Form[_], mode: Mode, context: AddAnApiContext, apiDetail: ApiDetail)(implicit request: Request[_], messages: Messages)
@@ -32,19 +31,17 @@
 
     @formHelper(action = routes.ApiPolicyConditionsDeclarationPageController.onSubmit(mode, context), Symbol("autoComplete") -> "off") {
 
-        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-            <h1 class="govuk-fieldset__heading govuk-!-margin-bottom-5">@messages("apiPolicyConditionsDeclarationPage.heading", apiDetail.title)</h1>
-        </legend>
+        <h1 class="govuk-heading-l govuk-!-margin-bottom-5">@messages("apiPolicyConditionsDeclarationPage.heading", apiDetail.title)</h1>
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
         }
 
         <div class="govuk-inset-text govuk-!-margin-bottom-3">
-            @messages("apiPolicyConditionsDeclarationPage.statement1"))))
+            @messages("apiPolicyConditionsDeclarationPage.statement1")
             <br>
             <br>
-            @messages("apiPolicyConditionsDeclarationPage.statement2"))))
+            @messages("apiPolicyConditionsDeclarationPage.statement2")
         </div>
 
         <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-bottom-7 govuk-section-break--visible govuk-!-margin-top-7">
@@ -86,7 +83,6 @@
             )
         )
 
-        </fieldset>
         <div class="govuk-button-group">
             @govukButton(
                 ButtonViewModel(messages("apiPolicyConditionsDeclarationPage.button.accept"))
