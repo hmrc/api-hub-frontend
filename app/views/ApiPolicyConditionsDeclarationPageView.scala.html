@@ -22,31 +22,31 @@
         formHelper: FormWithCSRF,
         govukErrorSummary: GovukErrorSummary,
         govukCheckboxes: GovukCheckboxes,
-        govukButton: GovukButton,
-        govukInsetText: GovukInsetText
+        govukButton: GovukButton
 )
 
 @(form: Form[_], mode: Mode, context: AddAnApiContext, apiDetail: ApiDetail)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("apiPolicyConditionsDeclarationPage.title", apiDetail.title))) {
 
-    <h1 class="govuk-heading-xl">@messages("apiPolicyConditionsDeclarationPage.heading", apiDetail.title)</h1>
-
     @formHelper(action = routes.ApiPolicyConditionsDeclarationPageController.onSubmit(mode, context), Symbol("autoComplete") -> "off") {
+
+        <h1 class="govuk-heading-l govuk-!-margin-bottom-5">@messages("apiPolicyConditionsDeclarationPage.heading", apiDetail.title)</h1>
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
         }
 
-        <div>
-        @govukInsetText(InsetText(content = Text(messages("apiPolicyConditionsDeclarationPage.statement"))))
+        <div class="govuk-inset-text govuk-!-margin-bottom-3">
+            @messages("apiPolicyConditionsDeclarationPage.statement1")
+            <br>
+            <br>
+            @messages("apiPolicyConditionsDeclarationPage.statement2")
         </div>
 
-        <div class="govuk-grid-row">
-            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible"/>
-        </div>
+        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-bottom-7 govuk-section-break--visible govuk-!-margin-top-7">
 
-        <h1 class="govuk-heading-l">@messages("apiPolicyConditionsDeclarationPage.checkYourAnswersLabel", apiDetail.title)</h1>
+        <h2 class="govuk-heading-m">@messages("apiPolicyConditionsDeclarationPage.checkYourAnswersLabel", apiDetail.title)</h2>
 
         <div>
             <p class="govuk-body">
@@ -72,7 +72,7 @@
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vitae et leo duis ut diam quam nulla. Sagittis purus sit amet volutpat consequat mauris nunc. Morbi tristique senectus et netus et malesuada fames ac.</p>
         </div>
 
-        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible"/>
+        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-bottom-7 govuk-!-margin-top-7">
 
         @govukCheckboxes(
             CheckboxesViewModel(
@@ -83,14 +83,16 @@
             )
         )
 
-        @govukButton(
-            ButtonViewModel(messages("apiPolicyConditionsDeclarationPage.button.accept"))
-        )
-        @govukButton(
-            ButtonViewModel(content = messages("apiPolicyConditionsDeclarationPage.button.cancel"))
-                    .asSecondaryButton()
-                    .asLink(routes.ApiDetailsController.onPageLoad(apiDetail.id).url)
-        )
+        <div class="govuk-button-group">
+            @govukButton(
+                ButtonViewModel(messages("apiPolicyConditionsDeclarationPage.button.accept"))
+            )
+            @govukButton(
+                ButtonViewModel(content = messages("apiPolicyConditionsDeclarationPage.button.cancel"))
+                        .asSecondaryButton()
+                        .asLink(routes.ApiDetailsController.onPageLoad(apiDetail.id).url)
+            )
+        </div>
 
     }
 }
