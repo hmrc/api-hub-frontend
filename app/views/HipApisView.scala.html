@@ -38,8 +38,6 @@ govukTable: GovukTable,
             <a class="govuk-link govuk-link--no-visited-state" href="@routes.ApiDetailsController.onPageLoad(apiDetail.id)">@apiDetail.title</a>
         </span>
 
-        <span class="call-out-data-attribute">@{messages("hipApis.api.endpoints",apiDetail.endpoints.size)}</span>
-
         <p class="govuk-body additional-message">@apiDetail.shortDescription</p>
 
     </div>
