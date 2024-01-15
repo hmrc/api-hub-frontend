@@ -30,7 +30,9 @@ object AppDependencies {
     "com.vladsch.flexmark"    %  "flexmark-all"            % "0.62.2",
     "uk.gov.hmrc"             %% "bootstrap-test-play-30"  % bootstrapPlayVersion,
     "nu.validator"            %  "validator"               % "20.7.2"
-  ).map(_ % "test, it")
+  ).map(_ % Test)
+
+  val it = Seq.empty
 
   def apply(): Seq[ModuleID] = compile ++ test
 }
