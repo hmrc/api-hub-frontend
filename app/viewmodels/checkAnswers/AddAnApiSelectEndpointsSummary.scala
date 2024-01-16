@@ -36,12 +36,15 @@ object AddAnApiSelectEndpointsSummary  {
         val endpoints = AvailableEndpoints.selectedEndpoints(apiDetail, application, answers)
           .values
           .flatten
-          .map(endpoint => s"<li>${httpMethod(endpoint)} ${endpoint.path}</li>")
+          .map(endpoint => s"<li class=\"govuk-!-margin-bottom-3\">${httpMethod(endpoint)}" +
+            s"<code class=\"code--header govuk-!-margin-top-2\">" +
+              s"<strong class=\"bold-xsmall\">${endpoint.path}</strong>" +
+            s"</code></li>")
           .mkString
 
         val value = ValueViewModel(
           HtmlContent(
-            s"<ul class='govuk-list'>$endpoints</ul>"
+            s"<ul class='govuk-list govuk-list--bullet'>$endpoints</ul>"
           )
         )
 
@@ -56,7 +59,7 @@ object AddAnApiSelectEndpointsSummary  {
     }
 
   private def httpMethod(endpoint: AvailableEndpoint): String = {
-    s"<strong class='govuk-tag govuk-tag--blue'>${endpoint.endpointMethod.httpMethod}</strong>"
+    s"<strong class='govuk-tag govuk-tag--blue govuk-!-margin-right-1'>${endpoint.endpointMethod.httpMethod}</strong>"
   }
 
 }
