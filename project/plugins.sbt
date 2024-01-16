@@ -16,8 +16,6 @@ addSbtPlugin("org.scoverage" % "sbt-scoverage" % "2.0.9")
 
 addSbtPlugin("net.ground5hark.sbt" % "sbt-concat" % "0.2.0")
 
-//addSbtPlugin("com.github.sbt" % "sbt-uglify" % "3.0.0")
-
 addSbtPlugin("com.typesafe.sbt" % "sbt-digest" % "1.1.4")
 
 addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.6.4")
