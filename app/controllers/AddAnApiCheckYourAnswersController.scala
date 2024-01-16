@@ -52,8 +52,7 @@ class AddAnApiCheckYourAnswersController @Inject()(
         endpointsSummary <- buildEndpointsSummary(request.userAnswers, apiDetail, application, context)
       } yield SummaryListViewModel(
         rows = Seq(applicationSummary, apiDetailSummary, endpointsSummary).flatten
-      ))
-        .map(summaryList => Ok(view(summaryList, Some(request.user), context)))
+      )).map(summaryList => Ok(view(summaryList, Some(request.user), context)))
   }
 
   private def fetchApplication(userAnswers: UserAnswers): Future[Option[Application]] = {
