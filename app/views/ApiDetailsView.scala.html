@@ -17,6 +17,7 @@
 @import models.api._
 @import models.user.UserModel
 @import views.html.helper.CSPNonce
+@import views.MarkdownUtils
 
 @this(
         layout: templates.Layout,
@@ -151,16 +152,18 @@
 
                             @if(method.summary.isDefined) {
                                 <strong class="govuk-heading-s govuk-!-margin-bottom-4 govuk-!-margin-top-5">@messages("apiDetails.endpoints.summary")</strong>
-                                <p class="govuk-body">
-                                    @method.summary.getOrElse("")
-                                </p>
+                                <!-- This div is a container for the markdown and applies some default styles. Needs more thought. -->
+                                <div class="govuk-body">
+                                    @MarkdownUtils.parse(method.summary.getOrElse(""))
+                                </div>
                             }
 
                             @if(method.description.isDefined) {
                                 <strong class="govuk-heading-s govuk-!-margin-bottom-4 govuk-!-margin-top-5">@messages("apiDetails.endpoints.description")</strong>
-                                <p class="govuk-body">
-                                    @method.description.getOrElse("")
-                                </p>
+                                <!-- This div is a container for the markdown and applies some default styles. Needs more thought. -->
+                                <div class="govuk-body">
+                                    @MarkdownUtils.parse(method.description.getOrElse(""))
+                                </div>
                             }
                         }
                     </section>
