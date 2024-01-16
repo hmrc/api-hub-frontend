@@ -36,9 +36,9 @@ object AddAnApiSelectEndpointsSummary  {
         val endpoints = AvailableEndpoints.selectedEndpoints(apiDetail, application, answers)
           .values
           .flatten
-          .map(endpoint => s"<li class=\"govuk-!-margin-bottom-3\">${httpMethod(endpoint)}" +
-            s"<code class=\"code--header govuk-!-margin-top-2\">" +
-              s"<strong class=\"bold-xsmall\">${endpoint.path}</strong>" +
+          .map(endpoint => s"<li class='govuk-!-margin-bottom-3'>${httpMethod(endpoint)}" +
+            s"<code class='code--header govuk-!-margin-top-2'>" +
+              s"<strong class='bold-xsmall'>${endpoint.path}</strong>" +
             s"</code></li>")
           .mkString
 
