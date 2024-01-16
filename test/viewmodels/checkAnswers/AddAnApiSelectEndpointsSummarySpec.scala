@@ -74,9 +74,9 @@ class AddAnApiSelectEndpointsSummarySpec extends AnyFreeSpec with Matchers with 
         AddAnApi
       )
 
-      val endpoint1 = "<li><strong class='govuk-tag govuk-tag--blue'>GET</strong> /path1</li>"
-      val endpoint2 = "<li><strong class='govuk-tag govuk-tag--blue'>POST</strong> /path2</li>"
-      val text = s"<ul class='govuk-list'>$endpoint1$endpoint2</ul>"
+      val endpoint1 = "<li class='govuk-!-margin-bottom-3'><strong class='govuk-tag govuk-tag--blue govuk-!-margin-right-1'>GET</strong><code class='code--header govuk-!-margin-top-2'><strong class='bold-xsmall'>/path1</strong></code></li>"
+      val endpoint2 = "<li class='govuk-!-margin-bottom-3'><strong class='govuk-tag govuk-tag--blue govuk-!-margin-right-1'>POST</strong><code class='code--header govuk-!-margin-top-2'><strong class='bold-xsmall'>/path2</strong></code></li>"
+      val text = s"<ul class='govuk-list govuk-list--bullet'>$endpoint1$endpoint2</ul>"
 
       val expected = SummaryListRow(
         key = Key(Text("addAnApiSelectEndpoints.checkYourAnswersLabel")),
