@@ -17,17 +17,10 @@ object AppDependencies {
   )
 
   val test = Seq(
-    "org.scalatest"           %% "scalatest"               % "3.2.17",
     "org.scalatestplus"       %% "scalacheck-1-17"         % "3.2.17.0",
-    "org.scalatestplus"       %% "mockito-5-8"             % "3.2.17.0",
-    "org.scalatestplus.play"  %% "scalatestplus-play"      % "7.0.1",
-    "org.pegdown"             %  "pegdown"                 % "1.6.0",
-    "org.jsoup"               %  "jsoup"                   % "1.17.2",
-    "org.playframework"       %% "play-test"               % PlayVersion.current,
     "org.mockito"             %% "mockito-scala"           % "1.17.30",
     "org.scalacheck"          %% "scalacheck"              % "1.17.0",
     "uk.gov.hmrc.mongo"       %% "hmrc-mongo-test-play-30" % hmrcMongoVersion,
-    "com.vladsch.flexmark"    %  "flexmark-all"            % "0.62.2",
     "uk.gov.hmrc"             %% "bootstrap-test-play-30"  % bootstrapPlayVersion,
     "nu.validator"            %  "validator"               % "20.7.2"
   ).map(_ % Test)
