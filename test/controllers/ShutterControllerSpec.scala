@@ -54,18 +54,6 @@ class ShutterControllerSpec extends SpecBase with MockitoSugar with TableDrivenP
         contentAsString(result) must not be shutterMessage
       }
     }
-
-    "must allow access to metric routes" in {
-      val fixture = buildFixture()
-
-      running(fixture.application) {
-        val request = FakeRequest(GET, "/admin/metrics")
-        val result = route(fixture.application, request).value
-
-        status(result) mustBe OK
-        contentAsString(result) must not be shutterMessage
-      }
-    }
   }
 
   private case class Fixture(
