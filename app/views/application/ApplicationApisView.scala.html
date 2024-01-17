@@ -37,19 +37,16 @@
       line-height: 1.47368;
       display: block;
     }
-
     .hip-details__summary {
       background-color: #fff;
       border-top: 4px solid rgba(0, 0, 0, 0);
       padding: 20px 24px 24px;
     }
-
     .hip-details__summary {
       color: #005eb8;
       cursor: pointer;
       position: relative;
     }
-
     .hip-expander {
       background-color: #fff;
       border: 1px solid #d8dde0;
@@ -58,18 +55,15 @@
       margin-bottom: 16px;
       font-family: "nta", Arial, sans-serif;
     }
-
     .hip-expander .hip-details__summary-text {
       color: #005eb8;
       cursor: pointer;
       display: inline-block;
       position: relative;
     }
-
     .hip-details__summary-text {
       text-decoration: underline;
     }
-
     @@media (min-width: 40.0625em) {
       .hip-expander .hip-details__text {
         padding-top: 0;
@@ -99,21 +93,34 @@
       margin-left: 0;
       margin-top: 0;
     }
-
     .hip-details__text {
       margin-top: 8px;
       padding: 16px;
       padding-left: 20px;
     }
-
     .hip-details__summary-info {
       float: right;
       color: #000 !important;
       margin-top: 6px;
     }
-
     .ready {
       color: #00703c;
+    }
+    .api-scopes-list-inline {
+        margin: 0px;
+        padding: 0px;
+    }
+    .api-scopes-list-inline li {
+        display: inline;
+    }
+    .api-scopes-list-inline li .govuk-tag--grey {
+        margin-top: 8px;
+    }
+    .api-scopes-list-inline li .scope {
+        font-weight: normal !important;
+    }
+    .capitalise-lower-case {
+        text-transform: none !important;
     }
 }
 
@@ -124,9 +131,10 @@
 }
 
 @endpointScopes(scopes: Seq[String]) = {
-    <ul class="govuk-list govuk-!-margin-bottom-0">
+    <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-1"><strong>Scopes:</strong></p>
+    <ul class="api-scopes-list-inline">
         @for(scope <- scopes) {
-            <li>@scope</li>
+            <li><strong class="govuk-tag govuk-tag govuk-tag--grey capitalise-lower-case">@scope</strong></li>
         }
     </ul>
 }
@@ -143,7 +151,12 @@
 
 @endpointName(endpoint: ApplicationEndpoint) = {
     <strong class="govuk-tag govuk-tag--purple">@{endpoint.httpMethod}</strong>
-    @endpoint.path
+    <code class="code--header govuk-!-margin-top-2"><strong class="bold-xsmall">@endpoint.path</strong></code>
+}
+
+@endpointNameAndScopes(endpoint: ApplicationEndpoint) = {
+    @endpointName(endpoint)
+    @endpointScopes(endpoint.scopes)
 }
 
 @layout(pageTitle = titleNoForm(messages("applicationApis.title")), user = user, fullWidth = true, customScriptsBlock = Some(scripts()), customStyles = Some(styles())) {
@@ -213,7 +226,6 @@
                                 head = Some(
                                     Seq(
                                         HeadCell(messages("applicationApis.apis.headings.endpoint")),
-                                        HeadCell(messages("applicationApis.apis.headings.scopes")),
                                         HeadCell(messages("applicationApis.apis.headings.dev")),
                                         HeadCell(messages("applicationApis.apis.headings.prod"))
                                     )
@@ -221,8 +233,7 @@
                                 rows = applicationApi.endpoints.map(
                                     endpoint =>
                                         Seq(
-                                            TableRow(content = HtmlContent(endpointName(endpoint))),
-                                            TableRow(content = HtmlContent(endpointScopes(endpoint.scopes))),
+                                            TableRow(content = HtmlContent(endpointNameAndScopes(endpoint))),
                                             TableRow(content = HtmlContent(endpointAccess(endpoint.secondaryAccess))),
                                             TableRow(content = HtmlContent(endpointAccess(endpoint.primaryAccess)))
                                         )
