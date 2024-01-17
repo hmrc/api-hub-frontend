@@ -115,6 +115,23 @@
     .ready {
       color: #00703c;
     }
+
+    .api-scopes-list-inline {
+    margin: 0px;
+    padding: 0px;
+    }
+    .api-scopes-list-inline li {
+    display: inline;
+    }
+    .api-scopes-list-inline li .govuk-tag--grey {
+    margin-top: 8px;
+    }
+    .api-scopes-list-inline li .scope {
+    font-weight: normal !important;
+    }
+    .capitalise-lower-case {
+    text-transform: none !important;
+    }
 }
 
 @hipApisLink() = {
@@ -124,9 +141,10 @@
 }
 
 @endpointScopes(scopes: Seq[String]) = {
-    <ul class="govuk-list govuk-!-margin-bottom-0">
+    <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-1"><strong>Scopes:</strong></p>
+    <ul class="api-scopes-list-inline">
         @for(scope <- scopes) {
-            <li>@scope</li>
+            <li><strong class="govuk-tag govuk-tag govuk-tag--grey capitalise-lower-case">@scope</strong></li>
         }
     </ul>
 }
@@ -143,7 +161,12 @@
 
 @endpointName(endpoint: ApplicationEndpoint) = {
     <strong class="govuk-tag govuk-tag--purple">@{endpoint.httpMethod}</strong>
-    @endpoint.path
+    <code class="code--header govuk-!-margin-top-2"><strong class="bold-xsmall">@endpoint.path</strong></code>
+}
+
+@endpointNameAndScopes(endpoint: ApplicationEndpoint) = {
+    @endpointName(endpoint)
+    @endpointScopes(endpoint.scopes)
 }
 
 @layout(pageTitle = titleNoForm(messages("applicationApis.title")), user = user, fullWidth = true, customScriptsBlock = Some(scripts()), customStyles = Some(styles())) {
@@ -213,7 +236,6 @@
                                 head = Some(
                                     Seq(
                                         HeadCell(messages("applicationApis.apis.headings.endpoint")),
-                                        HeadCell(messages("applicationApis.apis.headings.scopes")),
                                         HeadCell(messages("applicationApis.apis.headings.dev")),
                                         HeadCell(messages("applicationApis.apis.headings.prod"))
                                     )
@@ -221,8 +243,7 @@
                                 rows = applicationApi.endpoints.map(
                                     endpoint =>
                                         Seq(
-                                            TableRow(content = HtmlContent(endpointName(endpoint))),
-                                            TableRow(content = HtmlContent(endpointScopes(endpoint.scopes))),
+                                            TableRow(content = HtmlContent(endpointNameAndScopes(endpoint))),
                                             TableRow(content = HtmlContent(endpointAccess(endpoint.secondaryAccess))),
                                             TableRow(content = HtmlContent(endpointAccess(endpoint.primaryAccess)))
                                         )
