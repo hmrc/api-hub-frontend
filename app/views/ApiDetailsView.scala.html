@@ -60,10 +60,7 @@
                         </li>
 
                         <li class="side-nav__list">
-                            <span class="side-nav__title">@messages("apiDetails.leftNav.endpoints")</span>
-                            @for(endpoint <- apiDetail.endpoints) {
-                                <a href="#@{endpointName(endpoint)}" class="side-nav__link">@{endpoint.path}</a>
-                            }
+                            <a href="#@messages("apiDetails.leftNav.endpoints")" class="side-nav__link">@messages("apiDetails.leftNav.endpoints")</a>
                         </li>
 
                         <li>
@@ -134,7 +131,7 @@
 
                 <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-6 govuk-!-margin-top-0">
 
-                <h2 class="govuk-heading-m">
+                <h2 class="govuk-heading-m" id="@messages("apiDetails.endpoints.heading")">
                     @messages("apiDetails.endpoints.heading")
                 </h2>
 
