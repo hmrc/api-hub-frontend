@@ -22,7 +22,8 @@
         formHelper: FormWithCSRF,
         govukErrorSummary: GovukErrorSummary,
         govukCheckboxes: GovukCheckboxes,
-        govukButton: GovukButton
+        govukButton: GovukButton,
+        policyView: PolicyView
 )
 
 @(form: Form[_], mode: Mode, context: AddAnApiContext, apiDetail: ApiDetail)(implicit request: Request[_], messages: Messages)
@@ -49,27 +50,7 @@
         <h2 class="govuk-heading-m">@messages("apiPolicyConditionsDeclarationPage.checkYourAnswersLabel", apiDetail.title)</h2>
 
         <div>
-            <p class="govuk-body">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vitae et leo duis ut diam quam nulla. Sagittis purus sit amet volutpat consequat mauris nunc. Morbi tristique senectus et netus et malesuada fames ac.</p>
-            <div class="govuk-grid-row">
-                <ul class="govuk-list govuk-list--bullet">
-                    <li>
-                        Ridiculus mus mauris vitae ultricies. Id semper risus in hendrerit gravida rutrum.
-                    </li>
-                    <li>
-                        Mi tempus imperdiet nulla malesuada pellentesque elit eget. Purus gravida quis blandit turpis.
-                    </li>
-                    <li>
-                        Pretium vulputate sapien nec sagittis aliquam malesuada bibendum arcu.
-                    </li>
-                    <li>
-                        Turpis tincidunt id aliquet risus feugiat in ante metus dictum. Aliquet risus feugiat in ante metus dictum.
-                    </li>
-                </ul>
-
-            </div>
-            <p class="govuk-body">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vitae et leo duis ut diam quam nulla. Sagittis purus sit amet volutpat consequat mauris nunc. Morbi tristique senectus et netus et malesuada fames ac.</p>
+            @policyView()
         </div>
 
         <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-bottom-7 govuk-!-margin-top-7">
