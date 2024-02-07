@@ -1,0 +1,40 @@
+@*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.user.UserModel
+@import views.html.helper.CSPNonce
+
+@this(
+    layout: templates.Layout
+)
+
+@(oas: Html, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+
+@scripts() = {
+    <link rel="stylesheet" href='@routes.Assets.versioned("highlightjs/default.min.css")' @{CSPNonce.attr}>
+    <script src='@routes.Assets.versioned("highlightjs/highlight.min.js")' @{CSPNonce.attr}></script>
+}
+
+@layout(pageTitle = titleNoForm(messages("OAS Review")), user = user, showBackLink = true, fullWidth = true) {
+    @scripts()
+
+    <pre><code class="language-yaml">
+      @oas
+    </code></pre>
+
+    <script @{CSPNonce.attr}>hljs.highlightAll();</script>
+
+}
