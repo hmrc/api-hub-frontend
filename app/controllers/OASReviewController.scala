@@ -20,7 +20,6 @@ import com.google.inject.{Inject, Singleton}
 import controllers.actions.OptionalIdentifierAction
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.OASReview
 
@@ -36,10 +35,8 @@ class OASReviewController @Inject()(
       Ok(view(oas(), request.user))
   }
 
-  // This needs to be escaped HTML to work properly
-  // The highlightjs script issues warnings if not escaped
   private def oas() = {
-    HtmlFormat.escape("""
+        """
         |openapi: 3.0.3
         |info:
         |  title: NPS Interface Specification to validate a P800 Reference.
@@ -1232,7 +1229,6 @@ class OASReviewController @Inject()(
         |      description: Error Response Payload for this API
         |      title: Forbidden Error Response
         |""".stripMargin
-    )
   }
 
 }

@@ -21,7 +21,7 @@
     layout: templates.Layout
 )
 
-@(oas: Html, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+@(oas: String, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
 @scripts() = {
     <link rel="stylesheet" href='@routes.Assets.versioned("highlightjs/default.min.css")' @{CSPNonce.attr}>
@@ -32,7 +32,9 @@
     @scripts()
 
     <pre><code class="language-yaml">
-      @oas
+        <!-- The string might contain XML/HTML etc so must be escaped -->
+        <!-- If not then the highlightjs script writes warnings to the console -->
+        @HtmlFormat.escape(oas)
     </code></pre>
 
     <script @{CSPNonce.attr}>hljs.highlightAll();</script>
