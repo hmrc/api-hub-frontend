@@ -161,6 +161,12 @@ object ApplicationLenses {
         applicationTeamMembers.get(application) :+ TeamMember(email)
       )
 
+    def withSortedTeam(): Application =
+      applicationTeamMembers.set(
+        application,
+        application.teamMembers.sortWith(_.email.toUpperCase() < _.email.toUpperCase())
+      )
+
     def getRequiredScopeNames: Set[String] = {
       application
         .getSecondaryScopes
@@ -173,6 +179,7 @@ object ApplicationLenses {
         application,
         applicationApis.get(application) :+ api
       )
+
   }
 
 }

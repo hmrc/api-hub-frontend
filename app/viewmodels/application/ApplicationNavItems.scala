@@ -57,6 +57,12 @@ object ApplicationNavItems {
         isCurrentPage = currentPage == EnvironmentsAndCredentialsPage
       ),
       SideNavItem(
+        page = ManageTeamMembersPage,
+        title = messages("applicationNav.page.manageTeamMembers"),
+        link = controllers.application.routes.ManageTeamMembersController.onPageLoad(application.id),
+        isCurrentPage = currentPage == ManageTeamMembersPage
+      ),
+      SideNavItem(
         page = DeleteApplicationPage,
         title = messages("applicationNav.page.deleteApplication"),
         link = controllers.application.routes.DeleteApplicationConfirmationController.onPageLoad(application.id),

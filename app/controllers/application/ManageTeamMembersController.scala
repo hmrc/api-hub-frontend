@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,36 +16,27 @@
 
 package controllers.application
 
-import com.google.inject.Inject
+import com.google.inject.{Inject, Singleton}
 import controllers.actions.{ApplicationAuthActionProvider, IdentifierAction}
-import controllers.helpers.ApplicationApiBuilder
 import models.application.ApplicationLenses._
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.application.ApplicationDetailsView
+import views.html.application.ManageTeamMembersView
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
-class ApplicationDetailsController @Inject()(
+@Singleton
+class ManageTeamMembersController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   identify: IdentifierAction,
   applicationAuth: ApplicationAuthActionProvider,
-  view: ApplicationDetailsView,
-  applicationApiBuilder: ApplicationApiBuilder
+  view: ManageTeamMembersView
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id, enrich = true)).async {
+  def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id, enrich = false)).async {
     implicit request =>
-      applicationApiBuilder.build(request.application).map {
-        case Right(applicationApis) =>
-          Ok(view(
-            request.application.withSortedTeam(),
-            applicationApis,
-            Some(request.identifierRequest.user)
-          ))
-        case Left(result) => result
-      }
+      Future.successful(Ok(view(request.application.withSortedTeam(), request.identifierRequest.user)))
   }
 
 }
