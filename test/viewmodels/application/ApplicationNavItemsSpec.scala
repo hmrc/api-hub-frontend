@@ -55,6 +55,12 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TableDrivenPro
             isCurrentPage = false
           ),
           SideNavItem(
+            ManageTeamMembersPage,
+            "Manage team members",
+            controllers.application.routes.ManageTeamMembersController.onPageLoad(FakeApplication.id),
+            isCurrentPage = false
+          ),
+          SideNavItem(
             DeleteApplicationPage,
             "Delete application",
             controllers.application.routes.DeleteApplicationConfirmationController.onPageLoad(FakeApplication.id),
@@ -72,6 +78,7 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TableDrivenPro
         DetailsPage,
         ApisPage,
         EnvironmentsAndCredentialsPage,
+        ManageTeamMembersPage,
         DeleteApplicationPage
       )
 

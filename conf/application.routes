@@ -12,7 +12,6 @@ GET         /request-production-access/:id/start                        controll
 GET         /request-production-access                                  controllers.application.RequestProductionAccessController.onPageLoad()
 POST        /request-production-access                                  controllers.application.RequestProductionAccessController.onSubmit()
 
-
 GET         /provide-supporting-information                             controllers.application.ProvideSupportingInformationController.onPageLoad()
 POST        /provide-supporting-information                             controllers.application.ProvideSupportingInformationController.onSubmit()
 GET         /request-production-access/success                          controllers.application.RequestProductionAccessEndJourneyController.submitRequest()
@@ -22,3 +21,5 @@ GET         /delete-secondary-credential/:id/:clientId                  controll
 
 GET         /delete/:id                                                 controllers.application.DeleteApplicationConfirmationController.onPageLoad(id: String)
 POST        /delete/:id                                                 controllers.application.DeleteApplicationConfirmationController.onSubmit(id: String)
+
+GET         /manage-team-members/:id                                    controllers.application.ManageTeamMembersController.onPageLoad(id: String)

@@ -409,3 +409,7 @@ policyDeclaration.bullet.7 = You accept that you will only be invoking the API f
 policyDeclaration.bullet.8 = You accept that if a problem occurs with the API, your first point of contact should be the producer of the API rather than EIS.
 policyDeclaration.bullet.9 = You accept that invoking and using the data from the API should only be performed in the UK.
 policyDeclaration.bullet.10 = You accept that by using an API on this platform, your activity against that API will be monitored and logged.
+
+manageTeamMembers.title = Manage team members
+manageTeamMembers.heading = Team members ({0})
+manageTeamMembers.returnTo = Return to {0}
