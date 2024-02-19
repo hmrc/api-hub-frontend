@@ -106,4 +106,9 @@ class ApiHubService @Inject()(
     applicationsConnector.createAccessRequest(accessRequest)
   }
 
+  def addTeamMember(id: String, email: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    logger.debug(s"Adding team member to application $id")
+    applicationsConnector.addTeamMember(id, email)
+  }
+
 }
