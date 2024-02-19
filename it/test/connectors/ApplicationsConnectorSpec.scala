@@ -24,7 +24,7 @@ import models.UserEmail
 import models.accessrequest._
 import models.application._
 import models.exception.ApplicationCredentialLimitException
-import models.requests.{AddApiRequest, AddApiRequestEndpoint}
+import models.requests.{AddApiRequest, AddApiRequestEndpoint, TeamMemberRequest}
 import models.user.{LdapUser, UserModel}
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AsyncFreeSpec
@@ -572,6 +572,47 @@ class ApplicationsConnectorSpec
       )
 
       buildConnector(this).addApi(applicationId, newApi)(HeaderCarrier()).map(
+        result =>
+          result mustBe None
+      )
+    }
+  }
+
+  "ApplicationsConnector.addTeamMember" - {
+    "must place the correct request" in {
+      val applicationId = "test-id"
+      val email = "test-email"
+
+      stubFor(
+        post(urlEqualTo(s"/api-hub-applications/applications/$applicationId/team-members"))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .withHeader(CONTENT_TYPE, equalTo(ContentTypes.JSON))
+          .withRequestBody(equalToJson(Json.toJson(TeamMemberRequest(email)).toString()))
+          .willReturn(
+            aResponse()
+              .withStatus(NO_CONTENT)
+          )
+      )
+
+      buildConnector(this).addTeamMember(applicationId, email)(HeaderCarrier()).map(
+        result =>
+          result mustBe Some(())
+      )
+    }
+
+    "must return None when the application cannot be found" in {
+      val applicationId = "test-id"
+      val email = "test-email"
+
+      stubFor(
+        post(urlEqualTo(s"/api-hub-applications/applications/$applicationId/team-members"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+          )
+      )
+
+      buildConnector(this).addTeamMember(applicationId, email)(HeaderCarrier()).map(
         result =>
           result mustBe None
       )
