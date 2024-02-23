@@ -581,20 +581,20 @@ class ApplicationsConnectorSpec
   "ApplicationsConnector.addTeamMember" - {
     "must place the correct request" in {
       val applicationId = "test-id"
-      val email = "test-email"
+      val teamMember = TeamMember("test-email")
 
       stubFor(
         post(urlEqualTo(s"/api-hub-applications/applications/$applicationId/team-members"))
           .withHeader(AUTHORIZATION, equalTo("An authentication token"))
           .withHeader(CONTENT_TYPE, equalTo(ContentTypes.JSON))
-          .withRequestBody(equalToJson(Json.toJson(TeamMemberRequest(email)).toString()))
+          .withRequestBody(equalToJson(Json.toJson(TeamMemberRequest(teamMember)).toString()))
           .willReturn(
             aResponse()
               .withStatus(NO_CONTENT)
           )
       )
 
-      buildConnector(this).addTeamMember(applicationId, email)(HeaderCarrier()).map(
+      buildConnector(this).addTeamMember(applicationId, teamMember)(HeaderCarrier()).map(
         result =>
           result mustBe Some(())
       )
@@ -602,7 +602,7 @@ class ApplicationsConnectorSpec
 
     "must return None when the application cannot be found" in {
       val applicationId = "test-id"
-      val email = "test-email"
+      val teamMember = TeamMember("test-email")
 
       stubFor(
         post(urlEqualTo(s"/api-hub-applications/applications/$applicationId/team-members"))
@@ -612,7 +612,7 @@ class ApplicationsConnectorSpec
           )
       )
 
-      buildConnector(this).addTeamMember(applicationId, email)(HeaderCarrier()).map(
+      buildConnector(this).addTeamMember(applicationId, teamMember)(HeaderCarrier()).map(
         result =>
           result mustBe None
       )

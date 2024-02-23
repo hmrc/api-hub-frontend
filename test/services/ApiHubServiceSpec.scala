@@ -375,13 +375,13 @@ class ApiHubServiceSpec
       val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
 
       val applicationId = "test-id"
-      val email = "test-email"
+      val teamMember = TeamMember("test-email")
 
       when(applicationsConnector.addTeamMember(any(), any())(any())).thenReturn(Future.successful(Some(())))
 
-      service.addTeamMember(applicationId, email)(HeaderCarrier()).map {
+      service.addTeamMember(applicationId, teamMember)(HeaderCarrier()).map {
         result =>
-          verify(applicationsConnector).addTeamMember(ArgumentMatchers.eq(applicationId), ArgumentMatchers.eq(email))(any())
+          verify(applicationsConnector).addTeamMember(ArgumentMatchers.eq(applicationId), ArgumentMatchers.eq(teamMember))(any())
           result.value mustBe ()
       }
     }

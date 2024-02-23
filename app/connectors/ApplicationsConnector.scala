@@ -231,8 +231,8 @@ class ApplicationsConnector @Inject()(
       }
   }
 
-  def addTeamMember(id: String, email: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
-    val teamMemberRequest = TeamMemberRequest(email)
+  def addTeamMember(id: String, teamMember: TeamMember)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    val teamMemberRequest = TeamMemberRequest(teamMember)
 
     httpClient.post(url"$applicationsBaseUrl/api-hub-applications/applications/$id/team-members")
       .setHeader(CONTENT_TYPE -> JSON)

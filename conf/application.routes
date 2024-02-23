@@ -23,3 +23,5 @@ GET         /delete/:id                                                 controll
 POST        /delete/:id                                                 controllers.application.DeleteApplicationConfirmationController.onSubmit(id: String)
 
 GET         /manage-team-members/:id                                    controllers.application.ManageTeamMembersController.onPageLoad(id: String)
+GET         /add-team-member/:id                                        controllers.application.AddTeamMemberController.onPageLoad(id: String)
+POST        /add-team-member/:id                                        controllers.application.AddTeamMemberController.onSubmit(id: String)

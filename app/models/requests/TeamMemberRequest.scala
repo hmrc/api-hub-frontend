@@ -19,15 +19,13 @@ package models.requests
 import models.application.TeamMember
 import play.api.libs.json.{Format, Json}
 
-case class TeamMemberRequest(email: String) {
-
-  def toTeamMember: TeamMember = {
-    TeamMember(email)
-  }
-
-}
+case class TeamMemberRequest(email: String)
 
 object TeamMemberRequest {
+
+  def apply(teamMember: TeamMember): TeamMemberRequest = {
+    TeamMemberRequest(teamMember.email)
+  }
 
   implicit val formatTeamMemberRequest: Format[TeamMemberRequest] = Json.format[TeamMemberRequest]
 
