@@ -21,7 +21,7 @@ import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
 import models.AvailableEndpoint
 import models.accessrequest.{AccessRequest, AccessRequestRequest, AccessRequestStatus}
 import models.api.ApiDetail
-import models.application.{Application, Credential, EnvironmentName, NewApplication}
+import models.application.{Application, Credential, EnvironmentName, NewApplication, TeamMember}
 import models.exception.ApplicationsException
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
 import play.api.Logging
@@ -104,6 +104,11 @@ class ApiHubService @Inject()(
 
   def requestProductionAccess(accessRequest: AccessRequestRequest)(implicit hc: HeaderCarrier): Future[Unit] = {
     applicationsConnector.createAccessRequest(accessRequest)
+  }
+
+  def addTeamMember(id: String, teamMember: TeamMember)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    logger.debug(s"Adding team member to application $id")
+    applicationsConnector.addTeamMember(id, teamMember)
   }
 
 }

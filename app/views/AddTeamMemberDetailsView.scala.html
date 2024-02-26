@@ -25,13 +25,13 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode, index: Int, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+@(form: Form[_], submitTo: Call, user: UserModel)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("addTeamMemberDetails.title")), user = user) {
+@layout(pageTitle = title(form, messages("addTeamMemberDetails.title")), user = Some(user)) {
 
     <h1 class="govuk-heading-xl">@messages("addTeamMemberDetails.heading")</h1>
 
-    @formHelper(action = routes.AddTeamMemberDetailsController.onSubmit(mode, index)) {
+    @formHelper(action = submitTo) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

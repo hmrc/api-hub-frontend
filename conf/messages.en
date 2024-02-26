@@ -413,3 +413,4 @@ policyDeclaration.bullet.10 = You accept that by using an API on this platform, 
 manageTeamMembers.title = Manage team members
 manageTeamMembers.heading = Team members ({0})
 manageTeamMembers.returnTo = Return to {0}
+manageTeamMembers.addTeamMember = Add team member +

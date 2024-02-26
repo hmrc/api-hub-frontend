@@ -22,7 +22,7 @@ import models.UserEmail
 import models.accessrequest.{AccessRequest, AccessRequestDecisionRequest, AccessRequestRequest, AccessRequestStatus}
 import models.application._
 import models.exception.{ApplicationCredentialLimitException, ApplicationsException}
-import models.requests.AddApiRequest
+import models.requests.{AddApiRequest, TeamMemberRequest}
 import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION, CONTENT_TYPE}
 import play.api.http.MimeTypes.JSON
 import play.api.http.Status.NOT_FOUND
@@ -223,6 +223,21 @@ class ApplicationsConnector @Inject()(
       .setHeader((CONTENT_TYPE, JSON))
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .withBody(Json.toJson(decisionRequest))
+      .execute[Either[UpstreamErrorResponse, Unit]]
+      .flatMap {
+        case Right(()) => Future.successful(Some(()))
+        case Left(e) if e.statusCode == NOT_FOUND => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
+  }
+
+  def addTeamMember(id: String, teamMember: TeamMember)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    val teamMemberRequest = TeamMemberRequest(teamMember)
+
+    httpClient.post(url"$applicationsBaseUrl/api-hub-applications/applications/$id/team-members")
+      .setHeader(CONTENT_TYPE -> JSON)
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .withBody(Json.toJson(teamMemberRequest))
       .execute[Either[UpstreamErrorResponse, Unit]]
       .flatMap {
         case Right(()) => Future.successful(Some(()))

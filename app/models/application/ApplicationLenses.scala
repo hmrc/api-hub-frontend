@@ -152,6 +152,9 @@ object ApplicationLenses {
       applicationTeamMembers.get(application)
         .exists(teamMember => teamMember.email.equalsIgnoreCase(email))
 
+    def hasTeamMember(teamMember: TeamMember): Boolean =
+      hasTeamMember(teamMember.email)
+
     def hasTeamMember(user: UserModel): Boolean =
       user.email.exists(application.hasTeamMember)
 

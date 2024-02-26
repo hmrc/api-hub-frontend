@@ -27,7 +27,17 @@
 
 @layout(pageTitle = titleNoForm(messages("manageTeamMembers.title")), user = Some(user)) {
 
-    <h1 class="govuk-heading-l">@messages("manageTeamMembers.heading", application.teamMembers.size)</h1>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-l">@messages("manageTeamMembers.heading", application.teamMembers.size)</h1>
+        </div>
+        <div class="govuk-grid-column-one-third govuk-!-text-align-right">
+            @govukButton(Button(
+                content = messages("manageTeamMembers.addTeamMember"),
+                href = Some(controllers.application.routes.AddTeamMemberController.onPageLoad(application.id).url)
+            ))
+        </div>
+    </div>
 
     @govukTable(
         Table(

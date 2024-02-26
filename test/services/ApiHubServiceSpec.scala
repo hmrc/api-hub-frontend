@@ -368,6 +368,25 @@ class ApiHubServiceSpec
     }
   }
 
+  "addTeamMember" - {
+    "must make the correct request to the applications connector and return the response" in {
+      val applicationsConnector = mock[ApplicationsConnector]
+      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+
+      val applicationId = "test-id"
+      val teamMember = TeamMember("test-email")
+
+      when(applicationsConnector.addTeamMember(any(), any())(any())).thenReturn(Future.successful(Some(())))
+
+      service.addTeamMember(applicationId, teamMember)(HeaderCarrier()).map {
+        result =>
+          verify(applicationsConnector).addTeamMember(ArgumentMatchers.eq(applicationId), ArgumentMatchers.eq(teamMember))(any())
+          result.value mustBe ()
+      }
+    }
+  }
+
 }
 
 trait ApplicationGetterBehaviours {
