@@ -375,7 +375,7 @@ requestProductionAccessSuccess.applicationName = Application name
 requestProductionAccessSuccess.apiName = Api name
 requestProductionAccessSuccess.h2 = What you can do now
 requestProductionAccessSuccess.text.line1 = View and manage your {0} application.
-requestProductionAccessSuccess.text.line2 = You will receive and email once a decision on access has been made.
+requestProductionAccessSuccess.text.line2 = You will receive an email once a decision on access has been made.
 
 applicationDeletedSuccess.title = Application successfully deleted
 applicationDeletedSuccess.heading = Application successfully deleted
