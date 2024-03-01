@@ -26,15 +26,15 @@
 
 @footerlinkItems()  = @{
 
-    def footerItemForKey(item: String, attributes:Map[String, String] = Map.empty): FooterItem = {
+    def footerItemForKey(item: String, href: Option[String] = None, attributes:Map[String, String] = Map.empty): FooterItem = {
         FooterItem(
             text = Some(messages(s"footer.$item.text")),
-            href = Some(attributes.getOrElse("href", messages(s"footer.$item.url"))),
+            href = Some(href.getOrElse(messages(s"footer.$item.url"))),
             attributes = attributes
         )
     }
     Seq(footerItemForKey("govukHelp"),
-        footerItemForKey("accessibility", attributes = Map("href" -> accessibilityStatementConfig.url.getOrElse("#"))),
+        footerItemForKey("accessibility", accessibilityStatementConfig.url),
         footerItemForKey("contact"),
         footerItemForKey("welshHelp", attributes = Map("lang" -> "cy", "hreflang" -> "cy")))
 }
