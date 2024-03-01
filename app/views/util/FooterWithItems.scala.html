@@ -29,7 +29,7 @@
     def footerItemForKey(item: String, href: Option[String] = None, attributes:Map[String, String] = Map.empty): FooterItem = {
         FooterItem(
             text = Some(messages(s"footer.$item.text")),
-            href = Some(href.getOrElse(messages(s"footer.$item.url"))),
+            href = href.orElse(Some(messages(s"footer.$item.url"))),
             attributes = attributes
         )
     }
