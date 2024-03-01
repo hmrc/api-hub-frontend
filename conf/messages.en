@@ -257,6 +257,10 @@ hipApis.api.endpoints = {0} Endpoints
 hipApis.searchResults.empty = No APIs found.
 hipApis.link.text = HIP APIs
 
+support.link.text = Get support
+support.title = Get Support
+support.heading = Get support
+
 addAnApiApiId.checkYourAnswersLabel = API Name
 
 addAnApiSelectApplication.title = Select application

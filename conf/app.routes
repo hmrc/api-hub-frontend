@@ -22,6 +22,8 @@ GET         /account/sign-out-survey                                           c
 GET         /account/sign-out                                                  controllers.auth.AuthController.signOutNoSurvey()
 GET         /account/signed-out                                                controllers.auth.SignedOutController.onPageLoad
 
+GET         /get-support                                                       controllers.GetSupportController.onPageLoad
+
 GET         /unauthorised                                                      controllers.UnauthorisedController.onPageLoad
 
 GET         /application/register/application-name                             controllers.ApplicationNameController.onPageLoad(mode: Mode = NormalMode)
