@@ -110,7 +110,7 @@ sbt test
 ### Integration tests
 This microservice has some integration tests that can be run from the command line:
 ```
-sbt it:test
+sbt it/test
 ```
 
 ## License
