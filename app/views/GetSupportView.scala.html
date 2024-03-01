@@ -15,6 +15,8 @@
  *@
 
 @import views.html.helper.CSPNonce
+@import java.net.URLEncoder
+@import scala.xml.XML
 
 @this(
     layout: templates.Layout
@@ -26,10 +28,48 @@
  <link href='@routes.Assets.versioned("fontawesome6/css/all.min.css")' media="all" rel="stylesheet" type="text/css" @{CSPNonce.attr}/>
 }
 
+ @whatInformationToProvide() = {
+ <div class="govuk-details__text">
+  <p class="govuk-body">You will need to provide as much as the following information as possible:</p>
+  Please include the following information in the email where relevant
+  <ul class="govuk-list govuk-list--bullet">
+   <li>Your name</li>
+   <li>Your email address</li>
+   <li>Are you a digital user, stride user or other?</li>
+   <li>What were you trying to do?</li>
+   <li>What were you expecting to happen?</li>
+   <li>What time did it fail/start failing?</li>
+   <li>When was the last time you knew it was working?</li>
+   <li>Are you receiving a response code/error?</li>
+   <li>What is the frequency/volume of failures? (Hundreds? Thousands? Per hour? Per day?)</li>
+   <li>Where relevant please included samples of failing requests?</li>
+   <li>Do you have any logs, screenshots, URIs?</li>
+   <li>If you have included logs -
+    <ul class="govuk-list govuk-list--bullet">
+     <li>How can we identify your requests in the logs? (Sending IP? User-agent ? x-request-id? Correlation ID) </li>
+     <li>Please also click 'Short URL' to create a shortened URL to paste into the ticket - Kibana often cannot recreate the search from non-shortened URLs.</li>
+     <li>Please make sure that you set the time range to an absolute value - the relative and 'quick' ranges such as 'Last 15 minutes' will result in your logs dropping off the search as time passes.</li>
+    </ul>
+   </li>
+   <li>How can we repeat the problem?</li>
+   <li>And finally, are you sure the problem is with our service? (Have you checked the problem isn’t with your own service)</li>
+  </ul>
+ </div>
+ }
+
+@whatInformationToProvideText() = @{
+ val xml = XML.loadString(whatInformationToProvide().body)
+ val unencodedText = for {
+   e <- xml.child
+ } yield e.text + "\n"
+ URLEncoder.encode(unencodedText.mkString, "UTF-8")
+}
+
 @layout(
     pageTitle = titleNoForm(messages("support.title")),
     fullWidth = true,
-    timeout   = false
+    timeout   = false,
+    customScriptsBlock = Some(scripts())
 ) {
     <h1 class="govuk-heading-l">Get support</h1>
     <p class="govuk-body">If you need help with something Hub related you can use the following methods to contact us.</p>
@@ -54,32 +94,7 @@
           What information will I need to provide?
          </span>
         </summary>
-        <div class="govuk-details__text">
-         <p class="govuk-body">You will need to provide as much as the following information as possible:</p>
-         Please include the following information in the email where relevant
-         <ul class="govuk-list govuk-list--bullet">
-          <li>Your name</li>
-          <li>Your email address</li>
-          <li>Are you a digital user, stride user or other?</li>
-          <li>What were you trying to do?</li>
-          <li>What were you expecting to happen?</li>
-          <li>What time did it fail/start failing?</li>
-          <li>When was the last time you knew it was working?</li>
-          <li>Are you receiving a response code/error?</li>
-          <li>What is the frequency/volume of failures? (Hundreds? Thousands? Per hour? Per day?)</li>
-          <li>Where relevant please included samples of failing requests?</li>
-          <li>Do you have any logs, screenshots, URIs?</li>
-          <li>If you have included logs -
-           <ul class="govuk-list govuk-list--bullet">
-            <li>How can we identify your requests in the logs? (Sending IP? User-agent ? x-request-id? Correlation ID)
-            </li><li>Please also click 'Short URL' to create a shortened URL to paste into the ticket - Kibana often cannot recreate the search from non-shortened URLs.
-           </li><li>Please make sure that you set the time range to an absolute value - the relative and 'quick' ranges such as 'Last 15 minutes' will result in your logs dropping off the search as time passes.
-           </li></ul>
-          </li>
-          <li>How can we repeat the problem?</li>
-          <li>And finally, are you sure the problem is with our service? (Have you checked the problem isn’t with your own service)</li>
-         </ul>
-        </div>
+        @whatInformationToProvide()
        </details>
       </div>
      </div>
@@ -100,32 +115,7 @@
           What information will I need to provide?
          </span>
         </summary>
-        <div class="govuk-details__text">
-         <p class="govuk-body">You will need to provide as much as the following information as possible:</p>
-         Please include the following information in the email where relevant
-         <ul class="govuk-list govuk-list--bullet">
-          <li>Your name</li>
-          <li>Your email address</li>
-          <li>Are you a digital user, stride user or other?</li>
-          <li>What were you trying to do?</li>
-          <li>What were you expecting to happen?</li>
-          <li>What time did it fail/start failing?</li>
-          <li>When was the last time you knew it was working?</li>
-          <li>Are you receiving a response code/error?</li>
-          <li>What is the frequency/volume of failures? (Hundreds? Thousands? Per hour? Per day?)</li>
-          <li>Where relevant please included samples of failing requests?</li>
-          <li>Do you have any logs, screenshots, URIs?</li>
-          <li>If you have included logs -
-           <ul class="govuk-list govuk-list--bullet">
-            <li>How can we identify your requests in the logs? (Sending IP? User-agent ? x-request-id? Correlation ID)
-            </li><li>Please also click 'Short URL' to create a shortened URL to paste into the ticket - Kibana often cannot recreate the search from non-shortened URLs.
-           </li><li>Please make sure that you set the time range to an absolute value - the relative and 'quick' ranges such as 'Last 15 minutes' will result in your logs dropping off the search as time passes.
-           </li></ul>
-          </li>
-          <li>How can we repeat the problem?</li>
-          <li>And finally, are you sure the problem is with our service? (Have you checked the problem isn’t with your own service)</li>
-         </ul>
-        </div>
+        @whatInformationToProvide()
        </details>
       </div>
      </div>
