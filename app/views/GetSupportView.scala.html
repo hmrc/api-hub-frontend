@@ -57,6 +57,10 @@
      </div>
  }
 
+@encodeWithEscapedSpaces(unencodedText: String) = @{
+    URLEncoder.encode(unencodedText, "UTF-8").replace("+", "%20")
+}
+
 @whatInformationToProvideText() = @{
     def collectTextNodes(node: Node): List[String] = {
         node match {
@@ -67,7 +71,7 @@
     val rootNode = XML.loadString(whatInformationToProvide().body)
     val unencodedText = collectTextNodes(rootNode).map(n => n.trim).filter(n => !n.isBlank).mkString("\n\n")
 
-    URLEncoder.encode(unencodedText, "UTF-8").replace("+", "%20")
+    encodeWithEscapedSpaces(unencodedText)
 }
 
 @layout(
@@ -91,7 +95,7 @@
                 </p>
                 <p class="govuk-body additional-message">
                     If you are having problems using an API, you can contact us via this email
-                    <a href="mailto:@supportEmailAddress?subject=@messages("support.email.subject.consumer")&body=@whatInformationToProvideText()">@supportEmailAddress</a>.
+                    <a href="mailto:@supportEmailAddress?subject=@encodeWithEscapedSpaces(messages("support.email.subject.consumer"))&body=@whatInformationToProvideText()">@supportEmailAddress</a>.
                 </p>
 
                 <details class="govuk-details" style="margin-left: 38px; margin-top: 20px;">
@@ -113,7 +117,7 @@
                     </span>
                 </p>
                 <p class="govuk-body additional-message">If you are having problems creating an API, you can contact us via this email
-                    <a href="mailto:@supportEmailAddress?subject=@messages("support.email.subject.producer")&body=@whatInformationToProvideText()">@supportEmailAddress</a>.
+                    <a href="mailto:@supportEmailAddress?subject=@encodeWithEscapedSpaces(messages("support.email.subject.producer"))&body=@whatInformationToProvideText()">@supportEmailAddress</a>.
                 </p>
                 <details class="govuk-details" style="margin-left: 38px; margin-top: 20px;">
                     <summary class="govuk-details__summary">
