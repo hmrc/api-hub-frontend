@@ -260,6 +260,8 @@ hipApis.link.text = HIP APIs
 support.link.text = Get support
 support.title = Get Support
 support.heading = Get support
+support.email.subject.consumer = Support Request from API Hub - Consumer
+support.email.subject.producer = Support Request from API Hub - Producer
 
 addAnApiApiId.checkYourAnswersLabel = API Name
 

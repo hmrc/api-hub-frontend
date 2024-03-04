@@ -31,6 +31,8 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   private val contactHost = configuration.get[String]("contact-frontend.host")
   private val contactFormServiceIdentifier = "api-hub-frontend"
 
+  val supportEmailAddress = configuration.get[String]("support.emailAddress")
+
   def feedbackUrl(implicit request: RequestHeader): String =
     s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier&backUrl=${url"$host${request.uri}"}"
 
