@@ -17,12 +17,13 @@
 @import views.html.helper.CSPNonce
 @import java.net.URLEncoder
 @import scala.xml.{XML, Node, Text}
+@import models.user.UserModel
 
 @this(
     layout: templates.Layout
 )
 
-@(supportEmailAddress: String)(implicit request: Request[_], messages: Messages)
+@(supportEmailAddress: String, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
 @scripts() = {
     <link href='@routes.Assets.versioned("fontawesome6/css/all.min.css")' media="all" rel="stylesheet" type="text/css" @{CSPNonce.attr}/>
@@ -78,6 +79,7 @@
     pageTitle = titleNoForm(messages("support.title")),
     fullWidth = true,
     timeout   = false,
+    user      = user,
     customScriptsBlock = Some(scripts())
 ) {
     <h1 class="govuk-heading-l">@messages("support.heading")</h1>
