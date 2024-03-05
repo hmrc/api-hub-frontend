@@ -16,20 +16,21 @@
 
 package controllers
 
-import base.SpecBase
+import base.OptionallyAuthenticatedSpecBase
 import config.FrontendAppConfig
+import controllers.actions.FakeUser
+import org.scalatest.OptionValues
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import utils.HtmlValidation
 import views.html.GetSupportView
 
-class GetSupportControllerSpec extends SpecBase with HtmlValidation {
+class GetSupportControllerSpec extends OptionallyAuthenticatedSpecBase with OptionValues with HtmlValidation {
 
   "Get Support Controller" - {
 
-    "must return OK and the correct view for a GET" in {
-
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+    "must return OK and the correct view for a GET with an unauthenticated user" in {
+      val application = applicationBuilder(None).build()
 
       running(application) {
         val request = FakeRequest(GET, routes.GetSupportController.onPageLoad.url)
@@ -40,7 +41,24 @@ class GetSupportControllerSpec extends SpecBase with HtmlValidation {
         val config = application.injector.instanceOf[FrontendAppConfig]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(config.supportEmailAddress)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(config.supportEmailAddress, None)(request, messages(application)).toString
+        contentAsString(result) must validateAsHtml
+      }
+    }
+
+    "must return OK and the correct view for a GET with an authenticated user" in {
+      val application = applicationBuilder(Some(FakeUser)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.GetSupportController.onPageLoad.url)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[GetSupportView]
+        val config = application.injector.instanceOf[FrontendAppConfig]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(config.supportEmailAddress, Some(FakeUser))(request, messages(application)).toString
         contentAsString(result) must validateAsHtml
       }
     }
