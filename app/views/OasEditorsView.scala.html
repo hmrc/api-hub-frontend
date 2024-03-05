@@ -25,18 +25,17 @@ layout: templates.Layout
 
 @()(implicit request: Request[_], messages: Messages)
 
-@styles() = {
-    .govuk-width-container {
-
-    }
+@stylesheets() = {
+    <link href='@routes.Assets.versioned("oaseditors/main.css")' media="all" rel="stylesheet" type="text/css" @{CSPNonce.attr}/>
+    <link href='@routes.Assets.versioned("oaseditors/swagger/swagger-editor.css")' media="all" rel="stylesheet" type="text/css" @{CSPNonce.attr}/>
 }
 
-@layout(pageTitle = titleNoForm("OAS Editors spike"), showBackLink = false, fullWidth = true, customStyles = Some(styles())) {
-    <div id="redoc"></div>
+@layout(pageTitle = titleNoForm("OAS Editors spike"), showBackLink = false, fullWidth = true, customScriptsBlock = Some(stylesheets())) {
+    <div id="swagger-editor"></div>
 
-    <script src='@controllers.routes.Assets.versioned("javascripts/redoc/redoc.standalone.js")' charset="UTF-8" @{CSPNonce.attr}> </script>
+    <script src='@controllers.routes.Assets.versioned("oaseditors/oasYamlExample.js")' charset="UTF-8" @{CSPNonce.attr}> </script>
+    <script src='@controllers.routes.Assets.versioned("oaseditors/swagger/swagger-editor-bundle.js")' charset="UTF-8" @{CSPNonce.attr}> </script>
+    <script src='@controllers.routes.Assets.versioned("oaseditors/swagger/swagger-editor-standalone-preset.js")' charset="UTF-8" @{CSPNonce.attr}> </script>
+    <script src='@controllers.routes.Assets.versioned("oaseditors/init.js")' charset="UTF-8" @{CSPNonce.attr}> </script>
 
-    <script @{CSPNonce.attr}>
-        alert('hi');
-    </script>
 }

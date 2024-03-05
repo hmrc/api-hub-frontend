@@ -1,0 +1,13 @@
+#swagger-editor {
+    position: relative;
+    height: 600px;
+}
+.swagger-editor-standalone .topbar {
+    display: none;
+}
+#swagger-editor .Pane {
+    overflow-y: scroll;
+}
+#swagger-editor .Pane2 {
+    display: none;
+}
