@@ -1,0 +1,133 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import views.html.helper.CSPNonce
+@import java.net.URLEncoder
+@import scala.xml.{XML, Node, Text}
+
+@this(
+    layout: templates.Layout
+)
+
+@(supportEmailAddress: String)(implicit request: Request[_], messages: Messages)
+
+@scripts() = {
+    <link href='@routes.Assets.versioned("fontawesome6/css/all.min.css")' media="all" rel="stylesheet" type="text/css" @{CSPNonce.attr}/>
+}
+
+ @whatInformationToProvide() = {
+     <div class="govuk-details__text">
+         <p class="govuk-body">You will need to provide as much of the following information as possible:</p>
+         <p class="govuk-body">Please include the following information in the email where relevant</p>
+         <ul class="govuk-list govuk-list--bullet">
+             <li>Your name</li>
+             <li>Your email address</li>
+             <li>Are you a digital user, stride user or other?</li>
+             <li>What were you trying to do?</li>
+             <li>What were you expecting to happen?</li>
+             <li>What time did it fail/start failing?</li>
+             <li>When was the last time you knew it was working?</li>
+             <li>Are you receiving a response code/error?</li>
+             <li>What is the frequency/volume of failures? (Hundreds? Thousands? Per hour? Per day?)</li>
+             <li>Where relevant please included samples of failing requests?</li>
+             <li>Do you have any logs, screenshots, URIs?</li>
+             <li>If you have included logs -
+                 <ul class="govuk-list govuk-list--bullet">
+                     <li>How can we identify your requests in the logs? (Sending IP? User-agent ? x-request-id? Correlation ID) </li>
+                     <li>Please also click 'Short URL' to create a shortened URL to paste into the ticket - Kibana often cannot recreate the search from non-shortened URLs.</li>
+                     <li>Please make sure that you set the time range to an absolute value - the relative and 'quick' ranges such as 'Last 15 minutes' will result in your logs dropping off the search as time passes.</li>
+                 </ul>
+             </li>
+             <li>How can we repeat the problem?</li>
+             <li>And finally, are you sure the problem is with our service? (Have you checked the problem isn’t with your own service)</li>
+         </ul>
+     </div>
+ }
+
+@encodeWithEscapedSpaces(unencodedText: String) = @{
+    URLEncoder.encode(unencodedText, "UTF-8").replace("+", "%20")
+}
+
+@whatInformationToProvideText() = @{
+    def collectTextNodes(node: Node): List[String] = {
+        node match {
+            case Text(text) => List(text)
+            case _ => node.child.flatMap(collectTextNodes).toList
+        }
+    }
+    val rootNode = XML.loadString(whatInformationToProvide().body)
+    val unencodedText = collectTextNodes(rootNode).map(n => n.trim).filter(n => !n.isBlank).mkString("\n\n")
+
+    encodeWithEscapedSpaces(unencodedText)
+}
+
+@layout(
+    pageTitle = titleNoForm(messages("support.title")),
+    fullWidth = true,
+    timeout   = false,
+    customScriptsBlock = Some(scripts())
+) {
+    <h1 class="govuk-heading-l">@messages("support.heading")</h1>
+
+    <p class="govuk-body">If you need help with something Hub related you can use the following methods to contact us.</p>
+    <h3 class="govuk-heading-m ">Via Email</h3>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-half govuk-!-margin-top-3">
+            <div class="call-out-panel call-out-panel__small  govuk-!-margin-bottom-7">
+                <p class="govuk-body information--general-tag">
+                    <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                    <span class="call-out-type">
+                        Having an issue using an API?
+                    </span>
+                </p>
+                <p class="govuk-body additional-message">
+                    If you are having problems using an API, you can contact us via this email
+                    <a href="mailto:@supportEmailAddress?subject=@encodeWithEscapedSpaces(messages("support.email.subject.consumer"))&body=@whatInformationToProvideText()" class="govuk-link">@supportEmailAddress</a>.
+                </p>
+
+                <details class="govuk-details" style="margin-left: 38px; margin-top: 20px;">
+                    <summary class="govuk-details__summary">
+                        <span class="govuk-details__summary-text govuk-body-s" style="color: #1d70b8;">
+                            What information will I need to provide?
+                        </span>
+                    </summary>
+                    @whatInformationToProvide()
+                </details>
+            </div>
+        </div>
+        <div class="govuk-grid-column-one-half govuk-!-margin-top-3">
+            <div class="call-out-panel call-out-panel__small  govuk-!-margin-bottom-7">
+                <p class="govuk-body information--general-tag">
+                    <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                    <span class="call-out-type">
+                        Having an issue producing an API?
+                    </span>
+                </p>
+                <p class="govuk-body additional-message">If you are having problems creating an API, you can contact us via this email
+                    <a href="mailto:@supportEmailAddress?subject=@encodeWithEscapedSpaces(messages("support.email.subject.producer"))&body=@whatInformationToProvideText()" class="govuk-link">@supportEmailAddress</a>.
+                </p>
+                <details class="govuk-details" style="margin-left: 38px; margin-top: 20px;">
+                    <summary class="govuk-details__summary">
+                        <span class="govuk-details__summary-text govuk-body-s" style="color: #1d70b8;">
+                            What information will I need to provide?
+                        </span>
+                    </summary>
+                    @whatInformationToProvide()
+                </details>
+            </div>
+        </div>
+    </div>
+}
