@@ -18,6 +18,7 @@ package controllers
 
 import base.SpecBase
 import config.FrontendAppConfig
+import controllers.actions.FakeUser
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import utils.HtmlValidation
@@ -40,7 +41,7 @@ class GetSupportControllerSpec extends SpecBase with HtmlValidation {
         val config = application.injector.instanceOf[FrontendAppConfig]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(config.supportEmailAddress)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(config.supportEmailAddress, Some(FakeUser))(request, messages(application)).toString
         contentAsString(result) must validateAsHtml
       }
     }
