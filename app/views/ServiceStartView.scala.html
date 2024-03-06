@@ -1,0 +1,79 @@
+@*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.user.UserModel
+
+@this(
+    layout: templates.Layout,
+    govukButton : GovukButton
+)
+
+@(user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+
+@layout(
+    pageTitle    = titleNoForm(messages("serviceStart.title")),
+    showBackLink = false,
+    user = user
+) {
+
+    <h1 class="govuk-heading-xl">@messages("serviceStart.heading")</h1>
+
+    <p class="govuk-body">@messages("serviceStart.introduction")</p>
+
+    <h2 class="govuk-heading-m">@messages("serviceStart.whatYouCanDo")</h2>
+
+    <ul class="govuk-list govuk-list--bullet">
+        <li>
+            <strong>@messages("serviceStart.consume.heading")</strong>
+            <ul class="govuk-list">
+                <li>@messages("serviceStart.consume.list.1")</li>
+                <li>@messages("serviceStart.consume.list.2")</li>
+                <li>@messages("serviceStart.consume.list.3")</li>
+                <li>@messages("serviceStart.consume.list.4")</li>
+            </ul>
+        </li>
+        <li>
+            <strong>@messages("serviceStart.produce.heading")</strong>
+            <ul class="govuk-list">
+                <li>@messages("serviceStart.produce.list.1")</li>
+                <li>@messages("serviceStart.produce.list.2")</li>
+                <li>@messages("serviceStart.produce.list.3")</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h2 class="govuk-heading-m" id="before-you-start">@messages("serviceStart.beforeYouStart")</h2>
+
+    <p class="govuk-body"><strong>@messages("serviceStart.beforeExploring.heading")</strong></p>
+    <p class="govuk-body">@messages("serviceStart.beforeExploring.content")</p>
+
+    <p class="govuk-body"><strong>@messages("serviceStart.beforeConsuming.heading")</strong></p>
+    <p class="govuk-body">@messages("serviceStart.beforeConsuming.content")</p>
+
+    <p class="govuk-body"><strong>@messages("serviceStart.beforeProducing.heading")</strong></p>
+    <p class="govuk-body">@messages("serviceStart.beforeProducing.content")</p>
+    <ul class="govuk-list govuk-list--bullet">
+        <li>@messages("serviceStart.beforeProducing.list.1")</li>
+    </ul>
+
+    @govukButton(Button(
+        href = Some(routes.IndexController.onPageLoad.url),
+        isStartButton = true,
+        content = Text(messages("site.start")),
+        classes = "govuk-!-margin-top-5"
+    ))
+
+}
