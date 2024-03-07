@@ -19,7 +19,7 @@ package controllers
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.{OasEditorsAceView, OasEditorsMonacoView, OasEditorsSummaryView, OasEditorsSwaggerNewView, OasEditorsSwaggerOldView}
+import views.html.{OasEditorsAceView, OasEditorsCodeMirrorView, OasEditorsMonacoView, OasEditorsSummaryView, OasEditorsSwaggerNewView, OasEditorsSwaggerOldView}
 
 import javax.inject.Inject
 
@@ -30,6 +30,7 @@ class OasEditorsController @Inject()(
                                       swaggerNewView: OasEditorsSwaggerNewView,
                                       monacoView: OasEditorsMonacoView,
                                       aceView: OasEditorsAceView,
+                                      codeMirrorView: OasEditorsCodeMirrorView,
                                       ) extends FrontendBaseController with I18nSupport {
 
   def loadSummary: Action[AnyContent] = Action { implicit request =>
@@ -46,5 +47,8 @@ class OasEditorsController @Inject()(
   }
   def loadMonaco: Action[AnyContent] = Action { implicit request =>
     Ok(monacoView())
+  }
+  def loadCodeMirror: Action[AnyContent] = Action { implicit request =>
+    Ok(codeMirrorView())
   }
 }

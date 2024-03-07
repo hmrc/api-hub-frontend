@@ -20,3 +20,14 @@
     background-color: rgba(255, 0, 0, 0.5);
     position:absolute;
 }
+
+#codemirror-editor {
+    height: 500px;
+    width: 100%;
+}
+
+/* Stretch editor to fit inside its containing div */
+.cm-editor {
+    height: 100%;
+    width: 100%;
+}

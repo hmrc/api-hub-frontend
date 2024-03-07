@@ -14,8 +14,6 @@
  * limitations under the License.
  *@
 
-@import models.api._
-@import models.user.UserModel
 @import views.html.helper.CSPNonce
 
 
@@ -30,14 +28,11 @@ layout: templates.Layout
 }
 
 @layout(pageTitle = titleNoForm("OAS Editors spike"), showBackLink = false, fullWidth = true, customScriptsBlock = Some(stylesheets())) {
+    <script src='@controllers.routes.Assets.versioned("oaseditors/oasYamlExample.js")' charset="UTF-8" @{CSPNonce.attr}> </script>
 
-    <h1>OAS Editors spike</h1>
-    <ul>
-        <li><a href="@routes.OasEditorsController.loadSwaggerOld().url">Swagger (Old)</a></li>
-        <li><a href="@routes.OasEditorsController.loadSwaggerNew().url">Swagger (New)</a></li>
-        <li><a href="@routes.OasEditorsController.loadAce().url">Ace</a></li>
-        <li><a href="@routes.OasEditorsController.loadMonaco().url">Monaco</a></li>
-        <li><a href="@routes.OasEditorsController.loadCodeMirror().url">CodeMirror</a></li>
-    </ul>
-
+    <h1>Code Mirror</h1>
+    <!-- see https://github.com/RPGillespie6/codemirror-quickstart/blob/master/examples/example1.html -->
+    <div id="codemirror-editor">+</div>
+    <script  src='@controllers.routes.Assets.versioned("oaseditors/codemirror/cm6.bundle.js")' charset="UTF-8" @{CSPNonce.attr}> </script>
+    <script  src='@controllers.routes.Assets.versioned("oaseditors/codemirror/init.js")' charset="UTF-8" @{CSPNonce.attr}> </script>
 }

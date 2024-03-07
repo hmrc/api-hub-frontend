@@ -103,3 +103,4 @@ GET         /oas-editors/swagger-old                                            
 GET         /oas-editors/swagger-new                                            controllers.OasEditorsController.loadSwaggerNew()
 GET         /oas-editors/ace                                                    controllers.OasEditorsController.loadAce()
 GET         /oas-editors/monaco                                                 controllers.OasEditorsController.loadMonaco()
+GET         /oas-editors/code-mirror                                            controllers.OasEditorsController.loadCodeMirror()
