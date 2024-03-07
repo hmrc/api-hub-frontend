@@ -1,0 +1,1 @@
+var require = { paths: { 'vs': '/api-hub/assets/oaseditors/monaco' } };

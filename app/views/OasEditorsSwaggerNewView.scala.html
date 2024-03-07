@@ -1,0 +1,51 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.api._
+@import models.user.UserModel
+@import views.html.helper.CSPNonce
+
+
+@this(
+layout: templates.Layout
+)
+
+@()(implicit request: Request[_], messages: Messages)
+
+@stylesheets() = {
+    <link href='@routes.Assets.versioned("oaseditors/main.css")' media="all" rel="stylesheet" type="text/css" @{CSPNonce.attr}/>
+    <link href='@routes.Assets.versioned("oaseditors/swagger-new/css/main.1f8906a2.css")' media="all" rel="stylesheet" type="text/css" @{CSPNonce.attr}/>
+}
+
+@layout(pageTitle = titleNoForm("OAS Editors spike"), showBackLink = false, fullWidth = true, customScriptsBlock = Some(stylesheets())) {
+    <script src='@controllers.routes.Assets.versioned("oaseditors/oasYamlExample.js")' charset="UTF-8" @{CSPNonce.attr}> </script>
+    <link rel="manifest" href="oaseditors/swagger-new/manifest.json"/>
+    <h1>Swagger (New)</h1>
+    <div id="swagger-editor">
+    <div class="swagger-editor">
+        <div class="swagger-editor__splash-screen">
+            <figure class="swagger-editor__splash-screen-figure">
+                <img width="100%" src="oaseditors/swagger-new/media/splash-screen/logo.svg" alt="Swagger Editor"/>
+                <figcaption>5.0.0-alpha.88</figcaption>
+                <img width="25" height="25" class="swagger-editor__splash-screen-spinner" src="oaseditors/swagger-new/media/splash-screen/loader.gif" alt="Loading..."/>
+            </figure>
+        </div>
+    </div>
+    </div>
+    <script src='@controllers.routes.Assets.versioned("oaseditors/swagger-new/init.js")' charset="UTF-8" @{CSPNonce.attr}> </script>
+    <script defer src='/api-hub/assets/oaseditors/swagger-new/js/main.c7fd212d.js' charset="UTF-8" @{CSPNonce.attr}> </script>
+
+}

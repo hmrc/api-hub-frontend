@@ -19,16 +19,32 @@ package controllers
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.{OasEditorsView, UnauthorisedView}
+import views.html.{OasEditorsAceView, OasEditorsMonacoView, OasEditorsSummaryView, OasEditorsSwaggerNewView, OasEditorsSwaggerOldView}
 
 import javax.inject.Inject
 
 class OasEditorsController @Inject()(
-                                        val controllerComponents: MessagesControllerComponents,
-                                        view: OasEditorsView
+                                      val controllerComponents: MessagesControllerComponents,
+                                      summaryView: OasEditorsSummaryView,
+                                      swaggerOldView: OasEditorsSwaggerOldView,
+                                      swaggerNewView: OasEditorsSwaggerNewView,
+                                      monacoView: OasEditorsMonacoView,
+                                      aceView: OasEditorsAceView,
                                       ) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = Action { implicit request =>
-    Ok(view())
+  def loadSummary: Action[AnyContent] = Action { implicit request =>
+    Ok(summaryView())
+  }
+  def loadSwaggerOld: Action[AnyContent] = Action { implicit request =>
+    Ok(swaggerOldView())
+  }
+  def loadSwaggerNew: Action[AnyContent] = Action { implicit request =>
+    Ok(swaggerNewView())
+  }
+  def loadAce: Action[AnyContent] = Action { implicit request =>
+    Ok(aceView())
+  }
+  def loadMonaco: Action[AnyContent] = Action { implicit request =>
+    Ok(monacoView())
   }
 }

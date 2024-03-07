@@ -98,4 +98,8 @@ POST        /apis/add-endpoints/add-endpoints                                   
 GET         /apis/view-specification/:apiId                                     controllers.OasRedocController.onPageLoad(apiId: String)
 GET         /apis/oas/:apiId                                                    controllers.OasRedocController.getOas(apiId: String)
 
-GET         /oas-editors                                                        controllers.OasEditorsController.onPageLoad()
+GET         /oas-editors                                                        controllers.OasEditorsController.loadSummary()
+GET         /oas-editors/swagger-old                                            controllers.OasEditorsController.loadSwaggerOld()
+GET         /oas-editors/swagger-new                                            controllers.OasEditorsController.loadSwaggerNew()
+GET         /oas-editors/ace                                                    controllers.OasEditorsController.loadAce()
+GET         /oas-editors/monaco                                                 controllers.OasEditorsController.loadMonaco()

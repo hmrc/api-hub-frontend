@@ -1,0 +1,42 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.api._
+@import models.user.UserModel
+@import views.html.helper.CSPNonce
+
+
+@this(
+layout: templates.Layout
+)
+
+@()(implicit request: Request[_], messages: Messages)
+
+@stylesheets() = {
+    <link href='@routes.Assets.versioned("oaseditors/main.css")' media="all" rel="stylesheet" type="text/css" @{CSPNonce.attr}/>
+}
+
+@layout(pageTitle = titleNoForm("OAS Editors spike"), showBackLink = false, fullWidth = true, customScriptsBlock = Some(stylesheets())) {
+
+    <h1>OAS Editors spike</h1>
+    <ul>
+        <li><a href="@routes.OasEditorsController.loadSwaggerOld().url">Swagger (Old)</a></li>
+        <li><a href="@routes.OasEditorsController.loadSwaggerNew().url">Swagger (New)</a></li>
+        <li><a href="@routes.OasEditorsController.loadAce().url">Ace</a></li>
+        <li><a href="@routes.OasEditorsController.loadMonaco().url">Monaco</a></li>
+    </ul>
+
+}

@@ -1,4 +1,4 @@
-#swagger-editor {
+#swagger-editor, #ace-editor, #monaco-editor {
     position: relative;
     height: 600px;
 }
@@ -10,4 +10,13 @@
 }
 #swagger-editor .Pane2 {
     display: none;
+}
+.aceErrorHighlight {
+    background-color: rgba(255, 0, 0, 0.5);
+    position:absolute;
+    z-index:20
+}
+.monacoErrorHighlight {
+    background-color: rgba(255, 0, 0, 0.5);
+    position:absolute;
 }
