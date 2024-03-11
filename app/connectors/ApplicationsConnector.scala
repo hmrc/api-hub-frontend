@@ -21,6 +21,7 @@ import config.FrontendAppConfig
 import models.UserEmail
 import models.accessrequest.{AccessRequest, AccessRequestDecisionRequest, AccessRequestRequest, AccessRequestStatus}
 import models.application._
+import models.deployment._
 import models.exception.{ApplicationCredentialLimitException, ApplicationsException}
 import models.requests.{AddApiRequest, TeamMemberRequest}
 import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION, CONTENT_TYPE}
@@ -29,9 +30,8 @@ import play.api.http.Status.NOT_FOUND
 import play.api.libs.json.Json
 import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
 import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.HttpReads.is2xx
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps, UpstreamErrorResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpErrorFunctions, HttpResponse, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -42,7 +42,7 @@ class ApplicationsConnector @Inject()(
     crypto: ApplicationCrypto,
     servicesConfig: ServicesConfig,
     frontEndConfig: FrontendAppConfig
-  )(implicit ec: ExecutionContext) {
+  )(implicit ec: ExecutionContext) extends HttpErrorFunctions {
 
   private val applicationsBaseUrl = servicesConfig.baseUrl("api-hub-applications")
   private val clientAuthToken = frontEndConfig.appAuthToken
@@ -244,6 +244,41 @@ class ApplicationsConnector @Inject()(
         case Left(e) if e.statusCode == NOT_FOUND => Future.successful(None)
         case Left(e) => Future.failed(e)
       }
+  }
+
+  def generateDeployment(generateRequest: GenerateRequest)(implicit hc: HeaderCarrier): Future[GenerateResponse] = {
+    httpClient.post(url"$applicationsBaseUrl/api-hub-applications/deployments/generate")
+      .setHeader(CONTENT_TYPE -> JSON)
+      .setHeader(ACCEPT -> JSON)
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .withBody(Json.toJson(generateRequest))
+      .execute[HttpResponse]
+      .flatMap {
+        response =>
+          if (is2xx(response.status)) {
+            Future.successful(response.json.as[SuccessfulGenerateResponse])
+          }
+          else if (response.status == 400) {
+            handleBadRequest(response)
+              .map(Future.successful)
+              .getOrElse(Future.failed(UpstreamErrorResponse("Bad request", response.status)))
+          }
+          else {
+            Future.failed(UpstreamErrorResponse("Unexpected response", response.status))
+          }
+      }
+  }
+
+  private def handleBadRequest(response: HttpResponse): Option[InvalidOasResponse] = {
+    if (response.body.isEmpty) {
+      None
+    }
+    else {
+      response.json.validate[ValidationFailuresResponse].fold(
+        _ => None,
+        validationFailureResponse => Some(InvalidOasResponse(validationFailureResponse.failures))
+      )
+    }
   }
 
 }

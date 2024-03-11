@@ -3,6 +3,7 @@
 ->          /hmrc-frontend                                                     hmrcfrontend.Routes
 ->          /application                                                       application.Routes
 ->          /admin                                                             admin.Routes
+->          /deployment                                                        deployment.Routes
 
 GET         /                                                                  controllers.ServiceStartController.onPageLoad
 GET         /dashboard                                                         controllers.IndexController.onPageLoad

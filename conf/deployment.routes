@@ -1,0 +1,2 @@
+GET     /generate                               controllers.deployment.SimpleApiDeploymentController.onPageLoad()
+POST    /generate                               controllers.deployment.SimpleApiDeploymentController.onSubmit()
