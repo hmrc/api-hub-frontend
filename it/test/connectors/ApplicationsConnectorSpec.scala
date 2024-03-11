@@ -23,6 +23,7 @@ import connectors.ApplicationsConnectorSpec.ApplicationGetterBehaviours
 import models.UserEmail
 import models.accessrequest._
 import models.application._
+import models.deployment.{GenerateRequest, InvalidOasResponse, SuccessfulGenerateResponse, ValidationFailure}
 import models.exception.ApplicationCredentialLimitException
 import models.requests.{AddApiRequest, AddApiRequestEndpoint, TeamMemberRequest}
 import models.user.{LdapUser, UserModel}
@@ -615,6 +616,49 @@ class ApplicationsConnectorSpec
       buildConnector(this).addTeamMember(applicationId, teamMember)(HeaderCarrier()).map(
         result =>
           result mustBe None
+      )
+    }
+  }
+
+  "ApplicationsConnector.generateDeployment" - {
+    "must place the correct request and return the response" in {
+      val request = GenerateRequest("test-lob", "test-name", "test-description", "test-egress", "test-oas")
+      val response = SuccessfulGenerateResponse(101, "test-lob", "test-branch", 102)
+
+      stubFor(
+        post(urlEqualTo("/api-hub-applications/deployments/generate"))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .withHeader(CONTENT_TYPE, equalTo(ContentTypes.JSON))
+          .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
+          .withRequestBody(equalToJson(Json.toJson(request).toString()))
+          .willReturn(
+            aResponse()
+              .withBody(Json.toJson(response).toString())
+          )
+      )
+
+      buildConnector(this).generateDeployment(request)(HeaderCarrier()).map(
+        result =>
+          result mustBe response
+      )
+    }
+
+    "must handle a 400 bad Request response with invalid OAS payload" in {
+      val request = GenerateRequest("test-lob", "test-name", "test-description", "test-egress", "test-oas")
+      val response = InvalidOasResponse(Seq(ValidationFailure("test-type", "test-message")))
+
+      stubFor(
+        post(urlEqualTo("/api-hub-applications/deployments/generate"))
+          .willReturn(
+            aResponse()
+              .withStatus(BAD_REQUEST)
+              .withBody(Json.toJson(response).toString())
+          )
+      )
+
+      buildConnector(this).generateDeployment(request)(HeaderCarrier()).map(
+        result =>
+          result mustBe response
       )
     }
   }
