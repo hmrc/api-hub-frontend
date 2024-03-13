@@ -442,3 +442,8 @@ serviceStart.beforeConsuming.content = You will need specific roles to make API 
 serviceStart.beforeProducing.heading = Before you start producing an API
 serviceStart.beforeProducing.content = To deploy a test (hello world) API to the test environment you won't need anything, however to deploy a non-test API you will need the following:
 serviceStart.beforeProducing.list.1 = Endpoint details
+
+manageMyTeams.title = Manage teams
+manageMyTeams.heading = Manage teams
+manageMyTeams.hint = Teams can be used to help you manage your applications and create APIs.
+manageMyTeams.noTeams = You have not created any teams
