@@ -2,4 +2,4 @@ function initSwaggerEditor() {
 
 }
 initSwaggerEditor();
-globalThis.MonacoEnvironment=window.MonacoEnvironment={baseUrl:new URL("/stassstic/js/",document.baseURI||location.href).toString()}
+globalThidss.MonacoEnvironment=window.MonacoEnvironment={baseUrl:new URL("/api-hub/assets/oaseditors/swagger-new/js/",document.baseURI||location.href).toString()}

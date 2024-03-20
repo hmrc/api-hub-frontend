@@ -7,9 +7,8 @@ function initAceEditor() {
     // to read content: editor.getValue()
 
      //to highlight a line in error:
-    var Range = ace.require('ace/range').Range
-    editor.session.addMarker(new Range(3, 0, 4, 0), "aceErrorHighlight");
-
+    // var Range = ace.require('ace/range').Range
+    // editor.session.addMarker(new Range(3, 0, 4, 0), "aceErrorHighlight");
 
     /*
     // this doesnt work, should trigger whenever error list changes, see https://github.com/ajaxorg/ace/issues/3423 and https://stackoverflow.com/a/10667290/138256

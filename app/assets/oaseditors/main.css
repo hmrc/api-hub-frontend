@@ -31,3 +31,14 @@
     height: 100%;
     width: 100%;
 }
+
+.monaco-workbench {
+    /*swagger-new adds this to the body and makes page background black*/
+    background-color: white ! important;
+}
+.swagger-editor__top-bar, .swagger-editor__editor-preview-pane {
+    display: none;
+}
+.Pane:nth-child(3) {
+    display: none;
+}
