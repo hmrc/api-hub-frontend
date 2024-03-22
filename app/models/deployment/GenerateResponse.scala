@@ -20,7 +20,7 @@ import play.api.libs.json.{Format, Json}
 
 sealed trait GenerateResponse
 
-case class SuccessfulGenerateResponse(projectId: Int, lineOfBusiness: String, branchName: String, mergeRequestIid: Int) extends GenerateResponse
+case class SuccessfulGenerateResponse(id: String, version: String, mergeRequestIid: Int, uri: String) extends GenerateResponse
 
 object SuccessfulGenerateResponse {
 

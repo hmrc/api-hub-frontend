@@ -623,7 +623,7 @@ class ApplicationsConnectorSpec
   "ApplicationsConnector.generateDeployment" - {
     "must place the correct request and return the response" in {
       val request = GenerateRequest("test-lob", "test-name", "test-description", "test-egress", "test-oas")
-      val response = SuccessfulGenerateResponse(101, "test-lob", "test-branch", 102)
+      val response = SuccessfulGenerateResponse("test-id", "1.0.0", 102, "test-url")
 
       stubFor(
         post(urlEqualTo("/api-hub-applications/deployments/generate"))
