@@ -246,17 +246,17 @@ class ApplicationsConnector @Inject()(
       }
   }
 
-  def generateDeployment(generateRequest: GenerateRequest)(implicit hc: HeaderCarrier): Future[GenerateResponse] = {
+  def generateDeployment(deploymentsRequest: DeploymentsRequest)(implicit hc: HeaderCarrier): Future[DeploymentsResponse] = {
     httpClient.post(url"$applicationsBaseUrl/api-hub-applications/deployments/generate")
       .setHeader(CONTENT_TYPE -> JSON)
       .setHeader(ACCEPT -> JSON)
       .setHeader(AUTHORIZATION -> clientAuthToken)
-      .withBody(Json.toJson(generateRequest))
+      .withBody(Json.toJson(deploymentsRequest))
       .execute[HttpResponse]
       .flatMap {
         response =>
           if (is2xx(response.status)) {
-            Future.successful(response.json.as[SuccessfulGenerateResponse])
+            Future.successful(response.json.as[SuccessfulDeploymentsResponse])
           }
           else if (response.status == 400) {
             handleBadRequest(response)

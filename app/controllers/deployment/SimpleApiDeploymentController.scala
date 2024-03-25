@@ -19,7 +19,7 @@ package controllers.deployment
 import com.google.inject.{Inject, Singleton}
 import connectors.ApplicationsConnector
 import controllers.actions.IdentifierAction
-import models.deployment.{GenerateRequest, InvalidOasResponse, SuccessfulGenerateResponse}
+import models.deployment.{DeploymentsRequest, InvalidOasResponse, SuccessfulDeploymentsResponse}
 import play.api.Logging
 import play.api.data._
 import play.api.data.Forms._
@@ -43,22 +43,22 @@ class SimpleApiDeploymentController @Inject()(
 
   def onPageLoad(): Action[AnyContent] = identify {
     implicit request =>
-      Ok(view(generateRequestForm, request.user))
+      Ok(view(deploymentsRequestForm, request.user))
   }
 
   def onSubmit(): Action[AnyContent] = identify.async {
     implicit request =>
-      generateRequestForm.bindFromRequest().fold(
+      deploymentsRequestForm.bindFromRequest().fold(
         _ => Future.successful(BadRequest),
-        generateRequest =>
+        deploymentsRequest =>
           applicationsConnector
-            .generateDeployment(generateRequest)
+            .generateDeployment(deploymentsRequest)
             .map {
-              case response: SuccessfulGenerateResponse =>
-                logger.info(s"Successful generate response${System.lineSeparator()}${Json.prettyPrint(Json.toJson(response))}")
+              case response: SuccessfulDeploymentsResponse =>
+                logger.info(s"Successful deployments response${System.lineSeparator()}${Json.prettyPrint(Json.toJson(response))}")
                 Ok(Json.toJson(response))
               case response: InvalidOasResponse =>
-                logger.info(s"Invalid OAS generate response${System.lineSeparator()}${Json.prettyPrint(Json.toJson(response))}")
+                logger.info(s"Invalid OAS deployments response${System.lineSeparator()}${Json.prettyPrint(Json.toJson(response))}")
                 BadRequest(Json.toJson(response))
             }
       )
@@ -68,14 +68,14 @@ class SimpleApiDeploymentController @Inject()(
 
 object SimpleApiDeploymentController {
 
-  val generateRequestForm: Form[GenerateRequest] = Form(
+  val deploymentsRequestForm: Form[DeploymentsRequest] = Form(
     mapping(
       "lineOfBusiness" -> text,
       "name" -> text,
       "description" -> text,
       "egress" -> text,
       "oas" -> text
-    )(GenerateRequest.apply)(GenerateRequest.unapply)
+    )(DeploymentsRequest.apply)(DeploymentsRequest.unapply)
   )
 
 }
