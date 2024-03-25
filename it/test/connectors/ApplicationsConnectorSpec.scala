@@ -23,7 +23,7 @@ import connectors.ApplicationsConnectorSpec.ApplicationGetterBehaviours
 import models.UserEmail
 import models.accessrequest._
 import models.application._
-import models.deployment.{GenerateRequest, InvalidOasResponse, SuccessfulGenerateResponse, ValidationFailure}
+import models.deployment.{DeploymentsRequest, InvalidOasResponse, SuccessfulDeploymentsResponse, ValidationFailure}
 import models.exception.ApplicationCredentialLimitException
 import models.requests.{AddApiRequest, AddApiRequestEndpoint, TeamMemberRequest}
 import models.user.{LdapUser, UserModel}
@@ -622,8 +622,8 @@ class ApplicationsConnectorSpec
 
   "ApplicationsConnector.generateDeployment" - {
     "must place the correct request and return the response" in {
-      val request = GenerateRequest("test-lob", "test-name", "test-description", "test-egress", "test-oas")
-      val response = SuccessfulGenerateResponse("test-id", "1.0.0", 102, "test-url")
+      val request = DeploymentsRequest("test-lob", "test-name", "test-description", "test-egress", "test-oas")
+      val response = SuccessfulDeploymentsResponse("test-id", "1.0.0", 102, "test-url")
 
       stubFor(
         post(urlEqualTo("/api-hub-applications/deployments/generate"))
@@ -644,7 +644,7 @@ class ApplicationsConnectorSpec
     }
 
     "must handle a 400 bad Request response with invalid OAS payload" in {
-      val request = GenerateRequest("test-lob", "test-name", "test-description", "test-egress", "test-oas")
+      val request = DeploymentsRequest("test-lob", "test-name", "test-description", "test-egress", "test-oas")
       val response = InvalidOasResponse(Seq(ValidationFailure("test-type", "test-message")))
 
       stubFor(

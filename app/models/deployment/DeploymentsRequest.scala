@@ -18,10 +18,10 @@ package models.deployment
 
 import play.api.libs.json.{Format, Json}
 
-case class GenerateRequest(lineOfBusiness: String, name: String, description: String, egress: String, oas: String)
+case class DeploymentsRequest(lineOfBusiness: String, name: String, description: String, egress: String, oas: String)
 
-object GenerateRequest {
+object DeploymentsRequest {
 
-  implicit val formatGenerateRequest: Format[GenerateRequest] = Json.format[GenerateRequest]
+  implicit val formatDeploymentsRequest: Format[DeploymentsRequest] = Json.format[DeploymentsRequest]
 
 }
