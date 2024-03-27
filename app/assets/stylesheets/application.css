@@ -301,3 +301,15 @@
 .warning-colour {
     color: #f47738;
 }
+
+.ready {
+    color: #00703c;
+}
+
+.customised-table {
+    margin-bottom: 20px !important;
+}
+
+.customised-table tr:last-child td, .customised-table tr:last-child th {
+    border-color: #fff;
+}

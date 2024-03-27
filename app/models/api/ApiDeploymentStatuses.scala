@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,19 +18,11 @@ package models.api
 
 import play.api.libs.json.{Format, Json}
 
-case class ApiDetail(
-  id: String,
-  publisherReference: String,
-  title: String,
-  description: String,
-  version: String,
-  endpoints: Seq[Endpoint],
-  shortDescription: Option[String],
-  openApiSpecification: String
+case class ApiDeploymentStatuses (
+  primary: Boolean,
+  secondary: Boolean
 )
 
-object ApiDetail {
-
-  implicit val formatApiDetail: Format[ApiDetail] = Json.format[ApiDetail]
-
+object ApiDeploymentStatuses {
+  implicit val formatApiDeploymentStatuses: Format[ApiDeploymentStatuses] = Json.format[ApiDeploymentStatuses]
 }

@@ -29,6 +29,7 @@ class AvailableEndpointsSpec extends AnyFreeSpec with Matchers with TableDrivenP
 
   private val testApiDetail = ApiDetail(
     id = "test-id",
+    publisherReference = "test-publisher-reference",
     title = "test-title",
     description = "test-description",
     version = "test-version",

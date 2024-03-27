@@ -25,7 +25,7 @@ import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.ApiDetailsView
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ApiDetailsController @Inject()(
@@ -38,13 +38,25 @@ class ApiDetailsController @Inject()(
 
   def onPageLoad(id: String): Action[AnyContent] = optionallyIdentified.async {
     implicit request =>
-      apiHubService.getApiDetail(id).map {
-        case Some(apiDetail) => Ok(view(apiDetail, request.user))
-        case _ => errorResultBuilder.notFound(
-          Messages("site.apiNotFound.heading"),
-          Messages("site.apiNotFound.message", id)
-        )
-      }
+      for {
+        maybeApiDetail <- apiHubService.getApiDetail(id)
+        result <- maybeApiDetail match {
+          case Some(apiDetail) =>
+            for {
+              maybeApiDeploymentStatuses <- apiHubService.getApiDeploymentStatuses(apiDetail.publisherReference)
+            } yield maybeApiDeploymentStatuses match {
+              case Some(apiDeploymentStatuses) =>
+                Ok(view(apiDetail, apiDeploymentStatuses, request.user))
+              case None =>
+                errorResultBuilder.internalServerError(s"Unable to retrieve deployment statuses for API ${apiDetail.publisherReference}")
+            }
+          case None =>
+            Future.successful(errorResultBuilder.notFound(
+              Messages("site.apiNotFound.heading"),
+              Messages("site.apiNotFound.message", id)
+            ))
+        }
+      } yield result
   }
 
 }

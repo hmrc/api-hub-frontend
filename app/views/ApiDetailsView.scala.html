@@ -23,7 +23,7 @@
         govukButton: GovukButton
 )
 
-@(apiDetail: ApiDetail, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+@(apiDetail: ApiDetail, deploymentStatuses: ApiDeploymentStatuses, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
 @endpointName(endpoint: Endpoint) = @{
     endpoint.path.replaceAll("""[^a-zA-Z0-9\-_:.]""", "-") match {
@@ -40,6 +40,14 @@
     <a href="@routes.OasRedocController.onPageLoad(apiDetail.id).url" target="_blank" class="govuk-link govuk-link--no-visited-state">
         @messages("apiDetails.viewApiSpec.link")
     </a>
+}
+
+@showDeploymentStatus(isDeployed: Boolean) = {
+    @if(isDeployed) {
+        <i class="fa-solid fa-circle-check ready" aria-hidden="true"></i> @messages("apiDetails.deploymentStatus.deployed")
+    } else {
+        <i class="fa-solid fa-times-circle" aria-hidden="true"></i> @messages("apiDetails.deploymentStatus.notDeployed")
+    }
 }
 
 @layout(pageTitle = titleNoForm(messages("apiDetails.title")), user = user, customScriptsBlock = Some(scripts()), fullWidth = true) {
@@ -128,6 +136,27 @@
                         )
                     </p>
                 </div>
+
+                <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-6 govuk-!-margin-top-0">
+
+                <h2 class="govuk-heading-m" id="deploymentStatusHeader">
+                @messages("apiDetails.deploymentStatus.heading")
+                </h2>
+
+                <table class="govuk-table customised-table">
+                    <thead class="govuk-table__head">
+                        <tr class="govuk-table__row">
+                            <th scope="col" class="govuk-table__header">@messages("apiDetails.deploymentStatus.dev.heading")</th>
+                            <th scope="col" class="govuk-table__header">@messages("apiDetails.deploymentStatus.prod.heading")</th>
+                        </tr>
+                    </thead>
+                    <tbody class="govuk-table__body">
+                        <tr class="govuk-table__row">
+                            <td class="govuk-table__cell" id="deploymentStatusSecondary">@showDeploymentStatus(deploymentStatuses.secondary)</td>
+                            <td class="govuk-table__cell" id="deploymentStatusPrimary">@showDeploymentStatus(deploymentStatuses.primary)</td>
+                        </tr>
+                    </tbody>
+                </table>
 
                 <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-6 govuk-!-margin-top-0">
 

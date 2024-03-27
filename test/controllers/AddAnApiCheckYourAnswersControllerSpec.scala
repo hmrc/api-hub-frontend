@@ -63,6 +63,7 @@ class AddAnApiCheckYourAnswersControllerSpec extends SpecBase with SummaryListFl
     "must return OK and the correct view for a GET with complete user answers" in {
       val apiDetail = ApiDetail(
         "test-id",
+        "test-publisher-reference",
         "test-title",
         "test-description",
         "test-version",

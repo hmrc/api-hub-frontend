@@ -20,13 +20,14 @@ import com.google.inject.{Inject, Singleton}
 import config.FrontendAppConfig
 import models.UserEmail
 import models.accessrequest.{AccessRequest, AccessRequestDecisionRequest, AccessRequestRequest, AccessRequestStatus}
+import models.api.ApiDeploymentStatuses
 import models.application._
 import models.deployment._
 import models.exception.{ApplicationCredentialLimitException, ApplicationsException}
 import models.requests.{AddApiRequest, TeamMemberRequest}
 import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION, CONTENT_TYPE}
 import play.api.http.MimeTypes.JSON
-import play.api.http.Status.NOT_FOUND
+import play.api.http.Status.{BAD_GATEWAY, NOT_FOUND}
 import play.api.libs.json.Json
 import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
 import uk.gov.hmrc.http.HttpReads.Implicits._
@@ -266,6 +267,18 @@ class ApplicationsConnector @Inject()(
           else {
             Future.failed(UpstreamErrorResponse("Unexpected response", response.status))
           }
+      }
+  }
+
+  def getApiDeploymentStatuses(publisherReference: String)(implicit hc:HeaderCarrier): Future[Option[ApiDeploymentStatuses]] = {
+    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/apis/$publisherReference/deployment-status")
+      .setHeader((ACCEPT, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Either[UpstreamErrorResponse,ApiDeploymentStatuses]]
+      .flatMap {
+        case Right(apiDeploymentStatuses) => Future.successful(Some(apiDeploymentStatuses))
+        case Left(e) if e.statusCode == BAD_GATEWAY => Future.successful(None)
+        case Left(e) => Future.failed(e)
       }
   }
 

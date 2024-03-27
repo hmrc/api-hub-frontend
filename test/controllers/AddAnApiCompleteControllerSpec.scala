@@ -46,6 +46,7 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation {
   private val apiId = "test-api-id"
   private val expectedScopes = Set("test-scope-1", "test-scope-2")
   private val apiDetail = ApiDetail(apiId,
+    "publisher ref",
     "API title",
     "",
     "",
