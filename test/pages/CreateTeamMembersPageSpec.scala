@@ -20,15 +20,15 @@ import generators.ApplicationGenerator
 import models.application.TeamMember
 import pages.behaviours.PageBehaviours
 
-class CreateTeamStartPageSpec extends PageBehaviours with ApplicationGenerator {
+class CreateTeamMembersPageSpec extends PageBehaviours with ApplicationGenerator {
 
-  "CreateTeamStartPage" - {
+  "CreateTeamMembersPage" - {
 
-    beRetrievable[Seq[TeamMember]](CreateTeamStartPage)
+    beRetrievable[Seq[TeamMember]](CreateTeamMembersPage)
 
-    beSettable[Seq[TeamMember]](CreateTeamStartPage)
+    beSettable[Seq[TeamMember]](CreateTeamMembersPage)
 
-    beRemovable[Seq[TeamMember]](CreateTeamStartPage)
+    beRemovable[Seq[TeamMember]](CreateTeamMembersPage)
   }
 
 }

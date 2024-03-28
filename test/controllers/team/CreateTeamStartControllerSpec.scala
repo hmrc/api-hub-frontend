@@ -26,7 +26,7 @@ import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.CreateTeamStartPage
+import pages.CreateTeamMembersPage
 import play.api.Application
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -55,7 +55,7 @@ class CreateTeamStartControllerSpec extends SpecBase with MockitoSugar with Html
         status(result) mustBe SEE_OTHER
 
         val expected = UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
-          .set(CreateTeamStartPage, Seq[TeamMember](TeamMember(FakeUser.email.get)))
+          .set(CreateTeamMembersPage, Seq[TeamMember](TeamMember(FakeUser.email.get)))
           .toOption.value
 
         verify(fixture.createTeamSessionRepository).set(ArgumentMatchers.eq(expected))

@@ -16,7 +16,12 @@
 
 package pages
 
-case object CreateTeamStartPage extends Page {
+import models.application.TeamMember
+import play.api.libs.json.JsPath
 
-  override def toString: String = "createTeamStart"
+case object CreateTeamMembersPage extends QuestionPage[Seq[TeamMember]] {
+
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "createTeamMembers"
 }

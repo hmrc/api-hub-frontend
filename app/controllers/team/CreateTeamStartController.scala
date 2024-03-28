@@ -22,7 +22,7 @@ import models.application.TeamMember
 import models.requests.IdentifierRequest
 import models.{NormalMode, UserAnswers}
 import navigation.Navigator
-import pages.CreateTeamStartPage
+import pages.{CreateTeamMembersPage, CreateTeamStartPage}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import repositories.CreateTeamSessionRepository
@@ -54,7 +54,7 @@ class CreateTeamStartController @Inject()(
     UserAnswers(
       id = request.user.userId,
       lastUpdated = clock.instant()
-    ).set(CreateTeamStartPage, Seq(TeamMember(userEmail)))
+    ).set(CreateTeamMembersPage, Seq(TeamMember(userEmail)))
   }
 
   private def startJourney(userAnswers: Try[UserAnswers]) = {
