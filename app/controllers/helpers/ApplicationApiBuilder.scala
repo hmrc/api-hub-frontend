@@ -91,14 +91,20 @@ class ApplicationApiBuilder @Inject()(
   }
 
   private def fetchApiDetail(api: Api)(implicit request: Request[_]): Future[Either[Result, ApiDetail]] = {
-    apiHubService.getApiDetail(api.id).map(
-      _.toRight(
-        errorResultBuilder.notFound(
-          Messages("site.apiNotFound.heading"),
-          Messages("site.apiNotFound.message", api.id)
-        )
+//    apiHubService.getApiDetail(api.id).map(
+//      _.toRight(
+//        errorResultBuilder.notFound(
+//          Messages("site.apiNotFound.heading"),
+//          Messages("site.apiNotFound.message", api.id)
+//        )
+//      )
+//    )
+    Future.successful(Left(
+      errorResultBuilder.notFound(
+        Messages("site.apiNotFound.heading"),
+        Messages("site.apiNotFound.message", api.id)
       )
-    )
+    ))
   }
 
 }

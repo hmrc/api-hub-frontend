@@ -25,7 +25,7 @@
     govukTable: GovukTable
 )
 
-@(application: Application, applicationApis: Seq[ApplicationApi], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+@(application: Application, maybeApplicationApis: Option[Seq[ApplicationApi]], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
 @scripts() = {
     <link href='@routes.Assets.versioned("fontawesome6/css/all.min.css")' media="all" rel="stylesheet" type="text/css" @{CSPNonce.attr}/>
@@ -65,23 +65,30 @@
         <div class="govuk-grid-row govuk-!-margin-bottom-0">
             <div class="govuk-grid-column-one-half">
                 <h2 class="govuk-heading-m govuk-!-margin-bottom-4 govuk-!-margin-top-2">
-                    @if(applicationApis.isEmpty) {
-                        @messages("applicationDetails.apis.heading.noApis")
-                    } else {
-                        @messages("applicationDetails.apis.heading", applicationApis.size)
-                    }
+                    @(maybeApplicationApis match {
+                        case Some(applicationApis) => {
+                            if(applicationApis.isEmpty) {
+                                messages("applicationDetails.apis.heading.noApis")
+                            } else {
+                                messages("applicationDetails.apis.heading", applicationApis.size)
+                            }
+                        }
+                        case None => {
+                            "Nope"
+                        }
+                    })
                 </h2>
             </div>
         </div>
 
-        @if(applicationApis.isEmpty) {
+        @if(maybeApplicationApis.exists(_.isEmpty)) {
             <p class="govuk-body">
                 @Html(messages("applicationDetails.apis.noApis", hipApisLink()))
             </p>
 
             <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-top-5">
         } else {
-            @if(applicationApis.exists(_.hasPendingAccessRequest)) {
+            @if(maybeApplicationApis.exists(_.exists(_.hasPendingAccessRequest))) { //TODO this is ugly
                 <div class="call-out-panel call-out-panel__small govuk-!-margin-top-2">
                     <p class="govuk-body information-tag">
                         <i class="fa-solid fa-circle-exclamation warning-colour"></i>

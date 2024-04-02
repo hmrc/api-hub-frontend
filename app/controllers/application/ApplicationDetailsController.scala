@@ -41,10 +41,14 @@ class ApplicationDetailsController @Inject()(
         case Right(applicationApis) =>
           Ok(view(
             request.application.withSortedTeam(),
-            applicationApis,
+            Some(applicationApis),
             Some(request.identifierRequest.user)
           ))
-        case Left(result) => result
+        case Left(result) => Ok(view(
+          request.application.withSortedTeam(),
+          None,
+          Some(request.identifierRequest.user)
+        ))
       }
   }
 
