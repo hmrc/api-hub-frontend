@@ -19,7 +19,7 @@ package controllers
 import base.OptionallyAuthenticatedSpecBase
 import controllers.actions.FakeUser
 import generators.ApiDetailGenerators
-import models.api.ApiDetail
+import models.api.{ApiDeploymentStatuses, ApiDetail}
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
@@ -49,16 +49,19 @@ class ApiDetailsControllerSpec
 
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[ApiDetailsView]
+        val apiDeploymentStatuses = ApiDeploymentStatuses(true, false)
 
         forAll {(apiDetail: ApiDetail) =>
           when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
             .thenReturn(Future.successful(Some(apiDetail)))
+          when(fixture.apiHubService.getApiDeploymentStatuses(ArgumentMatchers.eq(apiDetail.publisherReference))(any()))
+            .thenReturn(Future.successful(Some(apiDeploymentStatuses)))
 
           val request = FakeRequest(GET, routes.ApiDetailsController.onPageLoad(apiDetail.id).url)
           val result = route(fixture.application, request).value
 
           status(result) mustBe OK
-          contentAsString(result) mustBe view(apiDetail, None)(request, messages(fixture.application)).toString()
+          contentAsString(result) mustBe view(apiDetail, apiDeploymentStatuses, None)(request, messages(fixture.application)).toString()
           contentAsString(result) must validateAsHtml
         }
       }
@@ -69,16 +72,19 @@ class ApiDetailsControllerSpec
 
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[ApiDetailsView]
+        val apiDeploymentStatuses = ApiDeploymentStatuses(true, false)
 
         forAll {(apiDetail: ApiDetail) =>
           when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
             .thenReturn(Future.successful(Some(apiDetail)))
+          when(fixture.apiHubService.getApiDeploymentStatuses(ArgumentMatchers.eq(apiDetail.publisherReference))(any()))
+            .thenReturn(Future.successful(Some(apiDeploymentStatuses)))
 
           val request = FakeRequest(GET, routes.ApiDetailsController.onPageLoad(apiDetail.id).url)
           val result = route(fixture.application, request).value
 
           status(result) mustBe OK
-          contentAsString(result) mustBe view(apiDetail, Some(FakeUser))(request, messages(fixture.application)).toString()
+          contentAsString(result) mustBe view(apiDetail, apiDeploymentStatuses, Some(FakeUser))(request, messages(fixture.application)).toString()
           contentAsString(result) must validateAsHtml
         }
       }
@@ -107,6 +113,31 @@ class ApiDetailsControllerSpec
           )(request, messages(fixture.application))
             .toString()
 
+        contentAsString(result) must validateAsHtml
+      }
+    }
+
+    "must show error page when API deployment statuses cannot be retrieved" in {
+      val fixture = buildFixture(userModel = Some(FakeUser))
+      val apiDetail = sampleApiDetail()
+
+      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+        .thenReturn(Future.successful(Some(apiDetail)))
+      when(fixture.apiHubService.getApiDeploymentStatuses(ArgumentMatchers.eq(apiDetail.publisherReference))(any()))
+        .thenReturn(Future.successful(None))
+
+      running(fixture.application) {
+        val request = FakeRequest(GET, routes.ApiDetailsController.onPageLoad(apiDetail.id).url)
+        val result = route(fixture.application, request).value
+        val view = fixture.application.injector.instanceOf[ErrorTemplate]
+
+        status(result) mustBe INTERNAL_SERVER_ERROR
+        contentAsString(result) mustBe view.apply(
+            pageTitle = "Sorry, we are experiencing technical difficulties - 500",
+            heading = "Sorry, we’re experiencing technical difficulties",
+            message = "Please try again in a few minutes."
+          )(request, messages(fixture.application))
+          .toString()
         contentAsString(result) must validateAsHtml
       }
     }

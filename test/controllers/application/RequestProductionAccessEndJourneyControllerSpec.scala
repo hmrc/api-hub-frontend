@@ -199,6 +199,7 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
   private def anApiDetail = {
     ApiDetail(
       id = "test-id",
+      publisherReference = "test-pub-ref",
       title = "test-title",
       description = "test-description",
       version = "test-version",

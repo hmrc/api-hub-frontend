@@ -247,6 +247,11 @@ apiDetails.viewApiSpec.link = Interactive API spec viewer
 apiDetails.endpoints.heading = Endpoints
 apiDetails.endpoints.summary = Summary
 apiDetails.endpoints.description = Description
+apiDetails.deploymentStatus.heading = Deployment status
+apiDetails.deploymentStatus.dev.heading = Development env
+apiDetails.deploymentStatus.prod.heading = Production env
+apiDetails.deploymentStatus.deployed = Deployed
+apiDetails.deploymentStatus.notDeployed = Not deployed
 
 hipApis.title = HIP APIs
 hipApis.search.heading = Search for an API

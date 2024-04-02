@@ -106,6 +106,7 @@ class RequestProductionAccessStartControllerSpec extends SpecBase with MockitoSu
   private def anApplication = {
     val apiDetail = ApiDetail(
       id = "test-id",
+      publisherReference = "test-publisher-reference",
       title = "test-title",
       description = "test-description",
       version = "test-version",

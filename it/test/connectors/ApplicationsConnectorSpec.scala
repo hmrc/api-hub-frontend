@@ -22,6 +22,7 @@ import config.FrontendAppConfig
 import connectors.ApplicationsConnectorSpec.ApplicationGetterBehaviours
 import models.UserEmail
 import models.accessrequest._
+import models.api.ApiDeploymentStatuses
 import models.application._
 import models.deployment.{DeploymentsRequest, InvalidOasResponse, SuccessfulDeploymentsResponse, ValidationFailure}
 import models.exception.ApplicationCredentialLimitException
@@ -38,7 +39,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.test.Helpers.{ACCEPT, AUTHORIZATION, CONTENT_TYPE}
 import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
@@ -663,6 +664,61 @@ class ApplicationsConnectorSpec
     }
   }
 
+  "ApplicationsConnector.getApiDeploymentStatuses" - {
+    "must place the correct request and return the response" in {
+      val publisherReference = "ref123"
+      val response = Some(ApiDeploymentStatuses(true, false))
+
+      stubFor(
+        get(urlEqualTo(s"/api-hub-applications/apis/$publisherReference/deployment-status"))
+          .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withBody(Json.toJson(response).toString())
+          )
+      )
+
+      buildConnector(this).getApiDeploymentStatuses(publisherReference)(HeaderCarrier()).map(
+        result =>
+          result mustBe response
+      )
+    }
+
+    "must handle a 502 response" in {
+      val publisherReference = "ref123"
+
+      stubFor(
+        get(urlEqualTo(s"/api-hub-applications/apis/$publisherReference/deployment-status"))
+          .willReturn(
+            aResponse()
+              .withStatus(BAD_GATEWAY)
+          )
+      )
+
+      buildConnector(this).getApiDeploymentStatuses(publisherReference)(HeaderCarrier()).map(
+        result =>
+          result mustBe None
+      )
+    }
+
+    "must fail for unexpected responses" in {
+      val publisherReference = "ref123"
+
+      stubFor(
+        get(urlEqualTo(s"/api-hub-applications/apis/$publisherReference/deployment-status"))
+          .willReturn(
+            aResponse()
+              .withStatus(INTERNAL_SERVER_ERROR)
+          )
+      )
+
+      val result = buildConnector(this).getApiDeploymentStatuses(publisherReference)(HeaderCarrier())
+      recoverToExceptionIf[UpstreamErrorResponse](result).map { e =>
+        e.statusCode mustBe INTERNAL_SERVER_ERROR
+      }
+    }
+  }
 }
 
 object ApplicationsConnectorSpec extends HttpClientV2Support {

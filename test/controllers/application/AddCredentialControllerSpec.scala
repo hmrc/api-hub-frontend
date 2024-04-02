@@ -95,8 +95,8 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
     "must return the Add Credential Success view when valid data is submitted by a a privileged user who is a team member or supporter" in {
       forAll(privilegedTeamMemberAndSupporterTable) {
         user =>
-          val api1 = ApiDetail("test-api-1", "test-api-name-1", "", "", Seq.empty, None, "")
-          val api2 = ApiDetail("test-api-2", "test-api-name-2", "", "", Seq.empty, None, "")
+          val api1 = ApiDetail("test-api-1", "pubRef1", "test-api-name-1", "", "", Seq.empty, None, "")
+          val api2 = ApiDetail("test-api-2", "pubRef2", "test-api-name-2", "", "", Seq.empty, None, "")
           val apiNames = Seq(api1.title, api2.title)
 
           val application = FakeApplication.copy(

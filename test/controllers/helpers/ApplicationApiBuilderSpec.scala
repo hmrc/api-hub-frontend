@@ -175,6 +175,7 @@ object ApplicationApiBuilderSpec {
   private val apiDetail1 =
     ApiDetail(
       id = apiId1,
+      publisherReference = "test-publisher-reference-1",
       title = "test-title-1",
       description = "test-description-1",
       version = "test-version-1",
@@ -200,6 +201,7 @@ object ApplicationApiBuilderSpec {
   private val apiDetail2 =
     ApiDetail(
       id = apiId2,
+      publisherReference = "test-publisher-reference-2",
       title = "test-title-2",
       description = "test-description-2",
       version = "test-version-2",
@@ -225,6 +227,7 @@ object ApplicationApiBuilderSpec {
   private val apiDetail3 =
     ApiDetail(
       id = apiId3,
+      publisherReference = "test-publisher-reference-3",
       title = "test-title-3",
       description = "test-description-3",
       version = "test-version-3",

@@ -20,7 +20,7 @@ import com.google.inject.{Inject, Singleton}
 import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
 import models.AvailableEndpoint
 import models.accessrequest.{AccessRequest, AccessRequestRequest, AccessRequestStatus}
-import models.api.ApiDetail
+import models.api.{ApiDeploymentStatuses, ApiDetail}
 import models.application.{Application, Credential, EnvironmentName, NewApplication, TeamMember}
 import models.exception.ApplicationsException
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
@@ -68,6 +68,10 @@ class ApiHubService @Inject()(
 
   def getApiDetail(id: String)(implicit hc: HeaderCarrier): Future[Option[ApiDetail]] = {
     integrationCatalogueConnector.getApiDetail(id)
+  }
+
+  def getApiDeploymentStatuses(publisherReference: String)(implicit hc: HeaderCarrier): Future[Option[ApiDeploymentStatuses]] = {
+    applicationsConnector.getApiDeploymentStatuses(publisherReference)
   }
 
   def getAllHipApis()(implicit hc: HeaderCarrier): Future[Seq[ApiDetail]] = {

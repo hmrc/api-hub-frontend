@@ -38,6 +38,7 @@ class AddAnApiSelectEndpointsSummarySpec extends AnyFreeSpec with Matchers with 
 
   private val apiDetail: ApiDetail = ApiDetail(
     "test-id",
+    "test-pub-ref",
     "test-title",
     "test-description",
     "test-version",

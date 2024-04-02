@@ -21,7 +21,7 @@ import controllers.actions.FakeApplication
 import generators.{AccessRequestGenerator, ApiDetailGenerators}
 import models.AvailableEndpoint
 import models.accessrequest._
-import models.api.EndpointMethod
+import models.api.{ApiDeploymentStatuses, EndpointMethod}
 import models.application.{Application, Creator, Credential, NewApplication, Primary, TeamMember}
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
 import org.mockito.ArgumentMatchers.any
@@ -171,6 +171,25 @@ class ApiHubServiceSpec
         .thenReturn(Future.successful(Some(expected)))
 
       service.getApiDetail(expected.id)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe Some(expected)
+      }
+    }
+  }
+
+  "getApiDeploymentStatuses" - {
+    "must call the applications connector and return the API detail" in {
+      val publisherReference = "ref123"
+      val expected = ApiDeploymentStatuses(true, false)
+
+      val applicationsConnector = mock[ApplicationsConnector]
+      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+
+      when(applicationsConnector.getApiDeploymentStatuses(ArgumentMatchers.eq(publisherReference))(any()))
+        .thenReturn(Future.successful(Some(expected)))
+
+      service.getApiDeploymentStatuses(publisherReference)(HeaderCarrier()) map {
         actual =>
           actual mustBe Some(expected)
       }

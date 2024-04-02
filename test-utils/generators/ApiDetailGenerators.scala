@@ -52,11 +52,12 @@ trait ApiDetailGenerators {
       id <- Gen.uuid
       title <- sensiblySizedAlphaNumStr
       description <- sensiblySizedAlphaNumStr
+      publisherReference <- sensiblySizedAlphaNumStr
       version <- sensiblySizedAlphaNumStr
       endpoints <- Gen.listOfN(size / listSizeQuota, arbitraryEndpoint.arbitrary).suchThat(_.nonEmpty)
       shortDescription <- sensiblySizedAlphaNumStr
       openApiSpecification <- sensiblySizedAlphaNumStr
-    } yield ApiDetail(id.toString, title,description, version, endpoints, Some(shortDescription), openApiSpecification)
+    } yield ApiDetail(id.toString, publisherReference, title,description, version, endpoints, Some(shortDescription), openApiSpecification)
   }
 
   implicit lazy val arbitraryApiDetail: Arbitrary[ApiDetail] = Arbitrary(genApiDetail)

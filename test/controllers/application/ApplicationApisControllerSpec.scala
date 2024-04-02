@@ -69,6 +69,7 @@ class ApplicationApisControllerSpec extends SpecBase with MockitoSugar with Test
 
       val apiDetail = ApiDetail(
         id = "test-id",
+        publisherReference = "test-pub-ref",
         title = "test-title",
         description = "test-description",
         version = "test-version",
