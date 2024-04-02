@@ -1,1 +1,3 @@
+GET     /create-team/start                                  controllers.team.CreateTeamStartController.startCreateTeam()
+
 GET     /manage-my-teams                                    controllers.team.ManageMyTeamsController.onPageLoad()
