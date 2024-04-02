@@ -98,7 +98,7 @@
 @govukLayout(
     pageTitle   = Some(pageTitle),
     headBlock   = Some(hmrcInternalHead(Some(head))),
-    headerBlock = Some(header(showBackLink, user)),
+    headerBlock = Some(header(showBackLink, user, appConfig.helpDocsPath)),
     beforeContentBlock = Some(beforeContent),
     footerBlock        = Some(footerWithItems()),
     scriptsBlock       = Some(hmrcScripts(

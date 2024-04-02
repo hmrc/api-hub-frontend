@@ -263,6 +263,8 @@ support.heading = Get support
 support.email.subject.consumer = Support Request from API Hub - Consumer
 support.email.subject.producer = Support Request from API Hub - Producer
 
+helpdocs.link.text = Help Docs
+
 addAnApiApiId.checkYourAnswersLabel = API Name
 
 addAnApiSelectApplication.title = Select application

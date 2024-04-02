@@ -20,7 +20,7 @@
     govukBackLink: GovukBackLink
 )
 
-@(showBackLink: Boolean, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+@(showBackLink: Boolean, user: Option[UserModel], helpDocsPath: String)(implicit request: Request[_], messages: Messages)
 <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PLWQQZB"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -103,6 +103,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <li>
                 <a class="govuk-link govuk-link--no-visited-state" style="margin-right: 30px;" href="@routes.HipApisController.onPageLoad().url">
                     @messages("hipApis.link.text")
+                </a>
+            </li>
+            <li>
+                <a class="govuk-link govuk-link--no-visited-state" style="margin-right: 30px;" href="@helpDocsPath">
+                    @messages("helpdocs.link.text")
                 </a>
             </li>
             <li>
