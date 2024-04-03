@@ -25,7 +25,7 @@
     govukTable: GovukTable
 )
 
-@(application: Application, applicationApis: Seq[ApplicationApi], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+@(application: Application, maybeApplicationApis: Option[Seq[ApplicationApi]], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
 @scripts() = {
     <link href='@routes.Assets.versioned("fontawesome6/css/all.min.css")' media="all" rel="stylesheet" type="text/css" @{CSPNonce.attr}/>
@@ -65,23 +65,35 @@
         <div class="govuk-grid-row govuk-!-margin-bottom-0">
             <div class="govuk-grid-column-one-half">
                 <h2 class="govuk-heading-m govuk-!-margin-bottom-4 govuk-!-margin-top-2">
-                    @if(applicationApis.isEmpty) {
-                        @messages("applicationDetails.apis.heading.noApis")
-                    } else {
-                        @messages("applicationDetails.apis.heading", applicationApis.size)
-                    }
+                    @(maybeApplicationApis match {
+                        case Some(applicationApis) => {
+                            if(applicationApis.isEmpty) {
+                                messages("applicationDetails.apis.heading.noApis")
+                            } else {
+                                messages("applicationDetails.apis.heading", applicationApis.size)
+                            }
+                        }
+                        case None => {
+                            messages("applicationDetails.apis.heading.noApis")
+                        }
+                    })
                 </h2>
             </div>
         </div>
 
-        @if(applicationApis.isEmpty) {
+        @if(maybeApplicationApis.isEmpty) {
+            <p class="govuk-body additional-message">
+                @Html(messages("applicationDetails.apis.error"))
+            </p>
+
+        } else if(maybeApplicationApis.exists(_.isEmpty)) {
             <p class="govuk-body">
                 @Html(messages("applicationDetails.apis.noApis", hipApisLink()))
             </p>
 
             <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-top-5">
         } else {
-            @if(applicationApis.exists(_.hasPendingAccessRequest)) {
+            @if(maybeApplicationApis.exists(_.exists(_.hasPendingAccessRequest))) {
                 <div class="call-out-panel call-out-panel__small govuk-!-margin-top-2">
                     <p class="govuk-body information-tag">
                         <i class="fa-solid fa-circle-exclamation warning-colour"></i>
@@ -95,27 +107,29 @@
                 </div>
             }
 
-            @govukTable(
-                Table(
-                    caption = None,
-                    head = Some(
-                        Seq(
-                            HeadCell(messages("applicationDetails.apis.apiName")),
-                            HeadCell(messages("applicationDetails.apis.devEnv")),
-                            HeadCell(messages("applicationDetails.apis.prodEnv"))
-                        )
-                    ),
-                    rows = applicationApis.map(
-                        applicationApi=>
+            @(maybeApplicationApis.map(applicationApis => {
+                govukTable(
+                    Table(
+                        caption = None,
+                        head = Some(
                             Seq(
-                                TableRow(content = applicationApi.apiDetail.title),
-                                TableRow(content = messages("applicationDetails.apis.endpointsAvailable", applicationApi.availableSecondaryEndpoints, applicationApi.totalEndpoints)),
-                                TableRow(content = messages("applicationDetails.apis.endpointsAvailable", applicationApi.availablePrimaryEndpoints, applicationApi.totalEndpoints))
+                                HeadCell(messages("applicationDetails.apis.apiName")),
+                                HeadCell(messages("applicationDetails.apis.devEnv")),
+                                HeadCell(messages("applicationDetails.apis.prodEnv"))
                             )
-                    ),
-                    firstCellIsHeader = true
+                        ),
+                        rows = applicationApis.map(
+                            applicationApi=>
+                                Seq(
+                                    TableRow(content = applicationApi.apiDetail.title),
+                                    TableRow(content = messages("applicationDetails.apis.endpointsAvailable", applicationApi.availableSecondaryEndpoints, applicationApi.totalEndpoints)),
+                                    TableRow(content = messages("applicationDetails.apis.endpointsAvailable", applicationApi.availablePrimaryEndpoints, applicationApi.totalEndpoints))
+                                )
+                        ),
+                        firstCellIsHeader = true
+                    )
                 )
-            )
+            }))
         }
 
         <div class="govuk-grid-row">
