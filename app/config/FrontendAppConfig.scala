@@ -42,6 +42,8 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val signOutUrl: String         = configuration.get[String]("urls.signOut")
   val appAuthToken: String       = configuration.get[String]("internal-auth.token")
 
+  val helpDocsPath: String       = configuration.get[String]("api-hub-guide.service-path")
+
   private val exitSurveyBaseUrl: String = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
   val exitSurveyUrl: String             = s"$exitSurveyBaseUrl/feedback/api-hub-frontend"
 
