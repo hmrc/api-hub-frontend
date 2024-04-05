@@ -53,7 +53,8 @@ trait SpecBase
         bind[IdentifierAction].to[FakeIdentifierAction],
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
         bind[AccessRequestDataRetrievalAction].toInstance(new FakeAccessRequestDataRetrievalAction(userAnswers)),
-        bind[AddAnApiDataRetrievalAction].toInstance(new FakeAddAnApiDataRetrievalAction(userAnswers))
+        bind[AddAnApiDataRetrievalAction].toInstance(new FakeAddAnApiDataRetrievalAction(userAnswers)),
+        bind[CreateTeamDataRetrievalAction].toInstance(new FakeCreateTeamDataRetrievalAction(userAnswers))
   )
 
 }
