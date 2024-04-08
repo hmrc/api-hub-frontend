@@ -21,6 +21,9 @@ import pages._
 
 trait PageGenerators {
 
+  implicit lazy val arbitraryCreateTeamNamePage: Arbitrary[CreateTeamNamePage.type] =
+    Arbitrary(CreateTeamNamePage)
+
   implicit lazy val arbitraryApiPolicyConditionsDeclarationPage: Arbitrary[ApiPolicyConditionsDeclarationPage.type] =
     Arbitrary(ApiPolicyConditionsDeclarationPage)
 

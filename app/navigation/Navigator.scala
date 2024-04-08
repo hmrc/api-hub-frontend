@@ -45,6 +45,7 @@ class Navigator @Inject()() {
     case AddAnApiSelectApplicationPage => addAnApiSelectApplicationNextPage(CheckMode)
     case AddAnApiSelectEndpointsPage => addAnApiSelectEndpointsNextPage(CheckMode)
     case ApiPolicyConditionsDeclarationPage => apiPolicyConditionsDeclarationNextPage(CheckMode)
+    case CreateTeamNamePage => _ => routes.IndexController.onPageLoad // TODO: Added temporarily to prevent error page after clicking Continue, remove as part of HIPP-1083
     case _ => _ => routes.CheckYourAnswersController.onPageLoad()
   }
 
