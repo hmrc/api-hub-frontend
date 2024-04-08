@@ -1,4 +1,6 @@
 GET     /create-team/start                                  controllers.team.CreateTeamStartController.startCreateTeam()
+GET     /create-team/add-team-member                        controllers.team.CreateTeamMemberController.onPageLoad()
+POST    /create-team/add-team-member                        controllers.team.CreateTeamMemberController.onSubmit()
 
 GET     /create-team/team-name                              controllers.team.CreateTeamNameController.onPageLoad(mode: Mode = NormalMode)
 POST    /create-team/team-name                              controllers.team.CreateTeamNameController.onSubmit(mode: Mode = NormalMode)

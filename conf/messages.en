@@ -463,3 +463,5 @@ createTeamName.checkYourAnswersLabel = Team name
 createTeamName.error.required = Enter a team name
 createTeamName.error.length = Team name must be 100 characters or less
 createTeamName.change.hidden = Give your team a name
+
+createTeamMember.email.duplicate = This email address has already been added to this team
