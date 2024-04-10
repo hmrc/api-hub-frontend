@@ -15,21 +15,21 @@
  *@
 
 @import models.user.UserModel
-@import models.application.TeamMember
 
 @this(
     layout: templates.Layout,
     govukTable: GovukTable,
     govukButton : GovukButton,
     formHelper: FormWithCSRF,
+    govukSummaryList: GovukSummaryList,
 )
 
-@(teamMemberDetails: Seq[TeamMember], user: UserModel)(implicit request: Request[_], messages: Messages)
+@(teamMemberDetails: SummaryList, user: UserModel)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("createTeamManageMembers.title")), user = Some(user)) {
+@layout(pageTitle = titleNoForm(messages("createTeamManageMembers.title")), fullWidth = true, user = Some(user)) {
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-one-half"">
-            <h1 class="govuk-heading-l">@messages("createTeamManageMembers.heading", teamMemberDetails.size)</h1>
+            <h1 class="govuk-heading-l">@messages("createTeamManageMembers.heading", teamMemberDetails.rows.size)</h1>
         </div>
         <div class="govuk-grid-column-one-half govuk-!-text-align-right">
         @govukButton(Button(
@@ -40,22 +40,7 @@
         </div>
     </div>
 
-    @govukTable(
-        Table(
-            caption = None,
-            firstCellIsHeader = true,
-            head = Some(
-                Seq(
-                    HeadCell(messages("createTeamManageMembers.emailAddressColumnHeading")),
-                    HeadCell(),
-                )
-            ),
-            rows = teamMemberDetails.map(
-                teamMember =>
-                    Seq(TableRow(content = teamMember.email))
-            )
-        )
-    )
+    @govukSummaryList(teamMemberDetails)
 
     @formHelper(action = controllers.team.routes.ManageTeamMembersController.onContinue) {
         @govukButton(Button(

@@ -23,7 +23,9 @@ import navigation.Navigator
 import pages.CreateTeamMembersPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.team.ManageTeamMembers
 import views.html.team.ManageTeamMembersView
 
 import javax.inject.Inject
@@ -43,15 +45,10 @@ class ManageTeamMembersController @Inject()(
 
   def onPageLoad: Action[AnyContent] = { (identify andThen getData andThen requireData) {
     implicit request =>
-      val maybeTeamMemberList = for {
-        userEmail <- request.user.email
-        allTeamMemberDetails <- request.userAnswers.get(CreateTeamMembersPage)
-        (currentUser, otherTeamMembers) = allTeamMemberDetails.partition(teamMember => emailAddressesMatch(teamMember.email, userEmail))
-        teamMemberList = currentUser ++ otherTeamMembers.sortBy(_.email)
-      } yield teamMemberList
-
-      maybeTeamMemberList match {
-        case Some(teamMemberList) => Ok(view(teamMemberList, request.user))
+      request.userAnswers.get(CreateTeamMembersPage) match {
+        case Some(teamMemberList) =>
+          val summaryListRows = SummaryList(rows=ManageTeamMembers.rows(teamMemberList))
+          Ok(view(summaryListRows, request.user))
         case None => errorResultBuilder.internalServerError("Unable to construct the team member list")
       }
   }}
@@ -61,7 +58,4 @@ class ManageTeamMembersController @Inject()(
       Redirect(navigator.nextPage(CreateTeamMembersPage, NormalMode, request.userAnswers))
   }}
 
-  private def emailAddressesMatch(email1: String, email2: String): Boolean = formatEmailAddress(email1) == formatEmailAddress(email2)
-
-  private def formatEmailAddress(email: String): String = email.toLowerCase.trim
 }
