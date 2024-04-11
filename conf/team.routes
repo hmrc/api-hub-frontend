@@ -3,7 +3,7 @@ GET     /create-team/add-team-member                        controllers.team.Cre
 POST    /create-team/add-team-member                        controllers.team.CreateTeamMemberController.onSubmit()
 GET     /create-team/team-members                           controllers.team.ManageTeamMembersController.onPageLoad()
 POST    /create-team/team-members                           controllers.team.ManageTeamMembersController.onContinue()
-GET     /create-team/remove-team-member/:index              controllers.team.RemoveTeamMemberController.removeTeamMember(mode: Mode = NormalMode, index: Int)
+GET     /create-team/remove-team-member/:index              controllers.team.RemoveTeamMemberController.removeTeamMember(index: Int)
 
 GET     /create-team/team-name                              controllers.team.CreateTeamNameController.onPageLoad(mode: Mode = NormalMode)
 POST    /create-team/team-name                              controllers.team.CreateTeamNameController.onSubmit(mode: Mode = NormalMode)

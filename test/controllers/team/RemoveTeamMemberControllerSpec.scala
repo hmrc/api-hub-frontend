@@ -59,7 +59,7 @@ class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with Opt
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.IndexController.onPageLoad.url
+        redirectLocation(result).value mustEqual routes.ManageTeamMembersController.onPageLoad.url
 
         val updatedAnswers = userAnswers
           .set(CreateTeamMembersPage, Seq(teamMember1))

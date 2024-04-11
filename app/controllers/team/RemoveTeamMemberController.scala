@@ -18,8 +18,6 @@ package controllers.team
 
 import controllers.actions._
 import controllers.helpers.ErrorResultBuilder
-import models.Mode
-import navigation.Navigator
 import pages.CreateTeamMembersPage
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc._
@@ -31,7 +29,6 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class RemoveTeamMemberController @Inject()(override val messagesApi: MessagesApi,
                                            sessionRepository: CreateTeamSessionRepository,
-                                           navigator: Navigator,
                                            identify: IdentifierAction,
                                            getData: CreateTeamDataRetrievalAction,
                                            requireData: DataRequiredAction,
@@ -39,7 +36,7 @@ class RemoveTeamMemberController @Inject()(override val messagesApi: MessagesApi
                                            errorResultBuilder: ErrorResultBuilder
                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def removeTeamMember(mode: Mode, index: Int): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def removeTeamMember(index: Int): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       request.userAnswers.get(CreateTeamMembersPage).fold[Future[Result]](teamMemberNotFound())(
         teamMembers => {
@@ -50,7 +47,7 @@ class RemoveTeamMemberController @Inject()(override val messagesApi: MessagesApi
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(CreateTeamMembersPage, members))
               _ <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(CreateTeamMembersPage, mode, updatedAnswers))
+            } yield Redirect(routes.ManageTeamMembersController.onPageLoad().url)
           }
         }
       )
