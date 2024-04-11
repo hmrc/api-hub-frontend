@@ -49,7 +49,7 @@ class ManageTeamMembersController @Inject()(
         case Some(teamMemberList) =>
           val summaryListRows = SummaryList(rows=ManageTeamMembers.rows(teamMemberList))
           Ok(view(summaryListRows, request.user))
-        case None => errorResultBuilder.internalServerError("Unable to construct the team member list")
+        case None => errorResultBuilder.internalServerError("User answers does not contain a team member list")
       }
   }}
 
