@@ -470,3 +470,9 @@ createTeamManageMembers.title = Manage team members
 createTeamManageMembers.heading = Team members ({0})
 createTeamManageMembers.addTeamMember = Add another team member
 createTeamManageMembers.emailAddressColumnHeading = Email address
+
+createTeam.title = Team created successfully
+createTeam.successMessage = Team created successfully
+createTeam.subheading = What you can do now
+createTeam.content.1 = View and manage your
+createTeam.content.2 = teams
