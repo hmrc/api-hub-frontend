@@ -27,11 +27,13 @@ import viewmodels.govuk.all.ActionItemViewModel
 class ManageTeamMembersSpec extends SpecBase with Matchers {
   implicit val messages: Messages = play.api.test.Helpers.stubMessages()
 
+  val currentUserEmail = "user@hmrc.gov.uk"
+
   "rows" - {
     "must return the correct summary rows when there is only one team member" in {
-      val teamMember = TeamMember("test@email.com")
+      val teamMember = TeamMember(currentUserEmail)
 
-      val actual = ManageTeamMembers.rows(Seq(teamMember))
+      val actual = ManageTeamMembers.rows(currentUserEmail, Seq(teamMember))
 
       val expected = Seq(
         SummaryListRow(
@@ -44,15 +46,15 @@ class ManageTeamMembersSpec extends SpecBase with Matchers {
     }
 
     "must return the correct summary rows when there are multiple team members" in {
-      val teamMember1 = TeamMember("user@example.com")
-      val teamMember2 = TeamMember("newMember2@example.com")
+      val teamMember1 = TeamMember("newMember2@example.com")
+      val teamMember2 = TeamMember(currentUserEmail)
       val teamMember3 = TeamMember("newMember1@example.com")
 
-      val actual = ManageTeamMembers.rows(Seq(teamMember1, teamMember2, teamMember3))
+      val actual = ManageTeamMembers.rows(currentUserEmail, Seq(teamMember1, teamMember2, teamMember3))
 
       val expected = Seq(
         SummaryListRow(
-          key = Key(Text(teamMember1.email)),
+          key = Key(Text(teamMember2.email)),
           value = Value(Empty),
         ),
         SummaryListRow(
@@ -68,13 +70,13 @@ class ManageTeamMembersSpec extends SpecBase with Matchers {
           ))
         ),
         SummaryListRow(
-          key = Key(Text(teamMember2.email)),
+          key = Key(Text(teamMember1.email)),
           value = Value(Empty),
           actions = Some(Actions(
             items = Seq(
               ActionItemViewModel(
                 Text("site.remove"),
-                controllers.team.routes.RemoveTeamMemberController.removeTeamMember(1).url
+                controllers.team.routes.RemoveTeamMemberController.removeTeamMember(0).url
               )
             )
           ))

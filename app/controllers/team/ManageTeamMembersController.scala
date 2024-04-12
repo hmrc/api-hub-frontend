@@ -18,6 +18,7 @@ package controllers.team
 
 import controllers.actions._
 import controllers.helpers.ErrorResultBuilder
+import controllers.routes
 import models.NormalMode
 import navigation.Navigator
 import pages.CreateTeamMembersPage
@@ -39,17 +40,18 @@ class ManageTeamMembersController @Inject()(
                                                 requireData: DataRequiredAction,
                                                 val controllerComponents: MessagesControllerComponents,
                                                 view: ManageTeamMembersView,
-                                                errorResultBuilder: ErrorResultBuilder
-                                              )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
-
+                                              ) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = { (identify andThen getData andThen requireData) {
     implicit request =>
-      request.userAnswers.get(CreateTeamMembersPage) match {
-        case Some(teamMemberList) =>
-          val summaryListRows = SummaryList(rows=ManageTeamMembers.rows(teamMemberList))
-          Ok(view(summaryListRows, request.user))
-        case None => errorResultBuilder.internalServerError("User answers does not contain a team member list")
+      val maybeSummaryListRows = for {
+        currentUserEmail <- request.user.email
+        teamMemberList <- request.userAnswers.get(CreateTeamMembersPage)
+      } yield SummaryList(rows=ManageTeamMembers.rows(currentUserEmail, teamMemberList))
+
+      maybeSummaryListRows match {
+        case Some(summaryListRows) => Ok(view(summaryListRows, request.user))
+        case None => Redirect(routes.JourneyRecoveryController.onPageLoad())
       }
   }}
 

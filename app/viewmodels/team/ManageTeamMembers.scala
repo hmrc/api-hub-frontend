@@ -25,22 +25,23 @@ import viewmodels.implicits._
 
 object ManageTeamMembers {
 
-  def rows(teamMembers: Seq[TeamMember])(implicit messages: Messages): Seq[SummaryListRow] = {
+  def rows(currentUserEmail: String, teamMembers: Seq[TeamMember])(implicit messages: Messages): Seq[SummaryListRow] = {
     val teamMembersWithIndexes = teamMembers.zipWithIndex
-    val (currentUser, otherTeamMembers) = (teamMembersWithIndexes.head, teamMembersWithIndexes.tail)
-    val orderedTeamMembersWithIndexes = currentUser +: otherTeamMembers.sortBy(_._1.email)
+    val (currentUser, otherTeamMembers) = teamMembersWithIndexes
+      .partition(teamMemberWithIndex => emailAddressesMatch(teamMemberWithIndex._1.email, currentUserEmail))
+    val orderedTeamMembersWithIndexes = currentUser ++ otherTeamMembers.sortBy(_._1.email)
 
     orderedTeamMembersWithIndexes
       .map {
         zipped => SummaryListRow(
           key = Key(Text(zipped._1.email)),
-          actions = actions(zipped._2)
+          actions = actions(emailAddressesMatch(zipped._1.email, currentUserEmail), zipped._2)
         )
       }
   }
 
-  private def actions(index: Int)(implicit messages: Messages): Option[Actions] = {
-    if (index == 0) {
+  private def actions(isCurrentUser: Boolean, index: Int)(implicit messages: Messages): Option[Actions] = {
+    if (isCurrentUser) {
       None
     }
     else {
@@ -54,5 +55,7 @@ object ManageTeamMembers {
       ))
     }
   }
+
+  private def emailAddressesMatch(email: String, currentUserEmail: String): Boolean = email.toLowerCase == currentUserEmail.toLowerCase
 
 }

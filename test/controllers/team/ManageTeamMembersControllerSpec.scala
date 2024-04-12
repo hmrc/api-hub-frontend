@@ -33,8 +33,9 @@ import views.html.team.ManageTeamMembersView
 
 class ManageTeamMembersControllerSpec extends SpecBase with HtmlValidation with OptionValues{
   "ManageTeamMembersController.onPageLoad" - {
+    val teamMemberList = Seq(TeamMember(FakeUser.email.get), TeamMember("user1@example.com"), TeamMember("user2@example.com"))
+
     "must return OK and the correct view for a GET when team members exist" in {
-      val teamMemberList = Seq(TeamMember("user1@example.com"), TeamMember("user2@example.com"))
       val fixture = buildFixture(Some(teamMemberList))
 
       running(fixture.application) {
@@ -44,13 +45,25 @@ class ManageTeamMembersControllerSpec extends SpecBase with HtmlValidation with 
         val msgs = messages(fixture.application)
 
         status(result) mustBe OK
-        contentAsString(result) mustBe view(SummaryList(rows=ManageTeamMembers.rows(teamMemberList)(msgs)), FakeUser)(request, msgs).toString
+        contentAsString(result) mustBe view(SummaryList(rows=ManageTeamMembers.rows(FakeUser.email.get, teamMemberList)(msgs)), FakeUser)(request, msgs).toString
         contentAsString(result) must validateAsHtml
       }
     }
 
-    "must return 500 error if UserAnswers not populated correctly" in {
+    "must display error page if UserAnswers not populated correctly" in {
       val fixture = buildFixture(None)
+
+      running(fixture.application) {
+        val request = FakeRequest(routes.ManageTeamMembersController.onPageLoad())
+        val result = route(fixture.application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(controllers.routes.JourneyRecoveryController.onPageLoad().url)
+      }
+    }
+
+    "must display error page if current user has no email" in {
+      val fixture = buildFixture(Some(teamMemberList), None)
 
       running(fixture.application) {
         val request = FakeRequest(routes.ManageTeamMembersController.onPageLoad())
@@ -79,9 +92,10 @@ class ManageTeamMembersControllerSpec extends SpecBase with HtmlValidation with 
 
   private case class Fixture(application: Application)
 
-  private def buildFixture(maybeTeamMembers: Option[Seq[TeamMember]]): Fixture = {
+  private def buildFixture(maybeTeamMembers: Option[Seq[TeamMember]], currentUserEmail: Option[String] = FakeUser.email): Fixture = {
     val userAnswers = UserAnswers("id")
     val application = applicationBuilder(
+        user = FakeUser.copy(email = currentUserEmail),
         userAnswers = maybeTeamMembers.map(userAnswers.set(CreateTeamMembersPage, _).toOption.value)
     ).build()
 
