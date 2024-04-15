@@ -25,6 +25,7 @@ import models.application._
 import models.deployment._
 import models.exception.{ApplicationCredentialLimitException, ApplicationsException}
 import models.requests.{AddApiRequest, TeamMemberRequest}
+import models.team.Team
 import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION, CONTENT_TYPE}
 import play.api.http.MimeTypes.JSON
 import play.api.http.Status.{BAD_GATEWAY, NOT_FOUND}
@@ -278,6 +279,18 @@ class ApplicationsConnector @Inject()(
       .flatMap {
         case Right(apiDeploymentStatuses) => Future.successful(Some(apiDeploymentStatuses))
         case Left(e) if e.statusCode == BAD_GATEWAY => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
+  }
+
+  def findTeamById(id: String)(implicit hc: HeaderCarrier): Future[Option[Team]] = {
+    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/teams/$id")
+      .setHeader((ACCEPT, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Either[UpstreamErrorResponse, Team]]
+      .flatMap {
+        case Right(team) => Future.successful(Some(team))
+        case Left(e) if e.statusCode == NOT_FOUND => Future.successful(None)
         case Left(e) => Future.failed(e)
       }
   }
