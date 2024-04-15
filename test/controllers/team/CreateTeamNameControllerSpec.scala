@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.team
 
 import base.SpecBase
+import controllers.{routes, team}
 import forms.CreateTeamNameFormProvider
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
