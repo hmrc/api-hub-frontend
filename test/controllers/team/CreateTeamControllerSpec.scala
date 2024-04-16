@@ -18,7 +18,6 @@ package controllers.team
 
 import base.SpecBase
 import controllers.actions.FakeUser
-import controllers.team.CreateTeamControllerSpec.fullAnswers
 import models.{CheckMode, UserAnswers}
 import models.application.TeamMember
 import models.team.{NewTeam, Team}
@@ -43,7 +42,7 @@ class CreateTeamControllerSpec extends SpecBase with MockitoSugar with ArgumentM
 
   "onSubmit" - {
     "must create the team, clear user answers, and return the success view" in {
-      val fixture = buildFixture(Some(fullAnswers))
+      val fixture = buildFixture(fullAnswers)
 
       when(fixture.apiHubService.createTeam(any)(any)).thenReturn(Future.successful(team))
       when(fixture.sessionRepository.clear(any)).thenReturn(Future.successful(true))
@@ -67,7 +66,7 @@ class CreateTeamControllerSpec extends SpecBase with MockitoSugar with ArgumentM
     "must redirect to the team name page if there is no team name answer" in {
       val answers = UserAnswers(FakeUser.userId).set(CreateTeamMembersPage, teamMembers).toOption.value
 
-      val fixture = buildFixture(Some(answers))
+      val fixture = buildFixture(answers)
 
       running(fixture.playApplication) {
         val request = FakeRequest(controllers.team.routes.CreateTeamController.onSubmit())
@@ -81,7 +80,7 @@ class CreateTeamControllerSpec extends SpecBase with MockitoSugar with ArgumentM
     "must redirect to the journey recovery page if there is no team members answer" in {
       val answers = UserAnswers(FakeUser.userId).set(CreateTeamNamePage, teamName).toOption.value
 
-      val fixture = buildFixture(Some(answers))
+      val fixture = buildFixture(answers)
 
       running(fixture.playApplication) {
         val request = FakeRequest(controllers.team.routes.CreateTeamController.onSubmit())
@@ -99,11 +98,11 @@ class CreateTeamControllerSpec extends SpecBase with MockitoSugar with ArgumentM
     sessionRepository: CreateTeamSessionRepository
   )
 
-  private def buildFixture(userAnswers: Option[UserAnswers] = None): Fixture = {
+  private def buildFixture(userAnswers: UserAnswers): Fixture = {
     val apiHubService = mock[ApiHubService]
     val sessionRepository = mock[CreateTeamSessionRepository]
 
-    val playApplication = applicationBuilder(userAnswers)
+    val playApplication = applicationBuilder(Some(userAnswers))
       .overrides(
         bind[ApiHubService].to(apiHubService),
         bind[CreateTeamSessionRepository].to(sessionRepository)
