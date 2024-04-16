@@ -470,3 +470,12 @@ createTeamManageMembers.title = Manage team members
 createTeamManageMembers.heading = Team members ({0})
 createTeamManageMembers.addTeamMember = Add another team member
 createTeamManageMembers.emailAddressColumnHeading = Email address
+
+createTeamCheckYourAnswers.title = Check your answers
+createTeamCheckYourAnswers.heading = Check your answers before creating your team
+createTeamCheckYourAnswers.teamDetails.heading = Team details
+createTeamCheckYourAnswers.teamMembers.heading = Team members ({0})
+createTeamCheckYourAnswers.complete.heading = Complete your team
+createTeamCheckYourAnswers.complete.guidance.1 = Team members you have added will be notified by email that they have been added to this team.
+createTeamCheckYourAnswers.complete.guidance.2 = This team will be assignable to applications and APIs.
+createTeamCheckYourAnswers.createTeam = Create team

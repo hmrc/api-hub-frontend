@@ -46,7 +46,7 @@ class CreateTeamMemberController @Inject()(
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
-      Ok(view(form, routes.CreateTeamMemberController.onSubmit, request.user))
+      Ok(view(form, routes.CreateTeamMemberController.onSubmit(), request.user))
   }
 
   def onSubmit: Action[AnyContent] = (identify andThen getData andThen requireData).async {
@@ -54,7 +54,7 @@ class CreateTeamMemberController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, routes.CreateTeamMemberController.onSubmit, request.user))),
+          Future.successful(BadRequest(view(formWithErrors, routes.CreateTeamMemberController.onSubmit(), request.user))),
 
         unformattedNewTeamMember => {
           val existingTeamMembers = request.userAnswers.get(CreateTeamMembersPage).getOrElse(Seq.empty)
@@ -63,7 +63,7 @@ class CreateTeamMemberController @Inject()(
           existingTeamMembers.find(existingTeamMember => emailAddressesMatch(existingTeamMember.email, newTeamMember.email)) match {
             case Some(_) =>
               val formWithErrors = form.fill(unformattedNewTeamMember).withError("email", "createTeamMember.email.duplicate")
-              Future.successful(BadRequest(view(formWithErrors, routes.CreateTeamMemberController.onSubmit, request.user)))
+              Future.successful(BadRequest(view(formWithErrors, routes.CreateTeamMemberController.onSubmit(), request.user)))
             case None =>
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(CreateTeamMembersPage, existingTeamMembers :+ newTeamMember))
