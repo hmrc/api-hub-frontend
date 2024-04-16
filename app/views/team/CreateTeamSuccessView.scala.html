@@ -14,9 +14,7 @@
  * limitations under the License.
  *@
 
-@import models.application.{Application, Credential}
 @import models.user.UserModel
-@import views.html.helper.CSPNonce
 
 @this(
     layout: templates.Layout,
@@ -31,6 +29,7 @@
     ))
 
     <h2 class="govuk-heading-m">@messages("createTeam.subheading")</h2>
+
     <p class="govuk-body">
         @Html(
             messages("createTeam.content.1")
