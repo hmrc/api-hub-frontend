@@ -24,6 +24,7 @@ import models.accessrequest._
 import models.api.{ApiDeploymentStatuses, EndpointMethod}
 import models.application.{Application, Creator, Credential, NewApplication, Primary, TeamMember}
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
+import models.team.Team
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
 import org.scalatest.OptionValues
@@ -406,6 +407,38 @@ class ApiHubServiceSpec
     }
   }
 
+  "findTeamById" - {
+    "must return the team from the applications connector when it exists" in {
+      val applicationsConnector = mock[ApplicationsConnector]
+      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+
+      val team = Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember("test-email")))
+
+      when(service.findTeamById(any())(any())).thenReturn(Future.successful(Some(team)))
+
+      service.findTeamById(team.id)(HeaderCarrier()).map {
+        result =>
+          verify(applicationsConnector).findTeamById(ArgumentMatchers.eq(team.id))(any())
+          result mustBe Some(team)
+      }
+    }
+
+    "must return None when the team does not exist" in {
+      val applicationsConnector = mock[ApplicationsConnector]
+      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+
+      val id = "test-team-id"
+
+      when(service.findTeamById(any())(any())).thenReturn(Future.successful(None))
+
+      service.findTeamById(id)(HeaderCarrier()).map {
+        result =>
+          result mustBe None
+      }
+    }
+  }
 }
 
 trait ApplicationGetterBehaviours {

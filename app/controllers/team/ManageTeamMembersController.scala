@@ -17,7 +17,6 @@
 package controllers.team
 
 import controllers.actions._
-import controllers.helpers.ErrorResultBuilder
 import controllers.routes
 import models.NormalMode
 import navigation.Navigator
@@ -30,7 +29,6 @@ import viewmodels.team.ManageTeamMembers
 import views.html.team.ManageTeamMembersView
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
 
 class ManageTeamMembersController @Inject()(
                                                 override val messagesApi: MessagesApi,
