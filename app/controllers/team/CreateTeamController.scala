@@ -17,11 +17,12 @@
 package controllers.team
 
 import controllers.actions._
-import models.CheckMode
+import models.application.TeamMember
+import models.{CheckMode, UserAnswers}
 import models.team.NewTeam
 import pages.{CreateTeamMembersPage, CreateTeamNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import repositories.CreateTeamSessionRepository
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -31,28 +32,47 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class CreateTeamController @Inject()(
-                                        override val messagesApi: MessagesApi,
-                                        identify: IdentifierAction,
-                                        service: ApiHubService,
-                                        sessionRepository: CreateTeamSessionRepository,
-                                        getData: CreateTeamDataRetrievalAction,
-                                        requireData: DataRequiredAction,
-                                        val controllerComponents: MessagesControllerComponents,
-                                        view: CreateTeamSuccessView,
-                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+  val controllerComponents: MessagesControllerComponents,
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: CreateTeamDataRetrievalAction,
+  requireData: DataRequiredAction,
+  apiHubService: ApiHubService,
+  sessionRepository: CreateTeamSessionRepository,
+  view: CreateTeamSuccessView
+)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onSubmit: Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      request.userAnswers.get(CreateTeamNamePage) match {
-        case Some(teamName) =>
-          val team = NewTeam(teamName, request.userAnswers.get(CreateTeamMembersPage).getOrElse(Seq.empty))
-          service.createTeam(team)
-            .flatMap(_ => sessionRepository.clear(request.userAnswers.id))
-            .map(_ => Ok(view(Some(request.user))))
+      validate(request.userAnswers).fold(
+        call => Future.successful(Redirect(call)),
+        newTeam =>
+          for {
+            _ <- apiHubService.createTeam(newTeam)
+            _ <- sessionRepository.clear(request.userAnswers.id)
+          } yield Ok(view(Some(request.user)))
+      )
+  }
 
-        case None =>
-          Future.successful(Redirect(routes.CreateTeamNameController.onPageLoad(CheckMode)))
-      }
+  private def validate(userAnswers: UserAnswers): Either[Call, NewTeam] = {
+    for {
+      name <- validateTeamName(userAnswers)
+      teamMembers <- validateTeamMembers(userAnswers)
+    } yield NewTeam(name, teamMembers)
+  }
+
+  private def validateTeamName(userAnswers: UserAnswers): Either[Call, String] = {
+    userAnswers.get(CreateTeamNamePage) match {
+      case Some(name) => Right(name)
+      case _ => Left(controllers.team.routes.CreateTeamNameController.onPageLoad(CheckMode))
+    }
+  }
+
+  private def validateTeamMembers(userAnswers: UserAnswers): Either[Call, Seq[TeamMember]] = {
+    userAnswers.get(CreateTeamMembersPage) match {
+      case Some(teamMembers) => Right(teamMembers)
+      case _ => Left(controllers.routes.JourneyRecoveryController.onPageLoad())
+    }
   }
 
 }
