@@ -35,14 +35,14 @@
         @govukButton(Button(
             classes = "govuk-button--secondary",
             content = messages("createTeamManageMembers.addTeamMember"),
-            href = Some(controllers.team.routes.CreateTeamMemberController.onPageLoad.url)
+            href = Some(controllers.team.routes.CreateTeamMemberController.onPageLoad().url)
         ))
         </div>
     </div>
 
     @govukSummaryList(teamMemberDetails)
 
-    @formHelper(action = controllers.team.routes.ManageTeamMembersController.onContinue) {
+    @formHelper(action = controllers.team.routes.ManageTeamMembersController.onContinue()) {
         @govukButton(Button(
             classes = "govuk-!-margin-top-6",
             content = messages("site.continue"),

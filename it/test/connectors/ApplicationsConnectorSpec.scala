@@ -721,6 +721,45 @@ class ApplicationsConnectorSpec
     }
   }
 
+  "ApplicationsConnector.findTeamById" - {
+    "must place the correct request and return the team when it exists" in {
+      val teamId = "test-team-id"
+      val expected = Team(teamId, "test-team-name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email.value)))
+
+      stubFor(
+        get(urlEqualTo(s"/api-hub-applications/teams/$teamId"))
+          .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withBody(Json.toJson(expected).toString())
+          )
+      )
+
+      buildConnector(this).findTeamById(teamId)(HeaderCarrier()).map {
+        result =>
+          result mustBe Some(expected)
+      }
+    }
+
+    "must place the request and return None when the team does not exist" in {
+      val teamId = "test-team-id"
+
+      stubFor(
+        get(urlEqualTo(s"/api-hub-applications/teams/$teamId"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+          )
+      )
+
+      buildConnector(this).findTeamById(teamId)(HeaderCarrier()).map {
+        result =>
+          result mustBe None
+      }
+    }
+  }
+
   "ApplicationsConnector.createTeam" - {
     "must place the correct request and return the team created" in {
       val newTeam = NewTeam("test-team-name", Seq(TeamMember("test-email")))

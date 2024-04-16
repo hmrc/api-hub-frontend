@@ -283,6 +283,18 @@ class ApplicationsConnector @Inject()(
       }
   }
 
+  def findTeamById(id: String)(implicit hc: HeaderCarrier): Future[Option[Team]] = {
+    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/teams/$id")
+      .setHeader((ACCEPT, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Either[UpstreamErrorResponse, Team]]
+      .flatMap {
+        case Right(team) => Future.successful(Some(team))
+        case Left(e) if e.statusCode == NOT_FOUND => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
+  }
+
   def createTeam(team: NewTeam)(implicit hc:HeaderCarrier): Future[Team] = {
     httpClient
       .post(url"$applicationsBaseUrl/api-hub-applications/teams")
