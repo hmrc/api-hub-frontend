@@ -11,3 +11,5 @@ GET     /create-team/change-team-name                       controllers.team.Cre
 POST    /create-team/change-team-name                       controllers.team.CreateTeamNameController.onSubmit(mode: Mode = CheckMode)
 
 GET     /manage-my-teams                                    controllers.team.ManageMyTeamsController.onPageLoad()
+
+GET     /:id                                                controllers.team.ManageTeamController.onPageLoad(id: String)
