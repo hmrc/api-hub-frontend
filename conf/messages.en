@@ -478,3 +478,9 @@ manageTeam.heading = Manage {0}
 manageTeam.teamMembers = Team members ({0})
 manageTeam.teamMembers.emailAddress = Email address
 manageTeam.return = Return to all teams
+
+createTeam.title = Team created successfully
+createTeam.successMessage = Team created successfully
+createTeam.subheading = What you can do now
+createTeam.content.1 = View and manage your
+createTeam.content.2 = teams

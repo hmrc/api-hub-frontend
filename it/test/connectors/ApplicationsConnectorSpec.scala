@@ -27,7 +27,7 @@ import models.application._
 import models.deployment.{DeploymentsRequest, InvalidOasResponse, SuccessfulDeploymentsResponse, ValidationFailure}
 import models.exception.ApplicationCredentialLimitException
 import models.requests.{AddApiRequest, AddApiRequestEndpoint, TeamMemberRequest}
-import models.team.Team
+import models.team.{NewTeam, Team}
 import models.user.{LdapUser, UserModel}
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AsyncFreeSpec
@@ -756,6 +756,30 @@ class ApplicationsConnectorSpec
       buildConnector(this).findTeamById(teamId)(HeaderCarrier()).map {
         result =>
           result mustBe None
+      }
+    }
+  }
+
+  "ApplicationsConnector.createTeam" - {
+    "must place the correct request and return the team created" in {
+      val newTeam = NewTeam("test-team-name", Seq(TeamMember("test-email")))
+      val team = Team("test-team-id", newTeam.name, LocalDateTime.now(), newTeam.teamMembers)
+
+      stubFor(
+        post(urlEqualTo(s"/api-hub-applications/teams"))
+          .withHeader(CONTENT_TYPE, equalTo(ContentTypes.JSON))
+          .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withStatus(CREATED)
+              .withBody(Json.toJson(team).toString())
+          )
+      )
+
+      buildConnector(this).createTeam(newTeam)(HeaderCarrier()).map {
+        result =>
+          result mustBe team
       }
     }
   }

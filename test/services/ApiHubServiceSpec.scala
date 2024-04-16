@@ -24,7 +24,7 @@ import models.accessrequest._
 import models.api.{ApiDeploymentStatuses, EndpointMethod}
 import models.application.{Application, Creator, Credential, NewApplication, Primary, TeamMember}
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
-import models.team.Team
+import models.team.{NewTeam, Team}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
 import org.scalatest.OptionValues
@@ -439,6 +439,26 @@ class ApiHubServiceSpec
       }
     }
   }
+
+  "createTeam" - {
+    "must make the correct request to the applications connector and return the created team" in {
+      val applicationsConnector = mock[ApplicationsConnector]
+      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+
+      val newTeam = NewTeam("test-team-name", Seq(TeamMember("test-email")))
+      val team = Team("test-team-id", newTeam.name, LocalDateTime.now(), newTeam.teamMembers)
+
+      when(applicationsConnector.createTeam(any())(any())).thenReturn(Future.successful(team))
+
+      service.createTeam(newTeam)(HeaderCarrier()).map {
+        result =>
+          verify(applicationsConnector).createTeam(ArgumentMatchers.eq(newTeam))(any())
+          result mustBe team
+      }
+    }
+  }
+
 }
 
 trait ApplicationGetterBehaviours {

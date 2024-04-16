@@ -24,7 +24,7 @@ import models.api.{ApiDeploymentStatuses, ApiDetail}
 import models.application.{Application, Credential, EnvironmentName, NewApplication, TeamMember}
 import models.exception.ApplicationsException
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
-import models.team.Team
+import models.team.{NewTeam, Team}
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -119,6 +119,10 @@ class ApiHubService @Inject()(
   def findTeamById(id: String)(implicit hc: HeaderCarrier): Future[Option[Team]] = {
     logger.debug(s"Fetching team $id")
     applicationsConnector.findTeamById(id)
+  }
+
+  def createTeam(team: NewTeam)(implicit hc: HeaderCarrier): Future[Team] = {
+    applicationsConnector.createTeam(team)
   }
 
 }
