@@ -784,6 +784,47 @@ class ApplicationsConnectorSpec
     }
   }
 
+  "ApplicationsConnector.addTeamMemberToTeam" - {
+    "must place the correct request" in {
+      val teamId = "test-id"
+      val teamMember = TeamMember("test-email")
+
+      stubFor(
+        post(urlEqualTo(s"/api-hub-applications/teams/$teamId/members"))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .withHeader(CONTENT_TYPE, equalTo(ContentTypes.JSON))
+          .withRequestBody(equalToJson(Json.toJson(TeamMemberRequest(teamMember)).toString()))
+          .willReturn(
+            aResponse()
+              .withStatus(NO_CONTENT)
+          )
+      )
+
+      buildConnector(this).addTeamMemberToTeam(teamId, teamMember)(HeaderCarrier()).map(
+        result =>
+          result mustBe Some(())
+      )
+    }
+
+    "must return None when the application cannot be found" in {
+      val teamId = "test-id"
+      val teamMember = TeamMember("test-email")
+
+      stubFor(
+        post(urlEqualTo(s"/api-hub-applications/teams/$teamId/members"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+          )
+      )
+
+      buildConnector(this).addTeamMemberToTeam(teamId, teamMember)(HeaderCarrier()).map(
+        result =>
+          result mustBe None
+      )
+    }
+  }
+
 }
 
 object ApplicationsConnectorSpec extends HttpClientV2Support {

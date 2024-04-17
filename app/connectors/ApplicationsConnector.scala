@@ -305,6 +305,22 @@ class ApplicationsConnector @Inject()(
       .execute[Team]
   }
 
+  def addTeamMemberToTeam(id: String, teamMember: TeamMember)(implicit hc:HeaderCarrier): Future[Option[Unit]] = {
+    val request = TeamMemberRequest(teamMember)
+
+    httpClient
+      .post(url"$applicationsBaseUrl/api-hub-applications/teams/$id/members")
+      .setHeader((CONTENT_TYPE, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .withBody(Json.toJson(request))
+      .execute[Either[UpstreamErrorResponse, Unit]]
+      .flatMap {
+        case Right(_) => Future.successful(Some(()))
+        case Left(e) if e.statusCode == NOT_FOUND => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
+  }
+
   private def handleBadRequest(response: HttpResponse): Option[InvalidOasResponse] = {
     if (response.body.isEmpty) {
       None

@@ -14,3 +14,6 @@ POST    /create-team/change-team-name                       controllers.team.Cre
 GET     /manage-my-teams                                    controllers.team.ManageMyTeamsController.onPageLoad()
 
 GET     /:id                                                controllers.team.ManageTeamController.onPageLoad(id: String)
+
+GET     /add-team-member/:id                                controllers.team.AddTeamMemberController.onPageLoad(id: String)
+POST    /add-team-member/:id                                controllers.team.AddTeamMemberController.onSubmit(id: String)
