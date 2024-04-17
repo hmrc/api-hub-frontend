@@ -24,6 +24,8 @@ site.neitherApiNorApplicationFound.heading = Neither Api nor application found
 site.neitherApiNorApplicationFound.message = Cannot find an API with Id {0} or an application with Id {1}.
 site.accessRequestNotFound.heading = Production access request not found
 site.accessRequestNotFound.message = Cannot find a production access request with Id {0}.
+site.teamNotFoundHeading = Team not found
+site.teamNotFoundMessage = Cannot find a team with Id {0}.
 
 date.day = Day
 date.month = Month
@@ -470,6 +472,18 @@ createTeamManageMembers.title = Manage team members
 createTeamManageMembers.heading = Team members ({0})
 createTeamManageMembers.addTeamMember = Add another team member
 createTeamManageMembers.emailAddressColumnHeading = Email address
+
+manageTeam.title = Manage {0}
+manageTeam.heading = Manage {0}
+manageTeam.teamMembers = Team members ({0})
+manageTeam.teamMembers.emailAddress = Email address
+manageTeam.return = Return to all teams
+
+createTeam.title = Team created successfully
+createTeam.successMessage = Team created successfully
+createTeam.subheading = What you can do now
+createTeam.content.1 = View and manage your
+createTeam.content.2 = teams
 
 createTeamCheckYourAnswers.title = Check your answers
 createTeamCheckYourAnswers.heading = Check your answers before creating your team

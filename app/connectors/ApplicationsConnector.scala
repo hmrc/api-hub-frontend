@@ -25,6 +25,7 @@ import models.application._
 import models.deployment._
 import models.exception.{ApplicationCredentialLimitException, ApplicationsException}
 import models.requests.{AddApiRequest, TeamMemberRequest}
+import models.team.{NewTeam, Team}
 import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION, CONTENT_TYPE}
 import play.api.http.MimeTypes.JSON
 import play.api.http.Status.{BAD_GATEWAY, NOT_FOUND}
@@ -280,6 +281,28 @@ class ApplicationsConnector @Inject()(
         case Left(e) if e.statusCode == BAD_GATEWAY => Future.successful(None)
         case Left(e) => Future.failed(e)
       }
+  }
+
+  def findTeamById(id: String)(implicit hc: HeaderCarrier): Future[Option[Team]] = {
+    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/teams/$id")
+      .setHeader((ACCEPT, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Either[UpstreamErrorResponse, Team]]
+      .flatMap {
+        case Right(team) => Future.successful(Some(team))
+        case Left(e) if e.statusCode == NOT_FOUND => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
+  }
+
+  def createTeam(team: NewTeam)(implicit hc:HeaderCarrier): Future[Team] = {
+    httpClient
+      .post(url"$applicationsBaseUrl/api-hub-applications/teams")
+      .setHeader((ACCEPT, JSON))
+      .setHeader((CONTENT_TYPE, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .withBody(Json.toJson(team))
+      .execute[Team]
   }
 
   private def handleBadRequest(response: HttpResponse): Option[InvalidOasResponse] = {

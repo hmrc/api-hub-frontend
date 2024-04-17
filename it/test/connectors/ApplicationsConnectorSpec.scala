@@ -27,6 +27,7 @@ import models.application._
 import models.deployment.{DeploymentsRequest, InvalidOasResponse, SuccessfulDeploymentsResponse, ValidationFailure}
 import models.exception.ApplicationCredentialLimitException
 import models.requests.{AddApiRequest, AddApiRequestEndpoint, TeamMemberRequest}
+import models.team.{NewTeam, Team}
 import models.user.{LdapUser, UserModel}
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AsyncFreeSpec
@@ -719,6 +720,70 @@ class ApplicationsConnectorSpec
       }
     }
   }
+
+  "ApplicationsConnector.findTeamById" - {
+    "must place the correct request and return the team when it exists" in {
+      val teamId = "test-team-id"
+      val expected = Team(teamId, "test-team-name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email.value)))
+
+      stubFor(
+        get(urlEqualTo(s"/api-hub-applications/teams/$teamId"))
+          .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withBody(Json.toJson(expected).toString())
+          )
+      )
+
+      buildConnector(this).findTeamById(teamId)(HeaderCarrier()).map {
+        result =>
+          result mustBe Some(expected)
+      }
+    }
+
+    "must place the request and return None when the team does not exist" in {
+      val teamId = "test-team-id"
+
+      stubFor(
+        get(urlEqualTo(s"/api-hub-applications/teams/$teamId"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+          )
+      )
+
+      buildConnector(this).findTeamById(teamId)(HeaderCarrier()).map {
+        result =>
+          result mustBe None
+      }
+    }
+  }
+
+  "ApplicationsConnector.createTeam" - {
+    "must place the correct request and return the team created" in {
+      val newTeam = NewTeam("test-team-name", Seq(TeamMember("test-email")))
+      val team = Team("test-team-id", newTeam.name, LocalDateTime.now(), newTeam.teamMembers)
+
+      stubFor(
+        post(urlEqualTo(s"/api-hub-applications/teams"))
+          .withHeader(CONTENT_TYPE, equalTo(ContentTypes.JSON))
+          .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withStatus(CREATED)
+              .withBody(Json.toJson(team).toString())
+          )
+      )
+
+      buildConnector(this).createTeam(newTeam)(HeaderCarrier()).map {
+        result =>
+          result mustBe team
+      }
+    }
+  }
+
 }
 
 object ApplicationsConnectorSpec extends HttpClientV2Support {

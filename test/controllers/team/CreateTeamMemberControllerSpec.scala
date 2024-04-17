@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.team
 
 import base.SpecBase
 import controllers.actions.FakeUser
@@ -39,12 +39,12 @@ import scala.concurrent.Future
 
 class CreateTeamMemberControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  private def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new AddTeamMemberDetailsFormProvider()
-  val form = formProvider()
+  private val formProvider = new AddTeamMemberDetailsFormProvider()
+  private val form = formProvider()
 
-  lazy val createTeamMemberRoute = controllers.team.routes.CreateTeamMemberController.onPageLoad().url
+  private lazy val createTeamMemberRoute = controllers.team.routes.CreateTeamMemberController.onPageLoad().url
 
   "CreateTeamMember Controller" - {
 

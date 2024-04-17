@@ -4,11 +4,15 @@ POST    /create-team/add-team-member                        controllers.team.Cre
 GET     /create-team/team-members                           controllers.team.ManageTeamMembersController.onPageLoad()
 POST    /create-team/team-members                           controllers.team.ManageTeamMembersController.onContinue()
 GET     /create-team/remove-team-member/:index              controllers.team.RemoveTeamMemberController.removeTeamMember(index: Int)
+POST    /create-team/create-team                            controllers.team.CreateTeamController.onSubmit()
 
 GET     /create-team/team-name                              controllers.team.CreateTeamNameController.onPageLoad(mode: Mode = NormalMode)
 POST    /create-team/team-name                              controllers.team.CreateTeamNameController.onSubmit(mode: Mode = NormalMode)
 GET     /create-team/change-team-name                       controllers.team.CreateTeamNameController.onPageLoad(mode: Mode = CheckMode)
 POST    /create-team/change-team-name                       controllers.team.CreateTeamNameController.onSubmit(mode: Mode = CheckMode)
+GET     /create-team/check-your-answers                     controllers.team.CreateTeamCheckYourAnswersController.onPageLoad()
 
 GET     /manage-my-teams                                    controllers.team.ManageMyTeamsController.onPageLoad()
-GET     /create-team/check-your-answers                     controllers.team.CreateTeamCheckYourAnswersController.onPageLoad()
+
+GET     /:id                                                controllers.team.ManageTeamController.onPageLoad(id: String)
+
