@@ -17,10 +17,10 @@
 @import models.user.UserModel
 
 @this(
-    layout: templates.Layout,
-    govukSummaryList: GovukSummaryList,
-    formHelper: FormWithCSRF,
-    govukButton: GovukButton
+        layout: templates.Layout,
+        govukSummaryList: GovukSummaryList,
+        formHelper: FormWithCSRF,
+        govukButton: GovukButton
 )
 
 @(teamName: SummaryList, teamMemberDetails: SummaryList, user: Some[UserModel])(implicit request: Request[_], messages: Messages)
@@ -33,7 +33,16 @@
 
     @govukSummaryList(teamName)
 
-    <h2 class="govuk-heading-m govuk-!-margin-top-9">@messages("createTeamCheckYourAnswers.teamMembers.heading", teamMemberDetails.rows.size)</h2>
+    <div class="govuk-summary-list">
+        <div class="govuk-grid-column-one-half govuk-!-padding-left-0">
+            <h2 class="govuk-heading-m govuk-!-text-align-left">@messages("createTeamCheckYourAnswers.teamMembers.heading", teamMemberDetails.rows.size)</h2>
+        </div>
+        <div class="govuk-grid-column-one-half govuk-!-text-align-right govuk-!-padding-right-0">
+            <a class="govuk-link govuk-!-text-align-right" href="@{
+                controllers.team.routes.ManageTeamMembersController.onPageLoad().url
+            }">@messages("site.change")</a>
+        </div>
+    </div>
 
     @govukSummaryList(teamMemberDetails)
 

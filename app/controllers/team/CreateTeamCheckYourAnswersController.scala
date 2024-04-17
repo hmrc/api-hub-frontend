@@ -17,7 +17,7 @@
 package controllers.team
 
 import com.google.inject.Inject
-import controllers.actions.{CreateTeamDataRetrievalAction, DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{CreateTeamDataRetrievalAction, DataRequiredAction, IdentifierAction}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController

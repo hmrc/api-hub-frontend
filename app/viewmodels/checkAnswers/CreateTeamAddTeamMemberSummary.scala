@@ -34,9 +34,7 @@ object CreateTeamAddTeamMemberSummary  {
       .map {
         zipped =>
           SummaryListRow(
-            key = Key(Text(zipped._1.email)),
-            actions = Some(Actions(
-              items = Seq(ActionItemViewModel("site.change", routes.ManageTeamMembersController.onPageLoad().url)
-              .withVisuallyHiddenText(messages("createTeamName.change.hidden"))))))
+            key = Key(Text(zipped._1.email))
+          )
       }
 }

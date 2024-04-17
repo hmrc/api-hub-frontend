@@ -44,7 +44,7 @@ class CreateTeamMemberControllerSpec extends SpecBase with MockitoSugar {
   val formProvider = new AddTeamMemberDetailsFormProvider()
   val form = formProvider()
 
-  lazy val createTeamMemberRoute = controllers.team.routes.CreateTeamMemberController.onPageLoad.url
+  lazy val createTeamMemberRoute = controllers.team.routes.CreateTeamMemberController.onPageLoad().url
 
   "CreateTeamMember Controller" - {
 
@@ -59,7 +59,7 @@ class CreateTeamMemberControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[AddTeamMemberDetailsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, controllers.team.routes.CreateTeamMemberController.onSubmit, FakeUser)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, controllers.team.routes.CreateTeamMemberController.onSubmit(), FakeUser)(request, messages(application)).toString
       }
     }
 
@@ -106,7 +106,7 @@ class CreateTeamMemberControllerSpec extends SpecBase with MockitoSugar {
 
             status(result) mustEqual BAD_REQUEST
             contentAsString(result) mustEqual
-              view(boundForm, controllers.team.routes.CreateTeamMemberController.onSubmit, FakeUser)(request, messages(application)).toString
+              view(boundForm, controllers.team.routes.CreateTeamMemberController.onSubmit(), FakeUser)(request, messages(application)).toString
           }
         }
     }
