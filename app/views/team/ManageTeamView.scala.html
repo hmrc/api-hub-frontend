@@ -40,9 +40,12 @@
 
     <div class="hip-flex-container govuk-!-margin-bottom-2">
         <h2 class="govuk-heading-m">@messages("manageTeam.teamMembers", team.teamMembers.size)</h2>
-        <a href="@controllers.team.routes.AddTeamMemberController.onPageLoad(team.id).url" class="govuk-button govuk-!-margin-bottom-1">
-            @messages("manageTeam.addTeamMember")
-        </a>
+        @govukButton(
+            Button(
+                href = Some(controllers.team.routes.AddTeamMemberController.onPageLoad(team.id).url),
+                content = Text(messages("manageTeam.addTeamMember"))
+            )
+        )
     </div>
 
     @govukTable(
