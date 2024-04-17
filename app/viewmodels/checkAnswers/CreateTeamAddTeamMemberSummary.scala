@@ -30,6 +30,7 @@ object CreateTeamAddTeamMemberSummary  {
   def rows(answers: UserAnswers)(implicit messages: Messages): Seq[SummaryListRow] =
     answers
       .get(CreateTeamMembersPage).getOrElse(Seq.empty)
+      .sortBy(_.email)
       .zipWithIndex
       .map {
         zipped =>
