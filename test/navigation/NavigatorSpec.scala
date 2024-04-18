@@ -101,6 +101,24 @@ class NavigatorSpec extends SpecBase with TryValues {
           navigator.nextPage(ApiPolicyConditionsDeclarationPage, NormalMode, buildUserAnswers(AddEndpoints)) mustBe routes.AddAnApiCheckYourAnswersController.onPageLoad(AddEndpoints)
         }
       }
+
+      "during the Create Team journey" - {
+        "must start with the Team Name page" in {
+          navigator.nextPage(CreateTeamStartPage, NormalMode, emptyUserAnswers) mustBe controllers.team.routes.CreateTeamNameController.onPageLoad(NormalMode)
+        }
+
+        "must go from the Team Name page to the Team Members page" in {
+          navigator.nextPage(CreateTeamNamePage, NormalMode, emptyUserAnswers) mustBe controllers.team.routes.ManageTeamMembersController.onPageLoad()
+        }
+
+        "must go from the Team Members page to the Check Your Answers page" in {
+          navigator.nextPage(CreateTeamMembersPage, NormalMode, emptyUserAnswers) mustBe controllers.team.routes.CreateTeamCheckYourAnswersController.onPageLoad()
+        }
+
+        "must go from the Team Member page to the Team Members page" in {
+          navigator.nextPage(CreateTeamMemberPage, NormalMode, emptyUserAnswers) mustBe controllers.team.routes.ManageTeamMembersController.onPageLoad()
+        }
+      }
     }
 
     "in Check mode" - {
@@ -148,6 +166,12 @@ class NavigatorSpec extends SpecBase with TryValues {
 
         "must go from the Add An API Accept Policy Conditions page to the Check Your Answers page" in {
           navigator.nextPage(ApiPolicyConditionsDeclarationPage, CheckMode, buildUserAnswers(AddEndpoints)) mustBe routes.AddAnApiCheckYourAnswersController.onPageLoad(AddEndpoints)
+        }
+      }
+
+      "during the Create Team journey" - {
+        "must go from Team Name to Check Your Answers" in {
+          navigator.nextPage(CreateTeamNamePage, CheckMode, emptyUserAnswers) mustBe controllers.team.routes.CreateTeamCheckYourAnswersController.onPageLoad()
         }
       }
     }

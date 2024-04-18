@@ -35,6 +35,10 @@ class Navigator @Inject()() {
     case AddAnApiSelectApplicationPage => addAnApiSelectApplicationNextPage(NormalMode)
     case AddAnApiSelectEndpointsPage => addAnApiSelectEndpointsNextPage(NormalMode)
     case ApiPolicyConditionsDeclarationPage => apiPolicyConditionsDeclarationNextPage(NormalMode)
+    case CreateTeamStartPage => _ => controllers.team.routes.CreateTeamNameController.onPageLoad(NormalMode)
+    case CreateTeamNamePage => _ => controllers.team.routes.ManageTeamMembersController.onPageLoad()
+    case CreateTeamMembersPage => _ => controllers.team.routes.CreateTeamCheckYourAnswersController.onPageLoad()
+    case CreateTeamMemberPage => _ => controllers.team.routes.ManageTeamMembersController.onPageLoad()
     case _ => _ => routes.IndexController.onPageLoad
   }
 
@@ -45,7 +49,7 @@ class Navigator @Inject()() {
     case AddAnApiSelectApplicationPage => addAnApiSelectApplicationNextPage(CheckMode)
     case AddAnApiSelectEndpointsPage => addAnApiSelectEndpointsNextPage(CheckMode)
     case ApiPolicyConditionsDeclarationPage => apiPolicyConditionsDeclarationNextPage(CheckMode)
-    case CreateTeamNamePage => _ => routes.IndexController.onPageLoad // TODO: Added temporarily to prevent error page after clicking Continue, remove as part of HIPP-1083
+    case CreateTeamNamePage => _ => controllers.team.routes.CreateTeamCheckYourAnswersController.onPageLoad()
     case _ => _ => routes.CheckYourAnswersController.onPageLoad()
   }
 

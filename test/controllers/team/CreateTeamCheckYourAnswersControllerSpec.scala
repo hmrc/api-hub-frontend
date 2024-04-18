@@ -46,7 +46,7 @@ class CreateTeamCheckYourAnswersControllerSpec extends SpecBase with SummaryList
 
         val view = application.injector.instanceOf[CreateTeamCheckYourAnswersView]
         val teamDetails = buildTeamDetailsSummaryList(emptyUserAnswers, messages(application))
-        val teamMemberDetails = buildTeamMembersSummaryList(emptyUserAnswers, messages(application))
+        val teamMemberDetails = buildTeamMembersSummaryList(emptyUserAnswers)
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(teamDetails, teamMemberDetails, Some(FakeUser))(request, messages(application)).toString
@@ -66,7 +66,7 @@ class CreateTeamCheckYourAnswersControllerSpec extends SpecBase with SummaryList
 
           val view = application.injector.instanceOf[CreateTeamCheckYourAnswersView]
           val teamDetails = buildTeamDetailsSummaryList(userAnswers, messages(application))
-          val teamMemberDetails = buildTeamMembersSummaryList(userAnswers, messages(application))
+          val teamMemberDetails = buildTeamMembersSummaryList(userAnswers)
 
           status(result) mustEqual OK
           contentAsString(result) mustEqual view(teamDetails, teamMemberDetails, Some(FakeUser))(request, messages(application)).toString
@@ -88,9 +88,9 @@ object CreateTeamCheckYourAnswersControllerSpec extends SummaryListFluency {
     )
   }
 
-  def buildTeamMembersSummaryList(userAnswers: UserAnswers, messages: Messages): SummaryList = {
+  def buildTeamMembersSummaryList(userAnswers: UserAnswers): SummaryList = {
     SummaryListViewModel(
-      rows = CreateTeamAddTeamMemberSummary.rows(userAnswers)(messages)
+      rows = CreateTeamAddTeamMemberSummary.rows(userAnswers)
     )
   }
 
