@@ -457,6 +457,11 @@ manageMyTeams.title = Manage teams
 manageMyTeams.heading = Manage teams
 manageMyTeams.hint = Teams can be used to help you manage your applications and create APIs.
 manageMyTeams.noTeams = You have not created any teams
+manageMyTeams.addNewTeam = Add new team
+manageMyTeams.headings.teamName = Team name
+manageMyTeams.headings.members = Members
+manageMyTeams.headings.created = Created
+manageMyTeams.yourTeams = Your teams
 
 createTeamName.title = Give your team a name
 createTeamName.heading = Give your team a name

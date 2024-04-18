@@ -440,6 +440,25 @@ class ApiHubServiceSpec
     }
   }
 
+  "findTeams" - {
+    "must return the teams from the applications connector" in {
+      val applicationsConnector = mock[ApplicationsConnector]
+      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+      val teamMemberEmail = "test-email"
+
+      val teams = Seq(Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember("test-email"))))
+
+      when(service.findTeams(ArgumentMatchers.eq(Some(teamMemberEmail)))(any())).thenReturn(Future.successful(teams))
+
+      service.findTeams(Some(teamMemberEmail))(HeaderCarrier()).map {
+        result =>
+          verify(applicationsConnector).findTeams(ArgumentMatchers.eq(Some(teamMemberEmail)))(any())
+          result mustBe teams
+      }
+    }
+  }
+
   "createTeam" - {
     "must make the correct request to the applications connector and return the created team" in {
       val applicationsConnector = mock[ApplicationsConnector]

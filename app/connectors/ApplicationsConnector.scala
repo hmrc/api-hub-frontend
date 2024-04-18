@@ -295,6 +295,21 @@ class ApplicationsConnector @Inject()(
       }
   }
 
+  def findTeams(teamMemberEmail: Option[String])(implicit hc: HeaderCarrier): Future[Seq[Team]] = {
+    val url = teamMemberEmail match {
+      case Some(emailAddress) =>
+        val emailAddressEncrypted = crypto.QueryParameterCrypto.encrypt(PlainText(emailAddress)).value
+        url"$applicationsBaseUrl/api-hub-applications/teams?teamMember=$emailAddressEncrypted"
+      case None =>
+        url"$applicationsBaseUrl/api-hub-applications/teams"
+    }
+
+    httpClient.get(url)
+      .setHeader((ACCEPT, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Seq[Team]]
+  }
+
   def createTeam(team: NewTeam)(implicit hc:HeaderCarrier): Future[Team] = {
     httpClient
       .post(url"$applicationsBaseUrl/api-hub-applications/teams")

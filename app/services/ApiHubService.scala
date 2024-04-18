@@ -121,6 +121,10 @@ class ApiHubService @Inject()(
     applicationsConnector.findTeamById(id)
   }
 
+  def findTeams(teamMemberEmail: Option[String])(implicit hc: HeaderCarrier): Future[Seq[Team]] = {
+    applicationsConnector.findTeams(teamMemberEmail)
+  }
+
   def createTeam(team: NewTeam)(implicit hc: HeaderCarrier): Future[Team] = {
     applicationsConnector.createTeam(team)
   }

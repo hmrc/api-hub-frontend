@@ -20,19 +20,25 @@ import com.google.inject.{Inject, Singleton}
 import controllers.actions.IdentifierAction
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.team.ManageMyTeamsView
+
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class ManageMyTeamsController @Inject()(
   override val controllerComponents: MessagesControllerComponents,
   identify: IdentifierAction,
+  service: ApiHubService,
   view: ManageMyTeamsView
-) extends FrontendBaseController with I18nSupport {
+)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = identify {
+  def onPageLoad(): Action[AnyContent] = identify.async {
     implicit request =>
-      Ok(view(request.user))
+      service.findTeams(request.user.email).map(_ match {
+        case Seq() => Redirect(controllers.routes.UnauthorisedController.onPageLoad.url)
+        case teams => Ok(view(teams sortBy(_.name), request.user))
+      })
   }
-
 }

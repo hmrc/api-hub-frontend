@@ -18,39 +18,69 @@ package controllers.team
 
 import base.SpecBase
 import controllers.actions.FakeUser
+import models.application.TeamMember
+import models.team.Team
 import models.user.UserModel
+import org.mockito.ArgumentMatchers.any
+import org.mockito.MockitoSugar
 import org.scalatest.OptionValues
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Application => PlayApplication}
+import services.ApiHubService
 import utils.HtmlValidation
 import views.html.team.ManageMyTeamsView
 
-class ManageMyTeamsControllerSpec extends SpecBase with HtmlValidation with OptionValues {
+import java.time.LocalDateTime
+import scala.concurrent.Future
+
+class ManageMyTeamsControllerSpec extends SpecBase with MockitoSugar with HtmlValidation with OptionValues {
 
   "ManageMyTeamsController" - {
-    "must return OK and the correct view for a GET" in {
+    "must return OK and the correct view for a GET when the user is in some teams" in {
       val fixture = buildFixture()
+      val team1 = Team("id1", "team 1", LocalDateTime.now(), Seq(TeamMember(FakeUser.email.value)))
+      val team2 = Team("id2", "team 2", LocalDateTime.now(), Seq(TeamMember(FakeUser.email.value)))
+      when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(Seq(team2, team1)))
 
       running(fixture.playApplication) {
         val request = FakeRequest(routes.ManageMyTeamsController.onPageLoad())
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[ManageMyTeamsView]
+        val teamsSortedByName = Seq(team1, team2)
 
         status(result) mustBe OK
-        contentAsString(result) mustBe view(FakeUser)(request, messages(fixture.playApplication)).toString
+        contentAsString(result) mustBe view(teamsSortedByName, FakeUser)(request, messages(fixture.playApplication)).toString
         contentAsString(result) must validateAsHtml
+      }
+    }
+
+    "must redirect to the unauthorised page when the user is not in any teams" in {
+      val fixture = buildFixture()
+      when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(Seq()))
+
+      running(fixture.playApplication) {
+        val request = FakeRequest(routes.ManageMyTeamsController.onPageLoad())
+        val result = route(fixture.playApplication, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(controllers.routes.UnauthorisedController.onPageLoad.url)
       }
     }
   }
 
-  private case class Fixture(playApplication: PlayApplication)
+  private case class Fixture(playApplication: PlayApplication, apiHubService: ApiHubService)
 
   private def buildFixture(userModel: UserModel = FakeUser): Fixture = {
-    val playApplication = applicationBuilder(userAnswers = Some(emptyUserAnswers), user = userModel)
-      .build()
+    val apiHubService = mock[ApiHubService]
 
-    Fixture(playApplication)
+    val playApplication = applicationBuilder(userAnswers = Some(emptyUserAnswers), user = userModel)
+      .overrides(
+        bind[ApiHubService].toInstance(apiHubService)
+      ).build()
+
+    Fixture(playApplication, apiHubService)
   }
 
 }

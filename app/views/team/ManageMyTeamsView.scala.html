@@ -15,12 +15,15 @@
  *@
 
 @import models.user.UserModel
+@import models.team.Team
+@import java.time.format.DateTimeFormatter
+@import views.html.helper.CSPNonce
 
 @this(
     layout: templates.Layout
 )
 
-@(user: UserModel)(implicit request: Request[_], messages: Messages)
+@(teams: Seq[Team], user: UserModel)(implicit request: Request[_], messages: Messages)
 
 @layout(
     pageTitle    = titleNoForm(messages("manageMyTeams.title")),
@@ -36,11 +39,46 @@
         @messages("manageMyTeams.hint")
     </div>
 
-
     <div class="call-out-panel govuk-!-margin-top-7 govuk-!-margin-bottom-7">
-        <p class="govuk-body">
-            @messages("manageMyTeams.noTeams")
-        </p>
+        <div class="call-out-flex-header">
+            <h2>@messages("manageMyTeams.yourTeams")</h2>
+            <a href="@controllers.team.routes.CreateTeamStartController.startCreateTeam()" class="govuk-button">@messages("manageMyTeams.addNewTeam")</a>
+        </div>
+
+        <table class="govuk-table">
+            <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header">@messages("manageMyTeams.headings.teamName")</th>
+                    <th scope="col" class="govuk-table__header">@messages("manageMyTeams.headings.members")</th>
+                    <th scope="col" class="govuk-table__header">@messages("manageMyTeams.headings.created")</th>
+                </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+                @for(team <- teams) {
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">
+                            <a href="@controllers.team.routes.ManageTeamController.onPageLoad(team.id)" class="govuk-body govuk-link govuk-link--no-visited-state">@team.name</a>
+                        </th>
+                        <td class="govuk-table__cell">@team.teamMembers.size</td>
+                        <td class="govuk-table__cell utcDateTime">@team.created.format(DateTimeFormatter.ISO_DATE_TIME)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
+
+    <script type="text/javascript" @CSPNonce.attr>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.utcDateTime').forEach(elUtcDateTime => {
+                const date = new Date(elUtcDateTime.textContent),
+                    isValidDate = !isNaN(date.valueOf());
+                if (isValidDate) {
+                    elUtcDateTime.textContent = date.toLocaleDateString(undefined, {day: "numeric", month: "short", year: "numeric"});
+                } else {
+                    console.warn(`Expected a valid date/time string but found "${utcDateTime.textContent}"`);
+                }
+            });
+        });
+    </script>
 
 }
