@@ -14,4 +14,33 @@ document.addEventListener('DOMContentLoaded', function(event) {
       window.history.back();
     });
   }
+
+  localiseUtcDateTimeValues();
 });
+
+function localiseUtcDateTimeValues() {
+  /* Ensure that date/time display formats are permitted by the gov.uk style guide, see:
+      https://www.gov.uk/guidance/style-guide/a-to-z-of-gov-uk-style#dates
+      https://www.gov.uk/guidance/style-guide/a-to-z-of-gov-uk-style#times
+  */
+  const utcSuffix = 'Z',
+      classToOptions = {
+        'utcDateShort': {dateStyle: "medium"},
+        // add other formats as needed
+      };
+
+  Object.entries(classToOptions).forEach(([className, options]) => {
+    document.querySelectorAll(`.${className}`).forEach(el => {
+      const rawDateText = el.textContent.trim(),
+          utcDateText = rawDateText + (rawDateText.endsWith(utcSuffix) ? '' : utcSuffix),
+          date = new Date(utcDateText),
+          isValidDate = !isNaN(date.valueOf());
+      if (isValidDate) {
+        el.textContent = date.toLocaleString(undefined, options);
+      } else {
+        console.warn(`Expected a valid date/time string but found "${rawDateText}"`);
+      }
+    });
+  });
+
+}

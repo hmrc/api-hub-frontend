@@ -56,16 +56,18 @@ class ManageMyTeamsControllerSpec extends SpecBase with MockitoSugar with HtmlVa
       }
     }
 
-    "must redirect to the unauthorised page when the user is not in any teams" in {
+    "must show No Teams message when the user is not in any teams" in {
       val fixture = buildFixture()
       when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(Seq()))
 
       running(fixture.playApplication) {
         val request = FakeRequest(routes.ManageMyTeamsController.onPageLoad())
         val result = route(fixture.playApplication, request).value
+        val view = fixture.playApplication.injector.instanceOf[ManageMyTeamsView]
 
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(controllers.routes.UnauthorisedController.onPageLoad.url)
+        status(result) mustBe OK
+        contentAsString(result) mustBe view(Seq.empty, FakeUser)(request, messages(fixture.playApplication)).toString
+        contentAsString(result) must validateAsHtml
       }
     }
   }

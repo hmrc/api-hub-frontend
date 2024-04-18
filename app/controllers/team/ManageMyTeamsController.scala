@@ -24,7 +24,7 @@ import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.team.ManageMyTeamsView
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ManageMyTeamsController @Inject()(
@@ -36,9 +36,9 @@ class ManageMyTeamsController @Inject()(
 
   def onPageLoad(): Action[AnyContent] = identify.async {
     implicit request =>
-      service.findTeams(request.user.email).map(_ match {
-        case Seq() => Redirect(controllers.routes.UnauthorisedController.onPageLoad.url)
-        case teams => Ok(view(teams sortBy(_.name), request.user))
-      })
+      (request.user.email match {
+        case Some(email) => service.findTeams(Some(email))
+        case None => Future.successful(Seq.empty)
+      }).map(teams => Ok(view(teams sortBy(_.name), request.user)))
   }
 }
