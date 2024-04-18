@@ -10,6 +10,7 @@ GET     /create-team/team-name                              controllers.team.Cre
 POST    /create-team/team-name                              controllers.team.CreateTeamNameController.onSubmit(mode: Mode = NormalMode)
 GET     /create-team/change-team-name                       controllers.team.CreateTeamNameController.onPageLoad(mode: Mode = CheckMode)
 POST    /create-team/change-team-name                       controllers.team.CreateTeamNameController.onSubmit(mode: Mode = CheckMode)
+GET     /create-team/check-your-answers                     controllers.team.CreateTeamCheckYourAnswersController.onPageLoad()
 
 GET     /manage-my-teams                                    controllers.team.ManageMyTeamsController.onPageLoad()
 
