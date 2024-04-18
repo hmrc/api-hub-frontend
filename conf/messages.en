@@ -478,12 +478,19 @@ manageTeam.heading = Manage {0}
 manageTeam.teamMembers = Team members ({0})
 manageTeam.teamMembers.emailAddress = Email address
 manageTeam.return = Return to all teams
+manageTeam.addTeamMember = Add team member
 
 createTeam.title = Team created successfully
 createTeam.successMessage = Team created successfully
 createTeam.subheading = What you can do now
 createTeam.content.1 = View and manage your
 createTeam.content.2 = teams
+
+teamUpdatedSuccessfully.title = Team updated successfully
+teamUpdatedSuccessfully.heading = Team updated successfully
+teamUpdatedSuccessfully.heading2 = What you can do now
+teamUpdatedSuccessfully.guidance = View and manage your {0}
+teamUpdatedSuccessfully.linkText = teams
 
 createTeamCheckYourAnswers.title = Check your answers
 createTeamCheckYourAnswers.heading = Check your answers before creating your team

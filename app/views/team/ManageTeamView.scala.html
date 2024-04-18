@@ -25,7 +25,14 @@
 
 @(team: Team, user: UserModel)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("manageTeam.title", team.name)), user = Some(user)) {
+@styles() = {
+    .hip-flex-container {
+        display: flex;
+        justify-content: space-between;
+    }
+}
+
+@layout(pageTitle = titleNoForm(messages("manageTeam.title", team.name)), user = Some(user), customStyles = Some(styles())) {
 
     <h1 class="govuk-heading-l">@messages("manageTeam.heading", team.name)</h1>
 
@@ -33,6 +40,12 @@
 
     <div class="hip-flex-container govuk-!-margin-bottom-2">
         <h2 class="govuk-heading-m">@messages("manageTeam.teamMembers", team.teamMembers.size)</h2>
+        @govukButton(
+            Button(
+                href = Some(controllers.team.routes.AddTeamMemberController.onPageLoad(team.id).url),
+                content = Text(messages("manageTeam.addTeamMember"))
+            )
+        )
     </div>
 
     @govukTable(

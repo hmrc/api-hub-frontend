@@ -21,7 +21,7 @@ import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
 import models.AvailableEndpoint
 import models.accessrequest.{AccessRequest, AccessRequestRequest, AccessRequestStatus}
 import models.api.{ApiDeploymentStatuses, ApiDetail}
-import models.application.{Application, Credential, EnvironmentName, NewApplication, TeamMember}
+import models.application._
 import models.exception.ApplicationsException
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
 import models.team.{NewTeam, Team}
@@ -123,6 +123,11 @@ class ApiHubService @Inject()(
 
   def createTeam(team: NewTeam)(implicit hc: HeaderCarrier): Future[Team] = {
     applicationsConnector.createTeam(team)
+  }
+
+  def addTeamMemberToTeam(id: String, teamMember: TeamMember)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    logger.debug(s"Adding team member to team $id")
+    applicationsConnector.addTeamMemberToTeam(id, teamMember)
   }
 
 }

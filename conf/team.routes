@@ -16,3 +16,5 @@ GET     /manage-my-teams                                    controllers.team.Man
 
 GET     /:id                                                controllers.team.ManageTeamController.onPageLoad(id: String)
 
+GET     /add-team-member/:id                                controllers.team.AddTeamMemberController.onPageLoad(id: String)
+POST    /add-team-member/:id                                controllers.team.AddTeamMemberController.onSubmit(id: String)
