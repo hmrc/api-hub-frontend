@@ -85,7 +85,7 @@ class ManageTeamMembersControllerSpec extends SpecBase with HtmlValidation with 
         val result = route(fixture.application, request).value
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(controllers.routes.IndexController.onPageLoad.url)
+        redirectLocation(result) mustBe Some(controllers.team.routes.CreateTeamCheckYourAnswersController.onPageLoad().url)
       }
     }
   }

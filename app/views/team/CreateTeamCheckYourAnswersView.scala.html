@@ -51,7 +51,7 @@
     <p class="govuk-body">@messages("createTeamCheckYourAnswers.complete.guidance.1")</p>
     <p class="govuk-body">@messages("createTeamCheckYourAnswers.complete.guidance.2")</p>
 
-    @formHelper(action = routes.RegisterApplicationController.create()) {
+    @formHelper(action = controllers.team.routes.CreateTeamController.onSubmit()) {
         @govukButton(
             ButtonViewModel(messages("createTeamCheckYourAnswers.createTeam"))
         )
