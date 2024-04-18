@@ -760,6 +760,51 @@ class ApplicationsConnectorSpec
     }
   }
 
+  "ApplicationsConnector.findTeams" - {
+    "must place the correct request and return the matching teams when a user email is provided" in {
+      val userEmail = "test-user-email"
+      val expected = Seq(Team("id1", "team1", LocalDateTime.now(), Seq(TeamMember(userEmail))))
+      val crypto = new ApplicationCrypto(ConfigFactory.parseResources("application.conf"))
+
+      val userEmailEncrypted = crypto.QueryParameterCrypto.encrypt(PlainText(userEmail)).value
+      val userEmailEncoded = URLEncoder.encode(userEmailEncrypted, "UTF-8")
+
+      stubFor(
+        get(urlEqualTo(s"/api-hub-applications/teams?teamMember=${userEmailEncoded}"))
+          .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withBody(Json.toJson(expected).toString())
+          )
+      )
+
+      buildConnector(this).findTeams(Some(userEmail))(HeaderCarrier()).map {
+        result =>
+          result mustBe expected
+      }
+    }
+
+    "must place the correct request and return the matching teams when no user email is provided" in {
+      val expected = Seq(Team("id1", "team1", LocalDateTime.now(), Seq(TeamMember("test@example.com"))))
+
+      stubFor(
+        get(urlEqualTo(s"/api-hub-applications/teams"))
+          .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withBody(Json.toJson(expected).toString())
+          )
+      )
+
+      buildConnector(this).findTeams(None)(HeaderCarrier()).map {
+        result =>
+          result mustBe expected
+      }
+    }
+  }
+
   "ApplicationsConnector.createTeam" - {
     "must place the correct request and return the team created" in {
       val newTeam = NewTeam("test-team-name", Seq(TeamMember("test-email")))

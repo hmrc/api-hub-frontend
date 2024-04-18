@@ -15,12 +15,21 @@
  *@
 
 @import models.user.UserModel
+@import models.team.Team
+@import java.time.format.DateTimeFormatter
+@import views.html.helper.CSPNonce
 
 @this(
-    layout: templates.Layout
+    layout: templates.Layout,
+    govukTable: GovukTable,
+    govukButton: GovukButton
 )
 
-@(user: UserModel)(implicit request: Request[_], messages: Messages)
+@(teams: Seq[Team], user: UserModel)(implicit request: Request[_], messages: Messages)
+
+@teamNameLink(team: Team) = {
+    <a href="@controllers.team.routes.ManageTeamController.onPageLoad(team.id)" class="govuk-body govuk-link govuk-link--no-visited-state">@team.name</a>
+}
 
 @layout(
     pageTitle    = titleNoForm(messages("manageMyTeams.title")),
@@ -36,11 +45,39 @@
         @messages("manageMyTeams.hint")
     </div>
 
-
     <div class="call-out-panel govuk-!-margin-top-7 govuk-!-margin-bottom-7">
-        <p class="govuk-body">
-            @messages("manageMyTeams.noTeams")
-        </p>
+        <div class="call-out-flex-header">
+            <h2>@messages("manageMyTeams.yourTeams")</h2>
+            @govukButton(
+                Button(
+                    href = Some(controllers.team.routes.CreateTeamStartController.startCreateTeam().url),
+                    content = Text(messages("manageMyTeams.addNewTeam"))
+                )
+            )
+        </div>
+
+        @if(teams.isEmpty) {
+            <p class="govuk-body">@messages("manageMyTeams.noTeams")</p>
+        } else {
+            @govukTable(
+                Table(
+                    caption = None,
+                    head = Some(Seq(
+                        HeadCell(messages("manageMyTeams.headings.teamName")),
+                        HeadCell(messages("manageMyTeams.headings.members")),
+                        HeadCell(messages("manageMyTeams.headings.created")),
+                    )),
+                    rows = teams.map(
+                        team =>
+                            Seq(
+                                TableRow(content = HtmlContent(teamNameLink(team))),
+                                TableRow(content = Text(team.teamMembers.size.toString)),
+                                TableRow(content = Text(team.created.format(DateTimeFormatter.ISO_DATE_TIME)), classes="utcDateShort")
+                            )
+                    )
+                )
+            )
+        }
     </div>
 
 }

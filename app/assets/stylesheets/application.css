@@ -198,6 +198,10 @@
 .call-out-panel .warning {
   color: #f47738;
 }
+.call-out-panel .call-out-flex-header {
+  display: flex;
+  justify-content: space-between;
+}
 .scopes-list {
     font-size: 16px;
 }
