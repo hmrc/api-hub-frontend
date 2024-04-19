@@ -14,10 +14,10 @@
  * limitations under the License.
  *@
 
-@import java.time.format.DateTimeFormatter
 @import models.user.UserModel
 @import models.team.Team
 @import viewmodels.admin.{AdminNavItems, AdminSideNavPages}
+@import views.ViewUtils
 
 @this(
     layout: templates.Layout,
@@ -53,7 +53,7 @@
                             Seq(
                                 TableRow(content = Text(team.name)),
                                 TableRow(content = HtmlContent(teamLink(team))),
-                                TableRow(content = Text(team.created.format(DateTimeFormatter.ISO_DATE_TIME)), classes="utcDateShort")
+                                TableRow(content = Text(ViewUtils.formatLocalDateTimeContainingUtc(team.created)), classes="utcDateShort")
                             )
                     )
                 )
