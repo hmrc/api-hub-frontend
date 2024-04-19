@@ -69,8 +69,8 @@
                 <dt class="govuk-summary-list__key">
                     @messages("accessRequest.headings.decided")
                 </dt>
-                <dd class="govuk-summary-list__value">
-                    @ViewUtils.formatShortDate(decision.decided)
+                <dd class="govuk-summary-list__value utcDateLong">
+                    @ViewUtils.formatLocalDateTimeContainingUtc(decision.decided)
                 </dd>
             </div>
             <div class="govuk-summary-list__row">

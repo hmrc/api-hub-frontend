@@ -16,8 +16,7 @@
 
 @import models.user.UserModel
 @import models.team.Team
-@import java.time.format.DateTimeFormatter
-@import views.html.helper.CSPNonce
+@import views.ViewUtils
 
 @this(
     layout: templates.Layout,
@@ -72,7 +71,7 @@
                             Seq(
                                 TableRow(content = HtmlContent(teamNameLink(team))),
                                 TableRow(content = Text(team.teamMembers.size.toString)),
-                                TableRow(content = Text(team.created.format(DateTimeFormatter.ISO_DATE_TIME)), classes="utcDateShort")
+                                TableRow(content = Text(ViewUtils.formatLocalDateTimeContainingUtc(team.created)), classes="utcDateShort")
                             )
                     )
                 )
