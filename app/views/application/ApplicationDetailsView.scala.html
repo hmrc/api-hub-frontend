@@ -31,13 +31,13 @@
     <link href='@routes.Assets.versioned("fontawesome6/css/all.min.css")' media="all" rel="stylesheet" type="text/css" @{CSPNonce.attr}/>
 }
 
-@applicationDetail(titleKey: String, value: String) = {
+@applicationDetail(titleKey: String, value: String, classes: String) = {
     <div class="govuk-grid-row govuk-!-margin-bottom-2">
         <div class="govuk-grid-column-one-quarter">
             <span class="govuk-body govuk-!-font-weight-bold govuk-!-margin-0">@messages(titleKey):</span>
         </div>
         <div class="govuk-grid-column-three-quarters" data-app-name="">
-            <p class="govuk-body govuk-!-margin-0">
+            <p class="govuk-body govuk-!-margin-0 @classes">
                 @value
             </p>
         </div>
@@ -56,9 +56,9 @@
 
         <h1 class="govuk-heading-l">@messages("applicationDetails.heading")</h1>
 
-        @applicationDetail("applicationDetails.application.application", application.name)
-        @applicationDetail("applicationDetails.application.created", ViewUtils.formatDate(application.created))
-        @applicationDetail("applicationDetails.application.applicationId", application.id)
+        @applicationDetail("applicationDetails.application.application", application.name, "")
+        @applicationDetail("applicationDetails.application.created", ViewUtils.formatLocalDateTimeContainingUtc(application.created), "utcDateLong")
+        @applicationDetail("applicationDetails.application.applicationId", application.id, "")
 
         <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
 

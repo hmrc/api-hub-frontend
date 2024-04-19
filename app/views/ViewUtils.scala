@@ -39,30 +39,8 @@ object ViewUtils {
     if (form.hasErrors || form.hasGlobalErrors) messages("error.browser.title.prefix") else ""
   }
 
-  private val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy HH:mm")
-  private val shortDateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMM yyyy HH:mm")
-  private val shortestDateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yy - HH:mm")
-  private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
-  private val shortDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yy")
-
-  def formatLocalDateTime(value: LocalDateTime): String = {
-    value.format(dateTimeFormatter)
-  }
-
-  def formatShortLocalDateTime(value: LocalDateTime): String = {
-    value.format(shortDateTimeFormatter)
-  }
-
-  def formatShortestLocalDateTime(value: LocalDateTime): String = {
-    value.format(shortestDateTimeFormatter)
-  }
-
-  def formatDate(value: LocalDateTime): String = {
-    s"${value.format(dateFormatter)}"
-  }
-
-  def formatShortDate(value: LocalDateTime): String = {
-    s"${value.format(shortDateFormatter)}"
+  def formatLocalDateTimeContainingUtc(value: LocalDateTime): String = {
+    value.format(DateTimeFormatter.ISO_DATE_TIME)
   }
 
   def formatAccessRequestStatus(status: AccessRequestStatus): Html = {

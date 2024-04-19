@@ -23,13 +23,22 @@ import java.time.LocalDateTime
 
 class ViewUtilsSpec extends AnyFreeSpec with Matchers {
 
-  "formatLocalDateTime" - {
-    "must return a date/time in the correct format" in {
+  "formatLocalDateTimeContainingUtc" - {
+    "must return a date/time in the correct format for GMT time" in {
       //noinspection ScalaStyle
       val dateTime = LocalDateTime.of(2023, 1, 3, 4, 5, 6)
-      val expected = "3 January 2023 04:05"
+      val expected = "2023-01-03T04:05:06"
 
-      val actual = ViewUtils.formatLocalDateTime(dateTime)
+      val actual = ViewUtils.formatLocalDateTimeContainingUtc(dateTime)
+      actual mustBe expected
+    }
+
+    "must return a date/time in the correct format for BST time" in {
+      //noinspection ScalaStyle
+      val dateTime = LocalDateTime.of(2023, 7, 3, 4, 5, 6)
+      val expected = "2023-07-03T04:05:06"
+
+      val actual = ViewUtils.formatLocalDateTimeContainingUtc(dateTime)
       actual mustBe expected
     }
   }

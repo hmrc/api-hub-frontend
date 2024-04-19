@@ -25,8 +25,9 @@ function localiseUtcDateTimeValues() {
   */
   const utcSuffix = 'Z',
       classToOptions = {
-        'utcDateShort': {dateStyle: "medium"},
-        // add other formats as needed
+        'utcDateShort': {dateStyle: "medium"}, // e.g. 1 Jan 2020
+        'utcDateLong': {dateStyle: "long"}, // e.g. 1 January 2020
+        'utcDateTime': {day:"numeric", month: "long", year: "numeric", hour: "numeric", minute: "numeric", hourCycle: 'h12'}, // e.g. 1 January 2020 at 12:00 pm
       };
 
   Object.entries(classToOptions).forEach(([className, options]) => {

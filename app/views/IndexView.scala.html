@@ -94,7 +94,7 @@
                                <a class="govuk-link govuk-link--no-visited-state" href={controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url}>{application.name}</a>
                            </h3>
                            <p class="govuk-body align-left">Team members: {application.teamMembers.length}</p>
-                           <p class="govuk-body align-left">Registered: {ViewUtils.formatDate(application.created)}</p>
+                           <p class="govuk-body align-left">Registered: <span class="utcDateLong">{ViewUtils.formatLocalDateTimeContainingUtc(application.created)}</span></p>
                        </div>
                    )
 

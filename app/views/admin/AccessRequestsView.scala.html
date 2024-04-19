@@ -52,8 +52,8 @@
                     @accessRequest.apiName
                 </p>
 
-                <p class="govuk-body additional-message">
-                    @ViewUtils.formatShortestLocalDateTime(accessRequest.requested)
+                <p class="govuk-body additional-message utcDateTime">
+                    @ViewUtils.formatLocalDateTimeContainingUtc(accessRequest.requested)
                 </p>
 
                 <p class="govuk-body additional-message">
