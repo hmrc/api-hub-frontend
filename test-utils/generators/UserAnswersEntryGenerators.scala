@@ -37,7 +37,7 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
     Arbitrary {
       for {
         page  <- arbitrary[CreateTeamNamePage.type]
-        value <- arbitrary[String].suchThat(_.nonEmpty).map(Json.toJson(_))
+        value <- genLegalUnicodeString.suchThat(_.nonEmpty).map(Json.toJson(_))
       } yield (page, value)
     }
 

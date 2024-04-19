@@ -505,3 +505,11 @@ createTeamCheckYourAnswers.complete.heading = Complete your team
 createTeamCheckYourAnswers.complete.guidance.1 = Team members you have added will be notified by email that they have been added to this team.
 createTeamCheckYourAnswers.complete.guidance.2 = This team will be assignable to applications and APIs.
 createTeamCheckYourAnswers.createTeam = Create team
+
+manageTeams.title = Manage teams
+manageTeams.heading = Manage teams
+manageTeams.admin = API Hub admin
+manageTeams.teams.caption = Teams
+manageTeams.teams.teamName = Team name
+manageTeams.teams.id = Id
+manageTeams.teams.created = Created

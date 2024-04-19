@@ -77,4 +77,16 @@ trait TestHelpers extends TableDrivenPropertyChecks {
     FakeApprover
   )
 
+  val usersWhoCanSupport: TableFor1[UserModel] = Table(
+    "User",
+    FakeSupporter
+  )
+
+  val usersWhoCannotSupport: TableFor1[UserModel] = Table(
+    "User",
+    FakeUser,
+    FakeApprover,
+    FakePrivilegedUser
+  )
+
 }
