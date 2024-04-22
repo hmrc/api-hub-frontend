@@ -23,6 +23,7 @@ import viewmodels.{SideNavItem, SideNavPage}
 object AdminSideNavPages {
 
   case object AccessRequestsPage extends SideNavPage
+  case object ManageTeamsPage extends SideNavPage
   case object ManageApplicationsPage extends SideNavPage
 
 }
@@ -46,6 +47,12 @@ object AdminNavItems {
           title = messages("manageApplications.title"),
           link = controllers.admin.routes.AccessRequestsController.onPageLoad(),
           isCurrentPage = currentPage == ManageApplicationsPage
+        ),
+        SideNavItem(
+          page = ManageTeamsPage,
+          title = messages("manageTeams.title"),
+          link = controllers.admin.routes.ManageTeamsController.onPageLoad(),
+          isCurrentPage = currentPage == ManageTeamsPage
         ),
         accessRequestsNavItem
       )
