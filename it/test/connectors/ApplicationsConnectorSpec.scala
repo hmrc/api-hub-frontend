@@ -624,7 +624,7 @@ class ApplicationsConnectorSpec
 
   "ApplicationsConnector.generateDeployment" - {
     "must place the correct request and return the response" in {
-      val request = DeploymentsRequest("test-lob", "test-name", "test-description", "test-egress", "test-oas")
+      val request = DeploymentsRequest("test-lob", "test-name", "test-description", "test-egress", "test-team-id", "test-oas")
       val response = SuccessfulDeploymentsResponse("test-id", "1.0.0", 102, "test-url")
 
       stubFor(
@@ -646,7 +646,7 @@ class ApplicationsConnectorSpec
     }
 
     "must handle a 400 bad Request response with invalid OAS payload" in {
-      val request = DeploymentsRequest("test-lob", "test-name", "test-description", "test-egress", "test-oas")
+      val request = DeploymentsRequest("test-lob", "test-name", "test-description", "test-egress", "test-team-id", "test-oas")
       val response = InvalidOasResponse(Seq(ValidationFailure("test-type", "test-message")))
 
       stubFor(
@@ -770,7 +770,7 @@ class ApplicationsConnectorSpec
       val userEmailEncoded = URLEncoder.encode(userEmailEncrypted, "UTF-8")
 
       stubFor(
-        get(urlEqualTo(s"/api-hub-applications/teams?teamMember=${userEmailEncoded}"))
+        get(urlEqualTo(s"/api-hub-applications/teams?teamMember=$userEmailEncoded"))
           .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
           .withHeader(AUTHORIZATION, equalTo("An authentication token"))
           .willReturn(
