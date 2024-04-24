@@ -43,12 +43,11 @@
 }
 
 @anApi(apiDetail: ApiDetail) = {
-    <div class="api-panel" data-apiStatus="@apiDetail.apiStatus">
+    <div class="api-panel" data-apistatus="@apiDetail.apiStatus">
         <span class="call-out-type information">
             <a class="govuk-link govuk-link--no-visited-state" href="@routes.ApiDetailsController.onPageLoad(apiDetail.id)">@apiDetail.title</a>
         </span>
         <p class="govuk-body additional-message">@apiDetail.shortDescription</p>
-        <p class="govuk-body additional-message">@apiDetail.apiStatus</p>
     </div>
 }
 
@@ -82,7 +81,7 @@
             </div>
         </div>
         <div class="govuk-grid-column-two-thirds api-results-container">
-            <h3 class="govuk-!-margin-0 govuk-label govuk-label--s">@messages("hipApis.searchResults.heading", apiDetails.size)</h3>
+            <h3 class="govuk-!-margin-0 govuk-label govuk-label--s">@messages("hipApis.searchResults.heading") (<span id="searchResultsSize">@apiDetails.size</span>)</h3>
             <div class="govuk-body" id="apiList">
             @apis(apiDetails)
             </div>
