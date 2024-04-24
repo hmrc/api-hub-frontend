@@ -317,3 +317,16 @@
 .customised-table tr:last-child td, .customised-table tr:last-child th {
     border-color: #fff;
 }
+
+.hip-color-override {
+    border-bottom: solid 1px #ebebeb;
+}
+
+.filters-container {
+    border-right: solid 1px #ebebeb;
+    min-height: 400px;
+}
+
+.api-results-container {
+    padding-left: 26px;
+}
