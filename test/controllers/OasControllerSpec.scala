@@ -19,7 +19,7 @@ package controllers
 import base.OptionallyAuthenticatedSpecBase
 import controllers.actions.FakeUser
 import generators.ApiDetailGenerators
-import models.api.ApiDetail
+import models.api.{ApiDetail, Live}
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
@@ -50,7 +50,7 @@ class OasControllerSpec
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[RedocView]
 
-        val apiDetail = ApiDetail("apiId", "pubRef", "an api", "a description", "1.0.0", Seq.empty, None, sampleOas)
+        val apiDetail = ApiDetail("apiId", "pubRef", "an api", "a description", "1.0.0", Seq.empty, None, sampleOas, Live)
         when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any())).thenReturn(Future.successful(Some(apiDetail)))
 
         val request = FakeRequest(GET, routes.OasRedocController.onPageLoad(apiDetail.id).url)
@@ -68,7 +68,7 @@ class OasControllerSpec
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[RedocView]
 
-        val apiDetail = ApiDetail("apiId", "pubRef", "an api", "a description", "1.0.0", Seq.empty, None, sampleOas)
+        val apiDetail = ApiDetail("apiId", "pubRef", "an api", "a description", "1.0.0", Seq.empty, None, sampleOas, Live)
         when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
           .thenReturn(Future.successful(Some(apiDetail)))
 
@@ -115,7 +115,7 @@ class OasControllerSpec
 
         running(fixture.application) {
 
-          val apiDetail = ApiDetail("apiId", "pubRef", "an api", "a description", "1.0.0", Seq.empty, None, sampleOas)
+          val apiDetail = ApiDetail("apiId", "pubRef", "an api", "a description", "1.0.0", Seq.empty, None, sampleOas, Live)
           when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any())).thenReturn(Future.successful(Some(apiDetail)))
 
           val request = FakeRequest(GET, routes.OasRedocController.getOas(apiDetail.id).url)

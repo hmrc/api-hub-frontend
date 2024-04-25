@@ -17,7 +17,7 @@
 package viewmodels.application
 
 import controllers.actions.FakeApplication
-import models.api.{ApiDetail, Endpoint, EndpointMethod}
+import models.api.{ApiDetail, Endpoint, EndpointMethod, Live}
 import models.application.ApplicationLenses.ApplicationLensOps
 import models.application.{Primary, Scope, Secondary}
 import org.scalatest.freespec.AnyFreeSpec
@@ -103,7 +103,8 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
             )
           ),
           shortDescription = None,
-          openApiSpecification = "test-oas-spec"
+          openApiSpecification = "test-oas-spec",
+          apiStatus = Live
         )
 
         val endpoints = Seq(

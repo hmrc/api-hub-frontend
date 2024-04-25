@@ -19,7 +19,7 @@ package controllers.application
 import base.SpecBase
 import controllers.actions.{FakeApplication, FakeUser}
 import models.accessrequest.{AccessRequestApi, AccessRequestEndpoint, AccessRequestRequest, Pending}
-import models.api.{ApiDetail, Endpoint, EndpointMethod}
+import models.api.{ApiDetail, Endpoint, EndpointMethod, Live}
 import models.application.ApplicationLenses.ApplicationLensOps
 import models.application._
 import models.user.UserModel
@@ -207,7 +207,8 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
         Endpoint(path = "/test", methods = Seq(EndpointMethod("GET", Some("A summary"), Some("A description"), Seq("test-scope")))),
         Endpoint(path = "/anothertest", methods = Seq(EndpointMethod("POST", Some("A summary"), Some("A description"), Seq("another-test-scope"))))),
       shortDescription = None,
-      openApiSpecification = "test-oas-spec"
+      openApiSpecification = "test-oas-spec",
+      apiStatus = Live
     )
   }
 

@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
 import controllers.routes
 import models.accessrequest.Pending
-import models.api.{ApiDetail, Endpoint, EndpointMethod}
+import models.api.{ApiDetail, Endpoint, EndpointMethod, Live}
 import models.application.ApplicationLenses.ApplicationLensOps
 import models.application.{Api, Scope, SelectedEndpoint}
 import models.user.UserModel
@@ -75,7 +75,8 @@ class ApplicationApisControllerSpec extends SpecBase with MockitoSugar with Test
         version = "test-version",
         endpoints = Seq(Endpoint(path = "/test", methods = Seq(EndpointMethod("GET", None, None, Seq("test-scope"))))),
         shortDescription = None,
-        openApiSpecification = "test-oas-spec"
+        openApiSpecification = "test-oas-spec",
+        apiStatus = Live
       )
 
       val application = FakeApplication

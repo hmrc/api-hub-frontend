@@ -18,7 +18,7 @@ package controllers
 
 import base.SpecBase
 import controllers.actions.{FakeApplication, FakeUser}
-import models.api.{ApiDetail, Endpoint, EndpointMethod}
+import models.api.{ApiDetail, Endpoint, EndpointMethod, Live}
 import models.{AddAnApi, ApiPolicyConditionsDeclaration, AvailableEndpoint, CheckMode, UserAnswers}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
@@ -52,7 +52,8 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation {
     "",
     Seq(Endpoint("/foo/bar", Seq(EndpointMethod("GET", None, None, expectedScopes.toSeq)))),
     None,
-    "")
+    "",
+    Live)
 
   private val fullUserAnswers = emptyUserAnswers
     .set(AddAnApiContextPage, AddAnApi).toOption.value
