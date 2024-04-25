@@ -45,7 +45,7 @@ class SimpleApiDeploymentController @Inject()(
 
   import SimpleApiDeploymentController._
 
-  private val form = deploymentsRequestFormProvider()
+  private val form = new DeploymentsRequestFormProvider()()
 
   def onPageLoad(): Action[AnyContent] = identify.async {
     implicit request =>
@@ -82,7 +82,7 @@ class SimpleApiDeploymentController @Inject()(
 
 object SimpleApiDeploymentController {
 
-  object deploymentsRequestFormProvider extends Mappings {
+  class DeploymentsRequestFormProvider() extends Mappings {
 
     def apply(): Form[DeploymentsRequest] =
       Form(
