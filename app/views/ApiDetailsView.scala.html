@@ -42,6 +42,16 @@
     </a>
 }
 
+@styleForApiStatus(apiStatus: ApiStatus) = @{
+    apiStatus match {
+        case Alpha => "govuk-tag--light-blue"
+        case Beta => "govuk-tag--blue"
+        case Live => "govuk-tag--green"
+        case Deprecated => "govuk-tag--grey"
+        case _ =>  ""
+    }
+}
+
 @showDeploymentStatus(isDeployed: Boolean) = {
     @if(isDeployed) {
         <i class="fa-solid fa-circle-check ready" aria-hidden="true"></i> @messages("apiDetails.deploymentStatus.deployed")
@@ -106,19 +116,27 @@
                         )
                     )
                 }
-
-                <div class="govuk-grid-row govuk-!-margin-bottom-2">
-                    <div class="govuk-grid-column-one-quarter">
-                        <span class="govuk-body govuk-!-font-weight-bold govuk-!-margin-0">@messages("apiDetails.details.version"):</span>
-                    </div>
-                    <div class="govuk-grid-column-three-quarters">
-                        <p class="govuk-body govuk-!-margin-0">
+                <dl class="govuk-summary-list govuk-!-margin-bottom-7">
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            @messages("apiDetails.details.version")
+                        </dt>
+                        <dd class="govuk-summary-list__value">
                             @apiDetail.version
-                        </p>
+                        </dd>
                     </div>
-                </div>
 
-                <hr class="govuk-section-break govuk-section-break--visible">
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            @messages("apiDetails.details.status")
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            <strong class="govuk-tag @styleForApiStatus(apiDetail.apiStatus) api-status">
+                                @apiDetail.apiStatus
+                            </strong>
+                        </dd>
+                    </div>
+                </dl>
 
                 <div class="call-out-panel govuk-!-margin-top-4">
                     <p class="govuk-body information-tag">
