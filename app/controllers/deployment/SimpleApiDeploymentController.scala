@@ -19,13 +19,16 @@ package controllers.deployment
 import com.google.inject.{Inject, Singleton}
 import connectors.ApplicationsConnector
 import controllers.actions.IdentifierAction
+import forms.mappings.Mappings
 import models.deployment.{DeploymentsRequest, InvalidOasResponse, SuccessfulDeploymentsResponse}
+import models.requests.IdentifierRequest
 import play.api.Logging
+import play.api.data.Forms.mapping
 import play.api.data._
-import play.api.data.Forms._
 import play.api.i18n.I18nSupport
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.deployment.SimpleApiDeploymentView
 
@@ -36,20 +39,23 @@ class SimpleApiDeploymentController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   identify: IdentifierAction,
   view: SimpleApiDeploymentView,
+  apiHubService: ApiHubService,
   applicationsConnector: ApplicationsConnector
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   import SimpleApiDeploymentController._
 
-  def onPageLoad(): Action[AnyContent] = identify {
+  private val form = new DeploymentsRequestFormProvider()()
+
+  def onPageLoad(): Action[AnyContent] = identify.async {
     implicit request =>
-      Ok(view(deploymentsRequestForm, request.user))
+      showView(OK, form)
   }
 
   def onSubmit(): Action[AnyContent] = identify.async {
     implicit request =>
-      deploymentsRequestForm.bindFromRequest().fold(
-        _ => Future.successful(BadRequest),
+      form.bindFromRequest().fold(
+        formWithErrors => showView(BAD_REQUEST, formWithErrors),
         deploymentsRequest =>
           applicationsConnector
             .generateDeployment(deploymentsRequest)
@@ -64,18 +70,32 @@ class SimpleApiDeploymentController @Inject()(
       )
   }
 
+  private def showView(code: Int, form: Form[_])(implicit request: IdentifierRequest[_]): Future[Result] = {
+    request.user.email
+      .map(email => apiHubService.findTeams(Some(email)))
+      .getOrElse(Future.successful(Seq.empty))
+      .map(teams => teams.sortBy(_.name.toLowerCase))
+      .map(teams => Status(code)(view(form, teams, request.user)))
+  }
+
 }
 
 object SimpleApiDeploymentController {
 
-  val deploymentsRequestForm: Form[DeploymentsRequest] = Form(
-    mapping(
-      "lineOfBusiness" -> text,
-      "name" -> text,
-      "description" -> text,
-      "egress" -> text,
-      "oas" -> text
-    )(DeploymentsRequest.apply)(DeploymentsRequest.unapply)
-  )
+  class DeploymentsRequestFormProvider() extends Mappings {
+
+    def apply(): Form[DeploymentsRequest] =
+      Form(
+        mapping(
+        "lineOfBusiness" -> text("Enter a line of business"),
+        "name" -> text("Enter a name"),
+        "description" -> text("Enter a description"),
+        "egress" -> text("Enter an egress"),
+        "teamId" -> text("Select a team"),
+        "oas" -> text("Enter the OAS")
+        )(DeploymentsRequest.apply)(DeploymentsRequest.unapply)
+      )
+
+  }
 
 }
