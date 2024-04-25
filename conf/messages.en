@@ -244,6 +244,7 @@ apiDetails.leftNav.endpoints = Endpoints
 apiDetails.leftNav.viewApiSpec = Interactive API view
 apiDetails.details.overview = API Overview
 apiDetails.details.version = Version
+apiDetails.details.status = Status
 apiDetails.viewApiSpec.information = View API specification
 apiDetails.viewApiSpec.message = To view the API specification use the {0}.
 apiDetails.viewApiSpec.link = Interactive API spec viewer

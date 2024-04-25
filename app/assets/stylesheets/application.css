@@ -330,3 +330,10 @@
 .api-results-container {
     padding-left: 26px;
 }
+
+.api-status {
+    text-transform: lowercase;
+}
+.api-status::first-letter {
+    text-transform: uppercase;
+}
