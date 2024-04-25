@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.actions.{FakeApplication, FakeUser}
 import models.{AddAnApi, UserAnswers}
 import models.api.ApiDetailLensesSpec.sampleOas
-import models.api.{ApiDetail, Endpoint, EndpointMethod}
+import models.api.{ApiDetail, Endpoint, EndpointMethod, Live}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -76,7 +76,8 @@ class AddAnApiCheckYourAnswersControllerSpec extends SpecBase with SummaryListFl
           )
         ),
         None,
-        sampleOas
+        sampleOas,
+        Live
       )
 
       val userAnswers = emptyUserAnswers

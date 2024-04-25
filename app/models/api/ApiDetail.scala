@@ -16,7 +16,24 @@
 
 package models.api
 
+import models.{Enumerable, WithName}
 import play.api.libs.json.{Format, Json}
+
+sealed trait ApiStatus
+
+case object Alpha extends WithName("ALPHA") with ApiStatus
+case object Beta extends WithName("BETA") with ApiStatus
+case object Live extends WithName("LIVE") with ApiStatus
+case object Deprecated extends WithName("DEPRECATED") with ApiStatus
+
+object ApiStatus extends Enumerable.Implicits {
+
+  val values: Seq[ApiStatus] = Seq(Alpha, Beta, Live, Deprecated)
+
+  implicit val enumerable: Enumerable[ApiStatus] =
+    Enumerable(values.map(value => value.toString -> value): _*)
+
+}
 
 case class ApiDetail(
   id: String,
@@ -26,7 +43,8 @@ case class ApiDetail(
   version: String,
   endpoints: Seq[Endpoint],
   shortDescription: Option[String],
-  openApiSpecification: String
+  openApiSpecification: String,
+  apiStatus: ApiStatus,
 )
 
 object ApiDetail {

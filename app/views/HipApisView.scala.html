@@ -16,30 +16,38 @@
 
 @import models.api._
 @import models.user.UserModel
-@import viewmodels.InputWidth._
+@import views.html.helper.CSPNonce
 
 @this(
-layout: templates.Layout,
-formHelper: FormWithCSRF,
-govukErrorSummary: GovukErrorSummary,
-govukInput: GovukInput,
-govukButton: GovukButton,
-govukTable: GovukTable,
-
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukInput: GovukInput,
+    govukButton: GovukButton,
+    govukTable: GovukTable,
 )
 
 @(user: Option[UserModel], apiDetails: Seq[ApiDetail] = Seq.empty)(implicit request: Request[_], messages: Messages)
 
+@scripts() = {
+    <script src='@routes.Assets.versioned("javascripts/hipApis.js")' type="application/javascript" @{CSPNonce.attr}></script>
+}
+
+@statusFilter(status: String, isChecked: Boolean = false) = {
+    <div class="govuk-checkboxes__item">
+        <input class="govuk-checkboxes__input" id="filter@status" name="filter-status" type="checkbox" value="@status" @if(isChecked){checked="checked"}>
+        <label class="govuk-label govuk-checkboxes__label" for="filter@status">
+            @status
+        </label>
+    </div>
+}
+
 @anApi(apiDetail: ApiDetail) = {
-
-    <div class="api-panel">
-
+    <div class="api-panel" data-apistatus="@apiDetail.apiStatus">
         <span class="call-out-type information">
             <a class="govuk-link govuk-link--no-visited-state" href="@routes.ApiDetailsController.onPageLoad(apiDetail.id)">@apiDetail.title</a>
         </span>
-
         <p class="govuk-body additional-message">@apiDetail.shortDescription</p>
-
     </div>
 }
 
@@ -51,17 +59,32 @@ govukTable: GovukTable,
     }
 }
 
-@layout(pageTitle = titleNoForm(messages("hipApis.title")), user = user) {
-
+@layout(pageTitle = titleNoForm(messages("hipApis.title")), user = user, fullWidth = true, customScriptsBlock = Some(scripts())) {
     <h2 class="govuk-heading-l">@messages("hipApis.title")</h2>
-    <div class = "govuk-grid-row">
-        <div class = "govuk-grid-column-full">
-            <h3 class="govuk-label--s">@messages("hipApis.searchResults.heading", apiDetails.size)</h3>
-            <div class="govuk-body">
+    <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible hip-color-override">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-third filters-container">
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                        <h2 class="govuk-fieldset__heading">
+                            Filter by status
+                        </h2>
+                    </legend>
+                    <div id="statusFilters" class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                        @statusFilter("ALPHA", true)
+                        @statusFilter("BETA", true)
+                        @statusFilter("LIVE", true)
+                        @statusFilter("DEPRECATED")
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+        <div class="govuk-grid-column-two-thirds api-results-container">
+            <h3 class="govuk-!-margin-0 govuk-label govuk-label--s">@messages("hipApis.searchResults.heading") (<span id="searchResultsSize">@apiDetails.size</span>)</h3>
+            <div class="govuk-body" id="apiList">
             @apis(apiDetails)
             </div>
         </div>
     </div>
-
 }
-

@@ -19,7 +19,7 @@ package controllers
 import base.OptionallyAuthenticatedSpecBase
 import controllers.actions.FakeUser
 import generators.ApiDetailGenerators
-import models.api.ApiDetail
+import models.api.{ApiDetail, Live}
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar
@@ -90,10 +90,10 @@ class HipApisControllerSpec
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[HipApisView]
 
-        val zebras = ApiDetail("id1", "ref1", "zebras", "zebras api", "1.0.0", Seq.empty, None, "oas")
-        val molluscs = ApiDetail("id2", "ref2", "MOLLUSCS", "molluscs api", "1.0.0", Seq.empty, None, "oas")
-        val aardvarks = ApiDetail("id3", "ref3", "aardvarks", "aardvarks api", "1.0.0", Seq.empty, None, "oas")
-        val pigeons = ApiDetail("id4", "ref4", "PIGEONS", "pigeons api", "1.0.0", Seq.empty, None, "oas")
+        val zebras = ApiDetail("id1", "ref1", "zebras", "zebras api", "1.0.0", Seq.empty, None, "oas", Live)
+        val molluscs = ApiDetail("id2", "ref2", "MOLLUSCS", "molluscs api", "1.0.0", Seq.empty, None, "oas", Live)
+        val aardvarks = ApiDetail("id3", "ref3", "aardvarks", "aardvarks api", "1.0.0", Seq.empty, None, "oas", Live)
+        val pigeons = ApiDetail("id4", "ref4", "PIGEONS", "pigeons api", "1.0.0", Seq.empty, None, "oas", Live)
 
         when(fixture.apiHubService.getAllHipApis()(any()))
           .thenReturn(Future.successful(Seq(molluscs, zebras, aardvarks, pigeons)))

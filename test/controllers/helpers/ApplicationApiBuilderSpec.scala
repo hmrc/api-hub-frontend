@@ -19,7 +19,7 @@ package controllers.helpers
 import base.SpecBase
 import controllers.actions.FakeApplication
 import models.accessrequest.{AccessRequest, Pending}
-import models.api.{ApiDetail, Endpoint, EndpointMethod}
+import models.api.{ApiDetail, Endpoint, EndpointMethod, Live}
 import models.application.{Api, Scope, SelectedEndpoint}
 import models.application.ApplicationLenses.ApplicationLensOps
 import org.mockito.ArgumentMatchers
@@ -195,7 +195,8 @@ object ApplicationApiBuilderSpec {
         )
       ),
       shortDescription = None,
-      openApiSpecification = "test-oas-spec-1"
+      openApiSpecification = "test-oas-spec-1",
+      apiStatus = Live
     )
 
   private val apiDetail2 =
@@ -221,7 +222,8 @@ object ApplicationApiBuilderSpec {
         )
       ),
       shortDescription = None,
-      openApiSpecification = "test-oas-spec-2"
+      openApiSpecification = "test-oas-spec-2",
+      apiStatus = Live
     )
 
   private val apiDetail3 =
@@ -240,7 +242,8 @@ object ApplicationApiBuilderSpec {
         )
       ),
       shortDescription = None,
-      openApiSpecification = "test-oas-spec-3"
+      openApiSpecification = "test-oas-spec-3",
+      apiStatus = Live
     )
 
   private def accessRequest = AccessRequest(
