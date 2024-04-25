@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('pageshow', () => {
     "use strict";
 
     const view = (() => {
