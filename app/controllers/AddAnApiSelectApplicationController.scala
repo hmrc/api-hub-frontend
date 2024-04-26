@@ -20,9 +20,7 @@ import controllers.actions.{AddAnApiCheckContextActionProvider, AddAnApiDataRetr
 import controllers.helpers.ErrorResultBuilder
 import forms.AddAnApiSelectApplicationFormProvider
 import models.api.ApiDetail
-import models.api.ApiDetailLenses.ApiDetailLensOps
 import models.application.Application
-import models.application.ApplicationLenses.ApplicationLensOps
 import models.requests.DataRequest
 import models.{AddAnApi, Mode}
 import navigation.Navigator
@@ -87,7 +85,7 @@ class AddAnApiSelectApplicationController @Inject()(
       email =>
         request.userAnswers.get(AddAnApiApiPage) match {
           case Some(apiDetail) =>
-            apiHubService.getUserApplications(email, enrich = true).map {
+            apiHubService.getUserApplications(email).map {
               applications =>
                 status(
                   view(
@@ -123,14 +121,14 @@ class AddAnApiSelectApplicationController @Inject()(
   private def applicationsWithAccess(apiDetail: ApiDetail, applications: Seq[Application]): Seq[Application] = {
     applications.filter(
       application =>
-        apiDetail.getRequiredScopeNames.intersect(application.getRequiredScopeNames).nonEmpty
+        application.apis.exists(api => api.id.equals(apiDetail.id))
     )
   }
 
   private def applicationsWithoutAccess(apiDetail: ApiDetail, applications: Seq[Application]): Seq[Application] = {
     applications.filter(
       application =>
-        apiDetail.getRequiredScopeNames.intersect(application.getRequiredScopeNames).isEmpty
+        !application.apis.exists(api => api.id.equals(apiDetail.id))
     )
   }
 
