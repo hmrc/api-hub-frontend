@@ -21,9 +21,8 @@ import controllers.actions.{FakeApplication, FakeUser}
 import forms.AddAnApiSelectApplicationFormProvider
 import generators.ApiDetailGenerators
 import models.api.ApiDetail
-import models.api.ApiDetailLenses.ApiDetailLensOps
-import models.application.{Application, Scope}
 import models.application.ApplicationLenses.ApplicationLensOps
+import models.application.{Api, Application}
 import models.{AddAnApi, Mode, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers
@@ -32,11 +31,11 @@ import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.{AddAnApiApiPage, AddAnApiContextPage, AddAnApiSelectApplicationPage}
 import play.api.data.Form
-import play.api.{Application => PlayApplication}
 import play.api.inject.bind
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import play.api.{Application => PlayApplication}
 import repositories.AddAnApiSessionRepository
 import services.ApiHubService
 import utils.HtmlValidation
@@ -59,7 +58,7 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
       when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
-      when(fixture.apiHubService.getUserApplications(ArgumentMatchers.eq(FakeUser.email.value), ArgumentMatchers.eq(true))(any()))
+      when(fixture.apiHubService.getUserApplications(ArgumentMatchers.eq(FakeUser.email.value), ArgumentMatchers.eq(false))(any()))
         .thenReturn(Future.successful(Seq.empty))
 
       running(fixture.application) {
@@ -81,7 +80,7 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
       when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
-      when(fixture.apiHubService.getUserApplications(ArgumentMatchers.eq(FakeUser.email.value), ArgumentMatchers.eq(true))(any()))
+      when(fixture.apiHubService.getUserApplications(ArgumentMatchers.eq(FakeUser.email.value), ArgumentMatchers.eq(false))(any()))
         .thenReturn(Future.successful(Seq(application)))
 
       running(fixture.application) {
@@ -103,7 +102,7 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
       when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
-      when(fixture.apiHubService.getUserApplications(ArgumentMatchers.eq(FakeUser.email.value), ArgumentMatchers.eq(true))(any()))
+      when(fixture.apiHubService.getUserApplications(ArgumentMatchers.eq(FakeUser.email.value), ArgumentMatchers.eq(false))(any()))
         .thenReturn(Future.successful(Seq(application)))
 
       running(fixture.application) {
@@ -126,7 +125,7 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
       when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
-      when(fixture.apiHubService.getUserApplications(ArgumentMatchers.eq(FakeUser.email.value), ArgumentMatchers.eq(true))(any()))
+      when(fixture.apiHubService.getUserApplications(ArgumentMatchers.eq(FakeUser.email.value), ArgumentMatchers.eq(false))(any()))
         .thenReturn(Future.successful(Seq(application1, application2)))
 
       running(fixture.application) {
@@ -150,7 +149,7 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
       when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
-      when(fixture.apiHubService.getUserApplications(ArgumentMatchers.eq(FakeUser.email.value), ArgumentMatchers.eq(true))(any()))
+      when(fixture.apiHubService.getUserApplications(ArgumentMatchers.eq(FakeUser.email.value), ArgumentMatchers.eq(false))(any()))
         .thenReturn(Future.successful(Seq(application)))
 
       running(fixture.application) {
@@ -219,7 +218,7 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
       when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
-      when(fixture.apiHubService.getUserApplications(ArgumentMatchers.eq(FakeUser.email.value), ArgumentMatchers.eq(true))(any()))
+      when(fixture.apiHubService.getUserApplications(ArgumentMatchers.eq(FakeUser.email.value), ArgumentMatchers.eq(false))(any()))
         .thenReturn(Future.successful(Seq(application)))
 
       running(fixture.application) {
@@ -334,11 +333,7 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
   private def buildApplicationWithAccess(apiDetail: ApiDetail): Application = {
     FakeApplication
       .copy(id = "test-application-id-1", name = "test-application-name-1")
-      .setSecondaryScopes(
-        apiDetail.getRequiredScopeNames
-          .toSeq
-          .map(scopeName => Scope(scopeName))
-      )
+      .addApi(Api(apiDetail.id, Seq.empty))
   }
 
   private def buildApplicationWithoutAccess(): Application = {
