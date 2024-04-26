@@ -22,8 +22,8 @@ case class DeploymentsRequest(
   lineOfBusiness: String,
   name: String,
   description: String,
-  teamId: String,
   egress: String,
+  teamId: String,
   oas: String
 )
 
