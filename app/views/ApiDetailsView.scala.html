@@ -23,7 +23,7 @@
         govukButton: GovukButton
 )
 
-@(apiDetail: ApiDetail, deploymentStatuses: ApiDeploymentStatuses, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+@(apiDetail: ApiDetail, deploymentStatuses: ApiDeploymentStatuses, user: Option[UserModel], teamName: Option[String])(implicit request: Request[_], messages: Messages)
 
 @endpointName(endpoint: Endpoint) = @{
     endpoint.path.replaceAll("""[^a-zA-Z0-9\-_:.]""", "-") match {
@@ -48,7 +48,6 @@
         case Beta => "govuk-tag--blue"
         case Live => "govuk-tag--green"
         case Deprecated => "govuk-tag--grey"
-        case _ =>  ""
     }
 }
 
@@ -136,6 +135,18 @@
                             </strong>
                         </dd>
                     </div>
+
+                    @if(teamName.isDefined) {
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                @messages("apiDetails.details.team")
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                @teamName.get
+                            </dd>
+                        </div>
+                    }
+
                 </dl>
 
                 <div class="call-out-panel govuk-!-margin-top-4">

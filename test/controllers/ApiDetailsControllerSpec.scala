@@ -20,10 +20,12 @@ import base.OptionallyAuthenticatedSpecBase
 import controllers.actions.FakeUser
 import generators.ApiDetailGenerators
 import models.api.{ApiDeploymentStatuses, ApiDetail}
+import models.team.Team
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
 import org.scalatest.OptionValues
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import play.api.Application
 import play.api.inject.bind
@@ -33,6 +35,7 @@ import services.ApiHubService
 import utils.HtmlValidation
 import views.html.{ApiDetailsView, ErrorTemplate}
 
+import java.time.LocalDateTime
 import scala.concurrent.Future
 
 class ApiDetailsControllerSpec
@@ -61,7 +64,8 @@ class ApiDetailsControllerSpec
           val result = route(fixture.application, request).value
 
           status(result) mustBe OK
-          contentAsString(result) mustBe view(apiDetail, apiDeploymentStatuses, None)(request, messages(fixture.application)).toString()
+          contentAsString(result) mustBe view(apiDetail, apiDeploymentStatuses, None, None)(request, messages(fixture.application)).toString()
+          contentAsString(result) should not include "Owning team"
           contentAsString(result) must validateAsHtml
         }
       }
@@ -84,7 +88,8 @@ class ApiDetailsControllerSpec
           val result = route(fixture.application, request).value
 
           status(result) mustBe OK
-          contentAsString(result) mustBe view(apiDetail, apiDeploymentStatuses, Some(FakeUser))(request, messages(fixture.application)).toString()
+          contentAsString(result) mustBe view(apiDetail, apiDeploymentStatuses, Some(FakeUser), None)(request, messages(fixture.application)).toString()
+          contentAsString(result) should not include "Owning team"
           contentAsString(result) must validateAsHtml
         }
       }
@@ -138,6 +143,57 @@ class ApiDetailsControllerSpec
             message = "Please try again in a few minutes."
           )(request, messages(fixture.application))
           .toString()
+        contentAsString(result) must validateAsHtml
+      }
+    }
+
+    "must display team name when api details contains a team and the team exists" in {
+      val fixture = buildFixture()
+
+      running(fixture.application) {
+        val view = fixture.application.injector.instanceOf[ApiDetailsView]
+        val apiDeploymentStatuses = ApiDeploymentStatuses(true, false)
+        val team = Team("teamId", "teamName", LocalDateTime.now(), List.empty)
+        val apiDetail = sampleApiDetail().copy(teamId = Some(team.id))
+
+        when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+          .thenReturn(Future.successful(Some(apiDetail)))
+        when(fixture.apiHubService.getApiDeploymentStatuses(ArgumentMatchers.eq(apiDetail.publisherReference))(any()))
+          .thenReturn(Future.successful(Some(apiDeploymentStatuses)))
+        when(fixture.apiHubService.findTeamById(any())(any()))
+          .thenReturn(Future.successful(Some(team)))
+
+        val request = FakeRequest(GET, routes.ApiDetailsController.onPageLoad(apiDetail.id).url)
+        val result = route(fixture.application, request).value
+
+        status(result) mustBe OK
+        contentAsString(result) mustBe view(apiDetail, apiDeploymentStatuses, None, Some(team.name))(request, messages(fixture.application)).toString()
+        contentAsString(result) must include("Owning team")
+        contentAsString(result) must include(team.name)
+        contentAsString(result) must validateAsHtml
+      }
+    }
+
+    "must display error message when api details contains a team but the team cannot be retrieved" in {
+      val fixture = buildFixture()
+
+      running(fixture.application) {
+        val view = fixture.application.injector.instanceOf[ApiDetailsView]
+        val apiDeploymentStatuses = ApiDeploymentStatuses(true, false)
+        val apiDetail = sampleApiDetail().copy(teamId = Some("teamId"))
+
+        when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+          .thenReturn(Future.successful(Some(apiDetail)))
+        when(fixture.apiHubService.getApiDeploymentStatuses(ArgumentMatchers.eq(apiDetail.publisherReference))(any()))
+          .thenReturn(Future.successful(Some(apiDeploymentStatuses)))
+        when(fixture.apiHubService.findTeamById(any())(any()))
+          .thenReturn(Future.successful(None))
+
+        val request = FakeRequest(GET, routes.ApiDetailsController.onPageLoad(apiDetail.id).url)
+        val result = route(fixture.application, request).value
+
+        status(result) mustBe OK
+        contentAsString(result) mustBe view(apiDetail, apiDeploymentStatuses, None, Some("Team details could not be retrieved"))(request, messages(fixture.application)).toString()
         contentAsString(result) must validateAsHtml
       }
     }

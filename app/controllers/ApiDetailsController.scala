@@ -19,6 +19,8 @@ package controllers
 import com.google.inject.{Inject, Singleton}
 import controllers.actions.OptionalIdentifierAction
 import controllers.helpers.ErrorResultBuilder
+import models.api.ApiDetail
+import models.requests.OptionalIdentifierRequest
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
@@ -41,15 +43,7 @@ class ApiDetailsController @Inject()(
       for {
         maybeApiDetail <- apiHubService.getApiDetail(id)
         result <- maybeApiDetail match {
-          case Some(apiDetail) =>
-            for {
-              maybeApiDeploymentStatuses <- apiHubService.getApiDeploymentStatuses(apiDetail.publisherReference)
-            } yield maybeApiDeploymentStatuses match {
-              case Some(apiDeploymentStatuses) =>
-                Ok(view(apiDetail, apiDeploymentStatuses, request.user))
-              case None =>
-                errorResultBuilder.internalServerError(s"Unable to retrieve deployment statuses for API ${apiDetail.publisherReference}")
-            }
+          case Some(apiDetail) => processApiDetail(apiDetail)
           case None =>
             Future.successful(errorResultBuilder.notFound(
               Messages("site.apiNotFound.heading"),
@@ -59,4 +53,25 @@ class ApiDetailsController @Inject()(
       } yield result
   }
 
+  private def processApiDetail(apiDetail: ApiDetail)(implicit request: OptionalIdentifierRequest[_]) = {
+    for {
+      maybeApiDeploymentStatuses <- apiHubService.getApiDeploymentStatuses(apiDetail.publisherReference)
+      maybeTeamName <- getTeamNameForApi(apiDetail.teamId)
+    } yield maybeApiDeploymentStatuses match {
+      case Some(apiDeploymentStatuses) =>
+        Ok(view(apiDetail, apiDeploymentStatuses, request.user, maybeTeamName))
+      case None =>
+        errorResultBuilder.internalServerError(s"Unable to retrieve deployment statuses for API ${apiDetail.publisherReference}")
+    }
+  }
+
+  private def getTeamNameForApi(maybeTeamId: Option[String])(implicit request: OptionalIdentifierRequest[_]) = {
+    maybeTeamId match {
+      case Some(teamId) => apiHubService.findTeamById(teamId).map(_ match {
+        case Some(team) => Some(team.name)
+        case None => Some(Messages("apiDetails.details.team.error"))
+      })
+      case None => Future.successful(None)
+    }
+  }
 }
