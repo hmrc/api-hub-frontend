@@ -48,7 +48,7 @@ class AuthenticatedIdentifierAction @Inject()(
   }
 
   private def handleMissingEmail(user: UserModel)(implicit request: Request[_]) = {
-    logger.warn(s"Missing email for user $user")
+    logger.warn(s"Missing email address for user ${user.userName} with id ${user.userId}")
     Future.successful(Ok(buildMissingEmailView(user.userType)))
   }
 
