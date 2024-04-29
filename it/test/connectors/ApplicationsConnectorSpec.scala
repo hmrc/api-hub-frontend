@@ -624,7 +624,7 @@ class ApplicationsConnectorSpec
 
   "ApplicationsConnector.generateDeployment" - {
     "must place the correct request and return the response" in {
-      val request = DeploymentsRequest("test-lob", "test-name", "test-description", "test-egress", "test-team-id", "test-oas")
+      val request = DeploymentsRequest("test-lob", "test-name", "test-description", "test-egress", "test-team-id", "test-oas", false)
       val response = SuccessfulDeploymentsResponse("test-id", "1.0.0", 102, "test-url")
 
       stubFor(
@@ -646,7 +646,7 @@ class ApplicationsConnectorSpec
     }
 
     "must handle a 400 bad Request response with invalid OAS payload" in {
-      val request = DeploymentsRequest("test-lob", "test-name", "test-description", "test-egress", "test-team-id", "test-oas")
+      val request = DeploymentsRequest("test-lob", "test-name", "test-description", "test-egress", "test-team-id", "test-oas", true)
       val response = InvalidOasResponse(Seq(ValidationFailure("test-type", "test-message")))
 
       stubFor(

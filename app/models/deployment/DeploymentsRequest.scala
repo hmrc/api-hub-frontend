@@ -24,7 +24,8 @@ case class DeploymentsRequest(
   description: String,
   egress: String,
   teamId: String,
-  oas: String
+  oas: String,
+  passthrough: Boolean
 )
 
 object DeploymentsRequest {
