@@ -133,8 +133,52 @@ class AuthActionSpec extends SpecBase with MockitoSugar {
         status(result) mustBe OK
       }
     }
-  }
 
+    "must show error page if stride user without email address" in {
+      val strideAuth = mock[StrideAuthenticator]
+      when(strideAuth.authenticate()(any())).thenReturn(Future.successful(UserAuthenticated(FakeUserStrideNoEmail)))
+
+      val application = applicationBuilder(userAnswers = None)
+        .overrides(
+          bind[StrideAuthenticator].toInstance(strideAuth)
+        )
+        .build()
+
+      running(application) {
+        val authAction = application.injector.instanceOf[AuthenticatedIdentifierAction]
+        val controller = new Harness(authAction)
+
+        val result = controller.onPageLoad()(FakeRequest())
+        val content = contentAsString(result)
+        content must include("You are not authorised to access this service")
+        content must include("You do not have a valid email address associated with your Stride account.")
+        status(result) mustBe OK
+      }
+    }
+
+    "must show error page if ldap user without email address" in {
+      val ldapAuth = mock[LdapAuthenticator]
+      when(ldapAuth.authenticate()(any())).thenReturn(Future.successful(UserAuthenticated(FakeUserLdapNoEmail)))
+
+      val application = applicationBuilder(userAnswers = None)
+        .overrides(
+          bind[LdapAuthenticator].toInstance(ldapAuth)
+        )
+        .build()
+
+      running(application) {
+        val authAction = application.injector.instanceOf[AuthenticatedIdentifierAction]
+        val controller = new Harness(authAction)
+
+        val result = controller.onPageLoad()(FakeRequest())
+
+        val content = contentAsString(result)
+        content must include("You are not authorised to access this service")
+        content must include("Your account does not have a linked email account.")
+        status(result) mustBe OK
+      }
+    }
+  }
 }
 
 object AuthActionSpec {

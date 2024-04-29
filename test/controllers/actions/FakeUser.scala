@@ -16,8 +16,12 @@
 
 package controllers.actions
 
-import models.user.{LdapUser, UserModel}
+import models.user.{LdapUser, StrideUser, UserModel}
 
 object FakeUser extends UserModel("id", "test-name", LdapUser, Some("test-email"))
+
+object FakeUserLdapNoEmail extends UserModel("id", "test-name", LdapUser, None)
+
+object FakeUserStrideNoEmail extends UserModel("id", "test-name", StrideUser, None)
 
 object FakeUserNotTeamMember extends UserModel("idx", "test-namex", LdapUser, Some("different-email"))

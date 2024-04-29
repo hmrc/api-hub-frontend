@@ -81,6 +81,9 @@ signedOut.guidance = We did not save your answers.
 
 unauthorised.title = Unauthorised
 unauthorised.heading = You do not have permission to access this page
+unauthorised.missingEmail.stride = You do not have a valid email address associated with your Stride account.
+unauthorised.missingEmail.ldap = Your account does not have a linked email account.
+unauthorised.missingEmail.heading = You are not authorised to access this service
 
 applicationName.title = Application Name
 applicationName.heading = What is the name of your application?
