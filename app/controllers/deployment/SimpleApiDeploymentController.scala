@@ -94,6 +94,7 @@ object SimpleApiDeploymentController {
         "teamId" -> text("Select a team"),
         "oas" -> text("Enter the OAS"),
         "passthrough" -> Forms.default(boolean(), false),
+        "status" -> text("Enter an API status"),
         )(DeploymentsRequest.apply)(DeploymentsRequest.unapply)
       )
 
