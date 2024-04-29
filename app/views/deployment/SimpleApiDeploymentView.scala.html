@@ -26,7 +26,8 @@
     govukTextarea : GovukTextarea,
     govukButton: GovukButton,
     govukSelect : GovukSelect,
-    govukErrorSummary : GovukErrorSummary
+    govukErrorSummary : GovukErrorSummary,
+    govukCheckboxes : GovukCheckboxes,
 )
 
 @(form: Form[_], teams: Seq[Team], user: UserModel)(implicit request: Request[_], messages: Messages)
@@ -70,6 +71,18 @@
                 label = LabelViewModel("Egress")
             )
             .withWidth(Full)
+        )
+
+        @govukCheckboxes(
+            Checkboxes(
+                name = "passthrough",
+                items = Seq(
+                    CheckboxItem(
+                        content = Text("Passthrough"),
+                        value = "true"
+                    ),
+                )
+            )
         )
 
         @govukSelect(
