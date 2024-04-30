@@ -60,6 +60,7 @@ GET         /sign-in                                                           c
 GET         /test-connectivity                                                 controllers.TestConnectivityController.onPageLoad()
 
 GET         /apis/details/:id                                                  controllers.ApiDetailsController.onPageLoad(id: String)
+GET         /apis/support/:id                                                  controllers.ApiSupportController.onPageLoad(id: String)
 
 GET         /apis/add-an-api/start/:id                                         controllers.AddAnApiStartController.addAnApi(id: String)
 GET         /apis/add-endpoints/start/:applicationId/:apiId                    controllers.AddAnApiStartController.addEndpoints(applicationId: String, apiId: String)
