@@ -25,14 +25,7 @@
 
 @(team: Team, user: UserModel)(implicit request: Request[_], messages: Messages)
 
-@styles() = {
-    .hip-flex-container {
-        display: flex;
-        justify-content: space-between;
-    }
-}
-
-@layout(pageTitle = titleNoForm(messages("manageTeam.title", team.name)), user = Some(user), customStyles = Some(styles())) {
+@layout(pageTitle = titleNoForm(messages("manageTeam.title", team.name)), user = Some(user)) {
 
     <h1 class="govuk-heading-l">@messages("manageTeam.heading", team.name)</h1>
 

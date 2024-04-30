@@ -44,11 +44,7 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
             <h1 class="govuk-heading-l">
-                @if(user.map(_.permissions.canSupport).getOrElse(false)) {
-                    @messages("index.heading.admin")
-                } else {
-                    @messages("index.heading")
-                }
+                @messages("index.heading")
             </h1>
         </div>
      @if(applications.isEmpty) {
@@ -85,8 +81,12 @@
         </div>
      } else {
          <div class="govuk-grid-column-full">
-             <div class="hip-card-container">
-                 <h2 class="govuk-heading-m hip-card-header">@applications.length Registered applications </h2>
+             <div class="call-out-panel dashboard-cards">
+                 <div class="hip-flex-container">
+                     <h2 class="govuk-heading-m call-out-header">@applications.length Registered applications </h2>
+                     <a class="govuk-button govuk-button--secondary hip-card-link" href="@routes.IndexController.createApplication">Register another application</a>
+                 </div>
+
                  <div class="hip-card-container-top">
                    @applications.map( application =>
                        <div class="hip-inner-card flex">
@@ -97,11 +97,6 @@
                            <p class="govuk-body align-left">Registered: <span class="utcDateLong">{ViewUtils.formatLocalDateTimeContainingUtc(application.created)}</span></p>
                        </div>
                    )
-
-
-                 </div>
-                 <div class="hip-card-container-bottom spacing-15-top-bottom spacing-30-left-right">
-                     <a class="govuk-link govuk-link--no-visited-state" href="@routes.IndexController.createApplication">Register another application</a>
                  </div>
              </div>
          </div>
