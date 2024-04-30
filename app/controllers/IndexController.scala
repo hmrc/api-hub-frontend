@@ -43,14 +43,14 @@ class IndexController @Inject()(
                                )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   def onPageLoad: Action[AnyContent] = identify.async { implicit request =>
+    val maxApplicationsToShow = 5
     request.user.email.fold[Future[Result]] {
       noEmail()
     }(email =>
-      if (request.user.permissions.canSupport){
-          apiHubService.getApplications().map(apps => Ok(view(apps, Some(request.user))))
-      }else{
-        apiHubService.getUserApplications(email).map(userApps => Ok(view(userApps, Some(request.user))))
-      }
+      apiHubService.getUserApplications(email).map(userApps => Ok(view(
+        userApps.sortBy(_.name).take(maxApplicationsToShow),
+        userApps.size,
+        Some(request.user))))
     )
   }
 

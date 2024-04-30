@@ -25,7 +25,7 @@
     govukTable: GovukTable
 )
 
-@(applications: Seq[Application], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+@(applications: Seq[Application], totalApplicationCount: Int, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
 @appDetailsLink(app:Application) = {
     <a href="@controllers.application.routes.ApplicationDetailsController.onPageLoad(app.id).url">
@@ -83,7 +83,7 @@
          <div class="govuk-grid-column-full">
              <div class="call-out-panel dashboard-cards">
                  <div class="hip-flex-container">
-                     <h2 class="govuk-heading-m call-out-header">@applications.length Registered applications </h2>
+                     <h2 class="govuk-heading-m call-out-header">@totalApplicationCount Registered applications </h2>
                      <a class="govuk-button govuk-button--secondary hip-card-link" href="@routes.IndexController.createApplication">Register another application</a>
                  </div>
 
@@ -98,6 +98,11 @@
                        </div>
                    )
                  </div>
+                 @if(totalApplicationCount > applications.size) {
+                     <a href="#" class="govuk-link govuk-link--no-visited-state view-all-link">
+                         View all your applications
+                     </a>
+                 }
              </div>
          </div>
      }

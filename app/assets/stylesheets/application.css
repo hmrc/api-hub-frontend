@@ -97,6 +97,12 @@
     justify-content: space-between;
 }
 
+.view-all-link {
+    font-size: 1rem;
+    display: block;
+    margin-top: 12px;
+}
+
 .flex {
     display: flex;
 }
