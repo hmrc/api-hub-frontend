@@ -50,11 +50,22 @@ error.number = Please enter a valid number
 error.required = Please enter a value
 error.summary.title = There is a problem
 
-index.title = Applications
-index.heading = Dashboard
-index.registerApplication = Register an application
-index.applications.name = Name
-index.applications.id = Id
+dashboard.title = Dashboard
+dashboard.heading = Dashboard
+dashboard.applications.title.none = Registered applications
+dashboard.applications.title.one = 1 Registered application
+dashboard.applications.title.many = {0} Registered applications
+dashboard.applications.none = You have no registered applications
+dashboard.applications.createFirst = Register an application
+dashboard.applications.createAnother = Register another application
+dashboard.applications.teamMembers = Team members: {0}
+dashboard.applications.created = Registered:
+dashboard.applications.viewAll = View all your applications
+
+applications.title = Your applications
+applications.heading = Your applications
+applications.teamMembers = Team members: {0}
+applications.created = Registered:
 
 checkYourAnswers.title = Check Your Answers
 checkYourAnswers.heading = Check your answers before creating your application
