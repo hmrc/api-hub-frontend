@@ -27,13 +27,6 @@
 
 @(applications: Seq[Application], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
-@appDetailsLink(app:Application) = {
-    <a href="@controllers.application.routes.ApplicationDetailsController.onPageLoad(app.id).url">
-        @app.name
-    </a>
-
-}
-
 @layout(
     pageTitle    = titleNoForm(messages("applications.title")),
     showBackLink = true,

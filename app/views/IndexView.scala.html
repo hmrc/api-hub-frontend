@@ -27,20 +27,12 @@
 
 @(applications: Seq[Application], totalApplicationCount: Int, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
-@appDetailsLink(app:Application) = {
-    <a href="@controllers.application.routes.ApplicationDetailsController.onPageLoad(app.id).url">
-        @app.name
-    </a>
-
-}
-
 @layout(
     pageTitle    = titleNoForm(messages("dashboard.title")),
     showBackLink = true,
     fullWidth    = true,
     user = user
 ) {
-
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
             <h1 class="govuk-heading-l">
