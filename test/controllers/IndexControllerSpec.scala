@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.IndexControllerSpec.{buildFixture, buildFixtureWithUser}
 import controllers.actions.FakeUser
 import models.application.{Application, Creator, TeamMember}
-import models.user.{Permissions, UserModel}
+import models.user.UserModel
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentCaptor, ArgumentMatchers, MockitoSugar}

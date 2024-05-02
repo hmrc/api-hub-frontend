@@ -41,7 +41,7 @@ class ApplicationsController @Inject()(
       noEmail()
     }(email =>
       apiHubService.getUserApplications(email).map(userApps => Ok(view(
-        userApps.sortBy(_.name),
+        userApps.sortBy(_.name.toLowerCase),
         Some(request.user))))
     )
   }

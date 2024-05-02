@@ -48,7 +48,7 @@ class IndexController @Inject()(
       noEmail()
     }(email =>
       apiHubService.getUserApplications(email).map(userApps => Ok(view(
-        userApps.sortBy(_.name).take(maxApplicationsToShow),
+        userApps.sortBy(_.name.toLowerCase).take(maxApplicationsToShow),
         userApps.size,
         Some(request.user))))
     )
