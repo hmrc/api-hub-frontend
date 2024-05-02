@@ -45,7 +45,7 @@
                     <a class="govuk-link govuk-link--no-visited-state" href={controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url}>{application.name}</a>
                 </h3>
                 <p class="govuk-body align-left">{messages("applications.teamMembers", application.teamMembers.size)}</p>
-                <p class="govuk-body align-left ">{messages("applications.created")}: <span class="utcDateShort">{ViewUtils.formatLocalDateTimeContainingUtc(application.created)}</span></p>
+                <p class="govuk-body align-left ">{messages("applications.created")} <span class="utcDateShort">{ViewUtils.formatLocalDateTimeContainingUtc(application.created)}</span></p>
             </div>
         </div>
     )
