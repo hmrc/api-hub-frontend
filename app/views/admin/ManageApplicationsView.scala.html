@@ -38,14 +38,15 @@
         <div class="hip-inner-card flex">
             <div class="left">
                 <h5 class="govuk-heading-s hip-inner-card-title govuk-!-margin-bottom-4">
-                    <a class="govuk-link govuk-link--no-visited-state" href="/version10/admin/view-deleted-app">{application.name}</a>
+                    <a class="govuk-link govuk-link--no-visited-state" href={controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url}>{application.name}</a>
                 </h5>
                 <p class="govuk-body-s govuk-!-margin-top-1">
-                    <strong>{messages("manageApplications.application.id")}: </strong>{application.id}</p>
+                    <strong>{messages("manageApplications.application.id")}: </strong>{application.id}
+                </p>
             </div>
             <div class="right ">
                 <p class="govuk-body-s govuk-!-margin-top-1">
-                    <strong>{messages("manageApplications.application.created")}: </strong>
+                    <strong>{messages("manageApplications.application.created")}:</strong>
                     <span class="utcDateShort">{ViewUtils.formatLocalDateTimeContainingUtc(application.created)}</span>
                 </p>
             </div>

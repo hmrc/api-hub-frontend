@@ -523,7 +523,7 @@ manageApplications.title = Manage applications
 manageApplications.heading = Manage applications
 manageApplications.admin = API Hub admin
 manageApplications.application.id = ID
-manageApplications.application.created = Created
+manageApplications.application.created = Registered
 
 manageTeams.title = Manage teams
 manageTeams.heading = Manage teams
