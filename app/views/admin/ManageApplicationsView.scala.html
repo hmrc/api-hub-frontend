@@ -1,0 +1,57 @@
+@*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.user.UserModel
+@import viewmodels.admin.{AdminNavItems, AdminSideNavPages}
+@import views.ViewUtils
+@import models.application.Application
+
+@this(
+    layout: templates.Layout,
+    govukTable: GovukTable
+)
+
+@(applications: Seq[Application], user: UserModel)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = titleNoForm(messages("govuk-grid-column-two-thirds.title")), user = Some(user), fullWidth = true) {
+
+    @views.html.templates.SideNav(messages("manageApplications.admin"), AdminNavItems(user, AdminSideNavPages.ManageApplicationsPage)) {
+
+        <h1 class="govuk-heading-m govuk-!-margin-bottom-7">
+            @messages("manageApplications.heading")
+        </h1>
+
+        @applications.map(application =>
+        <div class="hip-inner-card flex">
+            <div class="left">
+                <h5 class="govuk-heading-s hip-inner-card-title govuk-!-margin-bottom-4">
+                    <a class="govuk-link govuk-link--no-visited-state" href="/version10/admin/view-deleted-app">{application.name}</a>
+                </h5>
+                <p class="govuk-body-s govuk-!-margin-top-1">
+                    <strong>{messages("manageApplications.application.id")}: </strong>{application.id}</p>
+            </div>
+            <div class="right ">
+                <p class="govuk-body-s govuk-!-margin-top-1">
+                    <strong>{messages("manageApplications.application.created")}: </strong>
+                    <span class="utcDateShort">{ViewUtils.formatLocalDateTimeContainingUtc(application.created)}</span>
+                </p>
+            </div>
+        </div>
+        )
+
+    }
+
+}

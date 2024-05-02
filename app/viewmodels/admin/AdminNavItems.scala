@@ -45,7 +45,7 @@ object AdminNavItems {
         SideNavItem(
           page = ManageApplicationsPage,
           title = messages("manageApplications.title"),
-          link = controllers.admin.routes.AccessRequestsController.onPageLoad(),
+          link = controllers.admin.routes.ManageApplicationsController.onPageLoad(),
           isCurrentPage = currentPage == ManageApplicationsPage
         ),
         SideNavItem(

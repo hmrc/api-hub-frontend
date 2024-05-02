@@ -392,8 +392,6 @@ accessRequestRejectedSuccess.guidance.heading = What you can do now
 accessRequestRejectedSuccess.guidance.content = Return to {0}.
 accessRequestRejectedSuccess.guidance.link = API approval requests
 
-manageApplications.title = Manage applications
-
 provideSupportingInformation.heading = Provide supporting information
 provideSupportingInformation.title = Provide supporting information
 provideSupportingInformation.hint = Provide any additional information you think will support your request. For example a link to any technical information about your service, or details of discussions with the producing team.
@@ -520,6 +518,12 @@ createTeamCheckYourAnswers.complete.heading = Complete your team
 createTeamCheckYourAnswers.complete.guidance.1 = Team members you have added will be notified by email that they have been added to this team.
 createTeamCheckYourAnswers.complete.guidance.2 = This team will be assignable to applications and APIs.
 createTeamCheckYourAnswers.createTeam = Create team
+
+manageApplications.title = Manage applications
+manageApplications.heading = Manage applications
+manageApplications.admin = API Hub admin
+manageApplications.application.id = ID
+manageApplications.application.created = Created
 
 manageTeams.title = Manage teams
 manageTeams.heading = Manage teams
