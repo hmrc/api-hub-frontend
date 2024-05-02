@@ -96,7 +96,7 @@ object AdminNavItemsSpec {
     SideNavItem(
       page = ManageApplicationsPage,
       title = "Manage applications",
-      link = controllers.admin.routes.AccessRequestsController.onPageLoad(),
+      link = controllers.admin.routes.ManageApplicationsController.onPageLoad(),
       isCurrentPage = false
     )
   }

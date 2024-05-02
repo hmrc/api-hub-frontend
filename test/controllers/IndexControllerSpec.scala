@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.IndexControllerSpec.{buildFixture, buildFixtureWithUser}
 import controllers.actions.FakeUser
 import models.application.{Application, Creator, TeamMember}
-import models.user.{Permissions, UserModel}
+import models.user.UserModel
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentCaptor, ArgumentMatchers, MockitoSugar}
@@ -64,7 +64,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with HtmlValidation
 
         status(result) mustEqual OK
 
-        contentAsString(result) mustEqual view(applications, Some(FakeUser))(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(applications, applications.size, Some(FakeUser))(request, messages(fixture.application)).toString
         contentAsString(result) must validateAsHtml
       }
     }
@@ -113,32 +113,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with HtmlValidation
       }
     }
 
-    "must call apiHubService.getApplications() if user has support permissions" in {
-      val testEmail = "test-email"
-      val creatorEmail = "creator-email-2"
-      val applications = Seq(
-        Application("id-1", "app-name-1", Creator(creatorEmail), Seq.empty).copy(teamMembers = Seq(TeamMember(testEmail))),
-        Application("id-2", "app-name-2", Creator(creatorEmail), Seq.empty).copy(teamMembers = Seq(TeamMember(testEmail)))
-      )
-      val user: UserModel = FakeUser.copy(permissions = Permissions(canApprove = false, canSupport = true, isPrivileged = false))
-      val fixture = buildFixtureWithUser(userModel = user)
-      running(fixture.application) {
-
-        when(fixture.mockApiHubService.getApplications()(any()))
-          .thenReturn(Future.successful(applications))
-
-        val request = FakeRequest(GET, routes.IndexController.onPageLoad.url)
-
-        val result = route(fixture.application, request).value
-        val view = fixture.application.injector.instanceOf[IndexView]
-        status(result) mustEqual OK
-
-        contentAsString(result) mustEqual view(applications, Some(user))(request, messages(fixture.application)).toString
-        contentAsString(result) must validateAsHtml
-      }
-    }
-
-    "must call apiHubService.getUserApplications() if user does not have support permissions" in {
+    "must call apiHubService.getUserApplications()" in {
       val testEmail = "test-email"
       val creatorEmail = "creator-email-2"
       val applications = Seq(
@@ -157,7 +132,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with HtmlValidation
         val view = fixture.application.injector.instanceOf[IndexView]
         status(result) mustEqual OK
 
-        contentAsString(result) mustEqual view(applications, Some(FakeUser))(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(applications, applications.size, Some(FakeUser))(request, messages(fixture.application)).toString
         contentAsString(result) must validateAsHtml
       }
     }

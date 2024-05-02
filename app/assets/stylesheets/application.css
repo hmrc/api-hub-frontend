@@ -50,17 +50,59 @@
 .hip-inner-card {
     padding: 10px 20px;
     background-color: #ffffff;
-    border-bottom: solid 2px #1d70b8;
+    border-bottom: solid 2px #b1b4b6;
+    border-radius: 4px;
     border-top: solid 1px #b1b4b6;
     border-left: solid 1px #b1b4b6;
     border-right: solid 1px #b1b4b6;
-    margin-top: 20px;
+    margin-top: 0px;
+    margin-bottom: 12px;
     display: flex;
     flex-wrap: wrap;
 }
-.hip-inner-card-title {
-    width: 350px;
+.hip-inner-card h3, .hip-inner-card p {
+    margin-bottom: 0px !important;
+    word-wrap: break-word;
+    flex: 1;
 }
+.hip-inner-card strong {
+    font-size: 14px;
+}
+.hip-inner-card .left {
+    width: 65%;
+    float: left;
+}
+.hip-inner-card .right {
+    width: 30%;
+    float: right;
+    text-align: right;
+}
+.hip-inner-card .body {
+    padding-top: 8px;
+    padding-bottom: 4px;
+    clear: both;
+}
+
+.hip-card-header strong {
+    font-weight: 700;
+    font-size: 1rem !important;
+}
+
+.hip-inner-card-title {
+    display: inline-block;
+}
+
+.hip-flex-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.view-all-link {
+    font-size: 1rem;
+    display: block;
+    margin-top: 12px;
+}
+
 .flex {
     display: flex;
 }

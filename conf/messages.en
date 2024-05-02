@@ -12,8 +12,7 @@ site.start = Start now
 site.startAgain = Start again
 site.signIn = Sign in
 site.govuk = GOV.UK
-site.applications = Your Applications
-site.allApplications = All Applications
+site.dashboard = Dashboard
 site.approvals = API Hub Admin
 site.copy = Copy
 site.applicationNotFoundHeading = Application not found
@@ -51,12 +50,22 @@ error.number = Please enter a valid number
 error.required = Please enter a value
 error.summary.title = There is a problem
 
-index.title = Applications
-index.heading = Your Applications
-index.heading.admin = All Applications
-index.registerApplication = Register an application
-index.applications.name = Name
-index.applications.id = Id
+dashboard.title = Dashboard
+dashboard.heading = Dashboard
+dashboard.applications.title.none = Registered applications
+dashboard.applications.title.one = 1 Registered application
+dashboard.applications.title.many = {0} Registered applications
+dashboard.applications.none = You have no registered applications
+dashboard.applications.createFirst = Register an application
+dashboard.applications.createAnother = Register another application
+dashboard.applications.teamMembers = Team members: {0}
+dashboard.applications.created = Registered:
+dashboard.applications.viewAll = View all your applications
+
+applications.title = Your applications
+applications.heading = Your applications
+applications.teamMembers = Team members: {0}
+applications.created = Registered:
 
 checkYourAnswers.title = Check Your Answers
 checkYourAnswers.heading = Check your answers before creating your application
@@ -383,8 +392,6 @@ accessRequestRejectedSuccess.guidance.heading = What you can do now
 accessRequestRejectedSuccess.guidance.content = Return to {0}.
 accessRequestRejectedSuccess.guidance.link = API approval requests
 
-manageApplications.title = Manage applications
-
 provideSupportingInformation.heading = Provide supporting information
 provideSupportingInformation.title = Provide supporting information
 provideSupportingInformation.hint = Provide any additional information you think will support your request. For example a link to any technical information about your service, or details of discussions with the producing team.
@@ -511,6 +518,12 @@ createTeamCheckYourAnswers.complete.heading = Complete your team
 createTeamCheckYourAnswers.complete.guidance.1 = Team members you have added will be notified by email that they have been added to this team.
 createTeamCheckYourAnswers.complete.guidance.2 = This team will be assignable to applications and APIs.
 createTeamCheckYourAnswers.createTeam = Create team
+
+manageApplications.title = Manage applications
+manageApplications.heading = Manage applications
+manageApplications.admin = API Hub admin
+manageApplications.application.id = ID
+manageApplications.application.created = Registered
 
 manageTeams.title = Manage teams
 manageTeams.heading = Manage teams
