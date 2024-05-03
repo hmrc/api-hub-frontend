@@ -189,7 +189,8 @@
                     @govukButton(
                         Button(
                             href = Some(controllers.application.routes.RequestProductionAccessStartController.onPageLoad(application.id).url),
-                            content = Text(messages("applicationApis.requestProductionAccess"))
+                            content = Text(messages("applicationApis.requestProductionAccess")),
+                            id = Some("requestProductionAccess")
                         )
                     )
                 }

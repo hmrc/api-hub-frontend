@@ -49,7 +49,7 @@
                     <p class="govuk-body">@messages("dashboard.applications.none")</p>
                     @formHelper(action = routes.IndexController.onSubmit) {
                         @govukButton(
-                            ButtonViewModel(messages("dashboard.applications.createFirst"))
+                            Button(content = messages("dashboard.applications.createFirst"), id=Some("registerAnApplication"))
                         )
                     }
                 </div>
@@ -60,7 +60,7 @@
                     } else {
                         <h2 class="govuk-heading-m call-out-header">@messages("dashboard.applications.title.many", totalApplicationCount)</h2>
                     }
-                    <a class="govuk-button govuk-button--secondary hip-card-link" href="@routes.IndexController.createApplication">@messages("dashboard.applications.createAnother")</a>
+                    <a class="govuk-button govuk-button--secondary hip-card-link" href="@routes.IndexController.createApplication" id="registerAnotherApplication">@messages("dashboard.applications.createAnother")</a>
                 </div>
 
                 <div class="hip-card-container-top">
