@@ -25,7 +25,6 @@
     govukInput: GovukInput,
     govukButton: GovukButton,
     govukTable: GovukTable,
-    govukPagination: GovukPagination,
 )
 
 @(user: Option[UserModel], apiDetails: Seq[ApiDetail] = Seq.empty)(implicit request: Request[_], messages: Messages)
@@ -90,26 +89,5 @@
 
             <nav id="pagination"></nav>
         </div>
-
     </div>
-
-@*    <template>*@
-@*        @govukPagination(Pagination(*@
-@*            items = Some(Seq(*@
-@*                PaginationItem(*@
-@*                    href = "#",*@
-@*                    number = Some("0")*@
-@*                ),*@
-@*                PaginationItem(*@
-@*                    ellipsis = Some(true)*@
-@*                ),*@
-@*            )),*@
-@*            previous = Some(PaginationLink(*@
-@*                href = "#"*@
-@*            )),*@
-@*            next = Some(PaginationLink(*@
-@*                href = "#"*@
-@*            ))*@
-@*        ))        *@
-@*    </template>*@
 }

@@ -62,6 +62,7 @@ function buildPaginator(elContainer) {
 
             initialised = true;
         }
+
         return {
             render(currentPage, totalPages) {
                 if (!initialised) {
@@ -73,6 +74,7 @@ function buildPaginator(elContainer) {
 
                 const items = [];
                 for (let i = 1; i <= totalPages; i++) {
+                    // We always show links to the first and last pages, and to the current page and its immediate neighbours
                     if (i === 1 || i === totalPages || Math.abs(i - currentPage) < 2) {
                         items.push(buildPageNumberLink(i, i === currentPage));
                     } else if (items[items.length - 1] !== ELLIPSIS) {
@@ -97,13 +99,13 @@ function buildPaginator(elContainer) {
         view = buildView();
     let navigationHandler = noop;
 
-    view.onPreviousLinkClick(event => {
+    view.onPreviousLinkClick(() => {
         if (model.currentPage > 1) {
             navigationHandler(model.currentPage - 1);
         }
     });
 
-    view.onNextLinkClick(event => {
+    view.onNextLinkClick(() => {
         if (model.currentPage < model.totalPages) {
             navigationHandler(model.currentPage + 1);
         }

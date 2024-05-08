@@ -70,30 +70,30 @@ window.addEventListener('pageshow', () => {
             get totalPages() {
                 return Math.ceil(model.resultCount / this.itemsPerPage);
             },
-            itemsPerPage: 3
+            get itemsPerPage() {
+                return 15;
+            }
         }
     };
 
-
-    function setPaginationPage(pageNumber) {
-        console.log(`Navigating to page ${pageNumber}`);
+    function setPaginationPageNumber(pageNumber) {
         model.pagination.currentPage = pageNumber;
-        view.setPagination(model.pagination.currentPage, model.pagination.totalPages); //TODO repeated code
-        applyPaginationFiltering();
-        view.setApiPanelVisibility(model.apis);
-    }
 
-    view.onPaginationChanged(setPaginationPage);
+        const {currentPage, itemsPerPage, totalPages} = model.pagination,
+            startIndex = (currentPage - 1) * itemsPerPage,
+            endIndex = startIndex + itemsPerPage;
 
-    function applyPaginationFiltering() {
-        const startIndex = (model.pagination.currentPage - 1) * model.pagination.itemsPerPage,
-            endIndex = startIndex + model.pagination.itemsPerPage;
         model.apis
             .filter(apiDetail => ! apiDetail.hiddenByFilters)
             .forEach((apiDetail, index) => {
                 apiDetail.hiddenByPagination = index < startIndex || index >= endIndex;
             });
+
+        view.setApiPanelVisibility(model.apis);
+        view.setPagination(currentPage, totalPages);
     }
+
+    view.onPaginationChanged(setPaginationPageNumber);
 
     function applyFilters() {
         const filterFns = buildFilterFunctions();
@@ -101,7 +101,7 @@ window.addEventListener('pageshow', () => {
             apiDetail.hiddenByFilters = ! filterFns.every(fn => fn(apiDetail.data));
         });
 
-        setPaginationPage(1);
+        setPaginationPageNumber(1);
 
         view.setResultCount(model.resultCount);
     }
