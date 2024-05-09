@@ -19,7 +19,7 @@
     govukButton: GovukButton
 )
 
-@(ldapSignInUrl: String, strideSignInUrl: String)(implicit request: Request[_], messages: Messages)
+@(ldapSignInUrl: String, strideSignInUrl: String, apiHubGuideUrl: String)(implicit request: Request[_], messages: Messages)
 
 @layout(
     pageTitle    = titleNoForm(messages("signIn.title")),
@@ -61,7 +61,7 @@
 
                 <p class="govuk-body-s">
                     @messages("signIn.stride.help")
-                    <a href='@routes.Assets.versioned("documents/AH-AddingSRSroles-130323-1342-22.pdf")' target="_blank">
+                    <a href='@{apiHubGuideUrl}/documentation/api-hub-guide.html#how-do-you-get-access-to-it' target="_blank">
                         @messages("signIn.stride.helpLink")
                     </a>.
                 </p>

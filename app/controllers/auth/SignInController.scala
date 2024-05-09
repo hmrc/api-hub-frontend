@@ -35,7 +35,7 @@ class SignInController @Inject()(
 
   def onPageLoad(): Action[AnyContent] = Action {
     implicit request =>
-      Ok(view(ldapSignInUrl(config), strideSignInUrl(config)))
+      Ok(view(ldapSignInUrl(config), strideSignInUrl(config), config.helpDocsPath))
   }
 
 }
