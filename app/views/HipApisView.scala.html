@@ -30,6 +30,7 @@
 @(user: Option[UserModel], apiDetails: Seq[ApiDetail] = Seq.empty)(implicit request: Request[_], messages: Messages)
 
 @scripts() = {
+    <script src='@routes.Assets.versioned("javascripts/pagination.js")' type="application/javascript" @{CSPNonce.attr}></script>
     <script src='@routes.Assets.versioned("javascripts/hipApis.js")' type="application/javascript" @{CSPNonce.attr}></script>
 }
 
@@ -85,6 +86,8 @@
             <div class="govuk-body" id="apiList">
             @apis(apiDetails)
             </div>
+
+            <nav id="pagination"></nav>
         </div>
     </div>
 }
