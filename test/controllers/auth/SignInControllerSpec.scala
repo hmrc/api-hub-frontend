@@ -38,9 +38,10 @@ class SignInControllerSpec extends SpecBase with MockitoSugar {
         val config = application.injector.instanceOf[FrontendAppConfig]
         val ldapSignInUrl = s"${config.loginWithLdapUrl}?continue_url=${urlEncode(config.loginContinueUrl)}"
         val strideSignInUrl = s"${config.loginWithStrideUrl}?successURL=${urlEncode(config.loginContinueUrl)}&origin=${config.appName}"
+        val helpDocsPath = config.helpDocsPath
 
         status(result) mustBe OK
-        contentAsString(result) mustBe view(ldapSignInUrl, strideSignInUrl)(request, messages(application)).toString()
+        contentAsString(result) mustBe view(ldapSignInUrl, strideSignInUrl, helpDocsPath)(request, messages(application)).toString()
       }
     }
   }
