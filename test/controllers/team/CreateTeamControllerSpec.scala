@@ -20,6 +20,7 @@ import base.SpecBase
 import controllers.actions.FakeUser
 import models.{CheckMode, UserAnswers}
 import models.application.TeamMember
+import models.exception.TeamNameNotUniqueException
 import models.team.{NewTeam, Team}
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 import org.scalatest.OptionValues
@@ -44,7 +45,7 @@ class CreateTeamControllerSpec extends SpecBase with MockitoSugar with ArgumentM
     "must create the team, clear user answers, and return the success view" in {
       val fixture = buildFixture(fullAnswers)
 
-      when(fixture.apiHubService.createTeam(any)(any)).thenReturn(Future.successful(team))
+      when(fixture.apiHubService.createTeam(any)(any)).thenReturn(Future.successful(Right(team)))
       when(fixture.sessionRepository.clear(any)).thenReturn(Future.successful(true))
 
       running(fixture.playApplication) {
@@ -74,6 +75,23 @@ class CreateTeamControllerSpec extends SpecBase with MockitoSugar with ArgumentM
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe controllers.team.routes.CreateTeamNameController.onPageLoad(CheckMode).url
+      }
+    }
+
+    "must redirect to the team name page if the team name is not unique" in {
+      val fixture = buildFixture(fullAnswers)
+
+      when(fixture.apiHubService.createTeam(any)(any))
+        .thenReturn(Future.successful(Left(TeamNameNotUniqueException.forName(teamName))))
+
+      running(fixture.playApplication) {
+        val request = FakeRequest(controllers.team.routes.CreateTeamController.onSubmit())
+        val result = route(fixture.playApplication, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe controllers.team.routes.CreateTeamNameController.onPageLoad(CheckMode).url
+
+        verifyZeroInteractions(fixture.sessionRepository)
       }
     }
 

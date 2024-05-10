@@ -18,6 +18,7 @@ package controllers.team
 
 import controllers.actions._
 import models.application.TeamMember
+import models.exception.TeamNameNotUniqueException
 import models.{CheckMode, UserAnswers}
 import models.team.NewTeam
 import pages.{CreateTeamMembersPage, CreateTeamNamePage}
@@ -47,10 +48,15 @@ class CreateTeamController @Inject()(
       validate(request.userAnswers).fold(
         call => Future.successful(Redirect(call)),
         newTeam =>
-          for {
-            _ <- apiHubService.createTeam(newTeam)
-            _ <- sessionRepository.clear(request.userAnswers.id)
-          } yield Ok(view(Some(request.user)))
+          apiHubService.createTeam(newTeam).flatMap {
+            case Right(_) =>
+              for {
+                _ <- sessionRepository.clear(request.userAnswers.id)
+              } yield Ok(view(Some(request.user)))
+            case Left(_: TeamNameNotUniqueException) =>
+              Future.successful(Redirect(controllers.team.routes.CreateTeamNameController.onPageLoad(CheckMode)))
+            case Left(e) => throw e
+          }
       )
   }
 

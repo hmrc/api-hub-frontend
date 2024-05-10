@@ -49,5 +49,15 @@ class CreateTeamNameFormProviderSpec extends StringFieldBehaviours {
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
     )
+
+    "must strip leading and trailing spaces" in {
+      val name = "   test name  "
+
+      form.bind(Map(fieldName -> name)).fold(
+        hasErrors => fail(s"Found unexpected errors: $hasErrors"),
+        success => success mustBe name.trim
+      )
+    }
   }
+
 }

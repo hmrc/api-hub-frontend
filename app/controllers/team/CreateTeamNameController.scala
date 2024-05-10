@@ -21,9 +21,12 @@ import forms.CreateTeamNameFormProvider
 import models.Mode
 import navigation.Navigator
 import pages.CreateTeamNamePage
+import play.api.data.{Form, FormError}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import repositories.CreateTeamSessionRepository
+import services.ApiHubService
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.team.CreateTeamNameView
 
@@ -39,20 +42,29 @@ class CreateTeamNameController @Inject()(
                                         requireData: DataRequiredAction,
                                         formProvider: CreateTeamNameFormProvider,
                                         val controllerComponents: MessagesControllerComponents,
-                                        view: CreateTeamNameView
+                                        view: CreateTeamNameView,
+                                        apiHubService: ApiHubService
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form = formProvider()
+  private val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+      request.userAnswers.get(CreateTeamNamePage) match {
+        case None => Future.successful(Ok(view(form, mode)))
+        case Some(name) =>
+          val preparedForm = form.fill(name)
 
-      val preparedForm = request.userAnswers.get(CreateTeamNamePage) match {
-        case None => form
-        case Some(value) => form.fill(value)
+          isUniqueName(name).map(
+            isUnique =>
+              if (isUnique) {
+                Ok(view(preparedForm, mode))
+              }
+              else {
+                nameNotUnique(preparedForm, mode)
+              }
+          )
       }
-
-      Ok(view(preparedForm, mode))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
@@ -62,11 +74,28 @@ class CreateTeamNameController @Inject()(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, mode))),
 
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(CreateTeamNamePage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(CreateTeamNamePage, mode, updatedAnswers))
+        name =>
+          isUniqueName(name).flatMap(
+            isUnique =>
+              if (isUnique) {
+                for {
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(CreateTeamNamePage, name))
+                  _ <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(navigator.nextPage(CreateTeamNamePage, mode, updatedAnswers))
+              }
+              else {
+                Future.successful(nameNotUnique(form.fill(name), mode))
+              }
+          )
       )
   }
+
+  private def isUniqueName(name: String)(implicit hc: HeaderCarrier): Future[Boolean] = {
+    apiHubService.findTeamByName(name).map(_.isEmpty)
+  }
+
+  private def nameNotUnique(form: Form[String], mode: Mode)(implicit request: Request[_]) = {
+    BadRequest(view(form.withError(FormError("value", "createTeamName.error.nameNotUnique")), mode))
+  }
+
 }

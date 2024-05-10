@@ -27,7 +27,7 @@ import models.requests.{AddApiRequest, AddApiRequestEndpoint}
 import models.team.{NewTeam, Team}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
-import org.scalatest.OptionValues
+import org.scalatest.{EitherValues, OptionValues}
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
@@ -41,6 +41,7 @@ class ApiHubServiceSpec
     with Matchers
     with MockitoSugar
     with OptionValues
+    with EitherValues
     with ApplicationGetterBehaviours
     with ApiDetailGenerators
     with AccessRequestGenerator
@@ -440,6 +441,39 @@ class ApiHubServiceSpec
     }
   }
 
+  "findTeamByName" - {
+    "must return the team from the applications connector when it exists" in {
+      val applicationsConnector = mock[ApplicationsConnector]
+      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+
+      val team = Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember("test-email")))
+
+      when(service.findTeamByName(any())(any())).thenReturn(Future.successful(Some(team)))
+
+      service.findTeamByName(team.name)(HeaderCarrier()).map {
+        result =>
+          verify(applicationsConnector).findTeamByName(ArgumentMatchers.eq(team.name))(any())
+          result mustBe Some(team)
+      }
+    }
+
+    "must return None when the team does not exist" in {
+      val applicationsConnector = mock[ApplicationsConnector]
+      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+
+      val name = "test-team-name"
+
+      when(service.findTeamByName(any())(any())).thenReturn(Future.successful(None))
+
+      service.findTeamByName(name)(HeaderCarrier()).map {
+        result =>
+          result mustBe None
+      }
+    }
+  }
+
   "findTeams" - {
     "must return the teams from the applications connector" in {
       val applicationsConnector = mock[ApplicationsConnector]
@@ -468,12 +502,12 @@ class ApiHubServiceSpec
       val newTeam = NewTeam("test-team-name", Seq(TeamMember("test-email")))
       val team = Team("test-team-id", newTeam.name, LocalDateTime.now(), newTeam.teamMembers)
 
-      when(applicationsConnector.createTeam(any())(any())).thenReturn(Future.successful(team))
+      when(applicationsConnector.createTeam(any())(any())).thenReturn(Future.successful(Right(team)))
 
       service.createTeam(newTeam)(HeaderCarrier()).map {
         result =>
           verify(applicationsConnector).createTeam(ArgumentMatchers.eq(newTeam))(any())
-          result mustBe team
+          result.value mustBe team
       }
     }
   }
