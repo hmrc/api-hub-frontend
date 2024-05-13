@@ -136,6 +136,36 @@
                         </dd>
                     </div>
 
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            @messages("apiDetails.details.domain")
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            @if(apiDetail.domain.isDefined) {
+                                <strong class="govuk-tag govuk-tag--grey">
+                                    @apiDetail.domain
+                                </strong>
+                            } else {
+                                @messages("apiDetails.details.notSpecified")
+                            }
+                        </dd>
+                    </div>
+
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            @messages("apiDetails.details.subDomain")
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            @if(apiDetail.subDomain.isDefined) {
+                                <strong class="govuk-tag govuk-tag--grey">
+                                    @apiDetail.subDomain
+                                </strong>
+                            } else {
+                                @messages("apiDetails.details.notSpecified")
+                            }
+                        </dd>
+                    </div>
+
                     @if(teamName.isDefined) {
                         <div class="govuk-summary-list__row">
                             <dt class="govuk-summary-list__key">

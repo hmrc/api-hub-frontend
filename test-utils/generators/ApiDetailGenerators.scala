@@ -16,7 +16,7 @@
 
 package generators
 
-import models.api.{ApiDetail, Endpoint, EndpointMethod, IntegrationResponse, Live}
+import models.api._
 import org.scalacheck.rng.Seed
 import org.scalacheck.{Arbitrary, Gen}
 
@@ -57,7 +57,22 @@ trait ApiDetailGenerators {
       endpoints <- Gen.listOfN(size / listSizeQuota, arbitraryEndpoint.arbitrary).suchThat(_.nonEmpty)
       shortDescription <- sensiblySizedAlphaNumStr
       openApiSpecification <- sensiblySizedAlphaNumStr
-    } yield ApiDetail(id.toString, publisherReference, title,description, version, endpoints, Some(shortDescription), openApiSpecification, Live)
+      apiStatus <- Gen.oneOf(ApiStatus.values)
+      domain <- sensiblySizedAlphaNumStr
+      subDomain <- sensiblySizedAlphaNumStr
+    } yield ApiDetail(
+      id.toString,
+      publisherReference,
+      title,
+      description,
+      version,
+      endpoints,
+      Some(shortDescription),
+      openApiSpecification,
+      apiStatus,
+      domain = Some(domain),
+      subDomain = Some(subDomain)
+    )
   }
 
   implicit lazy val arbitraryApiDetail: Arbitrary[ApiDetail] = Arbitrary(genApiDetail)

@@ -45,7 +45,9 @@ case class ApiDetail(
   shortDescription: Option[String],
   openApiSpecification: String,
   apiStatus: ApiStatus,
-  teamId: Option[String] = None
+  teamId: Option[String] = None,
+  domain: Option[String] = None,
+  subDomain: Option[String] = None
 )
 
 object ApiDetail {
