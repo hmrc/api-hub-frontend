@@ -166,6 +166,23 @@
                         </dd>
                     </div>
 
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            @messages("apiDetails.details.hods")
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            @if(apiDetail.hods.nonEmpty) {
+                                @Html(
+                                    apiDetail.hods.map( hod =>
+                                        s"<strong class='govuk-tag govuk-tag--grey'>$hod</strong>"
+                                    ).mkString(" ")
+                                )
+                            } else {
+                                @messages("apiDetails.details.notSpecified")
+                            }
+                        </dd>
+                    </div>
+
                     @if(teamName.isDefined) {
                         <div class="govuk-summary-list__row">
                             <dt class="govuk-summary-list__key">

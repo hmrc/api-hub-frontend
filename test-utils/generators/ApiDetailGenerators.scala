@@ -60,6 +60,7 @@ trait ApiDetailGenerators {
       apiStatus <- Gen.oneOf(ApiStatus.values)
       domain <- sensiblySizedAlphaNumStr
       subDomain <- sensiblySizedAlphaNumStr
+      hods <- Gen.listOfN(size/ listSizeQuota, sensiblySizedAlphaNumStr).suchThat(_.nonEmpty)
     } yield ApiDetail(
       id.toString,
       publisherReference,
@@ -71,7 +72,8 @@ trait ApiDetailGenerators {
       openApiSpecification,
       apiStatus,
       domain = Some(domain),
-      subDomain = Some(subDomain)
+      subDomain = Some(subDomain),
+      hods = hods
     )
   }
 

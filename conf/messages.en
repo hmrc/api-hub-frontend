@@ -259,6 +259,7 @@ apiDetails.details.version = Version
 apiDetails.details.status = Status
 apiDetails.details.domain = Domain
 apiDetails.details.subDomain = Sub-domain
+apiDetails.details.hods = HoD/Backend
 apiDetails.details.notSpecified = Not specified
 apiDetails.details.team = Owning team
 apiDetails.details.team.error = Team details could not be retrieved
