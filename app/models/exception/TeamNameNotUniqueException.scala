@@ -14,19 +14,14 @@
  * limitations under the License.
  */
 
-package forms
+package models.exception
 
-import javax.inject.Inject
+case class TeamNameNotUniqueException(message: String) extends ApplicationsException(message, null)
 
-import forms.mappings.Mappings
-import play.api.data.Form
+object TeamNameNotUniqueException {
 
-class CreateTeamNameFormProvider @Inject() extends Mappings {
+  def forName(name: String): TeamNameNotUniqueException = {
+    TeamNameNotUniqueException(s"Team name $name is not unique and cannot be used")
+  }
 
-  def apply(): Form[String] =
-    Form(
-      "value" -> text("createTeamName.error.required")
-        .verifying(maxLength(100, "createTeamName.error.length"))
-        .transform(_.trim, (s: String) => s)
-    )
 }

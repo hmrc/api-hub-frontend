@@ -23,12 +23,12 @@ import models.accessrequest.{AccessRequest, AccessRequestDecisionRequest, Access
 import models.api.ApiDeploymentStatuses
 import models.application._
 import models.deployment._
-import models.exception.{ApplicationCredentialLimitException, ApplicationsException}
+import models.exception.{ApplicationCredentialLimitException, ApplicationsException, TeamNameNotUniqueException}
 import models.requests.{AddApiRequest, TeamMemberRequest}
 import models.team.{NewTeam, Team}
 import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION, CONTENT_TYPE}
 import play.api.http.MimeTypes.JSON
-import play.api.http.Status.{BAD_GATEWAY, NOT_FOUND}
+import play.api.http.Status.{BAD_GATEWAY, CONFLICT, NOT_FOUND}
 import play.api.libs.json.Json
 import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
 import uk.gov.hmrc.http.HttpReads.Implicits._
@@ -295,6 +295,18 @@ class ApplicationsConnector @Inject()(
       }
   }
 
+  def findTeamByName(name: String)(implicit hc: HeaderCarrier): Future[Option[Team]] = {
+    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/teams/name/$name")
+      .setHeader((ACCEPT, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Either[UpstreamErrorResponse, Team]]
+      .flatMap {
+        case Right(team) => Future.successful(Some(team))
+        case Left(e) if e.statusCode == NOT_FOUND => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
+  }
+
   def findTeams(teamMemberEmail: Option[String])(implicit hc: HeaderCarrier): Future[Seq[Team]] = {
     val url = teamMemberEmail match {
       case Some(emailAddress) =>
@@ -310,14 +322,19 @@ class ApplicationsConnector @Inject()(
       .execute[Seq[Team]]
   }
 
-  def createTeam(team: NewTeam)(implicit hc:HeaderCarrier): Future[Team] = {
+  def createTeam(team: NewTeam)(implicit hc:HeaderCarrier): Future[Either[ApplicationsException, Team]] = {
     httpClient
       .post(url"$applicationsBaseUrl/api-hub-applications/teams")
       .setHeader((ACCEPT, JSON))
       .setHeader((CONTENT_TYPE, JSON))
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .withBody(Json.toJson(team))
-      .execute[Team]
+      .execute[Either[UpstreamErrorResponse, Team]]
+      .flatMap {
+        case Right(team) => Future.successful(Right(team))
+        case Left(e) if e.statusCode == CONFLICT => Future.successful(Left(TeamNameNotUniqueException.forName(team.name)))
+        case Left(e) => Future.failed(e)
+      }
   }
 
   def addTeamMemberToTeam(id: String, teamMember: TeamMember)(implicit hc:HeaderCarrier): Future[Option[Unit]] = {

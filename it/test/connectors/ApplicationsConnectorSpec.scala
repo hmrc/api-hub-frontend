@@ -25,11 +25,11 @@ import models.accessrequest._
 import models.api.ApiDeploymentStatuses
 import models.application._
 import models.deployment.{DeploymentsRequest, InvalidOasResponse, SuccessfulDeploymentsResponse, ValidationFailure}
-import models.exception.ApplicationCredentialLimitException
+import models.exception.{ApplicationCredentialLimitException, TeamNameNotUniqueException}
 import models.requests.{AddApiRequest, AddApiRequestEndpoint, TeamMemberRequest}
 import models.team.{NewTeam, Team}
 import models.user.{LdapUser, UserModel}
-import org.scalatest.OptionValues
+import org.scalatest.{EitherValues, OptionValues}
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
@@ -53,6 +53,7 @@ class ApplicationsConnectorSpec
   with Matchers
   with WireMockSupport
   with OptionValues
+  with EitherValues
   with ApplicationGetterBehaviours
   with TableDrivenPropertyChecks {
 
@@ -760,6 +761,45 @@ class ApplicationsConnectorSpec
     }
   }
 
+  "ApplicationsConnector.findTeamByName" - {
+    "must place the correct request and return the team when it exists" in {
+      val name = "test-team-name"
+      val expected = Team("test-team-id", name, LocalDateTime.now(), Seq(TeamMember(FakeUser.email.value)))
+
+      stubFor(
+        get(urlEqualTo(s"/api-hub-applications/teams/name/$name"))
+          .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withBody(Json.toJson(expected).toString())
+          )
+      )
+
+      buildConnector(this).findTeamByName(name)(HeaderCarrier()).map {
+        result =>
+          result mustBe Some(expected)
+      }
+    }
+
+    "must place the request and return None when the team does not exist" in {
+      val name = "test-team-name"
+
+      stubFor(
+        get(urlEqualTo(s"/api-hub-applications/teams/name/$name"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+          )
+      )
+
+      buildConnector(this).findTeamByName(name)(HeaderCarrier()).map {
+        result =>
+          result mustBe None
+      }
+    }
+  }
+
   "ApplicationsConnector.findTeams" - {
     "must place the correct request and return the matching teams when a user email is provided" in {
       val userEmail = "test-user-email"
@@ -815,6 +855,7 @@ class ApplicationsConnectorSpec
           .withHeader(CONTENT_TYPE, equalTo(ContentTypes.JSON))
           .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
           .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .withRequestBody(equalToJson(Json.toJson(newTeam).toString()))
           .willReturn(
             aResponse()
               .withStatus(CREATED)
@@ -824,7 +865,24 @@ class ApplicationsConnectorSpec
 
       buildConnector(this).createTeam(newTeam)(HeaderCarrier()).map {
         result =>
-          result mustBe team
+          result.value mustBe team
+      }
+    }
+
+    "must return TeamNameNotUniqueException when the response is 409 Conflict" in {
+      val newTeam = NewTeam("test-team-name", Seq(TeamMember("test-email")))
+
+      stubFor(
+        post(urlEqualTo(s"/api-hub-applications/teams"))
+          .willReturn(
+            aResponse()
+              .withStatus(CONFLICT)
+          )
+      )
+
+      buildConnector(this).createTeam(newTeam)(HeaderCarrier()).map {
+        result =>
+          result mustBe Left(TeamNameNotUniqueException.forName(newTeam.name))
       }
     }
   }

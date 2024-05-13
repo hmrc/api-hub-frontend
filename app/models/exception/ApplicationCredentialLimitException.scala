@@ -19,7 +19,7 @@ package models.exception
 import models.application.EnvironmentName
 
 //noinspection ScalaStyle
-case class ApplicationCredentialLimitException(message: String) extends ApplicationsException("message", null)
+case class ApplicationCredentialLimitException(message: String) extends ApplicationsException(message, null)
 
 object ApplicationCredentialLimitException {
 
