@@ -1,5 +1,4 @@
-function buildPaginator(elContainer) {
-    "use strict";
+export function buildPaginator(elContainer) {
     const noop = () => {};
 
     function buildView() {

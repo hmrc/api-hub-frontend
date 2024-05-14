@@ -3,8 +3,10 @@ import sbt.Def
 import scoverage.ScoverageKeys
 import uk.gov.hmrc.DefaultBuildSettings
 import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
+import scala.sys.process._
 
 lazy val appName: String = "api-hub-frontend"
+lazy val jsTest = taskKey[Unit]("jsTest")
 
 ThisBuild / majorVersion := 0
 ThisBuild / scalaVersion := "2.13.12"
@@ -43,7 +45,7 @@ lazy val root = (project in file("."))
     ScoverageKeys.coverageMinimumStmtTotal := 78,
     ScoverageKeys.coverageFailOnMinimum := true,
     ScoverageKeys.coverageHighlighting := true,
-        scalacOptions ++= Seq(
+    scalacOptions ++= Seq(
       "-feature",
       "-rootdir",
       baseDirectory.value.getCanonicalPath,
@@ -65,7 +67,13 @@ lazy val root = (project in file("."))
     // below line required to force asset pipeline to operate in dev rather than only prod
     Assets / pipelineStages := Seq(concat),
     Global / excludeLintKeys += update / evictionWarningOptions,
-    scalacOptions ++= Seq("-deprecation", "-feature")
+    scalacOptions ++= Seq("-deprecation", "-feature"),
+    jsTest := {
+      val exitCode = ("npm ci" #&& "npm test").!
+      if (exitCode != 0) {
+        throw new MessageOnlyException("npm install and test failed")
+      }
+    }
   )
 
 lazy val it = (project in file("it"))
@@ -78,3 +86,8 @@ lazy val testSettings: Seq[Def.Setting[_]] = Seq(
   fork := true,
   unmanagedSourceDirectories += baseDirectory.value / "test-utils"
 )
+
+test := {
+  jsTest.value
+  (test in Test).value
+}
