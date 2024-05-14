@@ -1,6 +1,7 @@
-const BROWSER_DEFAULT_LOCALE = undefined;
+const BROWSER_DEFAULT_LOCALE = undefined,
+    BROWSER_DEFAULT_TZ = undefined;
 
-export function localiseUtcDateTimeValues(locale = BROWSER_DEFAULT_LOCALE) {
+export function localiseUtcDateTimeValues(locale = BROWSER_DEFAULT_LOCALE, timeZone = BROWSER_DEFAULT_TZ) {
     /* Ensure that date/time display formats are permitted by the gov.uk style guide, see:
         https://www.gov.uk/guidance/style-guide/a-to-z-of-gov-uk-style#dates
         https://www.gov.uk/guidance/style-guide/a-to-z-of-gov-uk-style#times
@@ -19,7 +20,7 @@ export function localiseUtcDateTimeValues(locale = BROWSER_DEFAULT_LOCALE) {
                 date = new Date(utcDateText),
                 isValidDate = !isNaN(date.valueOf());
             if (isValidDate) {
-                el.textContent = date.toLocaleString(locale, options);
+                el.textContent = date.toLocaleString(locale, {...options, timeZone});
             } else {
                 console.warn(`Expected a valid date/time string but found "${rawDateText}"`);
             }

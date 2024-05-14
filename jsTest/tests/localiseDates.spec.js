@@ -2,7 +2,9 @@ import {JSDOM} from 'jsdom';
 import {localiseUtcDateTimeValues} from '../../app/assets/javascripts/localiseDates.js';
 
 describe('localiseUtcDateTimeValues', () => {
-    const LOCALE = 'en-GB'; // need to specify locale for headless tests - normally this comes from the user's browser configuration
+    // need to specify these for headless tests - normally they come from the user's browser configuration
+    const LOCALE = 'en-GB',
+        TZ = 'Europe/London';
     let document;
 
     beforeEach(() => {
@@ -29,7 +31,7 @@ describe('localiseUtcDateTimeValues', () => {
             it(`${className} format applied correctly to ${utcDateTime}`, () => {
                 createDateField(className, utcDateTime);
 
-                localiseUtcDateTimeValues(LOCALE);
+                localiseUtcDateTimeValues(LOCALE, TZ);
 
                 expect(document.querySelector(`.${className}`).textContent).toBe(expected);
             });
@@ -41,7 +43,7 @@ describe('localiseUtcDateTimeValues', () => {
         spyOn(console, 'warn');
         createDateField('utcDateTime', invalidDate);
 
-        localiseUtcDateTimeValues(LOCALE);
+        localiseUtcDateTimeValues(LOCALE, TZ);
 
         expect(document.querySelector('.utcDateTime').textContent).toBe(invalidDate);
         expect(console.warn).toHaveBeenCalledWith(`Expected a valid date/time string but found "${invalidDate}"`);
@@ -50,7 +52,7 @@ describe('localiseUtcDateTimeValues', () => {
     it("date formatting is still correct if UTC timezone suffix is included in value",  () => {
         createDateField('utcDateLong', '2020-07-01T00:00:00Z');
 
-        localiseUtcDateTimeValues(LOCALE);
+        localiseUtcDateTimeValues(LOCALE, TZ);
 
         expect(document.querySelector('.utcDateLong').textContent).toBe('1 July 2020');
     });
