@@ -17,9 +17,11 @@
 package config
 
 import com.google.inject.{Inject, Singleton}
+import com.typesafe.config.{ConfigList, ConfigUtil}
 import play.api.Configuration
 import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
+import play.twirl.api.TwirlHelperImports.twirlJavaCollectionToScala
 import uk.gov.hmrc.http.StringContextOps
 
 @Singleton
@@ -61,5 +63,9 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val cacheTtl: Int = configuration.get[Int]("mongodb.timeToLiveInSeconds")
 
   val shutterMessage: String = configuration.get[String]("shutter-message")
+
+  val domains: Map[String, Seq[String]] = configuration.get[Configuration]("domains").entrySet.map {
+    case (k, v) => ConfigUtil.splitPath(k).get(0) -> v.asInstanceOf[ConfigList].map(_.unwrapped().toString).toSeq
+  }.toMap
 
 }
