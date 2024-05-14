@@ -33,3 +33,4 @@ bin
 /*.ipr
 *.iws
 /.bsp/
+node_modules

@@ -129,3 +129,7 @@ function buildPaginator(elContainer) {
         }
     };
 }
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = buildPaginator;
+}
