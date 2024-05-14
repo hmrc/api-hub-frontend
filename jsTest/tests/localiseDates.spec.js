@@ -24,23 +24,18 @@ describe('localiseUtcDateTimeValues', () => {
         [
             ['utcDateShort', '2020-01-01T00:00:00', '1 Jan 2020'],
             ['utcDateLong', '2020-01-01T00:00:00', '1 January 2020'],
-            /* The JS date formatter inserts a narrow no-break space character between the time and am/pm.
-             Also we need to split the date/time components apart and just check that they both appear somewhere
-             in the output because the exact format of a date/time value can vary between environments even if the
-             locale is the same. In this case browsers add 'at' between the date and time whereas node running in
-             the build pipeline just uses a comma. */
-            ['utcDateTime', '2020-01-01T12:00:00', '1 January 2020', '12:00\u202fpm'],
-            ['utcDateTime', '2020-07-01T01:00:00', '1 July 2020', '2:00\u202fam'],
-        ].forEach(([className, utcDateTime, expectedDate, expectedTime]) => {
+            ['utcDateTime', '2020-01-01T12:00:00', '1 January 2020 at 12:00 pm'],
+            ['utcDateTime', '2020-07-01T01:00:00', '1 July 2020 at 2:00 am'],
+        ].forEach(([className, utcDateTime, expectedDateTime]) => {
             it(`${className} format applied correctly to ${utcDateTime}`, () => {
                 createDateField(className, utcDateTime);
 
                 localiseUtcDateTimeValues(LOCALE, TZ);
 
-                expect(document.querySelector(`.${className}`).textContent).toContain(expectedDate);
-                if (expectedTime) {
-                    expect(document.querySelector(`.${className}`).textContent).toContain(expectedTime);
-                }
+                /* There is some variation in how date/times get formatted between environments even if the locale and
+                timezone are the same. In the comparison below we normalise whitespace to ensure the tests pass both
+                locally and in the build pipeline */
+                expect(document.querySelector(`.${className}`).textContent.replaceAll(/\s/g, ' ')).toBe(expectedDateTime);
             });
         })
     });

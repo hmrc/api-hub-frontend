@@ -8,9 +8,9 @@ export function localiseUtcDateTimeValues(locale = BROWSER_DEFAULT_LOCALE, timeZ
     */
     const utcSuffix = 'Z',
         classToOptions = {
-            'utcDateShort': {dateStyle: "medium"}, // e.g. 1 Jan 2020
-            'utcDateLong': {dateStyle: "long"}, // e.g. 1 January 2020
-            'utcDateTime': {day:"numeric", month: "long", year: "numeric", hour: "numeric", minute: "numeric", hourCycle: 'h12'}, // e.g. 1 January 2020 at 12:00 pm
+            'utcDateShort': [{dateStyle: "medium"}], // e.g. 1 Jan 2020
+            'utcDateLong': [{dateStyle: "long"}], // e.g. 1 January 2020
+            'utcDateTime': [{dateStyle: "long"}, {hour: "numeric", minute: "numeric", hourCycle: 'h12'}], // e.g. 1 January 2020 at 12:00 pm
         };
 
     Object.entries(classToOptions).forEach(([className, options]) => {
@@ -20,7 +20,12 @@ export function localiseUtcDateTimeValues(locale = BROWSER_DEFAULT_LOCALE, timeZ
                 date = new Date(utcDateText),
                 isValidDate = !isNaN(date.valueOf());
             if (isValidDate) {
-                el.textContent = date.toLocaleString(locale, {...options, timeZone});
+                const [dateFormatOptions, timeFormatOptions] = options;
+                el.textContent = date.toLocaleDateString(locale, {...dateFormatOptions, timeZone});
+                if (timeFormatOptions) {
+                    const formattedTime = date.toLocaleTimeString(locale, {...timeFormatOptions, timeZone});
+                    el.textContent += ` at ${formattedTime}`;
+                }
             } else {
                 console.warn(`Expected a valid date/time string but found "${rawDateText}"`);
             }
