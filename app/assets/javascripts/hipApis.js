@@ -1,5 +1,6 @@
-window.addEventListener('pageshow', () => {
-    "use strict";
+import {buildPaginator} from './pagination.js';
+
+export function onPageShow() {
 
     const view = (() => {
         const statusFilterEls = Array.from(document.querySelectorAll('#statusFilters .govuk-checkboxes__input')),
@@ -111,4 +112,8 @@ window.addEventListener('pageshow', () => {
     });
 
     applyFilters();
-});
+}
+
+if (typeof window !== 'undefined') {
+    window.addEventListener('pageshow', onPageShow);
+}

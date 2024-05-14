@@ -17,6 +17,8 @@ This service provides the following functionality:
 
 This service is written in [Scala](http://www.scala-lang.org/) and [Play](http://playframework.com/), so needs at least a [JRE] to run.
 
+JavaScript unit tests are run using npm/node, the recommended way to install these is via [nvm](https://github.com/nvm-sh/nvm?tab=readme-ov-file#installing-and-updating) using `nvm install lts`
+
 ## Dependencies
 Beyond the typical HMRC Digital platform dependencies this service relies on:
 - api-hub-applications
