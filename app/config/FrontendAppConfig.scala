@@ -17,10 +17,13 @@
 package config
 
 import com.google.inject.{Inject, Singleton}
+import models.api.{Domain, SubDomain}
 import play.api.Configuration
 import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.http.StringContextOps
+
+import scala.jdk.CollectionConverters.CollectionHasAsScala
 
 @Singleton
 class FrontendAppConfig @Inject() (configuration: Configuration) {
@@ -61,5 +64,18 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val cacheTtl: Int = configuration.get[Int]("mongodb.timeToLiveInSeconds")
 
   val shutterMessage: String = configuration.get[String]("shutter-message")
+
+  val domains: Seq[Domain] = configuration.get[Seq[Configuration]]("domains").map {
+    configuration => {
+      val config = configuration.underlying
+      Domain(
+        code = config.getString("code"),
+        description = config.getString("description"),
+        subDomains = config.getConfig("subdomains").entrySet.asScala.map {
+          case e => SubDomain(e.getKey, e.getValue.unwrapped().toString)
+        }.toSeq
+      )
+    }
+  }
 
 }
