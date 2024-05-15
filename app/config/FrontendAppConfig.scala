@@ -17,12 +17,13 @@
 package config
 
 import com.google.inject.{Inject, Singleton}
-import com.typesafe.config.{ConfigList, ConfigUtil}
+import models.api.{Domain, SubDomain}
 import play.api.Configuration
 import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
-import play.twirl.api.TwirlHelperImports.twirlJavaCollectionToScala
 import uk.gov.hmrc.http.StringContextOps
+
+import scala.jdk.CollectionConverters.CollectionHasAsScala
 
 @Singleton
 class FrontendAppConfig @Inject() (configuration: Configuration) {
@@ -64,8 +65,17 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
 
   val shutterMessage: String = configuration.get[String]("shutter-message")
 
-  val domains: Map[String, Seq[String]] = configuration.get[Configuration]("domains").entrySet.map {
-    case (k, v) => ConfigUtil.splitPath(k).get(0) -> v.asInstanceOf[ConfigList].map(_.unwrapped().toString).toSeq
-  }.toMap
+  val domains: Seq[Domain] = configuration.get[Seq[Configuration]]("domains").map {
+    configuration => {
+      val config = configuration.underlying
+      Domain(
+        code = config.getString("code"),
+        description = config.getString("description"),
+        subDomains = config.getConfig("subdomains").entrySet.asScala.map {
+          case e => SubDomain(e.getKey, e.getValue.unwrapped().toString)
+        }.toSeq
+      )
+    }
+  }
 
 }

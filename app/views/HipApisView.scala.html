@@ -28,7 +28,7 @@
     govukDetails : GovukDetails,
 )
 
-@(user: Option[UserModel], apiDetails: Seq[ApiDetail] = Seq.empty, domains: Map[String,Seq[String]])(implicit request: Request[_], messages: Messages)
+@(user: Option[UserModel], apiDetails: Seq[ApiDetail] = Seq.empty, domains: Domains)(implicit request: Request[_], messages: Messages)
 
 @scripts() = {
     <script src='@routes.Assets.versioned("javascripts/pagination.js")' type="module" @{CSPNonce.attr}></script>
@@ -69,18 +69,18 @@
     </legend>
 
     <div id="domainFilters" class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
-    @for(domain <- domains.keys) {
+    @for(domain <- domains.domains) {
         <div>
             <div class="govuk-checkboxes__item">
-                <input class="govuk-checkboxes__input" id="filter_@domain" type="checkbox" value="@domain">
-                <label class="govuk-label govuk-checkboxes__label" for="filter_@domain">@domain</label>
+                <input class="govuk-checkboxes__input" id="filter_@domain.code" type="checkbox" value="@domain.code">
+                <label class="govuk-label govuk-checkboxes__label" for="filter_@domain.code">@domain.description</label>
             </div>
             <div class="govuk-checkboxes__conditional" re>
                 <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
-                    @for(subDomain <- domains(domain)) {
+                    @for(subDomain <- domain.subDomains) {
                         <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input" id="filter_@{domain}_@subDomain" type="checkbox" value="@subDomain">
-                            <label class="govuk-label govuk-checkboxes__label" for="filter_@{domain}_@subDomain">@subDomain</label>
+                            <input class="govuk-checkboxes__input" id="filter_@{domain.code}_@{subDomain.code}" type="checkbox" value="@{subDomain.code}">
+                            <label class="govuk-label govuk-checkboxes__label" for="filter_@{domain.code}_@{subDomain.code}">@subDomain.description</label>
                         </div>
                     }
                 </div>

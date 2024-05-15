@@ -33,14 +33,13 @@ class HipApisController @Inject()(
   override val controllerComponents: MessagesControllerComponents,
   apiHubService: ApiHubService,
   view: HipApisView,
-  config: FrontendAppConfig,
   optionallyIdentified: OptionalIdentifierAction
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = optionallyIdentified.async {
     implicit request =>
       apiHubService.getAllHipApis().map {
-        case apiDetails: Seq[ApiDetail] => Ok(view(request.user, apiDetails.sortWith( _.title.toUpperCase < _.title.toUpperCase), config.domains))
+        case apiDetails: Seq[ApiDetail] => Ok(view(request.user, apiDetails.sortWith( _.title.toUpperCase < _.title.toUpperCase), apiHubService.getDomains()))
         case _ => InternalServerError
       }
   }
