@@ -16,13 +16,12 @@
 
 package services
 
-import config.FrontendAppConfig
 import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
 import controllers.actions.FakeApplication
 import generators.{AccessRequestGenerator, ApiDetailGenerators}
 import models.AvailableEndpoint
 import models.accessrequest._
-import models.api.{ApiDeploymentStatuses, Domain, Domains, EndpointMethod, SubDomain}
+import models.api.{ApiDeploymentStatuses, EndpointMethod}
 import models.application.{Application, Creator, Credential, NewApplication, Primary, TeamMember}
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
 import models.team.{NewTeam, Team}
@@ -31,7 +30,6 @@ import org.mockito.{ArgumentMatchers, MockitoSugar}
 import org.scalatest.{EitherValues, OptionValues}
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import org.scalatest.prop.TableDrivenPropertyChecks
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -48,7 +46,6 @@ class ApiHubServiceSpec
     with ApiDetailGenerators
     with AccessRequestGenerator
     with TableDrivenPropertyChecks {
-
 
   "registerApplication" - {
     "must call the applications connector and return the saved application" in {
@@ -482,34 +479,18 @@ class ApiHubServiceSpec
     }
   }
 
-  "getDomains" - {
-    "must return domain data read from the config file" in {
-      val fixture = buildFixture()
-
-      val domains = Seq(
-        Domain("domain-code-1", "domain-description-1", Seq(SubDomain("subdomain-code-1", "subdomain-description-1"))),
-        Domain("domain-code-2", "domain-description-2", Seq(SubDomain("subdomain-code-2", "subdomain-description-2")))
-      )
-      when(fixture.config.domains).thenReturn(domains)
-
-      fixture.service.getDomains().domains shouldBe domains
-    }
-  }
-
   private case class Fixture(
     applicationsConnector: ApplicationsConnector,
     integrationCatalogueConnector: IntegrationCatalogueConnector,
-    config: FrontendAppConfig,
     service: ApiHubService
   )
 
   private def buildFixture(): Fixture = {
     val applicationsConnector = mock[ApplicationsConnector]
     val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-    val config = mock[FrontendAppConfig]
-    val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector, config)
+    val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
 
-    Fixture(applicationsConnector, integrationCatalogueConnector, config, service)
+    Fixture(applicationsConnector, integrationCatalogueConnector, service)
   }
 
 }
@@ -526,7 +507,7 @@ trait ApplicationGetterBehaviours {
       when(applicationsConnector.getApplication(ArgumentMatchers.eq("id-1"), ArgumentMatchers.eq(enrich))(any())).thenReturn(Future.successful(expected))
 
       val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector, mock[FrontendAppConfig])
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
 
       service.getApplication("id-1", enrich)(HeaderCarrier()) map {
         actual =>
@@ -548,7 +529,7 @@ trait ApplicationGetterBehaviours {
         .thenReturn(Future.successful(expected))
 
       val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector, mock[FrontendAppConfig])
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
 
       service.getUserApplications("test-creator-email-2", enrich = enrich)(HeaderCarrier()) map {
         actual =>

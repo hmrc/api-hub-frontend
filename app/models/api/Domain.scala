@@ -18,5 +18,3 @@ package models.api
 
 case class Domain(code: String, description: String, subDomains: Seq[SubDomain])
 case class SubDomain(code: String, description: String)
-
-class Domains(val domains: Seq[Domain]) {} // add methods for looking up descriptions from codes in here
