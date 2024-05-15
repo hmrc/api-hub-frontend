@@ -22,7 +22,8 @@ import generators.{AccessRequestGenerator, ApiDetailGenerators}
 import models.AvailableEndpoint
 import models.accessrequest._
 import models.api.{ApiDeploymentStatuses, EndpointMethod}
-import models.application.{Application, Creator, Credential, NewApplication, Primary, TeamMember}
+import models.application.{Application, Creator, Credential, Deleted, NewApplication, Primary, TeamMember}
+import models.application.ApplicationLenses._
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
 import models.team.{NewTeam, Team}
 import org.mockito.ArgumentMatchers.any
@@ -72,22 +73,49 @@ class ApiHubServiceSpec
       val expected = Seq(application1, application2)
 
       val fixture = buildFixture()
-      when(fixture.applicationsConnector.getApplications()(any())).thenReturn(Future.successful(expected))
+      when(fixture.applicationsConnector.getApplications(any(), any())(any())).thenReturn(Future.successful(expected))
 
-      fixture.service.getApplications()(HeaderCarrier()) map {
+      fixture.service.getApplications(None, false)(HeaderCarrier()) map {
         actual =>
           actual mustBe expected
-          verify(fixture.applicationsConnector).getApplications()(any())
+          verify(fixture.applicationsConnector).getApplications(ArgumentMatchers.eq(None), ArgumentMatchers.eq(false))(any())
           succeed
       }
     }
 
-    "must" - {
-      behave like successfulUserApplicationsGetter(enrich = true)
+    "must call the applications connector and return a sequence of applications including deleted when requested" in {
+      val application1 = Application("id-1", "test-app-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1")))
+      val application2 = Application("id-2", "test-app-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2")))
+        .delete(Deleted(LocalDateTime.now(), "test-deleted-by"))
+      val expected = Seq(application1, application2)
+
+      val fixture = buildFixture()
+      when(fixture.applicationsConnector.getApplications(any(), any())(any())).thenReturn(Future.successful(expected))
+
+      fixture.service.getApplications(None, true)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe expected
+          verify(fixture.applicationsConnector).getApplications(ArgumentMatchers.eq(None), ArgumentMatchers.eq(true))(any())
+          succeed
+      }
     }
 
-    "must" - {
-      behave like successfulUserApplicationsGetter(enrich = false)
+    "must call the applications connector and return a user's applications when requested" in {
+      val application1 = Application("id-1", "test-app-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1")))
+      val application2 = Application("id-2", "test-app-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2")))
+      val expected = Seq(application1, application2)
+
+      val fixture = buildFixture()
+
+      when(fixture.applicationsConnector.getApplications(ArgumentMatchers.eq(Some("test-creator-email-2")), ArgumentMatchers.eq(false))(any()))
+        .thenReturn(Future.successful(expected))
+
+      fixture.service.getApplications(Some("test-creator-email-2"), false)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe expected
+          verify(fixture.applicationsConnector).getApplications(ArgumentMatchers.eq(Some("test-creator-email-2")), ArgumentMatchers.eq(false))(any())
+          succeed
+      }
     }
   }
 
@@ -513,28 +541,6 @@ trait ApplicationGetterBehaviours {
         actual =>
           actual mustBe expected
           verify(applicationsConnector).getApplication(ArgumentMatchers.eq("id-1"), ArgumentMatchers.eq(enrich))(any())
-          succeed
-      }
-    }
-  }
-
-  def successfulUserApplicationsGetter(enrich: Boolean): Unit = {
-    s"must call the applications connector and return a user's applications when enrich is $enrich" in {
-      val application1 = Application("id-1", "test-app-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1")))
-      val application2 = Application("id-2", "test-app-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2")))
-      val expected = Seq(application1, application2)
-
-      val applicationsConnector = mock[ApplicationsConnector]
-      when(applicationsConnector.getUserApplications(ArgumentMatchers.eq("test-creator-email-2"), ArgumentMatchers.eq(enrich))(any()))
-        .thenReturn(Future.successful(expected))
-
-      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
-
-      service.getUserApplications("test-creator-email-2", enrich = enrich)(HeaderCarrier()) map {
-        actual =>
-          actual mustBe expected
-          verify(applicationsConnector).getUserApplications(ArgumentMatchers.eq("test-creator-email-2"), ArgumentMatchers.eq(enrich))(any())
           succeed
       }
     }

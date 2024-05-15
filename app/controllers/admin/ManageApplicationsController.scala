@@ -37,7 +37,7 @@ class ManageApplicationsController @Inject()(
 
   def onPageLoad(): Action[AnyContent] = (identify andThen isSupport).async {
     implicit request =>
-      apiHubService.getApplications().map(applications => Ok(view(applications.sortBy(_.name.toLowerCase), request.user)))
+      apiHubService.getApplications(None, true).map(applications => Ok(view(applications.sortBy(_.name.toLowerCase), request.user)))
   }
 
 }

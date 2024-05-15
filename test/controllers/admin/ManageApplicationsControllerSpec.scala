@@ -49,7 +49,7 @@ class ManageApplicationsControllerSpec
           Application("id-2", "app-name-1", Creator(creatorEmail), Seq.empty).copy(teamMembers = Seq(TeamMember(testEmail)))
         )
 
-        when(fixture.apiHubService.getApplications()(any)).thenReturn(Future.successful(applications))
+        when(fixture.apiHubService.getApplications(any, any)(any)).thenReturn(Future.successful(applications))
 
         running(fixture.playApplication) {
           val request = FakeRequest(controllers.admin.routes.ManageApplicationsController.onPageLoad())
@@ -57,7 +57,7 @@ class ManageApplicationsControllerSpec
 
           status(result) mustBe OK
 
-          verify(fixture.apiHubService).getApplications()(any)
+          verify(fixture.apiHubService).getApplications(eqTo(None), eqTo(true))(any)
 
           val view = fixture.playApplication.injector.instanceOf[ManageApplicationsView]
           contentAsString(result) mustBe view(applications.sortBy(_.name.toLowerCase), user)(request, messages(fixture.playApplication)).toString()

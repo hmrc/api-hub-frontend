@@ -40,7 +40,7 @@ class ApplicationsController @Inject()(
     request.user.email.fold[Future[Result]] {
       noEmail()
     }(email =>
-      apiHubService.getUserApplications(email).map(userApps => Ok(view(
+      apiHubService.getApplications(Some(email), false).map(userApps => Ok(view(
         userApps.sortBy(_.name.toLowerCase),
         Some(request.user))))
     )

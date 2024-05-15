@@ -21,7 +21,8 @@
 
 @this(
     layout: templates.Layout,
-    govukTable: GovukTable
+    govukTable: GovukTable,
+    govukTag : GovukTag
 )
 
 @(applications: Seq[Application], user: UserModel)(implicit request: Request[_], messages: Messages)
@@ -34,24 +35,32 @@
             @messages("manageApplications.heading")
         </h1>
 
-        @applications.map(application =>
-        <div class="hip-inner-card flex">
-            <div class="left">
-                <h5 class="govuk-heading-s hip-inner-card-title govuk-!-margin-bottom-4">
-                    <a class="govuk-link govuk-link--no-visited-state" href={controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url}>{application.name}</a>
-                </h5>
-                <p class="govuk-body-s govuk-!-margin-top-1">
-                    <strong>{messages("manageApplications.application.id")}: </strong>{application.id}
-                </p>
+        @for(application <- applications){
+            <div class="hip-inner-card flex">
+                <div class="left">
+                    <h5 class="govuk-heading-s hip-inner-card-title govuk-!-margin-bottom-4">
+                        <a class="govuk-link govuk-link--no-visited-state" href=@controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url>@application.name</a>
+                    </h5>
+                    <p class="govuk-body-s govuk-!-margin-top-1">
+                        <strong>@messages("manageApplications.application.id"): </strong>@application.id
+                    </p>
+                </div>
+                <div class="right ">
+                    <p class="govuk-body-s govuk-!-margin-top-1">
+                        <strong>@messages("manageApplications.application.created"):</strong>
+                        <span class="utcDateShort">@ViewUtils.formatLocalDateTimeContainingUtc(application.created)</span>
+                    </p>
+                    @for(deleted <- application.deleted){
+                        <p class="govuk-body-s govuk-!-margin-top-1">
+                            @govukTag(Tag(
+                                content = Text("Deleted"),
+                                classes = "govuk-tag--grey"
+                            ))
+                        </p>
+                    }
+                </div>
             </div>
-            <div class="right ">
-                <p class="govuk-body-s govuk-!-margin-top-1">
-                    <strong>{messages("manageApplications.application.created")}:</strong>
-                    <span class="utcDateShort">{ViewUtils.formatLocalDateTimeContainingUtc(application.created)}</span>
-                </p>
-            </div>
-        </div>
-        )
+        }
 
     }
 

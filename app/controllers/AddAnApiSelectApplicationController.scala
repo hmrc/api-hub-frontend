@@ -85,7 +85,7 @@ class AddAnApiSelectApplicationController @Inject()(
       email =>
         request.userAnswers.get(AddAnApiApiPage) match {
           case Some(apiDetail) =>
-            apiHubService.getUserApplications(email).map {
+            apiHubService.getApplications(Some(email), false).map {
               applications =>
                 status(
                   view(

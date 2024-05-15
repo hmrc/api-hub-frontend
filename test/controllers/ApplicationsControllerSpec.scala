@@ -51,7 +51,7 @@ class ApplicationsControllerSpec extends SpecBase with MockitoSugar with HtmlVal
 
       running(fixture.application) {
 
-        when(fixture.mockApiHubService.getUserApplications(ArgumentMatchers.eq(testEmail), ArgumentMatchers.eq(false))(any()))
+        when(fixture.mockApiHubService.getApplications(ArgumentMatchers.eq(Some(testEmail)), ArgumentMatchers.eq(false))(any()))
           .thenReturn(Future.successful(applications))
 
         val request = FakeRequest(GET, routes.ApplicationsController.onPageLoad.url)

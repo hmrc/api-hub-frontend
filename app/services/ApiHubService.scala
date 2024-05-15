@@ -41,8 +41,8 @@ class ApiHubService @Inject()(
     applicationsConnector.registerApplication(newApplication)
   }
 
-  def getApplications()(implicit hc: HeaderCarrier): Future[Seq[Application]] = {
-    applicationsConnector.getApplications()
+  def getApplications(userEmail: Option[String], includeDeleted: Boolean)(implicit hc: HeaderCarrier): Future[Seq[Application]] = {
+    applicationsConnector.getApplications(userEmail, includeDeleted)
   }
 
   def getApplication(id:String, enrich: Boolean)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
@@ -59,9 +59,6 @@ class ApiHubService @Inject()(
     val endpoints = availableEndpoints.map(ae => AddApiRequestEndpoint(ae.endpointMethod.httpMethod, ae.path))
     applicationsConnector.addApi(applicationId, AddApiRequest(apiId, endpoints, scopes))
   }
-
-  def getUserApplications(email:String, enrich: Boolean = false)(implicit hc:HeaderCarrier): Future[Seq[Application]] =
-    applicationsConnector.getUserApplications(email, enrich)
 
   def testConnectivity()(implicit hc: HeaderCarrier): Future[String] = {
     applicationsConnector.testConnectivity()
