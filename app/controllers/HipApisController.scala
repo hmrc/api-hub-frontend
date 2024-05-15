@@ -17,7 +17,7 @@
 package controllers
 
 import com.google.inject.{Inject, Singleton}
-import config.FrontendAppConfig
+import config.Domains
 import controllers.actions.OptionalIdentifierAction
 import models.api.ApiDetail
 import play.api.i18n.I18nSupport
@@ -33,13 +33,14 @@ class HipApisController @Inject()(
   override val controllerComponents: MessagesControllerComponents,
   apiHubService: ApiHubService,
   view: HipApisView,
-  optionallyIdentified: OptionalIdentifierAction
+  optionallyIdentified: OptionalIdentifierAction,
+  domains: Domains
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = optionallyIdentified.async {
     implicit request =>
       apiHubService.getAllHipApis().map {
-        case apiDetails: Seq[ApiDetail] => Ok(view(request.user, apiDetails.sortWith( _.title.toUpperCase < _.title.toUpperCase), apiHubService.getDomains()))
+        case apiDetails: Seq[ApiDetail] => Ok(view(request.user, apiDetails.sortWith( _.title.toUpperCase < _.title.toUpperCase), domains.domains))
         case _ => InternalServerError
       }
   }

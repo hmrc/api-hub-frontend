@@ -17,11 +17,10 @@
 package services
 
 import com.google.inject.{Inject, Singleton}
-import config.FrontendAppConfig
 import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
 import models.AvailableEndpoint
 import models.accessrequest.{AccessRequest, AccessRequestRequest, AccessRequestStatus}
-import models.api.{ApiDeploymentStatuses, ApiDetail, Domain, Domains}
+import models.api.{ApiDeploymentStatuses, ApiDetail}
 import models.application._
 import models.exception.ApplicationsException
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
@@ -34,8 +33,7 @@ import scala.concurrent.Future
 @Singleton
 class ApiHubService @Inject()(
   applicationsConnector: ApplicationsConnector,
-  integrationCatalogueConnector: IntegrationCatalogueConnector,
-  config: FrontendAppConfig
+  integrationCatalogueConnector: IntegrationCatalogueConnector
 ) extends Logging {
 
   def registerApplication(newApplication: NewApplication)(implicit hc: HeaderCarrier): Future[Application] = {
@@ -138,5 +136,4 @@ class ApiHubService @Inject()(
     applicationsConnector.addTeamMemberToTeam(id, teamMember)
   }
 
-  def getDomains(): Domains = new Domains(config.domains)
 }

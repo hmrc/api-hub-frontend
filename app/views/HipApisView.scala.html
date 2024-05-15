@@ -28,7 +28,7 @@
     govukDetails : GovukDetails,
 )
 
-@(user: Option[UserModel], apiDetails: Seq[ApiDetail] = Seq.empty, domains: Domains)(implicit request: Request[_], messages: Messages)
+@(user: Option[UserModel], apiDetails: Seq[ApiDetail] = Seq.empty, domains: Seq[Domain])(implicit request: Request[_], messages: Messages)
 
 @scripts() = {
     <script src='@routes.Assets.versioned("javascripts/pagination.js")' type="module" @{CSPNonce.attr}></script>
@@ -69,7 +69,7 @@
     </legend>
 
     <div id="domainFilters" class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
-    @for(domain <- domains.domains) {
+    @for(domain <- domains) {
         <div>
             <div class="govuk-checkboxes__item">
                 <input class="govuk-checkboxes__input" id="filter_@domain.code" type="checkbox" value="@domain.code">
