@@ -57,9 +57,17 @@ class ApplicationsConnector @Inject()(
       .execute[Application]
   }
 
-  def getApplications()(implicit hc: HeaderCarrier): Future[Seq[Application]] = {
+  def getApplications(userEmail:Option[String], includeDeleted: Boolean)(implicit hc: HeaderCarrier): Future[Seq[Application]] = {
+    val applicationsUrl = userEmail match {
+      case Some(email) =>
+        val emailEncrypted = crypto.QueryParameterCrypto.encrypt(PlainText(email)).value
+        url"$applicationsBaseUrl/api-hub-applications/applications?teamMember=$emailEncrypted&includeDeleted=$includeDeleted"
+      case _ =>
+        url"$applicationsBaseUrl/api-hub-applications/applications?includeDeleted=$includeDeleted"
+    }
+
     httpClient
-      .get(url"$applicationsBaseUrl/api-hub-applications/applications")
+      .get(applicationsUrl)
       .setHeader((ACCEPT, JSON))
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Seq[Application]]
@@ -76,15 +84,6 @@ class ApplicationsConnector @Inject()(
         case Left(e) if e.statusCode==404 => Future.successful(None)
         case Left(e) => Future.failed(e)
       }
-  }
-
-  def getUserApplications(userEmail:String, enrich: Boolean)(implicit hc: HeaderCarrier): Future[Seq[Application]] = {
-    val emailEncrypted = crypto.QueryParameterCrypto.encrypt(PlainText(userEmail)).value
-    httpClient
-      .get(url"$applicationsBaseUrl/api-hub-applications/applications/?teamMember=$emailEncrypted&enrich=$enrich")
-      .setHeader((ACCEPT, JSON))
-      .setHeader(AUTHORIZATION -> clientAuthToken)
-      .execute[Seq[Application]]
   }
 
   def deleteApplication(id: String, currentUser: Option[String])(implicit hc: HeaderCarrier): Future[Option[Unit]] = {

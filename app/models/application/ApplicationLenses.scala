@@ -81,6 +81,12 @@ object ApplicationLenses {
       set = (application, apis) => application.copy(apis = apis)
     )
 
+  val applicationDeleted: Lens[Application, Option[Deleted]] =
+    Lens[Application, Option[Deleted]](
+      get = _.deleted,
+      set = (application, deleted) => application.copy(deleted = deleted)
+    )
+
   implicit class ApplicationLensOps(application: Application) {
 
     def getPrimaryScopes: Seq[Scope] =
@@ -181,6 +187,12 @@ object ApplicationLenses {
       applicationApis.set(
         application,
         applicationApis.get(application) :+ api
+      )
+
+    def delete(deleted: Deleted): Application =
+      applicationDeleted.set(
+        application,
+        Some(deleted)
       )
 
   }

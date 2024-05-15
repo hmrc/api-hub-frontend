@@ -24,6 +24,7 @@ import models.UserEmail
 import models.accessrequest._
 import models.api.ApiDeploymentStatuses
 import models.application._
+import models.application.ApplicationLenses._
 import models.deployment.{DeploymentsRequest, InvalidOasResponse, SuccessfulDeploymentsResponse, ValidationFailure}
 import models.exception.{ApplicationCredentialLimitException, TeamNameNotUniqueException}
 import models.requests.{AddApiRequest, AddApiRequestEndpoint, TeamMemberRequest}
@@ -84,16 +85,6 @@ class ApplicationsConnectorSpec
     }
   }
 
-  "ApplicationsConnector.getUserApplications" - {
-    "must" - {
-      behave like successfulUserApplicationsGetter(true)
-    }
-
-    "must" - {
-      behave like successfulUserApplicationsGetter(false)
-    }
-  }
-
   "ApplicationsConnector.getApplications" - {
     "must place the correct request and return the array of applications" in {
       val application1 = Application("id-1", "test-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1")))
@@ -101,7 +92,7 @@ class ApplicationsConnectorSpec
       val expected = Seq(application1, application2)
 
       stubFor(
-        get(urlEqualTo("/api-hub-applications/applications"))
+        get(urlEqualTo("/api-hub-applications/applications?includeDeleted=false"))
           .withHeader("Accept", equalTo("application/json"))
           .withHeader("Authorization", equalTo("An authentication token"))
           .willReturn(
@@ -110,7 +101,56 @@ class ApplicationsConnectorSpec
           )
       )
 
-      buildConnector(this).getApplications()(HeaderCarrier()) map {
+      buildConnector(this).getApplications(None, false)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe expected
+      }
+    }
+
+    "must place the correct request and return the applications including deleted ones when requested" in {
+      val application1 = Application("id-1", "test-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1")))
+      val application2 = Application("id-2", "test-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2")))
+        .delete(Deleted(LocalDateTime.now(), "test-deleted-by"))
+      val expected = Seq(application1, application2)
+
+      stubFor(
+        get(urlEqualTo("/api-hub-applications/applications?includeDeleted=true"))
+          .withHeader("Accept", equalTo("application/json"))
+          .withHeader("Authorization", equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withBody(toJsonString(expected))
+          )
+      )
+
+      buildConnector(this).getApplications(None, true)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe expected
+      }
+    }
+
+    "must place the correct request and return the applications for a given user when requested" in {
+      val testEmail = "test-user-email-2"
+      val application1 = Application("id-1", "test-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1")))
+        .copy(teamMembers = Seq(TeamMember("test-creator-email-1"), TeamMember(testEmail)))
+      val application2 = Application("id-2", "test-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2")))
+        .copy(teamMembers = Seq(TeamMember(testEmail), TeamMember("test-user-email-3")))
+      val expected = Seq(application1, application2)
+      val crypto = new ApplicationCrypto(ConfigFactory.parseResources("application.conf"))
+
+      val userEmailEncrypted = crypto.QueryParameterCrypto.encrypt(PlainText(testEmail)).value
+      val userEmailEncoded = URLEncoder.encode(userEmailEncrypted, "UTF-8")
+      stubFor(
+        get(urlEqualTo(f"/api-hub-applications/applications?teamMember=$userEmailEncoded&includeDeleted=false"))
+          .withHeader("Accept", equalTo("application/json"))
+          .withHeader("Authorization", equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withBody(toJsonString(expected))
+          )
+      )
+
+      buildConnector(this).getApplications(Some("test-user-email-2"), false)(HeaderCarrier()) map {
         actual =>
           actual mustBe expected
       }
@@ -1003,34 +1043,6 @@ object ApplicationsConnectorSpec extends HttpClientV2Support {
 
     }
 
-    def successfulUserApplicationsGetter(enrich: Boolean): Unit = {
-      s"must place the correct request and return the applications for a given user when enrich = $enrich" in {
-        val testEmail = "test-user-email-2"
-        val application1 = Application("id-1", "test-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1")))
-          .copy(teamMembers = Seq(TeamMember("test-creator-email-1"), TeamMember(testEmail)))
-        val application2 = Application("id-2", "test-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2")))
-          .copy(teamMembers = Seq(TeamMember(testEmail), TeamMember("test-user-email-3")))
-        val expected = Seq(application1, application2)
-        val crypto = new ApplicationCrypto(ConfigFactory.parseResources("application.conf"))
-
-        val userEmailEncrypted = crypto.QueryParameterCrypto.encrypt(PlainText(testEmail)).value
-        val userEmailEncoded = URLEncoder.encode(userEmailEncrypted, "UTF-8")
-        stubFor(
-          get(urlEqualTo(f"/api-hub-applications/applications/?teamMember=$userEmailEncoded&enrich=$enrich"))
-            .withHeader("Accept", equalTo("application/json"))
-            .withHeader("Authorization", equalTo("An authentication token"))
-            .willReturn(
-              aResponse()
-                .withBody(toJsonString(expected))
-            )
-        )
-
-        buildConnector(this).getUserApplications("test-user-email-2", enrich)(HeaderCarrier()) map {
-          actual =>
-            actual mustBe expected
-        }
-      }
-    }
   }
 
 }
