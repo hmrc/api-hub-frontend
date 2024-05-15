@@ -52,17 +52,14 @@ class ApiHubServiceSpec
       val newApplication = NewApplication("test-app-name", Creator("test-creator-email"), Seq(TeamMember("test-creator-email")))
       val expected = Application("id", newApplication)
 
-      val applicationsConnector = mock[ApplicationsConnector]
-      when(applicationsConnector.registerApplication(ArgumentMatchers.eq(newApplication))(any()))
+      val fixture = buildFixture()
+      when(fixture.applicationsConnector.registerApplication(ArgumentMatchers.eq(newApplication))(any()))
         .thenReturn(Future.successful(expected))
 
-      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
-
-      service.registerApplication(newApplication)(HeaderCarrier()) map {
+      fixture.service.registerApplication(newApplication)(HeaderCarrier()) map {
         actual =>
           actual mustBe expected
-          verify(applicationsConnector).registerApplication(ArgumentMatchers.eq(newApplication))(any())
+          verify(fixture.applicationsConnector).registerApplication(ArgumentMatchers.eq(newApplication))(any())
           succeed
       }
     }
@@ -74,16 +71,13 @@ class ApiHubServiceSpec
       val application2 = Application("id-2", "test-app-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2")))
       val expected = Seq(application1, application2)
 
-      val applicationsConnector = mock[ApplicationsConnector]
-      when(applicationsConnector.getApplications()(any())).thenReturn(Future.successful(expected))
+      val fixture = buildFixture()
+      when(fixture.applicationsConnector.getApplications()(any())).thenReturn(Future.successful(expected))
 
-      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
-
-      service.getApplications()(HeaderCarrier()) map {
+      fixture.service.getApplications()(HeaderCarrier()) map {
         actual =>
           actual mustBe expected
-          verify(applicationsConnector).getApplications()(any())
+          verify(fixture.applicationsConnector).getApplications()(any())
           succeed
       }
     }
@@ -112,17 +106,14 @@ class ApiHubServiceSpec
       val id = "test-id"
 
       val userEmail = Some("me@test.com")
-      val applicationsConnector = mock[ApplicationsConnector]
-      when(applicationsConnector.deleteApplication(ArgumentMatchers.eq(id), ArgumentMatchers.eq(userEmail))(any()))
+      val fixture = buildFixture()
+      when(fixture.applicationsConnector.deleteApplication(ArgumentMatchers.eq(id), ArgumentMatchers.eq(userEmail))(any()))
         .thenReturn(Future.successful(Some(())))
 
-      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
-
-      service.deleteApplication(id, userEmail)(HeaderCarrier()) map {
+      fixture.service.deleteApplication(id, userEmail)(HeaderCarrier()) map {
         actual =>
           actual mustBe Some(())
-          verify(applicationsConnector).deleteApplication(any(), ArgumentMatchers.eq(userEmail))(any())
+          verify(fixture.applicationsConnector).deleteApplication(any(), ArgumentMatchers.eq(userEmail))(any())
           succeed
       }
     }
@@ -130,14 +121,11 @@ class ApiHubServiceSpec
     "must return None when the applications connectors does to indicate the application was not found" in {
       val id = "test-id"
 
-      val applicationsConnector = mock[ApplicationsConnector]
-      when(applicationsConnector.deleteApplication(ArgumentMatchers.eq(id), any())(any()))
+      val fixture = buildFixture()
+      when(fixture.applicationsConnector.deleteApplication(ArgumentMatchers.eq(id), any())(any()))
         .thenReturn(Future.successful(None))
 
-      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
-
-      service.deleteApplication(id, None)(HeaderCarrier()) map {
+      fixture.service.deleteApplication(id, None)(HeaderCarrier()) map {
         actual =>
           actual mustBe None
       }
@@ -147,14 +135,12 @@ class ApiHubServiceSpec
   "testConnectivity" - {
     "must call the applications connector and return something" in {
       val expected = "something"
-      val applicationsConnector = mock[ApplicationsConnector]
-      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+      val fixture = buildFixture()
 
-      when(applicationsConnector.testConnectivity()(any()))
+      when(fixture.applicationsConnector.testConnectivity()(any()))
         .thenReturn(Future.successful(expected))
 
-      service.testConnectivity()(HeaderCarrier()) map {
+      fixture.service.testConnectivity()(HeaderCarrier()) map {
         actual =>
           actual mustBe expected
       }
@@ -165,14 +151,12 @@ class ApiHubServiceSpec
     "must call the integration catalogue connector and return the API detail" in {
       val expected = sampleApiDetail()
 
-      val applicationsConnector = mock[ApplicationsConnector]
-      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+      val fixture = buildFixture()
 
-      when(integrationCatalogueConnector.getApiDetail(ArgumentMatchers.eq(expected.id))(any()))
+      when(fixture.integrationCatalogueConnector.getApiDetail(ArgumentMatchers.eq(expected.id))(any()))
         .thenReturn(Future.successful(Some(expected)))
 
-      service.getApiDetail(expected.id)(HeaderCarrier()) map {
+      fixture.service.getApiDetail(expected.id)(HeaderCarrier()) map {
         actual =>
           actual mustBe Some(expected)
       }
@@ -184,14 +168,12 @@ class ApiHubServiceSpec
       val publisherReference = "ref123"
       val expected = ApiDeploymentStatuses(true, false)
 
-      val applicationsConnector = mock[ApplicationsConnector]
-      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+      val fixture = buildFixture()
 
-      when(applicationsConnector.getApiDeploymentStatuses(ArgumentMatchers.eq(publisherReference))(any()))
+      when(fixture.applicationsConnector.getApiDeploymentStatuses(ArgumentMatchers.eq(publisherReference))(any()))
         .thenReturn(Future.successful(Some(expected)))
 
-      service.getApiDeploymentStatuses(publisherReference)(HeaderCarrier()) map {
+      fixture.service.getApiDeploymentStatuses(publisherReference)(HeaderCarrier()) map {
         actual =>
           actual mustBe Some(expected)
       }
@@ -202,14 +184,12 @@ class ApiHubServiceSpec
     "must call the integration catalogue connector and some API details" in {
       val expected = Seq(sampleApiDetail())
 
-      val applicationsConnector = mock[ApplicationsConnector]
-      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+      val fixture = buildFixture()
 
-      when(integrationCatalogueConnector.getAllHipApis()(any()))
+      when(fixture.integrationCatalogueConnector.getAllHipApis()(any()))
         .thenReturn(Future.successful(expected))
 
-      service.getAllHipApis()(HeaderCarrier()) map {
+      fixture.service.getAllHipApis()(HeaderCarrier()) map {
         actual =>
           actual mustBe expected
       }
@@ -218,9 +198,7 @@ class ApiHubServiceSpec
 
   "addApi" - {
     "must call the applications connector with correct request and return something" in {
-      val applicationsConnector = mock[ApplicationsConnector]
-      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+      val fixture = buildFixture()
 
       val applicationId = "applicationId"
       val apiId = "apiId"
@@ -232,9 +210,9 @@ class ApiHubServiceSpec
       val apiRequest = AddApiRequest(apiId, Seq(AddApiRequestEndpoint(verb, path)), scopes)
 
       val expected = Some(())
-      when(applicationsConnector.addApi(ArgumentMatchers.eq(applicationId), ArgumentMatchers.eq(apiRequest))(any())).thenReturn(Future.successful(expected))
+      when(fixture.applicationsConnector.addApi(ArgumentMatchers.eq(applicationId), ArgumentMatchers.eq(apiRequest))(any())).thenReturn(Future.successful(expected))
 
-      service.addApi(applicationId, apiId, availableEndpoints)(HeaderCarrier()) map {
+      fixture.service.addApi(applicationId, apiId, availableEndpoints)(HeaderCarrier()) map {
         actual =>
           actual mustBe expected
       }
@@ -243,15 +221,13 @@ class ApiHubServiceSpec
 
   "addCredential" - {
     "must call the applications connector with the correct request and return the response" in {
-      val applicationsConnector = mock[ApplicationsConnector]
-      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+      val fixture = buildFixture()
       val expected = Credential("test-client-id", LocalDateTime.now(), Some("test-secret"), Some("test-fragment"))
 
-      when(applicationsConnector.addCredential(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(Primary))(any()))
+      when(fixture.applicationsConnector.addCredential(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(Primary))(any()))
         .thenReturn(Future.successful(Right(Some(expected))))
 
-      service.addCredential(FakeApplication.id, Primary)(HeaderCarrier()).map {
+      fixture.service.addCredential(FakeApplication.id, Primary)(HeaderCarrier()).map {
         actual =>
           actual mustBe Right(Some(expected))
       }
@@ -260,17 +236,15 @@ class ApiHubServiceSpec
 
   "deleteCredential" - {
     "must call the applications connector with the correct request and return the response" in {
-      val applicationsConnector = mock[ApplicationsConnector]
-      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+      val fixture = buildFixture()
       val clientId = "test-client-id"
 
-      when(applicationsConnector.deleteCredential(any(), any(), any())(any()))
+      when(fixture.applicationsConnector.deleteCredential(any(), any(), any())(any()))
         .thenReturn(Future.successful(Right(Some(()))))
 
-      service.deleteCredential(FakeApplication.id, Primary, clientId)(HeaderCarrier()).map {
+      fixture.service.deleteCredential(FakeApplication.id, Primary, clientId)(HeaderCarrier()).map {
         actual =>
-          verify(applicationsConnector).deleteCredential(
+          verify(fixture.applicationsConnector).deleteCredential(
             ArgumentMatchers.eq(FakeApplication.id),
             ArgumentMatchers.eq(Primary),
             ArgumentMatchers.eq(clientId))(any()
@@ -283,9 +257,7 @@ class ApiHubServiceSpec
 
   "getAccessRequests" - {
     "must make the correct request to the applications connector and return the access requests" in {
-      val applicationsConnector = mock[ApplicationsConnector]
-      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+      val fixture = buildFixture()
 
       val filters = Table(
         ("Application Id", "Status"),
@@ -297,11 +269,11 @@ class ApiHubServiceSpec
 
       forAll(filters) {(applicationIdFilter: Option[String], statusFilter: Option[AccessRequestStatus]) =>
         val expected = sampleAccessRequests()
-        when(applicationsConnector.getAccessRequests(any(), any())(any())).thenReturn(Future.successful(expected))
+        when(fixture.applicationsConnector.getAccessRequests(any(), any())(any())).thenReturn(Future.successful(expected))
 
-        service.getAccessRequests(applicationIdFilter, statusFilter)(HeaderCarrier()).map {
+        fixture.service.getAccessRequests(applicationIdFilter, statusFilter)(HeaderCarrier()).map {
           result =>
-            verify(applicationsConnector).getAccessRequests(ArgumentMatchers.eq(applicationIdFilter), ArgumentMatchers.eq(statusFilter))(any())
+            verify(fixture.applicationsConnector).getAccessRequests(ArgumentMatchers.eq(applicationIdFilter), ArgumentMatchers.eq(statusFilter))(any())
             result mustBe expected
         }
       }
@@ -310,9 +282,7 @@ class ApiHubServiceSpec
 
   "getAccessRequest" - {
     "must make the correct request to the applications connector and return the response" in {
-      val applicationsConnector = mock[ApplicationsConnector]
-      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+      val fixture = buildFixture()
 
       val accessRequest = sampleAccessRequest()
 
@@ -323,11 +293,11 @@ class ApiHubServiceSpec
       )
 
       forAll(accessRequests) {(id: String, accessRequest: Option[AccessRequest]) =>
-        when(applicationsConnector.getAccessRequest(any())(any())).thenReturn(Future.successful(accessRequest))
+        when(fixture.applicationsConnector.getAccessRequest(any())(any())).thenReturn(Future.successful(accessRequest))
 
-        service.getAccessRequest(id)(HeaderCarrier()).map {
+        fixture.service.getAccessRequest(id)(HeaderCarrier()).map {
           result =>
-            verify(applicationsConnector).getAccessRequest(ArgumentMatchers.eq(id))(any())
+            verify(fixture.applicationsConnector).getAccessRequest(ArgumentMatchers.eq(id))(any())
             result mustBe accessRequest
         }
       }
@@ -336,17 +306,15 @@ class ApiHubServiceSpec
 
   "approveAccessRequest" - {
     "must make the correct request to the applications connector and return the response" in {
-      val applicationsConnector = mock[ApplicationsConnector]
-      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+      val fixture = buildFixture()
       val id = "test-id"
       val decidedBy = "test-decided-by"
 
-      when(applicationsConnector.approveAccessRequest(any(), any())(any())).thenReturn(Future.successful(Some(())))
+      when(fixture.applicationsConnector.approveAccessRequest(any(), any())(any())).thenReturn(Future.successful(Some(())))
 
-      service.approveAccessRequest(id, decidedBy)(HeaderCarrier()).map {
+      fixture.service.approveAccessRequest(id, decidedBy)(HeaderCarrier()).map {
         result =>
-          verify(applicationsConnector).approveAccessRequest(ArgumentMatchers.eq(id), ArgumentMatchers.eq(decidedBy))(any())
+          verify(fixture.applicationsConnector).approveAccessRequest(ArgumentMatchers.eq(id), ArgumentMatchers.eq(decidedBy))(any())
           result mustBe Some(())
       }
     }
@@ -354,18 +322,16 @@ class ApiHubServiceSpec
 
   "rejectAccessRequest" - {
     "must make the correct request to the applications connector and return the response" in {
-      val applicationsConnector = mock[ApplicationsConnector]
-      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+      val fixture = buildFixture()
       val id = "test-id"
       val decidedBy = "test-decided-by"
       val rejectedReason = "test-rejected-reason"
 
-      when(applicationsConnector.rejectAccessRequest(any(), any(), any())(any())).thenReturn(Future.successful(Some(())))
+      when(fixture.applicationsConnector.rejectAccessRequest(any(), any(), any())(any())).thenReturn(Future.successful(Some(())))
 
-      service.rejectAccessRequest(id, decidedBy, rejectedReason)(HeaderCarrier()).map {
+      fixture.service.rejectAccessRequest(id, decidedBy, rejectedReason)(HeaderCarrier()).map {
         result =>
-          verify(applicationsConnector).rejectAccessRequest(ArgumentMatchers.eq(id), ArgumentMatchers.eq(decidedBy), ArgumentMatchers.eq(rejectedReason))(any())
+          verify(fixture.applicationsConnector).rejectAccessRequest(ArgumentMatchers.eq(id), ArgumentMatchers.eq(decidedBy), ArgumentMatchers.eq(rejectedReason))(any())
           result mustBe Some(())
       }
     }
@@ -373,17 +339,15 @@ class ApiHubServiceSpec
 
   "requestProductionAccess" - {
     "must make the correct request to the applications connector and return the response" in {
-      val applicationsConnector = mock[ApplicationsConnector]
-      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+      val fixture = buildFixture()
 
-      when(applicationsConnector.createAccessRequest(any())(any())).thenReturn(Future.successful(Some(())))
+      when(fixture.applicationsConnector.createAccessRequest(any())(any())).thenReturn(Future.successful(Some(())))
 
       val anAccessRequest = AccessRequestRequest("appId", "blah", "me@here", Seq.empty)
 
-      service.requestProductionAccess(anAccessRequest)(HeaderCarrier()).map {
+      fixture.service.requestProductionAccess(anAccessRequest)(HeaderCarrier()).map {
         result =>
-          verify(applicationsConnector).createAccessRequest(ArgumentMatchers.eq(anAccessRequest))(any())
+          verify(fixture.applicationsConnector).createAccessRequest(ArgumentMatchers.eq(anAccessRequest))(any())
           result mustBe ()
       }
     }
@@ -391,18 +355,16 @@ class ApiHubServiceSpec
 
   "addTeamMember" - {
     "must make the correct request to the applications connector and return the response" in {
-      val applicationsConnector = mock[ApplicationsConnector]
-      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+      val fixture = buildFixture()
 
       val applicationId = "test-id"
       val teamMember = TeamMember("test-email")
 
-      when(applicationsConnector.addTeamMember(any(), any())(any())).thenReturn(Future.successful(Some(())))
+      when(fixture.applicationsConnector.addTeamMember(any(), any())(any())).thenReturn(Future.successful(Some(())))
 
-      service.addTeamMember(applicationId, teamMember)(HeaderCarrier()).map {
+      fixture.service.addTeamMember(applicationId, teamMember)(HeaderCarrier()).map {
         result =>
-          verify(applicationsConnector).addTeamMember(ArgumentMatchers.eq(applicationId), ArgumentMatchers.eq(teamMember))(any())
+          verify(fixture.applicationsConnector).addTeamMember(ArgumentMatchers.eq(applicationId), ArgumentMatchers.eq(teamMember))(any())
           result.value mustBe ()
       }
     }
@@ -410,31 +372,27 @@ class ApiHubServiceSpec
 
   "findTeamById" - {
     "must return the team from the applications connector when it exists" in {
-      val applicationsConnector = mock[ApplicationsConnector]
-      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+      val fixture = buildFixture()
 
       val team = Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember("test-email")))
 
-      when(service.findTeamById(any())(any())).thenReturn(Future.successful(Some(team)))
+      when(fixture.service.findTeamById(any())(any())).thenReturn(Future.successful(Some(team)))
 
-      service.findTeamById(team.id)(HeaderCarrier()).map {
+      fixture.service.findTeamById(team.id)(HeaderCarrier()).map {
         result =>
-          verify(applicationsConnector).findTeamById(ArgumentMatchers.eq(team.id))(any())
+          verify(fixture.applicationsConnector).findTeamById(ArgumentMatchers.eq(team.id))(any())
           result mustBe Some(team)
       }
     }
 
     "must return None when the team does not exist" in {
-      val applicationsConnector = mock[ApplicationsConnector]
-      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+      val fixture = buildFixture()
 
       val id = "test-team-id"
 
-      when(service.findTeamById(any())(any())).thenReturn(Future.successful(None))
+      when(fixture.service.findTeamById(any())(any())).thenReturn(Future.successful(None))
 
-      service.findTeamById(id)(HeaderCarrier()).map {
+      fixture.service.findTeamById(id)(HeaderCarrier()).map {
         result =>
           result mustBe None
       }
@@ -443,31 +401,27 @@ class ApiHubServiceSpec
 
   "findTeamByName" - {
     "must return the team from the applications connector when it exists" in {
-      val applicationsConnector = mock[ApplicationsConnector]
-      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+      val fixture = buildFixture()
 
       val team = Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember("test-email")))
 
-      when(service.findTeamByName(any())(any())).thenReturn(Future.successful(Some(team)))
+      when(fixture.service.findTeamByName(any())(any())).thenReturn(Future.successful(Some(team)))
 
-      service.findTeamByName(team.name)(HeaderCarrier()).map {
+      fixture.service.findTeamByName(team.name)(HeaderCarrier()).map {
         result =>
-          verify(applicationsConnector).findTeamByName(ArgumentMatchers.eq(team.name))(any())
+          verify(fixture.applicationsConnector).findTeamByName(ArgumentMatchers.eq(team.name))(any())
           result mustBe Some(team)
       }
     }
 
     "must return None when the team does not exist" in {
-      val applicationsConnector = mock[ApplicationsConnector]
-      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+      val fixture = buildFixture()
 
       val name = "test-team-name"
 
-      when(service.findTeamByName(any())(any())).thenReturn(Future.successful(None))
+      when(fixture.service.findTeamByName(any())(any())).thenReturn(Future.successful(None))
 
-      service.findTeamByName(name)(HeaderCarrier()).map {
+      fixture.service.findTeamByName(name)(HeaderCarrier()).map {
         result =>
           result mustBe None
       }
@@ -476,18 +430,16 @@ class ApiHubServiceSpec
 
   "findTeams" - {
     "must return the teams from the applications connector" in {
-      val applicationsConnector = mock[ApplicationsConnector]
-      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+      val fixture = buildFixture()
       val teamMemberEmail = "test-email"
 
       val teams = Seq(Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember("test-email"))))
 
-      when(service.findTeams(ArgumentMatchers.eq(Some(teamMemberEmail)))(any())).thenReturn(Future.successful(teams))
+      when(fixture.service.findTeams(ArgumentMatchers.eq(Some(teamMemberEmail)))(any())).thenReturn(Future.successful(teams))
 
-      service.findTeams(Some(teamMemberEmail))(HeaderCarrier()).map {
+      fixture.service.findTeams(Some(teamMemberEmail))(HeaderCarrier()).map {
         result =>
-          verify(applicationsConnector).findTeams(ArgumentMatchers.eq(Some(teamMemberEmail)))(any())
+          verify(fixture.applicationsConnector).findTeams(ArgumentMatchers.eq(Some(teamMemberEmail)))(any())
           result mustBe teams
       }
     }
@@ -495,18 +447,16 @@ class ApiHubServiceSpec
 
   "createTeam" - {
     "must make the correct request to the applications connector and return the created team" in {
-      val applicationsConnector = mock[ApplicationsConnector]
-      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+      val fixture = buildFixture()
 
       val newTeam = NewTeam("test-team-name", Seq(TeamMember("test-email")))
       val team = Team("test-team-id", newTeam.name, LocalDateTime.now(), newTeam.teamMembers)
 
-      when(applicationsConnector.createTeam(any())(any())).thenReturn(Future.successful(Right(team)))
+      when(fixture.applicationsConnector.createTeam(any())(any())).thenReturn(Future.successful(Right(team)))
 
-      service.createTeam(newTeam)(HeaderCarrier()).map {
+      fixture.service.createTeam(newTeam)(HeaderCarrier()).map {
         result =>
-          verify(applicationsConnector).createTeam(ArgumentMatchers.eq(newTeam))(any())
+          verify(fixture.applicationsConnector).createTeam(ArgumentMatchers.eq(newTeam))(any())
           result.value mustBe team
       }
     }
@@ -514,21 +464,33 @@ class ApiHubServiceSpec
 
   "addTeamMemberToTeam" - {
     "must make the correct request to the applications connector and return the response" in {
-      val applicationsConnector = mock[ApplicationsConnector]
-      val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+      val fixture = buildFixture()
 
       val teamId = "test-id"
       val teamMember = TeamMember("test-email")
 
-      when(applicationsConnector.addTeamMemberToTeam(any(), any())(any())).thenReturn(Future.successful(Some(())))
+      when(fixture.applicationsConnector.addTeamMemberToTeam(any(), any())(any())).thenReturn(Future.successful(Some(())))
 
-      service.addTeamMemberToTeam(teamId, teamMember)(HeaderCarrier()).map {
+      fixture.service.addTeamMemberToTeam(teamId, teamMember)(HeaderCarrier()).map {
         result =>
-          verify(applicationsConnector).addTeamMemberToTeam(ArgumentMatchers.eq(teamId), ArgumentMatchers.eq(teamMember))(any())
+          verify(fixture.applicationsConnector).addTeamMemberToTeam(ArgumentMatchers.eq(teamId), ArgumentMatchers.eq(teamMember))(any())
           result.value mustBe ()
       }
     }
+  }
+
+  private case class Fixture(
+    applicationsConnector: ApplicationsConnector,
+    integrationCatalogueConnector: IntegrationCatalogueConnector,
+    service: ApiHubService
+  )
+
+  private def buildFixture(): Fixture = {
+    val applicationsConnector = mock[ApplicationsConnector]
+    val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
+    val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+
+    Fixture(applicationsConnector, integrationCatalogueConnector, service)
   }
 
 }
