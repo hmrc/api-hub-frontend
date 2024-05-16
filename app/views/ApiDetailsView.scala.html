@@ -23,7 +23,7 @@
         govukButton: GovukButton
 )
 
-@(apiDetail: ApiDetail, deploymentStatuses: ApiDeploymentStatuses, user: Option[UserModel], teamName: Option[String])(implicit request: Request[_], messages: Messages)
+@(apiDetail: ApiDetail, deploymentStatuses: ApiDeploymentStatuses, user: Option[UserModel], teamName: Option[String], domain: Option[String], subDomain: Option[String])(implicit request: Request[_], messages: Messages)
 
 @endpointName(endpoint: Endpoint) = @{
     endpoint.path.replaceAll("""[^a-zA-Z0-9\-_:.]""", "-") match {
@@ -141,9 +141,9 @@
                             @messages("apiDetails.details.domain")
                         </dt>
                         <dd class="govuk-summary-list__value">
-                            @if(apiDetail.domain.isDefined) {
+                            @if(domain.isDefined) {
                                 <strong class="govuk-tag govuk-tag--grey">
-                                    @apiDetail.domain
+                                    @domain
                                 </strong>
                             } else {
                                 @messages("apiDetails.details.notSpecified")
@@ -156,9 +156,9 @@
                             @messages("apiDetails.details.subDomain")
                         </dt>
                         <dd class="govuk-summary-list__value">
-                            @if(apiDetail.subDomain.isDefined) {
+                            @if(subDomain.isDefined) {
                                 <strong class="govuk-tag govuk-tag--grey">
-                                    @apiDetail.subDomain
+                                    @subDomain
                                 </strong>
                             } else {
                                 @messages("apiDetails.details.notSpecified")

@@ -17,6 +17,7 @@
 package controllers
 
 import com.google.inject.{Inject, Singleton}
+import config.Domains
 import controllers.actions.OptionalIdentifierAction
 import controllers.helpers.ErrorResultBuilder
 import models.api.ApiDetail
@@ -35,7 +36,8 @@ class ApiDetailsController @Inject()(
   apiHubService: ApiHubService,
   view: ApiDetailsView,
   errorResultBuilder: ErrorResultBuilder,
-  optionallyIdentified: OptionalIdentifierAction
+  optionallyIdentified: OptionalIdentifierAction,
+  domains: Domains
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(id: String): Action[AnyContent] = optionallyIdentified.async {
@@ -59,7 +61,14 @@ class ApiDetailsController @Inject()(
       maybeTeamName <- getTeamNameForApi(apiDetail.teamId)
     } yield maybeApiDeploymentStatuses match {
       case Some(apiDeploymentStatuses) =>
-        Ok(view(apiDetail, apiDeploymentStatuses, request.user, maybeTeamName))
+        Ok(view(
+          apiDetail,
+          apiDeploymentStatuses,
+          request.user,
+          maybeTeamName,
+          domains.getDomainDescription(apiDetail),
+          domains.getSubDomainDescription(apiDetail))
+        )
       case None =>
         errorResultBuilder.internalServerError(s"Unable to retrieve deployment statuses for API ${apiDetail.publisherReference}")
     }
@@ -67,11 +76,12 @@ class ApiDetailsController @Inject()(
 
   private def getTeamNameForApi(maybeTeamId: Option[String])(implicit request: OptionalIdentifierRequest[_]) = {
     maybeTeamId match {
-      case Some(teamId) => apiHubService.findTeamById(teamId).map(_ match {
+      case Some(teamId) => apiHubService.findTeamById(teamId).map {
         case Some(team) => Some(team.name)
         case None => Some(Messages("apiDetails.details.team.error"))
-      })
+      }
       case None => Future.successful(None)
     }
   }
+
 }
