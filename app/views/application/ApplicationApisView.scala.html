@@ -185,8 +185,11 @@
         @if(!application.issues.isEmpty) {
             <div class="govuk-grid-column-two-thirds">
                 <h2 class="govuk-heading-m govuk-!-margin-bottom-4 govuk-!-margin-top-2">
-                @messages("applicationDetails.apis.problem")
+                    @messages("applicationDetails.apis.problem")
                 </h2>
+                <p class="govuk-body">
+                    @messages("applicationDetails.apis.tryAgain")
+                </p>
             </div>
         } else {
             <div class="govuk-grid-column-one-half">

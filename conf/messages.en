@@ -120,7 +120,10 @@ applicationDetails.apis.noApis = You have no APIs added, {0} to your application
 applicationDetails.apis.endpointsAvailable = {0} of {1} endpoints available
 applicationDetails.apis.error = One of the APIs associated with this application no longer exists
 applicationDetails.apis.problem = Application APIs are not available.
+applicationDetails.apis.tryAgain = Please try again later.
+
 applicationDetails.environment.credentials.problem = Environments and Credentials are not available.
+
 applicationDetails.apis.apiName = API name
 applicationDetails.apis.devEnv = Dev env
 applicationDetails.apis.prodEnv = Prod env
