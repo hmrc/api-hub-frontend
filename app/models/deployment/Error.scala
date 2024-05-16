@@ -18,10 +18,10 @@ package models.deployment
 
 import play.api.libs.json.{Format, Json}
 
-case class ValidationFailuresResponse(failures: Seq[ValidationFailure])
+case class Error(`type`: String, message: String)
 
-object ValidationFailuresResponse {
+object Error {
 
-  implicit val formatValidationFailuresResponse: Format[ValidationFailuresResponse] = Json.format[ValidationFailuresResponse]
+  implicit val formatValidationFailure: Format[Error] = Json.format[Error]
 
 }

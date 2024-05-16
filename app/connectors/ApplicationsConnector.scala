@@ -357,9 +357,9 @@ class ApplicationsConnector @Inject()(
       None
     }
     else {
-      response.json.validate[ValidationFailuresResponse].fold(
+      response.json.validate[FailuresResponse].fold(
         _ => None,
-        validationFailureResponse => Some(InvalidOasResponse(validationFailureResponse.failures))
+        failureResponse => Some(InvalidOasResponse(failureResponse))
       )
     }
   }
