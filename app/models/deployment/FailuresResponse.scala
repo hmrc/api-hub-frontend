@@ -22,6 +22,6 @@ case class FailuresResponse(code: String, reason: String, errors: Option[Seq[Err
 
 object FailuresResponse {
 
-  implicit val formatFailure: Format[FailuresResponse] = Json.format[FailuresResponse]
+  implicit val formatFailuresResponse: Format[FailuresResponse] = Json.format[FailuresResponse]
 
 }

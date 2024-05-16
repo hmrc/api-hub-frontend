@@ -22,6 +22,6 @@ case class Error(`type`: String, message: String)
 
 object Error {
 
-  implicit val formatValidationFailure: Format[Error] = Json.format[Error]
+  implicit val formatError: Format[Error] = Json.format[Error]
 
 }
