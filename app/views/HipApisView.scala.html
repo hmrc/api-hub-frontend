@@ -17,6 +17,7 @@
 @import models.api._
 @import models.user.UserModel
 @import views.html.helper.CSPNonce
+@import config.Domains
 
 @this(
     layout: templates.Layout,
@@ -28,7 +29,7 @@
     govukDetails : GovukDetails,
 )
 
-@(user: Option[UserModel], apiDetails: Seq[ApiDetail] = Seq.empty, domains: Seq[Domain])(implicit request: Request[_], messages: Messages)
+@(user: Option[UserModel], apiDetails: Seq[ApiDetail] = Seq.empty, domains: Domains)(implicit request: Request[_], messages: Messages)
 
 @scripts() = {
     <link href='@routes.Assets.versioned("fontawesome6/css/all.min.css")' media="all" rel="stylesheet" type="text/css" @{CSPNonce.attr}/>
@@ -52,14 +53,14 @@
         </span>
         <p class="govuk-body additional-message">@apiDetail.shortDescription</p>
         <ul class="govuk-list hip-inline-list">
-            @(apiDetail.domain.map(domain =>
+            @(apiDetail.domain.map(_ =>
                 <li>
-                    <strong class="govuk-tag govuk-tag--grey">{domain}</strong>
+                    <strong class="govuk-tag govuk-tag--grey">{domains.getDomainDescription(apiDetail).getOrElse("")}</strong>
                 </li>
             ))
-            @(apiDetail.subDomain.map(subDomain =>
+            @(apiDetail.subDomain.map(_ =>
                 <li>
-                    <strong class="govuk-tag govuk-tag--grey">{subDomain}</strong>
+                    <strong class="govuk-tag govuk-tag--grey">{domains.getSubDomainDescription(apiDetail).getOrElse("")}</strong>
                 </li>
             ))
         </ul>
@@ -82,7 +83,7 @@
     </legend>
 
     <div id="domainFilters" class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
-    @for(domain <- domains) {
+    @for(domain <- domains.domains) {
         <div>
             <div class="govuk-checkboxes__item">
                 <input class="govuk-checkboxes__input domainFilter" id="filter_@domain.code" name="filter_@domain.code" type="checkbox" value="@domain.code">
