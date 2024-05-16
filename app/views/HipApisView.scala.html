@@ -31,6 +31,7 @@
 @(user: Option[UserModel], apiDetails: Seq[ApiDetail] = Seq.empty, domains: Seq[Domain])(implicit request: Request[_], messages: Messages)
 
 @scripts() = {
+    <link href='@routes.Assets.versioned("fontawesome6/css/all.min.css")' media="all" rel="stylesheet" type="text/css" @{CSPNonce.attr}/>
     <script src='@routes.Assets.versioned("javascripts/pagination.js")' type="module" @{CSPNonce.attr}></script>
     <script src='@routes.Assets.versioned("javascripts/hipApis.js")' type="module" @{CSPNonce.attr}></script>
 }
@@ -50,6 +51,18 @@
             <a class="govuk-link govuk-link--no-visited-state" href="@routes.ApiDetailsController.onPageLoad(apiDetail.id)">@apiDetail.title</a>
         </span>
         <p class="govuk-body additional-message">@apiDetail.shortDescription</p>
+        <ul class="govuk-list hip-inline-list">
+            @(apiDetail.domain.map(domain =>
+                <li>
+                    <strong class="govuk-tag govuk-tag--grey">{domain}</strong>
+                </li>
+            ))
+            @(apiDetail.subDomain.map(subDomain =>
+                <li>
+                    <strong class="govuk-tag govuk-tag--grey">{subDomain}</strong>
+                </li>
+            ))
+        </ul>
     </div>
 }
 
@@ -72,14 +85,14 @@
     @for(domain <- domains) {
         <div>
             <div class="govuk-checkboxes__item">
-                <input class="govuk-checkboxes__input" id="filter_@domain.code" type="checkbox" value="@domain.code">
+                <input class="govuk-checkboxes__input domainFilter" id="filter_@domain.code" name="filter_@domain.code" type="checkbox" value="@domain.code">
                 <label class="govuk-label govuk-checkboxes__label" for="filter_@domain.code">@domain.description</label>
             </div>
-            <div class="govuk-checkboxes__conditional" re>
+            <div class="govuk-checkboxes__conditional subdomainCheckboxes" data-domain="@domain.code">
                 <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
                     @for(subDomain <- domain.subDomains) {
                         <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input" id="filter_@{domain.code}_@{subDomain.code}" type="checkbox" value="@{subDomain.code}">
+                            <input class="govuk-checkboxes__input subDomainFilter" id="filter_@{domain.code}_@{subDomain.code}" name="filter_@{domain.code}_@{subDomain.code}" type="checkbox" data-domain="@domain.code" value="@{subDomain.code}">
                             <label class="govuk-label govuk-checkboxes__label" for="filter_@{domain.code}_@{subDomain.code}">@subDomain.description</label>
                         </div>
                     }
@@ -99,6 +112,16 @@
                 <fieldset class="govuk-fieldset">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                         <h2 class="govuk-fieldset__heading">
+                            Filter APIs
+                        </h2>
+                    </legend>
+                    <div class="govuk-body">
+                        <a href="#" class="govuk-link govuk-link--no-visited-state" id="resetFilters">Reset filters</a>
+                    </div>
+                    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible hip-color-override govuk-!-margin-top-5">
+
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                        <h2 class="govuk-fieldset__heading">
                             Filter by status
                         </h2>
                     </legend>
@@ -109,15 +132,21 @@
                         @statusFilter("DEPRECATED")
                     </div>
                     <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible hip-color-override govuk-!-margin-top-5">
+
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                         <h2 class="govuk-fieldset__heading">
                             Filter by domain
                         </h2>
                     </legend>
                     @govukDetails(Details(
+                        id = Some("viewDomainFilters"),
+                        classes = "govuk-!-margin-bottom-1",
                         summary = Text("View domain filters"),
                         content = HtmlContent(domainsAndSubDomains())
                     ))
+                    <div class="govuk-body filterSelectionCount">
+                        <strong id="domainFilterCount">0</strong> Selected
+                    </div>
                 </fieldset>
             </div>
         </div>
@@ -126,7 +155,16 @@
             <div class="govuk-body" id="apiList">
             @apis(apiDetails)
             </div>
-
+            <div id="noResultsPanel" class="call-out-panel call-out-panel__small">
+                <p class="govuk-body information--general-tag">
+                    <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                    <span class="call-out-type">
+                        No APIs found
+                    </span>
+                </p>
+                <p class="govuk-body additional-message">No APIs have been found that match your filter critera, try adjusting your filters.</p>
+                <p class="govuk-body additional-message"><a href="#" class="govuk-link govuk-link--no-visited-state" id="noResultsClearFilters">Clear filters</a></p>
+            </div>
             <nav id="pagination"></nav>
         </div>
     </div>
