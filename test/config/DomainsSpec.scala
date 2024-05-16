@@ -20,13 +20,15 @@ import fakes.FakeDomains
 import fakes.FakeDomains.data._
 import generators.ApiDetailGenerators
 import models.api.ApiDetailLenses._
-import models.api.SubDomain
+import models.api.{Domain, SubDomain}
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.prop.TableDrivenPropertyChecks
+import org.scalatest.prop.{TableDrivenPropertyChecks, TableFor3}
 
 class DomainsSpec extends AnyFreeSpec with Matchers with OptionValues with ApiDetailGenerators with TableDrivenPropertyChecks {
+
+  import DomainsSpec._
 
   "getDomain" - {
     "must return the correct domain given a code when it exists" in {
@@ -35,6 +37,11 @@ class DomainsSpec extends AnyFreeSpec with Matchers with OptionValues with ApiDe
 
     "must return None when no domain exists for the given code" in {
       FakeDomains.getDomain(unknownDomainCode) mustBe None
+    }
+
+    "must normalise codes in comparisons" in {
+      val domainCode = s" ${uglyDomainCode.toUpperCase()} "
+      uglyDomains.getDomain(domainCode).value mustBe uglyDomain
     }
   }
 
@@ -94,6 +101,13 @@ class DomainsSpec extends AnyFreeSpec with Matchers with OptionValues with ApiDe
         FakeDomains.getSubDomain(domainCode, subDomainCode) mustBe expected
       }
     }
+
+    "must normalise codes in comparisons" in {
+      val domainCode = s" ${uglyDomainCode.toUpperCase()} "
+      val subDomainCode = s" ${uglySubDomainCode.toUpperCase()} "
+
+      uglyDomains.getSubDomain(domainCode, subDomainCode).value mustBe uglySubDomain
+    }
   }
 
   "getSubDomainDescription(String, String)" - {
@@ -112,18 +126,6 @@ class DomainsSpec extends AnyFreeSpec with Matchers with OptionValues with ApiDe
       }
     }
   }
-
-  private val allOptionalDomainSubDomainScenarios = Table(
-    ("domain code", "sub-domain code", "expected"),
-    (Some(domain1.code), Some(subDomain1_3.code), Some(subDomain1_3.description)),
-    (Some(domain1.code), Some(subDomain2_1.code), Some(subDomain2_1.code)),
-    (Some(unknownDomainCode), Some(subDomain1_3.code), Some(subDomain1_3.code)),
-    (Some(domain1.code), Some(unknownSubDomainCode), Some(unknownSubDomainCode)),
-    (Some(unknownDomainCode), Some(unknownSubDomainCode), Some(unknownSubDomainCode)),
-    (Some(domain2.code), None, None),
-    (None, Some(subDomain2_1.code), Some(subDomain2_1.code)),
-    (None, None, None)
-  )
 
   "getSubDomainDescription(Option[String], Option[String])" - {
     "must return the correct description for the domain and sub-domain codes" in {
@@ -144,5 +146,39 @@ class DomainsSpec extends AnyFreeSpec with Matchers with OptionValues with ApiDe
       }
     }
   }
+
+}
+
+object DomainsSpec extends TableDrivenPropertyChecks {
+
+  val uglyDomainCode = "  TeSt-UgLy-CoDe "
+  val uglySubDomainCode = ""
+
+  val uglySubDomain: SubDomain = SubDomain(
+    code = uglySubDomainCode,
+    description =  s"Description of $uglySubDomainCode"
+  )
+
+  val uglyDomain: Domain = Domain(
+    code = uglyDomainCode,
+    description =  s"Description of $uglyDomainCode",
+    subDomains = Seq(uglySubDomain)
+  )
+
+  val uglyDomains: Domains = new Domains {
+    override def domains: Seq[Domain] = Seq(uglyDomain)
+  }
+
+  val allOptionalDomainSubDomainScenarios: TableFor3[Option[String], Option[String], Option[String]] = Table(
+    ("domain code", "sub-domain code", "expected"),
+    (Some(domain1.code), Some(subDomain1_3.code), Some(subDomain1_3.description)),
+    (Some(domain1.code), Some(subDomain2_1.code), Some(subDomain2_1.code)),
+    (Some(unknownDomainCode), Some(subDomain1_3.code), Some(subDomain1_3.code)),
+    (Some(domain1.code), Some(unknownSubDomainCode), Some(unknownSubDomainCode)),
+    (Some(unknownDomainCode), Some(unknownSubDomainCode), Some(unknownSubDomainCode)),
+    (Some(domain2.code), None, None),
+    (None, Some(subDomain2_1.code), Some(subDomain2_1.code)),
+    (None, None, None)
+  )
 
 }

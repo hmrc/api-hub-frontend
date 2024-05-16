@@ -28,7 +28,7 @@ trait Domains {
 
   def getDomain(domainCode: String): Option[Domain] = {
     domains
-      .find(_.code.toLowerCase.equals(domainCode.trim.toLowerCase))
+      .find(domain => normalise(domain.code).equals(normalise(domainCode)))
   }
 
   def getDomainDescription(domainCode: String): String = {
@@ -50,7 +50,7 @@ trait Domains {
       .flatMap(
         domain =>
           domain.subDomains
-            .find(_.code.toLowerCase.equals(subDomainCode.trim.toLowerCase))
+            .find(subDomain => normalise(subDomain.code).equals(normalise(subDomainCode)))
       )
   }
 
@@ -70,6 +70,10 @@ trait Domains {
 
   def getSubDomainDescription(apiDetail: ApiDetail): Option[String] = {
     getSubDomainDescription(apiDetail.domain, apiDetail.subDomain)
+  }
+
+  private def normalise(s: String): String = {
+    s.trim.toLowerCase()
   }
 
 }
