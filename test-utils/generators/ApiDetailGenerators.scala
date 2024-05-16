@@ -16,6 +16,7 @@
 
 package generators
 
+import fakes.FakeDomains
 import models.api._
 import org.scalacheck.rng.Seed
 import org.scalacheck.{Arbitrary, Gen}
@@ -58,8 +59,8 @@ trait ApiDetailGenerators {
       shortDescription <- sensiblySizedAlphaNumStr
       openApiSpecification <- sensiblySizedAlphaNumStr
       apiStatus <- Gen.oneOf(ApiStatus.values)
-      domain <- sensiblySizedAlphaNumStr
-      subDomain <- sensiblySizedAlphaNumStr
+      domain <- Gen.oneOf(FakeDomains.domains)
+      subDomain <- Gen.oneOf(domain.subDomains)
       hods <- Gen.listOfN(size/ listSizeQuota, sensiblySizedAlphaNumStr).suchThat(_.nonEmpty)
     } yield ApiDetail(
       id.toString,
@@ -71,8 +72,8 @@ trait ApiDetailGenerators {
       Some(shortDescription),
       openApiSpecification,
       apiStatus,
-      domain = Some(domain),
-      subDomain = Some(subDomain),
+      domain = Some(domain.code),
+      subDomain = Some(subDomain.code),
       hods = hods
     )
   }

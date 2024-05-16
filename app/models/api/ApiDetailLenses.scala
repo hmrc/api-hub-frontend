@@ -16,7 +16,21 @@
 
 package models.api
 
+import models.Lens
+
 object ApiDetailLenses {
+
+  val apiDetailDomain: Lens[ApiDetail, Option[String]] =
+    Lens[ApiDetail, Option[String]](
+      get = _.domain,
+      set = (apiDetail, domain) => apiDetail.copy(domain = domain)
+    )
+
+  val apiDetailSubDomain: Lens[ApiDetail, Option[String]] =
+    Lens[ApiDetail, Option[String]](
+      get = _.subDomain,
+      set = (apiDetail, subDomain) => apiDetail.copy(subDomain = subDomain)
+    )
 
   implicit class ApiDetailLensOps(apiDetail: ApiDetail) {
 
@@ -27,6 +41,24 @@ object ApiDetailLenses {
         .flatMap(_.scopes)
         .toSet
     }
+
+    def setDomain(domainCode: Option[String]): ApiDetail =
+      apiDetailDomain.set(apiDetail, domainCode)
+
+    def setDomain(domainCode: String): ApiDetail =
+      setDomain(Some(domainCode))
+
+    def setDomain(domain: Domain): ApiDetail =
+      setDomain(domain.code)
+
+    def setSubDomain(subDomainCode: Option[String]): ApiDetail =
+      apiDetailSubDomain.set(apiDetail, subDomainCode)
+
+    def setSubDomain(subDomainCode: String): ApiDetail =
+      setSubDomain(Some(subDomainCode))
+
+    def setSubDomain(subDomain: SubDomain): ApiDetail =
+      setSubDomain(subDomain.code)
 
   }
 
