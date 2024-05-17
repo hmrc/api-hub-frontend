@@ -1,12 +1,13 @@
 import {buildPaginator} from './pagination.js';
 import {buildDomainFilters} from "./hipApisDomainFilters.js";
+import {buildStatusFilters} from "./hipApisStatusFilters.js";
 
 export function onPageShow() {
-    const domainFilters = buildDomainFilters();
+    const domainFilters = buildDomainFilters(),
+        statusFilters = buildStatusFilters();
 
     const view = (() => {
-        const statusFilterEls = Array.from(document.querySelectorAll('#statusFilters .govuk-checkboxes__input')),
-            apiDetailPanelEls = Array.from(document.querySelectorAll('#apiList .api-panel')),
+        const apiDetailPanelEls = Array.from(document.querySelectorAll('#apiList .api-panel')),
             elSearchResultsSize = document.getElementById('searchResultsSize'),
             elPaginationContainer = document.getElementById('pagination'),
             elNoResultsPanel = document.getElementById('noResultsPanel'),
@@ -14,24 +15,19 @@ export function onPageShow() {
             elNoResultsResetFiltersLink = document.getElementById('noResultsClearFilters'),
             paginator = buildPaginator(elPaginationContainer);
 
-        let externalFilterChangeHandler = () => {};
-        function onFiltersChanged() {
-            externalFilterChangeHandler();
-        }
+        let onFiltersChangedHandler = () => {};
 
-        statusFilterEls.forEach(elCheckbox => {
-            elCheckbox.addEventListener('change', onFiltersChanged);
+        statusFilters.onChange(() => {
+            onFiltersChangedHandler();
         });
         domainFilters.onChange(() => {
-            onFiltersChanged();
+            onFiltersChangedHandler();
         });
 
         function clearAllFilters() {
-            statusFilterEls.forEach(el => {
-                el.checked = false;
-            });
+            statusFilters.clear();
             domainFilters.clear();
-            onFiltersChanged();
+            onFiltersChangedHandler();
         }
 
         elResetFiltersLink.addEventListener('click', clearAllFilters);
@@ -39,15 +35,12 @@ export function onPageShow() {
 
         return {
             onFiltersChanged(handler) {
-                externalFilterChangeHandler = handler;
+                onFiltersChangedHandler = handler;
             },
             onPaginationChanged(handler) {
                 paginator.onNavigation(pageNumber => {
                     handler(pageNumber);
                 });
-            },
-            getStatusFilterValues() {
-                return statusFilterEls.filter(el => el.checked).map(el => el.value);
             },
             getApiDetailPanels() {
                 return apiDetailPanelEls;
@@ -57,7 +50,8 @@ export function onPageShow() {
                     apiDetail.el.style.display = apiDetail.visible ? 'block' : 'none';
                 });
             },
-            setFilterVisibility(apis) {
+            initialiseFilters(apis) {
+                statusFilters.initialise();
                 domainFilters.initialiseFromApis(apis);
             },
             setResultCount(count) {
@@ -72,16 +66,11 @@ export function onPageShow() {
         };
     })();
 
-
     function buildFilterFunctions() {
-        function buildApiStatusFilterFunction() {
-            const selectedStatuses = new Set(view.getStatusFilterValues());
-            return data => selectedStatuses.size === 0 || selectedStatuses.has(data.apiStatus);
-        }
-
-        // add new filters here...
-
-        return [buildApiStatusFilterFunction(), domainFilters.buildFilterFunction()];
+        return [
+            statusFilters.buildFilterFunction(),
+            domainFilters.buildFilterFunction()
+        ];
     }
 
     const model = {
@@ -148,7 +137,7 @@ export function onPageShow() {
         applyFilters();
     });
 
-    view.setFilterVisibility(model.apis);
+    view.initialiseFilters(model.apis);
 
     applyFilters();
 }
