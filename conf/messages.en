@@ -288,6 +288,15 @@ hipApis.search.error.required = Enter a search term
 hipApis.api.endpoints = {0} Endpoints
 hipApis.searchResults.empty = No APIs found.
 hipApis.link.text = HIP APIs
+hipApis.filter.heading = Filter APIs
+hipApis.filter.reset = Reset filters
+hipApis.filter.byStatus = Filter by status
+hipApis.filter.byDomain = Filter by domain
+hipApis.filter.byDomain.view = View domain filters
+hipApis.filter.selected = Selected
+hipApis.filter.noResults.heading = No APIs found
+hipApis.filter.noResults.message = No APIs have been found that match your filter critera, try adjusting your filters.
+hipApis.filter.noResults.clearFilters = Clear filters
 
 support.link.text = Get Support
 support.title = Get Support
