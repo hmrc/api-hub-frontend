@@ -1,4 +1,5 @@
 import {buildPaginator} from './pagination.js';
+import {buildDomainFilters} from "./hipApisDomainFilters.js";
 
 export function onPageShow() {
 
@@ -11,116 +12,7 @@ export function onPageShow() {
             elResetFiltersLink = document.getElementById('resetFilters'),
             elNoResultsResetFiltersLink = document.getElementById('noResultsClearFilters'),
             paginator = buildPaginator(elPaginationContainer),
-            domainsView = (() => {
-                const domainFilterEls = [],
-                    subdomainFilterEls = [],
-                    elDomainFilterCount = document.getElementById('domainFilterCount'),
-                    elViewDomainFilters = document.getElementById('viewDomainFilters');
-
-                let onFiltersChangedHandler = () => {};
-
-                function toggleSubdomainCheckboxes(domain, visible) {
-                    document.querySelector(`.subdomainCheckboxes[data-domain="${domain}"]`).style.display = visible ? 'block' : 'none';
-                }
-
-                function removeElement(el) {
-                    el.parentElement.removeChild(el);
-                }
-
-                function updateDomainFilterCount() {
-                    const selectionCount = document.querySelectorAll('#domainFilters input:checked').length;
-                    elDomainFilterCount.textContent = '' + selectionCount;
-                }
-
-                function collapseDomainFilterSection(isCollapsed) {
-                    if (isCollapsed) {
-                        elViewDomainFilters.removeAttribute('open');
-                    } else {
-                        elViewDomainFilters.setAttribute('open', 'open');
-                    }
-                }
-
-                return {
-                    setFilterVisibility(apis) {
-                        const apiDomainLookup = {};
-                        apis
-                            .filter(apiDetail => apiDetail.data.domain || apiDetail.data.subdomain)
-                            .forEach(apiDetail => {
-                                const key = `${apiDetail.data.domain}/${apiDetail.data.subdomain}`;
-                                apiDomainLookup[key] = apiDetail.data;
-                            });
-
-                        const apiDomains = Object.values(apiDomainLookup);
-                        document.querySelectorAll('input.domainFilter').forEach(elDomainCheckbox => {
-                            const domain = elDomainCheckbox.value;
-                            if (apiDomains.some(api => api.domain === domain)) {
-                                domainFilterEls.push(elDomainCheckbox);
-                                elDomainCheckbox.addEventListener('change', () => {
-                                    const domain = elDomainCheckbox.value,
-                                        domainSelected = elDomainCheckbox.checked;
-                                    subdomainFilterEls
-                                        .filter(elSubdomainCheckbox => elSubdomainCheckbox.dataset['domain'] === domain)
-                                        .forEach(elSubdomainCheckbox => {
-                                            elSubdomainCheckbox.checked = domainSelected;
-                                        });
-                                    toggleSubdomainCheckboxes(domain, domainSelected);
-                                    onFiltersChangedHandler();
-                                });
-                                toggleSubdomainCheckboxes(domain, elDomainCheckbox.checked);
-
-                            } else {
-                                removeElement(elDomainCheckbox.parentElement);
-                                removeElement(document.querySelector(`.subdomainCheckboxes[data-domain="${domain}"]`));
-                            }
-                        });
-
-                        document.querySelectorAll('input.subDomainFilter').forEach(elSubDomainCheckbox => {
-                            const subDomain = elSubDomainCheckbox.value,
-                                domain = elSubDomainCheckbox.dataset['domain'];
-                            if (apiDomains.some(api => api.domain === domain && api.subdomain === subDomain)) {
-                                subdomainFilterEls.push(elSubDomainCheckbox);
-                                elSubDomainCheckbox.addEventListener('change', () => {
-                                    onFiltersChangedHandler();
-                                });
-                            } else {
-                                removeElement(elSubDomainCheckbox.parentElement);
-                            }
-                        });
-
-                        const anyDomainsSelected = domainFilterEls.some(el => el.checked);
-                        collapseDomainFilterSection(!anyDomainsSelected);
-
-                        updateDomainFilterCount();
-                    },
-                    onFiltersChanged(handler) {
-                        onFiltersChangedHandler = () => {
-                            updateDomainFilterCount();
-                            handler();
-                        };
-                    },
-                    getSelected() {
-                        const selections = {};
-                        domainFilterEls.filter(el => el.checked).forEach(el => {
-                            const domain = el.value;
-                            selections[domain] = subdomainFilterEls
-                                .filter(el => el.dataset['domain'] === domain && el.checked)
-                                .map(el => el.value);
-                        });
-                        return selections;
-                    },
-                    clearAllFilters() {
-                        domainFilterEls.forEach(el => {
-                            el.checked = false;
-                        });
-                        subdomainFilterEls.forEach(el => {
-                            el.checked = false;
-                        });
-                        document.querySelectorAll('.subdomainCheckboxes').forEach(el => el.style.display = 'none');
-                        collapseDomainFilterSection(true);
-                        updateDomainFilterCount();
-                    }
-                };
-            })();
+            domainFilters = buildDomainFilters();
 
         let externalFilterChangeHandler = () => {};
         function onFiltersChanged() {
@@ -130,7 +22,7 @@ export function onPageShow() {
         statusFilterEls.forEach(elCheckbox => {
             elCheckbox.addEventListener('change', onFiltersChanged);
         });
-        domainsView.onFiltersChanged(() => {
+        domainFilters.onChange(() => {
             onFiltersChanged();
         });
 
@@ -138,7 +30,7 @@ export function onPageShow() {
             statusFilterEls.forEach(el => {
                 el.checked = false;
             });
-            domainsView.clearAllFilters();
+            domainFilters.clear();
             onFiltersChanged();
         }
 
@@ -158,7 +50,7 @@ export function onPageShow() {
                 return statusFilterEls.filter(el => el.checked).map(el => el.value);
             },
             getDomainFilterValues() {
-                return domainsView.getSelected();
+                return domainFilters.getSelected();
             },
             getApiDetailPanels() {
                 return apiDetailPanelEls;
@@ -169,7 +61,7 @@ export function onPageShow() {
                 });
             },
             setFilterVisibility(apis) {
-                domainsView.setFilterVisibility(apis);
+                domainFilters.initialiseFromApis(apis);
             },
             setResultCount(count) {
                 elSearchResultsSize.textContent = count;
