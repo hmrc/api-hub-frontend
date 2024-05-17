@@ -131,7 +131,6 @@ export function onPageShow() {
             elCheckbox.addEventListener('change', onFiltersChanged);
         });
         domainsView.onFiltersChanged(() => {
-            console.log(domainsView.getSelected());
             onFiltersChanged();
         });
 
@@ -180,12 +179,6 @@ export function onPageShow() {
             },
             toggleNoResultsPanel(visible) {
                 elNoResultsPanel.style.display = visible ? 'block' : 'none';
-            },
-            clearAllFilters() {
-                statusFilterEls.forEach(el => {
-                    el.checked = false;
-                });
-                domainsView.clearAllFilters();
             }
         };
     })();

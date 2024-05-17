@@ -37,6 +37,10 @@
     <script src='@routes.Assets.versioned("javascripts/hipApis.js")' type="module" @{CSPNonce.attr}></script>
 }
 
+@normalise(text: String) = @{
+    text.trim.toLowerCase
+}
+
 @statusFilter(status: String, isChecked: Boolean = false) = {
     <div class="govuk-checkboxes__item">
         <input class="govuk-checkboxes__input" id="filter@status" name="filter-status" type="checkbox" value="@status" @if(isChecked){checked="checked"}>
@@ -47,7 +51,7 @@
 }
 
 @anApi(apiDetail: ApiDetail) = {
-    <div class="api-panel" data-apistatus="@apiDetail.apiStatus" data-domain='@apiDetail.domain.getOrElse("")' data-subdomain='@apiDetail.subDomain.getOrElse("")'>
+    <div class="api-panel" data-apistatus="@apiDetail.apiStatus" data-domain='@normalise(apiDetail.domain.getOrElse(""))' data-subdomain='@normalise(apiDetail.subDomain.getOrElse(""))'>
         <span class="call-out-type information">
             <a class="govuk-link govuk-link--no-visited-state" href="@routes.ApiDetailsController.onPageLoad(apiDetail.id)">@apiDetail.title</a>
         </span>
@@ -71,7 +75,7 @@
     @if(apiDetails.isEmpty) {
         @messages("hipApis.searchResults.empty")
     } else {
-        @apiDetails.map( api => anApi(api))
+        @apiDetails.map(api => anApi(api))
     }
 }
 
@@ -80,14 +84,14 @@
     @for(domain <- domains.domains) {
         <div>
             <div class="govuk-checkboxes__item">
-                <input class="govuk-checkboxes__input domainFilter" id="filter_@domain.code" name="filter_@domain.code" type="checkbox" value="@domain.code">
+                <input class="govuk-checkboxes__input domainFilter" id="filter_@domain.code" name="filter_@domain.code" type="checkbox" value="@normalise(domain.code)">
                 <label class="govuk-label govuk-checkboxes__label" for="filter_@domain.code">@domain.description</label>
             </div>
-            <div class="govuk-checkboxes__conditional subdomainCheckboxes" data-domain="@domain.code">
+            <div class="govuk-checkboxes__conditional subdomainCheckboxes" data-domain="@normalise(domain.code)">
                 <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
                     @for(subDomain <- domain.subDomains) {
                         <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input subDomainFilter" id="filter_@{domain.code}_@{subDomain.code}" name="filter_@{domain.code}_@{subDomain.code}" type="checkbox" data-domain="@domain.code" value="@{subDomain.code}">
+                            <input class="govuk-checkboxes__input subDomainFilter" id="filter_@{domain.code}_@{subDomain.code}" name="filter_@{domain.code}_@{subDomain.code}" type="checkbox" data-domain="@normalise(domain.code)" value="@normalise(subDomain.code)">
                             <label class="govuk-label govuk-checkboxes__label" for="filter_@{domain.code}_@{subDomain.code}">@subDomain.description</label>
                         </div>
                     }
