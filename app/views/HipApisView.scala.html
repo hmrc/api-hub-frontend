@@ -59,12 +59,12 @@
         <ul class="govuk-list hip-inline-list">
             @(apiDetail.domain.map(_ =>
                 <li>
-                    <strong class="govuk-tag govuk-tag--grey">{domains.getDomainDescription(apiDetail).getOrElse("")}</strong>
+                    <strong class="govuk-tag govuk-tag--grey domainTag">{domains.getDomainDescription(apiDetail).getOrElse("")}</strong>
                 </li>
             ))
             @(apiDetail.subDomain.map(_ =>
                 <li>
-                    <strong class="govuk-tag govuk-tag--grey">{domains.getSubDomainDescription(apiDetail).getOrElse("")}</strong>
+                    <strong class="govuk-tag govuk-tag--grey subDomainTag">{domains.getSubDomainDescription(apiDetail).getOrElse("")}</strong>
                 </li>
             ))
         </ul>
