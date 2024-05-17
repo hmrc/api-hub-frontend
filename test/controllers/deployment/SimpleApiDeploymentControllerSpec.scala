@@ -18,20 +18,55 @@ package controllers.deployment
 
 import base.SpecBase
 import connectors.ApplicationsConnector
+import controllers.actions.FakeUser
+import controllers.deployment.SimpleApiDeploymentController.DeploymentsRequestFormProvider
+import models.application.TeamMember
 import models.deployment.{Error, FailuresResponse, InvalidOasResponse, SuccessfulDeploymentsResponse}
+import models.team.Team
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+import org.scalatest.prop.TableDrivenPropertyChecks
+import play.api.data.Form
 import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Application => PlayApplication}
 import services.ApiHubService
+import utils.HtmlValidation
+import views.html.deployment.SimpleApiDeploymentView
 
+import java.time.LocalDateTime
 import scala.concurrent.Future
 
-class SimpleApiDeploymentControllerSpec extends SpecBase with MockitoSugar with ArgumentMatchersSugar {
+class SimpleApiDeploymentControllerSpec
+  extends SpecBase
+    with MockitoSugar
+    with ArgumentMatchersSugar
+    with HtmlValidation
+    with TableDrivenPropertyChecks {
 
   import SimpleApiDeploymentControllerSpec._
+
+  "onPageLoad" - {
+    "must return 200 OK and the correct view" in {
+      val fixture = buildFixture()
+
+      when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(teams))
+
+      running(fixture.playApplication) {
+        val request = FakeRequest(controllers.deployment.routes.SimpleApiDeploymentController.onPageLoad())
+        val result = route(fixture.playApplication, request).value
+
+        val view = fixture.playApplication.injector.instanceOf[SimpleApiDeploymentView]
+
+        status(result) mustBe OK
+        contentAsString(result) mustBe view(form, teams, FakeUser)(request, messages(fixture.playApplication)).toString()
+        contentAsString(result) must validateAsHtml
+
+        verify(fixture.apiHubService).findTeams(eqTo(Some(FakeUser.email.value)))(any)
+      }
+    }
+  }
 
   "onSubmit" - {
     "must respond with 200 OK and a success JSON response when returned by APIM" in {
@@ -78,6 +113,38 @@ class SimpleApiDeploymentControllerSpec extends SpecBase with MockitoSugar with 
         contentAsJson(result) mustBe Json.toJson(response)
       }
     }
+
+    "must return 400 Bad Request and errors when invalid data is submitted" in {
+      val fixture = buildFixture()
+      val fieldNames = Table(
+        "Field name",
+        "lineOfBusiness",
+        "name",
+        "description",
+        "egress",
+        "teamId",
+        "oas",
+        "passthrough",
+        "status"
+      )
+
+      when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(teams))
+
+      running(fixture.playApplication) {
+        forAll(fieldNames){fieldName =>
+          val request = FakeRequest(controllers.deployment.routes.SimpleApiDeploymentController.onSubmit())
+            .withFormUrlEncodedBody(invalidForm(fieldName): _*)
+          val result = route(fixture.playApplication, request).value
+
+          val boundForm = bindForm(form, invalidForm(fieldName))
+          val view = fixture.playApplication.injector.instanceOf[SimpleApiDeploymentView]
+
+          status(result) mustBe BAD_REQUEST
+          contentAsString(result) mustBe view(boundForm, teams, FakeUser)(request, messages(fixture.playApplication)).toString()
+          contentAsString(result) must validateAsHtml
+        }
+      }
+    }
   }
 
   private case class Fixture(
@@ -102,6 +169,8 @@ class SimpleApiDeploymentControllerSpec extends SpecBase with MockitoSugar with 
 
 object SimpleApiDeploymentControllerSpec {
 
+  val form = new DeploymentsRequestFormProvider()()
+
   val validForm = Seq(
     "lineOfBusiness" -> "test-line-of-business",
     "name" -> "test-name",
@@ -112,5 +181,32 @@ object SimpleApiDeploymentControllerSpec {
     "passthrough" -> "false",
     "status" -> "test-status"
   )
+
+  def invalidForm(missingField: String): Seq[(String, String)] =
+    validForm.filterNot(_._1.equalsIgnoreCase(missingField)) :+ (missingField, "")
+
+  def bindForm(form: Form[_], values: Seq[(String, String)]): Form[_] = {
+    form.bind(values.toMap)
+  }
+
+  val team1: Team = Team(
+    id = "test-id-1",
+    name = "test-name-1",
+    created = LocalDateTime.now(),
+    teamMembers = Seq(
+      TeamMember("test-email")
+    )
+  )
+
+  val team2: Team = Team(
+    id = "test-id-2",
+    name = "test-name-2",
+    created = LocalDateTime.now(),
+    teamMembers = Seq(
+      TeamMember("test-email")
+    )
+  )
+
+  val teams: Seq[Team] = Seq(team1, team2)
 
 }
