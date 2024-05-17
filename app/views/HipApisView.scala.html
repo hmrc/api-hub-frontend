@@ -76,12 +76,6 @@
 }
 
 @domainsAndSubDomains() = {
-    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
-        <h2 class="govuk-fieldset__heading">
-            Filter by domain
-        </h2>
-    </legend>
-
     <div id="domainFilters" class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
     @for(domain <- domains.domains) {
         <div>
@@ -110,17 +104,14 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-one-third filters-container">
             <div class="govuk-form-group">
+                <h2 class="govuk-heading-s govuk-!-margin-bottom-1">
+                    Filter APIs
+                </h2>
+                <div class="govuk-body">
+                    <a href="#" class="govuk-link govuk-link--no-visited-state" id="resetFilters">Reset filters</a>
+                </div>
+                <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible hip-color-override govuk-!-margin-top-5">
                 <fieldset class="govuk-fieldset">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
-                        <h2 class="govuk-fieldset__heading">
-                            Filter APIs
-                        </h2>
-                    </legend>
-                    <div class="govuk-body">
-                        <a href="#" class="govuk-link govuk-link--no-visited-state" id="resetFilters">Reset filters</a>
-                    </div>
-                    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible hip-color-override govuk-!-margin-top-5">
-
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                         <h2 class="govuk-fieldset__heading">
                             Filter by status
@@ -132,8 +123,9 @@
                         @statusFilter("LIVE", true)
                         @statusFilter("DEPRECATED")
                     </div>
-                    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible hip-color-override govuk-!-margin-top-5">
-
+                </fieldset>
+                <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible hip-color-override govuk-!-margin-top-5">
+                <fieldset class="govuk-fieldset">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                         <h2 class="govuk-fieldset__heading">
                             Filter by domain

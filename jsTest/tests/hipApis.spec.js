@@ -8,14 +8,19 @@ describe('hipApis', () => {
         const dom = (new JSDOM(`
             <!DOCTYPE html>
             <div id="statusFilters">
-                <input class="govuk-checkboxes__input" type="checkbox" value="ALPHA" checked="checked">
-                <input class="govuk-checkboxes__input" type="checkbox" value="BETA" checked="checked">
-                <input class="govuk-checkboxes__input" type="checkbox" value="LIVE" checked="checked">
+                <input class="govuk-checkboxes__input" type="checkbox" value="ALPHA" checked>
+                <input class="govuk-checkboxes__input" type="checkbox" value="BETA" checked>
+                <input class="govuk-checkboxes__input" type="checkbox" value="LIVE" checked>
                 <input class="govuk-checkboxes__input" type="checkbox" value="DEPRECATED">                
             </div>
             <div id="apiList"></div>
             <div id="searchResultsSize"></div>
             <div id="pagination"></div>
+            <div id="noResultsPanel"></div>
+            <div id="resetFilters"></div>
+            <div id="noResultsClearFilters"></div>
+            <div id="domainFilterCount"></div>
+            <div id="viewDomainFilters"></div>
         `));
         document = dom.window.document;
         globalThis.document = document;
