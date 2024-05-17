@@ -93,7 +93,7 @@ object SimpleApiDeploymentController {
         "egress" -> text("Enter an egress"),
         "teamId" -> text("Select a team"),
         "oas" -> text("Enter the OAS"),
-        "passthrough" -> boolean("Enter passthrough"),
+        "passthrough" -> Forms.default(boolean(), false),
         "status" -> text("Enter an API status"),
         )(DeploymentsRequest.apply)(DeploymentsRequest.unapply)
       )

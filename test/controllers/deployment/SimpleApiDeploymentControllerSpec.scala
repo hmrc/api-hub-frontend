@@ -116,6 +116,7 @@ class SimpleApiDeploymentControllerSpec
 
     "must return 400 Bad Request and errors when invalid data is submitted" in {
       val fixture = buildFixture()
+
       val fieldNames = Table(
         "Field name",
         "lineOfBusiness",
@@ -124,7 +125,6 @@ class SimpleApiDeploymentControllerSpec
         "egress",
         "teamId",
         "oas",
-        "passthrough",
         "status"
       )
 
