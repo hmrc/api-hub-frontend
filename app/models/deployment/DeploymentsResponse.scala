@@ -28,7 +28,7 @@ object SuccessfulDeploymentsResponse {
 
 }
 
-case class InvalidOasResponse(failures: Seq[ValidationFailure]) extends DeploymentsResponse
+case class InvalidOasResponse(failure: FailuresResponse) extends DeploymentsResponse
 
 object InvalidOasResponse {
 

@@ -25,7 +25,7 @@ import models.accessrequest._
 import models.api.ApiDeploymentStatuses
 import models.application._
 import models.application.ApplicationLenses._
-import models.deployment.{DeploymentsRequest, InvalidOasResponse, SuccessfulDeploymentsResponse, ValidationFailure}
+import models.deployment.{DeploymentsRequest, Error, FailuresResponse, InvalidOasResponse, SuccessfulDeploymentsResponse}
 import models.exception.{ApplicationCredentialLimitException, TeamNameNotUniqueException}
 import models.requests.{AddApiRequest, AddApiRequestEndpoint, TeamMemberRequest}
 import models.team.{NewTeam, Team}
@@ -688,7 +688,13 @@ class ApplicationsConnectorSpec
 
     "must handle a 400 bad Request response with invalid OAS payload" in {
       val request = DeploymentsRequest("test-lob", "test-name", "test-description", "test-egress", "test-team-id", "test-oas", true, "BETA")
-      val response = InvalidOasResponse(Seq(ValidationFailure("test-type", "test-message")))
+      val response = InvalidOasResponse(
+        FailuresResponse(
+          code = "BAD_REQUEST",
+          reason = "Validation Failed.",
+          errors = Some(Seq(Error("METADATA", """name must match \"^[a-z0-9\\-]+$\"""")))
+        )
+      )
 
       stubFor(
         post(urlEqualTo("/api-hub-applications/deployments/generate"))
