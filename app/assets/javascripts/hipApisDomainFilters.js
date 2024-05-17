@@ -86,6 +86,17 @@ export function buildDomainFilters() {
         });
     }
 
+    function getSelected() {
+        const selections = {};
+        domainFilterEls.filter(el => el.checked).forEach(el => {
+            const domain = el.value;
+            selections[domain] = subdomainFilterEls
+                .filter(el => el.dataset['domain'] === domain && el.checked)
+                .map(el => el.value);
+        });
+        return selections;
+    }
+
     return {
         initialiseFromApis(apis) {
             const apiDomains = getDomainsInUseByApis(apis);
@@ -113,15 +124,19 @@ export function buildDomainFilters() {
             collapseDomainFilterSection(true);
             updateDomainFilterCount();
         },
-        getSelected() {
-            const selections = {};
-            domainFilterEls.filter(el => el.checked).forEach(el => {
-                const domain = el.value;
-                selections[domain] = subdomainFilterEls
-                    .filter(el => el.dataset['domain'] === domain && el.checked)
-                    .map(el => el.value);
-            });
-            return selections;
+        buildFilterFunction() {
+            const selectedDomains = getSelected(),
+                noDomainsSelected = Object.keys(selectedDomains).length === 0;
+
+            return data => {
+                if (noDomainsSelected) {
+                    return true;
+                } else if (selectedDomains[data.domain]) {
+                    const noSubDomainsSelected = selectedDomains[data.domain].length === 0;
+                    return noSubDomainsSelected || selectedDomains[data.domain].includes(data.subdomain);
+                }
+                return false;
+            };
         }
     };
 }
