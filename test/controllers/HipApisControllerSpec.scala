@@ -18,7 +18,7 @@ package controllers
 
 import base.OptionallyAuthenticatedSpecBase
 import controllers.actions.FakeUser
-import fakes.FakeDomains
+import fakes.{FakeDomains, FakeHods}
 import generators.ApiDetailGenerators
 import models.api.{ApiDetail, Live}
 import models.user.UserModel
@@ -59,7 +59,7 @@ class HipApisControllerSpec
           val result = route(fixture.application, request).value
 
           status(result) mustBe OK
-          contentAsString(result) mustBe view(None, Seq(apiDetail), FakeDomains)(request, messages(fixture.application)).toString()
+          contentAsString(result) mustBe view(None, Seq(apiDetail), FakeDomains, FakeHods)(request, messages(fixture.application)).toString()
           contentAsString(result) must validateAsHtml
         }
       }
@@ -79,7 +79,7 @@ class HipApisControllerSpec
           val result = route(fixture.application, request).value
 
           status(result) mustBe OK
-          contentAsString(result) mustBe view(Some(FakeUser), Seq(apiDetail), FakeDomains)(request, messages(fixture.application)).toString()
+          contentAsString(result) mustBe view(Some(FakeUser), Seq(apiDetail), FakeDomains, FakeHods)(request, messages(fixture.application)).toString()
           contentAsString(result) must validateAsHtml
         }
       }
@@ -103,7 +103,7 @@ class HipApisControllerSpec
         val result = route(fixture.application, request).value
 
         status(result) mustBe OK
-        contentAsString(result) mustBe view(None, Seq(aardvarks, molluscs, pigeons, zebras), FakeDomains)(request, messages(fixture.application)).toString()
+        contentAsString(result) mustBe view(None, Seq(aardvarks, molluscs, pigeons, zebras), FakeDomains, FakeHods)(request, messages(fixture.application)).toString()
         contentAsString(result) must validateAsHtml
       }
     }

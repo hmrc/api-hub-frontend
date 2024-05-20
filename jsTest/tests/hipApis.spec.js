@@ -41,6 +41,8 @@ describe('hipApis', () => {
             <div id="noResultsClearFilters"></div>
             <div id="domainFilterCount"></div>
             <details id="viewDomainFilters"><summary></summary></details>
+            <div id="hodFilterCount"></div>
+            <details id="viewHodFilters"><summary></summary></details>
         `));
         document = dom.window.document;
         globalThis.document = document;
@@ -58,19 +60,21 @@ describe('hipApis', () => {
                 ['', 'd3s1'],
                 ['dx', 'dxs1'],
                 ['', ''],
-            ];
+            ],
+            hodsValues = ['', 'ems', 'internal,ems,invalid', 'apim', 'invalid'];
         let i= 0;
         while (i < count) {
             const apiStatus = statuses[i % statuses.length],
-                [domain, subdomain] = domainValues[i % domainValues.length];
-            panels.push({apiStatus, domain, subdomain})
+                [domain, subdomain] = domainValues[i % domainValues.length],
+                hods = hodsValues[i % hodsValues.length];
+            panels.push({apiStatus, domain, subdomain, hods})
             i++;
         }
         buildApiPanels(...panels);
     }
     function buildApiPanels(...panels) {
         document.getElementById('apiList').innerHTML = panels.map((panel, i) => {
-            return `<div class="api-panel" data-apistatus="${panel.apiStatus}" data-domain="${panel.domain}" data-subdomain="${panel.subdomain}" data-index="${i}"></div>`;
+            return `<div class="api-panel" data-apistatus="${panel.apiStatus}" data-domain="${panel.domain || ''}" data-subdomain="${panel.subdomain || ''}" data-index="${i}" data-hods="${panel.hods || ''}"></div>`;
         }).join('');
     }
     function getVisiblePanelData() {
@@ -80,7 +84,8 @@ describe('hipApis', () => {
                 apiStatus: el.dataset['apistatus'],
                 index: parseInt(el.dataset['index']),
                 domain: el.dataset['domain'],
-                subdomain: el.dataset['subdomain']
+                subdomain: el.dataset['subdomain'],
+                hods: el.dataset['hods']
             }));
     }
     function getResultCount() {
@@ -122,6 +127,7 @@ describe('hipApis', () => {
 
     it("when page initially displayed then only panels with selected statuses are visible",  () => {
         buildApiPanels({apiStatus: 'ALPHA'}, {apiStatus: 'BETA'}, {apiStatus: 'LIVE'}, {apiStatus: 'DEPRECATED'});
+        console.log(document.getElementById('apiList').innerHTML);
 
         onPageShow();
 
@@ -189,21 +195,21 @@ describe('hipApis', () => {
         clickDomainFilter('d1');
 
         expect(getVisiblePanelData()).toEqual([
-            { apiStatus: 'ALPHA', index: 0, domain: 'd1', subdomain: 'd1s1' },
-            { apiStatus: 'BETA', index: 1, domain: 'd1', subdomain: 'd1s2' },
-            { apiStatus: 'LIVE', index: 2, domain: 'd1', subdomain: 'd1s3' },
-            { apiStatus: 'ALPHA', index: 8, domain: 'd1', subdomain: 'd1s1' },
-            { apiStatus: 'BETA', index: 9, domain: 'd1', subdomain: 'd1s2' },
-            { apiStatus: 'LIVE', index: 10, domain: 'd1', subdomain: 'd1s3' },
-            { apiStatus: 'ALPHA', index: 16, domain: 'd1', subdomain: 'd1s1' },
-            { apiStatus: 'BETA', index: 17, domain: 'd1', subdomain: 'd1s2' },
-            { apiStatus: 'LIVE', index: 18, domain: 'd1', subdomain: 'd1s3' },
-            { apiStatus: 'ALPHA', index: 24, domain: 'd1', subdomain: 'd1s1' },
-            { apiStatus: 'BETA', index: 25, domain: 'd1', subdomain: 'd1s2' },
-            { apiStatus: 'LIVE', index: 26, domain: 'd1', subdomain: 'd1s3' },
-            { apiStatus: 'ALPHA', index: 32, domain: 'd1', subdomain: 'd1s1' },
-            { apiStatus: 'BETA', index: 33, domain: 'd1', subdomain: 'd1s2' },
-            { apiStatus: 'LIVE', index: 34, domain: 'd1', subdomain: 'd1s3' }
+            { apiStatus: 'ALPHA', index: 0, domain: 'd1', subdomain: 'd1s1', hods: ''},
+            { apiStatus: 'BETA', index: 1, domain: 'd1', subdomain: 'd1s2', hods: 'ems'},
+            { apiStatus: 'LIVE', index: 2, domain: 'd1', subdomain: 'd1s3', hods: 'internal,ems,invalid'},
+            { apiStatus: 'ALPHA', index: 8, domain: 'd1', subdomain: 'd1s1', hods: 'apim'},
+            { apiStatus: 'BETA', index: 9, domain: 'd1', subdomain: 'd1s2', hods: 'invalid'},
+            { apiStatus: 'LIVE', index: 10, domain: 'd1', subdomain: 'd1s3', hods: ''},
+            { apiStatus: 'ALPHA', index: 16, domain: 'd1', subdomain: 'd1s1', hods: 'ems'},
+            { apiStatus: 'BETA', index: 17, domain: 'd1', subdomain: 'd1s2', hods: 'internal,ems,invalid'},
+            { apiStatus: 'LIVE', index: 18, domain: 'd1', subdomain: 'd1s3', hods: 'apim'},
+            { apiStatus: 'ALPHA', index: 24, domain: 'd1', subdomain: 'd1s1', hods: 'invalid'},
+            { apiStatus: 'BETA', index: 25, domain: 'd1', subdomain: 'd1s2', hods: ''},
+            { apiStatus: 'LIVE', index: 26, domain: 'd1', subdomain: 'd1s3', hods: 'ems'},
+            { apiStatus: 'ALPHA', index: 32, domain: 'd1', subdomain: 'd1s1', hods: 'internal,ems,invalid'},
+            { apiStatus: 'BETA', index: 33, domain: 'd1', subdomain: 'd1s2', hods: 'apim'},
+            { apiStatus: 'LIVE', index: 34, domain: 'd1', subdomain: 'd1s3', hods: 'invalid'}
         ]);
     });
 
@@ -216,21 +222,21 @@ describe('hipApis', () => {
         clickDomainFilter('d2');
 
         expect(getVisiblePanelData()).toEqual([
-            { apiStatus: 'BETA', index: 1, domain: 'd1', subdomain: 'd1s2' },
-            { apiStatus: 'LIVE', index: 2, domain: 'd1', subdomain: 'd1s3' },
-            { apiStatus: 'BETA', index: 9, domain: 'd1', subdomain: 'd1s2' },
-            { apiStatus: 'LIVE', index: 10, domain: 'd1', subdomain: 'd1s3' },
-            { apiStatus: 'BETA', index: 17, domain: 'd1', subdomain: 'd1s2' },
-            { apiStatus: 'LIVE', index: 18, domain: 'd1', subdomain: 'd1s3' },
-            { apiStatus: 'BETA', index: 25, domain: 'd1', subdomain: 'd1s2' },
-            { apiStatus: 'LIVE', index: 26, domain: 'd1', subdomain: 'd1s3' },
-            { apiStatus: 'BETA', index: 33, domain: 'd1', subdomain: 'd1s2' },
-            { apiStatus: 'LIVE', index: 34, domain: 'd1', subdomain: 'd1s3' },
-            { apiStatus: 'BETA', index: 41, domain: 'd1', subdomain: 'd1s2' },
-            { apiStatus: 'LIVE', index: 42, domain: 'd1', subdomain: 'd1s3' },
-            { apiStatus: 'BETA', index: 49, domain: 'd1', subdomain: 'd1s2' },
-            { apiStatus: 'LIVE', index: 50, domain: 'd1', subdomain: 'd1s3' },
-            { apiStatus: 'BETA', index: 57, domain: 'd1', subdomain: 'd1s2' }
+            { apiStatus: 'BETA', index: 1, domain: 'd1', subdomain: 'd1s2', hods: 'ems'},
+            { apiStatus: 'LIVE', index: 2, domain: 'd1', subdomain: 'd1s3', hods: 'internal,ems,invalid'},
+            { apiStatus: 'BETA', index: 9, domain: 'd1', subdomain: 'd1s2', hods: 'invalid'},
+            { apiStatus: 'LIVE', index: 10, domain: 'd1', subdomain: 'd1s3', hods: ''},
+            { apiStatus: 'BETA', index: 17, domain: 'd1', subdomain: 'd1s2', hods: 'internal,ems,invalid'},
+            { apiStatus: 'LIVE', index: 18, domain: 'd1', subdomain: 'd1s3', hods: 'apim'},
+            { apiStatus: 'BETA', index: 25, domain: 'd1', subdomain: 'd1s2', hods: ''},
+            { apiStatus: 'LIVE', index: 26, domain: 'd1', subdomain: 'd1s3', hods: 'ems'},
+            { apiStatus: 'BETA', index: 33, domain: 'd1', subdomain: 'd1s2', hods: 'apim'},
+            { apiStatus: 'LIVE', index: 34, domain: 'd1', subdomain: 'd1s3', hods: 'invalid'},
+            { apiStatus: 'BETA', index: 41, domain: 'd1', subdomain: 'd1s2', hods: 'ems'},
+            { apiStatus: 'LIVE', index: 42, domain: 'd1', subdomain: 'd1s3', hods: 'internal,ems,invalid'},
+            { apiStatus: 'BETA', index: 49, domain: 'd1', subdomain: 'd1s2', hods: 'invalid'},
+            { apiStatus: 'LIVE', index: 50, domain: 'd1', subdomain: 'd1s3', hods: ''},
+            { apiStatus: 'BETA', index: 57, domain: 'd1', subdomain: 'd1s2', hods: 'internal,ems,invalid'}
         ]);
     });
 

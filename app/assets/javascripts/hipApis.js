@@ -1,10 +1,12 @@
 import {buildPaginator} from './pagination.js';
 import {buildDomainFilters} from "./hipApisDomainFilters.js";
 import {buildStatusFilters} from "./hipApisStatusFilters.js";
+import {buildHodsFilters} from "./hipApisHodsFilters.js";
 
 export function onPageShow() {
     const domainFilters = buildDomainFilters(),
-        statusFilters = buildStatusFilters();
+        statusFilters = buildStatusFilters(),
+        hodsFilters = buildHodsFilters();
 
     const view = (() => {
         const apiDetailPanelEls = Array.from(document.querySelectorAll('#apiList .api-panel')),
@@ -23,10 +25,14 @@ export function onPageShow() {
         domainFilters.onChange(() => {
             onFiltersChangedHandler();
         });
+        hodsFilters.onChange(() => {
+            onFiltersChangedHandler();
+        });
 
         function clearAllFilters() {
             statusFilters.clear();
             domainFilters.clear();
+            hodsFilters.clear();
             onFiltersChangedHandler();
         }
 
@@ -53,6 +59,7 @@ export function onPageShow() {
             initialiseFilters(apis) {
                 statusFilters.initialise();
                 domainFilters.initialiseFromApis(apis);
+                hodsFilters.initialiseFromApis(apis);
             },
             setResultCount(count) {
                 elSearchResultsSize.textContent = count;
@@ -69,7 +76,8 @@ export function onPageShow() {
     function buildFilterFunctions() {
         return [
             statusFilters.buildFilterFunction(),
-            domainFilters.buildFilterFunction()
+            domainFilters.buildFilterFunction(),
+            hodsFilters.buildFilterFunction()
         ];
     }
 
@@ -78,7 +86,8 @@ export function onPageShow() {
             data: {
                 apiStatus: el.dataset['apistatus'],
                 domain: el.dataset['domain'],
-                subdomain: el.dataset['subdomain']
+                subdomain: el.dataset['subdomain'],
+                hods: new Set(el.dataset['hods'].split(',').filter(h => h)),
                 // add other properties that we want to filter on here...
             },
             el,

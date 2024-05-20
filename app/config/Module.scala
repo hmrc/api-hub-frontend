@@ -41,7 +41,8 @@ class Module extends play.api.inject.Module {
       bindz(classOf[OptionalIdentifierAction]).to(classOf[OptionallyAuthenticatedIdentifierAction]),
       bindz(classOf[Clock]).toInstance(Clock.systemDefaultZone.withZone(ZoneOffset.UTC)),
       bindz[Encrypter with Decrypter].toProvider[CryptoProvider],
-      bindz[Domains].to(classOf[DomainsImpl]).eagerly()
+      bindz[Domains].to(classOf[DomainsImpl]).eagerly(),
+      bindz[Hods].to(classOf[HodsImpl]).eagerly()
     )
 
     val authTokenInitialiserBindings: Seq[Binding[_]] = if (configuration.get[Boolean]("create-internal-auth-token-on-start")) {
