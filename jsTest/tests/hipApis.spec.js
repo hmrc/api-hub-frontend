@@ -141,7 +141,6 @@ describe('hipApis', () => {
 
     it("when page initially displayed then only panels with selected statuses are visible",  () => {
         buildApiPanels({apiStatus: 'ALPHA'}, {apiStatus: 'BETA'}, {apiStatus: 'LIVE'}, {apiStatus: 'DEPRECATED'});
-        console.log(document.getElementById('apiList').innerHTML);
 
         onPageShow();
 
