@@ -40,7 +40,7 @@ describe('hipApis', () => {
             <div id="resetFilters"></div>
             <div id="noResultsClearFilters"></div>
             <div id="domainFilterCount"></div>
-            <div id="viewDomainFilters"></div>
+            <details id="viewDomainFilters"><summary></summary></details>
         `));
         document = dom.window.document;
         globalThis.document = document;
@@ -92,11 +92,29 @@ describe('hipApis', () => {
     function clickSubdomainFilter(value) {
         document.querySelector(`input[value="${value}"].subDomainFilter`).click();
     }
+    function domainFilterIsSelected(value) {
+        return document.querySelector(`input[value="${value}"].domainFilter`).checked;
+    }
+    function subdomainFilterIsSelected(value) {
+        return document.querySelector(`input[value="${value}"].subDomainFilter`).checked;
+    }
     function clickStatusFilter(value) {
         document.querySelector(`#statusFilters input[value="${value}"]`).click();
     }
+    function statusFilterIsSelected(value) {
+        return document.querySelector(`#statusFilters input[value="${value}"]`).checked;
+    }
+    function domainFiltersCollapsed() {
+        return document.getElementById('viewDomainFilters').open === false;
+    }
     function clickPageNumber(pageNumber) {
         document.querySelector(`#pagination .govuk-pagination__link[data-page="${pageNumber}"]`).click();
+    }
+    function getCurrentPageNumber() {
+        return parseInt(document.querySelector('.govuk-pagination__item--current').textContent);
+    }
+    function noResultsPanelIsVisible() {
+        return document.getElementById('noResultsPanel').style.display === 'block';
     }
     function indexAndStatus(panel) {
         return {apiStatus: panel.apiStatus, index: panel.index};
@@ -216,4 +234,130 @@ describe('hipApis', () => {
         ]);
     });
 
+    describe("domain filter selection counter", () => {
+        beforeEach(() => {
+            buildApiPanelsByCount(100);
+        });
+
+        function getDomainFilterCount() {
+            return parseInt(document.getElementById('domainFilterCount').textContent);
+        }
+
+        it("when page is first displayed then domain filter count is 0",  () => {
+            onPageShow();
+
+            expect(getDomainFilterCount()).toBe(0);
+        });
+
+        it("when domain filter with 3 subdomains is selected then domain filter count is 4",  () => {
+            onPageShow();
+
+            clickDomainFilter('d1');
+
+            expect(getDomainFilterCount()).toBe(4);
+        });
+
+        it("when domain filter with 3 subdomains is deselected then domain filter count is 0",  () => {
+            onPageShow();
+            clickDomainFilter('d1');
+
+            clickDomainFilter('d1');
+
+            expect(getDomainFilterCount()).toBe(0);
+        });
+
+        it("when subdomain is deselected then domain filter count reduces by 1",  () => {
+            onPageShow();
+            clickDomainFilter('d1');
+
+            clickSubdomainFilter('d1s2');
+
+            expect(getDomainFilterCount()).toBe(3);
+        });
+
+        it("when all subdomains are deselected then domain filter count is 1",  () => {
+            onPageShow();
+            clickDomainFilter('d1');
+
+            clickSubdomainFilter('d1s1');
+            clickSubdomainFilter('d1s2');
+            clickSubdomainFilter('d1s3');
+
+            expect(getDomainFilterCount()).toBe(1);
+        });
+    });
+
+    describe("reset filters", () => {
+        beforeEach(() => {
+            buildApiPanelsByCount(100);
+        });
+
+        function clickResetFiltersLink() {
+            document.getElementById('resetFilters').click();
+        }
+
+        it("when reset filters link is clicked then all status filters are reset",  () => {
+            onPageShow();
+
+            clickResetFiltersLink();
+
+            expect(statusFilterIsSelected('ALPHA')).toBe(false);
+            expect(statusFilterIsSelected('BETA')).toBe(false);
+            expect(statusFilterIsSelected('LIVE')).toBe(false);
+            expect(statusFilterIsSelected('DEPRECATED')).toBe(false);
+        });
+
+        it("when reset filters link is clicked then domain filters are reset",  () => {
+            onPageShow();
+            clickDomainFilter('d1');
+            clickDomainFilter('d2');
+            clickDomainFilter('d3');
+
+            clickResetFiltersLink();
+
+            expect(domainFilterIsSelected('d1')).toBe(false);
+            expect(domainFilterIsSelected('d2')).toBe(false);
+            expect(domainFilterIsSelected('d3')).toBe(false);
+            expect(subdomainFilterIsSelected('d1s1')).toBe(false);
+            expect(subdomainFilterIsSelected('d1s2')).toBe(false);
+            expect(subdomainFilterIsSelected('d1s3')).toBe(false);
+            expect(subdomainFilterIsSelected('d2s1')).toBe(false);
+        });
+
+        it("when reset filters link is clicked then domain filters are reset and section is collapsed",  () => {
+            onPageShow();
+
+            clickResetFiltersLink();
+
+            expect(domainFiltersCollapsed()).toBe(true);
+        });
+
+        it("when second page of results is displayed and reset filters link and is clicked then we return to the first page",  () => {
+            onPageShow();
+            clickPageNumber(2);
+
+            clickResetFiltersLink();
+
+            expect(getCurrentPageNumber()).toBe(1);
+        });
+    });
+
+    describe("no results", () => {
+        it("when no results match filters then 'no results' message is displayed",  () => {
+            buildApiPanelsByCount(1);
+            clickStatusFilter('ALPHA');
+
+            onPageShow();
+
+            expect(noResultsPanelIsVisible()).toBe(true);
+        });
+
+        it("when one result matches filters then 'no results' message is not displayed",  () => {
+            buildApiPanelsByCount(1);
+
+            onPageShow();
+
+            expect(noResultsPanelIsVisible()).toBe(false);
+        });
+    });
 });
