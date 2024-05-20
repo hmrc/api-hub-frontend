@@ -33,6 +33,11 @@ describe('hipApis', () => {
                     <div><input class="subDomainFilter" type="checkbox" value="d3s3" data-domain="d3"></div>
                 </div>
             </div>            
+            <div id="hodFilters">
+                <div><input class="hodFilter" type="checkbox" value="ems"></div>
+                <div><input class="hodFilter" type="checkbox" value="internal"></div>
+                <div><input class="hodFilter" type="checkbox" value="apim"></div>
+            </div>            
             <div id="apiList"></div>
             <div id="searchResultsSize"></div>
             <div id="pagination"></div>
@@ -109,8 +114,17 @@ describe('hipApis', () => {
     function statusFilterIsSelected(value) {
         return document.querySelector(`#statusFilters input[value="${value}"]`).checked;
     }
+    function clickHodFilter(value) {
+        document.querySelector(`#hodFilters input[value="${value}"]`).click();
+    }
+    function hodFilterIsSelected(value) {
+        return document.querySelector(`#hodFilters input[value="${value}"]`).checked;
+    }
     function domainFiltersCollapsed() {
         return document.getElementById('viewDomainFilters').open === false;
+    }
+    function hodFiltersCollapsed() {
+        return document.getElementById('viewHodFilters').open === false;
     }
     function clickPageNumber(pageNumber) {
         document.querySelector(`#pagination .govuk-pagination__link[data-page="${pageNumber}"]`).click();
@@ -240,6 +254,32 @@ describe('hipApis', () => {
         ]);
     });
 
+    it("when hod filters are applied then correct panels are shown",  () => {
+        buildApiPanelsByCount(100);
+        onPageShow();
+
+        clickHodFilter('internal');
+        clickHodFilter('ems');
+
+        expect(getVisiblePanelData()).toEqual([
+            { apiStatus: 'BETA', index: 1, domain: 'd1', subdomain: 'd1s2', hods: 'ems'},
+            { apiStatus: 'LIVE', index: 2, domain: 'd1', subdomain: 'd1s3', hods: 'internal,ems,invalid'},
+            { apiStatus: 'LIVE', index: 6, domain: 'dx', subdomain: 'dxs1', hods: 'ems'},
+            { apiStatus: 'ALPHA', index: 12, domain: 'd3', subdomain: '', hods: 'internal,ems,invalid'},
+            { apiStatus: 'ALPHA', index: 16, domain: 'd1', subdomain: 'd1s1', hods: 'ems'},
+            { apiStatus: 'BETA', index: 17, domain: 'd1', subdomain: 'd1s2', hods: 'internal,ems,invalid'},
+            { apiStatus: 'BETA', index: 21, domain: '', subdomain: 'd3s1', hods: 'ems'},
+            { apiStatus: 'LIVE', index: 22, domain: 'dx', subdomain: 'dxs1', hods: 'internal,ems,invalid'},
+            { apiStatus: 'LIVE', index: 26, domain: 'd1', subdomain: 'd1s3', hods: 'ems'},
+            { apiStatus: 'ALPHA', index: 32, domain: 'd1', subdomain: 'd1s1', hods: 'internal,ems,invalid'},
+            { apiStatus: 'ALPHA', index: 36, domain: 'd3', subdomain: '', hods: 'ems'},
+            { apiStatus: 'BETA', index: 37, domain: '', subdomain: 'd3s1', hods: 'internal,ems,invalid'},
+            { apiStatus: 'BETA', index: 41, domain: 'd1', subdomain: 'd1s2', hods: 'ems'},
+            { apiStatus: 'LIVE', index: 42, domain: 'd1', subdomain: 'd1s3', hods: 'internal,ems,invalid'},
+            { apiStatus: 'LIVE', index: 46, domain: 'dx', subdomain: 'dxs1', hods: 'ems'}
+        ]);
+    });
+
     describe("domain filter selection counter", () => {
         beforeEach(() => {
             buildApiPanelsByCount(100);
@@ -293,6 +333,30 @@ describe('hipApis', () => {
         });
     });
 
+    describe("HoD filter selection counter", () => {
+        beforeEach(() => {
+            buildApiPanelsByCount(100);
+        });
+
+        function getHodFilterCount() {
+            return parseInt(document.getElementById('hodFilterCount').textContent);
+        }
+
+        it("when page is first displayed then hod filter count is 0",  () => {
+            onPageShow();
+
+            expect(getHodFilterCount()).toBe(0);
+        });
+
+        it("when hod filter with is selected then domain filter count is 1",  () => {
+            onPageShow();
+
+            clickHodFilter('apim');
+
+            expect(getHodFilterCount()).toBe(1);
+        });
+    });
+
     describe("reset filters", () => {
         beforeEach(() => {
             buildApiPanelsByCount(100);
@@ -330,12 +394,31 @@ describe('hipApis', () => {
             expect(subdomainFilterIsSelected('d2s1')).toBe(false);
         });
 
-        it("when reset filters link is clicked then domain filters are reset and section is collapsed",  () => {
+        it("when reset filters link is clicked then domain filters section is collapsed",  () => {
             onPageShow();
 
             clickResetFiltersLink();
 
             expect(domainFiltersCollapsed()).toBe(true);
+        });
+
+        it("when reset filters link is clicked then hod filters are reset",  () => {
+            onPageShow();
+            clickHodFilter('apim');
+            clickHodFilter('ems');
+
+            clickResetFiltersLink();
+
+            expect(hodFilterIsSelected('apim')).toBe(false);
+            expect(hodFilterIsSelected('ems')).toBe(false);
+        });
+
+        it("when reset filters link is clicked then hod filters section is collapsed",  () => {
+            onPageShow();
+
+            clickResetFiltersLink();
+
+            expect(hodFiltersCollapsed()).toBe(true);
         });
 
         it("when second page of results is displayed and reset filters link and is clicked then we return to the first page",  () => {

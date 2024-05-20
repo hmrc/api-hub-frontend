@@ -401,6 +401,6 @@
     letter-spacing: 1px;
     white-space: nowrap;
 }
-.hodFilterLabel {
+.hodFilterLabel, .hodTag {
     text-transform: uppercase;
 }

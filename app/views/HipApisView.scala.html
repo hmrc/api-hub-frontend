@@ -68,6 +68,11 @@
                     <strong class="govuk-tag govuk-tag--grey subDomainTag">{domains.getSubDomainDescription(apiDetail).getOrElse("")}</strong>
                 </li>
             ))
+            @for(hod <- apiDetail.hods) {
+                <li>
+                    <strong class="govuk-tag govuk-tag--grey hodTag">@hod</strong>
+                </li>
+            }
         </ul>
     </div>
 }
