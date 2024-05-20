@@ -16,9 +16,9 @@
 
 package base
 
-import config.Domains
+import config.{Domains, Hods}
 import controllers.actions.{FakeOptionalIdentifierAction, OptionalIdentifierAction, OptionalUserProvider, OptionalUserProviderImpl}
-import fakes.FakeDomains
+import fakes.{FakeDomains, FakeHods}
 import models.user.UserModel
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -35,7 +35,8 @@ trait OptionallyAuthenticatedSpecBase extends AnyFreeSpec with Matchers {
       .overrides(
         bind[OptionalUserProvider].toInstance(new OptionalUserProviderImpl(user)),
         bind[OptionalIdentifierAction].to[FakeOptionalIdentifierAction],
-        bind[Domains].toInstance(FakeDomains)
+        bind[Domains].toInstance(FakeDomains),
+        bind[Hods].toInstance(FakeHods)
       )
   }
 

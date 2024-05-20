@@ -18,6 +18,7 @@
 @import models.user.UserModel
 @import views.html.helper.CSPNonce
 @import config.Domains
+@import config.Hods
 
 @this(
     layout: templates.Layout,
@@ -29,7 +30,7 @@
     govukDetails : GovukDetails,
 )
 
-@(user: Option[UserModel], apiDetails: Seq[ApiDetail] = Seq.empty, domains: Domains)(implicit request: Request[_], messages: Messages)
+@(user: Option[UserModel], apiDetails: Seq[ApiDetail] = Seq.empty, domains: Domains, hods: Hods)(implicit request: Request[_], messages: Messages)
 
 @scripts() = {
     <link href='@routes.Assets.versioned("fontawesome6/css/all.min.css")' media="all" rel="stylesheet" type="text/css" @{CSPNonce.attr}/>
@@ -51,7 +52,7 @@
 }
 
 @anApi(apiDetail: ApiDetail) = {
-    <div class="api-panel" data-apistatus="@apiDetail.apiStatus" data-domain='@normalise(apiDetail.domain.getOrElse(""))' data-subdomain='@normalise(apiDetail.subDomain.getOrElse(""))'>
+    <div class="api-panel" data-apistatus="@apiDetail.apiStatus" data-domain='@normalise(apiDetail.domain.getOrElse(""))' data-subdomain='@normalise(apiDetail.subDomain.getOrElse(""))' data-hods="@apiDetail.hods.map(normalise).mkString(",")">
         <span class="call-out-type information">
             <a class="govuk-link govuk-link--no-visited-state" href="@routes.ApiDetailsController.onPageLoad(apiDetail.id)">@apiDetail.title</a>
         </span>
@@ -67,6 +68,11 @@
                     <strong class="govuk-tag govuk-tag--grey subDomainTag">{domains.getSubDomainDescription(apiDetail).getOrElse("")}</strong>
                 </li>
             ))
+            @for(hod <- apiDetail.hods) {
+                <li>
+                    <strong class="govuk-tag govuk-tag--grey hodTag">@hod</strong>
+                </li>
+            }
         </ul>
     </div>
 }
@@ -96,6 +102,19 @@
                         </div>
                     }
                 </div>
+            </div>
+        </div>
+    }
+    </div>
+}
+
+@hodsFilters() = {
+    <div id="hodFilters" class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+    @for(hod <- hods.hods) {
+        <div>
+            <div class="govuk-checkboxes__item">
+                <input class="govuk-checkboxes__input hodFilter" id="filter_@hod" name="filter_@hod" type="checkbox" value="@normalise(hod)">
+                <label class="govuk-label govuk-checkboxes__label hodFilterLabel" for="filter_@hod">@hod</label>
             </div>
         </div>
     }
@@ -143,6 +162,23 @@
                     ))
                     <div class="govuk-body filterSelectionCount">
                         <strong id="domainFilterCount">0</strong> @messages("hipApis.filter.selected")
+                    </div>
+                </fieldset>
+                <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible hip-color-override govuk-!-margin-top-5">
+                <fieldset class="govuk-fieldset">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                        <h2 class="govuk-fieldset__heading">
+                        @messages("hipApis.filter.byHods")
+                        </h2>
+                    </legend>
+                    @govukDetails(Details(
+                        id = Some("viewHodFilters"),
+                        classes = "govuk-!-margin-bottom-1",
+                        summary = Text(messages("hipApis.filter.byHods.view")),
+                        content = HtmlContent(hodsFilters())
+                    ))
+                    <div class="govuk-body filterSelectionCount">
+                        <strong id="hodFilterCount">0</strong> @messages("hipApis.filter.selected")
                     </div>
                 </fieldset>
             </div>

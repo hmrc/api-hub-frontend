@@ -297,6 +297,8 @@ hipApis.filter.selected = Selected
 hipApis.filter.noResults.heading = No APIs found
 hipApis.filter.noResults.message = No APIs have been found that match your filter critera, try adjusting your filters.
 hipApis.filter.noResults.clearFilters = Clear filters
+hipApis.filter.byHods = Filter by HoD/Backend
+hipApis.filter.byHods.view = View HoD/Backend filters
 
 support.link.text = Get Support
 support.title = Get Support
