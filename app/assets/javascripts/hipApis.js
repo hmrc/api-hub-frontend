@@ -1,27 +1,46 @@
 import {buildPaginator} from './pagination.js';
+import {buildDomainFilters} from "./hipApisDomainFilters.js";
+import {buildStatusFilters} from "./hipApisStatusFilters.js";
 
 export function onPageShow() {
+    const domainFilters = buildDomainFilters(),
+        statusFilters = buildStatusFilters();
 
     const view = (() => {
-        const statusFilterEls = Array.from(document.querySelectorAll('#statusFilters .govuk-checkboxes__input')),
-            apiDetailPanelEls = Array.from(document.querySelectorAll('#apiList .api-panel')),
+        const apiDetailPanelEls = Array.from(document.querySelectorAll('#apiList .api-panel')),
             elSearchResultsSize = document.getElementById('searchResultsSize'),
             elPaginationContainer = document.getElementById('pagination'),
+            elNoResultsPanel = document.getElementById('noResultsPanel'),
+            elResetFiltersLink = document.getElementById('resetFilters'),
+            elNoResultsResetFiltersLink = document.getElementById('noResultsClearFilters'),
             paginator = buildPaginator(elPaginationContainer);
+
+        let onFiltersChangedHandler = () => {};
+
+        statusFilters.onChange(() => {
+            onFiltersChangedHandler();
+        });
+        domainFilters.onChange(() => {
+            onFiltersChangedHandler();
+        });
+
+        function clearAllFilters() {
+            statusFilters.clear();
+            domainFilters.clear();
+            onFiltersChangedHandler();
+        }
+
+        elResetFiltersLink.addEventListener('click', clearAllFilters);
+        elNoResultsResetFiltersLink.addEventListener('click', clearAllFilters);
 
         return {
             onFiltersChanged(handler) {
-                statusFilterEls.forEach(elCheckbox => {
-                    elCheckbox.addEventListener('change', handler);
-                });
+                onFiltersChangedHandler = handler;
             },
             onPaginationChanged(handler) {
                 paginator.onNavigation(pageNumber => {
                     handler(pageNumber);
                 });
-            },
-            getStatusFilterValues() {
-                return statusFilterEls.filter(el => el.checked).map(el => el.value);
             },
             getApiDetailPanels() {
                 return apiDetailPanelEls;
@@ -31,29 +50,35 @@ export function onPageShow() {
                     apiDetail.el.style.display = apiDetail.visible ? 'block' : 'none';
                 });
             },
+            initialiseFilters(apis) {
+                statusFilters.initialise();
+                domainFilters.initialiseFromApis(apis);
+            },
             setResultCount(count) {
                 elSearchResultsSize.textContent = count;
             },
             setPagination(currentPage, totalPages) {
                 paginator.render(currentPage, totalPages);
+            },
+            toggleNoResultsPanel(visible) {
+                elNoResultsPanel.style.display = visible ? 'block' : 'none';
             }
         };
     })();
 
     function buildFilterFunctions() {
-        function buildApiStatusFilterFunction() {
-            const selectedStatuses = new Set(view.getStatusFilterValues());
-            return data => selectedStatuses.has(data.apiStatus);
-        }
-        // add new filters here...
-
-        return [buildApiStatusFilterFunction()];
+        return [
+            statusFilters.buildFilterFunction(),
+            domainFilters.buildFilterFunction()
+        ];
     }
 
     const model = {
         apis: view.getApiDetailPanels().map(el => ({
             data: {
-                apiStatus: el.dataset['apistatus']
+                apiStatus: el.dataset['apistatus'],
+                domain: el.dataset['domain'],
+                subdomain: el.dataset['subdomain']
                 // add other properties that we want to filter on here...
             },
             el,
@@ -105,11 +130,14 @@ export function onPageShow() {
         setPaginationPageNumber(1);
 
         view.setResultCount(model.resultCount);
+        view.toggleNoResultsPanel(model.resultCount === 0);
     }
 
     view.onFiltersChanged(() => {
         applyFilters();
     });
+
+    view.initialiseFilters(model.apis);
 
     applyFilters();
 }

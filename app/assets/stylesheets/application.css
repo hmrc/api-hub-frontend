@@ -379,3 +379,25 @@
 .api-status::first-letter {
     text-transform: uppercase;
 }
+
+.api-panel .hip-inline-list {
+    margin-left: 0px;
+    margin-bottom: 0px;
+}
+.api-panel .hip-inline-list li {
+    display: inline-block !important;
+    margin-right: 12px;
+}
+.api-panel .hip-inline-list li .govuk-tag {
+    font-size: 14px;
+    font-weight: bold;
+    max-width: none;
+}
+.filterSelectionCount, #resetFilters {
+    font-size: 16px;
+}
+.domainTag, .subDomainTag {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    white-space: nowrap;
+}
