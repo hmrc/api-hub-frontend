@@ -67,8 +67,7 @@ class SimpleApiDeploymentController @Inject()(
                 Ok(deploymentSuccessView(request.user, response))
               case response: InvalidOasResponse =>
                 logger.info(s"Invalid OAS deployments response${System.lineSeparator()}${Json.prettyPrint(Json.toJson(response))}")
-                Ok(deploymentFailureView(request.user, response.failure))
-
+                BadRequest(deploymentFailureView(request.user, response.failure))
             }
       )
   }

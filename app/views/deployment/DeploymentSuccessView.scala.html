@@ -27,7 +27,7 @@ govukPanel: GovukPanel
 @(user: UserModel, successResponse: SuccessfulDeploymentsResponse)(implicit request: Request[_], messages: Messages)
 
 
-@layout(pageTitle = titleNoForm(messages("api.deployment.success.title")), showBackLink = true, user = Some(user)) {
+@layout(pageTitle = titleNoForm(messages("api.deployment.success.title")), showBackLink = false, user = Some(user)) {
 
     @govukPanel(Panel(
         classes = "govuk-!-margin-bottom-9",
@@ -45,6 +45,6 @@ govukPanel: GovukPanel
     </details>
     <br>
     @govukButton(
-        ButtonViewModel(messages("api.deployment.continue")).asLink(routes.IndexController.onPageLoad.url)
+        ButtonViewModel(messages("api.deployment.success.continue")).asLink(routes.IndexController.onPageLoad.url)
     )
 }

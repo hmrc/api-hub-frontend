@@ -69,7 +69,7 @@ class SimpleApiDeploymentControllerSpec
   }
 
   "onSubmit" - {
-    "must respond with 200 OK and a success JSON response when returned by APIM" in {
+    "must respond with 200 OK and a success view response when success returned by APIM" in {
       val fixture = buildFixture()
 
       val response = SuccessfulDeploymentsResponse(
@@ -95,7 +95,7 @@ class SimpleApiDeploymentControllerSpec
       }
     }
 
-    "must return 400 Bad Request and a failure JSON response when returned by APIM" in {
+    "must return 400 Bad Request and a failure view response when errors returned by APIM" in {
       val fixture = buildFixture()
 
       val response = InvalidOasResponse(
@@ -115,7 +115,7 @@ class SimpleApiDeploymentControllerSpec
 
         val view = fixture.playApplication.injector.instanceOf[DeploymentFailureView]
 
-        status(result) mustBe OK
+        status(result) mustBe BAD_REQUEST
         contentAsString(result) mustBe view(FakeUser, response.failure)(request, messages(fixture.playApplication)).toString()
         contentAsString(result) must validateAsHtml
 
