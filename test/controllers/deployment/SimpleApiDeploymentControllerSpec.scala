@@ -33,7 +33,7 @@ import play.api.test.Helpers._
 import play.api.{Application => PlayApplication}
 import services.ApiHubService
 import utils.HtmlValidation
-import views.html.deployment.SimpleApiDeploymentView
+import views.html.deployment.{DeploymentFailureView, DeploymentSuccessView, SimpleApiDeploymentView}
 
 import java.time.LocalDateTime
 import scala.concurrent.Future
@@ -86,8 +86,12 @@ class SimpleApiDeploymentControllerSpec
           .withFormUrlEncodedBody(validForm: _*)
         val result = route(fixture.playApplication, request).value
 
+        val view = fixture.playApplication.injector.instanceOf[DeploymentSuccessView]
+
         status(result) mustBe OK
-        contentAsJson(result) mustBe Json.toJson(response)
+        contentAsString(result) mustBe view(FakeUser, response)(request, messages(fixture.playApplication)).toString()
+        contentAsString(result) must validateAsHtml
+
       }
     }
 
@@ -109,8 +113,12 @@ class SimpleApiDeploymentControllerSpec
           .withFormUrlEncodedBody(validForm: _*)
         val result = route(fixture.playApplication, request).value
 
-        status(result) mustBe BAD_REQUEST
-        contentAsJson(result) mustBe Json.toJson(response)
+        val view = fixture.playApplication.injector.instanceOf[DeploymentFailureView]
+
+        status(result) mustBe OK
+        contentAsString(result) mustBe view(FakeUser, response.failure)(request, messages(fixture.playApplication)).toString()
+        contentAsString(result) must validateAsHtml
+
       }
     }
 

@@ -44,15 +44,14 @@ govukPanel: GovukPanel
 
 @layout(pageTitle = titleNoForm(messages("api.deployment.title")), showBackLink = true, user = Some(user), customScriptsBlock = Some(scripts())) {
 
-    <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
-
+    <div class="govuk-fieldset__legend govuk-fieldset__legend--xl">
         <h1 class="govuk-fieldset__heading govuk-!-margin-bottom-2 ">
             @messages("api.deployment.failure")
         </h1>
-        <div id="application-name-hint govuk-!-margin-top-2 govuk-!-margin-bottom-5 " class="govuk-hint">
+        <div class="govuk-hint">
             @messages("api.deployment.failure.message")
         </div>
-    </legend>
+    </div>
 
     <div class="call-out-panel call-out-panel__small govuk-!-margin-top-2 govuk-!-margin-bottom-7">
         <p class="govuk-body information-tag govuk-!-margin-bottom-2">
@@ -93,7 +92,7 @@ govukPanel: GovukPanel
     <br>
     <div class="govuk-button-group">
         @govukButton(
-            ButtonViewModel(messages("api.deployment.failure.continue")).asLink(controllers.deployment.routes.SimpleApiDeploymentController.onPageLoad.url)
+            ButtonViewModel(messages("api.deployment.failure.continue")).asLink(controllers.deployment.routes.SimpleApiDeploymentController.onPageLoad().url)
         )
         <a class="govuk-link govuk-link--no-visited-state govuk-!-margin-left-3" href="@routes.IndexController.onPageLoad.url">Cancel</a>
     </div>
