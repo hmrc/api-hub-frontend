@@ -94,21 +94,43 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
       }
     }
 
-    "must return OK and the correct view for a GET when the user has applications without access" in {
+    "must return OK and the correct view for a GET when the user has less than 5 applications without access" in {
       val apiDetail = sampleApiDetail()
-      val application = buildApplicationWithoutAccess()
+      val applications = buildApplicationsWithoutAccess(3)
       val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
 
       when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
       when(fixture.apiHubService.getApplications(ArgumentMatchers.eq(Some(FakeUser.email.value)), ArgumentMatchers.eq(false))(any()))
-        .thenReturn(Future.successful(Seq(application)))
+        .thenReturn(Future.successful(applications))
 
       running(fixture.application) {
         val request = FakeRequest(GET, routes.AddAnApiSelectApplicationController.onPageLoad(NormalMode).url)
         val result = route(fixture.application, request).value
-        val view = buildView(fixture.application, request, form, NormalMode, apiDetail, Seq.empty, Seq(application))
+        val view = buildView(fixture.application, request, form, NormalMode, apiDetail, Seq.empty, applications)
+
+        status(result) mustBe OK
+        contentAsString(result) mustBe view
+        contentAsString(result) must validateAsHtml
+      }
+    }
+
+    "must return OK and the correct view for a GET when the user has more than 5 applications without access" in {
+      val apiDetail = sampleApiDetail()
+      val applications = buildApplicationsWithoutAccess(10)
+      val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
+
+      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+        .thenReturn(Future.successful(Some(apiDetail)))
+
+      when(fixture.apiHubService.getApplications(ArgumentMatchers.eq(Some(FakeUser.email.value)), ArgumentMatchers.eq(false))(any()))
+        .thenReturn(Future.successful(applications))
+
+      running(fixture.application) {
+        val request = FakeRequest(GET, routes.AddAnApiSelectApplicationController.onPageLoad(NormalMode).url)
+        val result = route(fixture.application, request).value
+        val view = buildView(fixture.application, request, form, NormalMode, apiDetail, Seq.empty, applications)
 
         status(result) mustBe OK
         contentAsString(result) mustBe view
@@ -340,6 +362,14 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
     FakeApplication
       .copy(id = "test-application-id-2", name = "test-application-name-2")
       .setSecondaryScopes(Seq.empty)
+  }
+
+  private def buildApplicationsWithoutAccess(count: Int): Seq[Application] = {
+    Seq.tabulate(count) { i =>
+      FakeApplication
+        .copy(id = s"test-application-id-$i", name = s"test-application-name-$i")
+        .setSecondaryScopes(Seq.empty)
+    }
   }
 
   private def buildUserAnswers(apiDetail: ApiDetail): UserAnswers = {
