@@ -1,0 +1,100 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.user.UserModel
+@import models.deployment.{FailuresResponse, Error}
+@import views.html.helper.CSPNonce
+@import play.api.libs.json.Json
+
+@this(
+layout: templates.Layout,
+govukButton: GovukButton,
+govukPanel: GovukPanel
+)
+
+@(user: UserModel, failuresResponse: FailuresResponse)(implicit request: Request[_], messages: Messages)
+
+@scripts() = {
+    <link href='@routes.Assets.versioned("fontawesome6/css/all.min.css")' media="all" rel="stylesheet" type="text/css" @{CSPNonce.attr}/>
+}
+
+@styles() = {
+    .smallcode * {font-size:14px!important;}
+}
+
+@errorRow(deploymentError: Error) = {
+    <tr class="govuk-table__row">
+        <th scope="row" class="govuk-table__header">@{deploymentError.`type`}</th>
+        <td class="govuk-table__cell">@deploymentError.message</td>
+    </tr>
+}
+
+@layout(pageTitle = titleNoForm(messages("api.deployment.title")), showBackLink = true, user = Some(user), customScriptsBlock = Some(scripts())) {
+
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
+
+        <h1 class="govuk-fieldset__heading govuk-!-margin-bottom-2 ">
+            @messages("api.deployment.failure")
+        </h1>
+        <div id="application-name-hint govuk-!-margin-top-2 govuk-!-margin-bottom-5 " class="govuk-hint">
+            @messages("api.deployment.failure.message")
+        </div>
+    </legend>
+
+    <div class="call-out-panel call-out-panel__small govuk-!-margin-top-2 govuk-!-margin-bottom-7">
+        <p class="govuk-body information-tag govuk-!-margin-bottom-2">
+            <i class="fa-solid fa-circle-exclamation error-colour"></i>
+            <span class="call-out-type error">
+                @messages("api.deployment.failure.warning")
+            </span>
+        </p>
+        <table class="govuk-table hip-table">
+            <caption class="govuk-table__caption govuk-table__caption--s">Errors</caption>
+            <thead class="govuk-table__head govuk-!-font-size-16">
+                <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header app-custom-class">Type</th>
+                    <th scope="col" class="govuk-table__header app-custom-class">Message</th>
+                </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+                @if(failuresResponse.errors.isDefined) {
+                    @for(error <- failuresResponse.errors.get) {
+                        @errorRow(error)
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <details class="govuk-details">
+        <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">
+                View full error response
+            </span>
+        </summary>
+        <div class="govuk-details__text">
+            <pre class="code--block govuk-!-font-size-1">@{Json.prettyPrint(Json.toJson(failuresResponse))}</pre>
+        </div>
+    </details>
+    <p class="govuk-body govuk-!-margin-top-5">You can try to redeploy your API, if this error continues please contact <a href="@routes.GetSupportController.onPageLoad.url" class="govuk-link govuk-link--no-visited-state">support</a>.</p>
+    <br>
+    <div class="govuk-button-group">
+        @govukButton(
+            ButtonViewModel(messages("api.deployment.failure.continue")).asLink(controllers.deployment.routes.SimpleApiDeploymentController.onPageLoad.url)
+        )
+        <a class="govuk-link govuk-link--no-visited-state govuk-!-margin-left-3" href="@routes.IndexController.onPageLoad.url">Cancel</a>
+    </div>
+}

@@ -30,17 +30,19 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.deployment.SimpleApiDeploymentView
+import views.html.deployment.{DeploymentFailureView, DeploymentSuccessView, SimpleApiDeploymentView}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class SimpleApiDeploymentController @Inject()(
-  val controllerComponents: MessagesControllerComponents,
-  identify: IdentifierAction,
-  view: SimpleApiDeploymentView,
-  apiHubService: ApiHubService,
-  applicationsConnector: ApplicationsConnector
+                                               val controllerComponents: MessagesControllerComponents,
+                                               identify: IdentifierAction,
+                                               deploymentView: SimpleApiDeploymentView,
+                                               apiHubService: ApiHubService,
+                                               applicationsConnector: ApplicationsConnector,
+                                               deploymentSuccessView: DeploymentSuccessView,
+                                               deploymentFailureView: DeploymentFailureView,
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   import SimpleApiDeploymentController._
@@ -62,10 +64,11 @@ class SimpleApiDeploymentController @Inject()(
             .map {
               case response: SuccessfulDeploymentsResponse =>
                 logger.info(s"Successful deployments response${System.lineSeparator()}${Json.prettyPrint(Json.toJson(response))}")
-                Ok(Json.toJson(response))
+                Ok(deploymentSuccessView(request.user, response))
               case response: InvalidOasResponse =>
                 logger.info(s"Invalid OAS deployments response${System.lineSeparator()}${Json.prettyPrint(Json.toJson(response))}")
-                BadRequest(Json.toJson(response))
+                Ok(deploymentFailureView(request.user, response.failure))
+
             }
       )
   }
@@ -75,7 +78,7 @@ class SimpleApiDeploymentController @Inject()(
       .map(email => apiHubService.findTeams(Some(email)))
       .getOrElse(Future.successful(Seq.empty))
       .map(teams => teams.sortBy(_.name.toLowerCase))
-      .map(teams => Status(code)(view(form, teams, request.user)))
+      .map(teams => Status(code)(deploymentView(form, teams, request.user)))
   }
 
 }

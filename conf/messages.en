@@ -279,6 +279,7 @@ apiDetails.deploymentStatus.dev.heading = Development env
 apiDetails.deploymentStatus.prod.heading = Production env
 apiDetails.deploymentStatus.deployed = Deployed
 apiDetails.deploymentStatus.notDeployed = Not deployed
+apiDetails.deploymentStatus.notDeployed = Not deployed
 
 hipApis.title = HIP APIs
 hipApis.search.heading = Search for an API
@@ -553,3 +554,16 @@ manageTeams.teams.caption = Teams
 manageTeams.teams.teamName = Team name
 manageTeams.teams.id = Id
 manageTeams.teams.created = Created
+
+api.deployment.success.title = Your API deployment request has been accepted.
+api.deployment.success = Your API deployment request has been accepted.
+api.deployment.success.continue = Continue to dashboard
+api.deployment.success.viewDetails = View full success response
+api.deployment.failure.title = There was an error processing your deployment request
+api.deployment.failure = There was an error processing your deployment request
+api.deployment.failure.message = Review the details of the processing error below
+api.deployment.failure.warning = Review the processing errors
+api.deployment.failure.continue = Return to API deployment page
+api.deployment.failure.viewDetails = View full error response
+
+
