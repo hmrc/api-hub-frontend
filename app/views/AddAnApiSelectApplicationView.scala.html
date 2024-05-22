@@ -24,7 +24,9 @@
     govukButton : GovukButton,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
-    govukRadios: GovukRadios
+    govukRadios: GovukRadios,
+    govukSelect : GovukSelect,
+    govukFieldset : GovukFieldset
 )
 
 @(
@@ -37,7 +39,7 @@
 )(implicit request: Request[_], messages: Messages)
 
 @scripts() = {
-    <link href='@routes.Assets.versioned("fontawesome6/css/all.min.css")' media="all" rel="stylesheet" type="text/css" @{CSPNonce.attr}/>
+    <link href='@routes.Assets.versioned("fontawesome6/css/all.min.css")' media="all" rel="stylesheet" type="text/css" @{CSPNonce.attr}>
 }
 
 @displayApplicationsWithAccess() = {
@@ -102,31 +104,54 @@
                 @govukErrorSummary(ErrorSummaryViewModel(form))
             }
 
-            @govukRadios(
-                RadiosViewModel(
-                    field = form("value"),
-                    items = applicationsWithoutAccess.map(
-                        application =>
-                            RadioItem(
-                                content = Text(application.name),
-                                value = Some(application.id)
-                            )
-                    ),
-                    fieldset = Fieldset(
-                        legend = Some(Legend(
-                            content = messages("addAnApiSelectApplication.whichApplication", apiDetail.title),
-                            classes = "govuk-fieldset__legend--l",
-                            isPageHeading = true
-                        ))
+            @if(applicationsWithoutAccess.length <= 5) {
+                @govukRadios(
+                    RadiosViewModel(
+                        field = form("value"),
+                        items = applicationsWithoutAccess.map(
+                            application =>
+                                RadioItem(
+                                    content = Text(application.name),
+                                    value = Some(application.id)
+                                )
+                        ),
+                        fieldset = Fieldset(
+                            legend = Some(Legend(
+                                content = messages("addAnApiSelectApplication.whichApplication", apiDetail.title),
+                                classes = "govuk-fieldset__legend--l",
+                                isPageHeading = true
+                            ))
+                        )
+                    ).copy(
+                        hint = if(applicationsWithAccess.nonEmpty) {
+                            Some(Hint(content = HtmlContent(displayApplicationsWithAccess())))
+                        } else {
+                            None
+                        }
                     )
-                ).copy(
-                    hint = if (applicationsWithAccess.nonEmpty) {
-                        Some(Hint(content = HtmlContent(displayApplicationsWithAccess())))
-                    } else {
-                        None
-                    }
                 )
-            )
+            } else {
+                @govukFieldset(Fieldset(
+                    legend = Some(Legend(
+                        content = messages("addAnApiSelectApplication.whichApplication", apiDetail.title),
+                        classes = "govuk-fieldset__legend--l",
+                        isPageHeading = true
+                    )),
+                    html = govukSelect(
+                        Select(
+                            id = "applicationSelect",
+                            name = "value",
+                            items = applicationsWithoutAccess.map(
+                                application =>
+                                    SelectItem(
+                                        text = application.name,
+                                        value = Some(application.id)
+                                    )
+                            )
+                        )
+                    )
+                ))
+            }
 
             @govukButton(
                 ButtonViewModel(messages("site.continue"))
