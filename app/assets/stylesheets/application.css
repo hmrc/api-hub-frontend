@@ -391,8 +391,10 @@
 .domainTag, .subDomainTag, .apiStatusTag, .hodTag {
     text-transform: uppercase;
     letter-spacing: 1px;
-    white-space: nowrap;
     font-size: 1rem;
+}
+.api-panel .domainTag, .api-panel .subDomainTag {
+    white-space: nowrap;
 }
 .api-panel .api-panel-top .apiStatusTag {
     height: 20px;
