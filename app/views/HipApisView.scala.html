@@ -51,11 +51,27 @@
     </div>
 }
 
-@anApi(apiDetail: ApiDetail) = {
+@styleForApiStatus(apiStatus: ApiStatus) = @{
+    apiStatus match {
+        case Alpha => "govuk-tag--light-blue"
+        case Beta => "govuk-tag--blue"
+        case Live => "govuk-tag--green"
+        case Deprecated => "govuk-tag--grey"
+    }
+}
+
+    @anApi(apiDetail: ApiDetail) = {
     <div class="api-panel" data-apistatus="@apiDetail.apiStatus" data-domain='@normalise(apiDetail.domain.getOrElse(""))' data-subdomain='@normalise(apiDetail.subDomain.getOrElse(""))' data-hods="@apiDetail.hods.map(normalise).mkString(",")">
-        <span class="call-out-type information">
-            <a class="govuk-link govuk-link--no-visited-state" href="@routes.ApiDetailsController.onPageLoad(apiDetail.id)">@apiDetail.title</a>
-        </span>
+
+        <div class="api-panel-top">
+            <span class="call-out-type information govuk-!-margin-bottom-0">
+                <a class="govuk-link govuk-link--no-visited-state" href="@routes.ApiDetailsController.onPageLoad(apiDetail.id)">@apiDetail.title</a>
+            </span>
+            <strong class="govuk-tag apiStatusTag @styleForApiStatus(apiDetail.apiStatus)">
+                @apiDetail.apiStatus
+            </strong>
+        </div>
+
         <p class="govuk-body additional-message">@apiDetail.shortDescription</p>
         <ul class="govuk-list hip-inline-list">
             @(apiDetail.domain.map(_ =>

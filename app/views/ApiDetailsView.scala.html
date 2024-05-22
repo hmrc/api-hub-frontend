@@ -130,7 +130,7 @@
                             @messages("apiDetails.details.status")
                         </dt>
                         <dd class="govuk-summary-list__value">
-                            <strong class="govuk-tag @styleForApiStatus(apiDetail.apiStatus) api-status">
+                            <strong class="govuk-tag @styleForApiStatus(apiDetail.apiStatus) apiStatusTag">
                                 @apiDetail.apiStatus
                             </strong>
                         </dd>
@@ -142,7 +142,7 @@
                         </dt>
                         <dd class="govuk-summary-list__value">
                             @if(domain.isDefined) {
-                                <strong class="govuk-tag govuk-tag--grey">
+                                <strong class="govuk-tag govuk-tag--grey domainTag">
                                     @domain
                                 </strong>
                             } else {
@@ -157,7 +157,7 @@
                         </dt>
                         <dd class="govuk-summary-list__value">
                             @if(subDomain.isDefined) {
-                                <strong class="govuk-tag govuk-tag--grey">
+                                <strong class="govuk-tag govuk-tag--grey subDomainTag">
                                     @subDomain
                                 </strong>
                             } else {
@@ -174,7 +174,7 @@
                             @if(apiDetail.hods.nonEmpty) {
                                 @Html(
                                     apiDetail.hods.map( hod =>
-                                        s"<strong class='govuk-tag govuk-tag--grey'>$hod</strong>"
+                                        s"<strong class='govuk-tag govuk-tag--grey hodTag'>$hod</strong>"
                                     ).mkString(" ")
                                 )
                             } else {

@@ -373,13 +373,6 @@
     padding-left: 26px;
 }
 
-.api-status {
-    text-transform: lowercase;
-}
-.api-status::first-letter {
-    text-transform: uppercase;
-}
-
 .api-panel .hip-inline-list {
     margin-left: 0px;
     margin-bottom: 0px;
@@ -390,17 +383,25 @@
 }
 .api-panel .hip-inline-list li .govuk-tag {
     font-size: 14px;
-    font-weight: bold;
     max-width: none;
 }
 .filterSelectionCount, #resetFilters {
     font-size: 16px;
 }
-.domainTag, .subDomainTag {
+.domainTag, .subDomainTag, .apiStatusTag, .hodTag {
     text-transform: uppercase;
     letter-spacing: 1px;
     white-space: nowrap;
+    font-size: 1rem;
+}
+.api-panel .api-panel-top .apiStatusTag {
+    height: 20px;
 }
 .hodFilterLabel, .hodTag {
     text-transform: uppercase;
+}
+.api-panel .api-panel-top {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
 }
