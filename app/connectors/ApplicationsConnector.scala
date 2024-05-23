@@ -29,7 +29,7 @@ import models.team.{NewTeam, Team}
 import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION, CONTENT_TYPE}
 import play.api.http.MimeTypes.JSON
 import play.api.http.Status.{BAD_GATEWAY, CONFLICT, NOT_FOUND}
-import play.api.libs.json.Json
+import play.api.libs.json.{JsResultException, Json}
 import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.client.HttpClientV2
@@ -248,7 +248,7 @@ class ApplicationsConnector @Inject()(
   }
 
   def generateDeployment(deploymentsRequest: DeploymentsRequest)(implicit hc: HeaderCarrier): Future[DeploymentsResponse] = {
-    httpClient.post(url"$applicationsBaseUrl/api-hub-applications/deployments/generate")
+    httpClient.post(url"$applicationsBaseUrl/api-hub-applications/deployments")
       .setHeader(CONTENT_TYPE -> JSON)
       .setHeader(ACCEPT -> JSON)
       .setHeader(AUTHORIZATION -> clientAuthToken)
@@ -263,6 +263,35 @@ class ApplicationsConnector @Inject()(
             handleBadRequest(response)
               .map(Future.successful)
               .getOrElse(Future.failed(UpstreamErrorResponse("Bad request", response.status)))
+          }
+          else {
+            Future.failed(UpstreamErrorResponse("Unexpected response", response.status))
+          }
+      }
+  }
+
+  def updateDeployment(publisherRef: String,  redeploymentRequest: RedeploymentRequest)(implicit hc: HeaderCarrier): Future[Option[DeploymentsResponse]] = {
+    httpClient.put(url"$applicationsBaseUrl/api-hub-applications/deployments/$publisherRef")
+      .setHeader(CONTENT_TYPE -> JSON)
+      .setHeader(ACCEPT -> JSON)
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .withBody(Json.toJson(redeploymentRequest))
+      .execute[HttpResponse]
+      .flatMap {
+        response =>
+          if (is2xx(response.status)) {
+            response.json.validate[SuccessfulDeploymentsResponse].fold(
+              invalid => Future.failed(JsResultException(invalid)),
+              response => Future.successful(Some(response))
+            )
+          }
+          else if (response.status == 400) {
+            handleBadRequest(response)
+              .map(invalidOasResponse => Future.successful(Some(invalidOasResponse)))
+              .getOrElse(Future.failed(UpstreamErrorResponse("Bad request", response.status)))
+          }
+          else if (response.status == 404) {
+            Future.successful(None)
           }
           else {
             Future.failed(UpstreamErrorResponse("Unexpected response", response.status))

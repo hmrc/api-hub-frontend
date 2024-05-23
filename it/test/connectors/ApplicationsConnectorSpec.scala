@@ -25,7 +25,7 @@ import models.accessrequest._
 import models.api.ApiDeploymentStatuses
 import models.application._
 import models.application.ApplicationLenses._
-import models.deployment.{DeploymentsRequest, Error, FailuresResponse, InvalidOasResponse, SuccessfulDeploymentsResponse}
+import models.deployment.{DeploymentsRequest, Error, FailuresResponse, InvalidOasResponse, RedeploymentRequest, SuccessfulDeploymentsResponse}
 import models.exception.{ApplicationCredentialLimitException, TeamNameNotUniqueException}
 import models.requests.{AddApiRequest, AddApiRequestEndpoint, TeamMemberRequest}
 import models.team.{NewTeam, Team}
@@ -669,7 +669,7 @@ class ApplicationsConnectorSpec
       val response = SuccessfulDeploymentsResponse("test-id", "1.0.0", 102, "test-url")
 
       stubFor(
-        post(urlEqualTo("/api-hub-applications/deployments/generate"))
+        post(urlEqualTo("/api-hub-applications/deployments"))
           .withHeader(AUTHORIZATION, equalTo("An authentication token"))
           .withHeader(CONTENT_TYPE, equalTo(ContentTypes.JSON))
           .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
@@ -697,7 +697,7 @@ class ApplicationsConnectorSpec
       )
 
       stubFor(
-        post(urlEqualTo("/api-hub-applications/deployments/generate"))
+        post(urlEqualTo("/api-hub-applications/deployments"))
           .willReturn(
             aResponse()
               .withStatus(BAD_REQUEST)
@@ -708,6 +708,69 @@ class ApplicationsConnectorSpec
       buildConnector(this).generateDeployment(request)(HeaderCarrier()).map(
         result =>
           result mustBe response
+      )
+    }
+  }
+
+  "ApplicationsConnector.updateDeployment" - {
+    "must place the correct request and return the response" in {
+      val publisherRef = "test-publisher-ref"
+
+      val request = RedeploymentRequest(
+        description = "test-description",
+        oas = "test-oas",
+        status = "test-status"
+      )
+
+      val response = SuccessfulDeploymentsResponse("test-id", "1.0.0", 102, "test-url")
+
+      stubFor(
+        put(urlEqualTo(s"/api-hub-applications/deployments/$publisherRef"))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .withHeader(CONTENT_TYPE, equalTo(ContentTypes.JSON))
+          .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
+          .withRequestBody(equalToJson(Json.toJson(request).toString()))
+          .willReturn(
+            aResponse()
+              .withBody(Json.toJson(response).toString())
+          )
+      )
+
+      buildConnector(this).updateDeployment(publisherRef, request)(HeaderCarrier()).map(
+        result =>
+          result.value mustBe response
+      )
+    }
+
+    "must handle a 400 bad Request response with invalid OAS payload" in {
+      val publisherRef = "test-publisher-ref"
+
+      val request = RedeploymentRequest(
+        description = "test-description",
+        oas = "test-oas",
+        status = "test-status"
+      )
+
+      val response = InvalidOasResponse(
+        FailuresResponse(
+          code = "BAD_REQUEST",
+          reason = "Validation Failed.",
+          errors = Some(Seq(Error("METADATA", """name must match \"^[a-z0-9\\-]+$\"""")))
+        )
+      )
+
+      stubFor(
+        put(urlEqualTo(s"/api-hub-applications/deployments/$publisherRef"))
+          .willReturn(
+            aResponse()
+              .withStatus(BAD_REQUEST)
+              .withBody(Json.toJson(response).toString())
+          )
+      )
+
+      buildConnector(this).updateDeployment(publisherRef, request)(HeaderCarrier()).map(
+        result =>
+          result.value mustBe response
       )
     }
   }
