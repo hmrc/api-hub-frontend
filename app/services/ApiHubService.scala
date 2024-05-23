@@ -28,7 +28,7 @@ import models.team.{NewTeam, Team}
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ApiHubService @Inject()(
@@ -134,6 +134,13 @@ class ApiHubService @Inject()(
   def addTeamMemberToTeam(id: String, teamMember: TeamMember)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
     logger.debug(s"Adding team member to team $id")
     applicationsConnector.addTeamMemberToTeam(id, teamMember)
+  }
+
+  def getUserApis(teamMember: TeamMember)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[ApiDetail]]  = {
+    findTeams(Some(teamMember.email)) flatMap  {
+      case teams if teams.nonEmpty => integrationCatalogueConnector.filterApis(teams.map(_.id))
+      case _ => Future.successful(Seq.empty)
+    }
   }
 
 }

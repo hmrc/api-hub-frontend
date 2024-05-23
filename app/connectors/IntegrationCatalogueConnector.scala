@@ -70,6 +70,20 @@ class IntegrationCatalogueConnector @Inject()(
       }
   }
 
+  def filterApis(teamIds: Seq[String])(implicit hc: HeaderCarrier): Future[Seq[ApiDetail]] = {
+
+    val teamIdsParam = teamIds.map(id => s"teamIds=$id").mkString("&")
+
+    httpClient.get(url"$integrationCatalogueBaseUrl/integration-catalogue/integrations?$teamIdsParam")
+      .setHeader((ACCEPT, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Either[UpstreamErrorResponse, IntegrationResponse]]
+      .flatMap {
+        case Right(integrationResponse) => Future.successful(integrationResponse.results)
+        case Left(e) => Future.failed(e)
+      }
+  }
+
 }
 
 object IntegrationCatalogueConnector extends Logging {
