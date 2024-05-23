@@ -151,7 +151,7 @@ class IntegrationCatalogueConnectorSpec
         val expected = sampleApis()
 
         stubFor(
-          get(urlEqualTo("/integration-catalogue/integrations?teamIds=team1&teamIds=team2"))
+          get(urlEqualTo("/integration-catalogue/integrations?teamIds=team2&teamIds=team1"))
             .withHeader("Accept", equalTo("application/json"))
             .withHeader("Authorization", equalTo("An authentication token"))
             .willReturn(
@@ -170,7 +170,7 @@ class IntegrationCatalogueConnectorSpec
         val expected = IntegrationResponse(0,None, Seq.empty)
 
         stubFor(
-          get(urlEqualTo("/integration-catalogue/integrations?teamIds=team1&teamIds=team2"))
+          get(urlEqualTo("/integration-catalogue/integrations?teamIds=team2&teamIds=team1"))
             .withHeader("Accept", equalTo("application/json"))
             .withHeader("Authorization", equalTo("An authentication token"))
             .willReturn(
@@ -187,7 +187,7 @@ class IntegrationCatalogueConnectorSpec
 
       "must fail with an exception when integration catalogue returns a failure response" in {
         stubFor(
-          get(urlEqualTo("/integration-catalogue/integrations?teamIds=team1&teamIds=team2"))
+          get(urlEqualTo("/integration-catalogue/integrations?teamIds=team2&teamIds=team1"))
             .willReturn(
               aResponse()
                 .withStatus(INTERNAL_SERVER_ERROR)

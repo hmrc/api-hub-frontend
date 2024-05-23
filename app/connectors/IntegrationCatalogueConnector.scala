@@ -72,9 +72,10 @@ class IntegrationCatalogueConnector @Inject()(
 
   def filterApis(teamIds: Seq[String])(implicit hc: HeaderCarrier): Future[Seq[ApiDetail]] = {
 
-    val teamIdsParam = teamIds.map(id => s"teamIds=$id").mkString("&")
+    val queryParams = teamIds.map(id => ("teamIds", id))
 
-    httpClient.get(url"$integrationCatalogueBaseUrl/integration-catalogue/integrations?$teamIdsParam")
+    httpClient.get(url"$integrationCatalogueBaseUrl/integration-catalogue/integrations")
+      .transform(wsRq => wsRq.withQueryStringParameters(queryParams: _*))
       .setHeader((ACCEPT, JSON))
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Either[UpstreamErrorResponse, IntegrationResponse]]
