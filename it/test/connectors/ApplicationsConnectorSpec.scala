@@ -773,6 +773,29 @@ class ApplicationsConnectorSpec
           result.value mustBe response
       )
     }
+
+    "must return None when a 404 Not Found is received" in {
+      val publisherRef = "test-publisher-ref"
+
+      val request = RedeploymentRequest(
+        description = "test-description",
+        oas = "test-oas",
+        status = "test-status"
+      )
+
+      stubFor(
+        put(urlEqualTo(s"/api-hub-applications/deployments/$publisherRef"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+          )
+      )
+
+      buildConnector(this).updateDeployment(publisherRef, request)(HeaderCarrier()).map(
+        result =>
+          result mustBe None
+      )
+    }
   }
 
   "ApplicationsConnector.getApiDeploymentStatuses" - {
