@@ -121,6 +121,11 @@ applicationDetails.apis.endpointsAvailable = {0} of {1} endpoints available
 applicationDetails.apis.error = One of the APIs associated with this application no longer exists
 applicationDetails.apis.problem = Application APIs are not available.
 applicationDetails.apis.tryAgain = Please try again later.
+applicationDetails.apis.manageOrAddMore = Manage your {0} or {1} to your application.
+applicationDetails.apis.addMore = add more APIs
+applicationDetails.apis.appApis = Application APIs
+applicationDetails.apis.addApis = Add more APIs
+applicationDetails.apis.toYourApp = {0} to your application
 
 applicationDetails.environment.credentials.problem = Environments and Credentials are not available.
 

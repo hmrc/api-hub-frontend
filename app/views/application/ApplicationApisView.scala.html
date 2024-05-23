@@ -28,10 +28,7 @@
 @(application: Application, applicationApis: Seq[ApplicationApi], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
 @scripts() = {
-    <link href='@routes.Assets.versioned("fontawesome6/css/all.min.css")' media="all" rel="stylesheet" type="text/css"
-@{
-    CSPNonce.attr
-}/>
+    <link href='@routes.Assets.versioned("fontawesome6/css/all.min.css")' media="all" rel="stylesheet" type="text/css" @{CSPNonce.attr}>
 }
 
     @styles() = {
@@ -134,11 +131,9 @@
     }
 }
 
-@hipApisLink() = {
-    <a href="@{
-        routes.HipApisController.onPageLoad().url
-    }" class="govuk-link govuk-link--no-visited-state">
-    @messages("applicationApis.apis.hipApis")
+@hipApisLink(messageId: String) = {
+    <a href="@{routes.HipApisController.onPageLoad().url}" class="govuk-link govuk-link--no-visited-state">
+        @messages(messageId)
     </a>
 }
 
@@ -207,7 +202,8 @@
                     Button(
                         href = Some(controllers.application.routes.RequestProductionAccessStartController.onPageLoad(application.id).url),
                         content = Text(messages("applicationApis.requestProductionAccess")),
-                        id = Some("requestProductionAccess")
+                        id = Some("requestProductionAccess"),
+                        classes = "govuk-!-margin-bottom-2"
                     )
                 )
             }
@@ -218,7 +214,7 @@
         @if(application.issues.isEmpty) {
             @if(applicationApis.isEmpty) {
                 <p class="govuk-body">
-                @Html(messages("applicationApis.apis.noApis", hipApisLink()))
+                @Html(messages("applicationApis.apis.noApis", hipApisLink("applicationApis.apis.hipApis")))
                 </p>
             } else {
                 @if(applicationApis.exists(_.hasPendingAccessRequest)) {
@@ -234,6 +230,10 @@
                         </p>
                     </div>
                 }
+
+                <p class="govuk-body govuk-!-margin-bottom-5">
+                    @Html(messages("applicationDetails.apis.toYourApp", hipApisLink("applicationDetails.apis.addApis")))
+                </p>
 
                 @for(applicationApi <- applicationApis) {
                     <details class="hip-details hip-expander">
@@ -269,20 +269,20 @@
                                 )
                             )
 
-                        <div class="govuk-button-group">
-                            @if(!applicationApi.hasPendingAccessRequest) {
-                                @govukButton(
-                                    Button(
-                                        href = Some(routes.AddAnApiStartController.addEndpoints(application.id, applicationApi.apiDetail.id).url),
-                                        content = Text(messages("applicationApis.addEndpoints")),
-                                        classes = "govuk-button--secondary"
+                            <div class="govuk-button-group">
+                                @if(!applicationApi.hasPendingAccessRequest) {
+                                    @govukButton(
+                                        Button(
+                                            href = Some(routes.AddAnApiStartController.addEndpoints(application.id, applicationApi.apiDetail.id).url),
+                                            content = Text(messages("applicationApis.addEndpoints")),
+                                            classes = "govuk-button--secondary"
+                                        )
                                     )
-                                )
-                            }
-                        <a class="govuk-link govuk-link--no-visited-state" href="@routes.ApiDetailsController.onPageLoad(applicationApi.apiDetail.id)">
-                        @messages("applicationApis.apis.viewSpecification")
-                        </a>
-                        </div>
+                                }
+                                <a class="govuk-link govuk-link--no-visited-state" href="@routes.ApiDetailsController.onPageLoad(applicationApi.apiDetail.id)">
+                                @messages("applicationApis.apis.viewSpecification")
+                                </a>
+                            </div>
                         </div>
 
                     </details>

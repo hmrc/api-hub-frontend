@@ -44,9 +44,15 @@
     </div>
 }
 
-@hipApisLink() = {
+@hipApisLink(messageId: String) = {
     <a href="@{routes.HipApisController.onPageLoad().url}" class="govuk-link govuk-link--no-visited-state">
-        @messages("applicationDetails.apis.hipApis")
+        @messages(messageId)
+    </a>
+}
+
+@applicationApisLink() = {
+    <a href="@{controllers.application.routes.ApplicationApisController.onPageLoad(application.id).url}" class="govuk-link govuk-link--no-visited-state">
+        @messages("applicationDetails.apis.appApis")
     </a>
 }
 
@@ -100,7 +106,7 @@
 
             } else if(maybeApplicationApis.exists(_.isEmpty)) {
                 <p class="govuk-body">
-                    @Html(messages("applicationDetails.apis.noApis", hipApisLink()))
+                    @Html(messages("applicationDetails.apis.noApis", hipApisLink("applicationDetails.apis.hipApis")))
                 </p>
 
                 <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-top-5">
@@ -142,6 +148,11 @@
                         )
                     )
                 }))
+
+            <p class="govuk-body">
+                @Html(messages("applicationDetails.apis.manageOrAddMore", applicationApisLink(), hipApisLink("applicationDetails.apis.addMore")))
+            </p>
+            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
             }
         }
 
