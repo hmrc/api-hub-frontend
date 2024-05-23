@@ -1,0 +1,50 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.user.UserModel
+@import models.deployment.SuccessfulDeploymentsResponse
+@import play.api.libs.json.Json
+
+@this(
+layout: templates.Layout,
+govukButton: GovukButton,
+govukPanel: GovukPanel
+)
+
+@(user: UserModel, successResponse: SuccessfulDeploymentsResponse)(implicit request: Request[_], messages: Messages)
+
+
+@layout(pageTitle = titleNoForm(messages("api.deployment.success.title")), showBackLink = false, user = Some(user)) {
+
+    @govukPanel(Panel(
+        classes = "govuk-!-margin-bottom-9",
+        title = Text(messages("api.deployment.success"))
+    ))
+    <details class="govuk-details">
+        <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">
+                @messages("api.deployment.success.viewDetails")
+            </span>
+        </summary>
+        <div class="govuk-details__text">
+            <pre class="code--block">@{Json.prettyPrint(Json.toJson(successResponse))}</pre>
+        </div>
+    </details>
+    <br>
+    @govukButton(
+        ButtonViewModel(messages("api.deployment.success.continue")).asLink(routes.IndexController.onPageLoad.url)
+    )
+}

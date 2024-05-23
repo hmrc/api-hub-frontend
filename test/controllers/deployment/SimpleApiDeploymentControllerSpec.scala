@@ -33,7 +33,7 @@ import play.api.test.Helpers._
 import play.api.{Application => PlayApplication}
 import services.ApiHubService
 import utils.HtmlValidation
-import views.html.deployment.SimpleApiDeploymentView
+import views.html.deployment.{DeploymentFailureView, DeploymentSuccessView, SimpleApiDeploymentView}
 
 import java.time.LocalDateTime
 import scala.concurrent.Future
@@ -69,7 +69,7 @@ class SimpleApiDeploymentControllerSpec
   }
 
   "onSubmit" - {
-    "must respond with 200 OK and a success JSON response when returned by APIM" in {
+    "must respond with 200 OK and a success view response when success returned by APIM" in {
       val fixture = buildFixture()
 
       val response = SuccessfulDeploymentsResponse(
@@ -86,12 +86,16 @@ class SimpleApiDeploymentControllerSpec
           .withFormUrlEncodedBody(validForm: _*)
         val result = route(fixture.playApplication, request).value
 
+        val view = fixture.playApplication.injector.instanceOf[DeploymentSuccessView]
+
         status(result) mustBe OK
-        contentAsJson(result) mustBe Json.toJson(response)
+        contentAsString(result) mustBe view(FakeUser, response)(request, messages(fixture.playApplication)).toString()
+        contentAsString(result) must validateAsHtml
+
       }
     }
 
-    "must return 400 Bad Request and a failure JSON response when returned by APIM" in {
+    "must return 400 Bad Request and a failure view response when errors returned by APIM" in {
       val fixture = buildFixture()
 
       val response = InvalidOasResponse(
@@ -109,8 +113,12 @@ class SimpleApiDeploymentControllerSpec
           .withFormUrlEncodedBody(validForm: _*)
         val result = route(fixture.playApplication, request).value
 
+        val view = fixture.playApplication.injector.instanceOf[DeploymentFailureView]
+
         status(result) mustBe BAD_REQUEST
-        contentAsJson(result) mustBe Json.toJson(response)
+        contentAsString(result) mustBe view(FakeUser, response.failure)(request, messages(fixture.playApplication)).toString()
+        contentAsString(result) must validateAsHtml
+
       }
     }
 
