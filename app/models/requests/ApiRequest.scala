@@ -14,16 +14,9 @@
  * limitations under the License.
  */
 
-package controllers.actions
+package models.requests
 
-import models.user.{LdapUser, Permissions, StrideUser, UserModel}
+import models.api.ApiDetail
+import play.api.mvc.WrappedRequest
 
-object FakeUser extends UserModel("id", "test-name", LdapUser, Some("test-email"))
-
-object FakeUserLdapNoEmail extends UserModel("id", "test-name", LdapUser, None)
-
-object FakeUserStrideNoEmail extends UserModel("id", "test-name", StrideUser, None)
-
-object FakeUserNotTeamMember extends UserModel("idx", "test-namex", LdapUser, Some("different-email"))
-
-object FakeUserWithSupportRole extends UserModel("id", "support-user", LdapUser, Some("support-user@example.com"), Permissions(false, true, false))
+case class ApiRequest[A](identifierRequest: IdentifierRequest[A], apiDetails: ApiDetail) extends WrappedRequest[A](identifierRequest)
