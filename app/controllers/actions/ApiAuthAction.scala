@@ -45,22 +45,32 @@ class ApiAuthActionProviderImpl @Inject()(
       override protected def refine[A](identifierRequest: IdentifierRequest[A]): Future[Either[Result, ApiRequest[A]]] = {
         implicit val request: Request[_] = identifierRequest
 
-        for {
-          apiDetails <- apiHubService.getApiDetail(apiId)
-          userTeams <- identifierRequest.user.email.map(email => apiHubService.findTeams(Some(email))).getOrElse(Future.successful(Seq.empty))
-        } yield (apiDetails, userTeams) match {
-          case (Some(apiDetail), _) if identifierRequest.user.permissions.canSupport || userTeams.exists(team => apiDetail.teamId.contains(team.id)) =>
-            Right(ApiRequest(identifierRequest, apiDetail))
-          case (Some(_), _) =>
-            Left(Redirect(routes.UnauthorisedController.onPageLoad))
-          case (None, _) =>
-            Left(
+        apiHubService.getApiDetail(apiId).flatMap(_ match {
+          case Some(apiDetail) if identifierRequest.user.permissions.canSupport =>
+            Future.successful(Right(ApiRequest(identifierRequest, apiDetail)))
+
+          case Some(apiDetail) if apiDetail.teamId.isEmpty =>
+            Future.successful(Left(Redirect(routes.UnauthorisedController.onPageLoad)))
+
+          case Some(apiDetail) => identifierRequest.user.email match {
+            case Some(userEmail) => apiHubService.findTeams(Some(userEmail)).map(userTeams => {
+              if (userTeams.exists(team => apiDetail.teamId.contains(team.id))) {
+                Right(ApiRequest(identifierRequest, apiDetail))
+              } else {
+                Left(Redirect(routes.UnauthorisedController.onPageLoad))
+              }
+            })
+            case None => Future.successful(Left(Redirect(routes.UnauthorisedController.onPageLoad)))
+          }
+
+          case None =>
+            Future.successful(Left(
               errorResultBuilder.notFound(
                 Messages("site.apiNotFound.heading"),
                 Messages("site.apiNotFound.message", apiId)
               )
-            )
-        }
+            ))
+        })
       }
 
       override protected def executionContext: ExecutionContext = ec

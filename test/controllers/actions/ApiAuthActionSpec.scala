@@ -17,7 +17,7 @@
 package controllers.actions
 
 import base.SpecBase
-import models.requests.{ApiRequest, ApplicationRequest, IdentifierRequest}
+import models.requests.{ApiRequest, IdentifierRequest}
 import models.team.Team
 import models.user.UserModel
 import org.mockito.ArgumentMatchers
@@ -44,9 +44,6 @@ class ApiAuthActionSpec extends SpecBase with Matchers with MockitoSugar {
       val fixture = buildFixture()
 
       when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(FakeApiDetail.id))(any())).thenReturn(Future.successful(None))
-      when(fixture.apiHubService.findTeams(ArgumentMatchers.eq(FakeUser.email))(any())).thenReturn(
-        Future.successful(Seq(Team("team id", "team name", LocalDateTime.now(), Seq.empty)))
-      )
 
       running(fixture.playApplication) {
         val result = fixture.provider.apply(FakeApiDetail.id).invokeBlock(buildRequest(), buildInvokeBlock())
