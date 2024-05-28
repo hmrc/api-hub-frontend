@@ -20,11 +20,8 @@ import base.SpecBase
 import models.requests.{ApiRequest, IdentifierRequest}
 import models.team.Team
 import models.user.UserModel
-import org.mockito.ArgumentMatchers
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{never, verify, when}
+import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 import org.scalatest.matchers.must.Matchers
-import org.scalatestplus.mockito.MockitoSugar
 import play.api.Application
 import play.api.inject.bind
 import play.api.mvc.{AnyContentAsEmpty, Result, Results}
@@ -37,13 +34,13 @@ import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class ApiAuthActionSpec extends SpecBase with Matchers with MockitoSugar {
+class ApiAuthActionSpec extends SpecBase with Matchers with MockitoSugar with ArgumentMatchersSugar {
 
   "ApiAuthAction" - {
     "if API does not exist then it returns a 404" in {
       val fixture = buildFixture()
 
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(FakeApiDetail.id))(any())).thenReturn(Future.successful(None))
+      when(fixture.apiHubService.getApiDetail(eqTo(FakeApiDetail.id))(any)).thenReturn(Future.successful(None))
 
       running(fixture.playApplication) {
         val result = fixture.provider.apply(FakeApiDetail.id).invokeBlock(buildRequest(), buildInvokeBlock())
@@ -64,39 +61,39 @@ class ApiAuthActionSpec extends SpecBase with Matchers with MockitoSugar {
     "if API exists and user has the support role then it returns OK" in {
       val fixture = buildFixture()
 
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(FakeApiDetail.id))(any())).thenReturn(Future.successful(Some(FakeApiDetail)))
-      verify(fixture.apiHubService, never()).findTeams(ArgumentMatchers.eq(FakeSupporter.email))(any())
+      when(fixture.apiHubService.getApiDetail(eqTo(FakeApiDetail.id))(any)).thenReturn(Future.successful(Some(FakeApiDetail)))
 
       running(fixture.playApplication) {
         val result = fixture.provider.apply(FakeApiDetail.id).invokeBlock(buildRequest(FakeSupporter), buildInvokeBlock())
 
         status(result) mustBe OK
+        verify(fixture.apiHubService, never).findTeams(eqTo(FakeSupporter.email))(any)
       }
     }
 
     "if API exists but is not owned by any team then it returns Unauthorized" in {
       val fixture = buildFixture()
 
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(FakeApiDetail.id))(any())).thenReturn(
+      when(fixture.apiHubService.getApiDetail(eqTo(FakeApiDetail.id))(any)).thenReturn(
         Future.successful(Some(FakeApiDetail.copy(teamId = None)))
       )
-      verify(fixture.apiHubService, never()).findTeams(ArgumentMatchers.eq(FakeSupporter.email))(any())
 
       running(fixture.playApplication) {
         val result = fixture.provider.apply(FakeApiDetail.id).invokeBlock(buildRequest(FakeUser), buildInvokeBlock())
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.routes.UnauthorisedController.onPageLoad.url)
+        verify(fixture.apiHubService, never).findTeams(eqTo(FakeSupporter.email))(any)
       }
     }
 
     "if API exists and has an owning team but the user is not in that team then it returns Unauthorized" in {
       val fixture = buildFixture()
 
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(FakeApiDetail.id))(any())).thenReturn(
+      when(fixture.apiHubService.getApiDetail(eqTo(FakeApiDetail.id))(any)).thenReturn(
         Future.successful(Some(FakeApiDetail))
       )
-      when(fixture.apiHubService.findTeams(ArgumentMatchers.eq(FakeUser.email))(any())).thenReturn(
+      when(fixture.apiHubService.findTeams(eqTo(FakeUser.email))(any)).thenReturn(
         Future.successful(Seq(Team(FakeApiDetail.teamId.get + "different", "team name", LocalDateTime.now(), Seq.empty)))
       )
 
@@ -111,10 +108,10 @@ class ApiAuthActionSpec extends SpecBase with Matchers with MockitoSugar {
     "if API exists and has an owning team and the user is in that team then it returns Ok" in {
       val fixture = buildFixture()
 
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(FakeApiDetail.id))(any())).thenReturn(
+      when(fixture.apiHubService.getApiDetail(eqTo(FakeApiDetail.id))(any)).thenReturn(
         Future.successful(Some(FakeApiDetail))
       )
-      when(fixture.apiHubService.findTeams(ArgumentMatchers.eq(FakeUser.email))(any())).thenReturn(
+      when(fixture.apiHubService.findTeams(eqTo(FakeUser.email))(any)).thenReturn(
         Future.successful(Seq(
           Team("id1", "team name 1", LocalDateTime.now(), Seq.empty),
           Team(FakeApiDetail.teamId.get, "team name 2", LocalDateTime.now(), Seq.empty),
