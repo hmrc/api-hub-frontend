@@ -45,7 +45,7 @@ class ApiAuthActionProviderImpl @Inject()(
       override protected def refine[A](identifierRequest: IdentifierRequest[A]): Future[Either[Result, ApiRequest[A]]] = {
         implicit val request: Request[_] = identifierRequest
 
-        apiHubService.getApiDetail(apiId).flatMap(_ match {
+        apiHubService.getApiDetail(apiId).flatMap {
           case Some(apiDetail) if identifierRequest.user.permissions.canSupport =>
             Future.successful(Right(ApiRequest(identifierRequest, apiDetail)))
 
@@ -70,7 +70,7 @@ class ApiAuthActionProviderImpl @Inject()(
                 Messages("site.apiNotFound.message", apiId)
               )
             ))
-        })
+        }
       }
 
       override protected def executionContext: ExecutionContext = ec

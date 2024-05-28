@@ -22,7 +22,7 @@ import models.team.Team
 import models.user.UserModel
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{never, verify, when}
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.Application
@@ -65,12 +65,10 @@ class ApiAuthActionSpec extends SpecBase with Matchers with MockitoSugar {
       val fixture = buildFixture()
 
       when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(FakeApiDetail.id))(any())).thenReturn(Future.successful(Some(FakeApiDetail)))
-      when(fixture.apiHubService.findTeams(ArgumentMatchers.eq(FakeUserWithSupportRole.email))(any())).thenReturn(
-        Future.successful(Seq(Team(FakeApiDetail.teamId.get, "team name", LocalDateTime.now(), Seq.empty)))
-      )
+      verify(fixture.apiHubService, never()).findTeams(ArgumentMatchers.eq(FakeSupporter.email))(any())
 
       running(fixture.playApplication) {
-        val result = fixture.provider.apply(FakeApiDetail.id).invokeBlock(buildRequest(FakeUserWithSupportRole), buildInvokeBlock())
+        val result = fixture.provider.apply(FakeApiDetail.id).invokeBlock(buildRequest(FakeSupporter), buildInvokeBlock())
 
         status(result) mustBe OK
       }
@@ -82,9 +80,7 @@ class ApiAuthActionSpec extends SpecBase with Matchers with MockitoSugar {
       when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(FakeApiDetail.id))(any())).thenReturn(
         Future.successful(Some(FakeApiDetail.copy(teamId = None)))
       )
-      when(fixture.apiHubService.findTeams(ArgumentMatchers.eq(FakeUser.email))(any())).thenReturn(
-        Future.successful(Seq(Team("teamId", "team name", LocalDateTime.now(), Seq.empty)))
-      )
+      verify(fixture.apiHubService, never()).findTeams(ArgumentMatchers.eq(FakeSupporter.email))(any())
 
       running(fixture.playApplication) {
         val result = fixture.provider.apply(FakeApiDetail.id).invokeBlock(buildRequest(FakeUser), buildInvokeBlock())
