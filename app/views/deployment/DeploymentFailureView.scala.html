@@ -25,7 +25,7 @@ govukButton: GovukButton,
 govukPanel: GovukPanel
 )
 
-@(user: UserModel, failuresResponse: FailuresResponse)(implicit request: Request[_], messages: Messages)
+@(user: UserModel, failuresResponse: FailuresResponse, returnUrl: String)(implicit request: Request[_], messages: Messages)
 
 @scripts() = {
     <link href='@routes.Assets.versioned("fontawesome6/css/all.min.css")' media="all" rel="stylesheet" type="text/css" @{CSPNonce.attr}/>
@@ -92,7 +92,7 @@ govukPanel: GovukPanel
     <br>
     <div class="govuk-button-group">
         @govukButton(
-            ButtonViewModel(messages("api.deployment.failure.continue")).asLink(controllers.deployment.routes.SimpleApiDeploymentController.onPageLoad().url)
+            ButtonViewModel(messages("api.deployment.failure.continue")).asLink(returnUrl)
         )
         <a class="govuk-link govuk-link--no-visited-state govuk-!-margin-left-3" href="@routes.IndexController.onPageLoad.url">Cancel</a>
     </div>

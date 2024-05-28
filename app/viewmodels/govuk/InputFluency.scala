@@ -93,5 +93,9 @@ trait InputFluency {
 
     def withWidth(inputWidth: InputWidth): Input =
       input.withCssClass(inputWidth.toString)
+
+    def disabled(): Input =
+      input.copy(disabled = Some(true))
+
   }
 }

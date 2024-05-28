@@ -115,7 +115,7 @@ class SimpleApiDeploymentControllerSpec
         val view = fixture.playApplication.injector.instanceOf[DeploymentFailureView]
 
         status(result) mustBe BAD_REQUEST
-        contentAsString(result) mustBe view(FakeUser, response.failure)(request, messages(fixture.playApplication)).toString()
+        contentAsString(result) mustBe view(FakeUser, response.failure, controllers.deployment.routes.SimpleApiDeploymentController.onPageLoad().url)(request, messages(fixture.playApplication)).toString()
         contentAsString(result) must validateAsHtml
 
       }
