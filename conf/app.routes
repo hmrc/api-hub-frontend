@@ -5,6 +5,7 @@
 ->          /admin                                                             admin.Routes
 ->          /deployment                                                        deployment.Routes
 ->          /team                                                              team.Routes
+->          /my-apis                                                           myapis.Routes
 
 GET         /                                                                  controllers.ServiceStartController.onPageLoad
 GET         /dashboard                                                         controllers.IndexController.onPageLoad

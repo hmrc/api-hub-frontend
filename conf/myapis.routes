@@ -1,0 +1,1 @@
+GET     /:id                                                controllers.myapis.ManageTeamController.onPageLoad(id: String)
