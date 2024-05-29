@@ -17,28 +17,34 @@
 package controllers.myapis
 
 import com.google.inject.{Inject, Singleton}
-import controllers.actions.OptionalIdentifierAction
-import play.api.i18n.I18nSupport
+import controllers.actions.{ApiAuthActionProvider, IdentifierAction}
+import controllers.helpers.ErrorResultBuilder
+import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.myapis.MyApiDetailsView
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class MyApiDetailsController @Inject()(
   override val controllerComponents: MessagesControllerComponents,
   apiHubService: ApiHubService,
   view: MyApiDetailsView,
-  optionallyIdentified: OptionalIdentifierAction,
+  identify: IdentifierAction,
+  apiAuth: ApiAuthActionProvider,
+  errorResultBuilder: ErrorResultBuilder
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(id: String): Action[AnyContent] = optionallyIdentified.async {
+  def onPageLoad(id: String): Action[AnyContent] = (identify andThen apiAuth(id)).async {
     implicit request =>
       apiHubService.getApiDetail(id).map {
-        case Some(apiDetails) => Ok(view(apiDetails, request.user))
-        case _ => InternalServerError
+        case Some(apiDetails) => Ok(view(apiDetails, Some(request.identifierRequest.user)))
+        case _ => errorResultBuilder.notFound(
+          Messages("site.apiNotFound.heading"),
+          Messages("site.apiNotFound.message", id)
+        )
       }
   }
 

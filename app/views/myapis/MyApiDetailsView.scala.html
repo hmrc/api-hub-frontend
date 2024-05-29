@@ -17,17 +17,39 @@
 @import models.api._
 @import models.user.UserModel
 
-@this(
-        layout: templates.Layout,
-        govukButton: GovukButton
-)
+@this(layout: templates.Layout, govukButton: GovukButton)
 
 @(apiDetail: ApiDetail, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("apiDetails.title")), user = user, fullWidth = true) {
-
+@layout(pageTitle = titleNoForm(messages("myApis.details.title")), user = user, fullWidth = true) {
     <div class="govuk-grid-row">
-        my apis
-    </div>
+        <div id="navContent" class="govuk-grid-column-one-quarter sidebar stickySideMenu">
+            <div class="side-nav">
+                <h2 class="govuk-heading-s">@apiDetail.title</h2>
+                <ul class="side-nav__component">
+                    <li class="side-nav__list side-nav__list--selected">
+                        <a class="side-nav__link" href="#details">@messages("myApis.details.title")</a>
+                    </li>
+                    <li class="side-nav__list">
+                        <a href="#" class="side-nav__link">@messages("myApis.update.title")</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
 
+        <div class="govuk-grid-column-two-thirds content">
+            <h1 id="details" class="govuk-heading-l">@messages("myApis.details.title")</h1>
+
+            <dl class="govuk-summary-list govuk-!-margin-bottom-7">
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        @messages("myApis.details.name"):
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        @apiDetail.title
+                    </dd>
+                </div>
+            </dl>
+        </div>
+    </div>
 }
