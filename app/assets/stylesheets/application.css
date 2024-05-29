@@ -414,3 +414,7 @@
     justify-content: space-between;
     width: 100%;
 }
+.stickySideMenu {
+    position: sticky;
+    top: 10px;
+}

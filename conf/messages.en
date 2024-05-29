@@ -571,4 +571,6 @@ api.deployment.failure.warning = Review the processing errors
 api.deployment.failure.continue = Return to API deployment page
 api.deployment.failure.viewDetails = View full error response
 
-
+myApis.details.title = API details
+myApis.details.name = Name
+myApis.update.title = Update API
