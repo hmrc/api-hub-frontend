@@ -7,6 +7,7 @@ describe('hipApis', () => {
     beforeEach(() => {
         const dom = (new JSDOM(`
             <!DOCTYPE html>
+            <input id="nameFilter">
             <div id="statusFilters">
                 <input class="govuk-checkboxes__input" type="checkbox" value="ALPHA" checked>
                 <input class="govuk-checkboxes__input" type="checkbox" value="BETA" checked>
@@ -51,6 +52,7 @@ describe('hipApis', () => {
         `));
         document = dom.window.document;
         globalThis.document = document;
+        globalThis.Event = dom.window.Event;
     });
 
     function buildApiPanelsByCount(count) {
@@ -66,32 +68,34 @@ describe('hipApis', () => {
                 ['dx', 'dxs1'],
                 ['', ''],
             ],
-            hodsValues = ['', 'ems', 'internal,ems,invalid', 'apim', 'invalid'];
+            hodsValues = ['', 'ems', 'internal,ems,invalid', 'apim', 'invalid'],
+            names = [...Array(count)].map((_, i) => `api number ${i + 1}`);
         let i= 0;
         while (i < count) {
-            const apiStatus = statuses[i % statuses.length],
+            const apistatus = statuses[i % statuses.length],
                 [domain, subdomain] = domainValues[i % domainValues.length],
-                hods = hodsValues[i % hodsValues.length];
-            panels.push({apiStatus, domain, subdomain, hods})
+                hods = hodsValues[i % hodsValues.length],
+                name = names[i];
+            panels.push({apistatus, domain, subdomain, hods, name})
             i++;
         }
         buildApiPanels(...panels);
     }
     function buildApiPanels(...panels) {
         document.getElementById('apiList').innerHTML = panels.map((panel, i) => {
-            return `<div class="api-panel" data-apistatus="${panel.apiStatus}" data-domain="${panel.domain || ''}" data-subdomain="${panel.subdomain || ''}" data-index="${i}" data-hods="${panel.hods || ''}"></div>`;
+            return `<div class="api-panel" 
+                data-apistatus="${panel.apistatus}" 
+                data-domain="${panel.domain || ''}" 
+                data-subdomain="${panel.subdomain || ''}" 
+                data-index="${i}" 
+                data-hods="${panel.hods || ''}" 
+                data-apiname="${panel.name}"></div>`;
         }).join('');
     }
-    function getVisiblePanelData() {
+    function getVisiblePanelData(...props) {
         return Array.from(document.querySelectorAll('.api-panel'))
             .filter(el => el.style.display === 'block')
-            .map(el => ({
-                apiStatus: el.dataset['apistatus'],
-                index: parseInt(el.dataset['index']),
-                domain: el.dataset['domain'],
-                subdomain: el.dataset['subdomain'],
-                hods: el.dataset['hods']
-            }));
+            .map(el => props.reduce((acc, prop) => ({...acc, [prop]: el.dataset[prop]}), {index: parseInt(el.dataset.index)}));
     }
     function getResultCount() {
         return parseInt(document.getElementById('searchResultsSize').textContent);
@@ -135,36 +139,40 @@ describe('hipApis', () => {
     function noResultsPanelIsVisible() {
         return document.getElementById('noResultsPanel').style.display === 'block';
     }
-    function indexAndStatus(panel) {
-        return {apiStatus: panel.apiStatus, index: panel.index};
+    function enterNameFilterText(value) {
+        document.getElementById('nameFilter').value = value;
+        document.getElementById('nameFilter').dispatchEvent(new Event('input'));
     }
-
+    function getNameFilterText() {
+        return document.getElementById('nameFilter').value;
+    }
+    
     it("when page initially displayed then only panels with selected statuses are visible",  () => {
-        buildApiPanels({apiStatus: 'ALPHA'}, {apiStatus: 'BETA'}, {apiStatus: 'LIVE'}, {apiStatus: 'DEPRECATED'});
+        buildApiPanels({apistatus: 'ALPHA'}, {apistatus: 'BETA'}, {apistatus: 'LIVE'}, {apistatus: 'DEPRECATED'});
 
         onPageShow();
 
-        expect(getVisiblePanelData().map(indexAndStatus)).toEqual([{apiStatus: 'ALPHA', index: 0}, {apiStatus: 'BETA', index: 1}, {apiStatus: 'LIVE', index: 2}]);
+        expect(getVisiblePanelData('apistatus')).toEqual([{apistatus: 'ALPHA', index: 0}, {apistatus: 'BETA', index: 1}, {apistatus: 'LIVE', index: 2}]);
         expect(getResultCount()).toBe(3);
     });
 
     it("when status is deselected then panels with that status are hidden",  () => {
-        buildApiPanels({apiStatus: 'ALPHA'}, {apiStatus: 'BETA'}, {apiStatus: 'LIVE'}, {apiStatus: 'DEPRECATED'});
+        buildApiPanels({apistatus: 'ALPHA'}, {apistatus: 'BETA'}, {apistatus: 'LIVE'}, {apistatus: 'DEPRECATED'});
 
         onPageShow();
         clickStatusFilter('BETA');
 
-        expect(getVisiblePanelData().map(indexAndStatus)).toEqual([{apiStatus: 'ALPHA', index: 0}, {apiStatus: 'LIVE', index: 2}]);
+        expect(getVisiblePanelData('apistatus')).toEqual([{apistatus: 'ALPHA', index: 0}, {apistatus: 'LIVE', index: 2}]);
         expect(getResultCount()).toBe(2);
     });
 
     it("when status is selected then panels with that status are shown",  () => {
-        buildApiPanels({apiStatus: 'ALPHA'}, {apiStatus: 'BETA'}, {apiStatus: 'LIVE'}, {apiStatus: 'DEPRECATED'});
+        buildApiPanels({apistatus: 'ALPHA'}, {apistatus: 'BETA'}, {apistatus: 'LIVE'}, {apistatus: 'DEPRECATED'});
 
         onPageShow();
         clickStatusFilter('DEPRECATED');
 
-        expect(getVisiblePanelData().map(indexAndStatus)).toEqual([{apiStatus: 'ALPHA', index: 0}, {apiStatus: 'BETA', index: 1}, {apiStatus: 'LIVE', index: 2}, {apiStatus: 'DEPRECATED', index: 3}]);
+        expect(getVisiblePanelData('apistatus')).toEqual([{apistatus: 'ALPHA', index: 0}, {apistatus: 'BETA', index: 1}, {apistatus: 'LIVE', index: 2}, {apistatus: 'DEPRECATED', index: 3}]);
         expect(getResultCount()).toBe(4);
     });
 
@@ -207,22 +215,22 @@ describe('hipApis', () => {
 
         clickDomainFilter('d1');
 
-        expect(getVisiblePanelData()).toEqual([
-            { apiStatus: 'ALPHA', index: 0, domain: 'd1', subdomain: 'd1s1', hods: ''},
-            { apiStatus: 'BETA', index: 1, domain: 'd1', subdomain: 'd1s2', hods: 'ems'},
-            { apiStatus: 'LIVE', index: 2, domain: 'd1', subdomain: 'd1s3', hods: 'internal,ems,invalid'},
-            { apiStatus: 'ALPHA', index: 8, domain: 'd1', subdomain: 'd1s1', hods: 'apim'},
-            { apiStatus: 'BETA', index: 9, domain: 'd1', subdomain: 'd1s2', hods: 'invalid'},
-            { apiStatus: 'LIVE', index: 10, domain: 'd1', subdomain: 'd1s3', hods: ''},
-            { apiStatus: 'ALPHA', index: 16, domain: 'd1', subdomain: 'd1s1', hods: 'ems'},
-            { apiStatus: 'BETA', index: 17, domain: 'd1', subdomain: 'd1s2', hods: 'internal,ems,invalid'},
-            { apiStatus: 'LIVE', index: 18, domain: 'd1', subdomain: 'd1s3', hods: 'apim'},
-            { apiStatus: 'ALPHA', index: 24, domain: 'd1', subdomain: 'd1s1', hods: 'invalid'},
-            { apiStatus: 'BETA', index: 25, domain: 'd1', subdomain: 'd1s2', hods: ''},
-            { apiStatus: 'LIVE', index: 26, domain: 'd1', subdomain: 'd1s3', hods: 'ems'},
-            { apiStatus: 'ALPHA', index: 32, domain: 'd1', subdomain: 'd1s1', hods: 'internal,ems,invalid'},
-            { apiStatus: 'BETA', index: 33, domain: 'd1', subdomain: 'd1s2', hods: 'apim'},
-            { apiStatus: 'LIVE', index: 34, domain: 'd1', subdomain: 'd1s3', hods: 'invalid'}
+        expect(getVisiblePanelData('domain', 'subdomain')).toEqual([
+            { index: 0, domain: 'd1', subdomain: 'd1s1'},
+            { index: 1, domain: 'd1', subdomain: 'd1s2'},
+            { index: 2, domain: 'd1', subdomain: 'd1s3'},
+            { index: 8, domain: 'd1', subdomain: 'd1s1'},
+            { index: 9, domain: 'd1', subdomain: 'd1s2'},
+            { index: 10, domain: 'd1', subdomain: 'd1s3'},
+            { index: 16, domain: 'd1', subdomain: 'd1s1'},
+            { index: 17, domain: 'd1', subdomain: 'd1s2'},
+            { index: 18, domain: 'd1', subdomain: 'd1s3'},
+            { index: 24, domain: 'd1', subdomain: 'd1s1'},
+            { index: 25, domain: 'd1', subdomain: 'd1s2'},
+            { index: 26, domain: 'd1', subdomain: 'd1s3'},
+            { index: 32, domain: 'd1', subdomain: 'd1s1'},
+            { index: 33, domain: 'd1', subdomain: 'd1s2'},
+            { index: 34, domain: 'd1', subdomain: 'd1s3'}
         ]);
     });
 
@@ -234,22 +242,22 @@ describe('hipApis', () => {
         clickSubdomainFilter('d1s1');
         clickDomainFilter('d2');
 
-        expect(getVisiblePanelData()).toEqual([
-            { apiStatus: 'BETA', index: 1, domain: 'd1', subdomain: 'd1s2', hods: 'ems'},
-            { apiStatus: 'LIVE', index: 2, domain: 'd1', subdomain: 'd1s3', hods: 'internal,ems,invalid'},
-            { apiStatus: 'BETA', index: 9, domain: 'd1', subdomain: 'd1s2', hods: 'invalid'},
-            { apiStatus: 'LIVE', index: 10, domain: 'd1', subdomain: 'd1s3', hods: ''},
-            { apiStatus: 'BETA', index: 17, domain: 'd1', subdomain: 'd1s2', hods: 'internal,ems,invalid'},
-            { apiStatus: 'LIVE', index: 18, domain: 'd1', subdomain: 'd1s3', hods: 'apim'},
-            { apiStatus: 'BETA', index: 25, domain: 'd1', subdomain: 'd1s2', hods: ''},
-            { apiStatus: 'LIVE', index: 26, domain: 'd1', subdomain: 'd1s3', hods: 'ems'},
-            { apiStatus: 'BETA', index: 33, domain: 'd1', subdomain: 'd1s2', hods: 'apim'},
-            { apiStatus: 'LIVE', index: 34, domain: 'd1', subdomain: 'd1s3', hods: 'invalid'},
-            { apiStatus: 'BETA', index: 41, domain: 'd1', subdomain: 'd1s2', hods: 'ems'},
-            { apiStatus: 'LIVE', index: 42, domain: 'd1', subdomain: 'd1s3', hods: 'internal,ems,invalid'},
-            { apiStatus: 'BETA', index: 49, domain: 'd1', subdomain: 'd1s2', hods: 'invalid'},
-            { apiStatus: 'LIVE', index: 50, domain: 'd1', subdomain: 'd1s3', hods: ''},
-            { apiStatus: 'BETA', index: 57, domain: 'd1', subdomain: 'd1s2', hods: 'internal,ems,invalid'}
+        expect(getVisiblePanelData('domain', 'subdomain')).toEqual([
+            { index: 1, domain: 'd1', subdomain: 'd1s2' },
+            { index: 2, domain: 'd1', subdomain: 'd1s3' },
+            { index: 9, domain: 'd1', subdomain: 'd1s2' },
+            { index: 10, domain: 'd1', subdomain: 'd1s3' },
+            { index: 17, domain: 'd1', subdomain: 'd1s2' },
+            { index: 18, domain: 'd1', subdomain: 'd1s3' },
+            { index: 25, domain: 'd1', subdomain: 'd1s2' },
+            { index: 26, domain: 'd1', subdomain: 'd1s3' },
+            { index: 33, domain: 'd1', subdomain: 'd1s2' },
+            { index: 34, domain: 'd1', subdomain: 'd1s3' },
+            { index: 41, domain: 'd1', subdomain: 'd1s2' },
+            { index: 42, domain: 'd1', subdomain: 'd1s3' },
+            { index: 49, domain: 'd1', subdomain: 'd1s2' },
+            { index: 50, domain: 'd1', subdomain: 'd1s3' },
+            { index: 57, domain: 'd1', subdomain: 'd1s2' }
         ]);
     });
 
@@ -259,23 +267,40 @@ describe('hipApis', () => {
 
         clickHodFilter('internal');
         clickHodFilter('ems');
+        expect(getVisiblePanelData('hods')).toEqual([
+            { index: 1,  hods: 'ems'},
+            { index: 2,  hods: 'internal,ems,invalid'},
+            { index: 6,  hods: 'ems'},
+            { index: 12, hods: 'internal,ems,invalid'},
+            { index: 16, hods: 'ems'},
+            { index: 17, hods: 'internal,ems,invalid'},
+            { index: 21, hods: 'ems'},
+            { index: 22, hods: 'internal,ems,invalid'},
+            { index: 26, hods: 'ems'},
+            { index: 32, hods: 'internal,ems,invalid'},
+            { index: 36, hods: 'ems'},
+            { index: 37, hods: 'internal,ems,invalid'},
+            { index: 41, hods: 'ems'},
+            { index: 42, hods: 'internal,ems,invalid'},
+            { index: 46, hods: 'ems'}
+        ]);
+    });
 
-        expect(getVisiblePanelData()).toEqual([
-            { apiStatus: 'BETA', index: 1, domain: 'd1', subdomain: 'd1s2', hods: 'ems'},
-            { apiStatus: 'LIVE', index: 2, domain: 'd1', subdomain: 'd1s3', hods: 'internal,ems,invalid'},
-            { apiStatus: 'LIVE', index: 6, domain: 'dx', subdomain: 'dxs1', hods: 'ems'},
-            { apiStatus: 'ALPHA', index: 12, domain: 'd3', subdomain: '', hods: 'internal,ems,invalid'},
-            { apiStatus: 'ALPHA', index: 16, domain: 'd1', subdomain: 'd1s1', hods: 'ems'},
-            { apiStatus: 'BETA', index: 17, domain: 'd1', subdomain: 'd1s2', hods: 'internal,ems,invalid'},
-            { apiStatus: 'BETA', index: 21, domain: '', subdomain: 'd3s1', hods: 'ems'},
-            { apiStatus: 'LIVE', index: 22, domain: 'dx', subdomain: 'dxs1', hods: 'internal,ems,invalid'},
-            { apiStatus: 'LIVE', index: 26, domain: 'd1', subdomain: 'd1s3', hods: 'ems'},
-            { apiStatus: 'ALPHA', index: 32, domain: 'd1', subdomain: 'd1s1', hods: 'internal,ems,invalid'},
-            { apiStatus: 'ALPHA', index: 36, domain: 'd3', subdomain: '', hods: 'ems'},
-            { apiStatus: 'BETA', index: 37, domain: '', subdomain: 'd3s1', hods: 'internal,ems,invalid'},
-            { apiStatus: 'BETA', index: 41, domain: 'd1', subdomain: 'd1s2', hods: 'ems'},
-            { apiStatus: 'LIVE', index: 42, domain: 'd1', subdomain: 'd1s3', hods: 'internal,ems,invalid'},
-            { apiStatus: 'LIVE', index: 46, domain: 'dx', subdomain: 'dxs1', hods: 'ems'}
+    it("when name filter is applied then correct panels are shown",  () => {
+        buildApiPanelsByCount(100);
+        onPageShow();
+
+        enterNameFilterText('api number 1');
+        expect(getVisiblePanelData('apiname')).toEqual([
+            { index: 0, apiname: 'api number 1'},
+            { index: 9, apiname: 'api number 10'},
+            { index: 10, apiname: 'api number 11'},
+            { index: 12, apiname: 'api number 13'},
+            { index: 13, apiname: 'api number 14'},
+            { index: 14, apiname: 'api number 15'},
+            { index: 16, apiname: 'api number 17'},
+            { index: 17, apiname: 'api number 18'},
+            { index: 18, apiname: 'api number 19'},
         ]);
     });
 
@@ -418,6 +443,15 @@ describe('hipApis', () => {
             clickResetFiltersLink();
 
             expect(hodFiltersCollapsed()).toBe(true);
+        });
+
+        it("when reset filters link is clicked then name filter is cleared",  () => {
+            onPageShow();
+            enterNameFilterText('some api');
+
+            clickResetFiltersLink();
+
+            expect(getNameFilterText()).toBe('');
         });
 
         it("when second page of results is displayed and reset filters link and is clicked then we return to the first page",  () => {

@@ -305,6 +305,7 @@ hipApis.filter.noResults.message = No APIs have been found that match your filte
 hipApis.filter.noResults.clearFilters = Clear filters
 hipApis.filter.byHods = Filter by HoD/Backend
 hipApis.filter.byHods.view = View HoD/Backend filters
+hipApis.filter.byName = Filter by API name
 
 support.link.text = Get Support
 support.title = Get Support

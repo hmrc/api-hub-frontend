@@ -98,7 +98,7 @@ export function buildDomainFilters() {
     }
 
     return {
-        initialiseFromApis(apis) {
+        initialise(apis) {
             const apiDomains = getDomainsInUseByApis(apis);
             removeUnusedCheckboxes(apiDomains);
             setupCheckboxes();

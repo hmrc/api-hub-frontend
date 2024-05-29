@@ -67,7 +67,7 @@ export function buildHodsFilters() {
     }
 
     return {
-        initialiseFromApis(apis) {
+        initialise(apis) {
             const apiHods = getHodsInUseByApis(apis);
             removeUnusedCheckboxes(apiHods);
             setupCheckboxes();

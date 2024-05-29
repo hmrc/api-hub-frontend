@@ -2,11 +2,15 @@ import {buildPaginator} from './pagination.js';
 import {buildDomainFilters} from "./hipApisDomainFilters.js";
 import {buildStatusFilters} from "./hipApisStatusFilters.js";
 import {buildHodsFilters} from "./hipApisHodsFilters.js";
+import {buildNameFilter} from "./hipApisNameFilters.js";
 
 export function onPageShow() {
-    const domainFilters = buildDomainFilters(),
-        statusFilters = buildStatusFilters(),
-        hodsFilters = buildHodsFilters();
+    const filters = [
+            buildDomainFilters(),
+            buildStatusFilters(),
+            buildHodsFilters(),
+            buildNameFilter()
+        ];
 
     const view = (() => {
         const apiDetailPanelEls = Array.from(document.querySelectorAll('#apiList .api-panel')),
@@ -19,20 +23,10 @@ export function onPageShow() {
 
         let onFiltersChangedHandler = () => {};
 
-        statusFilters.onChange(() => {
-            onFiltersChangedHandler();
-        });
-        domainFilters.onChange(() => {
-            onFiltersChangedHandler();
-        });
-        hodsFilters.onChange(() => {
-            onFiltersChangedHandler();
-        });
+        filters.forEach(filter=> filter.onChange(() => onFiltersChangedHandler()));
 
         function clearAllFilters() {
-            statusFilters.clear();
-            domainFilters.clear();
-            hodsFilters.clear();
+            filters.forEach(filter => filter.clear());
             onFiltersChangedHandler();
         }
 
@@ -57,9 +51,7 @@ export function onPageShow() {
                 });
             },
             initialiseFilters(apis) {
-                statusFilters.initialise();
-                domainFilters.initialiseFromApis(apis);
-                hodsFilters.initialiseFromApis(apis);
+                filters.forEach(filter => filter.initialise(apis));
             },
             setResultCount(count) {
                 elSearchResultsSize.textContent = count;
@@ -74,11 +66,7 @@ export function onPageShow() {
     })();
 
     function buildFilterFunctions() {
-        return [
-            statusFilters.buildFilterFunction(),
-            domainFilters.buildFilterFunction(),
-            hodsFilters.buildFilterFunction()
-        ];
+        return filters.map(filter=> filter.buildFilterFunction());
     }
 
     const model = {
@@ -88,6 +76,7 @@ export function onPageShow() {
                 domain: el.dataset['domain'],
                 subdomain: el.dataset['subdomain'],
                 hods: new Set(el.dataset['hods'].split(',').filter(h => h)),
+                apiName: el.dataset['apiname'],
                 // add other properties that we want to filter on here...
             },
             el,
