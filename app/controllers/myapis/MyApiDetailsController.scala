@@ -18,34 +18,22 @@ package controllers.myapis
 
 import com.google.inject.{Inject, Singleton}
 import controllers.actions.{ApiAuthActionProvider, IdentifierAction}
-import controllers.helpers.ErrorResultBuilder
-import play.api.i18n.{I18nSupport, Messages}
+import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.myapis.MyApiDetailsView
-
 import scala.concurrent.ExecutionContext
 
 @Singleton
 class MyApiDetailsController @Inject()(
   override val controllerComponents: MessagesControllerComponents,
-  apiHubService: ApiHubService,
   view: MyApiDetailsView,
   identify: IdentifierAction,
-  apiAuth: ApiAuthActionProvider,
-  errorResultBuilder: ErrorResultBuilder
+  apiAuth: ApiAuthActionProvider
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(id: String): Action[AnyContent] = (identify andThen apiAuth(id)).async {
-    implicit request =>
-      apiHubService.getApiDetail(id).map {
-        case Some(apiDetails) => Ok(view(apiDetails, Some(request.identifierRequest.user)))
-        case _ => errorResultBuilder.notFound(
-          Messages("site.apiNotFound.heading"),
-          Messages("site.apiNotFound.message", id)
-        )
-      }
+  def onPageLoad(id: String): Action[AnyContent] = (identify andThen apiAuth(id)) {
+    implicit request => Ok(view(request.apiDetails, Some(request.identifierRequest.user)))
   }
 
 }

@@ -17,7 +17,7 @@
 @import models.api._
 @import models.user.UserModel
 
-@this(layout: templates.Layout, govukButton: GovukButton)
+@this(layout: templates.Layout, govukButton: GovukButton, govukSummaryList: GovukSummaryList)
 
 @(apiDetail: ApiDetail, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
@@ -40,16 +40,17 @@
         <div class="govuk-grid-column-two-thirds content">
             <h1 id="details" class="govuk-heading-l">@messages("myApis.details.title")</h1>
 
-            <dl class="govuk-summary-list govuk-!-margin-bottom-7">
-                <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">
-                        @messages("myApis.details.name"):
-                    </dt>
-                    <dd class="govuk-summary-list__value">
-                        @apiDetail.title
-                    </dd>
-                </div>
-            </dl>
+            @govukSummaryList(SummaryList(
+                rows = Seq(
+                    SummaryListRow(
+                        key = Key(
+                            content = Text(messages("myApis.details.name"))
+                        ),
+                        value = Value(
+                            content = apiDetail.title
+                        ),
+                    ))))
+
         </div>
     </div>
 }
