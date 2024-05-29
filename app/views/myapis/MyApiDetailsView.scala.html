@@ -31,7 +31,7 @@
                         <a class="side-nav__link" href="#details">@messages("myApis.details.title")</a>
                     </li>
                     <li class="side-nav__list">
-                        <a href="#" class="side-nav__link">@messages("myApis.update.title")</a>
+                        <a href="@controllers.myapis.routes.SimpleApiRedeploymentController.onPageLoad(apiDetail.id).url" class="side-nav__link">@messages("myApis.update.title")</a>
                     </li>
                 </ul>
             </div>

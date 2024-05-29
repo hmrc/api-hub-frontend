@@ -1,0 +1,90 @@
+@*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.user.UserModel
+@import models.api.ApiDetail
+@import viewmodels.InputWidth._
+@import models.api.Alpha
+@import models.api.ApiStatus
+
+@this(
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukErrorSummary : GovukErrorSummary,
+    govukInput : GovukInput,
+    govukSelect : GovukSelect,
+    govukTextarea : GovukTextarea,
+    govukButton: GovukButton
+)
+
+@(form: Form[_], apiDetail: ApiDetail, user: UserModel)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = title(form, "Update deployment"), user = Some(user)) {
+
+    <h1 class="govuk-heading-l">Update deployment</h1>
+
+    @formHelper(action = controllers.myapis.routes.SimpleApiRedeploymentController.onSubmit(apiDetail.id)) {
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form))
+        }
+
+        @govukInput(
+            Input(
+                id = "name",
+                name = "name",
+                label = LabelViewModel("Name"),
+                value = Some(apiDetail.publisherReference)
+            )
+            .withWidth(Full)
+            .disabled()
+        )
+
+        @govukInput(
+            InputViewModel(
+                field = form("description"),
+                label = LabelViewModel("Description")
+            )
+            .withWidth(Full)
+        )
+
+        @govukSelect(
+            SelectViewModel(
+                field = form("status"),
+                items = ApiStatus.values.map(
+                    apiStatus =>
+                        SelectItemViewModel(
+                            value = apiStatus.toString,
+                            text = apiStatus.toString
+                        )
+                        .selected(apiStatus == Alpha)
+                ),
+                label = LabelViewModel("Status")
+            )
+        )
+
+        @govukTextarea(
+            TextareaViewModel(
+                field = form("oas"),
+                label = LabelViewModel("OAS")
+            )
+        )
+
+        @govukButton(
+            ButtonViewModel(messages("site.continue"))
+        )
+    }
+
+}

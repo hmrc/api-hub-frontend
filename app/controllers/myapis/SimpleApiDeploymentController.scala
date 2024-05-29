@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.deployment
+package controllers.myapis
 
 import com.google.inject.{Inject, Singleton}
 import connectors.ApplicationsConnector
@@ -30,7 +30,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.deployment.{DeploymentFailureView, DeploymentSuccessView, SimpleApiDeploymentView}
+import views.html.myapis.{DeploymentFailureView, DeploymentSuccessView, SimpleApiDeploymentView}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -67,7 +67,7 @@ class SimpleApiDeploymentController @Inject()(
                 Ok(deploymentSuccessView(request.user, response))
               case response: InvalidOasResponse =>
                 logger.info(s"Invalid OAS deployments response${System.lineSeparator()}${Json.prettyPrint(Json.toJson(response))}")
-                BadRequest(deploymentFailureView(request.user, response.failure))
+                BadRequest(deploymentFailureView(request.user, response.failure, controllers.myapis.routes.SimpleApiDeploymentController.onPageLoad().url))
             }
       )
   }
