@@ -3,7 +3,6 @@
 ->          /hmrc-frontend                                                     hmrcfrontend.Routes
 ->          /application                                                       application.Routes
 ->          /admin                                                             admin.Routes
-->          /deployment                                                        deployment.Routes
 ->          /team                                                              team.Routes
 ->          /my-apis                                                           myapis.Routes
 

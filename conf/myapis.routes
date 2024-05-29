@@ -1,1 +1,7 @@
+GET     /generate                                           controllers.myapis.SimpleApiDeploymentController.onPageLoad()
+POST    /generate                                           controllers.myapis.SimpleApiDeploymentController.onSubmit()
+
+GET     /update/:id                                         controllers.myapis.SimpleApiRedeploymentController.onPageLoad(id: String)
+POST    /update/:id                                         controllers.myapis.SimpleApiRedeploymentController.onSubmit(id: String)
+
 GET     /:id                                                controllers.myapis.MyApiDetailsController.onPageLoad(id: String)

@@ -33,4 +33,5 @@ package object govuk {
       with SummaryListFluency
       with TagFluency
       with SelectFluency
+      with TextareaFluency
 }

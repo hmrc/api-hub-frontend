@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package controllers.deployment
+package controllers.myapis
 
 import base.SpecBase
 import connectors.ApplicationsConnector
 import controllers.actions.FakeUser
-import controllers.deployment.SimpleApiDeploymentController.DeploymentsRequestFormProvider
+import controllers.myapis.SimpleApiDeploymentController.DeploymentsRequestFormProvider
 import models.application.TeamMember
 import models.deployment.{Error, FailuresResponse, InvalidOasResponse, SuccessfulDeploymentsResponse}
 import models.team.Team
@@ -32,7 +32,7 @@ import play.api.test.Helpers._
 import play.api.{Application => PlayApplication}
 import services.ApiHubService
 import utils.HtmlValidation
-import views.html.deployment.{DeploymentFailureView, DeploymentSuccessView, SimpleApiDeploymentView}
+import views.html.myapis.{DeploymentFailureView, DeploymentSuccessView, SimpleApiDeploymentView}
 
 import java.time.LocalDateTime
 import scala.concurrent.Future
@@ -53,7 +53,7 @@ class SimpleApiDeploymentControllerSpec
       when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(teams))
 
       running(fixture.playApplication) {
-        val request = FakeRequest(controllers.deployment.routes.SimpleApiDeploymentController.onPageLoad())
+        val request = FakeRequest(controllers.myapis.routes.SimpleApiDeploymentController.onPageLoad())
         val result = route(fixture.playApplication, request).value
 
         val view = fixture.playApplication.injector.instanceOf[SimpleApiDeploymentView]
@@ -81,7 +81,7 @@ class SimpleApiDeploymentControllerSpec
       when(fixture.applicationsConnector.generateDeployment(any)(any)).thenReturn(Future.successful(response))
 
       running(fixture.playApplication) {
-        val request = FakeRequest(controllers.deployment.routes.SimpleApiDeploymentController.onSubmit())
+        val request = FakeRequest(controllers.myapis.routes.SimpleApiDeploymentController.onSubmit())
           .withFormUrlEncodedBody(validForm: _*)
         val result = route(fixture.playApplication, request).value
 
@@ -108,14 +108,14 @@ class SimpleApiDeploymentControllerSpec
       when(fixture.applicationsConnector.generateDeployment(any)(any)).thenReturn(Future.successful(response))
 
       running(fixture.playApplication) {
-        val request = FakeRequest(controllers.deployment.routes.SimpleApiDeploymentController.onSubmit())
+        val request = FakeRequest(controllers.myapis.routes.SimpleApiDeploymentController.onSubmit())
           .withFormUrlEncodedBody(validForm: _*)
         val result = route(fixture.playApplication, request).value
 
         val view = fixture.playApplication.injector.instanceOf[DeploymentFailureView]
 
         status(result) mustBe BAD_REQUEST
-        contentAsString(result) mustBe view(FakeUser, response.failure)(request, messages(fixture.playApplication)).toString()
+        contentAsString(result) mustBe view(FakeUser, response.failure, controllers.myapis.routes.SimpleApiDeploymentController.onPageLoad().url)(request, messages(fixture.playApplication)).toString()
         contentAsString(result) must validateAsHtml
 
       }
@@ -139,7 +139,7 @@ class SimpleApiDeploymentControllerSpec
 
       running(fixture.playApplication) {
         forAll(fieldNames){fieldName =>
-          val request = FakeRequest(controllers.deployment.routes.SimpleApiDeploymentController.onSubmit())
+          val request = FakeRequest(controllers.myapis.routes.SimpleApiDeploymentController.onSubmit())
             .withFormUrlEncodedBody(invalidForm(fieldName): _*)
           val result = route(fixture.playApplication, request).value
 

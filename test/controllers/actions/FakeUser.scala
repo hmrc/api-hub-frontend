@@ -16,7 +16,7 @@
 
 package controllers.actions
 
-import models.user.{LdapUser, Permissions, StrideUser, UserModel}
+import models.user.{LdapUser, StrideUser, UserModel}
 
 object FakeUser extends UserModel("id", "test-name", LdapUser, Some("test-email"))
 

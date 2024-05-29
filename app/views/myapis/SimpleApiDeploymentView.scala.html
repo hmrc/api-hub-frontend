@@ -17,7 +17,6 @@
 @import models.team.Team
 @import models.user.UserModel
 @import viewmodels.InputWidth._
-@import viewmodels.govuk.textarea._
 @import models.api.ApiStatus
 @import models.api.Alpha
 
@@ -38,7 +37,7 @@
 
     <h1 class="govuk-heading-l">Generate deployment</h1>
 
-    @formHelper(action = controllers.deployment.routes.SimpleApiDeploymentController.onSubmit()) {
+    @formHelper(action = controllers.myapis.routes.SimpleApiDeploymentController.onSubmit()) {
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
