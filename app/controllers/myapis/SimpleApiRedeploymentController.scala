@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.deployment
+package controllers.myapis
 
 import com.google.inject.{Inject, Singleton}
 import connectors.ApplicationsConnector
@@ -27,7 +27,7 @@ import play.api.data.Forms.mapping
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.deployment.{DeploymentFailureView, DeploymentSuccessView, SimpleApiRedeploymentView}
+import views.html.myapis.{DeploymentFailureView, DeploymentSuccessView, SimpleApiRedeploymentView}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -59,7 +59,7 @@ class SimpleApiRedeploymentController @Inject()(
           case Some(response: SuccessfulDeploymentsResponse) =>
             Ok(successView(request.identifierRequest.user, response))
           case Some(response: InvalidOasResponse) =>
-            BadRequest(failureView(request.identifierRequest.user, response.failure, controllers.deployment.routes.SimpleApiRedeploymentController.onPageLoad(id).url))
+            BadRequest(failureView(request.identifierRequest.user, response.failure, controllers.myapis.routes.SimpleApiRedeploymentController.onPageLoad(id).url))
           case None =>
             NotFound
         }

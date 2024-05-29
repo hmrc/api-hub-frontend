@@ -14,48 +14,42 @@
  * limitations under the License.
  *@
 
-@import models.team.Team
 @import models.user.UserModel
+@import models.api.ApiDetail
 @import viewmodels.InputWidth._
-@import models.api.ApiStatus
 @import models.api.Alpha
+@import models.api.ApiStatus
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
-    govukInput : GovukInput,
-    govukTextarea : GovukTextarea,
-    govukButton: GovukButton,
-    govukSelect : GovukSelect,
     govukErrorSummary : GovukErrorSummary,
-    govukCheckboxes : GovukCheckboxes,
+    govukInput : GovukInput,
+    govukSelect : GovukSelect,
+    govukTextarea : GovukTextarea,
+    govukButton: GovukButton
 )
 
-@(form: Form[_], teams: Seq[Team], user: UserModel)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], apiDetail: ApiDetail, user: UserModel)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, "Generate deployment"), user = Some(user)) {
+@layout(pageTitle = title(form, "Update deployment"), user = Some(user)) {
 
-    <h1 class="govuk-heading-l">Generate deployment</h1>
+    <h1 class="govuk-heading-l">Update deployment</h1>
 
-    @formHelper(action = controllers.deployment.routes.SimpleApiDeploymentController.onSubmit()) {
+    @formHelper(action = controllers.myapis.routes.SimpleApiRedeploymentController.onSubmit(apiDetail.id)) {
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
         @govukInput(
-            InputViewModel(
-                field = form("lineOfBusiness"),
-                label = LabelViewModel("Line of business")
+            Input(
+                id = "name",
+                name = "name",
+                label = LabelViewModel("Name"),
+                value = Some(apiDetail.publisherReference)
             )
             .withWidth(Full)
-        )
-
-        @govukInput(
-            InputViewModel(
-                field = form("name"),
-                label = LabelViewModel("Name")
-            )
-            .withWidth(Full)
+            .disabled()
         )
 
         @govukInput(
@@ -64,26 +58,6 @@
                 label = LabelViewModel("Description")
             )
             .withWidth(Full)
-        )
-
-        @govukInput(
-            InputViewModel(
-                field = form("egress"),
-                label = LabelViewModel("Egress")
-            )
-            .withWidth(Full)
-        )
-
-        @govukCheckboxes(
-            Checkboxes(
-                name = "passthrough",
-                items = Seq(
-                    CheckboxItem(
-                        content = Text("Passthrough"),
-                        value = "true"
-                    ),
-                )
-            )
         )
 
         @govukSelect(
@@ -98,20 +72,6 @@
                         .selected(apiStatus == Alpha)
                 ),
                 label = LabelViewModel("Status")
-            )
-        )
-
-        @govukSelect(
-            SelectViewModel(
-                field = form("teamId"),
-                items = teams.map(
-                    team =>
-                        SelectItemViewModel(
-                            value = team.id,
-                            text = team.name
-                        )
-                ),
-                label = LabelViewModel("Team")
             )
         )
 

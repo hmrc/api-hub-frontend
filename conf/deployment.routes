@@ -1,5 +1,0 @@
-GET     /generate                               controllers.deployment.SimpleApiDeploymentController.onPageLoad()
-POST    /generate                               controllers.deployment.SimpleApiDeploymentController.onSubmit()
-
-GET     /update/:id                             controllers.deployment.SimpleApiRedeploymentController.onPageLoad(id: String)
-POST    /update/:id                             controllers.deployment.SimpleApiRedeploymentController.onSubmit(id: String)

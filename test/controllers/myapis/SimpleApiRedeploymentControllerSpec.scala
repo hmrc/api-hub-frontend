@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package controllers.deployment
+package controllers.myapis
 
 import base.SpecBase
 import connectors.ApplicationsConnector
 import controllers.actions.{ApiAuthActionProvider, FakeApiAuthActions, FakeApiDetail, FakeUser}
-import controllers.deployment.SimpleApiRedeploymentController.RedeploymentRequestFormProvider
-import models.deployment.{Error, FailuresResponse, InvalidOasResponse, RedeploymentRequest, SuccessfulDeploymentsResponse}
+import controllers.myapis.SimpleApiRedeploymentController.RedeploymentRequestFormProvider
+import models.deployment._
 import models.user.UserModel
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 import org.scalatest.OptionValues
@@ -33,7 +33,7 @@ import play.api.test.Helpers._
 import play.api.{Application => PlayApplication}
 import services.ApiHubService
 import utils.HtmlValidation
-import views.html.deployment.{DeploymentFailureView, DeploymentSuccessView, SimpleApiRedeploymentView}
+import views.html.myapis.{DeploymentFailureView, DeploymentSuccessView, SimpleApiRedeploymentView}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -56,7 +56,7 @@ class SimpleApiRedeploymentControllerSpec
       when(fixture.apiAuthActionProvider.apply(any)(any)).thenReturn(successfulApiAuthAction(FakeApiDetail))
 
       running(fixture.playApplication) {
-        val request = FakeRequest(controllers.deployment.routes.SimpleApiRedeploymentController.onPageLoad(FakeApiDetail.id))
+        val request = FakeRequest(controllers.myapis.routes.SimpleApiRedeploymentController.onPageLoad(FakeApiDetail.id))
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[SimpleApiRedeploymentView]
 
@@ -82,7 +82,7 @@ class SimpleApiRedeploymentControllerSpec
       when(fixture.applicationsConnector.updateDeployment(any, any)(any)).thenReturn(Future.successful(Some(response)))
 
       running(fixture.playApplication) {
-        val request = FakeRequest(controllers.deployment.routes.SimpleApiRedeploymentController.onSubmit(FakeApiDetail.id))
+        val request = FakeRequest(controllers.myapis.routes.SimpleApiRedeploymentController.onSubmit(FakeApiDetail.id))
           .withFormUrlEncodedBody(validForm: _*)
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[DeploymentSuccessView]
@@ -110,11 +110,11 @@ class SimpleApiRedeploymentControllerSpec
       when(fixture.applicationsConnector.updateDeployment(any, any)(any)).thenReturn(Future.successful(Some(response)))
 
       running(fixture.playApplication) {
-        val request = FakeRequest(controllers.deployment.routes.SimpleApiRedeploymentController.onSubmit(FakeApiDetail.id))
+        val request = FakeRequest(controllers.myapis.routes.SimpleApiRedeploymentController.onSubmit(FakeApiDetail.id))
           .withFormUrlEncodedBody(validForm: _*)
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[DeploymentFailureView]
-        val returnUrl = controllers.deployment.routes.SimpleApiRedeploymentController.onPageLoad(FakeApiDetail.id).url
+        val returnUrl = controllers.myapis.routes.SimpleApiRedeploymentController.onPageLoad(FakeApiDetail.id).url
 
         status(result) mustBe BAD_REQUEST
         contentAsString(result) mustBe view(FakeUser, response.failure, returnUrl)(request, messages(fixture.playApplication)).toString()
@@ -136,7 +136,7 @@ class SimpleApiRedeploymentControllerSpec
 
       running(fixture.playApplication) {
         forAll(fieldNames){(fieldName: String) =>
-          val request = FakeRequest(controllers.deployment.routes.SimpleApiRedeploymentController.onSubmit(FakeApiDetail.id))
+          val request = FakeRequest(controllers.myapis.routes.SimpleApiRedeploymentController.onSubmit(FakeApiDetail.id))
             .withFormUrlEncodedBody(invalidForm(fieldName): _*)
           val result = route(fixture.playApplication, request).value
           val boundForm = bindForm(form, invalidForm(fieldName))
