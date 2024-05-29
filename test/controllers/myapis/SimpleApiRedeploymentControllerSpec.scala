@@ -63,6 +63,8 @@ class SimpleApiRedeploymentControllerSpec
         status(result) mustBe OK
         contentAsString(result) mustBe view(form, FakeApiDetail, FakeUser)(request, messages(fixture.playApplication)).toString()
         contentAsString(result) must validateAsHtml
+
+        verify(fixture.apiAuthActionProvider).apply(eqTo(FakeApiDetail.id))(any)
       }
     }
   }
@@ -91,6 +93,7 @@ class SimpleApiRedeploymentControllerSpec
         contentAsString(result) mustBe view(FakeUser, response)(request, messages(fixture.playApplication)).toString()
         contentAsString(result) must validateAsHtml
 
+        verify(fixture.apiAuthActionProvider).apply(eqTo(FakeApiDetail.id))(any)
         verify(fixture.applicationsConnector).updateDeployment(eqTo(FakeApiDetail.publisherReference), eqTo(redeploymentRequest))(any)
       }
     }
