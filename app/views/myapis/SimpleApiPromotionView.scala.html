@@ -1,0 +1,72 @@
+@*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.user.UserModel
+@import models.api.ApiDetail
+
+@this(
+    layout: templates.Layout,
+    govukSummaryList: GovukSummaryList,
+    formHelper: FormWithCSRF,
+    govukButton : GovukButton
+)
+
+@(apiDetail: ApiDetail, user: UserModel)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = titleNoForm("Promote to production"), user = Some(user)) {
+
+    <h1 class="govuk-heading-l">You are about to promote your API to production</h1>
+
+    @govukSummaryList(SummaryList(
+        rows = Seq(
+            SummaryListRow(
+                key = Key(
+                    content = Text(messages("myApis.details.name"))
+                ),
+                value = Value(
+                    content = apiDetail.title
+                ),
+            )
+        )
+    ))
+
+    <p class="govuk-body govuk-!-margin-bottom-9">
+        Your API will be available in the production environment.
+    </p>
+
+    <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-2">
+
+    <h2 class="govuk-heading-m">Finish and deploy your API to the production environment</h2>
+
+    @formHelper(action = controllers.myapis.routes.SimpleApiPromotionController.onSubmit(apiDetail.id)) {
+        <div class="govuk-button-group">
+            @govukButton(
+                ButtonViewModel(
+                    content = Text("Deploy API")
+                )
+            )
+
+            @govukButton(
+                ButtonViewModel(
+                    content = Text("Cancel")
+                )
+                .asSecondaryButton()
+                .asLink(controllers.myapis.routes.MyApiDetailsController.onPageLoad(apiDetail.id).url)
+            )
+        </div>
+    }
+
+}
