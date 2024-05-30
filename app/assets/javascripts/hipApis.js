@@ -2,7 +2,7 @@ import {buildPaginator} from './pagination.js';
 import {buildDomainFilters} from "./hipApisDomainFilters.js";
 import {buildStatusFilters} from "./hipApisStatusFilters.js";
 import {buildHodsFilters} from "./hipApisHodsFilters.js";
-import {buildNameFilter} from "./hipApisNameFilters.js";
+import {buildNameFilter} from "./hipApisNameFilter.js";
 
 export function onPageShow() {
     const filters = [
