@@ -77,7 +77,6 @@ export function onPageShow() {
                 subdomain: el.dataset['subdomain'],
                 hods: new Set(el.dataset['hods'].split(',').filter(h => h)),
                 apiName: el.dataset['apiname'],
-                // add other properties that we want to filter on here...
             },
             el,
             hiddenByFilters: false,
