@@ -37,9 +37,9 @@ describe('hipApisHodsFilters', () => {
         return document.querySelector(`.hodFilter[value="${hod}"]`);
     }
 
-    describe("initialiseFromApis", () => {
+    describe("initialise", () => {
         it("removes checkboxes for hods not in use by any APIs",  () => {
-            hodsFilters.initialiseFromApis(apis);
+            hodsFilters.initialise(apis);
 
             expect([...document.querySelectorAll('.hodFilter')].map(el => el.value)).toEqual(['h1', 'h2', 'h3']);
         });
@@ -53,38 +53,38 @@ describe('hipApisHodsFilters', () => {
             elHodCheckbox.click();
             expect(changeCount).toBe(0);
 
-            hodsFilters.initialiseFromApis(apis);
+            hodsFilters.initialise(apis);
 
             elHodCheckbox.click();
             expect(changeCount).toBe(1);
         });
 
         it("if no hods are selected then the hods filter section is collapsed",  () => {
-            hodsFilters.initialiseFromApis(apis);
+            hodsFilters.initialise(apis);
             expect(document.getElementById('viewHodFilters').open).toBe(false);
         });
 
         it("if hods are selected then the hod filter section is open",  () => {
             hodCheckbox('h1').click();
-            hodsFilters.initialiseFromApis(apis);
+            hodsFilters.initialise(apis);
             expect(document.getElementById('viewHodFilters').open).toBe(true);
         });
 
         it("if no hods are selected then the hod filter count is zero",  () => {
-            hodsFilters.initialiseFromApis(apis);
+            hodsFilters.initialise(apis);
             expect(document.getElementById('hodFilterCount').textContent).toBe('0');
         });
 
         it("if hods are selected then the hod filter count is the number of selected hods",  () => {
             hodCheckbox('h1').click();
-            hodsFilters.initialiseFromApis(apis);
+            hodsFilters.initialise(apis);
             expect(document.getElementById('hodFilterCount').textContent).toBe('1');
         });
     });
 
     describe("clear", () => {
         beforeEach(() => {
-            hodsFilters.initialiseFromApis(apis);
+            hodsFilters.initialise(apis);
         });
 
         it("clears all hods checkboxes",  () => {
@@ -113,7 +113,7 @@ describe('hipApisHodsFilters', () => {
     describe("the filter function", () => {
         let data;
         beforeEach(() => {
-            hodsFilters.initialiseFromApis(apis);
+            hodsFilters.initialise(apis);
             data = apis.map(api => api.data);
         });
 
