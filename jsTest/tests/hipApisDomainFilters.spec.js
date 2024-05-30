@@ -61,9 +61,9 @@ describe('hipApisDomainFilters', () => {
         return document.querySelector(`.subDomainFilter[value="${subDomain}"]`);
     }
 
-    describe("initialiseFromApis", () => {
+    describe("initialise", () => {
         it("removes checkboxes for domains not in use by any APIs",  () => {
-            domainFilters.initialiseFromApis(apis);
+            domainFilters.initialise(apis);
 
             expect([...document.querySelectorAll('.domainFilter')].map(el => el.value)).toEqual(['d1', 'd2', 'd3']);
             expect([...document.querySelectorAll('.subDomainFilter')].map(el => el.value)).toEqual(['d1s1', 'd1s2', 'd1s3', 'd2s1']);
@@ -80,7 +80,7 @@ describe('hipApisDomainFilters', () => {
             elSubdomainCheckbox.click();
             expect(changeCount).toBe(0);
 
-            domainFilters.initialiseFromApis(apis);
+            domainFilters.initialise(apis);
 
             elDomainCheckbox.click();
             expect(changeCount).toBe(1);
@@ -89,7 +89,7 @@ describe('hipApisDomainFilters', () => {
         });
 
         it("checking a domain checkbox displays and checks all associated subdomain checkboxes",  () => {
-            domainFilters.initialiseFromApis(apis);
+            domainFilters.initialise(apis);
 
             domainCheckbox('d1').click();
             expect(domainCheckbox('d1').checked).toBe(true);
@@ -102,7 +102,7 @@ describe('hipApisDomainFilters', () => {
         });
 
         it("unchecking a domain checkbox hides and unchecks all associated subdomain checkboxes",  () => {
-            domainFilters.initialiseFromApis(apis);
+            domainFilters.initialise(apis);
 
             domainCheckbox('d1').click();
             expect(domainCheckbox('d1').checked).toBe(true);
@@ -117,31 +117,31 @@ describe('hipApisDomainFilters', () => {
         });
 
         it("if no domains are selected then the domain filter section is collapsed",  () => {
-            domainFilters.initialiseFromApis(apis);
+            domainFilters.initialise(apis);
             expect(document.getElementById('viewDomainFilters').open).toBe(false);
         });
 
         it("if domains are selected then the domain filter section is open",  () => {
             domainCheckbox('d1').click();
-            domainFilters.initialiseFromApis(apis);
+            domainFilters.initialise(apis);
             expect(document.getElementById('viewDomainFilters').open).toBe(true);
         });
 
         it("if no domains are selected then the domain filter count is zero",  () => {
-            domainFilters.initialiseFromApis(apis);
+            domainFilters.initialise(apis);
             expect(document.getElementById('domainFilterCount').textContent).toBe('0');
         });
 
         it("if domains are selected then the domain filter count is the number of selected domains",  () => {
             domainCheckbox('d1').click();
-            domainFilters.initialiseFromApis(apis);
+            domainFilters.initialise(apis);
             expect(document.getElementById('domainFilterCount').textContent).toBe('1');
         });
     });
 
     describe("clear", () => {
         beforeEach(() => {
-            domainFilters.initialiseFromApis(apis);
+            domainFilters.initialise(apis);
         });
 
         it("clears all domain and subdomain checkboxes",  () => {
@@ -181,7 +181,7 @@ describe('hipApisDomainFilters', () => {
     describe("the filter function", () => {
         let data;
         beforeEach(() => {
-            domainFilters.initialiseFromApis(apis);
+            domainFilters.initialise(apis);
             data = apis.map(api => api.data);
         });
 
