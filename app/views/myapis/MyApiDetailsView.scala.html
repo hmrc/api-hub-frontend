@@ -25,7 +25,11 @@
         apiDeployments: ApiDeployments
 )
 
-@(apiDetail: ApiDetail, deploymentStatuses: ApiDeploymentStatuses, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+@(apiDetail: ApiDetail, deploymentStatuses: ApiDeploymentStatuses, user: Option[UserModel], supportEmailAddress: String)(implicit request: Request[_], messages: Messages)
+
+@supportEmailLink() = {
+    <a href="mailto:@supportEmailAddress" class="govuk-link">@supportEmailAddress</a>
+}
 
 @layout(pageTitle = titleNoForm(messages("myApis.details.title")), user = user, fullWidth = true) {
     <div class="govuk-grid-row">
@@ -56,6 +60,21 @@
                             content = apiDetail.title
                         ),
                     ))))
+
+            <div class="call-out-panel">
+            @if(user.map(_.permissions.canSupport).getOrElse(false)) {
+                <p class="govuk-body">
+                    @messages("myApis.promoteToProd.text")
+                </p>
+                <a href="@controllers.myapis.routes.SimpleApiPromotionController.onPageLoad(apiDetail.id)" class="govuk-button govuk-!-margin-bottom-2">@messages("myApis.promoteToProd.button")</a>
+            } else {
+                <p class="govuk-body govuk-body-s">@Html(messages("myApis.promoteToProd.guidance.main", supportEmailLink()))
+                <ul class="govuk-list govuk-list--bullet govuk-!-margin-left-0">
+                    <li>@messages("myApis.promoteToProd.guidance.item1")</li>
+                    <li>@messages("myApis.promoteToProd.guidance.item2")</li>
+                </ul>
+            }
+            </div>
 
             @apiDeployments(deploymentStatuses)
 
