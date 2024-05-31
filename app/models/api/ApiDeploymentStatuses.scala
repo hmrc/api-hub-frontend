@@ -18,10 +18,7 @@ package models.api
 
 import play.api.libs.json.{Format, Json}
 
-case class ApiDeploymentStatuses (
-  primary: Boolean,
-  secondary: Boolean
-)
+case class ApiDeploymentStatuses(primaryVersion: Option[String], secondaryVersion: Option[String])
 
 object ApiDeploymentStatuses {
   implicit val formatApiDeploymentStatuses: Format[ApiDeploymentStatuses] = Json.format[ApiDeploymentStatuses]

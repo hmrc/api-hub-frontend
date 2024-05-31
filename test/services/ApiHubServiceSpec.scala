@@ -194,7 +194,7 @@ class ApiHubServiceSpec
   "getApiDeploymentStatuses" - {
     "must call the applications connector and return the API detail" in {
       val publisherReference = "ref123"
-      val expected = ApiDeploymentStatuses(true, false)
+      val expected = ApiDeploymentStatuses(Some("1.0"), None)
 
       val fixture = buildFixture()
 
