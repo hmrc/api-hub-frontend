@@ -66,7 +66,7 @@
                 <p class="govuk-body">
                     @messages("myApis.promoteToProd.text")
                 </p>
-                <a class="govuk-button govuk-!-margin-bottom-2">@messages("myApis.promoteToProd.button")</a>
+                <a href="@controllers.myapis.routes.SimpleApiPromotionController.onPageLoad(apiDetail.id)" class="govuk-button govuk-!-margin-bottom-2">@messages("myApis.promoteToProd.button")</a>
             } else {
                 <p class="govuk-body govuk-body-s">@Html(messages("myApis.promoteToProd.guidance.main", supportEmailLink()))
                 <ul class="govuk-list govuk-list--bullet govuk-!-margin-left-0">
