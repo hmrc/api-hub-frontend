@@ -16,10 +16,16 @@
 
 @import models.api._
 @import models.user.UserModel
+@import views.html.components.ApiDeployments
 
-@this(layout: templates.Layout, govukButton: GovukButton, govukSummaryList: GovukSummaryList)
+@this(
+        layout: templates.Layout,
+        govukButton: GovukButton,
+        govukSummaryList: GovukSummaryList,
+        apiDeployments: ApiDeployments
+)
 
-@(apiDetail: ApiDetail, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+@(apiDetail: ApiDetail, deploymentStatuses: ApiDeploymentStatuses, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("myApis.details.title")), user = user, fullWidth = true) {
     <div class="govuk-grid-row">
@@ -50,6 +56,8 @@
                             content = apiDetail.title
                         ),
                     ))))
+
+            @apiDeployments(deploymentStatuses)
 
         </div>
     </div>

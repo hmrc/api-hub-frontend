@@ -476,3 +476,15 @@
     top: 10px;
     left: 10px;
 }
+
+.apiVersionTag {
+    text-transform: uppercase;
+}
+.apiStatusContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.apiStatusContainer strong {
+    width: max-content;
+}

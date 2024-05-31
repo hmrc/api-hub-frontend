@@ -53,7 +53,7 @@ class ApiDetailsControllerSpec
 
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[ApiDetailsView]
-        val apiDeploymentStatuses = ApiDeploymentStatuses(true, false)
+        val apiDeploymentStatuses = ApiDeploymentStatuses(Some("1"), None)
 
         forAll {(apiDetail: ApiDetail) =>
           when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
@@ -80,7 +80,7 @@ class ApiDetailsControllerSpec
 
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[ApiDetailsView]
-        val apiDeploymentStatuses = ApiDeploymentStatuses(true, false)
+        val apiDeploymentStatuses =  ApiDeploymentStatuses(Some("1"), None)
 
         forAll {(apiDetail: ApiDetail) =>
           when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
@@ -159,7 +159,7 @@ class ApiDetailsControllerSpec
 
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[ApiDetailsView]
-        val apiDeploymentStatuses = ApiDeploymentStatuses(true, false)
+        val apiDeploymentStatuses =  ApiDeploymentStatuses(Some("1"), None)
         val team = Team("teamId", "teamName", LocalDateTime.now(), List.empty)
         val apiDetail = sampleApiDetail().copy(teamId = Some(team.id))
 
@@ -189,7 +189,7 @@ class ApiDetailsControllerSpec
 
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[ApiDetailsView]
-        val apiDeploymentStatuses = ApiDeploymentStatuses(true, false)
+        val apiDeploymentStatuses =  ApiDeploymentStatuses(Some("1"), None)
         val apiDetail = sampleApiDetail().copy(teamId = Some("teamId"))
 
         when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))

@@ -801,7 +801,7 @@ class ApplicationsConnectorSpec
   "ApplicationsConnector.getApiDeploymentStatuses" - {
     "must place the correct request and return the response" in {
       val publisherReference = "ref123"
-      val response = Some(ApiDeploymentStatuses(true, false))
+      val response = Some(ApiDeploymentStatuses(Some("1.0"), None))
 
       stubFor(
         get(urlEqualTo(s"/api-hub-applications/apis/$publisherReference/deployment-status"))
