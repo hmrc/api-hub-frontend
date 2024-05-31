@@ -17,6 +17,7 @@
 package controllers.myapis
 
 import base.SpecBase
+import config.FrontendAppConfig
 import controllers.actions.{FakeSupporter, FakeUser}
 import controllers.routes
 import generators.ApiDetailGenerators
@@ -51,6 +52,7 @@ class MyApiDetailsControllerSpec
 
     running(fixture.application) {
       val view = fixture.application.injector.instanceOf[MyApiDetailsView]
+      val config = fixture.application.injector.instanceOf[FrontendAppConfig]
 
       when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any))
         .thenReturn(Future.successful(Some(apiDetail)))
@@ -63,7 +65,8 @@ class MyApiDetailsControllerSpec
       val result = route(fixture.application, request).value
 
       status(result) mustBe OK
-      contentAsString(result) mustBe view(apiDetail, deploymentStatuses, Some(FakeUser))(request, messages(fixture.application)).toString()
+      contentAsString(result) mustBe view(apiDetail, deploymentStatuses, Some(FakeUser),
+        config.supportEmailAddress)(request, messages(fixture.application)).toString()
       contentAsString(result) must validateAsHtml
     }
   }
@@ -75,6 +78,7 @@ class MyApiDetailsControllerSpec
 
     running(fixture.application) {
       val view = fixture.application.injector.instanceOf[MyApiDetailsView]
+      val config = fixture.application.injector.instanceOf[FrontendAppConfig]
 
       when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any))
         .thenReturn(Future.successful(Some(apiDetail)))
@@ -85,7 +89,8 @@ class MyApiDetailsControllerSpec
       val result = route(fixture.application, request).value
 
       status(result) mustBe OK
-      contentAsString(result) mustBe view(apiDetail, deploymentStatuses, Some(FakeSupporter))(request, messages(fixture.application)).toString()
+      contentAsString(result) mustBe view(apiDetail, deploymentStatuses, Some(FakeSupporter),
+        config.supportEmailAddress)(request, messages(fixture.application)).toString()
       contentAsString(result) must validateAsHtml
     }
   }
