@@ -4,4 +4,7 @@ POST    /generate                                           controllers.myapis.S
 GET     /update/:id                                         controllers.myapis.SimpleApiRedeploymentController.onPageLoad(id: String)
 POST    /update/:id                                         controllers.myapis.SimpleApiRedeploymentController.onSubmit(id: String)
 
+GET     /promote/:id                                        controllers.myapis.SimpleApiPromotionController.onPageLoad(id: String)
+POST    /promote/:id                                        controllers.myapis.SimpleApiPromotionController.onSubmit(id: String)
+
 GET     /:id                                                controllers.myapis.MyApiDetailsController.onPageLoad(id: String)

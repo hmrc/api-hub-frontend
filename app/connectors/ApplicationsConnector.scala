@@ -28,7 +28,7 @@ import models.requests.{AddApiRequest, TeamMemberRequest}
 import models.team.{NewTeam, Team}
 import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION, CONTENT_TYPE}
 import play.api.http.MimeTypes.JSON
-import play.api.http.Status.{BAD_GATEWAY, CONFLICT, NOT_FOUND}
+import play.api.http.Status._
 import play.api.libs.json.{JsResultException, Json}
 import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
 import uk.gov.hmrc.http.HttpReads.Implicits._
@@ -257,12 +257,10 @@ class ApplicationsConnector @Inject()(
       .flatMap {
         response =>
           if (is2xx(response.status)) {
-            Future.successful(response.json.as[SuccessfulDeploymentsResponse])
+            handleSuccessfulDeploymentsResponse(response)
           }
-          else if (response.status == 400) {
-            handleBadRequest(response)
-              .map(Future.successful)
-              .getOrElse(Future.failed(UpstreamErrorResponse("Bad request", response.status)))
+          else if (response.status == BAD_REQUEST) {
+            handleInvalidOasResponse(response)
           }
           else {
             Future.failed(UpstreamErrorResponse("Unexpected response", response.status))
@@ -280,17 +278,34 @@ class ApplicationsConnector @Inject()(
       .flatMap {
         response =>
           if (is2xx(response.status)) {
-            response.json.validate[SuccessfulDeploymentsResponse].fold(
-              invalid => Future.failed(JsResultException(invalid)),
-              response => Future.successful(Some(response))
-            )
+            handleSuccessfulDeploymentsResponse(response).map(Some(_))
           }
-          else if (response.status == 400) {
-            handleBadRequest(response)
-              .map(invalidOasResponse => Future.successful(Some(invalidOasResponse)))
-              .getOrElse(Future.failed(UpstreamErrorResponse("Bad request", response.status)))
+          else if (response.status == BAD_REQUEST) {
+            handleInvalidOasResponse(response).map(Some(_))
           }
-          else if (response.status == 404) {
+          else if (response.status == NOT_FOUND) {
+            Future.successful(None)
+          }
+          else {
+            Future.failed(UpstreamErrorResponse("Unexpected response", response.status))
+          }
+      }
+  }
+
+  def promoteToProduction(publisherRef: String)(implicit hc: HeaderCarrier): Future[Option[DeploymentsResponse]] = {
+    httpClient.put(url"$applicationsBaseUrl/api-hub-applications/deployments/$publisherRef/promote")
+      .setHeader(ACCEPT -> JSON)
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[HttpResponse]
+      .flatMap {
+        response =>
+          if (is2xx(response.status)) {
+            handleSuccessfulDeploymentsResponse(response).map(Some(_))
+          }
+          else if (response.status == BAD_REQUEST) {
+            handleInvalidOasResponse(response).map(Some(_))
+          }
+          else if (response.status == NOT_FOUND) {
             Future.successful(None)
           }
           else {
@@ -381,8 +396,15 @@ class ApplicationsConnector @Inject()(
       }
   }
 
-  private def handleBadRequest(response: HttpResponse): Option[InvalidOasResponse] = {
-    if (response.body.isEmpty) {
+  private def handleSuccessfulDeploymentsResponse(response: HttpResponse): Future[SuccessfulDeploymentsResponse] = {
+    response.json.validate[SuccessfulDeploymentsResponse].fold(
+      invalid => Future.failed(JsResultException(invalid)),
+      response => Future.successful(response)
+    )
+  }
+
+  private def handleInvalidOasResponse(response: HttpResponse): Future[InvalidOasResponse] = {
+    (if (response.body.isEmpty) {
       None
     }
     else {
@@ -390,7 +412,9 @@ class ApplicationsConnector @Inject()(
         _ => None,
         response => Some(response)
       )
-    }
+    })
+      .map(invalidOasResponse => Future.successful(invalidOasResponse))
+      .getOrElse(Future.failed(UpstreamErrorResponse("Bad request", response.status)))
   }
 
 }

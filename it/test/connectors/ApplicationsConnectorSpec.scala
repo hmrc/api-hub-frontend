@@ -688,26 +688,19 @@ class ApplicationsConnectorSpec
 
     "must handle a 400 bad Request response with invalid OAS payload" in {
       val request = DeploymentsRequest("test-lob", "test-name", "test-description", "test-egress", "test-team-id", "test-oas", true, "BETA")
-      val response = InvalidOasResponse(
-        FailuresResponse(
-          code = "BAD_REQUEST",
-          reason = "Validation Failed.",
-          errors = Some(Seq(Error("METADATA", """name must match \"^[a-z0-9\\-]+$\"""")))
-        )
-      )
 
       stubFor(
         post(urlEqualTo("/api-hub-applications/deployments"))
           .willReturn(
             aResponse()
               .withStatus(BAD_REQUEST)
-              .withBody(Json.toJson(response).toString())
+              .withBody(Json.toJson(invalidOasResponse).toString())
           )
       )
 
       buildConnector(this).generateDeployment(request)(HeaderCarrier()).map(
         result =>
-          result mustBe response
+          result mustBe invalidOasResponse
       )
     }
   }
@@ -751,26 +744,18 @@ class ApplicationsConnectorSpec
         status = "test-status"
       )
 
-      val response = InvalidOasResponse(
-        FailuresResponse(
-          code = "BAD_REQUEST",
-          reason = "Validation Failed.",
-          errors = Some(Seq(Error("METADATA", """name must match \"^[a-z0-9\\-]+$\"""")))
-        )
-      )
-
       stubFor(
         put(urlEqualTo(s"/api-hub-applications/deployments/$publisherRef"))
           .willReturn(
             aResponse()
               .withStatus(BAD_REQUEST)
-              .withBody(Json.toJson(response).toString())
+              .withBody(Json.toJson(invalidOasResponse).toString())
           )
       )
 
       buildConnector(this).updateDeployment(publisherRef, request)(HeaderCarrier()).map(
         result =>
-          result.value mustBe response
+          result.value mustBe invalidOasResponse
       )
     }
 
@@ -795,6 +780,67 @@ class ApplicationsConnectorSpec
         result =>
           result mustBe None
       )
+    }
+  }
+
+  "ApplicationsConnector.promoteToProduction" - {
+    "must place the correct request and return SuccessfulDeploymentsResponse on success" in {
+      val publisherRef = "test-publisher-ref"
+      val response = SuccessfulDeploymentsResponse("test-id", "1.0.0", 102, "test-url")
+
+      stubFor(
+        put(urlEqualTo(s"/api-hub-applications/deployments/$publisherRef/promote"))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
+          .willReturn(
+            aResponse()
+              .withBody(Json.toJson(response).toString())
+          )
+      )
+
+      buildConnector(this).promoteToProduction(publisherRef)(HeaderCarrier()).map {
+        result =>
+          result.value mustBe response
+      }
+    }
+
+    "must return InvalidOasResponse on failure" in {
+      val publisherRef = "test-publisher-ref"
+
+      stubFor(
+        put(urlEqualTo(s"/api-hub-applications/deployments/$publisherRef/promote"))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
+          .willReturn(
+            aResponse()
+              .withStatus(BAD_REQUEST)
+              .withBody(Json.toJson(invalidOasResponse).toString())
+          )
+      )
+
+      buildConnector(this).promoteToProduction(publisherRef)(HeaderCarrier()).map {
+        result =>
+          result.value mustBe invalidOasResponse
+      }
+    }
+
+    "must return None when the service cannot be found" in {
+      val publisherRef = "test-publisher-ref"
+
+      stubFor(
+        put(urlEqualTo(s"/api-hub-applications/deployments/$publisherRef/promote"))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+          )
+      )
+
+      buildConnector(this).promoteToProduction(publisherRef)(HeaderCarrier()).map {
+        result =>
+          result mustBe None
+      }
     }
   }
 
@@ -1100,6 +1146,14 @@ object ApplicationsConnectorSpec extends HttpClientV2Support {
     Seq(TeamMember(FakeUser.email.get)),
     Environments(),
     Seq.empty
+  )
+
+  val invalidOasResponse: InvalidOasResponse = InvalidOasResponse(
+    FailuresResponse(
+      code = "BAD_REQUEST",
+      reason = "Validation Failed.",
+      errors = Some(Seq(Error("METADATA", """name must match \"^[a-z0-9\\-]+$\"""")))
+    )
   )
 
   trait ApplicationGetterBehaviours {
