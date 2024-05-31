@@ -17,15 +17,17 @@
 package controllers.myapis
 
 import com.google.inject.{Inject, Singleton}
+import connectors.ApplicationsConnector
 import controllers.actions.{AuthorisedSupportAction, IdentifierAction}
 import controllers.helpers.ErrorResultBuilder
-import play.api.i18n.{I18nSupport, Messages}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
+import models.deployment.{InvalidOasResponse, SuccessfulDeploymentsResponse}
+import play.api.i18n.I18nSupport
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.myapis.SimpleApiPromotionView
+import views.html.myapis.{DeploymentFailureView, DeploymentSuccessView, SimpleApiPromotionView}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class SimpleApiPromotionController @Inject()(
@@ -34,30 +36,41 @@ class SimpleApiPromotionController @Inject()(
   isSupport: AuthorisedSupportAction,
   apiHubService: ApiHubService,
   view: SimpleApiPromotionView,
-  errorResultBuilder: ErrorResultBuilder
+  successView: DeploymentSuccessView,
+  failureView: DeploymentFailureView,
+  errorResultBuilder: ErrorResultBuilder,
+  applicationsConnector: ApplicationsConnector
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(id: String): Action[AnyContent] = (identify andThen isSupport).async {
     implicit request =>
       apiHubService.getApiDetail(id).map {
         case Some(apiDetail) => Ok(view(apiDetail, request.user))
-        case None => notFound(id)
+        case None => errorResultBuilder.apiNotFound(id)
       }
   }
 
   def onSubmit(id: String): Action[AnyContent] = (identify andThen isSupport).async {
     implicit request =>
-      apiHubService.getApiDetail(id).map {
-        case Some(apiDetail) => Ok
-        case None => notFound(id)
+      apiHubService.getApiDetail(id).flatMap {
+        case Some(apiDetail) =>
+          applicationsConnector.promoteToProduction(apiDetail.publisherReference).map {
+            case Some(response: SuccessfulDeploymentsResponse) =>
+              Ok(successView(request.user, response))
+            case Some(response: InvalidOasResponse) =>
+              BadRequest(
+                failureView(
+                  request.user,
+                  response.failure,
+                  controllers.myapis.routes.SimpleApiPromotionController.onPageLoad(id).url
+                )
+              )
+            case None =>
+              errorResultBuilder.apiNotFoundInApim(apiDetail)
+          }
+        case None =>
+          Future.successful(errorResultBuilder.apiNotFound(id))
       }
-  }
-
-  private def notFound(id: String)(implicit request: Request[_]): Result = {
-    errorResultBuilder.notFound(
-      Messages("site.apiNotFound.heading"),
-      Messages("site.apiNotFound.message", id)
-    )
   }
 
 }
