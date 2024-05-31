@@ -147,7 +147,7 @@ class SimpleApiPromotionControllerSpec
         val request = FakeRequest(controllers.myapis.routes.SimpleApiPromotionController.onSubmit(FakeApiDetail.id))
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[DeploymentFailureView]
-        val returnUrl = controllers.myapis.routes.SimpleApiPromotionController.onPageLoad(FakeApiDetail.id).url
+        val returnUrl = controllers.myapis.routes.MyApiDetailsController.onPageLoad(FakeApiDetail.id).url
 
         status(result) mustBe BAD_REQUEST
         contentAsString(result) mustBe view(FakeSupporter, response.failure, returnUrl)(request, messages(fixture.playApplication)).toString()

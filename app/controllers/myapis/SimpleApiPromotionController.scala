@@ -62,7 +62,7 @@ class SimpleApiPromotionController @Inject()(
                 failureView(
                   request.user,
                   response.failure,
-                  controllers.myapis.routes.SimpleApiPromotionController.onPageLoad(id).url
+                  controllers.myapis.routes.MyApiDetailsController.onPageLoad(id).url
                 )
               )
             case None =>
