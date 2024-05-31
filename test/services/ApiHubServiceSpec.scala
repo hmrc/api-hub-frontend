@@ -224,6 +224,49 @@ class ApiHubServiceSpec
     }
   }
 
+  "getUserApis" - {
+    val email = "test@hmrc.gov.uk"
+    "must call the applications and integration catalogue connectors and return some API details when user has teams" in {
+      val expected = Seq(sampleApiDetail())
+
+      val fixture = buildFixture()
+
+      when(fixture.integrationCatalogueConnector.filterApis(ArgumentMatchers.eq(Seq(email)))(any()))
+        .thenReturn(Future.successful(expected))
+
+      when(fixture.applicationsConnector.findTeams(ArgumentMatchers.eq(Some(email)))(any()))
+        .thenReturn(Future.successful(Seq(Team("teamId1", "Team 1", LocalDateTime.now(), Seq.empty))))
+
+      when(fixture.integrationCatalogueConnector.filterApis(ArgumentMatchers.eq(Seq("teamId1")))(any()))
+        .thenReturn(Future.successful(expected))
+
+      fixture.service.getUserApis(TeamMember(email))(HeaderCarrier(), executionContext) map {
+        actual => {
+          verify(fixture.applicationsConnector).findTeams(ArgumentMatchers.eq(Some(email)))(any())
+          verify(fixture.integrationCatalogueConnector).filterApis(ArgumentMatchers.eq(Seq("teamId1")))(any())
+          actual mustBe expected
+        }
+      }
+    }
+
+    "must not call integration catalogue connector and return empty list if user has no teams" in {
+      val expected = Seq.empty
+
+      val fixture = buildFixture()
+
+      when(fixture.applicationsConnector.findTeams(ArgumentMatchers.eq(Some(email)))(any()))
+        .thenReturn(Future.successful(Seq.empty))
+
+      fixture.service.getUserApis(TeamMember(email))(HeaderCarrier(), executionContext) map {
+        actual => {
+          verify(fixture.applicationsConnector).findTeams(ArgumentMatchers.eq(Some(email)))(any())
+          verifyZeroInteractions(fixture.integrationCatalogueConnector)
+          actual mustBe expected
+        }
+      }
+    }
+  }
+
   "addApi" - {
     "must call the applications connector with correct request and return something" in {
       val fixture = buildFixture()
