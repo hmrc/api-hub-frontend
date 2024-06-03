@@ -13,6 +13,8 @@ describe('hipApisStatusFilters', () => {
                 <input class="govuk-checkboxes__input" type="checkbox" value="LIVE">
                 <input class="govuk-checkboxes__input" type="checkbox" value="DEPRECATED">                
             </div>
+            <div id="statusFilterCount"></div>
+            <details id="viewStatusFilters"><summary></summary></details>            
         `));
         document = dom.window.document;
         globalThis.document = document;
@@ -20,32 +22,77 @@ describe('hipApisStatusFilters', () => {
         statusFilters = buildStatusFilters();
     });
 
-    it("after initialisation clicking a checkbox triggers the onChange handler",  () => {
-        let changeCount = 0;
-        statusFilters.onChange(() => changeCount++);
+    describe("initialise", () => {
+        it("after initialisation clicking a checkbox triggers the onChange handler", () => {
+            let changeCount = 0;
+            statusFilters.onChange(() => changeCount++);
 
-        const elCheckbox = document.querySelector('.govuk-checkboxes__input');
+            const elCheckbox = document.querySelector('.govuk-checkboxes__input');
 
-        elCheckbox.click();
-        expect(changeCount).toBe(0);
+            elCheckbox.click();
+            expect(changeCount).toBe(0);
 
-        statusFilters.initialise();
+            statusFilters.initialise();
 
-        elCheckbox.click();
-        expect(changeCount).toBe(1);
+            elCheckbox.click();
+            expect(changeCount).toBe(1);
+        });
+
+        it("if no statuses are selected then the status filter section is collapsed",  () => {
+            statusFilters.initialise();
+            expect(document.getElementById('viewStatusFilters').open).toBe(false);
+        });
+
+        it("if statuses are selected then the status filter section is open",  () => {
+            document.querySelector('[value="ALPHA"]').click();
+            statusFilters.initialise();
+            expect(document.getElementById('viewStatusFilters').open).toBe(true);
+        });
+
+        it("if no statuses are selected then the status filter count is zero",  () => {
+            statusFilters.initialise();
+            expect(document.getElementById('statusFilterCount').textContent).toBe('0');
+        });
+
+        it("if statuses are selected then the status filter count is the number of selected statuses",  () => {
+            document.querySelector('[value="ALPHA"]').click();
+            document.querySelector('[value="BETA"]').click();
+            statusFilters.initialise();
+            expect(document.getElementById('statusFilterCount').textContent).toBe('2');
+        });
+
     });
 
-    it("clear() unchecks all checkboxes",  () => {
-        const elCheckboxes = document.querySelectorAll('.govuk-checkboxes__input');
-        elCheckboxes.forEach(el => {
-            el.checked = true;
+    describe("clear", () => {
+        beforeEach(() => {
+            statusFilters.initialise();
         });
 
-        statusFilters.clear();
+        it("unchecks all checkboxes", () => {
+            const elCheckboxes = document.querySelectorAll('.govuk-checkboxes__input');
+            elCheckboxes.forEach(el => {
+                el.checked = true;
+            });
 
-        elCheckboxes.forEach(el => {
-            expect(el.checked).toBe(false);
+            statusFilters.clear();
+
+            elCheckboxes.forEach(el => {
+                expect(el.checked).toBe(false);
+            });
         });
+
+        it("collapses the status filter section",  () => {
+            document.getElementById('viewStatusFilters').setAttribute('open', 'open');
+            statusFilters.clear();
+            expect(document.getElementById('viewStatusFilters').open).toBe(false);
+        });
+
+        it("sets the status filter count to zero",  () => {
+            document.querySelector('[value="ALPHA"]').click();
+            statusFilters.clear();
+            expect(document.getElementById('statusFilterCount').textContent).toBe('0');
+        });
+
     });
 
     describe('the filter function', () => {

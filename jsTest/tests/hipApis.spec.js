@@ -49,6 +49,8 @@ describe('hipApis', () => {
             <details id="viewDomainFilters"><summary></summary></details>
             <div id="hodFilterCount"></div>
             <details id="viewHodFilters"><summary></summary></details>
+            <div id="statusFilterCount"></div>
+            <details id="viewStatusFilters"><summary></summary></details>
         `));
         document = dom.window.document;
         globalThis.document = document;
