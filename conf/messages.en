@@ -308,6 +308,8 @@ hipApis.filter.noResults.clearFilters = Clear filters
 hipApis.filter.byHods = Filter by HoD/Backend
 hipApis.filter.byHods.view = View HoD/Backend filters
 hipApis.filter.byName = Filter by API name
+hipApis.filter.byStatus = Filter by status
+hipApis.filter.byStatus.view = View status filters
 
 support.link.text = Get Support
 support.title = Get Support
