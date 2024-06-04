@@ -20,25 +20,23 @@
 @(title: String, navItems: Seq[SideNavItem])(contentBlock: Html)(implicit request: Request[_], messages: Messages)
 
 <div class="govuk-grid-row">
-    <div id="navContent" class="govuk-grid-column-one-quarter sidebar">
-        <div class="theiaStickySidebar">
-            <div class="side-nav">
-                <span class="govuk-heading-s govuk-!-margin-bottom-1 govuk-!-margin-top-2">
-                    @title
-                </span>
+    <div id="navContent" class="govuk-grid-column-one-quarter sidebar stickySideMenu">
+        <div class="side-nav">
+            <span class="govuk-heading-s govuk-!-margin-bottom-1 govuk-!-margin-top-2">
+                @title
+            </span>
 
-                <ul class="side-nav__component">
-                    @for(navItem <- navItems) {
-                    <li class="side-nav__list  @if(navItem.isCurrentPage){side-nav__list--selected}">
-                        <a class="side-nav__link" href="@navItem.link.url">
-                            @navItem.title
-                        </a>
-                    </li>
-                    }
-                </ul>
+            <ul class="side-nav__component">
+                @for(navItem <- navItems) {
+                <li class="side-nav__list  @if(navItem.isCurrentPage){side-nav__list--selected}">
+                    <a class="side-nav__link" href="@navItem.link.url">
+                        @navItem.title
+                    </a>
+                </li>
+                }
+            </ul>
 
-                <br>
-            </div>
+            <br>
         </div>
     </div>
 
@@ -46,15 +44,3 @@
         @contentBlock
     </div>
 </div>
-
-<script src='@controllers.routes.Assets.versioned("javascripts/jquery-3.7.1.min.js")' @CSPNonce.attr></script>
-<script src='@controllers.routes.Assets.versioned("javascripts/theia-sticky-sidebar.min.js")' @CSPNonce.attr></script>
-
-<script type="text/javascript" @CSPNonce.attr>
-  jQuery(document).ready(function() {
-    jQuery('.content, .sidebar').theiaStickySidebar({
-      // Settings
-      additionalMarginTop: 30
-    });
-  });
-</script>
