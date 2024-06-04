@@ -17,7 +17,6 @@
 @import models.api._
 @import models.user.UserModel
 @import views.html.components.ApiDeployments
-@import views.html.helper.CSPNonce
 
 @this(
         layout: templates.Layout,
@@ -52,216 +51,190 @@
 @layout(pageTitle = titleNoForm(messages("apiDetails.title")), user = user, fullWidth = true) {
 
     <div class="govuk-grid-row">
-        <div id="navContent" class="govuk-grid-column-one-quarter sidebar">
-            <div class="theiaStickySidebar">
-                <div class="side-nav">
-                    <ul class="side-nav__component">
-                        <li class="side-nav__list">
-                            <a class="side-nav__link" href="#details">
-                                @messages("apiDetails.leftNav.details")
-                            </a>
-                        </li>
+        <div id="navContent" class="govuk-grid-column-one-quarter sidebar stickySideMenu">
+            <div class="side-nav">
+                <ul class="side-nav__component">
+                    <li class="side-nav__list">
+                        <a class="side-nav__link" href="#details">
+                            @messages("apiDetails.leftNav.details")
+                        </a>
+                    </li>
 
-                        <li>
-                            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-                        </li>
+                    <li>
+                        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+                    </li>
 
-                        <li class="side-nav__list">
-                            <a href="#@messages("apiDetails.leftNav.endpoints")" class="side-nav__link">@messages("apiDetails.leftNav.endpoints")</a>
-                        </li>
+                    <li class="side-nav__list">
+                        <a href="#@messages("apiDetails.leftNav.endpoints")" class="side-nav__link">@messages("apiDetails.leftNav.endpoints")</a>
+                    </li>
 
-                        <li>
-                            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-                        </li>
+                    <li>
+                        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+                    </li>
 
-                        <li class="side-nav__list">
-                            <a href="@routes.OasRedocController.onPageLoad(apiDetail.id).url" target="_blank" class="side-nav__link">
-                                @messages("apiDetails.leftNav.viewApiSpec")
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+                    <li class="side-nav__list">
+                        <a href="@routes.OasRedocController.onPageLoad(apiDetail.id).url" target="_blank" class="side-nav__link">
+                            @messages("apiDetails.leftNav.viewApiSpec")
+                        </a>
+                    </li>
+                </ul>
             </div>
         </div>
 
         <div class="govuk-grid-column-two-thirds content">
-            <div class="theiaStickySidebar">
+            <h1 id="details" class="govuk-heading-l">@messages("apiDetails.apiName"): @apiDetail.title</h1>
 
-                <h1 id="details" class="govuk-heading-l">@messages("apiDetails.apiName"): @apiDetail.title</h1>
+            <h2 class="govuk-heading-m">
+                @messages("apiDetails.details.overview")
+            </h2>
 
-                <h2 class="govuk-heading-m">
-                    @messages("apiDetails.details.overview")
-                </h2>
+            <p class="govuk-body">
+                @apiDetail.shortDescription
+            </p>
 
-                <p class="govuk-body">
-                    @apiDetail.shortDescription
-                </p>
-
-                @if(user.isDefined) {
-                    @govukButton(
-                        Button(
-                            href = Some(routes.AddAnApiStartController.addAnApi(apiDetail.id).url),
-                            content = Text(messages("apiDetails.addToAnApplication"))
-                        )
+            @if(user.isDefined) {
+                @govukButton(
+                    Button(
+                        href = Some(routes.AddAnApiStartController.addAnApi(apiDetail.id).url),
+                        content = Text(messages("apiDetails.addToAnApplication"))
                     )
-                }
-                <dl class="govuk-summary-list govuk-!-margin-bottom-7">
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">
-                            @messages("apiDetails.details.version")
-                        </dt>
-                        <dd class="govuk-summary-list__value">
-                            @apiDetail.version
-                        </dd>
-                    </div>
-
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">
-                            @messages("apiDetails.details.status")
-                        </dt>
-                        <dd class="govuk-summary-list__value">
-                            <strong class="govuk-tag @styleForApiStatus(apiDetail.apiStatus) apiStatusTag">
-                                @apiDetail.apiStatus
-                            </strong>
-                        </dd>
-                    </div>
-
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">
-                            @messages("apiDetails.details.domain")
-                        </dt>
-                        <dd class="govuk-summary-list__value">
-                            @if(domain.isDefined) {
-                                <strong class="govuk-tag govuk-tag--grey domainTag">
-                                    @domain
-                                </strong>
-                            } else {
-                                @messages("apiDetails.details.notSpecified")
-                            }
-                        </dd>
-                    </div>
-
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">
-                            @messages("apiDetails.details.subDomain")
-                        </dt>
-                        <dd class="govuk-summary-list__value">
-                            @if(subDomain.isDefined) {
-                                <strong class="govuk-tag govuk-tag--grey subDomainTag">
-                                    @subDomain
-                                </strong>
-                            } else {
-                                @messages("apiDetails.details.notSpecified")
-                            }
-                        </dd>
-                    </div>
-
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">
-                            @messages("apiDetails.details.hods")
-                        </dt>
-                        <dd class="govuk-summary-list__value">
-                            @if(apiDetail.hods.nonEmpty) {
-                                @Html(
-                                    apiDetail.hods.map( hod =>
-                                        s"<strong class='govuk-tag govuk-tag--grey hodTag'>$hod</strong>"
-                                    ).mkString(" ")
-                                )
-                            } else {
-                                @messages("apiDetails.details.notSpecified")
-                            }
-                        </dd>
-                    </div>
-
-                    @if(teamName.isDefined) {
-                        <div class="govuk-summary-list__row">
-                            <dt class="govuk-summary-list__key">
-                                @messages("apiDetails.details.team")
-                            </dt>
-                            <dd class="govuk-summary-list__value">
-                                @teamName.get
-                            </dd>
-                        </div>
-                    }
-
-                </dl>
-
-                <div class="call-out-panel govuk-!-margin-top-4">
-                    <p class="govuk-body information-tag">
-                        <i class="fa-solid fa-circle-info information"></i>
-                        <span class="call-out-type information">
-                            @messages("apiDetails.viewApiSpec.information")
-                        </span>
-                    </p>
-                    <p class="govuk-body additional-message">
-                        @Html(
-                            messages(
-                                "apiDetails.viewApiSpec.message",
-                                viewApiSpecLink()
-                            )
-                        )
-                    </p>
+                )
+            }
+            <dl class="govuk-summary-list govuk-!-margin-bottom-7">
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        @messages("apiDetails.details.version")
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        @apiDetail.version
+                    </dd>
                 </div>
 
-                <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-6 govuk-!-margin-top-0">
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        @messages("apiDetails.details.status")
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        <strong class="govuk-tag @styleForApiStatus(apiDetail.apiStatus) apiStatusTag">
+                            @apiDetail.apiStatus
+                        </strong>
+                    </dd>
+                </div>
 
-                @apiDeployments(deploymentStatuses)
-
-                <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-6 govuk-!-margin-top-0">
-
-                <h2 class="govuk-heading-m" id="@messages("apiDetails.endpoints.heading")">
-                    @messages("apiDetails.endpoints.heading")
-                </h2>
-
-                @apiDetail.endpoints.zipWithIndex.map {case (endpoint, index) =>
-                    @if(index > 0) {
-                        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-bottom-6 govuk-!-margin-top-0">
-                    }
-
-                    <section id="@endpointName(endpoint)" class="govuk-!-padding-top-5">
-                        @for(method <- endpoint.methods) {
-                            <strong class="govuk-tag govuk-tag--green">@method.httpMethod</strong>
-
-                            <code class="code--header"><strong class="bold-xsmall">@endpoint.path</strong></code>
-
-                            @if(method.summary.isDefined) {
-                                <strong class="govuk-heading-s govuk-!-margin-bottom-4 govuk-!-margin-top-5">@messages("apiDetails.endpoints.summary")</strong>
-                                <p class="govuk-body">
-                                    @method.summary.getOrElse("")
-                                </p>
-                            }
-
-                            @if(method.description.isDefined) {
-                                <strong class="govuk-heading-s govuk-!-margin-bottom-4 govuk-!-margin-top-5">@messages("apiDetails.endpoints.description")</strong>
-                                <p class="govuk-body">
-                                    @method.description.getOrElse("")
-                                </p>
-                            }
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        @messages("apiDetails.details.domain")
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        @if(domain.isDefined) {
+                            <strong class="govuk-tag govuk-tag--grey domainTag">
+                                @domain
+                            </strong>
+                        } else {
+                            @messages("apiDetails.details.notSpecified")
                         }
-                    </section>
+                    </dd>
+                </div>
+
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        @messages("apiDetails.details.subDomain")
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        @if(subDomain.isDefined) {
+                            <strong class="govuk-tag govuk-tag--grey subDomainTag">
+                                @subDomain
+                            </strong>
+                        } else {
+                            @messages("apiDetails.details.notSpecified")
+                        }
+                    </dd>
+                </div>
+
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        @messages("apiDetails.details.hods")
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        @if(apiDetail.hods.nonEmpty) {
+                            @Html(
+                                apiDetail.hods.map( hod =>
+                                    s"<strong class='govuk-tag govuk-tag--grey hodTag'>$hod</strong>"
+                                ).mkString(" ")
+                            )
+                        } else {
+                            @messages("apiDetails.details.notSpecified")
+                        }
+                    </dd>
+                </div>
+
+                @if(teamName.isDefined) {
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            @messages("apiDetails.details.team")
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            @teamName.get
+                        </dd>
+                    </div>
                 }
+
+            </dl>
+
+            <div class="call-out-panel govuk-!-margin-top-4">
+                <p class="govuk-body information-tag">
+                    <i class="fa-solid fa-circle-info information"></i>
+                    <span class="call-out-type information">
+                        @messages("apiDetails.viewApiSpec.information")
+                    </span>
+                </p>
+                <p class="govuk-body additional-message">
+                    @Html(
+                        messages(
+                            "apiDetails.viewApiSpec.message",
+                            viewApiSpecLink()
+                        )
+                    )
+                </p>
             </div>
+
+            <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-6 govuk-!-margin-top-0">
+
+            @apiDeployments(deploymentStatuses)
+
+            <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-6 govuk-!-margin-top-0">
+
+            <h2 class="govuk-heading-m" id="@messages("apiDetails.endpoints.heading")">
+                @messages("apiDetails.endpoints.heading")
+            </h2>
+
+            @apiDetail.endpoints.zipWithIndex.map {case (endpoint, index) =>
+                @if(index > 0) {
+                    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-bottom-6 govuk-!-margin-top-0">
+                }
+
+                <section id="@endpointName(endpoint)" class="govuk-!-padding-top-5">
+                    @for(method <- endpoint.methods) {
+                        <strong class="govuk-tag govuk-tag--green">@method.httpMethod</strong>
+
+                        <code class="code--header"><strong class="bold-xsmall">@endpoint.path</strong></code>
+
+                        @if(method.summary.isDefined) {
+                            <strong class="govuk-heading-s govuk-!-margin-bottom-4 govuk-!-margin-top-5">@messages("apiDetails.endpoints.summary")</strong>
+                            <p class="govuk-body">
+                                @method.summary.getOrElse("")
+                            </p>
+                        }
+
+                        @if(method.description.isDefined) {
+                            <strong class="govuk-heading-s govuk-!-margin-bottom-4 govuk-!-margin-top-5">@messages("apiDetails.endpoints.description")</strong>
+                            <p class="govuk-body">
+                                @method.description.getOrElse("")
+                            </p>
+                        }
+                    }
+                </section>
+            }
         </div>
     </div>
-
-    <script src='@controllers.routes.Assets.versioned("javascripts/jquery-3.7.1.min.js")' @CSPNonce.attr></script>
-    <script src='@controllers.routes.Assets.versioned("javascripts/theia-sticky-sidebar.min.js")' @CSPNonce.attr></script>
-
-    <script type="text/javascript" @CSPNonce.attr>
-        $(document).ready(function() {
-            $('.content, .sidebar').theiaStickySidebar({
-                // Settings
-                additionalMarginTop: 30
-            });
-        });
-
-        $(document).on('click', 'a[href^="#"]', function (event) {
-            event.preventDefault();
-
-            $('html, body').animate({
-                scrollTop: $($.attr(this, 'href')).offset().top
-            }, 500);
-        });
-    </script>
-
 }
