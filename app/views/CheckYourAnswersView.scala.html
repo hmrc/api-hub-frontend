@@ -43,7 +43,7 @@
 
     @formHelper(action = routes.RegisterApplicationController.create()) {
         @govukButton(
-            ButtonViewModel(messages("checkYourAnswers.registerApplication"))
+            ButtonViewModel(messages("checkYourAnswers.registerApplication")).withId("registerApplicationButton")
         )
     }
 

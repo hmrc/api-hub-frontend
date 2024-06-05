@@ -51,7 +51,8 @@
 @layout(pageTitle = titleNoForm(messages("requestProductionAccessSuccess.title")), user = user, showBackLink = false) {
     @govukPanel(Panel(
         title = Text(messages("requestProductionAccessSuccess.heading")),
-        classes = "govuk-panel--warning hip-panel--secondary-success"
+        classes = "govuk-panel--warning hip-panel--secondary-success",
+        attributes = Map("id" -> "successHeading")
     ))
 
     @govukSummaryList(SummaryList(

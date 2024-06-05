@@ -28,13 +28,13 @@
 
 @(application: Application, maybeApplicationApis: Option[Seq[ApplicationApi]], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
-@applicationDetail(titleKey: String, value: String, classes: String) = {
+@applicationDetail(id: String, titleKey: String, value: String, classes: String) = {
     <div class="govuk-grid-row govuk-!-margin-bottom-2">
         <div class="govuk-grid-column-one-quarter">
             <span class="govuk-body govuk-!-font-weight-bold govuk-!-margin-0">@messages(titleKey):</span>
         </div>
         <div class="govuk-grid-column-three-quarters" data-app-name="">
-            <p class="govuk-body govuk-!-margin-0 @classes">
+            <p id = "@id" class="govuk-body govuk-!-margin-0 @classes">
                 @value
             </p>
         </div>
@@ -42,7 +42,7 @@
 }
 
 @hipApisLink(messageId: String) = {
-    <a href="@{routes.HipApisController.onPageLoad().url}" class="govuk-link govuk-link--no-visited-state">
+    <a id="addHipApisLink" href="@{routes.HipApisController.onPageLoad().url}" class="govuk-link govuk-link--no-visited-state">
         @messages(messageId)
     </a>
 }
@@ -59,9 +59,9 @@
 
         <h1 class="govuk-heading-l">@messages("applicationDetails.heading")</h1>
 
-        @applicationDetail("applicationDetails.application.application", application.name, "")
-        @applicationDetail("applicationDetails.application.created", ViewUtils.formatLocalDateTimeContainingUtc(application.created), "utcDateLong")
-        @applicationDetail("applicationDetails.application.applicationId", application.id, "")
+        @applicationDetail("applicationName", "applicationDetails.application.application", application.name, "")
+        @applicationDetail("applicationCreated", "applicationDetails.application.created", ViewUtils.formatLocalDateTimeContainingUtc(application.created), "utcDateLong")
+        @applicationDetail("applicationId", "applicationDetails.application.applicationId", application.id, "")
 
         <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
 
@@ -102,7 +102,7 @@
                 </p>
 
             } else if(maybeApplicationApis.exists(_.isEmpty)) {
-                <p class="govuk-body">
+                <p id="noApisMessage" class="govuk-body">
                     @Html(messages("applicationDetails.apis.noApis", hipApisLink("applicationDetails.apis.hipApis")))
                 </p>
 
@@ -136,7 +136,7 @@
                             rows = applicationApis.map(
                                 applicationApi=>
                                     Seq(
-                                        TableRow(content = applicationApi.apiDetail.title),
+                                        TableRow(content = applicationApi.apiDetail.title, attributes = Map("data-api-id" -> applicationApi.apiDetail.id)),
                                         TableRow(content = messages("applicationDetails.apis.endpointsAvailable", applicationApi.availableSecondaryEndpoints, applicationApi.totalEndpoints)),
                                         TableRow(content = messages("applicationDetails.apis.endpointsAvailable", applicationApi.availablePrimaryEndpoints, applicationApi.totalEndpoints))
                                     )
@@ -155,7 +155,7 @@
 
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-one-half">
-                <h2 class="govuk-heading-m govuk-!-margin-top-2">
+                <h2 id="teamMembersHeading" class="govuk-heading-m govuk-!-margin-top-2">
                     @messages("applicationDetails.teamMembers.heading", application.teamMembers.size)
                 </h2>
             </div>
@@ -167,7 +167,10 @@
                 head = Some(Seq(HeadCell(messages("applicationDetails.teamMembers.emailAddress")))),
                 rows = application.teamMembers.map(
                     teamMember =>
-                        Seq(TableRow(content = teamMember.email))
+                        Seq(TableRow(
+                            content = teamMember.email,
+                            attributes = Map("data-team-member-email" -> teamMember.email)
+                        ))
                 )
             )
         )

@@ -29,7 +29,7 @@
     user = user
 ) {
 
-    <h1 class="govuk-heading-xl">@messages("serviceStart.heading")</h1>
+    <h1 class="govuk-heading-xl" id="serviceStartHeading">@messages("serviceStart.heading")</h1>
 
     <p class="govuk-body">@messages("serviceStart.introduction")</p>
 
@@ -70,6 +70,7 @@
     </ul>
 
     @govukButton(Button(
+        id = Some("startNowButton"),
         href = Some(routes.IndexController.onPageLoad.url),
         isStartButton = true,
         content = Text(messages("site.start")),

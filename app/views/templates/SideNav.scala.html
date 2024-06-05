@@ -28,11 +28,11 @@
 
             <ul class="side-nav__component">
                 @for(navItem <- navItems) {
-                <li class="side-nav__list  @if(navItem.isCurrentPage){side-nav__list--selected}">
-                    <a class="side-nav__link" href="@navItem.link.url">
-                        @navItem.title
-                    </a>
-                </li>
+                    <li class="side-nav__list  @if(navItem.isCurrentPage){side-nav__list--selected}">
+                        <a class="side-nav__link" href="@navItem.link.url" data-nav-item-page="@navItem.page.toString">
+                            @navItem.title
+                        </a>
+                    </li>
                 }
             </ul>
 

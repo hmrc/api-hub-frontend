@@ -109,7 +109,8 @@
                             application =>
                                 RadioItem(
                                     content = Text(application.name),
-                                    value = Some(application.id)
+                                    value = Some(application.id),
+                                    attributes = Map("data-application-id" -> application.id)
                                 )
                         ),
                         fieldset = Fieldset(
@@ -151,7 +152,7 @@
             }
 
             @govukButton(
-                ButtonViewModel(messages("site.continue"))
+                ButtonViewModel(messages("site.continue")).withId("continueButton")
             )
         }
     }

@@ -40,7 +40,7 @@
 
     @formHelper(action = routes.AddAnApiCompleteController.addApi(context)) {
         @govukButton(
-            ButtonViewModel(messages("site.continue")).withCssClass("govuk-!-margin-top-5")
+            ButtonViewModel(messages("site.continue")).withCssClass("govuk-!-margin-top-5").withId("continueButton")
         )
     }
 
