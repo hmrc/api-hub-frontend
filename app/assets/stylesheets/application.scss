@@ -1,0 +1,566 @@
+// Palette
+$white: #ffffff;
+$off-white: #fbfbfb;
+$light-grey: #f3f2f1;
+$light-mid-grey: #ebebeb;
+$grey: #bfc1c3;
+$mid-grey: #b1b4b6;
+$dark-grey: #505a5f;
+$yellow: #ffbf47;
+$orange: #f47738;
+$red: #d4351c;
+$green: #00703c;
+$blue: #1d70b8;
+$mid-blue: #005ea5;
+$dark-blue: #003078;
+$purple: #4c2c92;
+$black: #0b0c0c;
+
+// Colour mapping
+$hip-card-border: $mid-grey;
+$hip-card-border-dark: $dark-grey;
+$hip-card-background: $light-grey;
+$hip-inner-card-background: $white;
+$panel-background: $off-white;
+$filter-separator-color: $light-mid-grey;
+$api-panel-border-color: $light-mid-grey;
+$call-out-list-item-background: $light-mid-grey;
+$call-out-panel-border-color: $light-mid-grey;
+$focus-color: $yellow;
+$warning-color: $orange;
+$error-color: $red;
+$ready-color: $green;
+$search-button-background: $blue;
+$side-nav-visited-link-color: $blue;
+$search-button-background: $blue;
+$search-button-text: $white;
+$side-nav-right-border: $grey;
+$side-nav-selected-color: $white;
+$side-nav-selected-background: $mid-blue;
+$side-nav-hover-color: $dark-blue;
+$info-color: $purple;
+$code-border: $grey;
+$code-background: $light-grey;
+$input-text-border: $black;
+$input-text-background: $white;
+
+.js-visible {
+    display: none !important;
+}
+
+.js-enabled .js-visible {
+    display: inline-block !important;
+}
+
+.custom-bottom-padding {
+    padding-bottom: 140px !important;
+    padding-top: 80px !important;
+}
+
+.custom-flex-container {
+    display: flex;
+    justify-content: space-between;
+    padding-left: 7%;
+    padding-right: 7%;
+    flex-wrap: wrap;
+}
+
+.hip-card-container .hip-card-container-top {
+    padding: 30px;
+    border-bottom: solid 1px $hip-card-border;
+}
+
+.hipp-card {
+    background-color: $hip-card-background;
+    border: solid 1px $hip-card-border-dark;
+    padding: 24px;
+    width: 30%;
+    min-width: 300px;
+    height: 380px;
+    margin-top: 16px;
+}
+
+.hip-card-header {
+    margin-top: 20px;
+    margin-left: 30px;
+    margin-bottom: 0px;
+}
+
+.hip-inner-card {
+    padding: 10px 20px;
+    background-color: $hip-inner-card-background;
+    border-bottom: solid 2px $hip-card-border;
+    border-radius: 4px;
+    border-top: solid 1px $hip-card-border;
+    border-left: solid 1px $hip-card-border;
+    border-right: solid 1px $hip-card-border;
+    margin-top: 0px;
+    margin-bottom: 12px;
+    display: flex;
+    flex-wrap: wrap;
+
+    h3, p {
+        margin-bottom: 0px !important;
+        word-wrap: break-word;
+        flex: 1;
+    }
+
+    strong {
+        font-size: 14px;
+    }
+
+    .left {
+        width: 65%;
+        float: left;
+    }
+
+    .right {
+        width: 30%;
+        float: right;
+        text-align: right;
+    }
+
+    .body {
+        padding-top: 8px;
+        padding-bottom: 4px;
+        clear: both;
+    }
+}
+
+.hip-card-header strong {
+    font-weight: 700;
+    font-size: 1rem !important;
+}
+
+.hip-inner-card-title {
+    display: inline-block;
+}
+
+.hip-flex-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.view-all-link {
+    font-size: 1rem;
+    display: block;
+    margin-top: 12px;
+}
+
+.flex {
+    display: flex;
+
+    .align-right {
+        margin-left: auto;
+        align-self: center;
+    }
+
+    .align-left {
+        margin-right: auto;
+        align-self: center;
+    }
+}
+
+.custom-second-nav {
+    margin: 0px;
+    padding: 0px;
+    float: right;
+
+    li {
+        display: inline;
+    }
+}
+
+.custom-back-link {
+    margin-top: 0px !important;
+    margin-bottom: 0px !important;
+}
+
+.custom-width-notification {
+    max-width: 100% !important;
+    font-weight: normal !important;
+    font-size: 1.2rem !important;
+}
+
+.api-panel {
+    font-family: "GDS Transport", arial, sans-serif;
+    min-height: 45px;
+    background-color: $panel-background;
+    border: solid 1px $api-panel-border-color;
+    border-radius: 5px;
+    padding: 12px 24px;
+    margin-top: 20px;
+    margin-bottom: 16px;
+    border-radius: 5px;
+    font-size: 0.8rem;
+
+    .call-out-body {
+        margin-top: 8px;
+        padding-left: 27px;
+        margin-bottom: 8px;
+    }
+
+    .call-out-list-item {
+        background-color: $call-out-list-item-background;
+        padding: 8px 20px;
+        width: 80%;
+    }
+
+    .call-out-data-attribute {
+        float: right;
+        font-size: 1.05rem;
+    }
+
+    .additional-message {
+        margin-top: 16px;
+        font-size: 1rem !important;
+        margin-bottom: 4px;
+        color: #000;
+    }
+
+    .call-out-type {
+        font-family: "GDS Transport", arial, sans-serif;
+        margin-bottom: 20px;
+        font-weight: 700;
+        font-size: 1.1rem !important;
+    }
+
+    .information-tag {
+        font-size: 1.2rem;
+        margin-bottom: 0px;
+    }
+
+    .information {
+        color: $info-color;
+    }
+
+    .hip-inline-list {
+        margin-left: 0px;
+        margin-bottom: 0px;
+    }
+
+    .hip-inline-list li {
+        display: inline-block !important;
+        margin-right: 12px;
+    }
+
+    .hip-inline-list li .govuk-tag {
+        font-size: 14px;
+        max-width: none;
+    }
+
+    .domainTag, .subDomainTag {
+        white-space: nowrap;
+    }
+
+    .api-panel-top {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+
+        .apiStatusTag {
+            height: 20px;
+        }
+    }
+}
+
+.call-out-panel {
+    font-family: "GDS Transport", arial, sans-serif;
+    min-height: 45px;
+    background-color: $panel-background;
+    border: solid 1px $call-out-panel-border-color;
+    border-radius: 5px;
+    padding: 20px;
+    margin-top: 20px;
+    margin-bottom: 40px;
+    border-radius: 5px;
+    font-size: 0.8rem;
+
+    .call-out-body {
+        margin-top: 8px;
+        padding-left: 27px;
+        margin-bottom: 8px;
+    }
+
+    .call-out-list-item {
+        background-color: $call-out-list-item-background;
+        padding: 8px 20px;
+        width: 80%;
+    }
+
+    ul {
+        margin-left: 37px;
+        margin-top: 16px;
+        font-size: 1rem;
+        margin-bottom: 12px;
+    }
+
+    .additional-message {
+        margin-left: 37px;
+        margin-top: 16px;
+        font-size: 1rem !important;
+        margin-bottom: 4px;
+    }
+
+    .call-out-type {
+        font-family: "GDS Transport", arial, sans-serif;
+        margin-bottom: 20px;
+        margin-left: 14px;
+        font-weight: 700;
+        font-size: 1rem !important;
+    }
+
+    .information-tag {
+        font-size: 1.2rem;
+        margin-bottom: 0px;
+    }
+
+    .information {
+        color: $info-color;
+    }
+
+    .warning {
+        color: $warning-color;
+    }
+
+    .error {
+        color: $error-color;
+    }
+
+    .call-out-flex-header {
+        display: flex;
+        justify-content: space-between;
+    }
+}
+
+.call-out-panel__small {
+    min-height: 20px !important;
+    padding: 10px !important;
+    margin-top: 0px !important;
+    margin-bottom: 20px !important;
+}
+
+.scopes-list {
+    font-size: 16px;
+}
+
+.custom-normal-case {
+    text-transform: none !important;
+}
+
+.custom-checkbox-holder {
+    margin-top: 30px;
+    padding: 30px 30px 10px 30px;
+    background-color: $hip-card-background;
+}
+
+.side-nav {
+    border-right: none;
+    display: block;
+    overflow: hidden;
+    border-right: 1px solid $side-nav-right-border;
+}
+
+.side-nav__component {
+    border: none;
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    margin-top: 16px;
+}
+
+.side-nav__list {
+    position: relative;
+    list-style: none;
+    font-size: 19px;
+    line-height: 1.31579;
+    font-family: "nta", Arial, sans-serif;
+    font-weight: 400;
+    text-transform: none;
+}
+
+.side-nav__link {
+    padding: 12px 30px 8px 15px;
+    text-decoration: none;
+    display: block;
+    background-color: transparent;
+    font-family: "GDS Transport", arial, sans-serif;
+    font-weight: 400;
+    text-transform: none;
+    font-size: 16px;
+    line-height: 1.25;
+    color: $search-button-background;
+
+    &:hover {
+        color: $side-nav-hover-color;
+        text-decoration: underline;
+    }
+
+    &:focus {
+        background-color: $focus-color;
+    }
+}
+
+.side-nav__list--selected {
+    .side-nav__link, &:hover .side-nav__link {
+        color: $side-nav-selected-color;
+        background-color: $side-nav-selected-background;
+    }
+
+    a.side-nav__link:visited, &:hover a.side-nav__link:visited {
+        color: $side-nav-visited-link-color;
+    }
+
+    > .side-nav__link, &:hover > .side-nav__link {
+        color: $side-nav-selected-color !important;
+        background-color: $side-nav-selected-background !important;
+    }
+}
+
+.code--header {
+    border: 1px solid $code-border;
+    border-radius: 4px;
+    padding: 2px 4px;
+    font-size: 16px;
+    font-weight: normal;
+    display: inline-block;
+    background-color: $code-background;
+    line-height: 1.1em;
+}
+
+.environment-block-header {
+    display: flex;
+
+    .left, .right {
+        flex-grow: 1;
+    }
+}
+
+.warning-colour {
+    color: $warning-color;
+}
+
+.error-colour {
+    color: $error-color;
+}
+
+.ready {
+    color: $ready-color;
+}
+
+.customised-table {
+    margin-bottom: 20px !important;
+
+    tr:last-child td, tr:last-child th {
+        border-width: 0;
+    }
+}
+
+.hip-color-override {
+    border-bottom: solid 1px $filter-separator-color;
+}
+
+.filters-container {
+    border-right: solid 1px $filter-separator-color;
+    min-height: 400px;
+}
+
+.api-results-container {
+    padding-left: 26px;
+}
+
+.filterSelectionCount, #resetFilters {
+    font-size: 16px;
+}
+
+.domainTag, .subDomainTag, .apiStatusTag, .hodTag {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 1rem;
+}
+
+.hodFilterLabel, .hodTag {
+    text-transform: uppercase;
+}
+
+.stickySideMenu {
+    position: sticky;
+    top: 10px;
+}
+
+.gem-c-search__item-wrapper {
+    display: table;
+    width: 100%;
+}
+
+.gem-c-search__item {
+    position: relative;
+    display: table-cell;
+    vertical-align: top;
+}
+
+.gem-c-search__input[type=search] {
+    font-family: "GDS Transport", arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-weight: 400;
+    font-size: 16px;
+    font-size: 1rem;
+    line-height: 1.4736842105;
+    margin: 0;
+    width: 100%;
+    height: 2.5em;
+    padding: 0.375em;
+    border: 2px solid $input-text-border;
+    background: $input-text-background;
+    border-radius: 0;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border-right-width: 0;
+}
+
+.gem-c-search__submit-wrapper {
+    width: 1%;
+}
+
+.gem-c-search__submit {
+    background-color: $search-button-background;
+    color: $search-button-text;
+    border: 0;
+    cursor: pointer;
+    border-radius: 0;
+    outline: 2px solid transparent;
+    outline-offset: 0;
+    position: relative;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    text-indent: -5000px;
+    overflow: hidden;
+
+    .gem-c-search__icon {
+        display: block;
+        pointer-events: none;
+        position: absolute;
+        height: 20px;
+        width: 20px;
+        top: 10px;
+        left: 10px;
+    }
+}
+
+.apiVersionTag {
+    text-transform: uppercase;
+}
+
+.apiStatusContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    strong {
+        width: max-content;
+    }
+}
