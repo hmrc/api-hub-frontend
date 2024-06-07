@@ -133,7 +133,9 @@ class SimpleApiRedeploymentControllerSpec
         "Field name",
         "description",
         "oas",
-        "status"
+        "status",
+        "domain",
+        "subdomain"
       )
 
       when(fixture.apiAuthActionProvider.apply(any)(any)).thenReturn(successfulApiAuthAction(FakeApiDetail))

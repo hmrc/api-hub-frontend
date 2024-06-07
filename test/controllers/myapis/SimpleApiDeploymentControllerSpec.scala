@@ -133,7 +133,9 @@ class SimpleApiDeploymentControllerSpec
         "egress",
         "teamId",
         "oas",
-        "status"
+        "status",
+        "domain",
+        "subdomain"
       )
 
       when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(teams))
