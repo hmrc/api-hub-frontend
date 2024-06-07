@@ -19,6 +19,9 @@
 @import viewmodels.InputWidth._
 @import models.api.ApiStatus
 @import models.api.Alpha
+@import config.Hods
+@import config.Domains
+@import views.html.helper.CSPNonce
 
 @this(
     layout: templates.Layout,
@@ -29,11 +32,16 @@
     govukSelect : GovukSelect,
     govukErrorSummary : GovukErrorSummary,
     govukCheckboxes : GovukCheckboxes,
+    govukFieldset : GovukFieldset
 )
 
-@(form: Form[_], teams: Seq[Team], user: UserModel)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], teams: Seq[Team], domains: Domains, hods: Hods, user: UserModel)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, "Generate deployment"), user = Some(user)) {
+@scripts() = {
+    <script src='@routes.Assets.versioned("javascripts/apiDeployment.js")' type="module" @{CSPNonce.attr}></script>
+}
+
+@layout(pageTitle = title(form, "Generate deployment"), user = Some(user), customScriptsBlock = Some(scripts())) {
 
     <h1 class="govuk-heading-l">Generate deployment</h1>
 
@@ -114,6 +122,55 @@
                 label = LabelViewModel("Team")
             )
         )
+
+        @govukSelect(
+            SelectViewModel(
+                field = form("domain"),
+                items = SelectItem(attributes = Map("label" -> " ", "hidden" -> "hidden")) +: domains.domains.map(
+                    domain =>
+                        SelectItemViewModel(
+                            value = domain.code,
+                            text = domain.description
+                        )
+                ),
+                label = LabelViewModel("Domain")
+            )
+        )
+
+        @govukSelect(
+            SelectViewModel(
+                field = form("subdomain"),
+                items = SelectItem(attributes = Map("label" -> " ", "hidden" -> "hidden")) +: domains.domains.flatMap(
+                    domain =>
+                        domain.subDomains.map(
+                            subDomain =>
+                                SelectItem(
+                                    value = Some(subDomain.code),
+                                    text = subDomain.description,
+                                    attributes = Map("data-domain" -> domain.code)
+                                )
+                        )
+                ),
+                label = LabelViewModel("Subdomain")
+            )
+        )
+
+        @govukCheckboxes(Checkboxes(
+            fieldset = Some(Fieldset(
+                legend = Some(Legend(
+                    content = Text("HoDs/Backends")
+                ))
+            )),
+            classes = "hodsCheckboxes",
+            hint = Some(Hint(
+                content = Text("Select all that apply.")
+            )),
+            name = "hods[]",
+            items = hods.hods.map(hod => CheckboxItem(
+                content = Text(hod),
+                value = hod
+            ))
+        ))
 
         @govukTextarea(
             TextareaViewModel(

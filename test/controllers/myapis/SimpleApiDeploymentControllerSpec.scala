@@ -20,6 +20,7 @@ import base.SpecBase
 import connectors.ApplicationsConnector
 import controllers.actions.FakeUser
 import controllers.myapis.SimpleApiDeploymentController.DeploymentsRequestFormProvider
+import fakes.{FakeDomains, FakeHods}
 import models.application.TeamMember
 import models.deployment.{Error, FailuresResponse, InvalidOasResponse, SuccessfulDeploymentsResponse}
 import models.team.Team
@@ -59,7 +60,7 @@ class SimpleApiDeploymentControllerSpec
         val view = fixture.playApplication.injector.instanceOf[SimpleApiDeploymentView]
 
         status(result) mustBe OK
-        contentAsString(result) mustBe view(form, teams, FakeUser)(request, messages(fixture.playApplication)).toString()
+        contentAsString(result) mustBe view(form, teams, FakeDomains, FakeHods, FakeUser)(request, messages(fixture.playApplication)).toString()
         contentAsString(result) must validateAsHtml
 
         verify(fixture.apiHubService).findTeams(eqTo(Some(FakeUser.email.value)))(any)
@@ -147,7 +148,7 @@ class SimpleApiDeploymentControllerSpec
           val view = fixture.playApplication.injector.instanceOf[SimpleApiDeploymentView]
 
           status(result) mustBe BAD_REQUEST
-          contentAsString(result) mustBe view(boundForm, teams, FakeUser)(request, messages(fixture.playApplication)).toString()
+          contentAsString(result) mustBe view(boundForm, teams, FakeDomains, FakeHods, FakeUser)(request, messages(fixture.playApplication)).toString()
           contentAsString(result) must validateAsHtml
         }
       }
@@ -186,7 +187,11 @@ object SimpleApiDeploymentControllerSpec {
     "teamId" -> "test-team-id",
     "oas" -> "test-oas",
     "passthrough" -> "false",
-    "status" -> "test-status"
+    "status" -> "test-status",
+    "domain" -> "1",
+    "subdomain" -> "1.1",
+    "hods[]" -> "1",
+    "hods[]" -> "2",
   )
 
   def invalidForm(missingField: String): Seq[(String, String)] =
