@@ -20,6 +20,7 @@ import base.SpecBase
 import connectors.ApplicationsConnector
 import controllers.actions.{ApiAuthActionProvider, FakeApiAuthActions, FakeApiDetail, FakeUser}
 import controllers.myapis.SimpleApiRedeploymentController.RedeploymentRequestFormProvider
+import fakes.{FakeDomains, FakeHods}
 import models.deployment._
 import models.user.UserModel
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
@@ -61,7 +62,7 @@ class SimpleApiRedeploymentControllerSpec
         val view = fixture.playApplication.injector.instanceOf[SimpleApiRedeploymentView]
 
         status(result) mustBe OK
-        contentAsString(result) mustBe view(form, FakeApiDetail, FakeUser)(request, messages(fixture.playApplication)).toString()
+        contentAsString(result) mustBe view(form, FakeApiDetail, FakeDomains, FakeHods, FakeUser)(request, messages(fixture.playApplication)).toString()
         contentAsString(result) must validateAsHtml
 
         verify(fixture.apiAuthActionProvider).apply(eqTo(FakeApiDetail.id))(any)
@@ -147,7 +148,7 @@ class SimpleApiRedeploymentControllerSpec
           val view = fixture.playApplication.injector.instanceOf[SimpleApiRedeploymentView]
 
           status(result) mustBe BAD_REQUEST
-          contentAsString(result) mustBe view(boundForm, FakeApiDetail, FakeUser)(request, messages(fixture.playApplication)).toString()
+          contentAsString(result) mustBe view(boundForm, FakeApiDetail, FakeDomains, FakeHods, FakeUser)(request, messages(fixture.playApplication)).toString()
           contentAsString(result) must validateAsHtml
         }
       }
@@ -185,13 +186,20 @@ object SimpleApiRedeploymentControllerSpec extends OptionValues {
   private val redeploymentRequest = RedeploymentRequest(
     description = "test-description",
     oas = "test-oas",
-    status = "test-status"
+    status = "test-status",
+    domain = "1",
+    subDomain = "1.1",
+    hods = Seq("1", "2")
   )
 
   private val validForm = Seq(
     "description" -> redeploymentRequest.description,
     "oas" -> redeploymentRequest.oas,
-    "status" -> redeploymentRequest.status
+    "status" -> redeploymentRequest.status,
+    "domain" -> "1",
+    "subdomain" -> "1.1",
+    "hods[]" -> "1",
+    "hods[]" -> "2",
   )
 
   private def invalidForm(missingField: String): Seq[(String, String)] =

@@ -17,12 +17,13 @@
 package controllers.myapis
 
 import com.google.inject.{Inject, Singleton}
+import config.{Domains, Hods}
 import connectors.ApplicationsConnector
 import controllers.actions.{ApiAuthActionProvider, IdentifierAction}
 import forms.mappings.Mappings
 import models.deployment.{InvalidOasResponse, RedeploymentRequest, SuccessfulDeploymentsResponse}
 import models.requests.ApiRequest
-import play.api.data.Form
+import play.api.data.{Form, Forms}
 import play.api.data.Forms.mapping
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -39,7 +40,9 @@ class SimpleApiRedeploymentController @Inject()(
   applicationsConnector: ApplicationsConnector,
   view: SimpleApiRedeploymentView,
   successView: DeploymentSuccessView,
-  failureView: DeploymentFailureView
+  failureView: DeploymentFailureView,
+  domains: Domains,
+  hods: Hods
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   import SimpleApiRedeploymentController._
@@ -67,7 +70,7 @@ class SimpleApiRedeploymentController @Inject()(
   }
 
   private def showView(code: Int, form: Form[_])(implicit request: ApiRequest[_]): Result = {
-    Status(code)(view(form, request.apiDetails, request.identifierRequest.user))
+    Status(code)(view(form, request.apiDetails, domains, hods, request.identifierRequest.user))
   }
 
 }
@@ -81,7 +84,10 @@ object SimpleApiRedeploymentController {
         mapping(
           "description" -> text("Enter a description"),
           "oas" -> text("Enter the OAS"),
-          "status" -> text("Enter an API status")
+          "status" -> text("Enter an API status"),
+          "domain" -> text("Enter a domain"),
+          "subdomain" -> text("Enter a subdomain"),
+          "hods" -> Forms.seq(text())
         )(RedeploymentRequest.apply)(RedeploymentRequest.unapply)
       )
 

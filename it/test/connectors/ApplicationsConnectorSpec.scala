@@ -714,7 +714,10 @@ class ApplicationsConnectorSpec
       val request = RedeploymentRequest(
         description = "test-description",
         oas = "test-oas",
-        status = "test-status"
+        status = "test-status",
+        domain = "test-domain",
+        subDomain = "test-subdomain",
+        hods = Seq("test-hod")
       )
 
       val response = SuccessfulDeploymentsResponse("test-id", "1.0.0", 102, "test-url")
@@ -743,7 +746,10 @@ class ApplicationsConnectorSpec
       val request = RedeploymentRequest(
         description = "test-description",
         oas = "test-oas",
-        status = "test-status"
+        status = "test-status",
+        domain = "test-domain",
+        subDomain = "test-subdomain",
+        hods = Seq("test-hod")
       )
 
       stubFor(
@@ -767,7 +773,10 @@ class ApplicationsConnectorSpec
       val request = RedeploymentRequest(
         description = "test-description",
         oas = "test-oas",
-        status = "test-status"
+        status = "test-status",
+        domain = "test-domain",
+        subDomain = "test-subdomain",
+        hods = Seq("test-hod")
       )
 
       stubFor(
