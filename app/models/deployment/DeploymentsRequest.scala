@@ -27,6 +27,9 @@ case class DeploymentsRequest(
   oas: String,
   passthrough: Boolean,
   status: String,
+  domain: String,
+  subDomain: String,
+  hods: Seq[String]
 )
 
 object DeploymentsRequest {

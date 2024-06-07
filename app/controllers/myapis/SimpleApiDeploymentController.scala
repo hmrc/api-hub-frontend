@@ -17,6 +17,7 @@
 package controllers.myapis
 
 import com.google.inject.{Inject, Singleton}
+import config.{Domains, Hods}
 import connectors.ApplicationsConnector
 import controllers.actions.IdentifierAction
 import forms.mappings.Mappings
@@ -43,6 +44,8 @@ class SimpleApiDeploymentController @Inject()(
                                                applicationsConnector: ApplicationsConnector,
                                                deploymentSuccessView: DeploymentSuccessView,
                                                deploymentFailureView: DeploymentFailureView,
+                                               domains: Domains,
+                                               hods: Hods
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   import SimpleApiDeploymentController._
@@ -77,7 +80,7 @@ class SimpleApiDeploymentController @Inject()(
       .map(email => apiHubService.findTeams(Some(email)))
       .getOrElse(Future.successful(Seq.empty))
       .map(teams => teams.sortBy(_.name.toLowerCase))
-      .map(teams => Status(code)(deploymentView(form, teams, request.user)))
+      .map(teams => Status(code)(deploymentView(form, teams, domains, hods, request.user)))
   }
 
 }
@@ -97,6 +100,9 @@ object SimpleApiDeploymentController {
         "oas" -> text("Enter the OAS"),
         "passthrough" -> Forms.default(boolean(), false),
         "status" -> text("Enter an API status"),
+        "domain" -> text("Enter a domain"),
+        "subdomain" -> text("Enter a subdomain"),
+        "hods" -> Forms.seq(text())
         )(DeploymentsRequest.apply)(DeploymentsRequest.unapply)
       )
 
