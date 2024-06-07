@@ -21,7 +21,10 @@ import play.api.libs.json.{Format, Json}
 case class RedeploymentRequest(
   description: String,
   oas: String,
-  status: String
+  status: String,
+  domain: String,
+  subDomain: String,
+  hods: Seq[String]
 )
 
 object RedeploymentRequest {
