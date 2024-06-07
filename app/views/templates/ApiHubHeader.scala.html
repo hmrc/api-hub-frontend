@@ -59,14 +59,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     </a>
                 </div>
                 <div class="govuk-grid-column-three-quarters govuk-!-text-align-right">
-                    @user.map(aUser =>
-                        <div>
-                            Signed in as <strong>{aUser.email.getOrElse(aUser.userName)}</strong> via
+                    @for(aUser <- user) {
+                        <div data-user-type="@aUser.userType" data-user-email="@aUser.email.getOrElse(aUser.userName)">
+                            Signed in as <strong>@aUser.email.getOrElse(aUser.userName)</strong> via
                             <strong class="govuk-tag govuk-tag--blue small-tag">
-                                {aUser.userType}
+                                @aUser.userType
                             </strong>
                         </div>
-                    )
+                    }
                 </div>
             </div>
         </div>
@@ -80,29 +80,29 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         }
         <ul class="custom-second-nav">
             <li>
-                <a class="govuk-link govuk-link--no-visited-state" href="@routes.IndexController.onPageLoad.url">
+                <a id="dashboardLink" data-header-link-name="dashboard" class="govuk-link govuk-link--no-visited-state" href="@routes.IndexController.onPageLoad.url">
                     @messages("site.dashboard")
                 </a>
             </li>
             @if(user.map(user => user.permissions.canApprove || user.permissions.canSupport).getOrElse(false)) {
                 <li>
-                    <a class="govuk-link govuk-link--no-visited-state" href="@controllers.admin.routes.AccessRequestsController.onPageLoad().url">
+                    <a id="apiHubAdminLink" data-header-link-name="apiHubAdmin" class="govuk-link govuk-link--no-visited-state" href="@controllers.admin.routes.AccessRequestsController.onPageLoad().url">
                         @messages("site.approvals")
                     </a>
                 </li>
             }
             <li>
-                <a class="govuk-link govuk-link--no-visited-state" href="@routes.HipApisController.onPageLoad().url">
+                <a id="hipApisLink" data-header-link-name="hipApis" class="govuk-link govuk-link--no-visited-state" href="@routes.HipApisController.onPageLoad().url">
                     @messages("hipApis.link.text")
                 </a>
             </li>
             <li>
-                <a class="govuk-link govuk-link--no-visited-state" href="@helpDocsPath">
+                <a id="helpDocsLink" data-header-link-name="helpDocs" class="govuk-link govuk-link--no-visited-state" href="@helpDocsPath">
                     @messages("helpdocs.link.text")
                 </a>
             </li>
             <li>
-                <a class="govuk-link govuk-link--no-visited-state" href="@routes.GetSupportController.onPageLoad.url">
+                <a id="getSupportLink" data-header-link-name="getSupport" class="govuk-link govuk-link--no-visited-state" href="@routes.GetSupportController.onPageLoad.url">
                 @messages("support.link.text")
                 </a>
             </li>
