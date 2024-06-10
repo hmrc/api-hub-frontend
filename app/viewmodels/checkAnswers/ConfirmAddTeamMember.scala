@@ -34,11 +34,11 @@ object ConfirmAddTeamMember {
       .map {
         zipped => SummaryListRow(
           key = Key(Text(zipped._1.email)),
-          actions = actions(zipped._2)
+          actions = actions(zipped._2, zipped._1.email)
         )
       }
 
-  private def actions(index: Int)(implicit messages: Messages): Option[Actions] = {
+  private def actions(index: Int, email: String)(implicit messages: Messages): Option[Actions] = {
     if (index == 0) {
       None
     }
@@ -48,11 +48,11 @@ object ConfirmAddTeamMember {
           ActionItemViewModel(
             "site.remove",
             routes.RemoveTeamMemberController.removeTeamMember(index).url
-          ),
+          ).withAttribute("data-remove-email" -> email),
           ActionItemViewModel(
             "site.change",
             routes.AddTeamMemberDetailsController.onPageLoad(CheckMode, index).url
-          )
+          ).withAttribute("data-change-email" -> email)
         )
       ))
     }

@@ -18,6 +18,7 @@ package controllers
 
 import com.google.inject.Inject
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import pages.TeamMembersPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -41,11 +42,11 @@ class CheckYourAnswersController @Inject()(
         rows = Seq(
           ApplicationNameSummary.row(request.userAnswers)
         ).flatten
-      )
+      ).withAttribute("data-summary-for" -> "application-details")
 
       val teamMemberDetails = SummaryListViewModel(
         rows = TeamMembersSummary.rows(request.userAnswers)
-      )
+      ).withAttribute("data-summary-for" -> "team-members")
 
       Ok(view(applicationDetails, teamMemberDetails, Some(request.user)))
   }
