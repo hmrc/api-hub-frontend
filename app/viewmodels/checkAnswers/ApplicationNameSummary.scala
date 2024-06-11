@@ -21,11 +21,19 @@ import models.{CheckMode, UserAnswers}
 import pages.ApplicationNamePage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{SummaryList, SummaryListRow}
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
 object ApplicationNameSummary  {
+
+  def summary(answers: UserAnswers)(implicit messages: Messages): SummaryList = {
+    SummaryListViewModel(
+      rows = Seq(
+        row(answers)
+      ).flatten
+    ).withAttribute("data-summary-for" -> "application-details")
+  }
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(ApplicationNamePage).map {
@@ -40,4 +48,5 @@ object ApplicationNameSummary  {
           )
         )
     }
+
 }

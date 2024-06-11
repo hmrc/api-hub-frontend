@@ -61,11 +61,13 @@ class ConfirmAddTeamMemberSpec extends AnyFreeSpec with Matchers with TryValues 
         items = Seq(
           ActionItem(
             href = routes.RemoveTeamMemberController.removeTeamMember(index).url,
-            content = Text("site.remove")
+            content = Text("site.remove"),
+            attributes = Map("data-remove-email" -> teamMember.email)
           ),
           ActionItem(
             href = routes.AddTeamMemberDetailsController.onPageLoad(CheckMode, index).url,
-            content = Text("site.change")
+            content = Text("site.change"),
+            attributes = Map("data-change-email" -> teamMember.email)
           )
         )
       ))
