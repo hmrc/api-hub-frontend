@@ -16,24 +16,17 @@
 
 @import models.user.UserModel
 @import models.deployment.{FailuresResponse, Error}
-@import views.html.helper.CSPNonce
 @import play.api.libs.json.Json
+@import views.html.components.IconsLink
 
 @this(
-layout: templates.Layout,
-govukButton: GovukButton,
-govukPanel: GovukPanel
+    layout: templates.Layout,
+    govukButton: GovukButton,
+    govukPanel: GovukPanel,
+    iconsLink: IconsLink
 )
 
 @(user: UserModel, failuresResponse: FailuresResponse, returnUrl: String)(implicit request: Request[_], messages: Messages)
-
-@scripts() = {
-    <link href='@routes.Assets.versioned("fontawesome6/css/all.min.css")' media="all" rel="stylesheet" type="text/css" @{CSPNonce.attr}/>
-}
-
-@styles() = {
-    .smallcode * {font-size:14px!important;}
-}
 
 @errorRow(deploymentError: Error) = {
     <tr class="govuk-table__row">
@@ -42,7 +35,7 @@ govukPanel: GovukPanel
     </tr>
 }
 
-@layout(pageTitle = titleNoForm(messages("api.deployment.title")), showBackLink = true, user = Some(user), customScriptsBlock = Some(scripts())) {
+@layout(pageTitle = titleNoForm(messages("api.deployment.title")), showBackLink = true, user = Some(user), customScriptsBlock = Some(iconsLink())) {
 
     <div class="govuk-fieldset__legend govuk-fieldset__legend--xl">
         <h1 class="govuk-fieldset__heading govuk-!-margin-bottom-2 ">

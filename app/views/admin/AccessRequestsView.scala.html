@@ -26,18 +26,7 @@
 
 @(accessRequests: Seq[AccessRequest], user: UserModel)(implicit request: Request[_], messages: Messages)
 
-@styles() = {
-    .text-overflow-ellipses {
-        width: 100%;
-        /* this code clamps based on specified lines */
-        overflow: hidden;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
-        display: -webkit-box;
-    }
-}
-
-@layout(pageTitle = titleNoForm(messages("accessRequests.title")), user = Some(user), fullWidth = true, customStyles = Some(styles())) {
+@layout(pageTitle = titleNoForm(messages("accessRequests.title")), user = Some(user), fullWidth = true) {
 
     @views.html.templates.SideNav(messages("accessRequests.admin"), AdminNavItems(user, AdminSideNavPages.AccessRequestsPage)) {
 

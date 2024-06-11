@@ -17,7 +17,6 @@
 @import models.application._
 @import models.user.UserModel
 @import viewmodels.application._
-@import views.html.helper.CSPNonce
 @import models.api.ApiDetail
 
 @this(
@@ -31,115 +30,14 @@
 
 @(form: Form[_], application: Application, applicationApis: Seq[ApplicationApi], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
-@scripts() = {
-    <link href='@routes.Assets.versioned("fontawesome6/css/all.min.css")' media="all" rel="stylesheet" type="text/css" @{CSPNonce.attr}/>
-}
-
-    @styles() = {
-    .hip-details {
-    font-size: 1.1875rem;
-    line-height: 1.47368;
-    display: block;
-    }
-    .hip-details__summary {
-    background-color: #fff;
-    border-top: 4px solid rgba(0, 0, 0, 0);
-    padding: 20px 24px 24px;
-    }
-    .hip-details__summary {
-    color: #005eb8;
-    cursor: pointer;
-    position: relative;
-    }
-    .hip-expander {
-    background-color: #fff;
-    border: 1px solid #d8dde0;
-    border-bottom-width: 4px;
-    margin-top: 16px;
-    margin-bottom: 16px;
-    font-family: "nta", Arial, sans-serif;
-    }
-    .hip-expander .hip-details__summary-text {
-    color: #005eb8;
-    cursor: pointer;
-    display: inline-block;
-    position: relative;
-    }
-    .hip-details__summary-text {
-    text-decoration: underline;
-    }
-
-    @@media (min-width: 40.0625em) {
-    .hip-expander .hip-details__text {
-    padding-top: 0;
-    }
-    }
-    @@media (min-width: 40.0625em) {
-    .hip-expander .hip-details__text {
-    padding-right: 24px;
-    }
-    }
-    @@media (min-width: 40.0625em) {
-    .hip-expander .hip-details__text {
-    padding-left: 24px;
-    }
-    }
-    @@media (min-width: 40.0625em) {
-    .hip-expander .hip-details__text {
-    padding-bottom: 24px;
-    }
-    }
-    .hip-expander .nhsuk-details__text {
-    padding-bottom: 16px;
-    padding-left: 16px;
-    padding-right: 16px;
-    padding-top: 0;
-    border-left: 0;
-    margin-left: 0;
-    margin-top: 0;
-    }
-    .hip-details__text {
-    margin-top: 8px;
-    padding: 16px;
-    padding-left: 20px;
-    }
-    .hip-details__summary-info {
-    float: right;
-    color: #000 !important;
-    margin-top: 6px;
-    }
-    .ready {
-    color: #00703c;
-    }
-    .custom-checkbox-holder {
-    margin-top: 30px;
-    padding: 30px 30px 10px 30px;
-    background-color: #f3f2f1;
-    }
-    .custom-normal-case {
-    text-transform: none !important;
-    }
-}
-
-
 @endpointScopes(scopes: Set[String]) = {
     <ul class="govuk-list govuk-list-inline scopes-list">
     @for(scope <- scopes) {
         <li>
-            <strong class="govuk-tag govuk-tag--grey custom-normal-case">@scope</strong>
+            <strong class="govuk-tag govuk-tag--grey preserve-case">@scope</strong>
         </li>
     }
     </ul>
-}
-
-@endpointAccess(access: ApplicationEndpointAccess) = {
-@if(access == Accessible) {
-    <i class="fa-solid fa-circle-check ready"></i>
-} else if (access == Inaccessible) {
-    <i class="fa-solid fa-times-circle"></i>
-    } else {
-    <i class="fa-solid fa-circle-exclamation warning-colour"></i>
-    }
 }
 
 @endpointName(endpoint: ApplicationEndpoint) = {
@@ -170,7 +68,7 @@
 
 }
 
-@layout(pageTitle = titleNoForm(messages("requestProductionAccess.title")), user = user, fullWidth = true, customScriptsBlock = Some(scripts()), customStyles = Some(styles())) {
+@layout(pageTitle = titleNoForm(messages("requestProductionAccess.title")), user = user, fullWidth = true) {
 
     @formHelper(action = controllers.application.routes.RequestProductionAccessController.onSubmit(), Symbol("autoComplete") -> "off") {
         @if(form.errors.nonEmpty) {
@@ -223,6 +121,7 @@
             <h2 class="govuk-body-l">@messages("requestProductionAccess.instruction")</h2>
         </div>
         <div>
+            <div class="hip-request-apis">
             @for(applicationApi <- applicationApis) {
                 <details class="hip-details hip-expander">
                     <summary class="hip-details__summary">
@@ -257,6 +156,7 @@
                     </div>
                 </details>
             }
+            </div>
 
             <br>
                 @govukCheckboxes(

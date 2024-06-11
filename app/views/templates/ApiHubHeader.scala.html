@@ -74,40 +74,40 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </header>
 
 <div class="govuk-width-container" role="region">
-    <div class="govuk-!-padding-bottom-3 govuk-!-padding-top-3" style="height: 20px;">
+    <nav class="hip-nav-header-links govuk-!-padding-bottom-3 govuk-!-padding-top-3">
         @if(showBackLink) {
             @govukBackLink(BackLinkViewModel(href = "#").withCssClass("custom-back-link"))
         }
         <ul class="custom-second-nav">
             <li>
-                <a class="govuk-link govuk-link--no-visited-state" style="margin-right: 30px;" href="@routes.IndexController.onPageLoad.url">
+                <a class="govuk-link govuk-link--no-visited-state" href="@routes.IndexController.onPageLoad.url">
                     @messages("site.dashboard")
                 </a>
             </li>
             @if(user.map(user => user.permissions.canApprove || user.permissions.canSupport).getOrElse(false)) {
                 <li>
-                    <a class="govuk-link govuk-link--no-visited-state" style="margin-right: 30px;" href="@controllers.admin.routes.AccessRequestsController.onPageLoad().url">
+                    <a class="govuk-link govuk-link--no-visited-state" href="@controllers.admin.routes.AccessRequestsController.onPageLoad().url">
                         @messages("site.approvals")
                     </a>
                 </li>
             }
             <li>
-                <a class="govuk-link govuk-link--no-visited-state" style="margin-right: 30px;" href="@routes.HipApisController.onPageLoad().url">
+                <a class="govuk-link govuk-link--no-visited-state" href="@routes.HipApisController.onPageLoad().url">
                     @messages("hipApis.link.text")
                 </a>
             </li>
             <li>
-                <a class="govuk-link govuk-link--no-visited-state" style="margin-right: 30px;" href="@helpDocsPath">
+                <a class="govuk-link govuk-link--no-visited-state" href="@helpDocsPath">
                     @messages("helpdocs.link.text")
                 </a>
             </li>
             <li>
-                <a class="govuk-link govuk-link--no-visited-state" style="margin-right: 30px;" href="@routes.GetSupportController.onPageLoad.url">
+                <a class="govuk-link govuk-link--no-visited-state" href="@routes.GetSupportController.onPageLoad.url">
                 @messages("support.link.text")
                 </a>
             </li>
         </ul>
-    </div>
+    </nav>
 
     <hr class="govuk-section-break govuk-section-break--visible">
 </div>

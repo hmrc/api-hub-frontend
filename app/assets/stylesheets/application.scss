@@ -33,6 +33,7 @@ $ready-color: $green;
 $search-button-background: $blue;
 $side-nav-visited-link-color: $blue;
 $search-button-background: $blue;
+$support-info-details-color: $blue;
 $search-button-text: $white;
 $side-nav-right-border: $grey;
 $side-nav-selected-color: $white;
@@ -43,6 +44,8 @@ $code-border: $grey;
 $code-background: $light-grey;
 $input-text-border: $black;
 $input-text-background: $white;
+$secondary-success-color: $white;
+$secondary-success-background: $dark-grey;
 
 .js-visible {
     display: none !important;
@@ -83,7 +86,7 @@ $input-text-background: $white;
 .hip-card-header {
     margin-top: 20px;
     margin-left: 30px;
-    margin-bottom: 0px;
+    margin-bottom: 0;
 }
 
 .hip-inner-card {
@@ -94,13 +97,13 @@ $input-text-background: $white;
     border-top: solid 1px $hip-card-border;
     border-left: solid 1px $hip-card-border;
     border-right: solid 1px $hip-card-border;
-    margin-top: 0px;
+    margin-top: 0;
     margin-bottom: 12px;
     display: flex;
     flex-wrap: wrap;
 
     h3, p {
-        margin-bottom: 0px !important;
+        margin-bottom: 0 !important;
         word-wrap: break-word;
         flex: 1;
     }
@@ -162,18 +165,26 @@ $input-text-background: $white;
 }
 
 .custom-second-nav {
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 0;
     float: right;
 
     li {
         display: inline;
+
+        a.govuk-link {
+            margin-right: 30px;
+        }
     }
 }
 
-.custom-back-link {
-    margin-top: 0px !important;
-    margin-bottom: 0px !important;
+.hip-nav-header-links {
+    height: 20px;
+
+    .custom-back-link {
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+    }
 }
 
 .custom-width-notification {
@@ -191,7 +202,6 @@ $input-text-background: $white;
     padding: 12px 24px;
     margin-top: 20px;
     margin-bottom: 16px;
-    border-radius: 5px;
     font-size: 0.8rem;
 
     .call-out-body {
@@ -227,7 +237,7 @@ $input-text-background: $white;
 
     .information-tag {
         font-size: 1.2rem;
-        margin-bottom: 0px;
+        margin-bottom: 0;
     }
 
     .information {
@@ -235,8 +245,8 @@ $input-text-background: $white;
     }
 
     .hip-inline-list {
-        margin-left: 0px;
-        margin-bottom: 0px;
+        margin-left: 0;
+        margin-bottom: 0;
     }
 
     .hip-inline-list li {
@@ -264,6 +274,16 @@ $input-text-background: $white;
     }
 }
 
+.api-panel--small {
+    padding-top: 16px !important;
+    p {
+        font-size: 1rem;
+    }
+    a {
+        font-size: 1rem !important;
+    }
+}
+
 .call-out-panel {
     font-family: "GDS Transport", arial, sans-serif;
     min-height: 45px;
@@ -273,7 +293,6 @@ $input-text-background: $white;
     padding: 20px;
     margin-top: 20px;
     margin-bottom: 40px;
-    border-radius: 5px;
     font-size: 0.8rem;
 
     .call-out-body {
@@ -312,7 +331,7 @@ $input-text-background: $white;
 
     .information-tag {
         font-size: 1.2rem;
-        margin-bottom: 0px;
+        margin-bottom: 0;
     }
 
     .information {
@@ -336,7 +355,7 @@ $input-text-background: $white;
 .call-out-panel__small {
     min-height: 20px !important;
     padding: 10px !important;
-    margin-top: 0px !important;
+    margin-top: 0 !important;
     margin-bottom: 20px !important;
 }
 
@@ -363,10 +382,9 @@ $input-text-background: $white;
 
 .side-nav__component {
     border: none;
-    margin: 0;
     padding: 0;
     list-style-type: none;
-    margin-top: 16px;
+    margin: 16px 0 0 0;
 }
 
 .side-nav__list {
@@ -504,7 +522,6 @@ $input-text-background: $white;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-weight: 400;
-    font-size: 16px;
     font-size: 1rem;
     line-height: 1.4736842105;
     margin: 0;
@@ -567,4 +584,85 @@ $input-text-background: $white;
 
 .hodsCheckboxes {
     text-transform: uppercase;
+}
+
+.text-overflow-ellipses {
+    width: 100%;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    display: -webkit-box;
+}
+
+.govuk-panel--warning.hip-panel--secondary-success {
+    color: $secondary-success-color;
+    background-color: $secondary-success-background;
+}
+
+.govuk-details.hip-details--get-support {
+    margin-left: 38px;
+    margin-top: 20px;
+
+    .govuk-details__summary-text {
+        color: $support-info-details-color;
+    }
+}
+
+.api-scopes-list-inline {
+    margin: 0px;
+    padding: 0px;
+
+    li {
+        display: inline;
+    }
+
+    li .govuk-tag--grey {
+        margin-top: 8px;
+    }
+
+    .scope {
+        font-weight: normal !important;
+    }
+}
+
+.hip-app-apis, .hip-request-apis {
+    .hip-details {
+        border: 1px solid #d8dde0;
+        border-bottom-width: 4px;
+        margin-bottom: 16px;
+
+        ::marker {
+            font-size: 1.1875rem;
+            line-height: 1.47368;
+        }
+        .hip-details__summary {
+            margin-top: 4px;
+            padding: 20px 24px 24px;
+            color: #005eb8;
+            cursor: pointer;
+        }
+        .hip-details__summary-text {
+            color: #005eb8;
+            cursor: pointer;
+            display: inline-block;
+            text-decoration: underline;
+        }
+        .hip-details__text {
+            margin-top: 8px;
+            padding: 16px 16px 16px 20px;
+        }
+        .hip-details__summary-info {
+            float: right;
+            margin-top: 6px;
+        }
+        .preserve-case {
+            text-transform: none !important;
+        }
+
+        @media (min-width: 40.0625em) {
+            .hip-expander .hip-details__text {
+                padding: 0 24px 24px;
+            }
+        }
+    }
 }

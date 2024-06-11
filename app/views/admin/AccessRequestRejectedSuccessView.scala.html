@@ -22,13 +22,6 @@
 
 @(user: UserModel)(implicit request: Request[_], messages: Messages)
 
-@styles() = {
-    .govuk-panel--warning {
-        color: #fff;
-        background-color: #505a5f;
-    }
-}
-
 @accessRequestsLink() = {
     <a href='@accessRequestsLinkUrl()' class='govuk-link govuk-link--no-visited-state'>
         @messages("accessRequestRejectedSuccess.guidance.link")
@@ -39,9 +32,9 @@
     controllers.admin.routes.AccessRequestsController.onPageLoad().url
 }
 
-@layout(pageTitle = titleNoForm(messages("accessRequestRejectedSuccess.title")), user = Some(user), showBackLink = false, customStyles = Some(styles())) {
+@layout(pageTitle = titleNoForm(messages("accessRequestRejectedSuccess.title")), user = Some(user), showBackLink = false) {
 
-    <div class="govuk-panel govuk-panel--warning">
+    <div class="govuk-panel govuk-panel--warning hip-panel--secondary-success">
         <h1 class="govuk-panel__title">
             @messages("accessRequestRejectedSuccess.heading")
         </h1>

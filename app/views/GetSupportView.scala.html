@@ -14,20 +14,17 @@
  * limitations under the License.
  *@
 
-@import views.html.helper.CSPNonce
 @import java.net.URLEncoder
 @import scala.xml.{XML, Node, Text}
 @import models.user.UserModel
+@import views.html.components.IconsLink
 
 @this(
-    layout: templates.Layout
+    layout: templates.Layout,
+    iconsLink: IconsLink
 )
 
 @(supportEmailAddress: String, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
-
-@scripts() = {
-    <link href='@routes.Assets.versioned("fontawesome6/css/all.min.css")' media="all" rel="stylesheet" type="text/css" @{CSPNonce.attr}/>
-}
 
  @whatInformationToProvide() = {
      <div class="govuk-details__text">
@@ -80,7 +77,7 @@
     fullWidth = true,
     timeout   = false,
     user      = user,
-    customScriptsBlock = Some(scripts())
+    customScriptsBlock = Some(iconsLink())
 ) {
     <h1 class="govuk-heading-l">@messages("support.heading")</h1>
 
@@ -100,9 +97,9 @@
                     <a href="mailto:@supportEmailAddress?subject=@encodeWithEscapedSpaces(messages("support.email.subject.consumer"))&body=@whatInformationToProvideText()" class="govuk-link">@supportEmailAddress</a>.
                 </p>
 
-                <details class="govuk-details" style="margin-left: 38px; margin-top: 20px;">
+                <details class="govuk-details hip-details--get-support">
                     <summary class="govuk-details__summary">
-                        <span class="govuk-details__summary-text govuk-body-s" style="color: #1d70b8;">
+                        <span class="govuk-details__summary-text govuk-body-s">
                             What information will I need to provide?
                         </span>
                     </summary>
@@ -121,9 +118,9 @@
                 <p class="govuk-body additional-message">If you are having problems creating an API, you can contact us via this email
                     <a href="mailto:@supportEmailAddress?subject=@encodeWithEscapedSpaces(messages("support.email.subject.producer"))&body=@whatInformationToProvideText()" class="govuk-link">@supportEmailAddress</a>.
                 </p>
-                <details class="govuk-details" style="margin-left: 38px; margin-top: 20px;">
+                <details class="govuk-details hip-details--get-support">
                     <summary class="govuk-details__summary">
-                        <span class="govuk-details__summary-text govuk-body-s" style="color: #1d70b8;">
+                        <span class="govuk-details__summary-text govuk-body-s">
                             What information will I need to provide?
                         </span>
                     </summary>

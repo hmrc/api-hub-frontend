@@ -15,13 +15,13 @@
  *@
 
 @import models.api.ApiDeploymentStatuses
-@import views.html.helper.CSPNonce
+@import views.html.components.IconsLink
 
-@this(govukTable: GovukTable)
+@this(govukTable: GovukTable, iconsLink: IconsLink)
 
 @(deploymentStatuses: ApiDeploymentStatuses)(implicit request: RequestHeader, messages: Messages)
 
-<link href='@routes.Assets.versioned("fontawesome6/css/all.min.css")' media="all" rel="stylesheet" type="text/css" @{CSPNonce.attr}>
+@iconsLink()
 
 @showDeploymentStatus(version: Option[String]) = {
     <div class="apiStatusContainer">

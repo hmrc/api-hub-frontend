@@ -17,119 +17,16 @@
 @import models.application._
 @import models.user.UserModel
 @import viewmodels.application._
-@import views.html.helper.CSPNonce
+@import views.html.components.IconsLink
 
 @this(
         layout: templates.Layout,
         govukTable: GovukTable,
-        govukButton: GovukButton
+        govukButton: GovukButton,
+        iconsLink: IconsLink
 )
 
 @(application: Application, applicationApis: Seq[ApplicationApi], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
-
-@scripts() = {
-    <link href='@routes.Assets.versioned("fontawesome6/css/all.min.css")' media="all" rel="stylesheet" type="text/css" @{CSPNonce.attr}>
-}
-
-    @styles() = {
-    pre, code {
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    word-break: normal;
-    overflow-wrap: anywhere;
-    background-color: #f8f8f8;
-    }
-    .hip-details {
-    font-size: 1.1875rem;
-    line-height: 1.47368;
-    display: block;
-    }
-    .hip-details__summary {
-    background-color: #fff;
-    border-top: 4px solid rgba(0, 0, 0, 0);
-    padding: 20px 24px 24px;
-    }
-    .hip-details__summary {
-    color: #005eb8;
-    cursor: pointer;
-    position: relative;
-    }
-    .hip-expander {
-    background-color: #fff;
-    border: 1px solid #d8dde0;
-    border-bottom-width: 4px;
-    margin-top: 16px;
-    margin-bottom: 16px;
-    font-family: "nta", Arial, sans-serif;
-    }
-    .hip-expander .hip-details__summary-text {
-    color: #005eb8;
-    cursor: pointer;
-    display: inline-block;
-    position: relative;
-    }
-    .hip-details__summary-text {
-    text-decoration: underline;
-    }
-    @@media (min-width: 40.0625em) {
-    .hip-expander .hip-details__text {
-    padding-top: 0;
-    }
-    }
-    @@media (min-width: 40.0625em) {
-    .hip-expander .hip-details__text {
-    padding-right: 24px;
-    }
-    }
-    @@media (min-width: 40.0625em) {
-    .hip-expander .hip-details__text {
-    padding-left: 24px;
-    }
-    }
-    @@media (min-width: 40.0625em) {
-    .hip-expander .hip-details__text {
-    padding-bottom: 24px;
-    }
-    }
-    .hip-expander .nhsuk-details__text {
-    padding-bottom: 16px;
-    padding-left: 16px;
-    padding-right: 16px;
-    padding-top: 0;
-    border-left: 0;
-    margin-left: 0;
-    margin-top: 0;
-    }
-    .hip-details__text {
-    margin-top: 8px;
-    padding: 16px;
-    padding-left: 20px;
-    }
-    .hip-details__summary-info {
-    float: right;
-    color: #000 !important;
-    margin-top: 6px;
-    }
-    .ready {
-    color: #00703c;
-    }
-    .api-scopes-list-inline {
-    margin: 0px;
-    padding: 0px;
-    }
-    .api-scopes-list-inline li {
-    display: inline;
-    }
-    .api-scopes-list-inline li .govuk-tag--grey {
-    margin-top: 8px;
-    }
-    .api-scopes-list-inline li .scope {
-    font-weight: normal !important;
-    }
-    .capitalise-lower-case {
-    text-transform: none !important;
-    }
-}
 
 @hipApisLink(messageId: String) = {
     <a href="@{routes.HipApisController.onPageLoad().url}" class="govuk-link govuk-link--no-visited-state">
@@ -141,7 +38,7 @@
     <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-1"><strong>Scopes:</strong></p>
     <ul class="api-scopes-list-inline">
     @for(scope <- scopes) {
-        <li><strong class="govuk-tag govuk-tag govuk-tag--grey capitalise-lower-case">@scope</strong></li>
+        <li><strong class="govuk-tag govuk-tag govuk-tag--grey preserve-case">@scope</strong></li>
     }
     </ul>
 }
@@ -164,11 +61,11 @@
 }
 
 @endpointNameAndScopes(endpoint: ApplicationEndpoint) = {
-@endpointName(endpoint)
-@endpointScopes(endpoint.scopes)
+    @endpointName(endpoint)
+    @endpointScopes(endpoint.scopes)
 }
 
-@layout(pageTitle = titleNoForm(messages("applicationApis.title")), user = user, fullWidth = true, customScriptsBlock = Some(scripts()), customStyles = Some(styles())) {
+@layout(pageTitle = titleNoForm(messages("applicationApis.title")), user = user, fullWidth = true, customScriptsBlock = Some(iconsLink())) {
 
     @views.html.templates.SideNav(application.name, ApplicationNavItems(application, ApplicationSideNavPages.ApisPage)) {
 
@@ -235,6 +132,7 @@
                     @Html(messages("applicationDetails.apis.toYourApp", hipApisLink("applicationDetails.apis.addApis")))
                 </p>
 
+                <div class="hip-app-apis">
                 @for(applicationApi <- applicationApis) {
                     <details class="hip-details hip-expander">
                         <summary class="hip-details__summary">
@@ -287,6 +185,7 @@
 
                     </details>
                 }
+                </div>
             }
         }
     }

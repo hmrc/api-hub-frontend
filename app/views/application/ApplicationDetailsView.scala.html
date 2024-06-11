@@ -18,18 +18,15 @@
 @import models.user.UserModel
 @import viewmodels.application.{ApplicationApi, ApplicationSideNavPages, ApplicationNavItems}
 @import views.ViewUtils
-@import views.html.helper.CSPNonce
+@import views.html.components.IconsLink
 
 @this(
     layout: templates.Layout,
-    govukTable: GovukTable
+    govukTable: GovukTable,
+    iconsLink: IconsLink
 )
 
 @(application: Application, maybeApplicationApis: Option[Seq[ApplicationApi]], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
-
-@scripts() = {
-    <link href='@routes.Assets.versioned("fontawesome6/css/all.min.css")' media="all" rel="stylesheet" type="text/css" @{CSPNonce.attr}/>
-}
 
 @applicationDetail(titleKey: String, value: String, classes: String) = {
     <div class="govuk-grid-row govuk-!-margin-bottom-2">
@@ -56,7 +53,7 @@
     </a>
 }
 
-@layout(pageTitle = titleNoForm(messages("applicationDetails.title")), user = user, fullWidth = true, customScriptsBlock = Some(scripts())) {
+@layout(pageTitle = titleNoForm(messages("applicationDetails.title")), user = user, fullWidth = true, customScriptsBlock = Some(iconsLink())) {
 
     @views.html.templates.SideNav(application.name, ApplicationNavItems(application, ApplicationSideNavPages.DetailsPage)) {
 
