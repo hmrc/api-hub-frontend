@@ -17,7 +17,7 @@
 @import models.api.ApiDetail
 @import models.application.Application
 @import models.user.UserModel
-@import views.html.helper.CSPNonce
+@import views.html.components.IconsLink
 
 @this(
     layout: templates.Layout,
@@ -26,7 +26,8 @@
     govukErrorSummary: GovukErrorSummary,
     govukRadios: GovukRadios,
     govukSelect : GovukSelect,
-    govukFieldset : GovukFieldset
+    govukFieldset : GovukFieldset,
+    iconsLink: IconsLink
 )
 
 @(
@@ -37,10 +38,6 @@
     applicationsWithAccess: Seq[Application],
     applicationsWithoutAccess: Seq[Application]
 )(implicit request: Request[_], messages: Messages)
-
-@scripts() = {
-    <link href='@routes.Assets.versioned("fontawesome6/css/all.min.css")' media="all" rel="stylesheet" type="text/css" @{CSPNonce.attr}>
-}
 
 @displayApplicationsWithAccess() = {
     <div class="call-out-panel">
@@ -65,7 +62,7 @@
     </div>
 }
 
-@layout(pageTitle = title(form, messages("addAnApiSelectApplication.title")), user = user, customScriptsBlock = Some(scripts())) {
+@layout(pageTitle = title(form, messages("addAnApiSelectApplication.title")), user = user, customScriptsBlock = Some(iconsLink())) {
 
     @if(applicationsWithAccess.isEmpty && applicationsWithoutAccess.isEmpty) {
         <div class="govuk-grid-row">

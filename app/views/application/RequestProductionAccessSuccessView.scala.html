@@ -18,27 +18,14 @@
 @import models.user.UserModel
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import models.accessrequest.AccessRequestApi
-@import views.html.helper.CSPNonce
-
 
 @this(
-layout: templates.Layout,
-govukPanel: GovukPanel,
-govukSummaryList: GovukSummaryList
-
+    layout: templates.Layout,
+    govukPanel: GovukPanel,
+    govukSummaryList: GovukSummaryList
 )
 
 @(app:Application, user: Option[UserModel], apis: Seq[AccessRequestApi])(implicit request: Request[_], messages: Messages)
-
-@scripts() = {
-    <link href='@routes.Assets.versioned("fontawesome6/css/all.min.css")' media="all" rel="stylesheet" type="text/css" @{CSPNonce.attr}/>
-}
-
-@styles() = {
-    .govuk-panel--warning {
-    background-color: #505a5f !important;
-    }
-}
 
 @applicationLink(application: Application) = {
     <a href='@applicationLinkUrl(application)' class='govuk-link govuk-link--no-visited-state'>
@@ -61,13 +48,11 @@ govukSummaryList: GovukSummaryList
     </ul>
 }
 
-@layout(pageTitle = titleNoForm(messages("requestProductionAccessSuccess.title")), user = user, showBackLink = false, customStyles = Some(styles())) {
-  <div class="govuk-panel--warning">
+@layout(pageTitle = titleNoForm(messages("requestProductionAccessSuccess.title")), user = user, showBackLink = false) {
     @govukPanel(Panel(
-    title = Text(messages("requestProductionAccessSuccess.heading")),
-    classes = "govuk-panel--warning"
-  ))
-  </div>
+        title = Text(messages("requestProductionAccessSuccess.heading")),
+        classes = "govuk-panel--warning hip-panel--secondary-success"
+    ))
 
     @govukSummaryList(SummaryList(
         rows = Seq(
