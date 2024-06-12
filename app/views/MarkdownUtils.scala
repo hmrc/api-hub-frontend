@@ -16,8 +16,8 @@
 
 package views
 
-import org.commonmark.ext.gfm.tables.{TableBlock, TableCell, TableHead, TableRow, TablesExtension}
-import org.commonmark.node.{AbstractVisitor, BulletList, Heading, Node, Paragraph}
+import org.commonmark.ext.gfm.tables.{TableBlock, TableBody, TableCell, TableHead, TableRow, TablesExtension}
+import org.commonmark.node.{AbstractVisitor, BulletList, Heading, Link, Node, OrderedList, Paragraph, ThematicBreak}
 import org.commonmark.parser.Parser
 import org.commonmark.renderer.html.{AttributeProvider, AttributeProviderContext, AttributeProviderFactory, HtmlRenderer}
 import play.twirl.api.Html
@@ -25,8 +25,6 @@ import play.twirl.api.Html
 import java.util
 
 object MarkdownUtils {
-
-  // See https://jira.tools.tax.service.gov.uk/browse/HIPP-443
   // See https://github.com/commonmark/commonmark-java
 
   // The markdown needs to fit into our document structure. The Summary or
@@ -36,15 +34,14 @@ object MarkdownUtils {
   private val maxHeaderLevel = 6
 
   // Extension to support GitHub markdown's pipe tables
+  // see https://github.github.com/gfm/#tables-extension-
   private val extensions = java.util.Arrays.asList(TablesExtension.create)
 
-  // This parses the markdown text into a node structure
   private val parser = Parser
     .builder()
     .extensions(extensions)
     .build()
 
-  // This renders the node structure into HTML
   private val renderer = HtmlRenderer
     .builder()
     .extensions(extensions)
@@ -58,20 +55,22 @@ object MarkdownUtils {
     Html(renderer.render(document))
   }
 
-  // This adds the Govuk classes on a per-tag basis.
-  // We should probably compare the styles supported by CommonMark and Govuk
-  // and add more cases.
   private object GovukAttributeProviderFactory extends AttributeProviderFactory {
     override def create(context: AttributeProviderContext): AttributeProvider = {
       (node: Node, _: String, attributes: util.Map[String, String]) => {
         node match {
           case _: BulletList => attributes.put("class", "govuk-list govuk-list--bullet")
+          case _: OrderedList => attributes.put("class", "govuk-list govuk-list--number")
           case _: Paragraph => attributes.put("class", "govuk-body")
           case _: TableBlock => attributes.put("class", "govuk-table")
-          case _: TableCell => attributes.put("class", "govuk-table__cell")
           case _: TableHead => attributes.put("class", "govuk-table__head")
+          case _: TableBody => attributes.put("class", "govuk-table__body")
+          case cell: TableCell if cell.isHeader => attributes.put("class", "govuk-table__header")
+          case cell: TableCell if ! cell.isHeader => attributes.put("class", "govuk-table__cell")
           case _: TableRow => attributes.put("class", "govuk-table__row")
           case _: Heading => attributes.put("class", "govuk-heading-s")
+          case _: Link => attributes.put("class", "govuk-link")
+          case _: ThematicBreak => attributes.put("class", "govuk-section-break govuk-section-break--visible")
           case _ => ()
         }
       }
@@ -90,90 +89,5 @@ object MarkdownUtils {
       heading.setLevel(Math.min(heading.getLevel + minHeaderLevel - 1, maxHeaderLevel))
     }
   }
-
-  // This is some test markdown referenced by the Jira ticket. It comes from a
-  // sample OAS file:
-  //   https://github.com/hmrc/integration-catalogue-oas-files/blob/master/platforms/test-files/apis/test-api-004-markdown.yaml
-  val exampleMarkdown: String =
-    """
-      |This is a test API to test the rendering of OAS in the API catalogue.
-      |This is testing:
-      |- Markdown
-      |
-      |TESTTAG (this is just so you can search for all the test APIs)
-      |
-      |# Markdown Test
-      |
-      |## Basic formatting
-      |*Bold*
-      |
-      |_italic_
-      |
-      |***bold italic***
-      |
-      |--strike through--
-      |
-      |## Link
-      |a link to <a href="www.google.com">google</a>.
-      |
-      |## Horizontal lines (different syntax) x 3
-      |***
-      |---
-      |___
-      |
-      |## Unformatted code
-      |### Block ticks
-      |```
-      |{
-      |  "name" : "Dave"
-      |}
-      |```
-      |### Indented
-      |    {
-      |      "name" : "Dave"
-      |    }
-      |
-      |Word ```code block```.
-      |
-      |## Headings (remember they get re-levelled to start at 4)
-      |
-      |# Heading 1
-      |## Heading 2
-      |### Heading 3
-      |#### Heading 4
-      |##### Heading 5
-      |###### Heading 6
-      |####### Heading 7 - invalid
-      |
-      |Another heading 1
-      |=================
-      |
-      |Another heading 2
-      |-----------------
-      |
-      |## Bullet List
-      |- List 1
-      |- List 2
-      |
-      |* List 1
-      |++
-      |Sub list 1? TODO
-      |++
-      |* List 2
-      |
-      |## Number List
-      |1. Number List 1
-      |1. Number List 2
-      |
-      |## Images
-      |
-      |![foo *bar*]
-      |
-      |[foo *bar*]: https://www.placecage.com/140/100 "train & tracks"
-      |
-      |Note: Image can't be hosted in the API catalogue
-      |
-      |# End of OAS description markdown
-      |""".stripMargin
 
 }
