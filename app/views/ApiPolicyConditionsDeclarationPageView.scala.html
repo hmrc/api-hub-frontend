@@ -66,7 +66,7 @@
 
         <div class="govuk-button-group">
             @govukButton(
-                ButtonViewModel(messages("apiPolicyConditionsDeclarationPage.button.accept"))
+                ButtonViewModel(messages("apiPolicyConditionsDeclarationPage.button.accept")).withId("acceptAndContinueButton")
             )
             @govukButton(
                 ButtonViewModel(content = messages("apiPolicyConditionsDeclarationPage.button.cancel"))

@@ -28,7 +28,7 @@
 @(app:Application, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
 @applicationLink(application: Application) = {
-    <a href='@applicationLinkUrl(application)' class='govuk-link govuk-link--no-visited-state'>
+    <a id="applicationLink" data-application-id="@application.id" href='@applicationLinkUrl(application)' class='govuk-link govuk-link--no-visited-state'>
         @(application.name)
     </a>
 }

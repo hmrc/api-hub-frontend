@@ -27,7 +27,7 @@
 @(user: UserModel)(implicit request: Request[_], messages: Messages)
 
 @applicationsLink(user: UserModel) = {
-    <a href='@controllers.routes.IndexController.onPageLoad.url' class='govuk-link govuk-link--no-visited-state'>
+    <a id="yourApplicationsLink" href='@controllers.routes.IndexController.onPageLoad.url' class='govuk-link govuk-link--no-visited-state'>
     @if(user.permissions.canSupport) {
         @messages("applicationDeletedSuccess.advice.allApplications")
     } else {

@@ -42,6 +42,7 @@
                     @govukButton(
                         ButtonViewModel(messages("site.continue"))
                             .asLink(ldapSignInUrl)
+                            .withId("signInViaLdapButton")
                     )
                 </p>
             </div>
@@ -56,6 +57,7 @@
                     @govukButton(
                         ButtonViewModel(messages("site.continue"))
                             .asLink(strideSignInUrl)
+                            .withId("signInViaStrideButton")
                     )
                 </p>
 

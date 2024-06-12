@@ -49,6 +49,9 @@ trait ButtonFluency {
     def withName(name: String): Button =
       button copy (name = Some(name))
 
+    def withId(id: String): Button =
+      button copy (id = Some(id))
+
     def withCssClass(newClass: String): Button =
       button copy (classes = s"${button.classes} $newClass")
 

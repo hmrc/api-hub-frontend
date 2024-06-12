@@ -62,12 +62,14 @@
             @govukButton(
                 ButtonViewModel(messages("deleteApplicationConfirmation.accept"))
                     .asWarningButton()
+                    .withId("acceptAndContinueButton")
             )
 
             @govukButton(
                 ButtonViewModel(content = messages("site.cancel"))
                     .asSecondaryButton()
                     .asLink(controllers.application.routes.ApplicationDetailsController.onPageLoad(applicationId).url)
+                    .withId("cancelButton")
             )
         </div>
     }

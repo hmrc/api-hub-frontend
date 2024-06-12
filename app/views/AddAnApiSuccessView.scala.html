@@ -27,8 +27,8 @@ govukPanel: GovukPanel
 @(application: Application, api: ApiDetail, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
 @applicationLink(application: Application) = {
-    <a href='@applicationLinkUrl(application)' class='govuk-link govuk-link--no-visited-state'>
-    @(application.name)
+    <a id='applicationLink' href='@applicationLinkUrl(application)' class='govuk-link govuk-link--no-visited-state' data-application-id='@application.id'>
+        @(application.name)
     </a>
 }
 
@@ -36,30 +36,37 @@ govukPanel: GovukPanel
     controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url
 }
 
+@successSummary() = {
+    <p id="successSummary">
+        @messages("addAnApiSuccess.summary", api.title)
+    </p>
+}
+
 @layout(pageTitle = titleNoForm(messages("addAnApiSuccess.title")), showBackLink = false, user = user) {
 
     @govukPanel(Panel(
         classes = "govuk-!-margin-bottom-9",
         title = Text(messages("addAnApiSuccess.title")),
-        content = HtmlContent(messages("addAnApiSuccess.summary", api.title))
+        content = HtmlContent(successSummary())
     ))
 
     <h2 class="govuk-heading-m">@messages("addAnApiSuccess.advice.heading")</h2>
+
     <p class="govuk-body">
-    @Html(
-        messages(
-            "addAnApiSuccess.advice.body1"
+        @Html(
+            messages(
+                "addAnApiSuccess.advice.body1"
+            )
         )
-    )
-    </p>
-    <p class="govuk-body">
-    @Html(
-        messages(
-            "addAnApiSuccess.advice.body2",
-            applicationLink(application)
-        )
-    )
     </p>
 
+    <p class="govuk-body">
+        @Html(
+            messages(
+                "addAnApiSuccess.advice.body2",
+                applicationLink(application)
+            )
+        )
+    </p>
 
 }

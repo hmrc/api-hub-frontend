@@ -82,7 +82,9 @@
         </div>
 
         <div class="govuk-grid-column-two-thirds content">
-            <h1 id="details" class="govuk-heading-l">@messages("apiDetails.apiName"): @apiDetail.title</h1>
+            <h1 id="details" class="govuk-heading-l" data-api-id="@apiDetail.id" data-api-title="@apiDetail.title">
+                @messages("apiDetails.apiName"): @apiDetail.title
+            </h1>
 
             <h2 class="govuk-heading-m">
                 @messages("apiDetails.details.overview")
@@ -95,6 +97,7 @@
             @if(user.isDefined) {
                 @govukButton(
                     Button(
+                        id = Some("addToAnApplicationButton"),
                         href = Some(routes.AddAnApiStartController.addAnApi(apiDetail.id).url),
                         content = Text(messages("apiDetails.addToAnApplication"))
                     )

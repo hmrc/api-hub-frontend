@@ -95,17 +95,11 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 object CheckYourAnswersControllerSpec extends SummaryListFluency {
 
   def buildApplicationDetailsSummaryList(userAnswers: UserAnswers, messages: Messages): SummaryList = {
-    SummaryListViewModel(
-      Seq(
-        ApplicationNameSummary.row(userAnswers)(messages)
-      ).flatten
-    )
+    ApplicationNameSummary.summary(userAnswers)(messages)
   }
 
   def buildTeamMembersSummaryList(userAnswers: UserAnswers, messages: Messages): SummaryList = {
-    SummaryListViewModel(
-      rows = TeamMembersSummary.rows(userAnswers)(messages)
-    )
+    TeamMembersSummary.summary(userAnswers)(messages)
   }
 
 }

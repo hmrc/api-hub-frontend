@@ -22,11 +22,17 @@ import models.{CheckMode, UserAnswers}
 import pages.TeamMembersPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{Key, SummaryListRow, Value}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{Key, SummaryList, SummaryListRow, Value}
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
 object TeamMembersSummary  {
+
+  def summary(answers: UserAnswers)(implicit messages: Messages): SummaryList = {
+    SummaryListViewModel(
+      rows = rows(answers)
+    ).withAttribute("data-summary-for" -> "team-members")
+  }
 
   def rows(answers: UserAnswers)(implicit messages: Messages): Seq[SummaryListRow] = {
     val teamMembers = answers.get(TeamMembersPage).getOrElse(Seq.empty)

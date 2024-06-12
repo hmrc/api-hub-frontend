@@ -102,7 +102,7 @@
                         <ul class="govuk-list govuk-list-inline scopes-list">
                             @for(scope <- value._1) {
                                 <li>
-                                    <strong class="govuk-tag govuk-tag--grey custom-normal-case">
+                                    <strong class="govuk-tag govuk-tag--grey custom-normal-case" data-scope="@scope">
                                         @scope
                                     </strong>
                                 </li>
@@ -116,7 +116,7 @@
         </div>
 
         @govukButton(
-            ButtonViewModel(messages("site.continue"))
+            ButtonViewModel(messages("site.continue")).withId("continueButton")
         )
     }
 }
