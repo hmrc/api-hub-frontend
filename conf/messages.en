@@ -440,9 +440,8 @@ requestProductionAccessSuccess.text.line2 = You will receive an email once a dec
 applicationDeletedSuccess.title = Application successfully deleted
 applicationDeletedSuccess.heading = Application successfully deleted
 applicationDeletedSuccess.advice.heading = What you can do now
-applicationDeletedSuccess.advice.returnTo = Return to {0}
-applicationDeletedSuccess.advice.yourApplications = Your applications
-applicationDeletedSuccess.advice.allApplications = All applications
+applicationDeletedSuccess.advice.returnTo = Return to the {0}
+applicationDeletedSuccess.advice.dashboard = dashboard
 applicationDeletedSuccess.advice.newApplication = Register a new application
 
 deleteApplicationConfirmation.title = Delete application

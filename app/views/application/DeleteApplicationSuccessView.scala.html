@@ -26,13 +26,9 @@
 
 @(user: UserModel)(implicit request: Request[_], messages: Messages)
 
-@applicationsLink(user: UserModel) = {
-    <a id="yourApplicationsLink" href='@controllers.routes.IndexController.onPageLoad.url' class='govuk-link govuk-link--no-visited-state'>
-    @if(user.permissions.canSupport) {
-        @messages("applicationDeletedSuccess.advice.allApplications")
-    } else {
-        @messages("applicationDeletedSuccess.advice.yourApplications")
-    }
+@applicationsLink() = {
+    <a id="returnToDashboardLink" href='@controllers.routes.IndexController.onPageLoad.url' class='govuk-link govuk-link--no-visited-state'>
+        @messages("applicationDeletedSuccess.advice.dashboard")
     </a>
 }
 
@@ -55,7 +51,7 @@
     @Html(
         messages(
             "applicationDeletedSuccess.advice.returnTo",
-            applicationsLink(user)
+            applicationsLink()
         )
     )
     </p>
