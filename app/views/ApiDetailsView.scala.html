@@ -17,6 +17,7 @@
 @import models.api._
 @import models.user.UserModel
 @import views.html.components.ApiDeployments
+@import views.MarkdownUtils
 
 @this(
         layout: templates.Layout,
@@ -223,17 +224,17 @@
                         <code class="code--header"><strong class="bold-xsmall">@endpoint.path</strong></code>
 
                         @if(method.summary.isDefined) {
-                            <strong class="govuk-heading-s govuk-!-margin-bottom-4 govuk-!-margin-top-5">@messages("apiDetails.endpoints.summary")</strong>
-                            <p class="govuk-body">
-                                @method.summary.getOrElse("")
-                            </p>
+                            <h3 class="govuk-heading-s govuk-!-margin-bottom-4 govuk-!-margin-top-5">@messages("apiDetails.endpoints.summary")</h3>
+                            <div class="govuk-body hip-api-info__summary">
+                                @MarkdownUtils.parse(method.summary.getOrElse(""))
+                            </div>
                         }
 
                         @if(method.description.isDefined) {
-                            <strong class="govuk-heading-s govuk-!-margin-bottom-4 govuk-!-margin-top-5">@messages("apiDetails.endpoints.description")</strong>
-                            <p class="govuk-body">
-                                @method.description.getOrElse("")
-                            </p>
+                            <h3 class="govuk-heading-s govuk-!-margin-bottom-4 govuk-!-margin-top-5">@messages("apiDetails.endpoints.description")</h3>
+                            <div class="govuk-body hip-api-info__description">
+                                @MarkdownUtils.parse(method.description.getOrElse(""))
+                            </div>
                         }
                     }
                 </section>
