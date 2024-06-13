@@ -32,8 +32,12 @@
     controllers.admin.routes.AccessRequestsController.onPageLoad().url
 }
 
-@layout(pageTitle = titleNoForm(messages("accessRequestRejectedSuccess.title")), user = Some(user), showBackLink = false) {
-
+@layout(
+    pageTitle = titleNoForm(messages("accessRequestRejectedSuccess.title")),
+    user = Some(user),
+    showBackLink = false,
+    activeLink = Some("apiHubAdmin")
+) {
     <div class="govuk-panel govuk-panel--warning hip-panel--secondary-success">
         <h1 class="govuk-panel__title">
             @messages("accessRequestRejectedSuccess.heading")

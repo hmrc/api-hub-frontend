@@ -46,6 +46,7 @@ $input-text-border: $black;
 $input-text-background: $white;
 $secondary-success-color: $white;
 $secondary-success-background: $dark-grey;
+$active-link-color: $dark-blue;
 
 .js-visible {
     display: none !important;
@@ -184,6 +185,13 @@ $secondary-success-background: $dark-grey;
     .custom-back-link {
         margin-top: 0 !important;
         margin-bottom: 0 !important;
+    }
+
+    a.active {
+        color: $active-link-color;
+        text-decoration: none;
+        border-bottom: 3px solid $active-link-color;
+        text-decoration-thickness: 3px;
     }
 }
 

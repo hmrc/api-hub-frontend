@@ -26,8 +26,12 @@
 
 @(accessRequests: Seq[AccessRequest], user: UserModel)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("accessRequests.title")), user = Some(user), fullWidth = true) {
-
+@layout(
+    pageTitle = titleNoForm(messages("accessRequests.title")),
+    user = Some(user),
+    fullWidth = true,
+    activeLink = Some("apiHubAdmin")
+) {
     @views.html.templates.SideNav(messages("accessRequests.admin"), AdminNavItems(user, AdminSideNavPages.AccessRequestsPage)) {
 
         <h1 class="govuk-heading-m govuk-!-margin-bottom-7">
