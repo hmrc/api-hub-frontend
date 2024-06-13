@@ -25,7 +25,8 @@
         govukButton: GovukButton,
         govukCheckboxes: GovukCheckboxes,
         govukErrorSummary: GovukErrorSummary,
-        formHelper: FormWithCSRF
+        formHelper: FormWithCSRF,
+        policyView: PolicyView
 )
 
 @(form: Form[_], application: Application, applicationApis: Seq[ApplicationApi], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
@@ -132,27 +133,8 @@
                         </span>
                         <span class="hip-details__summary-info govuk-body-s"></span>
                     </summary>
-                    <div class="hip-details__text">
-
-                        <p class="govuk-body">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vitae et leo duis ut diam quam nulla. Sagittis purus sit amet volutpat consequat mauris nunc. Morbi tristique senectus et netus et malesuada fames ac.</p>
-
-                        <ul class="govuk-list govuk-list--bullet">
-                            <li>
-                            Ridiculus mus mauris vitae ultricies. Id semper risus in hendrerit gravida rutrum.
-                            </li>
-                            <li>
-                            Mi tempus imperdiet nulla malesuada pellentesque elit eget. Purus gravida quis blandit turpis.
-                            </li>
-                            <li>
-                            Pretium vulputate sapien nec sagittis aliquam malesuada bibendum arcu.
-                            </li>
-                            <li>
-                            Turpis tincidunt id aliquet risus feugiat in ante metus dictum. Aliquet risus feugiat in ante metus dictum.
-                            </li>
-                        </ul>
-
-                        <p class="govuk-body">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vitae et leo duis ut diam quam nulla. Sagittis purus sit amet volutpat consequat mauris nunc. Morbi tristique senectus et netus et malesuada fames ac.</p>
-
+                    <div class="hip-details__terms">
+                        @policyView()
                     </div>
                 </details>
             }

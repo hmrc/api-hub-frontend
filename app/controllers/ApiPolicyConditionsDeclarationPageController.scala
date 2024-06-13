@@ -27,7 +27,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.AddAnApiSessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.{ApiPolicyConditionsDeclarationPageView, PolicyView}
+import views.html.ApiPolicyConditionsDeclarationPageView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -42,8 +42,7 @@ class ApiPolicyConditionsDeclarationPageController @Inject()(
   formProvider: ApiPolicyConditionsDeclarationPageFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: ApiPolicyConditionsDeclarationPageView,
-  checkContext: AddAnApiCheckContextActionProvider,
-  policyView: PolicyView
+  checkContext: AddAnApiCheckContextActionProvider
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
