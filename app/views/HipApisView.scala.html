@@ -148,7 +148,13 @@
     </div>
 }
 
-@layout(pageTitle = titleNoForm(messages("hipApis.title")), user = user, fullWidth = true, customScriptsBlock = Some(scripts())) {
+@layout(
+    pageTitle = titleNoForm(messages("hipApis.title")),
+    user = user,
+    fullWidth = true,
+    customScriptsBlock = Some(scripts()),
+    activeLink = Some("hipApis")
+) {
     <h2 class="govuk-heading-l">@messages("hipApis.title")</h2>
     <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible hip-color-override">
     <div class="govuk-grid-row">

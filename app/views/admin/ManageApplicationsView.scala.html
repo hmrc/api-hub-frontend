@@ -27,8 +27,12 @@
 
 @(applications: Seq[Application], user: UserModel)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("govuk-grid-column-two-thirds.title")), user = Some(user), fullWidth = true) {
-
+@layout(
+    pageTitle = titleNoForm(messages("govuk-grid-column-two-thirds.title")),
+    user = Some(user),
+    fullWidth = true,
+    activeLink = Some("apiHubAdmin")
+) {
     @views.html.templates.SideNav(messages("manageApplications.admin"), AdminNavItems(user, AdminSideNavPages.ManageApplicationsPage)) {
 
         <h1 class="govuk-heading-m govuk-!-margin-bottom-7">

@@ -30,8 +30,12 @@
     <a href="@controllers.team.routes.ManageTeamController.onPageLoad(team.id)">@team.id</a>
 }
 
-@layout(pageTitle = titleNoForm(messages("manageTeams.title")), user = Some(user), fullWidth = true) {
-
+@layout(
+    pageTitle = titleNoForm(messages("manageTeams.title")),
+    user = Some(user),
+    fullWidth = true,
+    activeLink = Some("apiHubAdmin")
+) {
     @views.html.templates.SideNav(messages("manageTeams.admin"), AdminNavItems(user, AdminSideNavPages.ManageTeamsPage)) {
 
         <h1 class="govuk-heading-m govuk-!-margin-bottom-7">

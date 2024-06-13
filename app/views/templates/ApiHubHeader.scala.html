@@ -20,7 +20,11 @@
     govukBackLink: GovukBackLink
 )
 
-@(showBackLink: Boolean, user: Option[UserModel], helpDocsPath: String)(implicit request: Request[_], messages: Messages)
+@(
+    showBackLink: Boolean,
+    user: Option[UserModel],
+    helpDocsPath: String,
+    activeLink: Option[String] = None)(implicit request: Request[_], messages: Messages)
 <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PLWQQZB"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -73,6 +77,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
 </header>
 
+@active(name: String) = @{
+    if (activeLink.contains(name)) {
+        "active"
+    } else {
+        ""
+    }
+}
+
 <div class="govuk-width-container" role="region">
     <nav class="hip-nav-header-links govuk-!-padding-bottom-3 govuk-!-padding-top-3">
         @if(showBackLink) {
@@ -80,19 +92,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         }
         <ul class="custom-second-nav">
             <li>
-                <a id="dashboardLink" data-header-link-name="dashboard" class="govuk-link govuk-link--no-visited-state" href="@routes.IndexController.onPageLoad.url">
+                <a id="dashboardLink" data-header-link-name="dashboard" class="govuk-link govuk-link--no-visited-state @active("dashboard")" href="@routes.IndexController.onPageLoad.url">
                     @messages("site.dashboard")
                 </a>
             </li>
             @if(user.map(user => user.permissions.canApprove || user.permissions.canSupport).getOrElse(false)) {
                 <li>
-                    <a id="apiHubAdminLink" data-header-link-name="apiHubAdmin" class="govuk-link govuk-link--no-visited-state" href="@controllers.admin.routes.AccessRequestsController.onPageLoad().url">
+                    <a id="apiHubAdminLink" data-header-link-name="apiHubAdmin" class="govuk-link govuk-link--no-visited-state @active("apiHubAdmin")" href="@controllers.admin.routes.AccessRequestsController.onPageLoad().url">
                         @messages("site.approvals")
                     </a>
                 </li>
             }
             <li>
-                <a id="hipApisLink" data-header-link-name="hipApis" class="govuk-link govuk-link--no-visited-state" href="@routes.HipApisController.onPageLoad().url">
+                <a id="hipApisLink" data-header-link-name="hipApis" class="govuk-link govuk-link--no-visited-state @active("hipApis")" href="@routes.HipApisController.onPageLoad().url">
                     @messages("hipApis.link.text")
                 </a>
             </li>
@@ -102,7 +114,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </a>
             </li>
             <li>
-                <a id="getSupportLink" data-header-link-name="getSupport" class="govuk-link govuk-link--no-visited-state" href="@routes.GetSupportController.onPageLoad.url">
+                <a id="getSupportLink" data-header-link-name="getSupport" class="govuk-link govuk-link--no-visited-state @active("getSupport")" href="@routes.GetSupportController.onPageLoad.url">
                 @messages("support.link.text")
                 </a>
             </li>
