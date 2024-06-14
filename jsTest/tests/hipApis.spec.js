@@ -1,5 +1,6 @@
 import {JSDOM} from 'jsdom';
 import {onPageShow} from '../../app/assets/javascripts/hipApis.js';
+import {isVisible} from "./testUtils.js";
 
 describe('hipApis', () => {
     let document;
@@ -96,7 +97,7 @@ describe('hipApis', () => {
     }
     function getVisiblePanelData(...props) {
         return Array.from(document.querySelectorAll('.api-panel'))
-            .filter(el => el.style.display === 'block')
+            .filter(isVisible)
             .map(el => props.reduce((acc, prop) => ({...acc, [prop]: el.dataset[prop]}), {index: parseInt(el.dataset.index)}));
     }
     function getResultCount() {
@@ -139,7 +140,7 @@ describe('hipApis', () => {
         return parseInt(document.querySelector('.govuk-pagination__item--current').textContent);
     }
     function noResultsPanelIsVisible() {
-        return document.getElementById('noResultsPanel').style.display === 'block';
+        return isVisible(document.getElementById('noResultsPanel'));
     }
     function enterNameFilterText(value) {
         document.getElementById('nameFilter').value = value;

@@ -18,6 +18,7 @@
 @import viewmodels.admin.{AdminNavItems, AdminSideNavPages}
 @import views.ViewUtils
 @import models.application.Application
+@import views.html.helper.CSPNonce
 
 @this(
     layout: templates.Layout,
@@ -27,11 +28,16 @@
 
 @(applications: Seq[Application], user: UserModel)(implicit request: Request[_], messages: Messages)
 
+@scripts() = {
+    <script src='@routes.Assets.versioned("javascripts/adminManageApps.js")' type="module" @{CSPNonce.attr}></script>
+}
+
 @layout(
     pageTitle = titleNoForm(messages("govuk-grid-column-two-thirds.title")),
     user = Some(user),
     fullWidth = true,
-    activeLink = Some("apiHubAdmin")
+    activeLink = Some("apiHubAdmin"),
+    customScriptsBlock = Some(scripts()),
 ) {
     @views.html.templates.SideNav(messages("manageApplications.admin"), AdminNavItems(user, AdminSideNavPages.ManageApplicationsPage)) {
 
@@ -39,8 +45,9 @@
             @messages("manageApplications.heading")
         </h1>
 
+        <div id="appDetailPanels">
         @for(application <- applications){
-            <div class="hip-inner-card flex">
+            <div class="hip-inner-card flex hip-application">
                 <div class="left">
                     <h5 class="govuk-heading-s hip-inner-card-title govuk-!-margin-bottom-4">
                         <a class="govuk-link govuk-link--no-visited-state" href=@controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url>@application.name</a>
@@ -65,6 +72,10 @@
                 </div>
             </div>
         }
+        </div>
+
+        <p id="displayCountMessage" class="govuk-body govuk-!-margin-top-4 hip-text--centered govuk-!-display-none">@Html(messages("manageApplications.displayCount", <strong id="displayCount"></strong>, <strong id="totalCount">10</strong>))</p>
+        <nav id="pagination" class="hip-pagination--centered"></nav>
 
     }
 

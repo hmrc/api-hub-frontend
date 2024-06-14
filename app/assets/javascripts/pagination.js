@@ -1,3 +1,5 @@
+import {setVisible} from "./utils.js";
+
 export function buildPaginator(elContainer) {
     const noop = () => {};
 
@@ -40,10 +42,6 @@ export function buildPaginator(elContainer) {
         }
 
         const ELLIPSIS = '<li class="govuk-pagination__item govuk-pagination__item--ellipses">&ctdot;</li>';
-
-        function setVisible(el, isVisible) {
-            el.style.display = isVisible ? 'block' : 'none';
-        }
 
         let pageNumberClickHandler = noop,
             previousLinkClickHandler = noop,
