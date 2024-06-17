@@ -28,8 +28,30 @@ describe('adminManageApps', () => {
     function displayCountMessageIsVisible() {
         return isVisible(document.getElementById('displayCountMessage'));
     }
+    function getDisplayCount() {
+        return Number(document.getElementById('displayCount').textContent);
+    }
+    function getTotalCount() {
+        return Number(document.getElementById('totalCount').textContent);
+    }
+    function getVisibleAppIndexes() {
+        return Array.from(document.querySelectorAll('.hip-application'))
+            .filter(el => !el.classList.contains('govuk-!-display-none'))
+            .map(el => Number(el.dataset.index));
+    }
+    function arrayFromTo(from, to) {
+        return Array.from({length: to - from + 1}, (_, i) => i + from);
+    }
+    function getPaginationPageLink(pageNumber) {
+        return document.querySelector(`#pagination a[data-page="${pageNumber}"]`);
+    }
 
-
+    function buildAppPanels(count) {
+        document.getElementById('appDetailPanels').innerHTML = Array.from(
+            {length: count},
+            (_, i) => `<div class="hip-application" data-index="${i+1}">App ${i+1}</div>`
+        ).join('');
+    }
 
     it("if 20 applications are present on the page then all are visible and pagination is not available",  () => {
         buildAppPanels(20);
@@ -49,6 +71,35 @@ describe('adminManageApps', () => {
         expect(displayCountMessageIsVisible()).toBeTrue();
     });
 
+    it("when the page loads only the first 20 applications are visible and the display message is correct",  () => {
+        buildAppPanels(101);
 
+        onDomLoaded();
+
+        expect(getDisplayCount()).toBe(20);
+        expect(getTotalCount()).toBe(101);
+        expect(getVisibleAppIndexes()).toEqual(arrayFromTo(1, 20));
+    });
+
+    it("when we navigate to the second page the correct applications are visible and the display message is correct",  () => {
+        buildAppPanels(101);
+
+        onDomLoaded();
+        getPaginationPageLink(2).click();
+
+        expect(getDisplayCount()).toBe(20);
+        expect(getTotalCount()).toBe(101);
+        expect(getVisibleAppIndexes()).toEqual(arrayFromTo(21, 40));
+    });
+
+    it("when we navigate to the final page the correct applications are visible and the display message is correct",  () => {
+        buildAppPanels(101);
+
+        onDomLoaded();
+        getPaginationPageLink(6).click();
+
+        expect(getDisplayCount()).toBe(1);
+        expect(getTotalCount()).toBe(101);
+        expect(getVisibleAppIndexes()).toEqual(arrayFromTo(101, 101));
     });
 });
