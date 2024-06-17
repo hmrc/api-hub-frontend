@@ -555,6 +555,7 @@ manageApplications.heading = Manage applications
 manageApplications.admin = API Hub admin
 manageApplications.application.id = ID
 manageApplications.application.created = Registered
+manageApplications.displayCount = Showing {0} of {1}
 
 manageTeams.title = Manage teams
 manageTeams.heading = Manage teams

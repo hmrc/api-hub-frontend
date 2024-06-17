@@ -3,6 +3,7 @@ import {buildDomainFilters} from "./hipApisDomainFilters.js";
 import {buildStatusFilters} from "./hipApisStatusFilters.js";
 import {buildHodsFilters} from "./hipApisHodsFilters.js";
 import {buildNameFilter} from "./hipApisNameFilter.js";
+import {setVisible} from "./utils.js";
 
 export function onPageShow() {
     const filters = [
@@ -47,7 +48,7 @@ export function onPageShow() {
             },
             setApiPanelVisibility(apis) {
                 apis.forEach(apiDetail => {
-                    apiDetail.el.style.display = apiDetail.visible ? 'block' : 'none';
+                    setVisible(apiDetail.el, apiDetail.visible);
                 });
             },
             initialiseFilters(apis) {
@@ -60,7 +61,7 @@ export function onPageShow() {
                 paginator.render(currentPage, totalPages);
             },
             toggleNoResultsPanel(visible) {
-                elNoResultsPanel.style.display = visible ? 'block' : 'none';
+                setVisible(elNoResultsPanel, visible);
             }
         };
     })();

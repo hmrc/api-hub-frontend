@@ -1,4 +1,5 @@
 import {buildPaginator} from '../../app/assets/javascripts/pagination.js';
+import {isVisible} from "./testUtils.js";
 import {JSDOM} from 'jsdom';
 
 describe('pagination', () => {
@@ -21,7 +22,7 @@ describe('pagination', () => {
 
     it("paginator not visible if only 1 page of results", () => {
         paginator.render(1, 1);
-        expect(elContainer.style.display).toEqual('none');
+        expect(isVisible(elContainer)).toBeFalse();
     });
 
     describe('Previous link', () => {
@@ -31,12 +32,12 @@ describe('pagination', () => {
 
         it("previous link not visible when on first page", () => {
             paginator.render(1, 10);
-            expect(previousLink().style.display).toEqual('none');
+            expect(isVisible(previousLink())).toBeFalse();
         });
 
         it("previous link is visible when on second page", () => {
             paginator.render(2, 10);
-            expect(previousLink().style.display).toEqual('block');
+            expect(isVisible(previousLink())).toBeTrue();
         });
 
         it("clicking previous link navigates to the previous page", () => {
@@ -53,12 +54,12 @@ describe('pagination', () => {
 
         it("next link not visible when on last page", () => {
             paginator.render(5, 5);
-            expect(nextLink().style.display).toEqual('none');
+            expect(isVisible(nextLink())).toBeFalse();
         });
 
         it("next link is visible when on second to last page", () => {
             paginator.render(4, 5);
-            expect(nextLink().style.display).toEqual('block');
+            expect(isVisible(nextLink())).toBeTrue();
         });
 
         it("clicking next link navigates to the next page", () => {
