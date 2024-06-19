@@ -1,9 +1,9 @@
-import {buildPaginator} from './pagination.js';
+import {buildPaginator, HIDDEN_BY_PAGINATION} from './paginationController.js';
 import {buildDomainFilters} from "./hipApisDomainFilters.js";
 import {buildStatusFilters} from "./hipApisStatusFilters.js";
 import {buildHodsFilters} from "./hipApisHodsFilters.js";
 import {buildNameFilter} from "./hipApisNameFilter.js";
-import {setVisible} from "./utils.js";
+import {setVisible, noop} from "./utils.js";
 
 export function onPageShow() {
     const filters = [
@@ -19,10 +19,9 @@ export function onPageShow() {
             elPaginationContainer = document.getElementById('pagination'),
             elNoResultsPanel = document.getElementById('noResultsPanel'),
             elResetFiltersLink = document.getElementById('resetFilters'),
-            elNoResultsResetFiltersLink = document.getElementById('noResultsClearFilters'),
-            paginator = buildPaginator(elPaginationContainer);
+            elNoResultsResetFiltersLink = document.getElementById('noResultsClearFilters');
 
-        let onFiltersChangedHandler = () => {};
+        let onFiltersChangedHandler = noop;
 
         filters.forEach(filter=> filter.onChange(() => onFiltersChangedHandler()));
 
@@ -38,13 +37,11 @@ export function onPageShow() {
             onFiltersChanged(handler) {
                 onFiltersChangedHandler = handler;
             },
-            onPaginationChanged(handler) {
-                paginator.onNavigation(pageNumber => {
-                    handler(pageNumber);
-                });
+            get apiDetailPanels() {
+                return [...apiDetailPanelEls];
             },
-            getApiDetailPanels() {
-                return apiDetailPanelEls;
+            get paginationContainer() {
+                return elPaginationContainer;
             },
             setApiPanelVisibility(apis) {
                 apis.forEach(apiDetail => {
@@ -57,21 +54,20 @@ export function onPageShow() {
             setResultCount(count) {
                 elSearchResultsSize.textContent = count;
             },
-            setPagination(currentPage, totalPages) {
-                paginator.render(currentPage, totalPages);
-            },
             toggleNoResultsPanel(visible) {
                 setVisible(elNoResultsPanel, visible);
             }
         };
     })();
 
+    const paginator = buildPaginator(view.paginationContainer, 15)
+
     function buildFilterFunctions() {
         return filters.map(filter=> filter.buildFilterFunction());
     }
 
     const model = {
-        apis: view.getApiDetailPanels().map(el => ({
+        apis: view.apiDetailPanels.map(el => ({
             data: {
                 apiStatus: el.dataset['apistatus'],
                 domain: el.dataset['domain'],
@@ -81,43 +77,14 @@ export function onPageShow() {
             },
             el,
             hiddenByFilters: false,
-            hiddenByPagination: false,
             get visible() {
-                return !this.hiddenByFilters && !this.hiddenByPagination;
+                return !this.hiddenByFilters && !this[HIDDEN_BY_PAGINATION];
             }
         })),
         get resultCount() {
             return this.apis.filter(apiDetail => ! apiDetail.hiddenByFilters).length;
-        },
-        pagination: {
-            currentPage: 1,
-            get totalPages() {
-                return Math.ceil(model.resultCount / this.itemsPerPage);
-            },
-            get itemsPerPage() {
-                return 15;
-            }
         }
     };
-
-    function setPaginationPageNumber(pageNumber) {
-        model.pagination.currentPage = pageNumber;
-
-        const {currentPage, itemsPerPage, totalPages} = model.pagination,
-            startIndex = (currentPage - 1) * itemsPerPage,
-            endIndex = startIndex + itemsPerPage;
-
-        model.apis
-            .filter(apiDetail => ! apiDetail.hiddenByFilters)
-            .forEach((apiDetail, index) => {
-                apiDetail.hiddenByPagination = index < startIndex || index >= endIndex;
-            });
-
-        view.setApiPanelVisibility(model.apis);
-        view.setPagination(currentPage, totalPages);
-    }
-
-    view.onPaginationChanged(setPaginationPageNumber);
 
     function applyFilters() {
         const filterFns = buildFilterFunctions();
@@ -125,11 +92,16 @@ export function onPageShow() {
             apiDetail.hiddenByFilters = ! filterFns.every(fn => fn(apiDetail.data));
         });
 
-        setPaginationPageNumber(1);
+        paginator.initialise(model.apis.filter(apiDetail => ! apiDetail.hiddenByFilters));
+        view.setApiPanelVisibility(model.apis);
 
         view.setResultCount(model.resultCount);
         view.toggleNoResultsPanel(model.resultCount === 0);
     }
+
+    paginator.onPaginationChanged(() => {
+        view.setApiPanelVisibility(model.apis);
+    });
 
     view.onFiltersChanged(() => {
         applyFilters();

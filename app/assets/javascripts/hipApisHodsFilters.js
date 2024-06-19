@@ -1,3 +1,5 @@
+import {noop} from "./utils.js";
+
 // Modern browsers have Set.intersection but NodeJS only added it fairly recently so we need to provide a polyfill for the build pipeline
 if (! Set.prototype.intersection) {
     Set.prototype.intersection = function(that) {
@@ -10,7 +12,7 @@ export function buildHodsFilters() {
         elHodFilterCount = document.getElementById('hodFilterCount'),
         elViewHodFilters = document.getElementById('viewHodFilters');
 
-    let onFiltersChangedHandler = () => {};
+    let onFiltersChangedHandler = noop;
 
     function removeElement(el) {
         el.parentElement.removeChild(el);

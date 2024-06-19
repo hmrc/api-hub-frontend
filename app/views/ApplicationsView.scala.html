@@ -17,6 +17,7 @@
 @import models.application.Application
 @import models.user.UserModel
 @import views.ViewUtils
+@import views.html.helper.CSPNonce
 
 @this(
     layout: templates.Layout,
@@ -27,19 +28,24 @@
 
 @(applications: Seq[Application], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
+@scripts() = {
+    <script src='@routes.Assets.versioned("javascripts/yourApplications.js")' type="module" @{CSPNonce.attr}></script>
+}
+
 @layout(
     pageTitle    = titleNoForm(messages("applications.title")),
     showBackLink = true,
     user = user,
-    fullWidth = true
+    fullWidth = true,
+    customScriptsBlock = Some(scripts()),
 ) {
     <h1 class="govuk-heading-m govuk-!-margin-bottom-7">
         @messages("applications.heading")
     </h1>
 
-    <div class="hip-card-container-top">
+    <div id="appDetailPanels" class="hip-card-container-top">
     @applications.map( application =>
-        <div class="hip-card-container-top">
+        <div class="hip-card-container-top hip-application">
             <div class="hip-inner-card flex">
                 <h3 class="govuk-heading-s align-left hip-inner-card-title">
                     <a class="govuk-link govuk-link--no-visited-state" href={controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url} data-application-id={application.id}>{application.name}</a>
@@ -50,5 +56,8 @@
         </div>
     )
     </div>
+
+    <p id="displayCountMessage" class="govuk-body govuk-!-margin-top-4 hip-text--centered govuk-!-display-none">@Html(messages("manageApplications.displayCount", <strong id="displayCount"></strong>, <strong id="totalCount">10</strong>))</p>
+    <nav id="pagination" class="hip-pagination--centered"></nav>
 
 }

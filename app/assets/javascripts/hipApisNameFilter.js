@@ -1,7 +1,9 @@
+import {noop} from "./utils.js";
+
 export function buildNameFilter() {
     const elFilterText = document.getElementById('nameFilter');
 
-    let onFiltersChangedHandler = () => {};
+    let onFiltersChangedHandler = noop;
 
     function normalise(value) {
         return value.trim().toLowerCase();

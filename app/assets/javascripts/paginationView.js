@@ -1,8 +1,6 @@
-import {setVisible} from "./utils.js";
+import {setVisible, noop} from "./utils.js";
 
-export function buildPaginator(elContainer) {
-    const noop = () => {};
-
+export function buildPaginationView(elContainer) {
     function buildView() {
         elContainer.classList.add('govuk-pagination');
         elContainer.setAttribute('aria-label', 'Pagination');
@@ -123,6 +121,9 @@ export function buildPaginator(elContainer) {
         },
         onNavigation(handler) {
             navigationHandler = handler;
+        },
+        get isVisible() {
+            return model.totalPages > 1;
         }
     };
 }
