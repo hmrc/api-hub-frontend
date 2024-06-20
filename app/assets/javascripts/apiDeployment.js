@@ -1,7 +1,9 @@
+import {noop} from "./utils.js";
+
 export function onLoad(){
     const domains = (() => {
         const elDomain = document.getElementById('domain');
-        let onChangeHandler = () => {};
+        let onChangeHandler = noop;
 
         elDomain.addEventListener('input', event => {
             onChangeHandler();

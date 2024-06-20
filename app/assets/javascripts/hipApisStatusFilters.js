@@ -1,9 +1,11 @@
+import {noop} from "./utils.js";
+
 export function buildStatusFilters() {
     const statusFilterEls = Array.from(document.querySelectorAll('#statusFilters .govuk-checkboxes__input')),
         elStatusFilterCount = document.getElementById('statusFilterCount'),
         elViewStatusFilters = document.getElementById('viewStatusFilters');
 
-    let onFiltersChangedHandler = () => {};
+    let onFiltersChangedHandler = noop;
 
     function getSelected() {
         return statusFilterEls.filter(el => el.checked).map(el => el.value);

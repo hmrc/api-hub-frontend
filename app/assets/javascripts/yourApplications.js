@@ -15,7 +15,7 @@ export function onDomLoaded() {
         }
     }));
 
-    const paginator = buildPaginator(elPaginationContainer, 20);
+    const paginator = buildPaginator(elPaginationContainer, 10);
 
     paginator.onPaginationChanged(paginationDetails => {
         applicationPanels.forEach(appPanel => {
