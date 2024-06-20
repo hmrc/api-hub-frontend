@@ -17,6 +17,7 @@
 package controllers.application
 
 import base.SpecBase
+import config.FrontendAppConfig
 import controllers.actions.{FakeApplication, FakePrivilegedUser, FakeUser, FakeUserNotTeamMember}
 import controllers.routes
 import models.application.{Primary, Secondary}
@@ -51,9 +52,10 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
             val request = FakeRequest(GET, controllers.application.routes.EnvironmentAndCredentialsController.onPageLoad(FakeApplication.id).url)
             val result = route(fixture.playApplication, request).value
             val view = fixture.playApplication.injector.instanceOf[EnvironmentAndCredentialsView]
+            val config = fixture.playApplication.injector.instanceOf[FrontendAppConfig]
 
             status(result) mustEqual OK
-            contentAsString(result) mustBe view(FakeApplication, user)(request, messages(fixture.playApplication)).toString
+            contentAsString(result) mustBe view(FakeApplication, user, config.helpDocsPath)(request, messages(fixture.playApplication)).toString
             contentAsString(result) must validateAsHtml
           }
       }
