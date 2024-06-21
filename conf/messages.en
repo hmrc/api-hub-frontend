@@ -585,3 +585,8 @@ myApis.promoteToProd.button = Promote to production
 myApis.promoteToProd.guidance.main = To deploy your API in production please contact {0}, providing the following details:
 myApis.promoteToProd.guidance.item1 = RFC number
 myApis.promoteToProd.guidance.item2 = Time and date of your RFC window
+
+myApis.usage.title = Application usage for API: {0}
+myApis.usage.heading = Application usage for API: {0}
+myApis.usage.link = API usage
+myApis.usage.noApplications = No applications are using this API

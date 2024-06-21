@@ -22,7 +22,7 @@ import generators.{AccessRequestGenerator, ApiDetailGenerators}
 import models.AvailableEndpoint
 import models.accessrequest._
 import models.api.{ApiDeploymentStatuses, EndpointMethod}
-import models.application.{Application, Creator, Credential, Deleted, NewApplication, Primary, TeamMember}
+import models.application.{Api, Application, Creator, Credential, Deleted, NewApplication, Primary, TeamMember}
 import models.application.ApplicationLenses._
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
 import models.team.{NewTeam, Team}
@@ -114,6 +114,42 @@ class ApiHubServiceSpec
         actual =>
           actual mustBe expected
           verify(fixture.applicationsConnector).getApplications(ArgumentMatchers.eq(Some("test-creator-email-2")), ArgumentMatchers.eq(false))(any())
+          succeed
+      }
+    }
+  }
+  "getApplicationsUsingApi" - {
+    val apiId = "myApiId"
+
+    "must call the applications connector and return a sequence of applications" in {
+      val application1 = Application("id-1", "test-app-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1"))).addApi(Api(apiId))
+      val application2 = Application("id-2", "test-app-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2"))).addApi(Api(apiId))
+      val expected = Seq(application1, application2)
+
+      val fixture = buildFixture()
+      when(fixture.applicationsConnector.getApplicationsUsingApi(any(), any())(any())).thenReturn(Future.successful(expected))
+
+      fixture.service.getApplicationsUsingApi(apiId, false)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe expected
+          verify(fixture.applicationsConnector).getApplicationsUsingApi(ArgumentMatchers.eq(apiId), ArgumentMatchers.eq(false))(any())
+          succeed
+      }
+    }
+
+    "must call the applications connector and return a sequence of applications including deleted when requested" in {
+      val application1 = Application("id-1", "test-app-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1"))).addApi(Api(apiId))
+      val application2 = Application("id-2", "test-app-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2"))).addApi(Api(apiId))
+        .delete(Deleted(LocalDateTime.now(), "test-deleted-by"))
+      val expected = Seq(application1, application2)
+
+      val fixture = buildFixture()
+      when(fixture.applicationsConnector.getApplicationsUsingApi(any(), any())(any())).thenReturn(Future.successful(expected))
+
+      fixture.service.getApplicationsUsingApi(apiId, true)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe expected
+          verify(fixture.applicationsConnector).getApplicationsUsingApi(ArgumentMatchers.eq(apiId), ArgumentMatchers.eq(true))(any())
           succeed
       }
     }

@@ -1,0 +1,102 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.api._
+@import models.user.UserModel
+@import views.html.components.ApiDeployments
+@import models.application.Application
+@import views.ViewUtils
+@import views.html.components.IconsLink
+
+@this(
+        layout: templates.Layout,
+        govukButton: GovukButton,
+        govukSummaryList: GovukSummaryList,
+        govukTag: GovukTag,
+        apiDeployments: ApiDeployments,
+        iconsLink: IconsLink
+)
+
+@(apiDetail: ApiDetail, applications: Seq[Application], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+
+@layout(
+    pageTitle    = titleNoForm(messages("myApis.usage.title", apiDetail.title)),
+    showBackLink = true,
+    user = user,
+    fullWidth = true,
+    customScriptsBlock = Some(iconsLink())
+) {
+    <div class="govuk-grid-row">
+        <div id="navContent" class="govuk-grid-column-one-quarter sidebar stickySideMenu">
+            <div class="side-nav">
+                <h2 class="govuk-heading-s">@apiDetail.title</h2>
+                <ul class="side-nav__component">
+                    <li class="side-nav__list">
+                        <a href="@controllers.myapis.routes.MyApiDetailsController.onPageLoad(apiDetail.id).url" class="side-nav__link">@messages("myApis.details.title")</a>
+                    </li>
+                    <li class="side-nav__list">
+                        <a href="@controllers.myapis.routes.SimpleApiRedeploymentController.onPageLoad(apiDetail.id).url" class="side-nav__link">@messages("myApis.update.title")</a>
+                    </li>
+                    <li class="side-nav__list side-nav__list--selected">
+                        <a class="side-nav__link">@messages("myApis.usage.link")</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="govuk-grid-column-three-quarters">
+
+            <h1 class="govuk-heading-m govuk-!-margin-bottom-7">
+                @messages("myApis.usage.heading", apiDetail.title)
+            </h1>
+
+            @if(applications.isEmpty) {
+                <div id="noResultsPanel" class="call-out-panel call-out-panel__small">
+                    <p class="govuk-body information--general-tag govuk-!-margin-bottom-1">
+                        <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                        <span class="call-out-type">
+                            @messages("myApis.usage.noApplications")
+                        </span>
+                    </p>
+                </div>
+            }
+
+            <div id="appDetailPanels" class="hip-card-container-top">
+            @for(application <- applications) {
+                <div class="hip-card-container-top hip-application">
+                    <div class="hip-inner-card flex">
+                        <h3 class="govuk-heading-s align-left hip-inner-card-title">
+                            @if(application.deleted.isEmpty) {
+                                <a class="govuk-link govuk-link--no-visited-state" href="@controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url" data-application-id="@application.id">@application.name</a>
+                            } else {
+                                <span class="govuk-!-font-weight-regular">@application.name</span>
+                                @for(deleted <- application.deleted) {
+                                    @govukTag(Tag(
+                                        content = Text("Deleted"),
+                                        classes = "govuk-tag--grey govuk-!-margin-left-1"
+                                    ))
+                                }
+                            }
+                        </h3>
+                        <p class="govuk-body align-left">@messages("applications.teamMembers", application.teamMembers.size)</p>
+                        <p class="govuk-body align-left ">@messages("applications.created") <span class="utcDateShort">@ViewUtils.formatLocalDateTimeContainingUtc(application.created)</span></p>
+                    </div>
+                </div>
+            }
+            </div>
+        </div>
+    </div>
+}
