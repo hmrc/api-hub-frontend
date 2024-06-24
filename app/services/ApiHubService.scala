@@ -45,6 +45,10 @@ class ApiHubService @Inject()(
     applicationsConnector.getApplications(userEmail, includeDeleted)
   }
 
+  def getApplicationsUsingApi(apiId: String, includeDeleted: Boolean)(implicit hc: HeaderCarrier): Future[Seq[Application]] = {
+    applicationsConnector.getApplicationsUsingApi(apiId, includeDeleted)
+  }
+
   def getApplication(id:String, enrich: Boolean)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
     applicationsConnector.getApplication(id, enrich)
   }

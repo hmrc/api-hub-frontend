@@ -73,6 +73,14 @@ class ApplicationsConnector @Inject()(
       .execute[Seq[Application]]
   }
 
+  def getApplicationsUsingApi(apiId: String, includeDeleted: Boolean)(implicit hc: HeaderCarrier): Future[Seq[Application]] = {
+    httpClient
+      .get(url"$applicationsBaseUrl/api-hub-applications/applications/using-api/$apiId?includeDeleted=$includeDeleted")
+      .setHeader((ACCEPT, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Seq[Application]]
+  }
+
   def getApplication(id:String, enrich: Boolean)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
     httpClient
       .get(url"$applicationsBaseUrl/api-hub-applications/applications/$id?enrich=$enrich")

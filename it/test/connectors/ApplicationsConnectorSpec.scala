@@ -157,6 +157,53 @@ class ApplicationsConnectorSpec
     }
   }
 
+  "ApplicationsConnector.getApplicationsUsingApi" - {
+    val apiId = "myApiId"
+
+    "must place the correct request and return the array of applications" in {
+      val application1 = Application("id-1", "test-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1"))).addApi(Api(apiId))
+      val application2 = Application("id-2", "test-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2"))).addApi(Api(apiId))
+      val expected = Seq(application1, application2)
+
+      stubFor(
+        get(urlEqualTo(s"/api-hub-applications/applications/using-api/$apiId?includeDeleted=false"))
+          .withHeader("Accept", equalTo("application/json"))
+          .withHeader("Authorization", equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withBody(toJsonString(expected))
+          )
+      )
+
+      buildConnector(this).getApplicationsUsingApi(apiId, false)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe expected
+      }
+    }
+
+    "must place the correct request and return the applications including deleted ones when requested" in {
+      val application1 = Application("id-1", "test-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1"))).addApi(Api(apiId))
+      val application2 = Application("id-2", "test-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2"))).addApi(Api(apiId))
+        .delete(Deleted(LocalDateTime.now(), "test-deleted-by"))
+      val expected = Seq(application1, application2)
+
+      stubFor(
+        get(urlEqualTo(s"/api-hub-applications/applications/using-api/$apiId?includeDeleted=true"))
+          .withHeader("Accept", equalTo("application/json"))
+          .withHeader("Authorization", equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withBody(toJsonString(expected))
+          )
+      )
+
+      buildConnector(this).getApplicationsUsingApi(apiId, true)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe expected
+      }
+    }
+  }
+
   "ApplicationsConnector.getApplication" - {
     "must" - {
       behave like successfulApplicationGetter(true)

@@ -8,3 +8,5 @@ GET     /promote/:id                                        controllers.myapis.S
 POST    /promote/:id                                        controllers.myapis.SimpleApiPromotionController.onSubmit(id: String)
 
 GET     /:id                                                controllers.myapis.MyApiDetailsController.onPageLoad(id: String)
+
+GET     /usage/:apiId                                       controllers.myapis.ApiUsageController.onPageLoad(apiId: String)

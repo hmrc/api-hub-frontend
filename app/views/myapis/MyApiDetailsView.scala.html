@@ -43,6 +43,11 @@
                     <li class="side-nav__list">
                         <a href="@controllers.myapis.routes.SimpleApiRedeploymentController.onPageLoad(apiDetail.id).url" class="side-nav__link">@messages("myApis.update.title")</a>
                     </li>
+                    @if(user.exists(_.permissions.canSupport)) {
+                        <li class="side-nav__list">
+                            <a href="@controllers.myapis.routes.ApiUsageController.onPageLoad(apiDetail.id).url" class="side-nav__link">@messages("myApis.usage.link")</a>
+                        </li>
+                    }
                 </ul>
             </div>
         </div>
