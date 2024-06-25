@@ -64,6 +64,10 @@ class ApiHubService @Inject()(
     applicationsConnector.addApi(applicationId, AddApiRequest(apiId, endpoints, scopes))
   }
 
+  def removeApi(applicationId: String, apiId: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    applicationsConnector.removeApi(applicationId, apiId)
+  }
+
   def testConnectivity()(implicit hc: HeaderCarrier): Future[String] = {
     applicationsConnector.testConnectivity()
   }
