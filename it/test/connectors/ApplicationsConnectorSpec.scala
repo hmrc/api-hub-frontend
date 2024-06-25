@@ -669,6 +669,45 @@ class ApplicationsConnectorSpec
     }
   }
 
+  "ApplicationsConnector.removeApi" - {
+    "must place the correct request" in {
+      val applicationId = "test-id"
+      val apiId = "test-api-id"
+
+      stubFor(
+        delete(urlEqualTo(s"/api-hub-applications/applications/$applicationId/apis/$apiId"))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withStatus(NO_CONTENT)
+          )
+      )
+
+      buildConnector(this).removeApi(applicationId, apiId)(HeaderCarrier()).map(
+        result =>
+          result mustBe Some(())
+      )
+    }
+
+    "must return None when the application cannot be found" in {
+      val applicationId = "test-id"
+      val apiId = "test-api-id"
+
+      stubFor(
+        delete(urlEqualTo(s"/api-hub-applications/applications/$applicationId/apis/$apiId"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+          )
+      )
+
+      buildConnector(this).removeApi(applicationId, apiId)(HeaderCarrier()).map(
+        result =>
+          result mustBe None
+      )
+    }
+  }
+
   "ApplicationsConnector.addTeamMember" - {
     "must place the correct request" in {
       val applicationId = "test-id"
