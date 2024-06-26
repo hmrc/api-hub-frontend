@@ -25,7 +25,7 @@
 @(application: Application, user: UserModel)(implicit request: Request[_], messages: Messages)
 
 @applicationLink() = {
-    <a class="govuk-link govuk-link--no-visited-state" href="@controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id)">
+    <a id="applicationLink" class="govuk-link govuk-link--no-visited-state" href="@controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id)">
         @application.name
     </a>
 }
@@ -43,7 +43,7 @@
     </h2>
 
     <p class="govuk-body">
-        @Html(messages( "removeApiSuccess.link", applicationLink()))
+        @Html(messages("removeApiSuccess.link", applicationLink()))
     </p>
 
 }
