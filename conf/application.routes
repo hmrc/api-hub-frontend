@@ -26,3 +26,6 @@ POST        /delete/:id                                                 controll
 GET         /manage-team-members/:id                                    controllers.application.ManageTeamMembersController.onPageLoad(id: String)
 GET         /add-team-member/:id                                        controllers.application.AddTeamMemberController.onPageLoad(id: String)
 POST        /add-team-member/:id                                        controllers.application.AddTeamMemberController.onSubmit(id: String)
+
+GET         /remove-api/:applicationId/:apiId                           controllers.application.RemoveApiController.onPageLoad(applicationId: String, apiId: String)
+POST        /remove-api/:applicationId/:apiId                           controllers.application.RemoveApiController.onSubmit(applicationId: String, apiId: String)
