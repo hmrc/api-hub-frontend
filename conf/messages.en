@@ -595,7 +595,7 @@ myApis.usage.noApplications = No applications are using this API
 removeApiConfirmation.title = Confirm remove API
 removeApiConfirmation.heading = You are about to remove the following API from this application
 removeApiConfirmation.error = Please make a selection
-removeApiConfirmation.guidance1 = The API will be removed from the application.
+removeApiConfirmation.guidance1 = The API will be removed from the application. If there are any pending production access requests, they will be cancelled.
 removeApiConfirmation.guidance2 = If you need to use this API again you will need to add it to your application again.
 removeApiConfirmation.legend = Continue and remove this API?
 
