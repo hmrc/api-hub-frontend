@@ -17,6 +17,7 @@
 package generators
 
 import models.application._
+import org.scalacheck.rng.Seed
 import org.scalacheck.{Arbitrary, Gen}
 
 import java.time.{Instant, LocalDateTime, ZoneId}
@@ -80,7 +81,7 @@ trait ApplicationGenerator {
     } yield Environments(primary,secondary)
   }
 
-  implicit val applicationGenerator: Arbitrary[Application] = Arbitrary {
+  private def applicationGen: Gen[Application] = Gen.sized { _ =>
     for {
       appId <- appIdGenerator
       name <- Gen.alphaStr
@@ -90,17 +91,19 @@ trait ApplicationGenerator {
       teamMembers <- Gen.listOf(teamMemberGenerator)
       environments <- environmentsGenerator
     } yield
-    Application(
-      appId,
-      name,
-      created,
-      createdBy,
-      lastUpdated,
-      teamMembers,
-      environments,
-      Seq.empty
-    )
+      Application(
+        appId,
+        name,
+        created,
+        createdBy,
+        lastUpdated,
+        teamMembers,
+        environments,
+        Seq.empty
+      )
   }
+
+  implicit val applicationGenerator: Arbitrary[Application] = Arbitrary(applicationGen)
 
   implicit val newApplicationGenerator: Arbitrary[NewApplication] =
     Arbitrary {
@@ -115,5 +118,10 @@ trait ApplicationGenerator {
           teamMembers
         )
     }
+
+  private val parameters = Gen.Parameters.default
+
+  def sampleApplication(): Application =
+    applicationGen.pureApply(parameters, Seed.random())
 
 }

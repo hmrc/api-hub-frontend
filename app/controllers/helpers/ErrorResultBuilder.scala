@@ -18,6 +18,7 @@ package controllers.helpers
 
 import com.google.inject.{Inject, Singleton}
 import models.api.ApiDetail
+import models.application.Application
 import play.api.Logging
 import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND}
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
@@ -70,6 +71,13 @@ class ErrorResultBuilder @Inject()(
     notFound(None, Some(heading), Some(message))
   }
 
+  def applicationNotFound(id: String)(implicit request: Request[_]): Result = {
+    notFound(
+      Messages("site.applicationNotFoundHeading"),
+      Messages("site.applicationNotFoundMessage", id)
+    )
+  }
+
   def apiNotFound(id: String)(implicit request: Request[_]): Result = {
     notFound(
       Messages("site.apiNotFound.heading"),
@@ -82,6 +90,17 @@ class ErrorResultBuilder @Inject()(
       Messages("site.apiNotFound.heading"),
       Messages("site.apiNotFoundInApim.message", apiDetail.title)
     )
+  }
+
+  def apiNotFoundInApplication(apiTitle: String, application: Application)(implicit request: Request[_]): Result = {
+    notFound(
+      Messages("site.apiNotFound.heading"),
+      Messages("site.apiNotFoundInApplication.message", apiTitle, application.name)
+    )
+  }
+
+  def apiNotFoundInApplication(apiDetail: ApiDetail, application: Application)(implicit request: Request[_]): Result = {
+    apiNotFoundInApplication(apiDetail.title, application)
   }
 
   def notFound(title: String, heading: String, message: String)(implicit request: Request[_]): Result = {

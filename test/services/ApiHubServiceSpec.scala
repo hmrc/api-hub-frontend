@@ -326,6 +326,31 @@ class ApiHubServiceSpec
     }
   }
 
+  "removeApi" - {
+    "must return the response from the applications connector" in {
+      val applicationId = "test-application-id"
+      val apiId = "test-api-id"
+
+      val results = Table(
+        "response",
+        Some(()),
+        None
+      )
+
+      forAll(results){ response =>
+        val fixture = buildFixture()
+
+        when(fixture.applicationsConnector.removeApi(ArgumentMatchers.eq(applicationId), ArgumentMatchers.eq(apiId))(any()))
+          .thenReturn(Future.successful(response))
+
+        fixture.service.removeApi(applicationId, apiId)(HeaderCarrier()).map {
+          result =>
+            result mustBe response
+        }
+      }
+    }
+  }
+
   "addCredential" - {
     "must call the applications connector with the correct request and return the response" in {
       val fixture = buildFixture()

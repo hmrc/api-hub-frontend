@@ -189,6 +189,10 @@ object ApplicationLenses {
         applicationApis.get(application) :+ api
       )
 
+    def hasApi(id: String): Boolean = {
+      application.apis.exists(_.id.equals(id))
+    }
+
     def delete(deleted: Deleted): Application =
       applicationDeleted.set(
         application,
