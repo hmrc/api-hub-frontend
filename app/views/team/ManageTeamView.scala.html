@@ -28,6 +28,7 @@
 @layout(pageTitle = titleNoForm(messages("manageTeam.title", team.name)), user = Some(user)) {
 
     <h1 class="govuk-heading-l">@messages("manageTeam.heading", team.name)</h1>
+    <a class="govuk-link govuk-link--no-visited-state" href = @Some(controllers.team.routes.ChangeTeamNameController.onPageLoad(team.id).url)>@messages("changeTeamName.link")</a>
 
     <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
 

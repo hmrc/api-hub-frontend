@@ -24,7 +24,7 @@ import models.api.ApiDeploymentStatuses
 import models.application._
 import models.deployment._
 import models.exception.{ApplicationCredentialLimitException, ApplicationsException, TeamNameNotUniqueException}
-import models.requests.{AddApiRequest, TeamMemberRequest}
+import models.requests.{AddApiRequest, ChangeTeamNameRequest, TeamMemberRequest}
 import models.team.{NewTeam, Team}
 import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION, CONTENT_TYPE}
 import play.api.http.MimeTypes.JSON
@@ -400,6 +400,23 @@ class ApplicationsConnector @Inject()(
       .flatMap {
         case Right(_) => Future.successful(Some(()))
         case Left(e) if e.statusCode == NOT_FOUND => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
+  }
+
+  def changeTeamName(id: String, newName: String)(implicit hc:HeaderCarrier): Future[Either[ApplicationsException,Unit]] = {
+    val request = ChangeTeamNameRequest(newName)
+
+    httpClient
+      .put(url"$applicationsBaseUrl/api-hub-applications/teams/$id")
+      .setHeader((CONTENT_TYPE, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .withBody(Json.toJson(request))
+      .execute[Either[UpstreamErrorResponse, Unit]]
+      .flatMap {
+        case Right(_) => Future.successful(Right(()))
+        case Left(e) if e.statusCode == NOT_FOUND => Future.successful(Right(()))
+        case Left(e) if e.statusCode == CONFLICT => Future.successful(Left(TeamNameNotUniqueException.forName(newName)))
         case Left(e) => Future.failed(e)
       }
   }
