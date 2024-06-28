@@ -175,10 +175,14 @@
                                             content = Text(messages("applicationApis.addEndpoints")),
                                             classes = "govuk-button--secondary"
                                         )
+                                        .withAttribute("data-add-endpoints-api-id", applicationApi.apiDetail.id)
                                     )
                                 }
-                                <a class="govuk-link govuk-link--no-visited-state" href="@routes.ApiDetailsController.onPageLoad(applicationApi.apiDetail.id)">
-                                @messages("applicationApis.apis.viewSpecification")
+                                <a class="govuk-link govuk-link--no-visited-state" href="@routes.ApiDetailsController.onPageLoad(applicationApi.apiDetail.id)" data-api-specification-api-id="@applicationApi.apiDetail.id">
+                                    @messages("applicationApis.apis.viewSpecification")
+                                </a>
+                                <a class="govuk-link govuk-link--no-visited-state" href="@controllers.application.routes.RemoveApiController.onPageLoad(application.id, applicationApi.apiDetail.id)" data-remove-api-api-id="@applicationApi.apiDetail.id">
+                                    @messages("applicationApis.removeApi")
                                 </a>
                             </div>
                         </div>
