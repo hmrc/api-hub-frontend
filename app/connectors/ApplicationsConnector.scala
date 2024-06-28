@@ -120,6 +120,18 @@ class ApplicationsConnector @Inject()(
       }
   }
 
+  def removeApi(applicationId: String, apiId: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    httpClient
+      .delete(url"$applicationsBaseUrl/api-hub-applications/applications/$applicationId/apis/$apiId")
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Either[UpstreamErrorResponse, Unit]]
+      .flatMap {
+        case Right(_) => Future.successful(Some(()))
+        case Left(e) if e.statusCode == 404 => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
+  }
+
   def testConnectivity()(implicit hc:HeaderCarrier): Future[String] = {
     httpClient
       .get(url"$applicationsBaseUrl/api-hub-applications/test-connectivity")
