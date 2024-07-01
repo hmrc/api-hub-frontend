@@ -151,4 +151,9 @@ class ApiHubService @Inject()(
     }
   }
 
+  def changeTeamName(id: String, newName: String)(implicit hc: HeaderCarrier): Future[Either[ApplicationsException,Unit]] = {
+      logger.debug(s"Changing team name for team $id to $newName")
+      applicationsConnector.changeTeamName(id, newName)
+  }
+
 }

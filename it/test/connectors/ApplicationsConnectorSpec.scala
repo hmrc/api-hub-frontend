@@ -27,7 +27,7 @@ import models.application._
 import models.application.ApplicationLenses._
 import models.deployment.{DeploymentsRequest, Error, FailuresResponse, InvalidOasResponse, RedeploymentRequest, SuccessfulDeploymentsResponse}
 import models.exception.{ApplicationCredentialLimitException, TeamNameNotUniqueException}
-import models.requests.{AddApiRequest, AddApiRequestEndpoint, TeamMemberRequest}
+import models.requests.{AddApiRequest, AddApiRequestEndpoint, ChangeTeamNameRequest, TeamMemberRequest}
 import models.team.{NewTeam, Team}
 import models.user.{LdapUser, UserModel}
 import org.scalatest.{EitherValues, OptionValues}
@@ -1199,6 +1199,67 @@ class ApplicationsConnectorSpec
       buildConnector(this).addTeamMemberToTeam(teamId, teamMember)(HeaderCarrier()).map(
         result =>
           result mustBe None
+      )
+    }
+  }
+
+  "ApplicationsConnector.changeTeamName" - {
+    "must place the correct request" in {
+      val teamId = "test-id"
+      val newName = "new name"
+
+      stubFor(
+        put(urlEqualTo(s"/api-hub-applications/teams/$teamId"))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .withHeader(CONTENT_TYPE, equalTo(ContentTypes.JSON))
+          .withRequestBody(equalToJson(Json.toJson(ChangeTeamNameRequest(newName)).toString()))
+          .willReturn(
+            aResponse()
+              .withStatus(NO_CONTENT)
+          )
+      )
+
+      buildConnector(this).changeTeamName(teamId, newName)(HeaderCarrier()).map(
+        result =>
+          result mustBe Right(())
+      )
+    }
+
+    "must return None when the application cannot be found" in {
+      val teamId = "test-id"
+      val newName = "new name"
+
+      stubFor(
+        post(urlEqualTo(s"/api-hub-applications/teams/$teamId/members"))
+          .withRequestBody(equalToJson(Json.toJson(ChangeTeamNameRequest(newName)).toString()))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+          )
+      )
+
+      buildConnector(this).changeTeamName(teamId, newName)(HeaderCarrier()).map(
+        result =>
+          result mustBe Right(())
+      )
+    }
+
+    "must return name not unique exception when duplicate name" in {
+      val teamId = "test-id"
+      val newName = "new name"
+
+      stubFor(
+        put(urlEqualTo(s"/api-hub-applications/teams/$teamId"))
+          .withRequestBody(equalToJson(Json.toJson(ChangeTeamNameRequest(newName)).toString()))
+          .willReturn(
+            aResponse()
+              .withStatus(CONFLICT)
+          )
+      )
+
+      buildConnector(this).changeTeamName(teamId, newName)(HeaderCarrier()).map(
+        result =>
+          result mustBe Left(TeamNameNotUniqueException.forName(newName))
       )
     }
   }
