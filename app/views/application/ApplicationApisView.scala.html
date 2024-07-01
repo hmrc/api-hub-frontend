@@ -38,7 +38,7 @@
     <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-1"><strong>Scopes:</strong></p>
     <ul class="api-scopes-list-inline">
     @for(scope <- scopes) {
-        <li><strong class="govuk-tag govuk-tag govuk-tag--grey preserve-case">@scope</strong></li>
+        <li><strong class="hip-tag--scope">@scope</strong></li>
     }
     </ul>
 }
@@ -140,7 +140,10 @@
                             @applicationApi.apiDetail.title
                             </span>
                             <span class="hip-details__summary-info govuk-body-s">
-                            @messages("applicationApis.apis.endpointsAdded", applicationApi.selectedEndpoints, applicationApi.totalEndpoints)
+                            @Html(messages("applicationApis.apis.endpointsAdded",
+                                <span class="govuk-!-font-weight-bold">{applicationApi.selectedEndpoints}</span>,
+                                <span class="govuk-!-font-weight-bold">{applicationApi.totalEndpoints}</span>
+                            ))
                             </span>
                         </summary>
 

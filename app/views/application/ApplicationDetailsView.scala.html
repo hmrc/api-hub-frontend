@@ -53,6 +53,10 @@
     </a>
 }
 
+@boldNumber(number: Int) = {
+    <span class="govuk-!-font-weight-bold">@number</span>
+}
+
 @layout(pageTitle = titleNoForm(messages("applicationDetails.title")), user = user, fullWidth = true, customScriptsBlock = Some(iconsLink())) {
 
     @views.html.templates.SideNav(application.name, ApplicationNavItems(application, ApplicationSideNavPages.DetailsPage)) {
@@ -137,8 +141,8 @@
                                 applicationApi=>
                                     Seq(
                                         TableRow(content = applicationApi.apiDetail.title, attributes = Map("data-api-id" -> applicationApi.apiDetail.id)),
-                                        TableRow(content = messages("applicationDetails.apis.endpointsAvailable", applicationApi.availableSecondaryEndpoints, applicationApi.totalEndpoints)),
-                                        TableRow(content = messages("applicationDetails.apis.endpointsAvailable", applicationApi.availablePrimaryEndpoints, applicationApi.totalEndpoints))
+                                        TableRow(content = HtmlContent(messages("applicationDetails.apis.endpointsAvailable", boldNumber(applicationApi.availableSecondaryEndpoints), boldNumber(applicationApi.totalEndpoints)))),
+                                        TableRow(content = HtmlContent(messages("applicationDetails.apis.endpointsAvailable", boldNumber(applicationApi.availablePrimaryEndpoints), boldNumber(applicationApi.totalEndpoints))))
                                     )
                             ),
                             firstCellIsHeader = true

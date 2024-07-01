@@ -36,7 +36,8 @@
         @govukButton(
             Button(
                 href = Some(controllers.team.routes.AddTeamMemberController.onPageLoad(team.id).url),
-                content = Text(messages("manageTeam.addTeamMember"))
+                content = Text(messages("manageTeam.addTeamMember")),
+                classes = "hip-no-stretch"
             )
         )
     </div>

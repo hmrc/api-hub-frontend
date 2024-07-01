@@ -35,7 +35,7 @@
     <ul class="govuk-list govuk-list-inline scopes-list">
     @for(scope <- scopes) {
         <li>
-            <strong class="govuk-tag govuk-tag--grey preserve-case">@scope</strong>
+            <strong class="hip-tag--scope">@scope</strong>
         </li>
     }
     </ul>
@@ -49,7 +49,7 @@
 }
 
 @endpointSummary(endpoint: ApplicationEndpoint, apiDetail: ApiDetail) = {
-    <p>@descriptionOf(apiDetail, endpoint)</p>
+    <p class="govuk-body-s govuk-!-margin-top-4">@descriptionOf(apiDetail, endpoint)</p>
 }
 
 @endpointDetails(endpoint: ApplicationEndpoint, apiDetail: ApiDetail) = {
@@ -76,7 +76,7 @@
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
         }
         <h1 class="govuk-heading-l">@messages("requestProductionAccess.title")</h1>
-        <h2 class="govuk-body-l">@messages("requestProductionAccess.heading")</h2>
+        <p class="govuk-body">@messages("requestProductionAccess.heading")</p>
 
 
         <div class="custom-checkbox-holder govuk-!-margin-top-0">
@@ -105,22 +105,18 @@
 
                     <div class="govuk-details__text">
                         @applicationApi.endpoints.map(endpoint => endpointDetails(endpoint, applicationApi.apiDetail))
-
-                    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-                    <div>
-                        @messages("requestProductionAccess.scopes")
-                        @endpointScopes(applicationApi.endpoints.flatMap(endpoint => endpoint.scopes).toSet)
-                    </div>
+                        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+                        <p class="govuk-body">@messages("requestProductionAccess.scopes")</p>
+                        <div>
+                            @endpointScopes(applicationApi.endpoints.flatMap(endpoint => endpoint.scopes).toSet)
+                        </div>
                     </div>
 
                 </details>
 
             }
         </div>
-        <br>
-        <div>
-            <h2 class="govuk-body-l">@messages("requestProductionAccess.instruction")</h2>
-        </div>
+        <p class="govuk-body govuk-!-margin-top-4">@messages("requestProductionAccess.instruction")</p>
         <div>
             <div class="hip-request-apis">
             @for(applicationApi <- applicationApis) {

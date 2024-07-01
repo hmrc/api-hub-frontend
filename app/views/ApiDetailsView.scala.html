@@ -22,7 +22,8 @@
 @this(
         layout: templates.Layout,
         govukButton: GovukButton,
-        apiDeployments: ApiDeployments
+        apiDeployments: ApiDeployments,
+        newTabLink: components.NewTabLink
 )
 
 @(apiDetail: ApiDetail, deploymentStatuses: ApiDeploymentStatuses, user: Option[UserModel], teamName: Option[String], domain: Option[String], subDomain: Option[String])(implicit request: Request[_], messages: Messages)
@@ -31,21 +32,6 @@
     endpoint.path.replaceAll("""[^a-zA-Z0-9\-_:.]""", "-") match {
         case s"-$rest" => rest
         case default => default
-    }
-}
-
-@viewApiSpecLink() = {
-    <a href="@routes.OasRedocController.onPageLoad(apiDetail.id).url" target="_blank" class="govuk-link govuk-link--no-visited-state">
-        @messages("apiDetails.viewApiSpec.link")
-    </a>
-}
-
-@styleForApiStatus(apiStatus: ApiStatus) = @{
-    apiStatus match {
-        case Alpha => "govuk-tag--light-blue"
-        case Beta => "govuk-tag--blue"
-        case Live => "govuk-tag--green"
-        case Deprecated => "govuk-tag--grey"
     }
 }
 
@@ -74,9 +60,7 @@
                     </li>
 
                     <li class="side-nav__list">
-                        <a href="@routes.OasRedocController.onPageLoad(apiDetail.id).url" target="_blank" class="side-nav__link">
-                            @messages("apiDetails.leftNav.viewApiSpec")
-                        </a>
+                        @newTabLink(routes.OasRedocController.onPageLoad(apiDetail.id).url, messages("apiDetails.leftNav.viewApiSpec"), "side-nav__link", false)
                     </li>
                 </ul>
             </div>
@@ -119,7 +103,7 @@
                         @messages("apiDetails.details.status")
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        <strong class="govuk-tag @styleForApiStatus(apiDetail.apiStatus) apiStatusTag">
+                        <strong class="hip-tag--api-status" data-status="@apiDetail.apiStatus">
                             @apiDetail.apiStatus
                         </strong>
                     </dd>
@@ -131,7 +115,7 @@
                     </dt>
                     <dd class="govuk-summary-list__value">
                         @if(domain.isDefined) {
-                            <strong class="govuk-tag govuk-tag--grey domainTag">
+                            <strong class="hip-tag--domain">
                                 @domain
                             </strong>
                         } else {
@@ -146,7 +130,7 @@
                     </dt>
                     <dd class="govuk-summary-list__value">
                         @if(subDomain.isDefined) {
-                            <strong class="govuk-tag govuk-tag--grey subDomainTag">
+                            <strong class="hip-tag--subdomain">
                                 @subDomain
                             </strong>
                         } else {
@@ -163,7 +147,7 @@
                         @if(apiDetail.hods.nonEmpty) {
                             @Html(
                                 apiDetail.hods.map( hod =>
-                                    s"<strong class='govuk-tag govuk-tag--grey hodTag'>$hod</strong>"
+                                    s"<strong class='hip-tag--hod'>$hod</strong>"
                                 ).mkString(" ")
                             )
                         } else {
@@ -196,7 +180,7 @@
                     @Html(
                         messages(
                             "apiDetails.viewApiSpec.message",
-                            viewApiSpecLink()
+                            newTabLink(routes.OasRedocController.onPageLoad(apiDetail.id).url, messages("apiDetails.viewApiSpec.link"), "govuk-link govuk-link--no-visited-state")
                         )
                     )
                 </p>
