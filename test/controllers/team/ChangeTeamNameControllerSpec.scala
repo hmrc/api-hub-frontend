@@ -17,7 +17,7 @@
 package controllers.team
 
 import base.SpecBase
-import controllers.actions.{FakeUser, FakeUserNotTeamMember}
+import controllers.actions.{FakeSupporter, FakeUser, FakeUserNotTeamMember}
 import controllers.team
 import forms.ChangeTeamNameFormProvider
 import models.application.TeamMember
@@ -54,7 +54,7 @@ class ChangeTeamNameControllerSpec extends SpecBase with MockitoSugar with Argum
 
   "onPageLoad" - {
 
-    "must return OK and the correct view for a GET" in {
+    "must return OK and the correct view for a GET when the user is a team member" in {
       val fixture = buildFixture()
 
       running(fixture.application) {
@@ -69,6 +69,25 @@ class ChangeTeamNameControllerSpec extends SpecBase with MockitoSugar with Argum
         redirectLocation(result) mustBe None
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form.fill("team name"), controllers.team.routes.ChangeTeamNameController.onSubmit(id), FakeUser)(request, messages(fixture.application)).toString
+        contentAsString(result) must validateAsHtml
+      }
+    }
+
+    "must return OK and the correct view for a GET when the user is a supporter but not on the team" in {
+      val fixture = buildFixture(userModel = FakeSupporter)
+
+      running(fixture.application) {
+        val request = FakeRequest(GET, changeTeamNameRoutePageLoad)
+
+        when(fixture.apiHubService.findTeamById(eqTo(id))(any)).thenReturn(Future.successful(Some(testTeam)))
+
+        val result = route(fixture.application, request).value
+
+        val view = fixture.application.injector.instanceOf[ChangeTeamNameView]
+
+        redirectLocation(result) mustBe None
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form.fill("team name"), controllers.team.routes.ChangeTeamNameController.onSubmit(id), FakeSupporter)(request, messages(fixture.application)).toString
         contentAsString(result) must validateAsHtml
       }
     }
