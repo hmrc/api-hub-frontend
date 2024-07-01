@@ -270,18 +270,10 @@ $active-link-color: govuk-colour("dark-blue");
         max-width: none;
     }
 
-    .domainTag, .subDomainTag {
-        white-space: nowrap;
-    }
-
     .api-panel-top {
         display: flex;
         justify-content: space-between;
         width: 100%;
-
-        .apiStatusTag {
-            height: 20px;
-        }
     }
 }
 
@@ -503,7 +495,7 @@ $active-link-color: govuk-colour("dark-blue");
     font-size: 16px;
 }
 
-.hodFilterLabel, .hodTag {
+.hodFilterLabel {
     text-transform: uppercase;
 }
 
