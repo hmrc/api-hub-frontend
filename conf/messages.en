@@ -1,4 +1,4 @@
-service.name = The API Hub
+service.name = The Integration Hub
 
 site.back = Back
 site.remove = Remove
@@ -13,7 +13,7 @@ site.startAgain = Start again
 site.signIn = Sign in
 site.govuk = GOV.UK
 site.dashboard = Dashboard
-site.approvals = API Hub Admin
+site.approvals = Integration Hub Admin
 site.copy = Copy
 site.applicationNotFoundHeading = Application not found
 site.applicationNotFoundMessage = Cannot find an application with Id {0}.
@@ -188,7 +188,7 @@ addCredentialChecklist.error.required = You must confirm you meet the conditions
 addCredentialChecklist.guidance = To generate production credentials, you must satisfy the following conditions:
 addCredentialChecklist.condition1 = You must have Security Check (SC) Clearance
 addCredentialChecklist.condition2 = You must have a secure mechanism for storing production credentials
-addCredentialChecklist.condition3 = You must agree that if the credentials are compromised or there is suspicion of compromise by an intruder or unauthorised user, you will notify The API Hub immediately
+addCredentialChecklist.condition3 = You must agree that if the credentials are compromised or there is suspicion of compromise by an intruder or unauthorised user, you will notify The Integration Hub immediately
 addCredentialChecklist.confirm = I confirm that the above conditions are satisfied
 
 addCredentialSuccess.title = Client secret successfully created
@@ -253,10 +253,10 @@ confirmAddTeamMember.change.hidden = Confirm add team member
 signIn.title = Sign-in
 signIn.ldap.heading = Sign in via LDAP
 signIn.ldap.instructions = Use your {0} email to sign in.
-signIn.ldap.guidance = Digital users will be taken to a sign in screen and be asked to enter their email and password to access the API Hub.
+signIn.ldap.guidance = Digital users will be taken to a sign in screen and be asked to enter their email and password to access the Integration Hub.
 signIn.stride.heading = Sign in via STRIDE
 signIn.stride.instructions = Use your {0} email to sign in.
-signIn.stride.guidance = If you are on a corporate device you will automatically be signed in and taken to The API Hub.
+signIn.stride.guidance = If you are on a corporate device you will automatically be signed in and taken to The Integration Hub.
 signIn.stride.help = To sign in via STRIDE you will need the "The API Hub user" role assigned in the Service Request System.
 signIn.stride.helpLink = Find out how to self serve the role
 
@@ -318,8 +318,8 @@ hipApis.filter.byStatus.view = View status filters
 support.link.text = Get Support
 support.title = Get Support
 support.heading = Get support
-support.email.subject.consumer = Support Request from API Hub - Consumer
-support.email.subject.producer = Support Request from API Hub - Producer
+support.email.subject.consumer = Support Request from Integration Hub - Consumer
+support.email.subject.producer = Support Request from Integration Hub - Producer
 
 helpdocs.link.text = Help Docs
 
@@ -385,7 +385,7 @@ requestProductionAccess.error.required = You must confirm that you have read and
 
 accessRequests.title = API requests
 accessRequests.heading = API production access requests
-accessRequests.admin = API Hub admin
+accessRequests.admin = Integration Hub admin
 accessRequests.headings.requestedBy = Requested by
 accessRequests.headings.supportingInformation = Supporting information
 accessRequests.headings.rejectedReason = Rejected reason
@@ -478,9 +478,9 @@ manageTeamMembers.heading = Team members ({0})
 manageTeamMembers.returnTo = Return to {0}
 manageTeamMembers.addTeamMember = Add team member +
 
-serviceStart.title = The API Hub
-serviceStart.heading = The API Hub
-serviceStart.introduction = The API HUB is a self-service portal offering users the chance to integrate their services with existing APIs within the EIS space.
+serviceStart.title = The Integration Hub
+serviceStart.heading = The Integration Hub
+serviceStart.introduction = The Integration Hub is a self-service portal offering users the chance to integrate their services with existing APIs within the EIS space.
 serviceStart.whatYouCanDo = What you can do
 serviceStart.consume.heading = Use existing APIs
 serviceStart.consume.list.1 = Register your service
@@ -559,14 +559,14 @@ createTeamCheckYourAnswers.createTeam = Create team
 
 manageApplications.title = Manage applications
 manageApplications.heading = Manage applications
-manageApplications.admin = API Hub admin
+manageApplications.admin = Integration Hub admin
 manageApplications.application.id = ID
 manageApplications.application.created = Registered
 manageApplications.displayCount = Showing {0} of {1}
 
 manageTeams.title = Manage teams
 manageTeams.heading = Manage teams
-manageTeams.admin = API Hub admin
+manageTeams.admin = Integration Hub admin
 manageTeams.teams.caption = Teams
 manageTeams.teams.teamName = Team name
 manageTeams.teams.id = Id
