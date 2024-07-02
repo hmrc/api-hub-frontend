@@ -1240,6 +1240,7 @@ object ApplicationsConnectorSpec extends HttpClientV2Support {
     LocalDateTime.now(),
     Creator(FakeUser.email.get),
     LocalDateTime.now(),
+    None,
     Seq(TeamMember(FakeUser.email.get)),
     Environments(),
     Seq.empty

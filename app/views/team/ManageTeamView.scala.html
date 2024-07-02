@@ -23,7 +23,7 @@
     govukButton: GovukButton
 )
 
-@(team: Team, user: UserModel)(implicit request: Request[_], messages: Messages)
+@(team: Team, applicationId: Option[String], user: UserModel)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("manageTeam.title", team.name)), user = Some(user)) {
 
@@ -52,12 +52,23 @@
         )
     )
 
-    @govukButton(
-        Button(
-            href = Some(controllers.team.routes.ManageMyTeamsController.onPageLoad().url),
-            content = Text(messages("manageTeam.return")),
-            classes = "govuk-button--secondary govuk-!-margin-top-5"
-        )
-    )
+    @{applicationId match {
+        case Some(id) =>
+            govukButton(
+                Button(
+                    href = Some(controllers.application.routes.ApplicationDetailsController.onPageLoad(id).url),
+                    content = Text(messages("Return to your application")),
+                    classes = "govuk-button--secondary govuk-!-margin-top-5"
+                )
+            )
+        case None =>
+            govukButton(
+                Button(
+                    href = Some(controllers.team.routes.ManageMyTeamsController.onPageLoad().url),
+                    content = Text(messages("manageTeam.return")),
+                    classes = "govuk-button--secondary govuk-!-margin-top-5"
+                )
+            )
+    }}
 
 }

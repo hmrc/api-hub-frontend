@@ -199,6 +199,10 @@ object ApplicationLenses {
         Some(deleted)
       )
 
+    def isMigrated: Boolean = {
+      application.teamId.isDefined
+    }
+
   }
 
 }
