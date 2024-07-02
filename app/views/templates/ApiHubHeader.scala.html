@@ -57,14 +57,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
         <div class="govuk-header__content">
             <div class="govuk-grid-row">
-                <div class="govuk-grid-column-one-quarter">
+                <div class="govuk-grid-column-one-half">
                     <a href="@routes.ServiceStartController.onPageLoad.url" class="govuk-header__link govuk-header__service-name">
-                        The API Hub
+                        @messages("service.name")
                     </a>
                 </div>
-                <div class="govuk-grid-column-three-quarters govuk-!-text-align-right">
+                <div class="govuk-grid-column-one half govuk-!-text-align-right">
                     @for(aUser <- user) {
-                        <div data-user-type="@aUser.userType" data-user-email="@aUser.email.getOrElse(aUser.userName)">
+                        <div data-user-type="@aUser.userType" data-user-email="@aUser.email.getOrElse(aUser.userName)" class="hip-header__signed-in">
                             Signed in as <strong>@aUser.email.getOrElse(aUser.userName)</strong> via
                             <strong class="govuk-tag govuk-tag--blue small-tag">
                                 @aUser.userType

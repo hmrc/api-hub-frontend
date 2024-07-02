@@ -1,6 +1,6 @@
-# API Hub Frontend
+# Integration Hub Frontend
 
-This service provides a frontend for the API Hub.
+This service provides a frontend for the Integration Hub.
 
 For more information on the project please visit this space in Confluence:
 https://confluence.tools.tax.service.gov.uk/display/AH/The+API+Hub+Home
@@ -31,7 +31,7 @@ section here:
 https://catalogue.tax.service.gov.uk/service/api-hub-frontend
 
 ### api-hub-applications
-The api-hub-applications microservice is the backend component of The API Hub.
+The api-hub-applications microservice is the backend component of The Integration Hub.
 
 This service authenticates to api-hub-applications using internal-auth's service-to-service
 auth pattern. See this GitHub repo 
@@ -76,7 +76,7 @@ page that presents the user with a choice to login via LDAP or Stride.
 More information on how to login is available on Confluence:
 https://confluence.tools.tax.service.gov.uk/display/AH/Login+Examples
 
-More information on the security model of The API Hub is on confluence:
+More information on the security model of The Integration Hub is on confluence:
 https://confluence.tools.tax.service.gov.uk/display/AH/Permissions+Matrix+and+Mappings
 
 #### LDAP
