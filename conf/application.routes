@@ -29,3 +29,12 @@ POST        /add-team-member/:id                                        controll
 
 GET         /remove-api/:applicationId/:apiId                           controllers.application.RemoveApiController.onPageLoad(applicationId: String, apiId: String)
 POST        /remove-api/:applicationId/:apiId                           controllers.application.RemoveApiController.onSubmit(applicationId: String, apiId: String)
+
+GET         /register-v2/start                                          controllers.application.register.RegisterApplicationStartController.start()
+GET         /register-v2/check-your-answers                             controllers.application.register.CheckYourAnswersController.onPageLoad()
+POST        /register-v2/register-application                           controllers.application.register.RegisterApplicationController.register()
+
+GET         /register-v2/application-name                               controllers.application.register.ApplicationNameController.onPageLoad(mode: Mode = NormalMode)
+POST        /register-v2/application-name                               controllers.application.register.ApplicationNameController.onSubmit(mode: Mode = NormalMode)
+GET         /register-v2/change-application-name                        controllers.application.register.ApplicationNameController.onPageLoad(mode: Mode = CheckMode)
+POST        /register-v2/change-application-name                        controllers.application.register.ApplicationNameController.onSubmit(mode: Mode = CheckMode)

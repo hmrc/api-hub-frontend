@@ -23,7 +23,7 @@
     govukButton: GovukButton
 )
 
-@(applicationDetails: SummaryList, teamMemberDetails: SummaryList, user: Some[UserModel])(implicit request: Request[_], messages: Messages)
+@(applicationDetails: SummaryList, teamMemberDetails: SummaryList, postCall: Call, user: Some[UserModel])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("checkYourAnswers.title")), user = user, fullWidth = true) {
 
@@ -41,7 +41,7 @@
 
     <p class="govuk-body">@messages("checkYourAnswers.complete.guidance")</p>
 
-    @formHelper(action = routes.RegisterApplicationController.create()) {
+    @formHelper(action = postCall) {
         @govukButton(
             ButtonViewModel(messages("checkYourAnswers.registerApplication")).withId("registerApplicationButton")
         )
