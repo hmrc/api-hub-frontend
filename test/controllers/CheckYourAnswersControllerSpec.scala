@@ -47,9 +47,10 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
         val view = application.injector.instanceOf[CheckYourAnswersView]
         val applicationDetails = buildApplicationDetailsSummaryList(emptyUserAnswers, messages(application))
         val teamMemberDetails = buildTeamMembersSummaryList(emptyUserAnswers, messages(application))
+        val postCall = routes.RegisterApplicationController.create()
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(applicationDetails, teamMemberDetails, Some(FakeUser))(request, messages(application)).toString
+        contentAsString(result) mustEqual view(applicationDetails, teamMemberDetails, postCall, Some(FakeUser))(request, messages(application)).toString
         contentAsString(result) must validateAsHtml
       }
     }
@@ -67,9 +68,10 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
           val view = application.injector.instanceOf[CheckYourAnswersView]
           val applicationDetails = buildApplicationDetailsSummaryList(userAnswers, messages(application))
           val teamMemberDetails = buildTeamMembersSummaryList(userAnswers, messages(application))
+          val postCall = routes.RegisterApplicationController.create()
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(applicationDetails, teamMemberDetails, Some(FakeUser))(request, messages(application)).toString
+          contentAsString(result) mustEqual view(applicationDetails, teamMemberDetails, postCall, Some(FakeUser))(request, messages(application)).toString
           contentAsString(result) must validateAsHtml
         }
       })

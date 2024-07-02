@@ -37,12 +37,12 @@ import scala.concurrent.Future
 
 class ApplicationNameControllerSpec extends SpecBase with MockitoSugar with HtmlValidation {
 
-  def onwardRoute = Call("GET", "/foo")
+  private def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new ApplicationNameFormProvider()
-  val form = formProvider()
+  private val formProvider = new ApplicationNameFormProvider()
+  private val form = formProvider()
 
-  lazy val applicationNameRoute = routes.ApplicationNameController.onPageLoad(NormalMode).url
+  private lazy val applicationNameRoute = routes.ApplicationNameController.onPageLoad(NormalMode).url
 
   "ApplicationName Controller" - {
 
@@ -56,9 +56,10 @@ class ApplicationNameControllerSpec extends SpecBase with MockitoSugar with Html
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[ApplicationNameView]
+        val postCall = routes.ApplicationNameController.onSubmit(NormalMode)
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, Some(FakeUser))(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, postCall, Some(FakeUser))(request, messages(application)).toString
         contentAsString(result) must validateAsHtml
       }
     }
@@ -71,13 +72,12 @@ class ApplicationNameControllerSpec extends SpecBase with MockitoSugar with Html
 
       running(application) {
         val request = FakeRequest(GET, applicationNameRoute)
-
         val view = application.injector.instanceOf[ApplicationNameView]
-
         val result = route(application, request).value
+        val postCall = routes.ApplicationNameController.onSubmit(NormalMode)
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, Some(FakeUser))(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, postCall, Some(FakeUser))(request, messages(application)).toString
         contentAsString(result) must validateAsHtml
       }
     }
@@ -120,11 +120,11 @@ class ApplicationNameControllerSpec extends SpecBase with MockitoSugar with Html
         val boundForm = form.bind(Map("value" -> ""))
 
         val view = application.injector.instanceOf[ApplicationNameView]
-
         val result = route(application, request).value
+        val postCall = routes.ApplicationNameController.onSubmit(NormalMode)
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, Some(FakeUser))(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, postCall, Some(FakeUser))(request, messages(application)).toString
         contentAsString(result) must validateAsHtml
       }
     }

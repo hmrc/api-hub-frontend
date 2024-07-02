@@ -55,7 +55,7 @@ class ManageTeamControllerSpec extends SpecBase with MockitoSugar with ArgumentM
             status(result) mustBe OK
 
             val view = fixture.playApplication.injector.instanceOf[ManageTeamView]
-            contentAsString(result) mustBe view(team, user)(request, messages(fixture.playApplication)).toString()
+            contentAsString(result) mustBe view(team, None, user)(request, messages(fixture.playApplication)).toString()
             contentAsString(result) must validateAsHtml
 
             verify(fixture.apiHubService).findTeamById(eqTo(team.id))(any)
@@ -101,7 +101,7 @@ class ManageTeamControllerSpec extends SpecBase with MockitoSugar with ArgumentM
           )
         )
 
-        contentAsString(result) mustBe view(sortedTeam, user)(request, messages(fixture.playApplication)).toString()
+        contentAsString(result) mustBe view(sortedTeam, None, user)(request, messages(fixture.playApplication)).toString()
       }
     }
 

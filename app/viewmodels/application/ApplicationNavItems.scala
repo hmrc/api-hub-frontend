@@ -18,6 +18,7 @@ package viewmodels.application
 
 import models.application.Application
 import play.api.i18n.Messages
+import play.api.mvc.Call
 import viewmodels.{SideNavItem, SideNavPage}
 
 object ApplicationSideNavPages {
@@ -59,7 +60,7 @@ object ApplicationNavItems {
       SideNavItem(
         page = ManageTeamMembersPage,
         title = messages("applicationNav.page.manageTeamMembers"),
-        link = controllers.application.routes.ManageTeamMembersController.onPageLoad(application.id),
+        link = manageTeamMembersLink(application),
         isCurrentPage = currentPage == ManageTeamMembersPage
       ),
       SideNavItem(
@@ -69,6 +70,13 @@ object ApplicationNavItems {
         isCurrentPage = currentPage == DeleteApplicationPage
       )
     )
+  }
+
+  private def manageTeamMembersLink(application: Application): Call = {
+    application.teamId match {
+      case Some(teamId) => controllers.team.routes.ManageTeamController.onPageLoad(teamId, Some(application.id))
+      case None => controllers.application.routes.ManageTeamMembersController.onPageLoad(application.id)
+    }
   }
 
 }
