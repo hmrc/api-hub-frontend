@@ -16,7 +16,8 @@
 
 @this(
     layout: templates.Layout,
-    govukButton: GovukButton
+    govukButton: GovukButton,
+    newTabLink: components.NewTabLink
 )
 
 @(ldapSignInUrl: String, strideSignInUrl: String, apiHubGuideUrl: String)(implicit request: Request[_], messages: Messages)
@@ -34,7 +35,7 @@
             <div class="hipp-card">
                 <p class="govuk-body govuk-!-font-weight-bold">@messages("signIn.ldap.heading")</p>
 
-                <p class="govuk-body">@messages("signIn.ldap.instructions")</p>
+                <p class="govuk-body">@Html(messages("signIn.ldap.instructions", <span class="govuk-!-font-weight-bold">@digital.hmrc.gov.uk</span>))</p>
 
                 <p class="govuk-body-s">@messages("signIn.ldap.guidance")</p>
 
@@ -49,7 +50,7 @@
             <div class="hipp-card">
                 <p class="govuk-body govuk-!-font-weight-bold">@messages("signIn.stride.heading")</p>
 
-                <p class="govuk-body">@messages("signIn.stride.instructions")</p>
+                <p class="govuk-body">@Html(messages("signIn.stride.instructions", <span class="govuk-!-font-weight-bold">@hmrc.gov.uk</span>))</p>
 
                 <p class="govuk-body-s">@messages("signIn.stride.guidance")</p>
 
@@ -63,9 +64,7 @@
 
                 <p class="govuk-body-s">
                     @messages("signIn.stride.help")
-                    <a href='@{apiHubGuideUrl}/documentation/api-hub-guide.html#how-do-you-get-access-to-it' target="_blank">
-                        @messages("signIn.stride.helpLink")
-                    </a>.
+                    @newTabLink(apiHubGuideUrl + "/documentation/api-hub-guide.html#how-do-you-get-access-to-it", messages("signIn.stride.helpLink"))
                 </p>
             </div>
         </div>

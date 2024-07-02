@@ -63,7 +63,7 @@
                     }
                     @formHelper(action = routes.IndexController.onSubmit) {
                         @govukButton(
-                            Button(content = messages("dashboard.applications.createAnother"), id=Some("registerAnApplicationButton"))
+                            Button(content = messages("dashboard.applications.createAnother"), id=Some("registerAnApplicationButton"), classes="govuk-button--secondary")
                         )
                     }
                 </div>
