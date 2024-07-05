@@ -88,7 +88,8 @@
                 items = Seq(
                     CheckboxItem(
                         content = Text("Passthrough"),
-                        value = "true"
+                        value = "true",
+                        checked = form("passthrough").value.contains("true")
                     ),
                 )
             )
@@ -155,21 +156,16 @@
             )
         )
 
-        @govukCheckboxes(Checkboxes(
-            fieldset = Some(Fieldset(
-                legend = Some(Legend(
-                    content = Text("HoDs/Backends")
-                ))
-            )),
-            classes = "hodsCheckboxes",
-            hint = Some(Hint(
-                content = Text("Select all that apply.")
-            )),
-            name = "hods[]",
-            items = hods.hods.map(hod => CheckboxItem(
-                content = Text(hod),
-                value = hod
-            ))
+        @govukCheckboxes(CheckboxesViewModel(
+            legend = Legend("HoDs/Backends"),
+            name = "hods",
+            form = form,
+            items = hods.hods.zipWithIndex.map{ case (hod, index) => CheckboxItemViewModel(
+                content = Text(hod.description),
+                fieldId = "hods",
+                index = index,
+                value = hod.code
+            )}
         ))
 
         @govukTextarea(

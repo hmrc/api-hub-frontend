@@ -26,7 +26,7 @@
         newTabLink: components.NewTabLink
 )
 
-@(apiDetail: ApiDetail, deploymentStatuses: ApiDeploymentStatuses, user: Option[UserModel], teamName: Option[String], domain: Option[String], subDomain: Option[String])(implicit request: Request[_], messages: Messages)
+@(apiDetail: ApiDetail, deploymentStatuses: ApiDeploymentStatuses, user: Option[UserModel], teamName: Option[String], domain: Option[String], subDomain: Option[String], hods: Seq[String])(implicit request: Request[_], messages: Messages)
 
 @endpointName(endpoint: Endpoint) = @{
     endpoint.path.replaceAll("""[^a-zA-Z0-9\-_:.]""", "-") match {
@@ -144,9 +144,9 @@
                         @messages("apiDetails.details.hods")
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        @if(apiDetail.hods.nonEmpty) {
+                        @if(hods.nonEmpty) {
                             @Html(
-                                apiDetail.hods.map( hod =>
+                                hods.map( hod =>
                                     s"<strong class='hip-tag--hod'>$hod</strong>"
                                 ).mkString(" ")
                             )

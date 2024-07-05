@@ -18,7 +18,7 @@ package controllers
 
 import base.OptionallyAuthenticatedSpecBase
 import controllers.actions.FakeUser
-import fakes.FakeDomains
+import fakes.{FakeDomains, FakeHods}
 import generators.ApiDetailGenerators
 import models.api.{ApiDeploymentStatuses, ApiDetail}
 import models.team.Team
@@ -66,9 +66,10 @@ class ApiDetailsControllerSpec
 
           val domain = FakeDomains.getDomainDescription(apiDetail)
           val subDomain = FakeDomains.getSubDomainDescription(apiDetail)
+          val hods = apiDetail.hods.map(FakeHods.getDescription(_))
 
           status(result) mustBe OK
-          contentAsString(result) mustBe view(apiDetail, apiDeploymentStatuses, None, None, domain, subDomain)(request, messages(fixture.application)).toString()
+          contentAsString(result) mustBe view(apiDetail, apiDeploymentStatuses, None, None, domain, subDomain, hods)(request, messages(fixture.application)).toString()
           contentAsString(result) should not include "Owning team"
           contentAsString(result) must validateAsHtml
         }
@@ -93,9 +94,10 @@ class ApiDetailsControllerSpec
 
           val domain = FakeDomains.getDomainDescription(apiDetail)
           val subDomain = FakeDomains.getSubDomainDescription(apiDetail)
+          val hods = apiDetail.hods.map(FakeHods.getDescription(_))
 
           status(result) mustBe OK
-          contentAsString(result) mustBe view(apiDetail, apiDeploymentStatuses, Some(FakeUser), None, domain, subDomain)(request, messages(fixture.application)).toString()
+          contentAsString(result) mustBe view(apiDetail, apiDeploymentStatuses, Some(FakeUser), None, domain, subDomain, hods)(request, messages(fixture.application)).toString()
           contentAsString(result) should not include "Owning team"
           contentAsString(result) must validateAsHtml
         }
@@ -175,9 +177,10 @@ class ApiDetailsControllerSpec
 
         val domain = FakeDomains.getDomainDescription(apiDetail)
         val subDomain = FakeDomains.getSubDomainDescription(apiDetail)
+        val hods = apiDetail.hods.map(FakeHods.getDescription(_))
 
         status(result) mustBe OK
-        contentAsString(result) mustBe view(apiDetail, apiDeploymentStatuses, None, Some(team.name), domain, subDomain)(request, messages(fixture.application)).toString()
+        contentAsString(result) mustBe view(apiDetail, apiDeploymentStatuses, None, Some(team.name), domain, subDomain, hods)(request, messages(fixture.application)).toString()
         contentAsString(result) must include("Owning team")
         contentAsString(result) must include(team.name)
         contentAsString(result) must validateAsHtml
@@ -204,9 +207,10 @@ class ApiDetailsControllerSpec
 
         val domain = FakeDomains.getDomainDescription(apiDetail)
         val subDomain = FakeDomains.getSubDomainDescription(apiDetail)
+        val hods = apiDetail.hods.map(FakeHods.getDescription(_))
 
         status(result) mustBe OK
-        contentAsString(result) mustBe view(apiDetail, apiDeploymentStatuses, None, Some("Team details could not be retrieved"), domain, subDomain)(request, messages(fixture.application)).toString()
+        contentAsString(result) mustBe view(apiDetail, apiDeploymentStatuses, None, Some("Team details could not be retrieved"), domain, subDomain, hods)(request, messages(fixture.application)).toString()
         contentAsString(result) must validateAsHtml
       }
     }

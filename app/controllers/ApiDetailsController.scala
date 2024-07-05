@@ -17,7 +17,7 @@
 package controllers
 
 import com.google.inject.{Inject, Singleton}
-import config.Domains
+import config.{Domains, Hods}
 import controllers.actions.OptionalIdentifierAction
 import controllers.helpers.ErrorResultBuilder
 import models.api.ApiDetail
@@ -37,7 +37,8 @@ class ApiDetailsController @Inject()(
   view: ApiDetailsView,
   errorResultBuilder: ErrorResultBuilder,
   optionallyIdentified: OptionalIdentifierAction,
-  domains: Domains
+  domains: Domains,
+  hods: Hods
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(id: String): Action[AnyContent] = optionallyIdentified.async {
@@ -67,7 +68,8 @@ class ApiDetailsController @Inject()(
           request.user,
           maybeTeamName,
           domains.getDomainDescription(apiDetail),
-          domains.getSubDomainDescription(apiDetail))
+          domains.getSubDomainDescription(apiDetail),
+          apiDetail.hods.map(hods.getDescription(_)))
         )
       case None =>
         errorResultBuilder.internalServerError(s"Unable to retrieve deployment statuses for API ${apiDetail.publisherReference}")

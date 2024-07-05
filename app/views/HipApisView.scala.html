@@ -87,7 +87,7 @@
             ))
             @for(hod <- apiDetail.hods) {
                 <li>
-                    <strong class="hip-tag--hod">@hod</strong>
+                    <strong class="hip-tag--hod">@hods.getDescription(hod)</strong>
                 </li>
             }
         </ul>
@@ -130,8 +130,8 @@
     @for(hod <- hods.hods) {
         <div>
             <div class="govuk-checkboxes__item">
-                <input class="govuk-checkboxes__input hodFilter" id="filter_@hod" name="filter_@hod" type="checkbox" value="@normalise(hod)">
-                <label class="govuk-label govuk-checkboxes__label hodFilterLabel" for="filter_@hod">@hod</label>
+                <input class="govuk-checkboxes__input hodFilter" id="filter_@hod.code" name="filter_@hod.code" type="checkbox" value="@normalise(hod.code)">
+                <label class="govuk-label govuk-checkboxes__label" for="filter_@hod.code">@hod.description</label>
             </div>
         </div>
     }
