@@ -17,15 +17,30 @@
 package config
 
 import com.google.inject.{Inject, Singleton}
+import models.api.Hod
 import play.api.Configuration
 
 trait Hods {
-  def hods: Seq[String]
+  def hods: Seq[Hod]
+
+  def getDescription(hodCode: String): String = {
+    hods.find(hod => normalise(hod.code).equals(normalise(hodCode)))
+      .map(_.description)
+      .getOrElse(hodCode)
+  }
+
+  private def normalise(s: String): String = {
+    s.trim.toLowerCase()
+  }
+
 }
 
 @Singleton
 class HodsImpl @Inject()(configuration: Configuration) extends Hods {
 
-  override val hods: Seq[String] = configuration.get[Seq[String]]("hods")
+  override val hods: Seq[Hod] = configuration.get[Map[String,String]]("hods")
+    .map{ case (name, description) => Hod(name, description) }
+    .toSeq
+    .sortBy(_.description.toLowerCase)
 
 }

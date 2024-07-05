@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,6 @@
  * limitations under the License.
  */
 
-package fakes
+package models.api
 
-import config.Hods
-import models.api.Hod
-
-object FakeHods extends Hods {
-
-  override val hods: Seq[Hod] = {
-    Seq(
-      Hod("EMS", "Enterprise Matching Service"),
-      Hod("apim", "API Management (HIP)"),
-      Hod("internal", "internal"),
-    )
-  }
-
-}
+case class Hod(code: String, description: String)
