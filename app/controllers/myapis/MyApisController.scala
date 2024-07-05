@@ -25,7 +25,7 @@ import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.team.MyApisView
+import views.html.myapis.MyApisView
 
 import scala.concurrent.{ExecutionContext, Future}
 
