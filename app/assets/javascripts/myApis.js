@@ -1,35 +1,109 @@
 import {buildPaginator, HIDDEN_BY_PAGINATION} from './paginationController.js';
-import {setVisible} from "./utils.js";
+import {buildNameFilter} from "./hipApisNameFilter.js";
+import {setVisible, noop} from "./utils.js";
 
-export function onDomLoaded() {
-    const apiPanelEls = Array.from(document.querySelectorAll('#myApisPanels .hip-api')),
-        elPaginationContainer = document.getElementById('pagination'),
-        elDisplayCountMessage = document.getElementById('displayCountMessage'),
-        elDisplayCountShowing = document.getElementById('displayCount'),
-        elDisplayCountTotal = document.getElementById('totalCount');
+export function onPageShow() {
+    const filters = [
+        buildNameFilter()
+    ];
 
-    const apiPanels = apiPanelEls.map(el => ({
-        el,
-        get visible() {
-            return !this[HIDDEN_BY_PAGINATION];
+    const view = (() => {
+        const myApiPanelEls = Array.from(document.querySelectorAll('#myApisPanels .hip-api')),
+            elSearchResultsSize = document.getElementById('searchResultsSize'),
+            elPaginationContainer = document.getElementById('pagination'),
+            elDisplayCountMessage = document.getElementById('displayCountMessage'),
+            elDisplayCount = document.getElementById('displayCount'),
+            elTotalCount = document.getElementById('totalCount');
+
+        let onFiltersChangedHandler = noop;
+
+        filters.forEach(filter=> filter.onChange(() => onFiltersChangedHandler()));
+
+        return {
+            onFiltersChanged(handler) {
+                onFiltersChangedHandler = handler;
+            },
+            get myApisPanels() {
+                return [...myApiPanelEls];
+            },
+            get paginationContainer() {
+                return elPaginationContainer;
+            },
+            setApiPanelVisibility(apis) {
+                apis.forEach(apiDetail => {
+                    setVisible(apiDetail.el, apiDetail.visible);
+                });
+            },
+            initialiseFilters(apis) {
+                filters.forEach(filter => filter.initialise(apis));
+            },
+            setResultCount(count) {
+                elSearchResultsSize.textContent = count;
+            },
+            get displayCountMessage() {
+                return elDisplayCountMessage;
+            },
+            get displayCount() {
+                return elDisplayCount;
+            },
+            get totalCount() {
+                return elTotalCount;
+            }
+        };
+    })();
+
+    const paginator = buildPaginator(view.paginationContainer, 5)
+
+    function buildFilterFunctions() {
+        return filters.map(filter=> filter.buildFilterFunction());
+    }
+
+    const model = {
+        apis: view.myApisPanels.map(el => ({
+            data: {
+                apiName: el.dataset['apiname'],
+            },
+            el,
+            hiddenByFilters: false,
+            get visible() {
+                return !this.hiddenByFilters && !this[HIDDEN_BY_PAGINATION];
+            }
+        })),
+        get resultCount() {
+            return this.apis.filter(apiDetail => ! apiDetail.hiddenByFilters).length;
         }
-    }));
+    };
 
-    const paginator = buildPaginator(elPaginationContainer, 20);
-
-    paginator.onPaginationChanged(paginationDetails => {
-        apiPanels.forEach(apiPanel => {
-            setVisible(apiPanel.el, apiPanel.visible);
+    function applyMyApisFilters() {
+        const myApisFilterFns = buildFilterFunctions();
+        model.apis.forEach(apiDetail => {
+            apiDetail.hiddenByFilters = ! myApisFilterFns.every(fn => fn(apiDetail.data));
         });
 
-        setVisible(elDisplayCountMessage, paginationDetails.isPaginating);
-        elDisplayCountShowing.textContent = paginationDetails.visibleItemCount;
-        elDisplayCountTotal.textContent = paginationDetails.totalItemCount;
+        paginator.initialise(model.apis.filter(apiDetail => ! apiDetail.hiddenByFilters));
+        view.setApiPanelVisibility(model.apis);
+
+        view.setResultCount(model.resultCount);
+        view.toggleNoResultsPanel(model.resultCount === 0);
+    }
+
+    paginator.onPaginationChanged(paginationDetails => {
+        view.setApiPanelVisibility(model.apis);
+        setVisible(view.displayCountMessage, paginationDetails.isPaginating);
+        view.displayCount.textContent = paginationDetails.visibleItemCount;
+        view.totalCount.textContent = paginationDetails.totalItemCount;
+        console.log(paginationDetails)
     });
 
-    paginator.initialise(apiPanels);
+    view.onFiltersChanged(() => {
+        applyMyApisFilters();
+    });
+
+    view.initialiseFilters(model.apis);
+
+    applyMyApisFilters();
 }
 
 if (typeof window !== 'undefined') {
-    window.addEventListener("DOMContentLoaded", onDomLoaded);
+    window.addEventListener('pageshow', onPageShow);
 }

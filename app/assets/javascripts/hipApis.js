@@ -1,7 +1,4 @@
 import {buildPaginator, HIDDEN_BY_PAGINATION} from './paginationController.js';
-import {buildDomainFilters} from "./hipApisDomainFilters.js";
-import {buildStatusFilters} from "./hipApisStatusFilters.js";
-import {buildHodsFilters} from "./hipApisHodsFilters.js";
 import {buildNameFilter} from "./hipApisNameFilter.js";
 import {setVisible, noop} from "./utils.js";
 

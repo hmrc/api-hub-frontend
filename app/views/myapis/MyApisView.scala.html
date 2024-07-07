@@ -32,6 +32,10 @@
     }></script>
 }
 
+@normalise(text: String) = @{
+    text.trim.toLowerCase
+}
+
 @layout(
     pageTitle = titleNoForm(messages("govuk-grid-column-two-thirds.title")),
     user = Some(user),
@@ -41,7 +45,7 @@
 ) {
 
     <h1 class="govuk-heading-m govuk-!-margin-bottom-7">
-    @messages("myApis.heading", myApis.size)
+    @messages("myApis.all.heading", myApis.size)
     </h1>
 
     <div class="gem-c-search__item-wrapper">
@@ -58,7 +62,7 @@
 
     <div id="myApisPanels">
     @for(api <- myApis) {
-        <div class="hip-inner-card flex hip-application">
+        <div class="hip-inner-card flex hip-api" data-apiname="@normalise(api.title)">
             <div class="left">
                 <h5 class="govuk-heading-s hip-inner-card-title govuk-!-margin-bottom-4">
                     <a class="govuk-link govuk-link--no-visited-state" href=@controllers.routes.ApiDetailsController.onPageLoad(api.id).url>@api.title</a>
@@ -68,8 +72,7 @@
     }
     </div>
 
-    <p id="displayCountMessage" class="govuk-body govuk-!-margin-top-4 hip-text--centered govuk-!-display-none">@Html(messages("manageApplications.displayCount", <strong id="displayCount"></strong>, <strong id="totalCount">10</strong>))</p>
+    <p id="displayCountMessage" class="govuk-body govuk-!-margin-top-4 hip-text--centered ">@Html(messages("manageApplications.displayCount", <strong id="displayCount"></strong>, <strong id="totalCount">10</strong>))</p>
     <nav id="pagination" class="hip-pagination--centered"></nav>
-
 
 }
