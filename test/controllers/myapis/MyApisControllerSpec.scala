@@ -16,16 +16,14 @@
 
 package controllers.myapis
 
-import base.OptionallyAuthenticatedSpecBase
+import base.SpecBase
 import controllers.actions.FakeUser
-import controllers.routes
-import fakes.{FakeDomains, FakeHods}
 import generators.ApiDetailGenerators
 import models.api.{ApiDetail, Live}
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar
-import org.scalatest.{AsyncTestSuite, OptionValues}
+import org.scalatest.OptionValues
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import play.api.Application
 import play.api.inject.bind
@@ -33,29 +31,27 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.ApiHubService
 import utils.HtmlValidation
-import views.html.HipApisView
 import views.html.myapis.MyApisView
 
 import scala.concurrent.Future
 
 class MyApisControllerSpec
-  extends OptionallyAuthenticatedSpecBase
+  extends SpecBase
     with MockitoSugar
     with ScalaCheckDrivenPropertyChecks
     with ApiDetailGenerators
     with HtmlValidation
-    with OptionValues
-    with AsyncTestSuite {
+    with OptionValues {
 
-  "GET" - {
-    "must return OK and the correct view when the API detail exists for an authenticated user" in {
-      val fixture = buildFixture(userModel = Some(FakeUser))
+  "onPageLoad" - {
+    "must return OK and the correct view when the APIS exist for an authenticated user" in {
+      val fixture = buildFixture()
 
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[MyApisView]
 
         forAll { (apiDetail: ApiDetail) =>
-          when(fixture.apiHubService.getUserApis(any())(any, any))(any)
+          when(fixture.apiHubService.getUserApis(any)(any, any))
             .thenReturn(Future.successful(Seq(apiDetail)))
 
           val request = FakeRequest(GET, controllers.myapis.routes.MyApisController.onPageLoad().url)
@@ -68,65 +64,29 @@ class MyApisControllerSpec
       }
     }
 
-    "must return OK and the correct view when the authenticated user has no teams or no apis" in {
-      val fixture = buildFixture(userModel = Some(FakeUser))
+    "must return OK and the correct view when an unauthenticated user has no apis or teams" in {
+      val fixture = buildFixture()
 
       running(fixture.application) {
-        when(fixture.apiHubService.getUserApis(any())(any, any))(any)
+        when(fixture.apiHubService.getUserApis(any)(any, any))
           .thenReturn(Future.successful(Seq.empty))
 
         val request = FakeRequest(GET, controllers.myapis.routes.MyApisController.onPageLoad().url)
         val result = route(fixture.application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        status(result) mustBe NOT_FOUND
+        contentAsString(result) must include("You have no APIs, or do do not belong to any teams.")
+        contentAsString(result) must validateAsHtml
       }
     }
   }
 
-
-  "must return OK and the correct view when the API detail exists for an unauthenticated user" in {
-    val fixture = buildFixture(userModel = None)
-
-    running(fixture.application) {
-      val request = FakeRequest(GET, controllers.myapis.routes.MyApisController.onPageLoad().url)
-      val result = route(fixture.application, request).value
-
-      status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad.url)
-    }
-  }
-
-  "must return the apis in case-insensitive alphabetical order" in {
-    val fixture = buildFixture()
-
-    running(fixture.application) {
-      val view = fixture.application.injector.instanceOf[HipApisView]
-
-      val zebras = ApiDetail("id1", "ref1", "zebras", "zebras api", "1.0.0", Seq.empty, None, "oas", Live)
-      val molluscs = ApiDetail("id2", "ref2", "MOLLUSCS", "molluscs api", "1.0.0", Seq.empty, None, "oas", Live)
-      val aardvarks = ApiDetail("id3", "ref3", "aardvarks", "aardvarks api", "1.0.0", Seq.empty, None, "oas", Live)
-      val pigeons = ApiDetail("id4", "ref4", "PIGEONS", "pigeons api", "1.0.0", Seq.empty, None, "oas", Live)
-
-      when(fixture.apiHubService.getUserApis(any)(any, any))
-        .thenReturn(Future.successful(Seq(molluscs, zebras, aardvarks, pigeons)))
-
-      val request = FakeRequest(GET, routes.HipApisController.onPageLoad().url)
-      val result = route(fixture.application, request).value
-
-      status(result) mustBe OK
-      contentAsString(result) mustBe view(None, Seq(aardvarks, molluscs, pigeons, zebras), FakeDomains, FakeHods)(request, messages(fixture.application)).toString()
-      contentAsString(result) must validateAsHtml
-    }
-  }
-
-
   private case class Fixture(apiHubService: ApiHubService, application: Application)
 
-  private def buildFixture(userModel: Option[UserModel] = None): Fixture = {
+  private def buildFixture(userModel: UserModel = FakeUser): Fixture = {
     val apiHubService = mock[ApiHubService]
 
-    val application = applicationBuilder(userModel)
+    val application = applicationBuilder(user = userModel)
       .overrides(
         bind[ApiHubService].toInstance(apiHubService)
       )
