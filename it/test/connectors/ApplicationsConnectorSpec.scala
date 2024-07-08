@@ -29,7 +29,7 @@ import models.deployment.{DeploymentsRequest, Error, FailuresResponse, InvalidOa
 import models.exception.{ApplicationCredentialLimitException, TeamNameNotUniqueException}
 import models.requests.{AddApiRequest, AddApiRequestEndpoint, ChangeTeamNameRequest, TeamMemberRequest}
 import models.team.{NewTeam, Team}
-import models.user.{LdapUser, UserModel}
+import models.user.{LdapUser, UserContactDetails, UserModel}
 import org.scalatest.{EitherValues, OptionValues}
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -1264,6 +1264,29 @@ class ApplicationsConnectorSpec
     }
   }
 
+  "getUserContactDetails" - {
+    "must place the correct request and return the user contact details" in {
+      val expected = Seq(
+        UserContactDetails("user1@example.com"),
+        UserContactDetails("user2@example.com")
+      )
+
+      stubFor(
+        get(urlEqualTo(s"/api-hub-applications/users"))
+          .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withBody(Json.toJson(expected).toString())
+          )
+      )
+
+      buildConnector(this).getUserContactDetails()(HeaderCarrier()).map {
+        result =>
+          result mustBe expected
+      }
+    }
+  }
 }
 
 object ApplicationsConnectorSpec extends HttpClientV2Support {

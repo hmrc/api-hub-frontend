@@ -26,6 +26,7 @@ import models.deployment._
 import models.exception.{ApplicationCredentialLimitException, ApplicationsException, TeamNameNotUniqueException}
 import models.requests.{AddApiRequest, ChangeTeamNameRequest, TeamMemberRequest}
 import models.team.{NewTeam, Team}
+import models.user.UserContactDetails
 import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION, CONTENT_TYPE}
 import play.api.http.MimeTypes.JSON
 import play.api.http.Status._
@@ -431,6 +432,13 @@ class ApplicationsConnector @Inject()(
         case Left(e) if e.statusCode == CONFLICT => Future.successful(Left(TeamNameNotUniqueException.forName(newName)))
         case Left(e) => Future.failed(e)
       }
+  }
+
+  def getUserContactDetails()(implicit hc: HeaderCarrier): Future[Seq[UserContactDetails]] = {
+    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/users")
+      .setHeader((ACCEPT, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Seq[UserContactDetails]]
   }
 
   private def handleSuccessfulDeploymentsResponse(response: HttpResponse): Future[SuccessfulDeploymentsResponse] = {

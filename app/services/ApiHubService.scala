@@ -25,6 +25,7 @@ import models.application._
 import models.exception.ApplicationsException
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
 import models.team.{NewTeam, Team}
+import models.user.UserContactDetails
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -154,6 +155,10 @@ class ApiHubService @Inject()(
   def changeTeamName(id: String, newName: String)(implicit hc: HeaderCarrier): Future[Either[ApplicationsException,Unit]] = {
       logger.debug(s"Changing team name for team $id to $newName")
       applicationsConnector.changeTeamName(id, newName)
+  }
+
+  def getUserContactDetails()(implicit hc: HeaderCarrier): Future[Seq[UserContactDetails]] = {
+    applicationsConnector.getUserContactDetails()
   }
 
 }
