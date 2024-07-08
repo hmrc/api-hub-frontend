@@ -595,8 +595,6 @@ myApis.usage.title = Application usage for API: {0}
 myApis.usage.heading = Application usage for API: {0}
 myApis.usage.link = API usage
 myApis.usage.noApplications = No applications are using this API
-myApis.empty.heading = Your teams don't own any APIs or maybe there's no You in Team?
-myApis.empty.hint = Try adding some APIs or Teams or something?
 myApis.all.heading = Your APIs ({0})
 
 removeApiConfirmation.title = Confirm remove API

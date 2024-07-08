@@ -19,15 +19,13 @@ package controllers.myapis
 import com.google.inject.{Inject, Singleton}
 import controllers.actions.IdentifierAction
 import controllers.helpers.ErrorResultBuilder
-import models.api.{Alpha, ApiDetail, ApiStatus, Endpoint}
 import models.application.TeamMember
-import play.api.i18n.{I18nSupport, Messages}
+import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.myapis.MyApisView
 
-import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -41,16 +39,10 @@ class MyApisController @Inject()(
 
   def onPageLoad(): Action[AnyContent] = identified.async {
     implicit request =>
-      val eventualDetails = request.user.email.map(email => apiHubService.getUserApis(TeamMember(email))).getOrElse(Future.successful(Seq.empty))
-      eventualDetails flatMap {
-        case apiDetails: Seq[ApiDetail] if apiDetails.isEmpty =>
-          Future.successful(errorResultBuilder.notFound(
-            Messages("myApis.empty.heading"),
-            Messages("myApis.empty.hint")
-          ))
-        case apiDetails: Seq[ApiDetail] =>
-          val html = view.apply(apiDetails, request.user)
-          Future.successful(Ok(html))
+      request.user.email
+        .map(email => apiHubService.getUserApis(TeamMember(email)))
+        .getOrElse(Future.successful(Seq.empty)) flatMap {
+        apiDetails => Future.successful(Ok(view.apply(apiDetails, request.user)))
       }
   }
 }
