@@ -38,11 +38,6 @@ describe('myApis', () => {
                 data-apiname="${panel}" data-index="${i}"></div>`;
         }).join('');
     }
-    function getMyApisVisiblePanelData(...props) {
-        return Array.from(document.querySelectorAll('.hip-api'))
-            .filter(isVisible)
-            .map(el => props.reduce((acc, prop) => ({...acc, [prop]: el.dataset[prop]}), {index: parseInt(el.dataset.index)}));
-    }
     function clickPageNumber(pageNumber) {
         document.querySelector(`#pagination .govuk-pagination__link[data-page="${pageNumber}"]`).click();
     }
@@ -89,8 +84,6 @@ describe('myApis', () => {
 
         enterMyApiNameFilterText('api number 1');
         let myApisVisiblePanelData = getMyApisVisiblePanelData('apiname');
-        console.log("OIYAF")
-        console.log(myApisVisiblePanelData)
         expect(myApisVisiblePanelData).toEqual([
             { index: 0, apiname: 'api number 1'},
             { index: 9, apiname: 'api number 10'},

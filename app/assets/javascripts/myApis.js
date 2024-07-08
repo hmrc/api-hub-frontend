@@ -84,7 +84,6 @@ export function onPageShow() {
         view.setApiPanelVisibility(model.apis);
 
         view.setResultCount(model.resultCount);
-        // view.toggleNoResultsPanel(model.resultCount === 0);
     }
 
     paginator.onPaginationChanged(paginationDetails => {
@@ -92,7 +91,6 @@ export function onPageShow() {
         setVisible(view.displayCountMessage, paginationDetails.isPaginating);
         view.displayCount.textContent = paginationDetails.visibleItemCount;
         view.totalCount.textContent = paginationDetails.totalItemCount;
-        console.log(paginationDetails)
     });
 
     view.onFiltersChanged(() => {

@@ -37,15 +37,14 @@
 }
 
 @layout(
-    pageTitle = titleNoForm(messages("govuk-grid-column-two-thirds.title")),
+    pageTitle = titleNoForm(messages("myApis.all.title")),
     user = Some(user),
     fullWidth = true,
-    activeLink = Some("apiHubAdmin"),
     customScriptsBlock = Some(scripts()),
 ) {
 
     <h1 class="govuk-heading-m govuk-!-margin-bottom-7">
-    @messages("myApis.all.heading", myApis.size)
+        @messages("myApis.all.heading") (<span id="searchResultsSize">@myApis.size</span>)
     </h1>
 
     <div class="gem-c-search__item-wrapper">

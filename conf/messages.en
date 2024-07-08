@@ -595,7 +595,8 @@ myApis.usage.title = Application usage for API: {0}
 myApis.usage.heading = Application usage for API: {0}
 myApis.usage.link = API usage
 myApis.usage.noApplications = No applications are using this API
-myApis.all.heading = Your APIs ({0})
+myApis.all.title = Your APIs
+myApis.all.heading = Your APIs
 
 removeApiConfirmation.title = Confirm remove API
 removeApiConfirmation.heading = You are about to remove the following API from this application
