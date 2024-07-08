@@ -44,46 +44,13 @@ class MyApisController @Inject()(
       val eventualDetails = request.user.email.map(email => apiHubService.getUserApis(TeamMember(email))).getOrElse(Future.successful(Seq.empty))
       eventualDetails flatMap {
         case apiDetails: Seq[ApiDetail] if apiDetails.isEmpty =>
-          val html = view.apply(jokeApiDetails(), request.user)
-          Future.successful(Ok(html))
-
-
-        //          Future.successful(errorResultBuilder.notFound(
-        //            Messages("myApis.empty.heading"),
-        //            Messages("myApis.empty.hint")
-        //          ))
+          Future.successful(errorResultBuilder.notFound(
+            Messages("myApis.empty.heading"),
+            Messages("myApis.empty.hint")
+          ))
         case apiDetails: Seq[ApiDetail] =>
           val html = view.apply(apiDetails, request.user)
           Future.successful(Ok(html))
       }
   }
-
-  private def jokeApiDetails() = {
-
-    var details: Seq[ApiDetail] = Seq.empty
-
-    for {i <- 1 to 30} {
-      val detail = ApiDetail(
-        "74bed1f8-e095-4803-b4d1-e18a8d75301a",
-        s"publisherReference$i",
-        s"title$i",
-        s"description$i",
-        s"version$i",
-        Seq.empty,
-        Some(s"shortDescription$i"),
-        s"openApiSpecification$i",
-        Alpha,
-        Some("Team1"),
-        None,
-        None,
-        Seq.empty
-      )
-
-      details = details ++ Seq(detail)
-    }
-
-    details
-
-  }
-
 }
