@@ -608,3 +608,8 @@ removeApiSuccess.title = API removed
 removeApiSuccess.heading = API removed successfully
 removeApiSuccess.whatNext = What you can do now
 removeApiSuccess.link = View and manage your {0}.
+
+getUsers.title = View users
+getUsers.heading = View users
+getUsers.copy = Copy to clipboard
+getUsers.admin = Integration Hub admin
