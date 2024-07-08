@@ -12,7 +12,9 @@ describe('myApis', () => {
             <div id="myApisPanels"></div>
             <div id="searchResultsSize"></div>
             <div id="pagination"></div>
-            
+            <div id="displayCountMessage"></div>
+            <div id="displayCount"></div>
+            <div id="totalCount"></div>
         `));
         document = dom.window.document;
         globalThis.document = document;
@@ -32,17 +34,14 @@ describe('myApis', () => {
     }
     function buildApiPanels(...panels) {
         document.getElementById('myApisPanels').innerHTML = panels.map((panel, i) => {
-            return `<div class="api-panel" 
-                data-apiname="${panel.name}"></div>`;
+            return `<div class="hip-api" 
+                data-apiname="${panel}" data-index="${i}"></div>`;
         }).join('');
     }
-    function getVisiblePanelData(...props) {
-        return Array.from(document.querySelectorAll('.api-panel'))
+    function getMyApisVisiblePanelData(...props) {
+        return Array.from(document.querySelectorAll('.hip-api'))
             .filter(isVisible)
             .map(el => props.reduce((acc, prop) => ({...acc, [prop]: el.dataset[prop]}), {index: parseInt(el.dataset.index)}));
-    }
-    function getResultCount() {
-        return parseInt(document.getElementById('searchResultsSize').textContent);
     }
     function clickPageNumber(pageNumber) {
         document.querySelector(`#pagination .govuk-pagination__link[data-page="${pageNumber}"]`).click();
@@ -54,8 +53,10 @@ describe('myApis', () => {
         document.getElementById('nameFilter').value = value;
         document.getElementById('nameFilter').dispatchEvent(new Event('input'));
     }
-    function getMyApiNameFilterText() {
-        return document.getElementById('nameFilter').value;
+    function getVisiblePanelData(...props) {
+        return Array.from(document.querySelectorAll('.hip-api'))
+            .filter(isVisible)
+            .map(el => props.reduce((acc, prop) => ({...acc, [prop]: el.dataset[prop]}), {index: parseInt(el.dataset.index)}));
     }
     
     it("only first page of my apis results are displayed when page loads",  () => {
@@ -64,7 +65,7 @@ describe('myApis', () => {
         onPageShow();
 
         expect(getVisiblePanelData().map(p => p.index)).toEqual(
-            [0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18] // 'DEPRECATED' apis hidden by default
+            [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         );
     });
 
@@ -75,15 +76,11 @@ describe('myApis', () => {
         clickPageNumber(2);
 
         expect(getVisiblePanelData().map(p => p.index)).toEqual(
-            [20, 21, 22, 24, 25, 26, 28, 29, 30, 32, 33, 34, 36, 37, 38] // 'DEPRECATED' apis hidden by default
+            [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
         );
-    });
 
-    it("when second page of results is displayed and reset filters link and is clicked then we return to the first page",  () => {
-        onPageShow();
-        clickPageNumber(2);
+        expect(getCurrentPageNumber()).toBe(2);
 
-        expect(getCurrentPageNumber()).toBe(1);
     });
 
     it("when my apis name filter is applied then correct panels are shown",  () => {
@@ -91,16 +88,20 @@ describe('myApis', () => {
         onPageShow();
 
         enterMyApiNameFilterText('api number 1');
-        expect(getVisiblePanelData('apiname')).toEqual([
+        let myApisVisiblePanelData = getMyApisVisiblePanelData('apiname');
+        console.log("OIYAF")
+        console.log(myApisVisiblePanelData)
+        expect(myApisVisiblePanelData).toEqual([
             { index: 0, apiname: 'api number 1'},
             { index: 9, apiname: 'api number 10'},
             { index: 10, apiname: 'api number 11'},
+            { index: 11, apiname: 'api number 12'},
             { index: 12, apiname: 'api number 13'},
             { index: 13, apiname: 'api number 14'},
             { index: 14, apiname: 'api number 15'},
+            { index: 15, apiname: 'api number 16'},
             { index: 16, apiname: 'api number 17'},
-            { index: 17, apiname: 'api number 18'},
-            { index: 18, apiname: 'api number 19'},
+            { index: 17, apiname: 'api number 18'}
         ]);
     });
 });

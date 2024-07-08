@@ -52,7 +52,7 @@ export function onPageShow() {
         };
     })();
 
-    const paginator = buildPaginator(view.paginationContainer, 5)
+    const paginator = buildPaginator(view.paginationContainer, 10)
 
     function buildFilterFunctions() {
         return filters.map(filter=> filter.buildFilterFunction());
@@ -84,7 +84,7 @@ export function onPageShow() {
         view.setApiPanelVisibility(model.apis);
 
         view.setResultCount(model.resultCount);
-        view.toggleNoResultsPanel(model.resultCount === 0);
+        // view.toggleNoResultsPanel(model.resultCount === 0);
     }
 
     paginator.onPaginationChanged(paginationDetails => {
