@@ -3,4 +3,5 @@ GET         /access-requests/:id                                                
 POST        /access-requests/:id                                                    controllers.admin.AccessRequestController.onSubmit(id)
 GET         /teams                                                                  controllers.admin.ManageTeamsController.onPageLoad()
 GET         /applications                                                           controllers.admin.ManageApplicationsController.onPageLoad()
+GET         /apis                                                                   controllers.admin.ManageApisController.onPageLoad()
 GET         /users                                                                  controllers.admin.GetUsersController.onPageLoad()

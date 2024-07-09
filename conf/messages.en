@@ -564,6 +564,12 @@ manageApplications.application.id = ID
 manageApplications.application.created = Registered
 manageApplications.displayCount = Showing {0} of {1}
 
+manageApis.title = Manage APIs
+manageApis.heading = Manage APIs
+manageApis.admin = Integration Hub admin
+manageApis.displayCount = Showing {0} of {1}
+manageApis.search.label = Filter APIs by name
+
 manageTeams.title = Manage teams
 manageTeams.heading = Manage teams
 manageTeams.admin = Integration Hub admin

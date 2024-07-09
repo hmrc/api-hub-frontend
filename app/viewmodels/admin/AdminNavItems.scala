@@ -26,6 +26,7 @@ object AdminSideNavPages {
   case object ManageTeamsPage extends SideNavPage
   case object GetUsersPage extends SideNavPage
   case object ManageApplicationsPage extends SideNavPage
+  case object ManageApisPage extends SideNavPage
 
 }
 
@@ -48,6 +49,12 @@ object AdminNavItems {
           title = messages("manageApplications.title"),
           link = controllers.admin.routes.ManageApplicationsController.onPageLoad(),
           isCurrentPage = currentPage == ManageApplicationsPage
+        ),
+        SideNavItem(
+          page = ManageApisPage,
+          title = messages("manageApis.title"),
+          link = controllers.admin.routes.ManageApisController.onPageLoad(),
+          isCurrentPage = currentPage == ManageApisPage
         ),
         SideNavItem(
           page = ManageTeamsPage,
