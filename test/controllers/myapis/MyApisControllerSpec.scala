@@ -75,7 +75,7 @@ class MyApisControllerSpec
         val result = route(fixture.application, request).value
 
         status(result) mustBe NOT_FOUND
-        contentAsString(result) must include("You have no APIs, or do do not belong to any teams.")
+        contentAsString(result) must include("You have no APIs, or do not belong to any teams.")
         contentAsString(result) must validateAsHtml
       }
     }
