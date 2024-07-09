@@ -20,6 +20,7 @@
 @import config.Domains
 @import config.Hods
 @import views.html.components.IconsLink
+@import views.html.components.SearchBox
 
 @this(
     layout: templates.Layout,
@@ -29,7 +30,8 @@
     govukButton: GovukButton,
     govukTable: GovukTable,
     govukDetails : GovukDetails,
-    iconsLink: IconsLink
+    iconsLink: IconsLink,
+    searchBox: SearchBox
 )
 
 @(user: Option[UserModel], apiDetails: Seq[ApiDetail] = Seq.empty, domains: Domains, hods: Hods)(implicit request: Request[_], messages: Messages)
@@ -157,24 +159,7 @@
                     <a href="#" class="govuk-link govuk-link--no-visited-state" id="resetFilters">@messages("hipApis.filter.reset")</a>
                 </div>
                 <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible hip-color-override govuk-!-margin-top-5">
-                <fieldset class="govuk-fieldset">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
-                        <h2 class="govuk-fieldset__heading">
-                            @messages("hipApis.filter.byName")
-                        </h2>
-                    </legend>
-                    <div class="gem-c-search__item-wrapper">
-                        <input class="gem-c-search__item gem-c-search__input" id="nameFilter" name="nameFilter" title="Search" type="search">
-                        <div class="gem-c-search__item gem-c-search__submit-wrapper">
-                            <button class="gem-c-search__submit" type="submit">
-                                <svg class="gem-c-search__icon" width="27" height="27" viewBox="0 0 27 27" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-                                    <circle cx="12.0161" cy="11.0161" r="8.51613" stroke="currentColor" stroke-width="3"></circle>
-                                    <line x1="17.8668" y1="17.3587" x2="26.4475" y2="25.9393" stroke="currentColor" stroke-width="3"></line>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </fieldset>
+                @searchBox(messages("hipApis.filter.byName"), "nameFilter")
                 <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible hip-color-override govuk-!-margin-top-5">
                 <fieldset class="govuk-fieldset">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
