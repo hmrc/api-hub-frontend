@@ -597,7 +597,7 @@ myApis.usage.link = API usage
 myApis.usage.noApplications = No applications are using this API
 myApis.all.title = Your APIs
 myApis.all.heading = Your APIs
-myApis.empty.heading = You have no APIs, or do do not belong to any teams.
+myApis.empty.heading = You have no APIs, or do not belong to any teams.
 myApis.search.label = Filter by API name
 
 removeApiConfirmation.title = Confirm remove API
