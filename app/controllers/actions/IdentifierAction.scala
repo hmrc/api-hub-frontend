@@ -41,15 +41,9 @@ class AuthenticatedIdentifierAction @Inject()(
       case result: UserAuthResult => Future.successful(result)
     }.flatMap {
       case UserAuthenticated(user) if !user.email.exists(_.trim.nonEmpty) => handleMissingEmail(user)(request)
-      case UserAuthenticated(user) => {
-        Console.println(s"OIYAF: Authenticated: $request")
-        block(IdentifierRequest(request, user))
-      }
+      case UserAuthenticated(user) => block(IdentifierRequest(request, user))
       case UserUnauthorised => Future.successful(Redirect(controllers.routes.UnauthorisedController.onPageLoad))
-      case UserUnauthenticated => {
-        Console.println(s"OIYAF: Unauthenticated: $request")
-        Future.successful(Redirect(controllers.auth.routes.SignInController.onPageLoad()))
-      }
+      case UserUnauthenticated => Future.successful(Redirect(controllers.auth.routes.SignInController.onPageLoad()))
     }
   }
 
