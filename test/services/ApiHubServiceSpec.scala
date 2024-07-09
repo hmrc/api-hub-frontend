@@ -26,6 +26,7 @@ import models.application.{Api, Application, Creator, Credential, Deleted, NewAp
 import models.application.ApplicationLenses._
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
 import models.team.{NewTeam, Team}
+import models.user.UserContactDetails
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
 import org.scalatest.{EitherValues, OptionValues}
@@ -607,6 +608,24 @@ class ApiHubServiceSpec
         result =>
           verify(fixture.applicationsConnector).addTeamMemberToTeam(ArgumentMatchers.eq(teamId), ArgumentMatchers.eq(teamMember))(any())
           result.value mustBe ()
+      }
+    }
+  }
+
+  "getUserContactDetails" - {
+    "must make the correct request to the applications connector and return the response" in {
+      val fixture = buildFixture()
+      val users = Seq(
+        UserContactDetails("user1@example.com"),
+        UserContactDetails("user2@example.com")
+      )
+
+      when(fixture.applicationsConnector.getUserContactDetails()(any())).thenReturn(Future.successful(users))
+
+      fixture.service.getUserContactDetails()(HeaderCarrier()).map {
+        result =>
+          verify(fixture.applicationsConnector).getUserContactDetails()(any())
+          result mustBe users
       }
     }
   }
