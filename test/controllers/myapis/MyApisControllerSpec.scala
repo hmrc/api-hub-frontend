@@ -81,6 +81,30 @@ class MyApisControllerSpec
     }
   }
 
+  "must return the apis in case-insensitive alphabetical order" in {
+    val fixture = buildFixture()
+
+    running(fixture.application) {
+      val view = fixture.application.injector.instanceOf[MyApisView]
+
+      val zebras = ApiDetail("id1", "ref1", "zebras", "zebras api", "1.0.0", Seq.empty, None, "oas", Live)
+      val molluscs = ApiDetail("id2", "ref2", "MOLLUSCS", "molluscs api", "1.0.0", Seq.empty, None, "oas", Live)
+      val aardvarks = ApiDetail("id3", "ref3", "aardvarks", "aardvarks api", "1.0.0", Seq.empty, None, "oas", Live)
+      val pigeons = ApiDetail("id4", "ref4", "PIGEONS", "pigeons api", "1.0.0", Seq.empty, None, "oas", Live)
+
+      when(fixture.apiHubService.getUserApis(any)(any, any))
+        .thenReturn(Future.successful(Seq(molluscs, zebras, aardvarks, pigeons)))
+
+      val request = FakeRequest(GET, controllers.myapis.routes.MyApisController.onPageLoad().url)
+      val result = route(fixture.application, request).value
+
+      status(result) mustBe OK
+      contentAsString(result) mustBe view(Seq(aardvarks, molluscs, pigeons, zebras), FakeUser)(request, messages(fixture.application)).toString()
+      contentAsString(result) must validateAsHtml
+    }
+  }
+
+
   private case class Fixture(apiHubService: ApiHubService, application: Application)
 
   private def buildFixture(userModel: UserModel = FakeUser): Fixture = {

@@ -47,8 +47,7 @@ class MyApisController @Inject()(
             Messages("myApis.empty.heading")
           ))
         case apiDetails: Seq[ApiDetail] =>
-          val html = view.apply(apiDetails, request.user)
-          Future.successful(Ok(html))
+          Future.successful(Ok(view(apiDetails.sortWith( _.title.toUpperCase < _.title.toUpperCase), request.user)))
       }
   }
 }

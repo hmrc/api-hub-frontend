@@ -83,7 +83,7 @@ describe('myApis', () => {
         onPageShow();
 
         enterMyApiNameFilterText('api number 1');
-        let myApisVisiblePanelData = getMyApisVisiblePanelData('apiname');
+        let myApisVisiblePanelData = getVisiblePanelData('apiname');
         expect(myApisVisiblePanelData).toEqual([
             { index: 0, apiname: 'api number 1'},
             { index: 9, apiname: 'api number 10'},
