@@ -30,7 +30,7 @@ export function buildPaginator(itemsPerPage) {
 
     function applyPagination() {
         const onLastPage = model.currentPage === model.totalPages,
-            visibleItemsCount = onLastPage ? model.items.length % itemsPerPage : itemsPerPage,
+            visibleItemsCount = onLastPage ? model.items.length - itemsPerPage * (model.totalPages - 1) : itemsPerPage,
             totalItemsCount = model.items.length;
 
         view.render(model.currentPage, model.totalPages, visibleItemsCount, totalItemsCount);

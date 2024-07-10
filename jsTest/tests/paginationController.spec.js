@@ -58,6 +58,16 @@ describe('paginationController', () => {
             expect(paginationHelper.getShowingCount()).toBe(2); // final page, this count is different
             expect(paginationHelper.getTotalCount()).toBe(32);
         });
+        it("item count is correct on the last page when it has exactly 1 page worth of items", () => {
+            paginator.render(buildItems(20));
+
+            expect(paginationHelper.getShowingCount()).toBe(10);
+            expect(paginationHelper.getTotalCount()).toBe(20);
+
+            paginationHelper.clickNext();
+            expect(paginationHelper.getShowingCount()).toBe(10);
+            expect(paginationHelper.getTotalCount()).toBe(20);
+        });
     });
 
     describe('item visibility', () => {
