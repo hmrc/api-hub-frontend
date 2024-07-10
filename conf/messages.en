@@ -569,6 +569,8 @@ manageApis.heading = Manage APIs
 manageApis.admin = Integration Hub admin
 manageApis.displayCount = Showing {0} of {1}
 manageApis.search.label = Filter APIs by name
+manageApis.noResults.title = No APIs found
+manageApis.noResults.message = No APIs have been found that match your filter criteria, try adjusting your filter.
 
 manageTeams.title = Manage teams
 manageTeams.heading = Manage teams

@@ -16,22 +16,23 @@
 
 @import models.user.UserModel
 @import viewmodels.admin.{AdminNavItems, AdminSideNavPages}
-@import views.ViewUtils
-@import models.application.Application
 @import views.html.helper.CSPNonce
 @import models.api.ApiDetail
 @import views.html.components.SearchBox
+@import views.html.components.IconsLink
 
 @this(
     layout: templates.Layout,
     govukTable: GovukTable,
     govukTag : GovukTag,
-    searchBox: SearchBox
+    searchBox: SearchBox,
+    iconsLink: IconsLink,
 )
 
 @(apis: Seq[ApiDetail], user: UserModel)(implicit request: Request[_], messages: Messages)
 
 @scripts() = {
+    @iconsLink()
     <script src='@routes.Assets.versioned("javascripts/adminManageApis.js")' type="module" @{CSPNonce.attr}></script>
 }
 
@@ -44,7 +45,7 @@
 ) {
     @views.html.templates.SideNav(messages("manageApis.admin"), AdminNavItems(user, AdminSideNavPages.ManageApisPage)) {
 
-        <h1 class="govuk-heading-m govuk-!-margin-bottom-7">
+        <h1 class="govuk-heading-m">
             @messages("manageApis.heading")
         </h1>
 
@@ -52,12 +53,21 @@
 
         <div id="apiDetailPanels">
         @for(api <- apis){
-            <div class="hip-inner-card flex hip-application">
-                <h5 class="govuk-heading-s hip-inner-card-title govuk-!-margin-bottom-4">
+            <div class="hip-inner-card flex hip-api" data-apiname="@api.title">
+                <h5 class="govuk-heading-s hip-inner-card-title govuk-!-margin-bottom-2">
                     <a class="govuk-link govuk-link--no-visited-state" href=@controllers.myapis.routes.MyApiDetailsController.onPageLoad(api.id).url>@api.title</a>
                 </h5>
             </div>
         }
+            <div id="noResultsPanel" class="call-out-panel call-out-panel__small govuk-!-display-none ">
+                <p class="govuk-body information--general-tag govuk-!-margin-bottom-2">
+                    <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                    <span class="call-out-type">
+                        @messages("manageApis.noResults.title")
+                    </span>
+                </p>
+                <p class="govuk-body additional-message govuk-!-margin-bottom-1 govuk-!-margin-top-1">@messages("manageApis.noResults.message")</p>
+            </div>
         </div>
 
         <p id="displayCountMessage" class="govuk-body govuk-!-margin-top-4 hip-text--centered govuk-!-display-none">@Html(messages("manageApis.displayCount", <strong id="displayCount"></strong>, <strong id="totalCount">10</strong>))</p>
