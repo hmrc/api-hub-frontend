@@ -13,7 +13,8 @@ export function onPageShow() {
             elPaginationContainer = document.getElementById('pagination'),
             elDisplayCountMessage = document.getElementById('displayCountMessage'),
             elDisplayCount = document.getElementById('displayCount'),
-            elTotalCount = document.getElementById('totalCount');
+            elTotalCount = document.getElementById('totalCount'),
+            elNoSearchResults = document.getElementById('noSearchResults');
 
         let onFiltersChangedHandler = noop;
 
@@ -33,6 +34,9 @@ export function onPageShow() {
                 apis.forEach(apiDetail => {
                     setVisible(apiDetail.el, apiDetail.visible);
                 });
+            },
+            setNoSearchResultsVisibility(apis) {
+                setVisible(elNoSearchResults, !apis.some(anyApi => anyApi.visible));
             },
             initialiseFilters(apis) {
                 filters.forEach(filter => filter.initialise(apis));
@@ -82,8 +86,8 @@ export function onPageShow() {
 
         paginator.initialise(model.apis.filter(apiDetail => ! apiDetail.hiddenByFilters));
         view.setApiPanelVisibility(model.apis);
-
         view.setResultCount(model.resultCount);
+        view.setNoSearchResultsVisibility(model.apis);
     }
 
     paginator.onPaginationChanged(paginationDetails => {

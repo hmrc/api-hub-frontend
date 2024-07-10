@@ -15,6 +15,7 @@ describe('myApis', () => {
             <div id="displayCountMessage"></div>
             <div id="displayCount"></div>
             <div id="totalCount"></div>
+            <div id="noSearchResults"></div>
         `));
         document = dom.window.document;
         globalThis.document = document;
@@ -96,5 +97,16 @@ describe('myApis', () => {
             { index: 16, apiname: 'api number 17'},
             { index: 17, apiname: 'api number 18'}
         ]);
+        expect(isVisible(document.querySelector('[id=noSearchResults]'))).toBeFalse();
     });
+
+    it("when my apis name filter is applied and there are no results then appropriate message is shown",  () => {
+        buildApiPanelsByCount(10);
+        onPageShow();
+
+        enterMyApiNameFilterText('xylophone');
+
+        expect(isVisible(document.querySelector('[id=noSearchResults]'))).toBeTrue();
+    });
+
 });

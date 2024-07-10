@@ -50,6 +50,7 @@
     <h2 class="govuk-heading-s govuk-!-margin-bottom-2">
     @messages("myApis.search.label")
     </h2>
+
     <div class="gem-c-search__item-wrapper">
         <input class="gem-c-search__item gem-c-search__input govuk-!-margin-bottom-5" id="nameFilter" name="nameFilter" title="Search" type="search">
         <div class="gem-c-search__item gem-c-search__submit-wrapper">
@@ -60,6 +61,12 @@
                 </svg>
             </button>
         </div>
+    </div>
+
+    <div>
+        <h2 class="govuk-heading-s govuk-!-display-none" id="noSearchResults">
+        @messages("myApis.search.noResults")
+        </h2>
     </div>
 
     <div id="myApisPanels">

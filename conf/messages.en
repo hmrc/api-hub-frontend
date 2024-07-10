@@ -599,6 +599,7 @@ myApis.all.title = Your APIs
 myApis.all.heading = Your APIs
 myApis.empty.heading = You have no APIs, or do not belong to any teams.
 myApis.search.label = Filter by API name
+myApis.search.noResults = No APIs have been found that match your filter criteria, try adjusting your filter.
 
 removeApiConfirmation.title = Confirm remove API
 removeApiConfirmation.heading = You are about to remove the following API from this application

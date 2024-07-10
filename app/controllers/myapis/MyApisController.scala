@@ -19,7 +19,7 @@ package controllers.myapis
 import com.google.inject.{Inject, Singleton}
 import controllers.actions.IdentifierAction
 import controllers.helpers.ErrorResultBuilder
-import models.api.ApiDetail
+import models.api.{Alpha, ApiDetail}
 import models.application.TeamMember
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -43,11 +43,45 @@ class MyApisController @Inject()(
       val eventualDetails = request.user.email.map(email => apiHubService.getUserApis(TeamMember(email))).getOrElse(Future.successful(Seq.empty))
       eventualDetails flatMap {
         case apiDetails: Seq[ApiDetail] if apiDetails.isEmpty =>
-          Future.successful(errorResultBuilder.notFound(
-            Messages("myApis.empty.heading")
-          ))
+          val html = view.apply(jokeApiDetails(), request.user)
+          Future.successful(Ok(html))
+
+
+        //          Future.successful(errorResultBuilder.notFound(
+        //            Messages("myApis.empty.heading"),
+        //            Messages("myApis.empty.hint")
+        //          ))
         case apiDetails: Seq[ApiDetail] =>
           Future.successful(Ok(view(apiDetails.sortWith( _.title.toUpperCase < _.title.toUpperCase), request.user)))
       }
   }
+
+  private def jokeApiDetails() = {
+
+    var details: Seq[ApiDetail] = Seq.empty
+
+    for {i <- 1 to 5} {
+      val detail = ApiDetail(
+        "74bed1f8-e095-4803-b4d1-e18a8d75301a",
+        s"publisherReference$i",
+        s"title$i",
+        s"description$i",
+        s"version$i",
+        Seq.empty,
+        Some(s"shortDescription$i"),
+        s"openApiSpecification$i",
+        Alpha,
+        Some("Team1"),
+        None,
+        None,
+        Seq.empty
+      )
+
+      details = details ++ Seq(detail)
+    }
+
+    details
+
+  }
+
 }
