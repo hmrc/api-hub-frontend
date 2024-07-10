@@ -10,10 +10,6 @@ export function onPageShow() {
     const view = (() => {
         const myApiPanelEls = Array.from(document.querySelectorAll('#myApisPanels .hip-api')),
             elSearchResultsSize = document.getElementById('searchResultsSize'),
-            elPaginationContainer = document.getElementById('pagination'),
-            elDisplayCountMessage = document.getElementById('displayCountMessage'),
-            elDisplayCount = document.getElementById('displayCount'),
-            elTotalCount = document.getElementById('totalCount'),
             elNoSearchResults = document.getElementById('noSearchResults');
 
         let onFiltersChangedHandler = noop;
@@ -26,9 +22,6 @@ export function onPageShow() {
             },
             get myApisPanels() {
                 return [...myApiPanelEls];
-            },
-            get paginationContainer() {
-                return elPaginationContainer;
             },
             setApiPanelVisibility(apis) {
                 apis.forEach(apiDetail => {
@@ -43,20 +36,11 @@ export function onPageShow() {
             },
             setResultCount(count) {
                 elSearchResultsSize.textContent = count;
-            },
-            get displayCountMessage() {
-                return elDisplayCountMessage;
-            },
-            get displayCount() {
-                return elDisplayCount;
-            },
-            get totalCount() {
-                return elTotalCount;
             }
         };
     })();
 
-    const paginator = buildPaginator(view.paginationContainer, 10)
+    const paginator = buildPaginator(10)
 
     function buildFilterFunctions() {
         return filters.map(filter=> filter.buildFilterFunction());
@@ -84,18 +68,12 @@ export function onPageShow() {
             apiDetail.hiddenByFilters = ! myApisFilterFns.every(fn => fn(apiDetail.data));
         });
 
-        paginator.initialise(model.apis.filter(apiDetail => ! apiDetail.hiddenByFilters));
         view.setApiPanelVisibility(model.apis);
+        paginator.render(model.apis.filter(apiDetail => ! apiDetail.hiddenByFilters).map(panel => panel.el));
+
         view.setResultCount(model.resultCount);
         view.setNoSearchResultsVisibility(model.apis);
     }
-
-    paginator.onPaginationChanged(paginationDetails => {
-        view.setApiPanelVisibility(model.apis);
-        setVisible(view.displayCountMessage, paginationDetails.isPaginating);
-        view.displayCount.textContent = paginationDetails.visibleItemCount;
-        view.totalCount.textContent = paginationDetails.totalItemCount;
-    });
 
     view.onFiltersChanged(() => {
         applyMyApisFilters();

@@ -18,12 +18,14 @@
 @import models.user.UserModel
 @import views.ViewUtils
 @import views.html.helper.CSPNonce
+@import views.html.components.Paginator
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukButton: GovukButton,
-    govukTable: GovukTable
+    govukTable: GovukTable,
+    paginator: Paginator
 )
 
 @(applications: Seq[Application], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
@@ -57,7 +59,6 @@
     )
     </div>
 
-    <p id="displayCountMessage" class="govuk-body govuk-!-margin-top-4 hip-text--centered govuk-!-display-none">@Html(messages("manageApplications.displayCount", <strong id="displayCount"></strong>, <strong id="totalCount">10</strong>))</p>
-    <nav id="pagination" class="hip-pagination--centered"></nav>
+    @paginator()
 
 }

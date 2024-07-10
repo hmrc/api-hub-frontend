@@ -21,6 +21,7 @@
 @import config.Hods
 @import views.html.components.IconsLink
 @import views.html.components.SearchBox
+@import views.html.components.Paginator
 
 @this(
     layout: templates.Layout,
@@ -31,7 +32,8 @@
     govukTable: GovukTable,
     govukDetails : GovukDetails,
     iconsLink: IconsLink,
-    searchBox: SearchBox
+    searchBox: SearchBox,
+    paginator: Paginator
 )
 
 @(user: Option[UserModel], apiDetails: Seq[ApiDetail] = Seq.empty, domains: Domains, hods: Hods)(implicit request: Request[_], messages: Messages)
@@ -230,7 +232,7 @@
                     <a href="#" class="govuk-link govuk-link--no-visited-state" id="noResultsClearFilters">@messages("hipApis.filter.noResults.clearFilters")</a>
                 </p>
             </div>
-            <nav id="pagination"></nav>
+            @paginator()
         </div>
     </div>
 }

@@ -28,6 +28,7 @@ site.accessRequestNotFound.message = Cannot find a production access request wit
 site.teamNotFoundHeading = Team not found
 site.teamNotFoundMessage = Cannot find a team with Id {0}.
 site.opensInNewTab = opens in new tab
+site.displayCount = Showing {0} of {1}
 
 date.day = Day
 date.month = Month
@@ -562,12 +563,10 @@ manageApplications.heading = Manage applications
 manageApplications.admin = Integration Hub admin
 manageApplications.application.id = ID
 manageApplications.application.created = Registered
-manageApplications.displayCount = Showing {0} of {1}
 
 manageApis.title = Manage APIs
 manageApis.heading = Manage APIs
 manageApis.admin = Integration Hub admin
-manageApis.displayCount = Showing {0} of {1}
 manageApis.search.label = Filter APIs by name
 manageApis.noResults.title = No APIs found
 manageApis.noResults.message = No APIs have been found that match your filter criteria, try adjusting your filter.
