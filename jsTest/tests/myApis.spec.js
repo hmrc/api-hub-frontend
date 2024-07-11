@@ -1,6 +1,6 @@
 import {JSDOM} from 'jsdom';
 import {onPageShow} from '../../app/assets/javascripts/myApis.js';
-import {paginationHelper, paginationContainerHtml} from "./testUtils.js";
+import {paginationHelper, paginationContainerHtml, isVisible} from "./testUtils.js";
 
 describe('myApis', () => {
     let document;
