@@ -48,7 +48,7 @@
     @views.html.templates.SideNav(messages("manageApis.admin"), AdminNavItems(user, AdminSideNavPages.ManageApisPage)) {
 
         <h1 class="govuk-heading-m">
-            @messages("manageApis.heading")
+            @Html(messages("manageApis.heading", <span id="apiCount"></span>))
         </h1>
 
         @searchBox(messages("manageApis.search.label"), "nameFilter", "govuk-!-margin-bottom-5")

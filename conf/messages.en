@@ -565,7 +565,7 @@ manageApplications.application.id = ID
 manageApplications.application.created = Registered
 
 manageApis.title = Manage APIs
-manageApis.heading = Manage APIs
+manageApis.heading = Manage APIs ({0})
 manageApis.admin = Integration Hub admin
 manageApis.search.label = Filter APIs by name
 manageApis.noResults.title = No APIs found

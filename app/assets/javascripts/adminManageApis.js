@@ -5,6 +5,7 @@ export function onDomLoaded() {
     const view = (() => {
         const apiDetailPanelEls = Array.from(document.querySelectorAll('#apiDetailPanels .hip-api')),
             elNoResultsPanel = document.getElementById('noResultsPanel'),
+            elApiCount = document.getElementById('apiCount'),
             elNameFilter = document.getElementById('nameFilter');
 
         let onFiltersChangedHandler = noop;
@@ -31,6 +32,9 @@ export function onDomLoaded() {
             toggleNoResultsPanel(visible) {
                 setVisible(elNoResultsPanel, visible);
             },
+            set resultCount(value) {
+                elApiCount.textContent = value;
+            }
         };
     })();
 
@@ -58,11 +62,13 @@ export function onDomLoaded() {
 
         const resultCount = filteredPanels.length;
         view.toggleNoResultsPanel(resultCount === 0);
+        view.resultCount = resultCount;
     }
 
     view.onFiltersChanged(() => {
         applyFilter();
     });
+    applyFilter();
 
     paginator.render(apiPanels.map(o => o.el));
 }
