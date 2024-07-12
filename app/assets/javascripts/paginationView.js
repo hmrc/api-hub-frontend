@@ -1,129 +1,71 @@
 import {setVisible, noop} from "./utils.js";
 
-export function buildPaginationView(elContainer) {
-    function buildView() {
-        elContainer.classList.add('govuk-pagination');
-        elContainer.setAttribute('aria-label', 'Pagination');
+export function buildPaginationView() {
+    const elContainer = document.getElementById('paginationContainer'),
+        elList = elContainer.querySelector('.govuk-pagination__list'),
+        elPrev = elContainer.querySelector('.govuk-pagination__prev'),
+        elNext = elContainer.querySelector('.govuk-pagination__next'),
+        elPageLink = elContainer.querySelector('.govuk-pagination__item'),
+        elPageLinkCurrent = elContainer.querySelector('.govuk-pagination__item--current'),
+        elEllipsis = elContainer.querySelector('.govuk-pagination__item--ellipses'),
+        elDisplayCount = elContainer.querySelector('.hip-pagination__showing-count'),
+        elTotalCount = elContainer.querySelector('.hip-pagination__total-count');
 
-        const elPrev = document.createElement('div');
-        elPrev.classList.add('govuk-pagination__prev');
-        elPrev.innerHTML = `
-            <a class="govuk-link govuk-pagination__link" href="#" rel="prev">
-              <svg class="govuk-pagination__icon govuk-pagination__icon--prev" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
-                <path d="m6.5938-0.0078125-6.7266 6.7266 6.7441 6.4062 1.377-1.449-4.1856-3.9768h12.896v-2h-12.984l4.2931-4.293-1.414-1.414z"></path>
-              </svg>
-              <span class="govuk-pagination__link-title">
-                Previous<span class="govuk-visually-hidden"> page</span>
-              </span>
-            </a>`;
+    elList.removeChild(elPageLink);
+    elList.removeChild(elPageLinkCurrent);
+    elList.removeChild(elEllipsis);
 
-        const elNext = document.createElement('div');
-        elNext.classList.add('govuk-pagination__next');
-        elNext.innerHTML = `
-            <a class="govuk-link govuk-pagination__link" href="#" rel="next">
-              <span class="govuk-pagination__link-title">
-                Next<span class="govuk-visually-hidden"> page</span>
-              </span>
-              <svg class="govuk-pagination__icon govuk-pagination__icon--next" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
-                <path d="m8.107-0.0078125-1.4136 1.414 4.2926 4.293h-12.986v2h12.896l-4.1855 3.9766 1.377 1.4492 6.7441-6.4062-6.7246-6.7266z"></path>
-              </svg>
-            </a>`;
-
-        const elList = document.createElement('ul');
-        elList.classList.add('govuk-pagination__list');
-
-        function buildPageNumberLink(pageNumber, isCurrentPage) {
-            return `
-                <li class="govuk-pagination__item ${isCurrentPage ? 'govuk-pagination__item--current' : ''}">
-                    <a class="govuk-link govuk-pagination__link" data-page="${pageNumber}" href="#" aria-label="Page ${pageNumber}" ${isCurrentPage ? 'aria-current="page"' : ''}>${pageNumber}</a>
-                </li>`;
-        }
-
-        const ELLIPSIS = '<li class="govuk-pagination__item govuk-pagination__item--ellipses">&ctdot;</li>';
-
-        let pageNumberClickHandler = noop,
-            previousLinkClickHandler = noop,
-            nextLinkClickHandler = noop;
-
-        elList.addEventListener('click', event => pageNumberClickHandler(event));
-        elPrev.addEventListener('click', event => previousLinkClickHandler(event));
-        elNext.addEventListener('click', event => nextLinkClickHandler(event));
-
-        let initialised = false;
-        function initialise() {
-            elContainer.appendChild(elPrev);
-            elContainer.appendChild(elList);
-            elContainer.appendChild(elNext);
-
-            initialised = true;
-        }
-
-        return {
-            render(currentPage, totalPages) {
-                if (!initialised) {
-                    initialise();
-                }
-                setVisible(elContainer, totalPages > 1);
-                setVisible(elPrev, currentPage > 1);
-                setVisible(elNext, currentPage < totalPages);
-
-                const items = [];
-                for (let i = 1; i <= totalPages; i++) {
-                    // We always show links to the first and last pages, and to the current page and its immediate neighbours
-                    if (i === 1 || i === totalPages || Math.abs(i - currentPage) < 2) {
-                        items.push(buildPageNumberLink(i, i === currentPage));
-                    } else if (items[items.length - 1] !== ELLIPSIS) {
-                        items.push(ELLIPSIS);
-                    }
-                }
-                elList.innerHTML = items.join('');
-            },
-            onNextLinkClick(handler) {
-                nextLinkClickHandler = handler;
-            },
-            onPreviousLinkClick(handler) {
-                previousLinkClickHandler = handler;
-            },
-            onPageNumberLinkClick(handler) {
-                pageNumberClickHandler = handler;
-            }
-        };
+    function buildPageNumberLink(pageNumber, isCurrentPage) {
+        const elLinkBox = (isCurrentPage ? elPageLinkCurrent :  elPageLink).cloneNode(true),
+            elLink = elLinkBox.querySelector('.govuk-pagination__link');
+        elLink.dataset.page = pageNumber;
+        elLink.textContent = pageNumber;
+        elLink.setAttribute('aria-label', `Page ${pageNumber}`);
+        return elLinkBox;
     }
 
-    const model = {currentPage: null, totalPages: null},
-        view = buildView();
-    let navigationHandler = noop;
+    function buildEllipsis() {
+        return elEllipsis.cloneNode(true);
+    }
 
-    view.onPreviousLinkClick(() => {
-        if (model.currentPage > 1) {
-            navigationHandler(model.currentPage - 1);
-        }
-    });
+    let pageNumberClickHandler = noop,
+        previousLinkClickHandler = noop,
+        nextLinkClickHandler = noop;
 
-    view.onNextLinkClick(() => {
-        if (model.currentPage < model.totalPages) {
-            navigationHandler(model.currentPage + 1);
-        }
-    });
-
-    view.onPageNumberLinkClick(event => {
-        const pageNumber = parseInt(event.target.dataset.page);
-        if (pageNumber && pageNumber !== model.currentPage) {
-            navigationHandler(pageNumber);
-        }
-    });
+    elList.addEventListener('click', event => pageNumberClickHandler(Number(event.target.dataset.page)));
+    elPrev.addEventListener('click', event => previousLinkClickHandler(event));
+    elNext.addEventListener('click', event => nextLinkClickHandler(event));
 
     return {
-        render(currentPage, totalPages) {
-            model.currentPage = currentPage;
-            model.totalPages = totalPages;
-            view.render(currentPage, totalPages);
+        render(currentPage, totalPages, visibleItemsCount, totalItemsCount) {
+            setVisible(elContainer, totalPages > 1);
+            setVisible(elPrev, currentPage > 1);
+            setVisible(elNext, currentPage < totalPages);
+
+            let lastItemWasEllipsis = false;
+            elList.innerHTML = '';
+            for (let i = 1; i <= totalPages; i++) {
+                // We always show links to the first and last pages, and to the current page and its immediate neighbours
+                if (i === 1 || i === totalPages || Math.abs(i - currentPage) < 2) {
+                    elList.appendChild(buildPageNumberLink(i, i === currentPage));
+                    lastItemWasEllipsis = false;
+                } else if (! lastItemWasEllipsis) {
+                    elList.appendChild(buildEllipsis());
+                    lastItemWasEllipsis = true;
+                }
+            }
+
+            elDisplayCount.textContent = visibleItemsCount;
+            elTotalCount.textContent = totalItemsCount;
         },
-        onNavigation(handler) {
-            navigationHandler = handler;
+        onNextLinkClick(handler) {
+            nextLinkClickHandler = handler;
         },
-        get isVisible() {
-            return model.totalPages > 1;
+        onPreviousLinkClick(handler) {
+            previousLinkClickHandler = handler;
+        },
+        onPageNumberLinkClick(handler) {
+            pageNumberClickHandler = handler;
         }
     };
 }

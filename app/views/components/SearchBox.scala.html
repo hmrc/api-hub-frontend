@@ -1,0 +1,38 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@this()
+
+@(heading: String, name: String, cssClasses: String = "")(implicit request: RequestHeader)
+
+<fieldset class="govuk-fieldset @{cssClasses}">
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+        <h2 class="govuk-fieldset__heading">
+            @heading
+        </h2>
+    </legend>
+    <div class="gem-c-search__item-wrapper">
+        <input class="gem-c-search__item gem-c-search__input" id="@name" name="@name" title="Search" type="search">
+        <div class="gem-c-search__item gem-c-search__submit-wrapper">
+            <button class="gem-c-search__submit" type="submit">
+                <svg class="gem-c-search__icon" width="27" height="27" viewBox="0 0 27 27" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+                    <circle cx="12.0161" cy="11.0161" r="8.51613" stroke="currentColor" stroke-width="3"></circle>
+                    <line x1="17.8668" y1="17.3587" x2="26.4475" y2="25.9393" stroke="currentColor" stroke-width="3"></line>
+                </svg>
+            </button>
+        </div>
+    </div>
+</fieldset>

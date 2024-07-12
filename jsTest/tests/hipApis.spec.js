@@ -1,6 +1,6 @@
 import {JSDOM} from 'jsdom';
 import {onPageShow} from '../../app/assets/javascripts/hipApis.js';
-import {isVisible} from "./testUtils.js";
+import {paginationHelper, paginationContainerHtml, isVisible} from "./testUtils.js";
 
 describe('hipApis', () => {
     let document;
@@ -42,7 +42,6 @@ describe('hipApis', () => {
             </div>            
             <div id="apiList"></div>
             <div id="searchResultsSize"></div>
-            <div id="pagination"></div>
             <div id="noResultsPanel"></div>
             <div id="resetFilters"></div>
             <div id="noResultsClearFilters"></div>
@@ -52,6 +51,7 @@ describe('hipApis', () => {
             <details id="viewHodFilters"><summary></summary></details>
             <div id="statusFilterCount"></div>
             <details id="viewStatusFilters"><summary></summary></details>
+            ${paginationContainerHtml}
         `));
         document = dom.window.document;
         globalThis.document = document;
@@ -95,11 +95,6 @@ describe('hipApis', () => {
                 data-apiname="${panel.name}"></div>`;
         }).join('');
     }
-    function getVisiblePanelData(...props) {
-        return Array.from(document.querySelectorAll('.api-panel'))
-            .filter(isVisible)
-            .map(el => props.reduce((acc, prop) => ({...acc, [prop]: el.dataset[prop]}), {index: parseInt(el.dataset.index)}));
-    }
     function getResultCount() {
         return parseInt(document.getElementById('searchResultsSize').textContent);
     }
@@ -133,12 +128,6 @@ describe('hipApis', () => {
     function hodFiltersCollapsed() {
         return document.getElementById('viewHodFilters').open === false;
     }
-    function clickPageNumber(pageNumber) {
-        document.querySelector(`#pagination .govuk-pagination__link[data-page="${pageNumber}"]`).click();
-    }
-    function getCurrentPageNumber() {
-        return parseInt(document.querySelector('.govuk-pagination__item--current').textContent);
-    }
     function noResultsPanelIsVisible() {
         return isVisible(document.getElementById('noResultsPanel'));
     }
@@ -155,7 +144,7 @@ describe('hipApis', () => {
 
         onPageShow();
 
-        expect(getVisiblePanelData('apistatus')).toEqual([{apistatus: 'ALPHA', index: 0}, {apistatus: 'BETA', index: 1}, {apistatus: 'LIVE', index: 2}]);
+        expect(paginationHelper.getVisiblePanelData('.api-panel', 'apistatus')).toEqual([{apistatus: 'ALPHA', index: 0}, {apistatus: 'BETA', index: 1}, {apistatus: 'LIVE', index: 2}]);
         expect(getResultCount()).toBe(3);
     });
 
@@ -165,7 +154,7 @@ describe('hipApis', () => {
         onPageShow();
         clickStatusFilter('BETA');
 
-        expect(getVisiblePanelData('apistatus')).toEqual([{apistatus: 'ALPHA', index: 0}, {apistatus: 'LIVE', index: 2}]);
+        expect(paginationHelper.getVisiblePanelData('.api-panel', 'apistatus')).toEqual([{apistatus: 'ALPHA', index: 0}, {apistatus: 'LIVE', index: 2}]);
         expect(getResultCount()).toBe(2);
     });
 
@@ -175,7 +164,7 @@ describe('hipApis', () => {
         onPageShow();
         clickStatusFilter('DEPRECATED');
 
-        expect(getVisiblePanelData('apistatus')).toEqual([{apistatus: 'ALPHA', index: 0}, {apistatus: 'BETA', index: 1}, {apistatus: 'LIVE', index: 2}, {apistatus: 'DEPRECATED', index: 3}]);
+        expect(paginationHelper.getVisiblePanelData('.api-panel', 'apistatus')).toEqual([{apistatus: 'ALPHA', index: 0}, {apistatus: 'BETA', index: 1}, {apistatus: 'LIVE', index: 2}, {apistatus: 'DEPRECATED', index: 3}]);
         expect(getResultCount()).toBe(4);
     });
 
@@ -184,7 +173,7 @@ describe('hipApis', () => {
 
         onPageShow();
 
-        expect(getVisiblePanelData().map(p => p.index)).toEqual(
+        expect(paginationHelper.getVisiblePanelIndexes('.api-panel')).toEqual(
             [0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18] // 'DEPRECATED' apis hidden by default
         );
     });
@@ -193,9 +182,9 @@ describe('hipApis', () => {
         buildApiPanelsByCount(100);
 
         onPageShow();
-        clickPageNumber(2);
+        paginationHelper.getPaginationPageLink(2).click();
 
-        expect(getVisiblePanelData().map(p => p.index)).toEqual(
+        expect(paginationHelper.getVisiblePanelIndexes('.api-panel')).toEqual(
             [20, 21, 22, 24, 25, 26, 28, 29, 30, 32, 33, 34, 36, 37, 38] // 'DEPRECATED' apis hidden by default
         );
     });
@@ -204,10 +193,10 @@ describe('hipApis', () => {
         buildApiPanelsByCount(100);
 
         onPageShow();
-        clickPageNumber(2);
+        paginationHelper.getPaginationPageLink(2).click();
         clickStatusFilter('DEPRECATED');
 
-        expect(getVisiblePanelData().map(p => p.index)).toEqual(
+        expect(paginationHelper.getVisiblePanelIndexes('.api-panel')).toEqual(
             [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
         );
     });
@@ -218,7 +207,7 @@ describe('hipApis', () => {
 
         clickDomainFilter('d1');
 
-        expect(getVisiblePanelData('domain', 'subdomain')).toEqual([
+        expect(paginationHelper.getVisiblePanelData('.api-panel', 'domain', 'subdomain')).toEqual([
             { index: 0, domain: 'd1', subdomain: 'd1s1'},
             { index: 1, domain: 'd1', subdomain: 'd1s2'},
             { index: 2, domain: 'd1', subdomain: 'd1s3'},
@@ -245,7 +234,7 @@ describe('hipApis', () => {
         clickSubdomainFilter('d1s1');
         clickDomainFilter('d2');
 
-        expect(getVisiblePanelData('domain', 'subdomain')).toEqual([
+        expect(paginationHelper.getVisiblePanelData('.api-panel', 'domain', 'subdomain')).toEqual([
             { index: 1, domain: 'd1', subdomain: 'd1s2' },
             { index: 2, domain: 'd1', subdomain: 'd1s3' },
             { index: 9, domain: 'd1', subdomain: 'd1s2' },
@@ -270,7 +259,7 @@ describe('hipApis', () => {
 
         clickHodFilter('internal');
         clickHodFilter('ems');
-        expect(getVisiblePanelData('hods')).toEqual([
+        expect(paginationHelper.getVisiblePanelData('.api-panel','hods')).toEqual([
             { index: 1,  hods: 'ems'},
             { index: 2,  hods: 'internal,ems,invalid'},
             { index: 6,  hods: 'ems'},
@@ -294,7 +283,7 @@ describe('hipApis', () => {
         onPageShow();
 
         enterNameFilterText('api number 1');
-        expect(getVisiblePanelData('apiname')).toEqual([
+        expect(paginationHelper.getVisiblePanelData('.api-panel', 'apiname')).toEqual([
             { index: 0, apiname: 'api number 1'},
             { index: 9, apiname: 'api number 10'},
             { index: 10, apiname: 'api number 11'},
@@ -459,11 +448,11 @@ describe('hipApis', () => {
 
         it("when second page of results is displayed and reset filters link and is clicked then we return to the first page",  () => {
             onPageShow();
-            clickPageNumber(2);
+            paginationHelper.getPaginationPageLink(2).click();
 
             clickResetFiltersLink();
 
-            expect(getCurrentPageNumber()).toBe(1);
+            expect(paginationHelper.getCurrentPageNumber()).toBe(1);
         });
     });
 

@@ -1,41 +1,55 @@
 import {buildPaginationView} from './paginationView.js';
-import {noop} from "./utils.js";
+import {setVisible} from "./utils.js";
 
 export const HIDDEN_BY_PAGINATION = 'hiddenByPagination';
 
-export function buildPaginator(elNavContainer, itemsPerPage) {
-    const view = buildPaginationView(elNavContainer),
+export function buildPaginator(itemsPerPage) {
+    const view = buildPaginationView(),
         model = {};
 
-    let paginationChangedHandler = noop;
-
-    view.onNavigation(pageNumber => {
-        applyPagination(pageNumber);
+    view.onNextLinkClick(() => {
+        if (model.currentPage < model.totalPages) {
+            model.currentPage++;
+            applyPagination();
+        }
     });
 
-    function applyPagination(currentPage) {
-        view.render(currentPage, Math.ceil(model.items.length / itemsPerPage));
+    view.onPreviousLinkClick(() => {
+        if (model.currentPage > 1) {
+            model.currentPage--;
+            applyPagination();
+        }
+    });
 
-        const startIndex = (currentPage - 1) * itemsPerPage,
+    view.onPageNumberLinkClick(pageNumber => {
+        if (pageNumber > 0 && pageNumber <= model.totalPages && pageNumber !== model.currentPage) {
+            model.currentPage = pageNumber;
+            applyPagination();
+        }
+    });
+
+    function applyPagination() {
+        const onLastPage = model.currentPage === model.totalPages,
+            visibleItemsCount = onLastPage ? model.items.length - itemsPerPage * (model.totalPages - 1) : itemsPerPage,
+            totalItemsCount = model.items.length;
+
+        view.render(model.currentPage, model.totalPages, visibleItemsCount, totalItemsCount);
+
+        const startIndex = (model.currentPage - 1) * itemsPerPage,
             endIndex = startIndex + itemsPerPage;
 
         model.items.forEach((item, index) => {
-            item[HIDDEN_BY_PAGINATION] = index < startIndex || index >= endIndex;
-        });
-        paginationChangedHandler({
-            isPaginating: view.isVisible,
-            visibleItemCount: model.items.filter(item => !item[HIDDEN_BY_PAGINATION]).length,
-            totalItemCount: model.items.length
+            setVisible(item, index >= startIndex && index < endIndex);
         });
     }
 
     return {
-        initialise(items) {
+        render(items) {
             model.items = items;
-            applyPagination(1);
-        },
-        onPaginationChanged(handler) {
-            paginationChangedHandler = handler;
+            model.currentPage = 1;
+            model.totalPages = Math.ceil(model.items.length / itemsPerPage);
+
+            applyPagination();
         }
     };
 }

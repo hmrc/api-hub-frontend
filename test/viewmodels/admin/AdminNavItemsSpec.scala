@@ -23,7 +23,7 @@ import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages
 import play.api.test.Helpers.running
 import viewmodels.SideNavItem
-import viewmodels.admin.AdminSideNavPages.{AccessRequestsPage, GetUsersPage, ManageApplicationsPage, ManageTeamsPage}
+import viewmodels.admin.AdminSideNavPages.{AccessRequestsPage, GetUsersPage, ManageApisPage, ManageApplicationsPage, ManageTeamsPage}
 
 class AdminNavItemsSpec extends SpecBase with Matchers with TableDrivenPropertyChecks {
 
@@ -36,7 +36,7 @@ class AdminNavItemsSpec extends SpecBase with Matchers with TableDrivenPropertyC
       running(playApplication) {
         implicit val implicitMessages: Messages = messages(playApplication)
         val actual = AdminNavItems(FakeSupporter, AccessRequestsPage)
-        val expected = Seq(manageApplicationsNavItem(), manageTeamsNavItem(), getUsersNavItem(), accessRequestsNavItem())
+        val expected = Seq(manageApplicationsNavItem(), manageApisNavItem(), manageTeamsNavItem(), getUsersNavItem(), accessRequestsNavItem())
 
         actual mustBe expected
       }
@@ -97,6 +97,15 @@ object AdminNavItemsSpec {
       page = ManageApplicationsPage,
       title = "Manage applications",
       link = controllers.admin.routes.ManageApplicationsController.onPageLoad(),
+      isCurrentPage = false
+    )
+  }
+
+  private def manageApisNavItem(): SideNavItem = {
+    SideNavItem(
+      page = ManageApisPage,
+      title = "Manage APIs",
+      link = controllers.admin.routes.ManageApisController.onPageLoad(),
       isCurrentPage = false
     )
   }

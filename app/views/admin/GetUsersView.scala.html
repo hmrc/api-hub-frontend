@@ -34,7 +34,7 @@
     user = Some(user),
     fullWidth = true,
     activeLink = Some("apiHubAdmin"),
-    customScriptsBlock = Some(scripts)
+    customScriptsBlock = Some(scripts())
 ) {
     @views.html.templates.SideNav(messages("getUsers.admin"), AdminNavItems(user, AdminSideNavPages.GetUsersPage)) {
         <h1 class="govuk-heading-m govuk-!-margin-bottom-7">

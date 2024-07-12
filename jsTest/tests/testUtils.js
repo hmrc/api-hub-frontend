@@ -1,3 +1,74 @@
 export function isVisible(el) {
     return !el.classList.contains('govuk-!-display-none');
 }
+
+export const paginationContainerHtml = `
+    <div id="paginationContainer">
+        <strong class="hip-pagination__showing-count"></strong>
+        <strong class="hip-pagination__total-count"></strong>
+    
+        <nav>
+            <div class="govuk-pagination__prev"></div>
+            <ul class="govuk-pagination__list">
+                <li class="govuk-pagination__item">
+                    <a class="govuk-pagination__link"></a>
+                </li>
+                <li class="govuk-pagination__item govuk-pagination__item--current">
+                    <a class="govuk-pagination__link"></a>
+                </li>
+                <li class="govuk-pagination__item govuk-pagination__item--ellipses"></li>            
+            </ul>
+            <div class="govuk-pagination__next"></div>
+        </nav>
+    </div>
+`;
+
+export function arrayFromTo(from, to) {
+    return Array.from({length: to - from + 1}, (_, i) => i + from);
+}
+
+export const paginationHelper = {
+    paginationIsAvailable() {
+        return isVisible(document.getElementById('paginationContainer'));
+    },
+    getCurrentPageNumber() {
+        return parseInt(document.querySelector('.govuk-pagination__item--current').textContent);
+    },
+    getShowingCount() {
+        return Number(document.querySelector('.hip-pagination__showing-count').textContent);
+    },
+    getTotalCount() {
+        return Number(document.querySelector('.hip-pagination__total-count').textContent);
+    },
+    getPaginationPageLink(pageNumber) {
+        return document.querySelector(`#paginationContainer a[data-page="${pageNumber}"]`);
+    },
+    getVisiblePanelData(selector, ...props) {
+        return Array.from(document.querySelectorAll(selector))
+            .filter(isVisible)
+            .map(el => props.reduce((acc, prop) => ({...acc, [prop]: el.dataset[prop]}), {index: parseInt(el.dataset.index)}));
+    },
+    getVisiblePanelIndexes(selector) {
+        return this.getVisiblePanelData(selector, 'index').map(({index}) => parseInt(index));
+    },
+    getPageNumberLinks() {
+        return [...document.querySelectorAll('.govuk-pagination__item a')].map(el => parseInt(el.dataset.page));
+    },
+    getCurrentPageLinkNumber() {
+        return parseInt(document.querySelector('.govuk-pagination__item--current a').dataset.page);
+    },
+    nextLink() {
+        return document.querySelector('.govuk-pagination__next ');
+    },
+    clickNext(){
+        this.nextLink().click();
+    },
+    previousLink() {
+        return document.querySelector('.govuk-pagination__prev');
+    },
+    clickPrevious() {
+        this.previousLink().click();
+    }
+
+
+};
