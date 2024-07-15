@@ -40,7 +40,7 @@ class MyApiDetailsController @Inject()(
 
   def onPageLoad(id: String): Action[AnyContent] = (identify andThen apiAuth(id)) async {
     implicit request => apiHubService.getApiDeploymentStatuses(request.apiDetails.publisherReference).map {
-      case Some(deploymentStatuses) => Ok(view(request.apiDetails, deploymentStatuses, Some(request.identifierRequest.user), config.supportEmailAddress))
+      case Some(deploymentStatuses) => Ok(view(request.apiDetails, deploymentStatuses, request.identifierRequest.user, config.supportEmailAddress))
       case None => errorResultBuilder.internalServerError(s"Unable to retrieve deployment statuses for API ${request.apiDetails.publisherReference}")
     }
   }

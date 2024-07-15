@@ -65,7 +65,7 @@ class MyApiDetailsControllerSpec
       val result = route(fixture.application, request).value
 
       status(result) mustBe OK
-      contentAsString(result) mustBe view(apiDetail, deploymentStatuses, Some(FakeUser),
+      contentAsString(result) mustBe view(apiDetail, deploymentStatuses, FakeUser,
         config.supportEmailAddress)(request, messages(fixture.application)).toString()
       contentAsString(result) must validateAsHtml
     }
@@ -89,7 +89,7 @@ class MyApiDetailsControllerSpec
       val result = route(fixture.application, request).value
 
       status(result) mustBe OK
-      contentAsString(result) mustBe view(apiDetail, deploymentStatuses, Some(FakeSupporter),
+      contentAsString(result) mustBe view(apiDetail, deploymentStatuses, FakeSupporter,
         config.supportEmailAddress)(request, messages(fixture.application)).toString()
       contentAsString(result) must validateAsHtml
     }
