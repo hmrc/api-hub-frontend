@@ -607,6 +607,21 @@ myApis.all.heading = Your APIs
 myApis.empty.heading = You have no APIs, or do not belong to any teams.
 myApis.search.label = Filter by API name
 myApis.search.noResults = No APIs have been found that match your filter criteria, try adjusting your filter.
+myApis.update.team.title = Change owning team
+myApis.update.team.heading = Change owning team
+myApis.update.team.apiName = Name
+myApis.update.team.owningTeam = Owning team
+myApis.update.team.created = Created
+myApis.update.team.id = ID
+myApis.update.team.noTeam = Not specified
+myApis.update.team.selectNew = Select which team owns this API
+myApis.update.team.error.required = Select an owning team
+myApis.update.team.save = Save and continue
+myApis.update.team.nonSupport.title = Managing owning team
+myApis.update.team.nonSupport.text1 = The owning team of this API can only be managed by The Integration Hub support team.
+myApis.update.team.nonSupport.text2 = If you wish to change the ownership of this team to a new team please {0}.
+myApis.update.team.nonSupport.text3 = Contact support
+
 
 removeApiConfirmation.title = Confirm remove API
 removeApiConfirmation.heading = You are about to remove the following API from this application

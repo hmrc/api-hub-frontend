@@ -724,3 +724,9 @@ header {
         }
     }
 }
+
+.hip-summary-list__compact {
+    .govuk-summary-list__key, .govuk-summary-list__value {
+        padding-bottom: 0;
+    }
+}

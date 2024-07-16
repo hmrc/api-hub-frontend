@@ -48,7 +48,7 @@ object MyApisNavItems {
       ),
       SideNavItem(
         page = ChangeOwningTeamPage,
-        title = messages("myApis.update.team"),
+        title = messages("myApis.update.team.title"),
         link = controllers.myapis.routes.UpdateApiTeamController.onPageLoad(apiId),
         isCurrentPage = currentPage == ChangeOwningTeamPage
       )
