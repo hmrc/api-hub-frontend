@@ -26,7 +26,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.myapis.UpdateApiTeamView
+import views.html.myapis.{UpdateApiTeamSuccessView, UpdateApiTeamView}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -38,6 +38,7 @@ class UpdateApiTeamController @Inject()(
   formProvider: UpdateApiTeamFormProvider,
   apiHubService: ApiHubService,
   view: UpdateApiTeamView,
+  successView: UpdateApiTeamSuccessView,
   config: FrontendAppConfig
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
   private val form = formProvider()
@@ -59,7 +60,7 @@ class UpdateApiTeamController @Inject()(
         formWithErrors => showView(BAD_REQUEST, formWithErrors),
         teamId =>
           apiHubService.updateApiTeam(apiId, teamId).map { _ =>
-            Redirect(controllers.myapis.routes.UpdateApiTeamController.onPageLoad(apiId))
+            Ok(successView(request.apiDetails, request.identifierRequest.user))
           }
       )
   }
