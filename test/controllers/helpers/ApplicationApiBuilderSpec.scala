@@ -37,7 +37,7 @@ import services.ApiHubService
 import viewmodels.application.{Accessible, ApplicationApi, ApplicationEndpoint, Inaccessible, Requested}
 import views.html.ErrorTemplate
 
-import java.time.LocalDateTime
+import java.time.{Instant, LocalDateTime}
 import scala.concurrent.Future
 
 class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
@@ -196,7 +196,8 @@ object ApplicationApiBuilderSpec {
       ),
       shortDescription = None,
       openApiSpecification = "test-oas-spec-1",
-      apiStatus = Live
+      apiStatus = Live,
+      reviewedDate = Instant.now()
     )
 
   private val apiDetail2 =
@@ -223,7 +224,8 @@ object ApplicationApiBuilderSpec {
       ),
       shortDescription = None,
       openApiSpecification = "test-oas-spec-2",
-      apiStatus = Live
+      apiStatus = Live,
+      reviewedDate = Instant.now()
     )
 
   private val apiDetail3 =
@@ -243,7 +245,8 @@ object ApplicationApiBuilderSpec {
       ),
       shortDescription = None,
       openApiSpecification = "test-oas-spec-3",
-      apiStatus = Live
+      apiStatus = Live,
+      reviewedDate = Instant.now()
     )
 
   private def accessRequest = AccessRequest(

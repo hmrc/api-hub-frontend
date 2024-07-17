@@ -162,7 +162,8 @@ class ProvideSupportingInformationControllerSpec extends SpecBase with MockitoSu
       endpoints = Seq(Endpoint(path = "/test", methods = Seq(EndpointMethod("GET", Some("A summary"), Some("A description"), Seq("test-scope"))))),
       shortDescription = None,
       openApiSpecification = "test-oas-spec",
-      apiStatus = Live
+      apiStatus = Live,
+      reviewedDate = Instant.now()
     )
   }
 

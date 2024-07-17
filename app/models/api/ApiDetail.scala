@@ -19,7 +19,7 @@ package models.api
 import models.{Enumerable, WithName}
 import play.api.libs.json._
 
-import java.time.Instant
+import java.time.{Instant, ZoneOffset}
 import java.time.format.DateTimeFormatter
 
 sealed trait ApiStatus
@@ -60,7 +60,7 @@ object ApiDetail {
     val instantDateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
     implicit val customInstantFormat: Format[Instant] = Format(
       Reads(js => JsSuccess(instantDateFormatter.parse(js.as[String], Instant.from))),
-      Writes(d => JsString(instantDateFormatter.format(d)))
+      Writes(d => JsString(instantDateFormatter.format(d.atOffset(ZoneOffset.UTC))))
     )
     Json.format[ApiDetail]
   }

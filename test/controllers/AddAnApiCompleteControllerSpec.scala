@@ -53,7 +53,8 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation {
     Seq(Endpoint("/foo/bar", Seq(EndpointMethod("GET", None, None, expectedScopes.toSeq)))),
     None,
     "",
-    Live)
+    Live,
+    reviewedDate = Instant.now())
 
   private val fullUserAnswers = emptyUserAnswers
     .set(AddAnApiContextPage, AddAnApi).toOption.value

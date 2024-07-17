@@ -18,6 +18,8 @@ package controllers.actions
 
 import models.api.{ApiDetail, Endpoint, EndpointMethod, Live}
 
+import java.time.Instant
+
 
 object FakeApiDetail extends ApiDetail(
   "apiId",
@@ -32,5 +34,6 @@ object FakeApiDetail extends ApiDetail(
   Some("teamId"),
   Some("domain"),
   Some("subdomain"),
-  Seq("hod1")
+  Seq("hod1"),
+  Instant.now()
 )

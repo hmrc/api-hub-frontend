@@ -34,6 +34,7 @@ import services.ApiHubService
 import utils.HtmlValidation
 import views.html.HipApisView
 
+import java.time.Instant
 import scala.concurrent.Future
 
 class HipApisControllerSpec
@@ -91,10 +92,10 @@ class HipApisControllerSpec
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[HipApisView]
 
-        val zebras = ApiDetail("id1", "ref1", "zebras", "zebras api", "1.0.0", Seq.empty, None, "oas", Live)
-        val molluscs = ApiDetail("id2", "ref2", "MOLLUSCS", "molluscs api", "1.0.0", Seq.empty, None, "oas", Live)
-        val aardvarks = ApiDetail("id3", "ref3", "aardvarks", "aardvarks api", "1.0.0", Seq.empty, None, "oas", Live)
-        val pigeons = ApiDetail("id4", "ref4", "PIGEONS", "pigeons api", "1.0.0", Seq.empty, None, "oas", Live)
+        val zebras = ApiDetail("id1", "ref1", "zebras", "zebras api", "1.0.0", Seq.empty, None, "oas", Live, reviewedDate = Instant.now())
+        val molluscs = ApiDetail("id2", "ref2", "MOLLUSCS", "molluscs api", "1.0.0", Seq.empty, None, "oas", Live, reviewedDate = Instant.now())
+        val aardvarks = ApiDetail("id3", "ref3", "aardvarks", "aardvarks api", "1.0.0", Seq.empty, None, "oas", Live, reviewedDate = Instant.now())
+        val pigeons = ApiDetail("id4", "ref4", "PIGEONS", "pigeons api", "1.0.0", Seq.empty, None, "oas", Live, reviewedDate = Instant.now())
 
         when(fixture.apiHubService.getAllHipApis()(any()))
           .thenReturn(Future.successful(Seq(molluscs, zebras, aardvarks, pigeons)))

@@ -21,6 +21,9 @@ import models.api._
 import org.scalacheck.rng.Seed
 import org.scalacheck.{Arbitrary, Gen}
 
+import java.time.Instant
+import java.time.temporal.{ChronoUnit, TemporalUnit}
+
 trait ApiDetailGenerators {
 
   private val listSizeQuota = 10
@@ -62,6 +65,7 @@ trait ApiDetailGenerators {
       domain <- Gen.oneOf(FakeDomains.domains)
       subDomain <- Gen.oneOf(domain.subDomains)
       hods <- Gen.listOfN(size/ listSizeQuota, sensiblySizedAlphaNumStr).suchThat(_.nonEmpty)
+      reviewedDate <- Gen.const(Instant.now().truncatedTo(ChronoUnit.SECONDS))
     } yield ApiDetail(
       id.toString,
       publisherReference,
@@ -74,7 +78,8 @@ trait ApiDetailGenerators {
       apiStatus,
       domain = Some(domain.code),
       subDomain = Some(subDomain.code),
-      hods = hods
+      hods = hods,
+      reviewedDate = reviewedDate
     )
   }
 

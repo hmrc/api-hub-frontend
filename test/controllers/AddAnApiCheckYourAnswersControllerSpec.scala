@@ -77,7 +77,8 @@ class AddAnApiCheckYourAnswersControllerSpec extends SpecBase with SummaryListFl
         ),
         None,
         sampleOas,
-        Live
+        Live,
+        reviewedDate = Instant.now()
       )
 
       val userAnswers = emptyUserAnswers
