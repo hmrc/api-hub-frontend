@@ -20,6 +20,7 @@
 @import viewmodels.myapis.{MyApisNavItems, MyApisNavPages}
 @import views.html.components.IconsLink
 @import views.ViewUtils
+@import views.html.helper.CSPNonce
 
 @this(
     layout: templates.Layout,
@@ -33,11 +34,17 @@
 
 @(form: Form[_], apiDetail: ApiDetail, owningTeam: Option[Team], teams: Seq[Team], user: UserModel, supportEmailAddress: String)(implicit request: Request[_], messages: Messages)
 
+@scripts() = {
+    @iconsLink()
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/accessible-autocomplete.min.css")"  type="text/css">
+    <script src="@routes.Assets.versioned("javascripts/updateApiTeam.js")" type="module" @{CSPNonce.attr}></script>
+}
+
 @contactSupportLink() = {
     <a href="mailto:@supportEmailAddress" class="govuk-link">@messages("myApis.update.team.nonSupport.text3")</a>
 }
 
-@layout(pageTitle = titleNoForm(messages("myApis.update.team.title")), user = Some(user), fullWidth = true, customScriptsBlock = Some(iconsLink())) {
+@layout(pageTitle = titleNoForm(messages("myApis.update.team.title")), user = Some(user), fullWidth = true, customScriptsBlock = Some(scripts())) {
     @views.html.templates.SideNav(apiDetail.title, MyApisNavItems(apiDetail.id, user, MyApisNavPages.ChangeOwningTeamPage)) {
         @formHelper(action = controllers.myapis.routes.UpdateApiTeamController.onSubmit(apiDetail.id), Symbol("autoComplete") -> "off") {
             @if(form.errors.nonEmpty) {
@@ -92,14 +99,19 @@
             @if(user.permissions.canSupport) {
                 <h3 class="govuk-heading-s">@messages("myApis.update.team.selectNew")</h3>
 
-                @govukSelect(Select(
-                    id = "owningTeam",
-                    name = "owningTeam",
-                    items = Seq(SelectItem()) ++ teams.filter(_.id != owningTeam.map(_.id).getOrElse("")).map(team => SelectItem(value = Some(team.id), text = team.name))
-                ))
+                <select id="owningTeam" name="owningTeam">
+                    <option value="">Select an owning team</option>
+                    @for(team <- teams){
+                      @if(!owningTeam.exists(_.id == team.id)){
+                        <option value="@team.id">@team.name</option>
+                      }
+                    }
+                </select>
 
                 @govukButton(
-                    ButtonViewModel(messages("myApis.update.team.save"))
+                    ButtonViewModel(
+                        messages("myApis.update.team.save")
+                    ).withCssClass("govuk-!-margin-top-5")
                 )
             } else {
                 <div class="call-out-panel call-out-panel__small">
