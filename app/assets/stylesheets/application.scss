@@ -735,3 +735,6 @@ header {
     // added this to fix a bug in accessible-autocomplete component where drop-down arrow was not being displayed when showAllValues is set to true
     z-index: 1;
 }
+.autocomplete__option {
+    @include govuk-font($size: 19);
+}
