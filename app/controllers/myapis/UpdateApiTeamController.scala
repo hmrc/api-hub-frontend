@@ -38,8 +38,7 @@ class UpdateApiTeamController @Inject()(
   formProvider: UpdateApiTeamFormProvider,
   apiHubService: ApiHubService,
   view: UpdateApiTeamView,
-  successView: UpdateApiTeamSuccessView,
-  config: FrontendAppConfig
+  successView: UpdateApiTeamSuccessView
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
   private val form = formProvider()
 
@@ -50,7 +49,7 @@ class UpdateApiTeamController @Inject()(
   private def showView(code: Int, form: Form[_])(implicit request: ApiRequest[_]): Future[Result] = {
     apiHubService.findTeams(None).map(teams => {
       val owningTeam = teams.find(team => request.apiDetails.teamId.contains(team.id))
-      Status(code)(view(form, request.apiDetails, owningTeam, teams, request.identifierRequest.user, config.supportEmailAddress))
+      Status(code)(view(form, request.apiDetails, owningTeam, teams, request.identifierRequest.user))
     })
   }
 

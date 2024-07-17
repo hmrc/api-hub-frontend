@@ -1,9 +1,12 @@
 import './accessible-autocomplete.min.js';
 
 document.addEventListener('DOMContentLoaded', function() {
-    accessibleAutocomplete.enhanceSelectElement({
-        defaultValue: '',
-        selectElement: document.getElementById('owningTeam'),
-        showAllValues: true
-    })
+    const elOwningTeamSelect = document.getElementById('owningTeam');
+    if (elOwningTeamSelect) {
+        accessibleAutocomplete.enhanceSelectElement({
+            defaultValue: '',
+            selectElement: elOwningTeamSelect,
+            showAllValues: true
+        })
+    }
 });

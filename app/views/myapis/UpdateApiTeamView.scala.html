@@ -32,7 +32,7 @@
     iconsLink: IconsLink,
 )
 
-@(form: Form[_], apiDetail: ApiDetail, owningTeam: Option[Team], teams: Seq[Team], user: UserModel, supportEmailAddress: String)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], apiDetail: ApiDetail, owningTeam: Option[Team], teams: Seq[Team], user: UserModel)(implicit request: Request[_], messages: Messages)
 
 @scripts() = {
     @iconsLink()
@@ -41,7 +41,7 @@
 }
 
 @contactSupportLink() = {
-    <a href="mailto:@supportEmailAddress" class="govuk-link">@messages("myApis.update.team.nonSupport.text3")</a>
+    <a href="@routes.GetSupportController.onPageLoad" class="govuk-link">@messages("myApis.update.team.nonSupport.text3")</a>
 }
 
 @layout(pageTitle = titleNoForm(messages("myApis.update.team.title")), user = Some(user), fullWidth = true, customScriptsBlock = Some(scripts())) {
@@ -101,7 +101,7 @@
 
                 <select id="owningTeam" name="owningTeam">
                     <option value="">Select an owning team</option>
-                    @for(team <- teams){
+                    @for(team <- teams.sortBy(_.name)){
                       @if(!owningTeam.exists(_.id == team.id)){
                         <option value="@team.id">@team.name</option>
                       }
