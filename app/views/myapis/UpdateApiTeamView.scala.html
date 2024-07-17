@@ -19,6 +19,7 @@
 @import models.user.UserModel
 @import viewmodels.myapis.{MyApisNavItems, MyApisNavPages}
 @import views.html.components.IconsLink
+@import views.ViewUtils
 
 @this(
     layout: templates.Layout,
@@ -63,6 +64,15 @@
                         ),
                         value = Value(
                             content = Text(owningTeam.map(_.name).getOrElse(messages("myApis.update.team.noTeam")))
+                        ),
+                    ),
+                    SummaryListRow(
+                        key = Key(
+                            content = Text(messages("myApis.update.team.reviewedDate"))
+                        ),
+                        value = Value(
+                            content = Text(ViewUtils.formatInstantAsUtc(apiDetail.reviewedDate)),
+                            classes = "utcDateLong"
                         ),
                     ),
                     SummaryListRow(
