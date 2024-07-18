@@ -87,6 +87,7 @@ class IntegrationCatalogueConnector @Inject()(
 
   def updateApiTeam(apiId: String, teamId: String)(implicit hc: HeaderCarrier): Future[ApiDetail] = {
     httpClient.put(url"$integrationCatalogueBaseUrl/integration-catalogue/apis/$apiId/teams/$teamId")
+      .setHeader((ACCEPT, JSON))
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Either[UpstreamErrorResponse, ApiDetail]]
       .flatMap {

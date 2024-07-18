@@ -17,7 +17,6 @@
 package controllers.myapis
 
 import com.google.inject.{Inject, Singleton}
-import config.FrontendAppConfig
 import controllers.actions.{ApiAuthActionProvider, IdentifierAction}
 import forms.myapis.UpdateApiTeamFormProvider
 import models.requests.ApiRequest
