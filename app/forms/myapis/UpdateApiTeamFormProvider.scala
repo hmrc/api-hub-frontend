@@ -14,26 +14,17 @@
  * limitations under the License.
  */
 
-package controllers.actions
+package forms.myapis
 
-import models.api.{ApiDetail, Endpoint, EndpointMethod, Live}
+import forms.mappings.Mappings
+import play.api.data.Form
 
-import java.time.Instant
+import javax.inject.Inject
 
+class UpdateApiTeamFormProvider @Inject() extends Mappings {
 
-object FakeApiDetail extends ApiDetail(
-  "apiId",
-  "pubRef",
-  "title",
-  "description",
-  "version",
-  Seq(Endpoint("/path", Seq(EndpointMethod("GET", None, None, Seq.empty)))),
-  Some("short description"),
-  "oas",
-  Live,
-  Some("teamId"),
-  Some("domain"),
-  Some("subdomain"),
-  Seq("hod1"),
-  Instant.now()
-)
+  def apply(): Form[String] =
+    Form(
+      "owningTeam" -> text("myApis.update.team.error.required")
+    )
+}

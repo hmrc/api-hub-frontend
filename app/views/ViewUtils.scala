@@ -21,7 +21,7 @@ import play.api.data.Form
 import play.api.i18n.Messages
 import play.twirl.api.Html
 
-import java.time.LocalDateTime
+import java.time.{Instant, LocalDateTime, ZoneOffset}
 import java.time.format.DateTimeFormatter
 
 object ViewUtils {
@@ -41,6 +41,10 @@ object ViewUtils {
 
   def formatLocalDateTimeContainingUtc(value: LocalDateTime): String = {
     value.format(DateTimeFormatter.ISO_DATE_TIME)
+  }
+
+  def formatInstantAsUtc(instant: Instant): String = {
+    instant.atOffset(ZoneOffset.UTC).format(DateTimeFormatter.ISO_DATE_TIME)
   }
 
   def formatAccessRequestStatus(status: AccessRequestStatus): Html = {

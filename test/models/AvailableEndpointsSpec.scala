@@ -25,6 +25,8 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 
+import java.time.Instant
+
 class AvailableEndpointsSpec extends AnyFreeSpec with Matchers with TableDrivenPropertyChecks {
 
   private val testApiDetail = ApiDetail(
@@ -36,7 +38,8 @@ class AvailableEndpointsSpec extends AnyFreeSpec with Matchers with TableDrivenP
     endpoints = Seq.empty,
     shortDescription = None,
     openApiSpecification = sampleOas,
-    apiStatus = Live
+    apiStatus = Live,
+    reviewedDate = Instant.now()
   )
 
   "AvailableEndpoints.apply" - {

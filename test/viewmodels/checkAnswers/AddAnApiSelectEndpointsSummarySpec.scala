@@ -59,7 +59,8 @@ class AddAnApiSelectEndpointsSummarySpec extends AnyFreeSpec with Matchers with 
     ),
     None,
     sampleOas,
-    Live
+    Live,
+    reviewedDate = Instant.now()
   )
 
   "row" - {

@@ -65,7 +65,7 @@ class ApiUsageControllerSpec
       val result = route(fixture.application, request).value
 
       status(result) mustBe OK
-      contentAsString(result) mustBe view(apiDetail, apps, Some(FakeSupporter))(request, messages(fixture.application)).toString()
+      contentAsString(result) mustBe view(apiDetail, apps, FakeSupporter)(request, messages(fixture.application)).toString()
       contentAsString(result) must validateAsHtml
     }
   }

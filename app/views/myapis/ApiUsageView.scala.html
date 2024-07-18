@@ -20,6 +20,7 @@
 @import models.application.Application
 @import views.ViewUtils
 @import views.html.components.IconsLink
+@import viewmodels.myapis.{MyApisNavItems, MyApisNavPages}
 
 @this(
         layout: templates.Layout,
@@ -30,73 +31,53 @@
         iconsLink: IconsLink
 )
 
-@(apiDetail: ApiDetail, applications: Seq[Application], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+@(apiDetail: ApiDetail, applications: Seq[Application], user: UserModel)(implicit request: Request[_], messages: Messages)
 
 @layout(
     pageTitle    = titleNoForm(messages("myApis.usage.title", apiDetail.title)),
     showBackLink = true,
-    user = user,
+    user = Some(user),
     fullWidth = true,
     customScriptsBlock = Some(iconsLink())
 ) {
-    <div class="govuk-grid-row">
-        <div id="navContent" class="govuk-grid-column-one-quarter sidebar stickySideMenu">
-            <div class="side-nav">
-                <h2 class="govuk-heading-s">@apiDetail.title</h2>
-                <ul class="side-nav__component">
-                    <li class="side-nav__list">
-                        <a href="@controllers.myapis.routes.MyApiDetailsController.onPageLoad(apiDetail.id).url" class="side-nav__link">@messages("myApis.details.title")</a>
-                    </li>
-                    <li class="side-nav__list">
-                        <a href="@controllers.myapis.routes.SimpleApiRedeploymentController.onPageLoad(apiDetail.id).url" class="side-nav__link">@messages("myApis.update.title")</a>
-                    </li>
-                    <li class="side-nav__list side-nav__list--selected">
-                        <a class="side-nav__link">@messages("myApis.usage.link")</a>
-                    </li>
-                </ul>
+    @views.html.templates.SideNav(apiDetail.title, MyApisNavItems(apiDetail.id, user, MyApisNavPages.ApiUsagePage)) {
+        <h1 class="govuk-heading-m govuk-!-margin-bottom-7">
+        @messages("myApis.usage.heading", apiDetail.title)
+        </h1>
+
+        @if(applications.isEmpty) {
+            <div id="noResultsPanel" class="call-out-panel call-out-panel__small">
+                <p class="govuk-body information--general-tag govuk-!-margin-bottom-1">
+                    <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                    <span class="call-out-type">
+                    @messages("myApis.usage.noApplications")
+                    </span>
+                </p>
             </div>
-        </div>
+        }
 
-        <div class="govuk-grid-column-three-quarters">
-
-            <h1 class="govuk-heading-m govuk-!-margin-bottom-7">
-                @messages("myApis.usage.heading", apiDetail.title)
-            </h1>
-
-            @if(applications.isEmpty) {
-                <div id="noResultsPanel" class="call-out-panel call-out-panel__small">
-                    <p class="govuk-body information--general-tag govuk-!-margin-bottom-1">
-                        <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
-                        <span class="call-out-type">
-                            @messages("myApis.usage.noApplications")
-                        </span>
-                    </p>
+        <div id="appDetailPanels" class="hip-card-container-top">
+        @for(application <- applications) {
+            <div class="hip-card-container-top hip-application">
+                <div class="hip-inner-card flex">
+                    <h3 class="govuk-heading-s align-left hip-inner-card-title">
+                    @if(application.deleted.isEmpty) {
+                        <a class="govuk-link govuk-link--no-visited-state" href="@controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url" data-application-id="@application.id">@application.name</a>
+                    } else {
+                        <span class="govuk-!-font-weight-regular">@application.name</span>
+                        @for(deleted <- application.deleted) {
+                            @govukTag(Tag(
+                                content = Text("Deleted"),
+                                classes = "govuk-tag--grey govuk-!-margin-left-1"
+                            ))
+                        }
+                    }
+                    </h3>
+                    <p class="govuk-body align-left">@messages("applications.teamMembers", application.teamMembers.size)</p>
+                    <p class="govuk-body align-left ">@messages("applications.created") <span class="utcDateShort">@ViewUtils.formatLocalDateTimeContainingUtc(application.created)</span></p>
                 </div>
-            }
-
-            <div id="appDetailPanels" class="hip-card-container-top">
-            @for(application <- applications) {
-                <div class="hip-card-container-top hip-application">
-                    <div class="hip-inner-card flex">
-                        <h3 class="govuk-heading-s align-left hip-inner-card-title">
-                            @if(application.deleted.isEmpty) {
-                                <a class="govuk-link govuk-link--no-visited-state" href="@controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url" data-application-id="@application.id">@application.name</a>
-                            } else {
-                                <span class="govuk-!-font-weight-regular">@application.name</span>
-                                @for(deleted <- application.deleted) {
-                                    @govukTag(Tag(
-                                        content = Text("Deleted"),
-                                        classes = "govuk-tag--grey govuk-!-margin-left-1"
-                                    ))
-                                }
-                            }
-                        </h3>
-                        <p class="govuk-body align-left">@messages("applications.teamMembers", application.teamMembers.size)</p>
-                        <p class="govuk-body align-left ">@messages("applications.created") <span class="utcDateShort">@ViewUtils.formatLocalDateTimeContainingUtc(application.created)</span></p>
-                    </div>
-                </div>
-            }
             </div>
+        }
         </div>
-    </div>
+    }
 }

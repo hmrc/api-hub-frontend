@@ -36,6 +36,7 @@ import viewmodels.application.{Accessible, ApplicationApi, ApplicationEndpoint, 
 import views.html.ErrorTemplate
 import views.html.application.ApplicationDetailsView
 
+import java.time.Instant
 import scala.concurrent.Future
 
 class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with TestHelpers with HtmlValidation{
@@ -117,7 +118,8 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         endpoints = Seq(Endpoint(path = "/test", methods = Seq(EndpointMethod("GET", None, None, Seq("test-scope"))))),
         shortDescription = None,
         openApiSpecification = "test-oas-spec",
-        apiStatus = Live
+        apiStatus = Live,
+        reviewedDate = Instant.now()
       )
 
       val application = FakeApplication

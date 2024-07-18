@@ -208,7 +208,8 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
         Endpoint(path = "/anothertest", methods = Seq(EndpointMethod("POST", Some("A summary"), Some("A description"), Seq("another-test-scope"))))),
       shortDescription = None,
       openApiSpecification = "test-oas-spec",
-      apiStatus = Live
+      apiStatus = Live,
+      reviewedDate = Instant.now()
     )
   }
 

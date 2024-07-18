@@ -113,7 +113,8 @@ class RequestProductionAccessStartControllerSpec extends SpecBase with MockitoSu
       endpoints = Seq(Endpoint(path = "/test", methods = Seq(EndpointMethod("GET", None, None, Seq("test-scope"))))),
       shortDescription = None,
       openApiSpecification = "test-oas-spec",
-      apiStatus = Live
+      apiStatus = Live,
+      reviewedDate = Instant.now()
     )
     val application = FakeApplication
       .addApi(Api(apiDetail.id, Seq(SelectedEndpoint("GET", "/test"))))

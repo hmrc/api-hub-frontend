@@ -19,7 +19,7 @@ package views
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 
-import java.time.LocalDateTime
+import java.time.{LocalDateTime, ZoneOffset}
 
 class ViewUtilsSpec extends AnyFreeSpec with Matchers {
 
@@ -43,4 +43,23 @@ class ViewUtilsSpec extends AnyFreeSpec with Matchers {
     }
   }
 
+  "formatInstantAsUtc" - {
+    "must return a date/time in the correct format for GMT time" in {
+      //noinspection ScalaStyle
+      val instant = LocalDateTime.of(2023, 1, 3, 4, 5, 6).toInstant(ZoneOffset.UTC)
+      val expected = "2023-01-03T04:05:06Z"
+
+      val actual = ViewUtils.formatInstantAsUtc(instant)
+      actual mustBe expected
+    }
+
+    "must return a date/time in the correct format for BST time" in {
+      //noinspection ScalaStyle
+      val instant = LocalDateTime.of(2023, 7, 3, 4, 5, 6).toInstant(ZoneOffset.UTC)
+      val expected = "2023-07-03T04:05:06Z"
+
+      val actual = ViewUtils.formatInstantAsUtc(instant)
+      actual mustBe expected
+    }
+  }
 }

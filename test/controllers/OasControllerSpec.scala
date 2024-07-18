@@ -33,6 +33,7 @@ import services.ApiHubService
 import utils.HtmlValidation
 import views.html.{ErrorTemplate, RedocView}
 
+import java.time.Instant
 import scala.concurrent.Future
 
 class OasControllerSpec
@@ -50,7 +51,7 @@ class OasControllerSpec
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[RedocView]
 
-        val apiDetail = ApiDetail("apiId", "pubRef", "an api", "a description", "1.0.0", Seq.empty, None, sampleOas, Live)
+        val apiDetail = ApiDetail("apiId", "pubRef", "an api", "a description", "1.0.0", Seq.empty, None, sampleOas, Live, reviewedDate = Instant.now())
         when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any())).thenReturn(Future.successful(Some(apiDetail)))
 
         val request = FakeRequest(GET, routes.OasRedocController.onPageLoad(apiDetail.id).url)
@@ -68,7 +69,7 @@ class OasControllerSpec
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[RedocView]
 
-        val apiDetail = ApiDetail("apiId", "pubRef", "an api", "a description", "1.0.0", Seq.empty, None, sampleOas, Live)
+        val apiDetail = ApiDetail("apiId", "pubRef", "an api", "a description", "1.0.0", Seq.empty, None, sampleOas, Live, reviewedDate = Instant.now())
         when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
           .thenReturn(Future.successful(Some(apiDetail)))
 
@@ -115,7 +116,7 @@ class OasControllerSpec
 
         running(fixture.application) {
 
-          val apiDetail = ApiDetail("apiId", "pubRef", "an api", "a description", "1.0.0", Seq.empty, None, sampleOas, Live)
+          val apiDetail = ApiDetail("apiId", "pubRef", "an api", "a description", "1.0.0", Seq.empty, None, sampleOas, Live, reviewedDate = Instant.now())
           when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any())).thenReturn(Future.successful(Some(apiDetail)))
 
           val request = FakeRequest(GET, routes.OasRedocController.getOas(apiDetail.id).url)

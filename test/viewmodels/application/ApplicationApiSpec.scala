@@ -24,6 +24,8 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
+import java.time.Instant
+
 class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks {
 
   import ApplicationApiSpec._
@@ -104,7 +106,8 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
           ),
           shortDescription = None,
           openApiSpecification = "test-oas-spec",
-          apiStatus = Live
+          apiStatus = Live,
+          reviewedDate = Instant.now()
         )
 
         val endpoints = Seq(

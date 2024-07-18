@@ -13,3 +13,6 @@ GET     /:id                                                controllers.myapis.M
 
 GET     /usage/:apiId                                       controllers.myapis.ApiUsageController.onPageLoad(apiId: String)
 
+GET     /update-team/:apiId                                 controllers.myapis.UpdateApiTeamController.onPageLoad(apiId: String)
+POST    /update-team/:apiId                                 controllers.myapis.UpdateApiTeamController.onSubmit(apiId: String)
+
