@@ -107,43 +107,37 @@
 
         <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
 
-        @if(applications.isEmpty) {
-            <div id="noResultsPanel" class="call-out-panel call-out-panel__small">
-                <p class="govuk-body information--general-tag govuk-!-margin-bottom-1">
-                    <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
-                    <span class="call-out-type">
-                    @messages("myApis.usage.noApplications")
-                    </span>
-                </p>
-            </div>
-        }
-
         <div class="call-out-panel govuk-!-margin-top-7 govuk-!-margin-bottom-7">
             <h2 class="govuk-heading-m">@messages("myApis.usage.applications.heading", applications.size)</h2>
 
-            @govukTable(
-                Table(
-                    head = Some(Seq(
-                        HeadCell(messages("myApis.usage.table.name")),
-                        HeadCell(messages("myApis.usage.table.status")),
-                        HeadCell(messages("myApis.usage.table.date")),
-                    )),
-                    rows = applications.map(
-                        application =>
-                            Seq(
-                                TableRow(content = HtmlContent(applicationName(application))),
-                                TableRow(content = application.deleted.map(_ => HtmlContent(govukTag(Tag(
-                                    content = Text("Deleted"),
-                                    classes = "govuk-tag--grey"
-                                )))).getOrElse(Empty)),
-                                TableRow(content = Text(ViewUtils.formatLocalDateTimeContainingUtc(application.created)), classes="utcDateShort")
-                            )
+            @if(applications.isEmpty) {
+                <p class="govuk-body">@messages("myApis.usage.noApplications")</p>
+            } else {
+                @govukTable(
+                    Table(
+                        head = Some(Seq(
+                            HeadCell(messages("myApis.usage.table.name")),
+                            HeadCell(messages("myApis.usage.table.status")),
+                            HeadCell(messages("myApis.usage.table.date")),
+                        )),
+                        rows = applications.map(
+                            application =>
+                                Seq(
+                                    TableRow(content = HtmlContent(applicationName(application))),
+                                    TableRow(content = application.deleted.map(_ => HtmlContent(govukTag(Tag(
+                                        content = Text("Deleted"),
+                                        classes = "govuk-tag--grey"
+                                    )))).getOrElse(Empty)),
+                                    TableRow(content = Text(ViewUtils.formatLocalDateTimeContainingUtc(application.created)), classes = "utcDateShort")
+                                )
+                        ),
+                        attributes = Map(("id", "applicationsTable"))
                     ),
-                    attributes = Map(("id", "applicationsTable"))
-                ),
-            )
-            @paginator()
+                )
+                @paginator()
+            }
         </div>
+
 
     }
 }

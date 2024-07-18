@@ -18,13 +18,14 @@ package controllers.myapis
 
 import com.google.inject.{Inject, Singleton}
 import controllers.actions.{ApiAuthActionProvider, AuthorisedSupportAction, IdentifierAction}
+import models.team.Team
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.myapis.ApiUsageView
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ApiUsageController @Inject()(
@@ -37,9 +38,10 @@ class ApiUsageController @Inject()(
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(apiId: String): Action[AnyContent] = (identify andThen isSupport andThen apiAuth(apiId)) async {
-    implicit request => apiHubService.getApplicationsUsingApi(apiId, true).map { applications =>
-      Ok(view(request.apiDetails, None, applications, request.identifierRequest.user))
-    }
+    implicit request => for {
+      applications <- apiHubService.getApplicationsUsingApi(apiId, true)
+      owningTeam <- request.apiDetails.teamId.fold(Future.successful(Option.empty[Team]))(apiHubService.findTeamById)
+    } yield  Ok(view(request.apiDetails, owningTeam, applications, request.identifierRequest.user))
   }
 
 }
