@@ -22,7 +22,7 @@ import org.scalacheck.rng.Seed
 import org.scalacheck.{Arbitrary, Gen}
 
 import java.time.Instant
-import java.time.temporal.{ChronoUnit, TemporalUnit}
+import java.time.temporal.ChronoUnit
 
 trait ApiDetailGenerators {
 
