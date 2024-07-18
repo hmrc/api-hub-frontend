@@ -38,7 +38,7 @@ class ApiUsageController @Inject()(
 
   def onPageLoad(apiId: String): Action[AnyContent] = (identify andThen isSupport andThen apiAuth(apiId)) async {
     implicit request => apiHubService.getApplicationsUsingApi(apiId, true).map { applications =>
-      Ok(view(request.apiDetails, applications, request.identifierRequest.user))
+      Ok(view(request.apiDetails, None, applications, request.identifierRequest.user))
     }
   }
 

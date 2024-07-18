@@ -21,6 +21,7 @@
 @import views.ViewUtils
 @import views.html.components.IconsLink
 @import viewmodels.myapis.{MyApisNavItems, MyApisNavPages}
+@import models.team.Team
 
 @this(
         layout: templates.Layout,
@@ -28,10 +29,22 @@
         govukSummaryList: GovukSummaryList,
         govukTag: GovukTag,
         apiDeployments: ApiDeployments,
-        iconsLink: IconsLink
+        iconsLink: IconsLink,
+        govukTable: GovukTable
 )
 
-@(apiDetail: ApiDetail, applications: Seq[Application], user: UserModel)(implicit request: Request[_], messages: Messages)
+@(apiDetail: ApiDetail, owningTeam: Option[Team], applications: Seq[Application], user: UserModel)(implicit request: Request[_], messages: Messages)
+
+@applicationLink(application: Application) = {
+    <a href="@controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id)" class="govuk-link">@application.name</a>
+}
+
+@applicationName(application: Application) = {
+  @(application.deleted match {
+    case Some(_) => <span>{application.name}</span>
+    case None => applicationLink(application)
+  })
+}
 
 @layout(
     pageTitle    = titleNoForm(messages("myApis.usage.title", apiDetail.title)),
@@ -41,9 +54,50 @@
     customScriptsBlock = Some(iconsLink())
 ) {
     @views.html.templates.SideNav(apiDetail.title, MyApisNavItems(apiDetail.id, user, MyApisNavPages.ApiUsagePage)) {
-        <h1 class="govuk-heading-m govuk-!-margin-bottom-7">
-        @messages("myApis.usage.heading", apiDetail.title)
+        <h1 class="govuk-heading-l">
+        @messages("myApis.usage.title")
         </h1>
+
+        @govukSummaryList(SummaryList(
+            rows = Seq(
+                SummaryListRow(
+                    key = Key(
+                        content = Text(messages("myApis.update.team.apiName"))
+                    ),
+                    value = Value(
+                        content = apiDetail.title
+                    ),
+                ),
+                SummaryListRow(
+                    key = Key(
+                        content = Text(messages("myApis.update.team.owningTeam"))
+                    ),
+                    value = Value(
+                        content = Text(owningTeam.map(_.name).getOrElse(messages("myApis.update.team.noTeam")))
+                    ),
+                ),
+                SummaryListRow(
+                    key = Key(
+                        content = Text(messages("myApis.update.team.reviewedDate"))
+                    ),
+                    value = Value(
+                        content = Text(ViewUtils.formatInstantAsUtc(apiDetail.reviewedDate)),
+                        classes = "utcDateLong"
+                    ),
+                ),
+                SummaryListRow(
+                    key = Key(
+                        content = Text(messages("myApis.update.team.id"))
+                    ),
+                    value = Value(
+                        content = apiDetail.id
+                    ),
+                )
+            ),
+            classes = "govuk-summary-list--no-border hip-summary-list__compact"
+        ))
+
+        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
 
         @if(applications.isEmpty) {
             <div id="noResultsPanel" class="call-out-panel call-out-panel__small">
@@ -56,28 +110,29 @@
             </div>
         }
 
-        <div id="appDetailPanels" class="hip-card-container-top">
-        @for(application <- applications) {
-            <div class="hip-card-container-top hip-application">
-                <div class="hip-inner-card flex">
-                    <h3 class="govuk-heading-s align-left hip-inner-card-title">
-                    @if(application.deleted.isEmpty) {
-                        <a class="govuk-link govuk-link--no-visited-state" href="@controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url" data-application-id="@application.id">@application.name</a>
-                    } else {
-                        <span class="govuk-!-font-weight-regular">@application.name</span>
-                        @for(deleted <- application.deleted) {
-                            @govukTag(Tag(
-                                content = Text("Deleted"),
-                                classes = "govuk-tag--grey govuk-!-margin-left-1"
-                            ))
-                        }
-                    }
-                    </h3>
-                    <p class="govuk-body align-left">@messages("applications.teamMembers", application.teamMembers.size)</p>
-                    <p class="govuk-body align-left ">@messages("applications.created") <span class="utcDateShort">@ViewUtils.formatLocalDateTimeContainingUtc(application.created)</span></p>
-                </div>
-            </div>
-        }
+        <div class="call-out-panel govuk-!-margin-top-7 govuk-!-margin-bottom-7">
+            <h2 class="govuk-heading-m">@messages("myApis.usage.applications.heading", applications.size)</h2>
+
+            @govukTable(
+                Table(
+                    head = Some(Seq(
+                        HeadCell(messages("myApis.usage.table.name")),
+                        HeadCell(messages("myApis.usage.table.status")),
+                        HeadCell(messages("myApis.usage.table.date")),
+                    )),
+                    rows = applications.map(
+                        application =>
+                            Seq(
+                                TableRow(content = HtmlContent(applicationName(application))),
+                                TableRow(content = application.deleted.map(_ => HtmlContent(govukTag(Tag(
+                                    content = Text("Deleted"),
+                                    classes = "govuk-tag--grey"
+                                )))).getOrElse(Empty)),
+                                TableRow(content = Text(ViewUtils.formatLocalDateTimeContainingUtc(application.created)), classes="utcDateShort")
+                            )
+                    )
+                )
+            )
         </div>
     }
 }
