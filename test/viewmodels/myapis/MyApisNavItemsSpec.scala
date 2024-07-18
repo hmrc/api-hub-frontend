@@ -117,7 +117,7 @@ object MyApisNavItemsSpec {
   private def apiUsagePage(): SideNavItem = {
     SideNavItem(
       page = ApiUsagePage,
-      title = "API usage",
+      title = "View API usage",
       link = controllers.myapis.routes.ApiUsageController.onPageLoad(apiId),
       isCurrentPage = false
     )

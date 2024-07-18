@@ -46,18 +46,21 @@ class ApiUsageControllerSpec
 
   "must return OK and the correct view for a support user" in {
     val fixture = buildFixture(FakeSupporter)
-    val apiDetail = sampleApiDetail()
+    val teamId = "teamId"
+    val apiDetail = sampleApiDetail().copy(teamId = Some(teamId))
     val apps = Seq(
       Application("id-1", "test-app-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1"))).addApi(Api("apiId")),
       Application("id-2", "test-app-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2"))).addApi(Api("apiId"))
         .delete(Deleted(LocalDateTime.now(), "deletingUser"))
     )
+    val owningTeam = Team(teamId, "teamName", LocalDateTime.now(), List.empty)
 
     running(fixture.application) {
       val view = fixture.application.injector.instanceOf[ApiUsageView]
 
       when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any))
         .thenReturn(Future.successful(Some(apiDetail)))
+      when(fixture.apiHubService.findTeamById(eqTo(teamId))(any)).thenReturn(Future.successful(Some(owningTeam)))
       when(fixture.apiHubService.getApplicationsUsingApi(eqTo(apiDetail.id), eqTo(true))(any))
         .thenReturn(Future.successful(apps))
 
@@ -65,7 +68,7 @@ class ApiUsageControllerSpec
       val result = route(fixture.application, request).value
 
       status(result) mustBe OK
-      contentAsString(result) mustBe view(apiDetail, apps, FakeSupporter)(request, messages(fixture.application)).toString()
+      contentAsString(result) mustBe view(apiDetail, Some(owningTeam), apps, FakeSupporter)(request, messages(fixture.application)).toString()
       contentAsString(result) must validateAsHtml
     }
   }

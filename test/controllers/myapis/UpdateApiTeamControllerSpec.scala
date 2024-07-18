@@ -100,7 +100,6 @@ class UpdateApiTeamControllerSpec
         running(fixture.playApplication) {
           val request = FakeRequest(controllers.myapis.routes.UpdateApiTeamController.onPageLoad(FakeApiDetail.id))
           val result = route(fixture.playApplication, request).value
-          val view = fixture.playApplication.injector.instanceOf[UpdateApiTeamView]
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad.url)
