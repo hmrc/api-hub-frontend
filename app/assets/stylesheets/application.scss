@@ -310,7 +310,7 @@ $active-link-color: govuk-colour("dark-blue");
         width: 80%;
     }
 
-    ul {
+    ul:not(.govuk-pagination__list) {
         margin-left: 37px;
         margin-top: 16px;
         font-size: 1rem;

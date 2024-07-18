@@ -22,6 +22,8 @@
 @import views.html.components.IconsLink
 @import viewmodels.myapis.{MyApisNavItems, MyApisNavPages}
 @import models.team.Team
+@import views.html.helper.CSPNonce
+@import views.html.components.Paginator
 
 @this(
         layout: templates.Layout,
@@ -30,7 +32,8 @@
         govukTag: GovukTag,
         apiDeployments: ApiDeployments,
         iconsLink: IconsLink,
-        govukTable: GovukTable
+        govukTable: GovukTable,
+        paginator: Paginator
 )
 
 @(apiDetail: ApiDetail, owningTeam: Option[Team], applications: Seq[Application], user: UserModel)(implicit request: Request[_], messages: Messages)
@@ -46,12 +49,17 @@
   })
 }
 
+@scripts() = {
+    @iconsLink()
+    <script src='@routes.Assets.versioned("javascripts/apiUsage.js")' type="module" @{CSPNonce.attr}></script>>
+}
+
 @layout(
     pageTitle    = titleNoForm(messages("myApis.usage.title", apiDetail.title)),
     showBackLink = true,
     user = Some(user),
     fullWidth = true,
-    customScriptsBlock = Some(iconsLink())
+    customScriptsBlock = Some(scripts())
 ) {
     @views.html.templates.SideNav(apiDetail.title, MyApisNavItems(apiDetail.id, user, MyApisNavPages.ApiUsagePage)) {
         <h1 class="govuk-heading-l">
@@ -130,9 +138,12 @@
                                 )))).getOrElse(Empty)),
                                 TableRow(content = Text(ViewUtils.formatLocalDateTimeContainingUtc(application.created)), classes="utcDateShort")
                             )
-                    )
-                )
+                    ),
+                    attributes = Map(("id", "applicationsTable"))
+                ),
             )
+            @paginator()
         </div>
+
     }
 }
