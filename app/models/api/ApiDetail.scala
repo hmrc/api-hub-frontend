@@ -52,8 +52,11 @@ case class ApiDetail(
   domain: Option[String] = None,
   subDomain: Option[String] = None,
   hods: Seq[String] = List.empty,
-  reviewedDate: Instant
-)
+  reviewedDate: Instant,
+  platform: String
+) {
+  def isSelfServe: Boolean = platform == "HIP"
+}
 
 object ApiDetail {
   implicit val formatApiDetail: OFormat[ApiDetail] = {

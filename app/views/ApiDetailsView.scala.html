@@ -18,15 +18,20 @@
 @import models.user.UserModel
 @import views.html.components.ApiDeployments
 @import views.MarkdownUtils
+@import viewmodels.ApiView
+@import viewmodels.NonSelfServeApiView
+@import viewmodels.SelfServeApiView
+@import views.html.components.IconsLink
 
 @this(
-        layout: templates.Layout,
-        govukButton: GovukButton,
-        apiDeployments: ApiDeployments,
-        newTabLink: components.NewTabLink
+    layout: templates.Layout,
+    govukButton: GovukButton,
+    apiDeployments: ApiDeployments,
+    newTabLink: components.NewTabLink,
+    iconsLink: IconsLink
 )
 
-@(apiDetail: ApiDetail, deploymentStatuses: ApiDeploymentStatuses, user: Option[UserModel], teamName: Option[String], domain: Option[String], subDomain: Option[String], hods: Seq[String])(implicit request: Request[_], messages: Messages)
+@(apiDetail: ApiDetail, user: Option[UserModel], apiView: ApiView)(implicit request: Request[_], messages: Messages)
 
 @endpointName(endpoint: Endpoint) = @{
     endpoint.path.replaceAll("""[^a-zA-Z0-9\-_:.]""", "-") match {
@@ -35,7 +40,47 @@
     }
 }
 
-@layout(pageTitle = titleNoForm(messages("apiDetails.title")), user = user, fullWidth = true) {
+@selfServeApiCallout() = {
+    <div class="call-out-panel call-out-panel__small success">
+        <p class="govuk-body information--general-tag">
+            <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+            <span class="call-out-type">
+                This API is available for self service
+            </span>
+        </p>
+        <p class="govuk-body additional-message">This API can be added to an application, and credentials can be created for usage.</p>
+        <p class="govuk-body additional-message">
+        @if(user.isDefined) {
+            @govukButton(
+                Button(
+                    id = Some("addToAnApplicationButton"),
+                    href = Some(routes.AddAnApiStartController.addAnApi(apiDetail.id).url),
+                    content = Text(messages("apiDetails.addToAnApplication")),
+                    classes = "govuk-!-margin-bottom-2"
+                )
+            )
+        }
+        </p>
+    </div>
+}
+
+@nonSelfServeApiCallout(teamEmail: String) = {
+    <div class="call-out-panel call-out-panel__small success">
+        <p class="govuk-body information--general-tag">
+            <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+            <span class="call-out-type">
+                This API cannot be self served
+            </span>
+        </p>
+        <p class="govuk-body additional-message">This API is not available for self service.</p>
+        <p class="govuk-body additional-message">
+            If you require further information, including how to consume this API please contact the
+            <a href="mailto:@teamEmail">front door team</a>.
+        </p>
+    </div>
+}
+
+@layout(pageTitle = titleNoForm(messages("apiDetails.title")), user = user, fullWidth = true, customScriptsBlock = Some(iconsLink())) {
 
     <div class="govuk-grid-row">
         <div id="navContent" class="govuk-grid-column-one-quarter sidebar stickySideMenu">
@@ -79,15 +124,11 @@
                 @apiDetail.shortDescription
             </p>
 
-            @if(user.isDefined) {
-                @govukButton(
-                    Button(
-                        id = Some("addToAnApplicationButton"),
-                        href = Some(routes.AddAnApiStartController.addAnApi(apiDetail.id).url),
-                        content = Text(messages("apiDetails.addToAnApplication"))
-                    )
-                )
-            }
+            @{apiView match {
+                case _: SelfServeApiView => selfServeApiCallout()
+                case nonSelfServeApiView: NonSelfServeApiView => nonSelfServeApiCallout(nonSelfServeApiView.teamEmail)
+            }}
+
             <dl class="govuk-summary-list govuk-!-margin-bottom-7">
                 <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">
@@ -111,12 +152,23 @@
 
                 <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">
+                        @messages("apiDetails.details.platform")
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        <strong class="hip-tag--platform">
+                            @apiDetail.platform
+                        </strong>
+                    </dd>
+                </div>
+
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
                         @messages("apiDetails.details.domain")
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        @if(domain.isDefined) {
+                        @if(apiView.domainDescription.isDefined) {
                             <strong class="hip-tag--domain">
-                                @domain
+                                @apiView.domainDescription
                             </strong>
                         } else {
                             @messages("apiDetails.details.notSpecified")
@@ -129,9 +181,9 @@
                         @messages("apiDetails.details.subDomain")
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        @if(subDomain.isDefined) {
+                        @if(apiView.subDomainDescription.isDefined) {
                             <strong class="hip-tag--subdomain">
-                                @subDomain
+                                @apiView.subDomainDescription
                             </strong>
                         } else {
                             @messages("apiDetails.details.notSpecified")
@@ -144,9 +196,9 @@
                         @messages("apiDetails.details.hods")
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        @if(hods.nonEmpty) {
+                        @if(apiView.hodDescriptions.nonEmpty) {
                             @Html(
-                                hods.map( hod =>
+                                apiView.hodDescriptions.map( hod =>
                                     s"<strong class='hip-tag--hod'>$hod</strong>"
                                 ).mkString(" ")
                             )
@@ -156,14 +208,18 @@
                     </dd>
                 </div>
 
-                <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">
-                        @messages("apiDetails.details.team")
-                    </dt>
-                    <dd class="govuk-summary-list__value">
-                        @{teamName.getOrElse(messages("apiDetails.details.notSpecified"))}
-                    </dd>
-                </div>
+                @{apiView match {
+                    case selfServeApiView: SelfServeApiView =>
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                {messages("apiDetails.details.team")}
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                {selfServeApiView.teamName.getOrElse(messages("apiDetails.details.notSpecified"))}
+                            </dd>
+                        </div>
+                    case _ => ()
+                }}
 
             </dl>
 
@@ -186,9 +242,10 @@
 
             <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-6 govuk-!-margin-top-0">
 
-            @apiDeployments(deploymentStatuses)
-
-            <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-6 govuk-!-margin-top-0">
+            @{apiView match {
+                case selfServeApiView: SelfServeApiView => apiDeployments(selfServeApiView.deploymentStatuses)
+                case _ => ()
+            }}
 
             <h2 class="govuk-heading-m" id="@messages("apiDetails.endpoints.heading")">
                 @messages("apiDetails.endpoints.heading")

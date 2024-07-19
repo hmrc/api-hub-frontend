@@ -273,6 +273,7 @@ apiDetails.leftNav.viewApiSpec = Interactive API view
 apiDetails.details.overview = API Overview
 apiDetails.details.version = Version
 apiDetails.details.status = Status
+apiDetails.details.platform = Platform
 apiDetails.details.domain = Domain
 apiDetails.details.subDomain = Sub-domain
 apiDetails.details.hods = HoD/Backend
