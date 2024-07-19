@@ -25,7 +25,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.myapis.MyApiDetailsView
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class MyApiDetailsController @Inject()(
@@ -39,9 +39,14 @@ class MyApiDetailsController @Inject()(
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(id: String): Action[AnyContent] = (identify andThen apiAuth(id)) async {
-    implicit request => apiHubService.getApiDeploymentStatuses(request.apiDetails.publisherReference).map {
-      case Some(deploymentStatuses) => Ok(view(request.apiDetails, deploymentStatuses, request.identifierRequest.user, config.supportEmailAddress))
-      case None => errorResultBuilder.internalServerError(s"Unable to retrieve deployment statuses for API ${request.apiDetails.publisherReference}")
+    implicit request => for {
+      deploymentStatuses <- apiHubService.getApiDeploymentStatuses(request.apiDetails.publisherReference)
+      team <- deploymentStatuses.flatMap(_ => request.apiDetails.teamId.map(apiHubService.findTeamById)).getOrElse(Future.successful(None))
+    } yield deploymentStatuses match {
+      case Some(deploymentStatuses) =>
+        Ok(view(request.apiDetails, deploymentStatuses, request.identifierRequest.user, config.supportEmailAddress, team.map(_.name)))
+      case None =>
+        errorResultBuilder.internalServerError(s"Unable to retrieve deployment statuses for API ${request.apiDetails.publisherReference}")
     }
   }
 

@@ -156,16 +156,14 @@
                     </dd>
                 </div>
 
-                @if(teamName.isDefined) {
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">
-                            @messages("apiDetails.details.team")
-                        </dt>
-                        <dd class="govuk-summary-list__value">
-                            @teamName.get
-                        </dd>
-                    </div>
-                }
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        @messages("apiDetails.details.team")
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        @{teamName.getOrElse(messages("apiDetails.details.notSpecified"))}
+                    </dd>
+                </div>
 
             </dl>
 
