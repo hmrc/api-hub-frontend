@@ -26,7 +26,6 @@ import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentMatchers, MockitoSugar}
 import org.scalatest.OptionValues
-import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import play.api.Application
 import play.api.inject.bind
@@ -70,7 +69,6 @@ class ApiDetailsControllerSpec
 
           status(result) mustBe OK
           contentAsString(result) mustBe view(apiDetail, apiDeploymentStatuses, None, None, domain, subDomain, hods)(request, messages(fixture.application)).toString()
-          contentAsString(result) should not include "Owning team"
           contentAsString(result) must validateAsHtml
         }
       }
@@ -98,7 +96,6 @@ class ApiDetailsControllerSpec
 
           status(result) mustBe OK
           contentAsString(result) mustBe view(apiDetail, apiDeploymentStatuses, Some(FakeUser), None, domain, subDomain, hods)(request, messages(fixture.application)).toString()
-          contentAsString(result) should not include "Owning team"
           contentAsString(result) must validateAsHtml
         }
       }

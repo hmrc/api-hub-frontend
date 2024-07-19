@@ -46,7 +46,9 @@ class MyApiDetailsControllerSpec
 
   "must return OK and the correct view for a user on the api team" in {
     val fixture = buildFixture()
-    val apiTeam = Team("teamId", "teamName", LocalDateTime.now(), List.empty)
+    val teamId = "teamId"
+    val teamName = "teamName"
+    val apiTeam = Team(teamId, teamName, LocalDateTime.now(), List.empty)
     val apiDetail = sampleApiDetail().copy(teamId = Some(apiTeam.id))
     val deploymentStatuses = ApiDeploymentStatuses(Some("1.0"), None)
 
@@ -58,6 +60,8 @@ class MyApiDetailsControllerSpec
         .thenReturn(Future.successful(Some(apiDetail)))
       when(fixture.apiHubService.findTeams(eqTo(FakeUser.email))(any))
         .thenReturn(Future.successful(List(apiTeam)))
+      when(fixture.apiHubService.findTeamById(eqTo(teamId))(any))
+        .thenReturn(Future.successful(Some(apiTeam)))
       when(fixture.apiHubService.getApiDeploymentStatuses(eqTo(apiDetail.publisherReference))(any))
         .thenReturn(Future.successful(Some(deploymentStatuses)))
 
@@ -66,7 +70,7 @@ class MyApiDetailsControllerSpec
 
       status(result) mustBe OK
       contentAsString(result) mustBe view(apiDetail, deploymentStatuses, FakeUser,
-        config.supportEmailAddress)(request, messages(fixture.application)).toString()
+        config.supportEmailAddress, Some(teamName))(request, messages(fixture.application)).toString()
       contentAsString(result) must validateAsHtml
     }
   }
@@ -90,7 +94,7 @@ class MyApiDetailsControllerSpec
 
       status(result) mustBe OK
       contentAsString(result) mustBe view(apiDetail, deploymentStatuses, FakeSupporter,
-        config.supportEmailAddress)(request, messages(fixture.application)).toString()
+        config.supportEmailAddress, None)(request, messages(fixture.application)).toString()
       contentAsString(result) must validateAsHtml
     }
   }
@@ -161,6 +165,7 @@ class MyApiDetailsControllerSpec
         )(request, messages(fixture.application))
         .toString()
       contentAsString(result) must validateAsHtml
+      verify(fixture.apiHubService, never).findTeamById(any)(any)
     }
   }
 
