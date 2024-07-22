@@ -36,5 +36,11 @@ case class NonSelfServeApiViewModel(
   domainDescription: Option[String],
   subDomainDescription: Option[String],
   hodDescriptions: Seq[String],
-  teamEmail: String,
+  contactEmail: ApiContactEmail
 ) extends ApiViewModel
+
+trait ApiContactEmail {
+  def email: String
+}
+case class ApiTeamContactEmail(email: String) extends ApiContactEmail
+case class HubSupportContactEmail(email: String) extends ApiContactEmail

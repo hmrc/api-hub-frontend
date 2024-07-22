@@ -22,6 +22,9 @@
 @import viewmodels.NonSelfServeApiViewModel
 @import viewmodels.SelfServeApiViewModel
 @import views.html.components.IconsLink
+@import viewmodels.ApiContactEmail
+@import viewmodels.ApiTeamContactEmail
+@import viewmodels.HubSupportContactEmail
 
 @this(
     layout: templates.Layout,
@@ -64,7 +67,11 @@
     </div>
 }
 
-@nonSelfServeApiCallout(teamEmail: String) = {
+@mailToLink(text: String, emailAddress: String) = {
+    <a href="mailto:@emailAddress">@text</a>
+}
+
+@nonSelfServeApiCallout(contactEmail: ApiContactEmail) = {
     <div class="call-out-panel call-out-panel__small success">
         <p class="govuk-body information--general-tag">
             <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
@@ -75,7 +82,10 @@
         <p class="govuk-body additional-message">This API is not available for self service.</p>
         <p class="govuk-body additional-message">
             If you require further information, including how to consume this API please contact the
-            <a href="mailto:@teamEmail">front door team</a>.
+            @{contactEmail match {
+                case ApiTeamContactEmail(emailAddress) => mailToLink("front door team", emailAddress)
+                case HubSupportContactEmail(emailAddress) => mailToLink("Integration Hub support team", emailAddress)
+            }}
         </p>
     </div>
 }
@@ -126,7 +136,7 @@
 
             @{apiViewModel match {
                 case _: SelfServeApiViewModel => selfServeApiCallout()
-                case nonSelfServeApiView: NonSelfServeApiViewModel => nonSelfServeApiCallout(nonSelfServeApiView.teamEmail)
+                case nonSelfServeApiView: NonSelfServeApiViewModel => nonSelfServeApiCallout(nonSelfServeApiView.contactEmail)
             }}
 
             <dl class="govuk-summary-list govuk-!-margin-bottom-7">

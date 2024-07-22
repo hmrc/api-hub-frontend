@@ -17,16 +17,16 @@
 package controllers
 
 import com.google.inject.{Inject, Singleton}
-import config.{Domains, Hods}
+import config.{Domains, FrontendAppConfig, Hods}
 import controllers.actions.OptionalIdentifierAction
 import controllers.helpers.ErrorResultBuilder
-import models.api.ApiDetail
+import models.api.{ApiDetail, Maintainer}
 import models.requests.OptionalIdentifierRequest
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.{SelfServeApiViewModel, NonSelfServeApiViewModel}
+import viewmodels.{ApiContactEmail, ApiTeamContactEmail, HubSupportContactEmail, NonSelfServeApiViewModel, SelfServeApiViewModel}
 import views.html.ApiDetailsView
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -39,7 +39,8 @@ class ApiDetailsController @Inject()(
   errorResultBuilder: ErrorResultBuilder,
   optionallyIdentified: OptionalIdentifierAction,
   domains: Domains,
-  hods: Hods
+  hods: Hods,
+  frontendAppConfig: FrontendAppConfig
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(id: String): Action[AnyContent] = optionallyIdentified.async {
@@ -88,7 +89,7 @@ class ApiDetailsController @Inject()(
           domains.getDomainDescription(apiDetail),
           domains.getSubDomainDescription(apiDetail),
           apiDetail.hods.map(hods.getDescription(_)),
-          "fd@example.com"
+          getContactEmailAddress(apiDetail.maintainer)
         )
       )))
   }
@@ -100,6 +101,13 @@ class ApiDetailsController @Inject()(
         case None => Some(Messages("apiDetails.details.team.error"))
       }
       case None => Future.successful(None)
+    }
+  }
+
+  private def getContactEmailAddress(maintainer: Maintainer): ApiContactEmail = {
+    maintainer.contactInfo.flatMap(_.emailAddress) match {
+      case email :: Nil => ApiTeamContactEmail(email)
+      case _ => HubSupportContactEmail(frontendAppConfig.supportEmailAddress)
     }
   }
 
