@@ -17,7 +17,7 @@
 @import models.api.ApiDeploymentStatuses
 @import views.html.components.IconsLink
 
-@this(govukTable: GovukTable, iconsLink: IconsLink)
+@this(govukSummaryList: GovukSummaryList, iconsLink: IconsLink)
 
 @(deploymentStatuses: ApiDeploymentStatuses)(implicit request: RequestHeader, messages: Messages)
 
@@ -48,32 +48,29 @@
         @messages("apiDeployments.heading")
     </h2>
 
-    <dl class="govuk-summary-list">
-
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">
-              @messages("apiDeployments.environment.secondary")
-            </dt>
-            <dd class="govuk-summary-list__value">
-                @showDeploymentStatus(deploymentStatuses.secondaryVersion)
-            </dd>
-            <dd class="govuk-summary-list__actions">
-                @showDeployedVersion(deploymentStatuses.secondaryVersion)
-            </dd>
-        </div>
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">
-              @messages("apiDeployments.environment.primary")
-            </dt>
-            <dd class="govuk-summary-list__value">
-                @showDeploymentStatus(deploymentStatuses.primaryVersion)
-            </dd>
-            <dd class="govuk-summary-list__actions">
-                @showDeployedVersion(deploymentStatuses.primaryVersion)
-            </dd>
-
-        </div>
-
-    </dl>
+    @govukSummaryList(
+        SummaryList(
+            rows = Seq(
+                SummaryListRow(
+                    key = Key(
+                        content = Text(messages("apiDeployments.environment.secondary"))
+                    ),
+                    value = Value(
+                        content = HtmlContent(showDeploymentStatus(deploymentStatuses.secondaryVersion))
+                    ),
+                    actions = Some(Actions(items = Seq(ActionItem(content = HtmlContent(showDeployedVersion(deploymentStatuses.secondaryVersion))))))
+                ),
+                SummaryListRow(
+                    key = Key(
+                        content = Text(messages("apiDeployments.environment.primary"))
+                    ),
+                    value = Value(
+                        content = HtmlContent(showDeploymentStatus(deploymentStatuses.primaryVersion))
+                    ),
+                    actions = Some(Actions(items = Seq(ActionItem(content = HtmlContent(showDeployedVersion(deploymentStatuses.primaryVersion))))))
+                )
+            )
+        )
+    )
 
 </div>
