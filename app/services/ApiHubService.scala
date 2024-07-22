@@ -162,7 +162,7 @@ class ApiHubService @Inject()(
   }
 
   def updateApiTeam(apiId: String, teamId: String)(implicit hc: HeaderCarrier): Future[ApiDetail] = {
-    integrationCatalogueConnector.updateApiTeam(apiId, teamId)
+    applicationsConnector.updateApiTeam(apiId, teamId)
   }
 
 }

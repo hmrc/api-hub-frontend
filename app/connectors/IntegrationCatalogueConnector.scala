@@ -84,17 +84,6 @@ class IntegrationCatalogueConnector @Inject()(
         case Left(e) => Future.failed(e)
       }
   }
-
-  def updateApiTeam(apiId: String, teamId: String)(implicit hc: HeaderCarrier): Future[ApiDetail] = {
-    httpClient.put(url"$integrationCatalogueBaseUrl/integration-catalogue/apis/$apiId/teams/$teamId")
-      .setHeader((ACCEPT, JSON))
-      .setHeader(AUTHORIZATION -> clientAuthToken)
-      .execute[Either[UpstreamErrorResponse, ApiDetail]]
-      .flatMap {
-        case Right(apiDetail) => Future.successful(apiDetail)
-        case Left(e) => Future.failed(e)
-      }
-  }
 }
 
 object IntegrationCatalogueConnector extends Logging {

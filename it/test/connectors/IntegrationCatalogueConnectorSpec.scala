@@ -201,42 +201,6 @@ class IntegrationCatalogueConnectorSpec
     }
   }
 
-  "updateApiTeam" - {
-    val teamId = "team1"
-    val apiDetails = sampleApiDetail().copy(teamId = Some(teamId))
-
-    "must place the correct request and return an ApiDetail" in {
-      stubFor(
-        put(urlEqualTo(s"/integration-catalogue/apis/${apiDetails.id}/teams/$teamId"))
-          .withHeader("Accept", equalTo("application/json"))
-          .withHeader("Authorization", equalTo("An authentication token"))
-          .willReturn(
-            aResponse()
-              .withBody(Json.toJson(apiDetails).toString())
-          )
-      )
-
-      buildConnector().updateApiTeam(apiDetails.id, teamId)(HeaderCarrier()) map {
-        actual =>
-          actual mustBe apiDetails
-      }
-    }
-
-    "must fail with an exception when integration catalogue returns a failure response" in {
-      stubFor(
-        put(urlEqualTo(s"/integration-catalogue/apis/${apiDetails.id}/teams/$teamId"))
-          .willReturn(
-            aResponse()
-              .withStatus(INTERNAL_SERVER_ERROR)
-          )
-      )
-
-      recoverToSucceededIf[UpstreamErrorResponse] {
-        buildConnector().updateApiTeam(apiDetails.id, teamId)(HeaderCarrier())
-      }
-    }
-  }
-
   private def buildConnector(): IntegrationCatalogueConnector = {
     val servicesConfig = new ServicesConfig(
       Configuration.from(Map(

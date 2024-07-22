@@ -23,17 +23,18 @@ import connectors.ApplicationsConnectorSpec.ApplicationGetterBehaviours
 import models.UserEmail
 import models.accessrequest._
 import models.api.ApiDeploymentStatuses
-import models.application._
+import models.api.ApiDetailLensesSpec.sampleApiDetail
 import models.application.ApplicationLenses._
+import models.application._
 import models.deployment.{DeploymentsRequest, Error, FailuresResponse, InvalidOasResponse, RedeploymentRequest, SuccessfulDeploymentsResponse}
 import models.exception.{ApplicationCredentialLimitException, TeamNameNotUniqueException}
 import models.requests.{AddApiRequest, AddApiRequestEndpoint, ChangeTeamNameRequest, TeamMemberRequest}
 import models.team.{NewTeam, Team}
 import models.user.{LdapUser, UserContactDetails, UserModel}
-import org.scalatest.{EitherValues, OptionValues}
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
+import org.scalatest.{EitherValues, OptionValues}
 import play.api.Configuration
 import play.api.http.ContentTypes
 import play.api.http.Status._
@@ -41,8 +42,8 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.test.Helpers.{ACCEPT, AUTHORIZATION, CONTENT_TYPE}
 import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
-import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
+import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import java.net.URLEncoder
@@ -1287,6 +1288,43 @@ class ApplicationsConnectorSpec
       }
     }
   }
+
+  "updateApiTeam" - {
+    val teamId = "team1"
+    val apiDetails = sampleApiDetail().copy(teamId = Some(teamId))
+
+    "must place the correct request and return an ApiDetail" in {
+      stubFor(
+        put(urlEqualTo(s"/api-hub-applications/apis/${apiDetails.id}/teams/$teamId"))
+          .withHeader("Accept", equalTo("application/json"))
+          .withHeader("Authorization", equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withBody(Json.toJson(apiDetails).toString())
+          )
+      )
+
+      buildConnector(this).updateApiTeam(apiDetails.id, teamId)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe apiDetails
+      }
+    }
+
+    "must fail with an exception when integration catalogue returns a failure response" in {
+      stubFor(
+        put(urlEqualTo(s"/api-hub-applications/apis/${apiDetails.id}/teams/$teamId"))
+          .willReturn(
+            aResponse()
+              .withStatus(INTERNAL_SERVER_ERROR)
+          )
+      )
+
+      recoverToSucceededIf[UpstreamErrorResponse] {
+        buildConnector(this).updateApiTeam(apiDetails.id, teamId)(HeaderCarrier())
+      }
+    }
+  }
+
 }
 
 object ApplicationsConnectorSpec extends HttpClientV2Support {
