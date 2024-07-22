@@ -25,6 +25,7 @@
 @import viewmodels.ApiContactEmail
 @import viewmodels.ApiTeamContactEmail
 @import viewmodels.HubSupportContactEmail
+@import views.ViewUtils
 
 @this(
     layout: templates.Layout,
@@ -230,6 +231,15 @@
                         </div>
                     case _ => ()
                 }}
+
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        @messages("apiDetails.details.reviewedDate")
+                    </dt>
+                    <dd class="govuk-summary-list__value utcDateLong">
+                        @{ViewUtils.formatInstantAsUtc(apiDetail.reviewedDate)}
+                    </dd>
+                </div>
 
             </dl>
 

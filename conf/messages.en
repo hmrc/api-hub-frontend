@@ -279,6 +279,7 @@ apiDetails.details.subDomain = Sub-domain
 apiDetails.details.hods = HoD/Backend
 apiDetails.details.notSpecified = Not specified
 apiDetails.details.team = Owning team
+apiDetails.details.reviewedDate = Last reviewed
 apiDetails.details.team.error = Team details could not be retrieved
 apiDetails.viewApiSpec.information = View API specification
 apiDetails.viewApiSpec.message = To view the API specification use the {0}.
