@@ -22,18 +22,18 @@ import generators.{AccessRequestGenerator, ApiDetailGenerators}
 import models.AvailableEndpoint
 import models.accessrequest._
 import models.api.{ApiDeploymentStatuses, EndpointMethod}
+import models.application.{Api, Application, Creator, Credential, Deleted, NewApplication, Primary, TeamMember}
 import models.application.ApplicationLenses._
-import models.application._
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
 import models.team.{NewTeam, Team}
 import models.user.UserContactDetails
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchersSugar.eqTo
 import org.mockito.{ArgumentMatchers, MockitoSugar}
+import org.scalatest.{EitherValues, OptionValues}
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
-import org.scalatest.{EitherValues, OptionValues}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.LocalDateTime

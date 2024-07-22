@@ -16,6 +16,29 @@
 
 package connectors
 
+import com.google.inject.{Inject, Singleton}
+import config.FrontendAppConfig
+import models.UserEmail
+import models.accessrequest.{AccessRequest, AccessRequestDecisionRequest, AccessRequestRequest, AccessRequestStatus}
+import models.api.{ApiDeploymentStatuses, ApiDetail}
+import models.application._
+import models.deployment._
+import models.exception.{ApplicationCredentialLimitException, ApplicationsException, TeamNameNotUniqueException}
+import models.requests.{AddApiRequest, ChangeTeamNameRequest, TeamMemberRequest}
+import models.team.{NewTeam, Team}
+import models.user.UserContactDetails
+import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION, CONTENT_TYPE}
+import play.api.http.MimeTypes.JSON
+import play.api.http.Status._
+import play.api.libs.json.{JsResultException, Json}
+import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
+import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpErrorFunctions, HttpResponse, StringContextOps, UpstreamErrorResponse}
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+
+import scala.concurrent.{ExecutionContext, Future}
+
 @Singleton
 class ApplicationsConnector @Inject()(
     httpClient: HttpClientV2,
