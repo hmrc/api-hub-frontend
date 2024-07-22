@@ -26,7 +26,7 @@ import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.{SelfServeApiView, NonSelfServeApiView}
+import viewmodels.{SelfServeApiViewModel, NonSelfServeApiViewModel}
 import views.html.ApiDetailsView
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -67,7 +67,7 @@ class ApiDetailsController @Inject()(
         Ok(view(
           apiDetail,
           request.user,
-          SelfServeApiView(
+          SelfServeApiViewModel(
             domains.getDomainDescription(apiDetail),
             domains.getSubDomainDescription(apiDetail),
             apiDetail.hods.map(hods.getDescription(_)),
@@ -84,7 +84,7 @@ class ApiDetailsController @Inject()(
       Future.successful(Ok(view(
         apiDetail,
         request.user,
-        NonSelfServeApiView(
+        NonSelfServeApiViewModel(
           domains.getDomainDescription(apiDetail),
           domains.getSubDomainDescription(apiDetail),
           apiDetail.hods.map(hods.getDescription(_)),

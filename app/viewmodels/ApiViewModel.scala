@@ -18,23 +18,23 @@ package viewmodels
 
 import models.api.ApiDeploymentStatuses
 
-trait ApiView {
+trait ApiViewModel {
   def domainDescription: Option[String]
   def subDomainDescription: Option[String]
   def hodDescriptions: Seq[String]
 }
 
-case class SelfServeApiView(
+case class SelfServeApiViewModel(
   domainDescription: Option[String],
   subDomainDescription: Option[String],
   hodDescriptions: Seq[String],
   teamName: Option[String],
   deploymentStatuses: ApiDeploymentStatuses
-) extends ApiView
+) extends ApiViewModel
 
-case class NonSelfServeApiView(
+case class NonSelfServeApiViewModel(
   domainDescription: Option[String],
   subDomainDescription: Option[String],
   hodDescriptions: Seq[String],
   teamEmail: String,
-) extends ApiView
+) extends ApiViewModel

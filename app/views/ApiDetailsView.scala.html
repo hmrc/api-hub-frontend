@@ -18,9 +18,9 @@
 @import models.user.UserModel
 @import views.html.components.ApiDeployments
 @import views.MarkdownUtils
-@import viewmodels.ApiView
-@import viewmodels.NonSelfServeApiView
-@import viewmodels.SelfServeApiView
+@import viewmodels.ApiViewModel
+@import viewmodels.NonSelfServeApiViewModel
+@import viewmodels.SelfServeApiViewModel
 @import views.html.components.IconsLink
 
 @this(
@@ -31,7 +31,7 @@
     iconsLink: IconsLink
 )
 
-@(apiDetail: ApiDetail, user: Option[UserModel], apiView: ApiView)(implicit request: Request[_], messages: Messages)
+@(apiDetail: ApiDetail, user: Option[UserModel], apiViewModel: ApiViewModel)(implicit request: Request[_], messages: Messages)
 
 @endpointName(endpoint: Endpoint) = @{
     endpoint.path.replaceAll("""[^a-zA-Z0-9\-_:.]""", "-") match {
@@ -124,9 +124,9 @@
                 @apiDetail.shortDescription
             </p>
 
-            @{apiView match {
-                case _: SelfServeApiView => selfServeApiCallout()
-                case nonSelfServeApiView: NonSelfServeApiView => nonSelfServeApiCallout(nonSelfServeApiView.teamEmail)
+            @{apiViewModel match {
+                case _: SelfServeApiViewModel => selfServeApiCallout()
+                case nonSelfServeApiView: NonSelfServeApiViewModel => nonSelfServeApiCallout(nonSelfServeApiView.teamEmail)
             }}
 
             <dl class="govuk-summary-list govuk-!-margin-bottom-7">
@@ -166,9 +166,9 @@
                         @messages("apiDetails.details.domain")
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        @if(apiView.domainDescription.isDefined) {
+                        @if(apiViewModel.domainDescription.isDefined) {
                             <strong class="hip-tag--domain">
-                                @apiView.domainDescription
+                                @apiViewModel.domainDescription
                             </strong>
                         } else {
                             @messages("apiDetails.details.notSpecified")
@@ -181,9 +181,9 @@
                         @messages("apiDetails.details.subDomain")
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        @if(apiView.subDomainDescription.isDefined) {
+                        @if(apiViewModel.subDomainDescription.isDefined) {
                             <strong class="hip-tag--subdomain">
-                                @apiView.subDomainDescription
+                                @apiViewModel.subDomainDescription
                             </strong>
                         } else {
                             @messages("apiDetails.details.notSpecified")
@@ -196,9 +196,9 @@
                         @messages("apiDetails.details.hods")
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        @if(apiView.hodDescriptions.nonEmpty) {
+                        @if(apiViewModel.hodDescriptions.nonEmpty) {
                             @Html(
-                                apiView.hodDescriptions.map( hod =>
+                                apiViewModel.hodDescriptions.map( hod =>
                                     s"<strong class='hip-tag--hod'>$hod</strong>"
                                 ).mkString(" ")
                             )
@@ -208,8 +208,8 @@
                     </dd>
                 </div>
 
-                @{apiView match {
-                    case selfServeApiView: SelfServeApiView =>
+                @{apiViewModel match {
+                    case selfServeApiView: SelfServeApiViewModel =>
                         <div class="govuk-summary-list__row">
                             <dt class="govuk-summary-list__key">
                                 {messages("apiDetails.details.team")}
@@ -242,8 +242,8 @@
 
             <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-6 govuk-!-margin-top-0">
 
-            @{apiView match {
-                case selfServeApiView: SelfServeApiView => apiDeployments(selfServeApiView.deploymentStatuses)
+            @{apiViewModel match {
+                case selfServeApiView: SelfServeApiViewModel => apiDeployments(selfServeApiView.deploymentStatuses)
                 case _ => ()
             }}
 
