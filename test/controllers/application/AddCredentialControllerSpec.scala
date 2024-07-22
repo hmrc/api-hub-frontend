@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.actions.{FakeApplication, FakePrivilegedUser, FakeUser, FakeUserNotTeamMember}
 import controllers.routes
 import forms.AddCredentialChecklistFormProvider
-import models.api.{ApiDetail, Live}
+import models.api.{ApiDetail, Live, Maintainer}
 import models.application.{Api, Application, Credential, Primary, Secondary}
 import models.exception.ApplicationCredentialLimitException
 import models.user.UserModel
@@ -95,8 +95,10 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
     "must return the Add Credential Success view when valid data is submitted by a a privileged user who is a team member or supporter" in {
       forAll(privilegedTeamMemberAndSupporterTable) {
         user =>
-          val api1 = ApiDetail("test-api-1", "pubRef1", "test-api-name-1", "", "", Seq.empty, None, "", Live, reviewedDate = Instant.now())
-          val api2 = ApiDetail("test-api-2", "pubRef2", "test-api-name-2", "", "", Seq.empty, None, "", Live, reviewedDate = Instant.now())
+          val api1 = ApiDetail("test-api-1", "pubRef1", "test-api-name-1", "", "", Seq.empty, None, "", Live,
+            reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
+          val api2 = ApiDetail("test-api-2", "pubRef2", "test-api-name-2", "", "", Seq.empty, None, "", Live,
+            reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
           val apiNames = Seq(api1.title, api2.title)
 
           val application = FakeApplication.copy(

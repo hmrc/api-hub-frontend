@@ -21,7 +21,7 @@ import controllers.actions.{FakeApplication, FakeUser}
 import controllers.routes
 import forms.RequestProductionAccessDeclarationFormProvider
 import models.accessrequest.Pending
-import models.api.{ApiDetail, Endpoint, EndpointMethod, Live}
+import models.api.{ApiDetail, Endpoint, EndpointMethod, Live, Maintainer}
 import models.application.ApplicationLenses.ApplicationLensOps
 import models.application._
 import models.user.UserModel
@@ -167,7 +167,9 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
       shortDescription = None,
       openApiSpecification = "test-oas-spec",
       apiStatus = Live,
-      reviewedDate = Instant.now()
+      reviewedDate = Instant.now(),
+      platform = "HIP",
+      maintainer = Maintainer("name", "#slack", List.empty)
     )
   }
 

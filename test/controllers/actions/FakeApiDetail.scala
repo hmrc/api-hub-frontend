@@ -16,7 +16,7 @@
 
 package controllers.actions
 
-import models.api.{ApiDetail, Endpoint, EndpointMethod, Live}
+import models.api.{ApiDetail, Endpoint, EndpointMethod, Live, Maintainer}
 
 import java.time.Instant
 
@@ -35,5 +35,7 @@ object FakeApiDetail extends ApiDetail(
   Some("domain"),
   Some("subdomain"),
   Seq("hod1"),
-  Instant.now()
+  Instant.now(),
+  "HIP",
+  Maintainer("name", "#slack", List.empty)
 )

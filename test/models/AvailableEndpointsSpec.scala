@@ -18,7 +18,7 @@ package models
 
 import controllers.actions.FakeApplication
 import models.api.ApiDetailLensesSpec.sampleOas
-import models.api.{ApiDetail, Endpoint, EndpointMethod, Live}
+import models.api.{ApiDetail, Endpoint, EndpointMethod, Live, Maintainer}
 import models.application.{Api, SelectedEndpoint}
 import models.application.ApplicationLenses._
 import org.scalatest.freespec.AnyFreeSpec
@@ -39,7 +39,9 @@ class AvailableEndpointsSpec extends AnyFreeSpec with Matchers with TableDrivenP
     shortDescription = None,
     openApiSpecification = sampleOas,
     apiStatus = Live,
-    reviewedDate = Instant.now()
+    reviewedDate = Instant.now(),
+    platform = "HIP",
+    maintainer = Maintainer("test-name", "test-slack"),
   )
 
   "AvailableEndpoints.apply" - {

@@ -18,7 +18,7 @@ package controllers
 
 import base.SpecBase
 import controllers.actions.{FakeApplication, FakeUser}
-import models.api.{ApiDetail, Endpoint, EndpointMethod, Live}
+import models.api.{ApiDetail, Endpoint, EndpointMethod, Live, Maintainer}
 import models.{AddAnApi, ApiPolicyConditionsDeclaration, AvailableEndpoint, CheckMode, UserAnswers}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
@@ -54,7 +54,10 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation {
     None,
     "",
     Live,
-    reviewedDate = Instant.now())
+    reviewedDate = Instant.now(),
+    platform = "API_PLATFORM",
+    maintainer = Maintainer("name", "#slack", List.empty)
+  )
 
   private val fullUserAnswers = emptyUserAnswers
     .set(AddAnApiContextPage, AddAnApi).toOption.value

@@ -17,10 +17,11 @@
 package controllers
 
 import base.OptionallyAuthenticatedSpecBase
+import config.FrontendAppConfig
 import controllers.actions.FakeUser
 import fakes.{FakeDomains, FakeHods}
 import generators.ApiDetailGenerators
-import models.api.{ApiDeploymentStatuses, ApiDetail}
+import models.api.{ApiDeploymentStatuses, ApiDetail, ContactInformation}
 import models.team.Team
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
@@ -33,6 +34,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.ApiHubService
 import utils.HtmlValidation
+import viewmodels.{ApiTeamContactEmail, HubSupportContactEmail, NonSelfServeApiViewModel, SelfServeApiViewModel}
 import views.html.{ApiDetailsView, ErrorTemplate}
 
 import java.time.LocalDateTime
@@ -47,14 +49,15 @@ class ApiDetailsControllerSpec
     with OptionValues {
 
   "GET" - {
-    "must return OK and the correct view when the API detail exists for an unauthenticated user" in {
+    "must return OK and the correct view when the API detail exists for an unauthenticated user and the API is self-serve" in {
       val fixture = buildFixture()
 
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[ApiDetailsView]
         val apiDeploymentStatuses = ApiDeploymentStatuses(Some("1"), None)
 
-        forAll {(apiDetail: ApiDetail) =>
+        forAll {(baseApiDetail: ApiDetail) =>
+          val apiDetail = baseApiDetail.copy(platform = "HIP")
           when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
             .thenReturn(Future.successful(Some(apiDetail)))
           when(fixture.apiHubService.getApiDeploymentStatuses(ArgumentMatchers.eq(apiDetail.publisherReference))(any()))
@@ -66,9 +69,73 @@ class ApiDetailsControllerSpec
           val domain = FakeDomains.getDomainDescription(apiDetail)
           val subDomain = FakeDomains.getSubDomainDescription(apiDetail)
           val hods = apiDetail.hods.map(FakeHods.getDescription(_))
+          val apiView = SelfServeApiViewModel(domain, subDomain, hods, None, apiDeploymentStatuses)
 
           status(result) mustBe OK
-          contentAsString(result) mustBe view(apiDetail, apiDeploymentStatuses, None, None, domain, subDomain, hods)(request, messages(fixture.application)).toString()
+          contentAsString(result) mustBe view(apiDetail, None, apiView)(request, messages(fixture.application)).toString()
+          contentAsString(result) must validateAsHtml
+        }
+      }
+    }
+
+    "must return OK and the correct view when the API detail exists for an unauthenticated user and the API is " +
+      "non-self-serve and there is no email address for the API team" in {
+      val fixture = buildFixture()
+
+      running(fixture.application) {
+        val view = fixture.application.injector.instanceOf[ApiDetailsView]
+        val config = fixture.application.injector.instanceOf[FrontendAppConfig]
+        val apiDeploymentStatuses = ApiDeploymentStatuses(Some("1"), None)
+
+        forAll {(baseApiDetail: ApiDetail) =>
+          val apiDetail = baseApiDetail.copy(platform = "OTHER", maintainer = baseApiDetail.maintainer.copy(contactInfo = List.empty))
+          when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+            .thenReturn(Future.successful(Some(apiDetail)))
+          when(fixture.apiHubService.getApiDeploymentStatuses(ArgumentMatchers.eq(apiDetail.publisherReference))(any()))
+            .thenReturn(Future.successful(Some(apiDeploymentStatuses)))
+
+          val request = FakeRequest(GET, routes.ApiDetailsController.onPageLoad(apiDetail.id).url)
+          val result = route(fixture.application, request).value
+
+          val domain = FakeDomains.getDomainDescription(apiDetail)
+          val subDomain = FakeDomains.getSubDomainDescription(apiDetail)
+          val hods = apiDetail.hods.map(FakeHods.getDescription(_))
+          val apiView = NonSelfServeApiViewModel(domain, subDomain, hods, HubSupportContactEmail(config.supportEmailAddress))
+
+          status(result) mustBe OK
+          contentAsString(result) mustBe view(apiDetail, None, apiView)(request, messages(fixture.application)).toString()
+          contentAsString(result) must validateAsHtml
+        }
+      }
+    }
+
+    "must return OK and the correct view when the API detail exists for an unauthenticated user and the API is " +
+      "non-self-serve and there is an email address for the API team" in {
+      val fixture = buildFixture()
+
+      running(fixture.application) {
+        val view = fixture.application.injector.instanceOf[ApiDetailsView]
+        val apiDeploymentStatuses = ApiDeploymentStatuses(Some("1"), None)
+        val apiTeamEmail = "team@example.com"
+
+        forAll {(baseApiDetail: ApiDetail) =>
+          val apiDetail = baseApiDetail.copy(platform = "OTHER",
+            maintainer = baseApiDetail.maintainer.copy(contactInfo = List(ContactInformation(name=None, emailAddress = Some(apiTeamEmail)))))
+          when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+            .thenReturn(Future.successful(Some(apiDetail)))
+          when(fixture.apiHubService.getApiDeploymentStatuses(ArgumentMatchers.eq(apiDetail.publisherReference))(any()))
+            .thenReturn(Future.successful(Some(apiDeploymentStatuses)))
+
+          val request = FakeRequest(GET, routes.ApiDetailsController.onPageLoad(apiDetail.id).url)
+          val result = route(fixture.application, request).value
+
+          val domain = FakeDomains.getDomainDescription(apiDetail)
+          val subDomain = FakeDomains.getSubDomainDescription(apiDetail)
+          val hods = apiDetail.hods.map(FakeHods.getDescription(_))
+          val apiView = NonSelfServeApiViewModel(domain, subDomain, hods, ApiTeamContactEmail(apiTeamEmail))
+
+          status(result) mustBe OK
+          contentAsString(result) mustBe view(apiDetail, None, apiView)(request, messages(fixture.application)).toString()
           contentAsString(result) must validateAsHtml
         }
       }
@@ -79,13 +146,11 @@ class ApiDetailsControllerSpec
 
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[ApiDetailsView]
-        val apiDeploymentStatuses =  ApiDeploymentStatuses(Some("1"), None)
+        val config = fixture.application.injector.instanceOf[FrontendAppConfig]
 
         forAll {(apiDetail: ApiDetail) =>
           when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
             .thenReturn(Future.successful(Some(apiDetail)))
-          when(fixture.apiHubService.getApiDeploymentStatuses(ArgumentMatchers.eq(apiDetail.publisherReference))(any()))
-            .thenReturn(Future.successful(Some(apiDeploymentStatuses)))
 
           val request = FakeRequest(GET, routes.ApiDetailsController.onPageLoad(apiDetail.id).url)
           val result = route(fixture.application, request).value
@@ -93,9 +158,10 @@ class ApiDetailsControllerSpec
           val domain = FakeDomains.getDomainDescription(apiDetail)
           val subDomain = FakeDomains.getSubDomainDescription(apiDetail)
           val hods = apiDetail.hods.map(FakeHods.getDescription(_))
+          val apiView = NonSelfServeApiViewModel(domain, subDomain, hods, HubSupportContactEmail(config.supportEmailAddress))
 
           status(result) mustBe OK
-          contentAsString(result) mustBe view(apiDetail, apiDeploymentStatuses, Some(FakeUser), None, domain, subDomain, hods)(request, messages(fixture.application)).toString()
+          contentAsString(result) mustBe view(apiDetail, Some(FakeUser), apiView)(request, messages(fixture.application)).toString()
           contentAsString(result) must validateAsHtml
         }
       }
@@ -133,7 +199,7 @@ class ApiDetailsControllerSpec
       val apiDetail = sampleApiDetail()
 
       when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
-        .thenReturn(Future.successful(Some(apiDetail)))
+        .thenReturn(Future.successful(Some(apiDetail.copy(platform = "HIP"))))
       when(fixture.apiHubService.getApiDeploymentStatuses(ArgumentMatchers.eq(apiDetail.publisherReference))(any()))
         .thenReturn(Future.successful(None))
 
@@ -160,7 +226,7 @@ class ApiDetailsControllerSpec
         val view = fixture.application.injector.instanceOf[ApiDetailsView]
         val apiDeploymentStatuses =  ApiDeploymentStatuses(Some("1"), None)
         val team = Team("teamId", "teamName", LocalDateTime.now(), List.empty)
-        val apiDetail = sampleApiDetail().copy(teamId = Some(team.id))
+        val apiDetail = sampleApiDetail().copy(teamId = Some(team.id), platform = "HIP")
 
         when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
           .thenReturn(Future.successful(Some(apiDetail)))
@@ -175,9 +241,10 @@ class ApiDetailsControllerSpec
         val domain = FakeDomains.getDomainDescription(apiDetail)
         val subDomain = FakeDomains.getSubDomainDescription(apiDetail)
         val hods = apiDetail.hods.map(FakeHods.getDescription(_))
+        val apiView = SelfServeApiViewModel(domain, subDomain, hods, Some(team.name), apiDeploymentStatuses)
 
         status(result) mustBe OK
-        contentAsString(result) mustBe view(apiDetail, apiDeploymentStatuses, None, Some(team.name), domain, subDomain, hods)(request, messages(fixture.application)).toString()
+        contentAsString(result) mustBe view(apiDetail, None, apiView)(request, messages(fixture.application)).toString()
         contentAsString(result) must include("Owning team")
         contentAsString(result) must include(team.name)
         contentAsString(result) must validateAsHtml
@@ -190,7 +257,7 @@ class ApiDetailsControllerSpec
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[ApiDetailsView]
         val apiDeploymentStatuses =  ApiDeploymentStatuses(Some("1"), None)
-        val apiDetail = sampleApiDetail().copy(teamId = Some("teamId"))
+        val apiDetail = sampleApiDetail().copy(teamId = Some("teamId"), platform = "HIP")
 
         when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
           .thenReturn(Future.successful(Some(apiDetail)))
@@ -205,9 +272,10 @@ class ApiDetailsControllerSpec
         val domain = FakeDomains.getDomainDescription(apiDetail)
         val subDomain = FakeDomains.getSubDomainDescription(apiDetail)
         val hods = apiDetail.hods.map(FakeHods.getDescription(_))
+        val apiView = SelfServeApiViewModel(domain, subDomain, hods, Some("Team details could not be retrieved"), apiDeploymentStatuses)
 
         status(result) mustBe OK
-        contentAsString(result) mustBe view(apiDetail, apiDeploymentStatuses, None, Some("Team details could not be retrieved"), domain, subDomain, hods)(request, messages(fixture.application)).toString()
+        contentAsString(result) mustBe view(apiDetail, None, apiView)(request, messages(fixture.application)).toString()
         contentAsString(result) must validateAsHtml
       }
     }

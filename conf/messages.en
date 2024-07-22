@@ -287,6 +287,11 @@ apiDetails.viewApiSpec.link = Interactive API spec viewer
 apiDetails.endpoints.heading = Endpoints
 apiDetails.endpoints.summary = Summary
 apiDetails.endpoints.description = Description
+apiDetails.selfServe.title = This API is available for self service
+apiDetails.selfServe.info = This API can be added to an application, and credentials can be created for usage.
+apiDetails.nonSelfServe.title = This API cannot be self served
+apiDetails.nonSelfServe.info1 = This API is not available for self service.
+apiDetails.nonSelfServe.info2 = If you require further information, including how to consume this API please contact the
 
 apiDeployments.heading = Deployment status
 apiDeployments.status.deployed = Deployed
