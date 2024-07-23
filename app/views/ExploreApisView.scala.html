@@ -40,7 +40,7 @@
 
 @scripts() = {
     @iconsLink()
-    <script src='@routes.Assets.versioned("javascripts/hipApis.js")' type="module" @{CSPNonce.attr}></script>
+    <script src='@routes.Assets.versioned("javascripts/exploreApis.js")' type="module" @{CSPNonce.attr}></script>
 }
 
 @normalise(text: String) = @{
@@ -100,7 +100,7 @@
 
 @apis(apiDetails: Seq[ApiDetail]) = {
     @if(apiDetails.isEmpty) {
-        @messages("hipApis.searchResults.empty")
+        @messages("exploreApis.searchResults.empty")
     } else {
         @apiDetails.map(api => anApi(api))
     }
@@ -143,80 +143,80 @@
 }
 
 @layout(
-    pageTitle = titleNoForm(messages("hipApis.title")),
+    pageTitle = titleNoForm(messages("exploreApis.title")),
     user = user,
     fullWidth = true,
     customScriptsBlock = Some(scripts()),
-    activeLink = Some("hipApis")
+    activeLink = Some("exploreApis")
 ) {
-    <h2 class="govuk-heading-l">@messages("hipApis.title")</h2>
+    <h2 class="govuk-heading-l">@messages("exploreApis.title")</h2>
     <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible hip-color-override">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-one-third filters-container">
             <div class="govuk-form-group">
                 <h2 class="govuk-heading-s govuk-!-margin-bottom-1">
-                    @messages("hipApis.filter.heading")
+                    @messages("exploreApis.filter.heading")
                 </h2>
                 <div class="govuk-body">
-                    <a href="#" class="govuk-link govuk-link--no-visited-state" id="resetFilters">@messages("hipApis.filter.reset")</a>
+                    <a href="#" class="govuk-link govuk-link--no-visited-state" id="resetFilters">@messages("exploreApis.filter.reset")</a>
                 </div>
                 <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible hip-color-override govuk-!-margin-top-5">
-                @searchBox(messages("hipApis.filter.byName"), "nameFilter")
+                @searchBox(messages("exploreApis.filter.byName"), "nameFilter")
                 <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible hip-color-override govuk-!-margin-top-5">
                 <fieldset class="govuk-fieldset">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                         <h2 class="govuk-fieldset__heading">
-                            @messages("hipApis.filter.byDomain")
+                            @messages("exploreApis.filter.byDomain")
                         </h2>
                     </legend>
                     @govukDetails(Details(
                         id = Some("viewDomainFilters"),
                         classes = "govuk-!-margin-bottom-1",
-                        summary = Text(messages("hipApis.filter.byDomain.view")),
+                        summary = Text(messages("exploreApis.filter.byDomain.view")),
                         content = HtmlContent(domainsAndSubDomains())
                     ))
                     <div class="govuk-body filterSelectionCount">
-                        <strong id="domainFilterCount">0</strong> @messages("hipApis.filter.selected")
+                        <strong id="domainFilterCount">0</strong> @messages("exploreApis.filter.selected")
                     </div>
                 </fieldset>
                 <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible hip-color-override govuk-!-margin-top-5">
                 <fieldset class="govuk-fieldset">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                         <h2 class="govuk-fieldset__heading">
-                        @messages("hipApis.filter.byHods")
+                        @messages("exploreApis.filter.byHods")
                         </h2>
                     </legend>
                     @govukDetails(Details(
                         id = Some("viewHodFilters"),
                         classes = "govuk-!-margin-bottom-1",
-                        summary = Text(messages("hipApis.filter.byHods.view")),
+                        summary = Text(messages("exploreApis.filter.byHods.view")),
                         content = HtmlContent(hodsFilters())
                     ))
                     <div class="govuk-body filterSelectionCount">
-                        <strong id="hodFilterCount">0</strong> @messages("hipApis.filter.selected")
+                        <strong id="hodFilterCount">0</strong> @messages("exploreApis.filter.selected")
                     </div>
                 </fieldset>
                 <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible hip-color-override govuk-!-margin-top-5">
                 <fieldset class="govuk-fieldset">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                         <h2 class="govuk-fieldset__heading">
-                        @messages("hipApis.filter.byStatus")
+                        @messages("exploreApis.filter.byStatus")
                         </h2>
                     </legend>
                     @govukDetails(Details(
                         id = Some("viewStatusFilters"),
                         classes = "govuk-!-margin-bottom-1",
-                        summary = Text(messages("hipApis.filter.byStatus.view")),
+                        summary = Text(messages("exploreApis.filter.byStatus.view")),
                         content = HtmlContent(statusFilters())
                     ))
                     <div class="govuk-body filterSelectionCount">
-                        <strong id="statusFilterCount">0</strong> @messages("hipApis.filter.selected")
+                        <strong id="statusFilterCount">0</strong> @messages("exploreApis.filter.selected")
                     </div>
                 </fieldset>
             </div>
         </div>
         <div class="govuk-grid-column-two-thirds api-results-container">
-            <h3 class="govuk-!-margin-0 govuk-label govuk-label--s">@messages("hipApis.searchResults.heading") (<span id="searchResultsSize">@apiDetails.size</span>)</h3>
+            <h3 class="govuk-!-margin-0 govuk-label govuk-label--s">@messages("exploreApis.searchResults.heading") (<span id="searchResultsSize">@apiDetails.size</span>)</h3>
             <div class="govuk-body" id="apiList">
                 @apis(apiDetails)
             </div>
@@ -224,12 +224,12 @@
                 <p class="govuk-body information--general-tag">
                     <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
                     <span class="call-out-type">
-                        @messages("hipApis.filter.noResults.heading")
+                        @messages("exploreApis.filter.noResults.heading")
                     </span>
                 </p>
-                <p class="govuk-body additional-message">@messages("hipApis.filter.noResults.message")</p>
+                <p class="govuk-body additional-message">@messages("exploreApis.filter.noResults.message")</p>
                 <p class="govuk-body additional-message">
-                    <a href="#" class="govuk-link govuk-link--no-visited-state" id="noResultsClearFilters">@messages("hipApis.filter.noResults.clearFilters")</a>
+                    <a href="#" class="govuk-link govuk-link--no-visited-state" id="noResultsClearFilters">@messages("exploreApis.filter.noResults.clearFilters")</a>
                 </p>
             </div>
             @paginator()

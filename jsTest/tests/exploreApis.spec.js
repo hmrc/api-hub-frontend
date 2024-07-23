@@ -1,8 +1,8 @@
 import {JSDOM} from 'jsdom';
-import {onPageShow} from '../../app/assets/javascripts/hipApis.js';
+import {onPageShow} from '../../app/assets/javascripts/exploreApis.js';
 import {paginationHelper, paginationContainerHtml, isVisible} from "./testUtils.js";
 
-describe('hipApis', () => {
+describe('exploreApis', () => {
     let document;
 
     beforeEach(() => {

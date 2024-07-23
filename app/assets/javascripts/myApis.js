@@ -1,5 +1,5 @@
 import {buildPaginator, HIDDEN_BY_PAGINATION} from './paginationController.js';
-import {buildNameFilter} from "./hipApisNameFilter.js";
+import {buildNameFilter} from "./exploreApisNameFilter.js";
 import {setVisible, noop} from "./utils.js";
 
 export function onPageShow() {

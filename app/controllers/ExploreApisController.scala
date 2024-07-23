@@ -24,15 +24,15 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.HipApisView
+import views.html.ExploreApisView
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class HipApisController @Inject()(
+class ExploreApisController @Inject()(
   override val controllerComponents: MessagesControllerComponents,
   apiHubService: ApiHubService,
-  view: HipApisView,
+  view: ExploreApisView,
   optionallyIdentified: OptionalIdentifierAction,
   domains: Domains,
   hods: Hods
@@ -40,7 +40,7 @@ class HipApisController @Inject()(
 
   def onPageLoad(): Action[AnyContent] = optionallyIdentified.async {
     implicit request =>
-      apiHubService.getAllHipApis().map {
+      apiHubService.getApis().map {
         case apiDetails: Seq[ApiDetail] => Ok(view(request.user, apiDetails.sortWith( _.title.toUpperCase < _.title.toUpperCase), domains, hods))
         case _ => InternalServerError
       }

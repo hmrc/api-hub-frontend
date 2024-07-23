@@ -1,7 +1,7 @@
 import {JSDOM} from 'jsdom';
-import {buildNameFilter} from "../../app/assets/javascripts/hipApisNameFilter.js";
+import {buildNameFilter} from "../../app/assets/javascripts/exploreApisNameFilter.js";
 
-describe('hipApisNameFilters', () => {
+describe('exploreApisNameFilters', () => {
     let nameFilter, apis, elNameFilter;
 
     beforeEach(() => {

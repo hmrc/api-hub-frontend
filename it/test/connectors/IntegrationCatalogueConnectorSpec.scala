@@ -90,12 +90,12 @@ class IntegrationCatalogueConnectorSpec
       }
     }
 
-    "getHipApis" - {
-      "must place the correct request and return some ApiDetails" in {
+    "getApis" - {
+      "must place the correct request and return some ApiDetails if no platform filter supplied" in {
         val expected = sampleApis()
 
         stubFor(
-          get(urlEqualTo(s"/integration-catalogue/integrations?platformFilter=hip&integrationType=api"))
+          get(urlEqualTo(s"/integration-catalogue/integrations?integrationType=api"))
             .withHeader("Accept", equalTo("application/json"))
             .withHeader("Authorization", equalTo("An authentication token"))
             .willReturn(
@@ -104,7 +104,26 @@ class IntegrationCatalogueConnectorSpec
             )
         )
 
-        buildConnector().getAllHipApis()(HeaderCarrier()) map {
+        buildConnector().getApis(None)(HeaderCarrier()) map {
+          actual =>
+            actual mustBe expected.results
+        }
+      }
+
+      "must place the correct request and return some ApiDetails if platform filter is supplied" in {
+        val expected = sampleApis()
+
+        stubFor(
+          get(urlEqualTo(s"/integration-catalogue/integrations?integrationType=api&platformFilter=hip"))
+            .withHeader("Accept", equalTo("application/json"))
+            .withHeader("Authorization", equalTo("An authentication token"))
+            .willReturn(
+              aResponse()
+                .withBody(Json.toJson(expected).toString())
+            )
+        )
+
+        buildConnector().getApis(Some("hip"))(HeaderCarrier()) map {
           actual =>
             actual mustBe expected.results
         }
@@ -114,7 +133,7 @@ class IntegrationCatalogueConnectorSpec
         val expected = IntegrationResponse(0,None, Seq.empty)
 
         stubFor(
-          get(urlEqualTo(s"/integration-catalogue/integrations?platformFilter=hip&integrationType=api"))
+          get(urlEqualTo(s"/integration-catalogue/integrations?integrationType=api"))
             .withHeader("Accept", equalTo("application/json"))
             .withHeader("Authorization", equalTo("An authentication token"))
             .willReturn(
@@ -123,7 +142,7 @@ class IntegrationCatalogueConnectorSpec
             )
         )
 
-        buildConnector().getAllHipApis()(HeaderCarrier()) map {
+        buildConnector().getApis(None)(HeaderCarrier()) map {
           actual =>
             actual mustBe Seq.empty
         }
@@ -141,7 +160,7 @@ class IntegrationCatalogueConnectorSpec
         )
 
         recoverToSucceededIf[UpstreamErrorResponse] {
-          buildConnector().getAllHipApis()(HeaderCarrier())
+          buildConnector().getApis(None)(HeaderCarrier())
         }
       }
     }

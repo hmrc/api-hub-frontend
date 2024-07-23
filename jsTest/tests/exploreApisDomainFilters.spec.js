@@ -1,7 +1,7 @@
 import {JSDOM} from 'jsdom';
-import {buildDomainFilters} from "../../app/assets/javascripts/hipApisDomainFilters.js";
+import {buildDomainFilters} from "../../app/assets/javascripts/exploreApisDomainFilters.js";
 
-describe('hipApisDomainFilters', () => {
+describe('exploreApisDomainFilters', () => {
     let document, domainFilters, apis;
 
     beforeEach(() => {

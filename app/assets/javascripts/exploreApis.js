@@ -1,8 +1,8 @@
 import {buildPaginator} from './paginationController.js';
-import {buildDomainFilters} from "./hipApisDomainFilters.js";
-import {buildStatusFilters} from "./hipApisStatusFilters.js";
-import {buildHodsFilters} from "./hipApisHodsFilters.js";
-import {buildNameFilter} from "./hipApisNameFilter.js";
+import {buildDomainFilters} from "./exploreApisDomainFilters.js";
+import {buildStatusFilters} from "./exploreApisStatusFilters.js";
+import {buildHodsFilters} from "./exploreApisHodsFilters.js";
+import {buildNameFilter} from "./exploreApisNameFilter.js";
 import {setVisible, noop} from "./utils.js";
 
 export function onPageShow() {

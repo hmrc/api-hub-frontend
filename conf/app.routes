@@ -72,8 +72,8 @@ POST        /apis/add-an-api/select-application                                c
 GET         /apis/add-an-api/change-select-application                         controllers.AddAnApiSelectApplicationController.onPageLoad(mode: Mode = CheckMode)
 POST        /apis/add-an-api/change-select-application                         controllers.AddAnApiSelectApplicationController.onSubmit(mode: Mode = CheckMode)
 
-GET         /apis                                                              controllers.HipApisController.onPageLoad()
-POST        /apis                                                              controllers.HipApisController.onSubmit()
+GET         /apis                                                              controllers.ExploreApisController.onPageLoad()
+POST        /apis                                                              controllers.ExploreApisController.onSubmit()
 
 GET         /apis/add-an-api/review-policy                                     controllers.ApiPolicyConditionsDeclarationPageController.onPageLoad(mode: Mode = NormalMode, context: AddAnApiContext = AddAnApi)
 POST        /apis/add-an-api/review-policy                                     controllers.ApiPolicyConditionsDeclarationPageController.onSubmit(mode: Mode = NormalMode, context: AddAnApiContext = AddAnApi)

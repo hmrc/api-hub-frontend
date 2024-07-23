@@ -28,8 +28,8 @@
 
 @(application: Application, applicationApis: Seq[ApplicationApi], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
-@hipApisLink(messageId: String) = {
-    <a href="@{routes.HipApisController.onPageLoad().url}" class="govuk-link govuk-link--no-visited-state">
+@exploreApisLink(messageId: String) = {
+    <a href="@{routes.ExploreApisController.onPageLoad().url}" class="govuk-link govuk-link--no-visited-state">
         @messages(messageId)
     </a>
 }
@@ -111,7 +111,7 @@
         @if(application.issues.isEmpty) {
             @if(applicationApis.isEmpty) {
                 <p class="govuk-body">
-                @Html(messages("applicationApis.apis.noApis", hipApisLink("applicationApis.apis.hipApis")))
+                @Html(messages("applicationApis.apis.noApis", exploreApisLink("applicationApis.apis.exploreApis")))
                 </p>
             } else {
                 @if(applicationApis.exists(_.hasPendingAccessRequest)) {
@@ -129,7 +129,7 @@
                 }
 
                 <p class="govuk-body govuk-!-margin-bottom-5">
-                    @Html(messages("applicationDetails.apis.toYourApp", hipApisLink("applicationDetails.apis.addApis")))
+                    @Html(messages("applicationDetails.apis.toYourApp", exploreApisLink("applicationDetails.apis.addApis")))
                 </p>
 
                 <div class="hip-app-apis">

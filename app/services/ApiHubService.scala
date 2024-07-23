@@ -81,8 +81,8 @@ class ApiHubService @Inject()(
     applicationsConnector.getApiDeploymentStatuses(publisherReference)
   }
 
-  def getAllHipApis()(implicit hc: HeaderCarrier): Future[Seq[ApiDetail]] = {
-    integrationCatalogueConnector.getAllHipApis()
+  def getApis(platform: Option[String] = None)(implicit hc: HeaderCarrier): Future[Seq[ApiDetail]] = {
+    integrationCatalogueConnector.getApis(platform)
   }
 
   def addCredential(id: String, environmentName: EnvironmentName)(implicit hc: HeaderCarrier): Future[Either[ApplicationsException, Option[Credential]]] = {
