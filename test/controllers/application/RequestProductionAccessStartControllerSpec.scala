@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
 import generators.ApiDetailGenerators
 import models.UserAnswers
-import models.api.{ApiDetail, Endpoint, EndpointMethod, Live}
+import models.api.{ApiDetail, Endpoint, EndpointMethod, Live, Maintainer}
 import models.application.ApplicationLenses.ApplicationLensOps
 import models.application._
 import models.user.UserModel
@@ -114,7 +114,9 @@ class RequestProductionAccessStartControllerSpec extends SpecBase with MockitoSu
       shortDescription = None,
       openApiSpecification = "test-oas-spec",
       apiStatus = Live,
-      reviewedDate = Instant.now()
+      reviewedDate = Instant.now(),
+      platform = "HIP",
+      maintainer = Maintainer("name", "#slack", List.empty)
     )
     val application = FakeApplication
       .addApi(Api(apiDetail.id, Seq(SelectedEndpoint("GET", "/test"))))

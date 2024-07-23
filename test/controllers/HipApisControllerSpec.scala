@@ -20,7 +20,7 @@ import base.OptionallyAuthenticatedSpecBase
 import controllers.actions.FakeUser
 import fakes.{FakeDomains, FakeHods}
 import generators.ApiDetailGenerators
-import models.api.{ApiDetail, Live}
+import models.api.{ApiDetail, Live, Maintainer}
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar
@@ -92,10 +92,12 @@ class HipApisControllerSpec
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[HipApisView]
 
-        val zebras = ApiDetail("id1", "ref1", "zebras", "zebras api", "1.0.0", Seq.empty, None, "oas", Live, reviewedDate = Instant.now())
-        val molluscs = ApiDetail("id2", "ref2", "MOLLUSCS", "molluscs api", "1.0.0", Seq.empty, None, "oas", Live, reviewedDate = Instant.now())
-        val aardvarks = ApiDetail("id3", "ref3", "aardvarks", "aardvarks api", "1.0.0", Seq.empty, None, "oas", Live, reviewedDate = Instant.now())
-        val pigeons = ApiDetail("id4", "ref4", "PIGEONS", "pigeons api", "1.0.0", Seq.empty, None, "oas", Live, reviewedDate = Instant.now())
+        val platform = "HIP"
+        val maintainer = Maintainer("name", "#slack", List.empty)
+        val zebras = ApiDetail("id1", "ref1", "zebras", "zebras api", "1.0.0", Seq.empty, None, "oas", Live, reviewedDate = Instant.now(), platform = platform, maintainer = maintainer)
+        val molluscs = ApiDetail("id2", "ref2", "MOLLUSCS", "molluscs api", "1.0.0", Seq.empty, None, "oas", Live, reviewedDate = Instant.now(), platform = platform, maintainer = maintainer)
+        val aardvarks = ApiDetail("id3", "ref3", "aardvarks", "aardvarks api", "1.0.0", Seq.empty, None, "oas", Live, reviewedDate = Instant.now(), platform = platform, maintainer = maintainer)
+        val pigeons = ApiDetail("id4", "ref4", "PIGEONS", "pigeons api", "1.0.0", Seq.empty, None, "oas", Live, reviewedDate = Instant.now(), platform = platform, maintainer = maintainer)
 
         when(fixture.apiHubService.getAllHipApis()(any()))
           .thenReturn(Future.successful(Seq(molluscs, zebras, aardvarks, pigeons)))

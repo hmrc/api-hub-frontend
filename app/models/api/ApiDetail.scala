@@ -52,8 +52,12 @@ case class ApiDetail(
   domain: Option[String] = None,
   subDomain: Option[String] = None,
   hods: Seq[String] = List.empty,
-  reviewedDate: Instant
-)
+  reviewedDate: Instant,
+  platform: String,
+  maintainer: Maintainer
+) {
+  def isSelfServe: Boolean = platform == "HIP"
+}
 
 object ApiDetail {
   implicit val formatApiDetail: OFormat[ApiDetail] = {
@@ -64,4 +68,16 @@ object ApiDetail {
     )
     Json.format[ApiDetail]
   }
+}
+
+case class Maintainer(name: String, slackChannel: String, contactInfo: List[ContactInformation] = List.empty)
+
+object Maintainer {
+  implicit val formatMaintainer: OFormat[Maintainer] = Json.format[Maintainer]
+}
+
+case class ContactInformation(name: Option[String], emailAddress: Option[String])
+
+object ContactInformation {
+  implicit val formatContactInformation: OFormat[ContactInformation] = Json.format[ContactInformation]
 }

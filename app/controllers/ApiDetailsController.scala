@@ -17,15 +17,16 @@
 package controllers
 
 import com.google.inject.{Inject, Singleton}
-import config.{Domains, Hods}
+import config.{Domains, FrontendAppConfig, Hods}
 import controllers.actions.OptionalIdentifierAction
 import controllers.helpers.ErrorResultBuilder
-import models.api.ApiDetail
+import models.api.{ApiDetail, Maintainer}
 import models.requests.OptionalIdentifierRequest
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.{ApiContactEmail, ApiTeamContactEmail, HubSupportContactEmail, NonSelfServeApiViewModel, SelfServeApiViewModel}
 import views.html.ApiDetailsView
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -38,7 +39,8 @@ class ApiDetailsController @Inject()(
   errorResultBuilder: ErrorResultBuilder,
   optionallyIdentified: OptionalIdentifierAction,
   domains: Domains,
-  hods: Hods
+  hods: Hods,
+  frontendAppConfig: FrontendAppConfig
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(id: String): Action[AnyContent] = optionallyIdentified.async {
@@ -46,7 +48,8 @@ class ApiDetailsController @Inject()(
       for {
         maybeApiDetail <- apiHubService.getApiDetail(id)
         result <- maybeApiDetail match {
-          case Some(apiDetail) => processApiDetail(apiDetail)
+          case Some(apiDetail) if apiDetail.isSelfServe => processSelfServeApiDetail(apiDetail)
+          case Some(apiDetail) => processNonSelfServeApiDetail(apiDetail)
           case None =>
             Future.successful(errorResultBuilder.notFound(
               Messages("site.apiNotFound.heading"),
@@ -56,7 +59,7 @@ class ApiDetailsController @Inject()(
       } yield result
   }
 
-  private def processApiDetail(apiDetail: ApiDetail)(implicit request: OptionalIdentifierRequest[_]) = {
+  private def processSelfServeApiDetail(apiDetail: ApiDetail)(implicit request: OptionalIdentifierRequest[_]) = {
     for {
       maybeApiDeploymentStatuses <- apiHubService.getApiDeploymentStatuses(apiDetail.publisherReference)
       maybeTeamName <- getTeamNameForApi(apiDetail.teamId)
@@ -64,16 +67,31 @@ class ApiDetailsController @Inject()(
       case Some(apiDeploymentStatuses) =>
         Ok(view(
           apiDetail,
-          apiDeploymentStatuses,
           request.user,
-          maybeTeamName,
-          domains.getDomainDescription(apiDetail),
-          domains.getSubDomainDescription(apiDetail),
-          apiDetail.hods.map(hods.getDescription(_)))
-        )
-      case None =>
+          SelfServeApiViewModel(
+            domains.getDomainDescription(apiDetail),
+            domains.getSubDomainDescription(apiDetail),
+            apiDetail.hods.map(hods.getDescription(_)),
+            maybeTeamName,
+            apiDeploymentStatuses,
+          )
+        ))
+      case _ =>
         errorResultBuilder.internalServerError(s"Unable to retrieve deployment statuses for API ${apiDetail.publisherReference}")
     }
+  }
+
+  private def processNonSelfServeApiDetail(apiDetail: ApiDetail)(implicit request: OptionalIdentifierRequest[_]) = {
+      Future.successful(Ok(view(
+        apiDetail,
+        request.user,
+        NonSelfServeApiViewModel(
+          domains.getDomainDescription(apiDetail),
+          domains.getSubDomainDescription(apiDetail),
+          apiDetail.hods.map(hods.getDescription(_)),
+          getContactEmailAddress(apiDetail.maintainer)
+        )
+      )))
   }
 
   private def getTeamNameForApi(maybeTeamId: Option[String])(implicit request: OptionalIdentifierRequest[_]) = {
@@ -83,6 +101,13 @@ class ApiDetailsController @Inject()(
         case None => Some(Messages("apiDetails.details.team.error"))
       }
       case None => Future.successful(None)
+    }
+  }
+
+  private def getContactEmailAddress(maintainer: Maintainer): ApiContactEmail = {
+    maintainer.contactInfo.flatMap(_.emailAddress) match {
+      case email :: Nil => ApiTeamContactEmail(email)
+      case _ => HubSupportContactEmail(frontendAppConfig.supportEmailAddress)
     }
   }
 

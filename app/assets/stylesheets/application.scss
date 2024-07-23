@@ -677,7 +677,7 @@ nav.hip-pagination--centered {
     max-width: none;
 }
 
-.hip-tag--domain, .hip-tag--subdomain, .hip-tag--hod {
+.hip-tag--domain, .hip-tag--subdomain, .hip-tag--hod, .hip-tag--platform {
     @extend .govuk-tag;
     @extend .govuk-tag--grey;
     text-transform: uppercase;

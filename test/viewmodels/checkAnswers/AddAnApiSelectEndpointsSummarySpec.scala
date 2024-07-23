@@ -19,7 +19,7 @@ package viewmodels.checkAnswers
 import controllers.actions.{FakeApplication, FakeUser}
 import controllers.routes
 import models.api.ApiDetailLensesSpec.sampleOas
-import models.api.{ApiDetail, Endpoint, EndpointMethod, Live}
+import models.api.{ApiDetail, Endpoint, EndpointMethod, Live, Maintainer}
 import models.{AddAnApi, CheckMode, UserAnswers}
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
@@ -60,7 +60,9 @@ class AddAnApiSelectEndpointsSummarySpec extends AnyFreeSpec with Matchers with 
     None,
     sampleOas,
     Live,
-    reviewedDate = Instant.now()
+    reviewedDate = Instant.now(),
+    platform = "API_PLATFORM",
+    maintainer = Maintainer("name", "#slack", List.empty)
   )
 
   "row" - {

@@ -66,6 +66,9 @@ trait ApiDetailGenerators {
       subDomain <- Gen.oneOf(domain.subDomains)
       hods <- Gen.listOfN(size/ listSizeQuota, sensiblySizedAlphaNumStr).suchThat(_.nonEmpty)
       reviewedDate <- Gen.const(Instant.now().truncatedTo(ChronoUnit.SECONDS))
+      platform <- sensiblySizedAlphaNumStr
+      maintainerName <- sensiblySizedAlphaNumStr
+      maintainerSlack <- sensiblySizedAlphaNumStr
     } yield ApiDetail(
       id.toString,
       publisherReference,
@@ -79,7 +82,9 @@ trait ApiDetailGenerators {
       domain = Some(domain.code),
       subDomain = Some(subDomain.code),
       hods = hods,
-      reviewedDate = reviewedDate
+      reviewedDate = reviewedDate,
+      platform = platform,
+      maintainer = Maintainer(maintainerName, s"#$maintainerSlack", List.empty)
     )
   }
 
