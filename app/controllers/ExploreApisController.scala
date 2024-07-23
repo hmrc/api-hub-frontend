@@ -17,7 +17,7 @@
 package controllers
 
 import com.google.inject.{Inject, Singleton}
-import config.{Domains, Hods}
+import config.{Domains, Hods, Platforms}
 import controllers.actions.OptionalIdentifierAction
 import models.api.ApiDetail
 import play.api.i18n.I18nSupport
@@ -35,13 +35,14 @@ class ExploreApisController @Inject()(
   view: ExploreApisView,
   optionallyIdentified: OptionalIdentifierAction,
   domains: Domains,
-  hods: Hods
+  hods: Hods,
+  platforms: Platforms
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = optionallyIdentified.async {
     implicit request =>
       apiHubService.getApis().map {
-        case apiDetails: Seq[ApiDetail] => Ok(view(request.user, apiDetails.sortWith( _.title.toUpperCase < _.title.toUpperCase), domains, hods))
+        case apiDetails: Seq[ApiDetail] => Ok(view(request.user, apiDetails.sortWith( _.title.toUpperCase < _.title.toUpperCase), domains, hods, platforms))
         case _ => InternalServerError
       }
   }

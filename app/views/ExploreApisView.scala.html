@@ -19,6 +19,7 @@
 @import views.html.helper.CSPNonce
 @import config.Domains
 @import config.Hods
+@import config.Platforms
 @import views.html.components.IconsLink
 @import views.html.components.SearchBox
 @import views.html.components.Paginator
@@ -36,7 +37,7 @@
     paginator: Paginator
 )
 
-@(user: Option[UserModel], apiDetails: Seq[ApiDetail] = Seq.empty, domains: Domains, hods: Hods)(implicit request: Request[_], messages: Messages)
+@(user: Option[UserModel], apiDetails: Seq[ApiDetail] = Seq.empty, domains: Domains, hods: Hods, platforms: Platforms)(implicit request: Request[_], messages: Messages)
 
 @scripts() = {
     @iconsLink()
@@ -66,7 +67,13 @@
 }
 
 @anApi(apiDetail: ApiDetail) = {
-    <div class="api-panel" data-apistatus="@apiDetail.apiStatus" data-domain='@normalise(apiDetail.domain.getOrElse(""))' data-subdomain='@normalise(apiDetail.subDomain.getOrElse(""))' data-hods='@apiDetail.hods.map(normalise).mkString(",")' data-apiname="@normalise(apiDetail.title)">
+    <div class="api-panel"
+            data-apistatus="@apiDetail.apiStatus"
+            data-domain='@normalise(apiDetail.domain.getOrElse(""))'
+            data-subdomain='@normalise(apiDetail.subDomain.getOrElse(""))'
+            data-hods='@apiDetail.hods.map(normalise).mkString(",")'
+            data-platform='@normalise(apiDetail.platform)'
+            data-apiname="@normalise(apiDetail.title)">
 
         <div class="api-panel-top">
             <span class="call-out-type information govuk-!-margin-bottom-0">
