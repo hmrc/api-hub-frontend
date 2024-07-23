@@ -259,7 +259,7 @@ signIn.stride.heading = Sign in via STRIDE
 signIn.stride.instructions = Use your {0} email to sign in.
 signIn.stride.guidance = If you are on a corporate device you will automatically be signed in and taken to The Integration Hub.
 signIn.stride.help = To sign in via STRIDE you will need the "The API Hub user" role assigned in the Service Request System.
-signIn.stride.helpLink = Find out how to self serve the role
+signIn.stride.helpLink = Find out how to self-serve the role
 
 testConnectivity.heading = Test Connectivity
 testConnectivity.title = Test Connectivity
@@ -287,10 +287,10 @@ apiDetails.viewApiSpec.link = Interactive API spec viewer
 apiDetails.endpoints.heading = Endpoints
 apiDetails.endpoints.summary = Summary
 apiDetails.endpoints.description = Description
-apiDetails.selfServe.title = This API is available for self service
+apiDetails.selfServe.title = This API is available for self-service
 apiDetails.selfServe.info = This API can be added to an application, and credentials can be created for usage.
-apiDetails.nonSelfServe.title = This API cannot be self served
-apiDetails.nonSelfServe.info1 = This API is not available for self service.
+apiDetails.nonSelfServe.title = This API cannot be self-served
+apiDetails.nonSelfServe.info1 = This API is not available for self-service.
 apiDetails.nonSelfServe.info2 = If you require further information, including how to consume this API please contact the
 
 apiDeployments.heading = Deployment status
