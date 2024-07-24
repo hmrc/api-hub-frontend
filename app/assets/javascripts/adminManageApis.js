@@ -1,7 +1,7 @@
 import {buildPaginator} from './paginationController.js';
 import {noop, setVisible} from "./utils.js";
 
-export function onDomLoaded() {
+export function onPageShow() {
     const view = (() => {
         const apiDetailPanelEls = Array.from(document.querySelectorAll('#apiDetailPanels .hip-api')),
             elNoResultsPanel = document.getElementById('noResultsPanel'),
@@ -68,11 +68,11 @@ export function onDomLoaded() {
     view.onFiltersChanged(() => {
         applyFilter();
     });
-    applyFilter();
 
     paginator.render(apiPanels.map(o => o.el));
+    applyFilter();
 }
 
 if (typeof window !== 'undefined') {
-    window.addEventListener("DOMContentLoaded", onDomLoaded);
+    window.addEventListener("pageshow", onPageShow);
 }
