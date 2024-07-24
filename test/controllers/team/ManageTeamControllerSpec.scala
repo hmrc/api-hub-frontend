@@ -17,7 +17,7 @@
 package controllers.team
 
 import base.SpecBase
-import controllers.actions.{FakeUser, FakeUserNotTeamMember}
+import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
 import controllers.routes
 import models.application.TeamMember
 import models.team.Team
@@ -55,7 +55,7 @@ class ManageTeamControllerSpec extends SpecBase with MockitoSugar with ArgumentM
             status(result) mustBe OK
 
             val view = fixture.playApplication.injector.instanceOf[ManageTeamView]
-            contentAsString(result) mustBe view(team, user)(request, messages(fixture.playApplication)).toString()
+            contentAsString(result) mustBe view(team, None, user)(request, messages(fixture.playApplication)).toString()
             contentAsString(result) must validateAsHtml
 
             verify(fixture.apiHubService).findTeamById(eqTo(team.id))(any)
@@ -101,7 +101,7 @@ class ManageTeamControllerSpec extends SpecBase with MockitoSugar with ArgumentM
           )
         )
 
-        contentAsString(result) mustBe view(sortedTeam, user)(request, messages(fixture.playApplication)).toString()
+        contentAsString(result) mustBe view(sortedTeam, None, user)(request, messages(fixture.playApplication)).toString()
       }
     }
 
@@ -125,6 +125,27 @@ class ManageTeamControllerSpec extends SpecBase with MockitoSugar with ArgumentM
             s"Cannot find a team with Id $teamId."
           )(request, messages(fixture.playApplication))
             .toString()
+        contentAsString(result) must validateAsHtml
+      }
+    }
+
+    "must link back to the application details page when arriving from there" in {
+      val team = Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email.value)))
+
+      val fixture = buildFixture()
+
+      when(fixture.apiHubService.findTeamById(any)(any)).thenReturn(Future.successful(Some(team)))
+
+      running(fixture.playApplication) {
+        val request = FakeRequest(controllers.team.routes.ManageTeamController.onPageLoad(team.id, Some(FakeApplication.id)))
+        val result = route(fixture.playApplication, request).value
+        val view = fixture.playApplication.injector.instanceOf[ManageTeamView]
+
+        val expectedLinkUrl = controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id).url
+
+        status(result) mustBe OK
+        contentAsString(result) mustBe view(team, Some(FakeApplication.id), FakeUser)(request, messages(fixture.playApplication)).toString()
+        contentAsString(result) must include(expectedLinkUrl)
         contentAsString(result) must validateAsHtml
       }
     }

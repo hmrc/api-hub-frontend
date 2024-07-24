@@ -18,6 +18,7 @@ package viewmodels.application
 
 import base.SpecBase
 import controllers.actions.FakeApplication
+import models.application.ApplicationLenses._
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages
@@ -95,6 +96,31 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TableDrivenPro
 
             actual mustBe Seq(page)
         }
+      }
+    }
+
+    "must link to the manage global teams page for an application owned by a global team" in {
+      val teamId = "test-team-id"
+
+      val application = FakeApplication
+        .setTeamId(teamId)
+        .setTeamMembers(Seq.empty)
+
+      val expected = SideNavItem(
+        ManageTeamMembersPage,
+        "Manage team members",
+        controllers.team.routes.ManageTeamController.onPageLoad(teamId, Some(FakeApplication.id)),
+        isCurrentPage = false
+      )
+
+      val playApplication = applicationBuilder(None).build()
+
+      running(playApplication) {
+        implicit val implicitMessages: Messages = messages(playApplication)
+
+        val actual = ApplicationNavItems(application, DetailsPage)
+
+        actual must contain(expected)
       }
     }
   }

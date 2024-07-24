@@ -542,6 +542,7 @@ manageTeam.heading = Manage {0}
 manageTeam.teamMembers = Team members ({0})
 manageTeam.teamMembers.emailAddress = Email address
 manageTeam.return = Return to all teams
+manageTeam.returnToApplication = Return to your application
 manageTeam.addTeamMember = Add team member
 
 createTeam.title = Team created successfully

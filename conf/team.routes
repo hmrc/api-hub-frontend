@@ -14,11 +14,10 @@ GET     /create-team/check-your-answers                     controllers.team.Cre
 
 GET     /manage-my-teams                                    controllers.team.ManageMyTeamsController.onPageLoad()
 
-GET     /:id                                                controllers.team.ManageTeamController.onPageLoad(id: String)
+GET     /:id                                                controllers.team.ManageTeamController.onPageLoad(id: String, applicationId: Option[String] ?= None)
 
 GET     /add-team-member/:id                                controllers.team.AddTeamMemberController.onPageLoad(id: String)
 POST    /add-team-member/:id                                controllers.team.AddTeamMemberController.onSubmit(id: String)
 
 GET     /change-team-name/:id                               controllers.team.ChangeTeamNameController.onPageLoad(id: String)
 POST    /change-team-name/:id                               controllers.team.ChangeTeamNameController.onSubmit(id: String)
-
