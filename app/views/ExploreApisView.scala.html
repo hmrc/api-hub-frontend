@@ -80,7 +80,7 @@
                 <a class="govuk-link govuk-link--no-visited-state" href="@routes.ApiDetailsController.onPageLoad(apiDetail.id)" data-api-id="@apiDetail.id">@apiDetail.title</a>
             </span>
             @if(platforms.isSelfServe(apiDetail.platform)){
-                <strong class="hip-tag--platform__self-serve">Self serve</strong>
+                <strong class="hip-tag--platform__self-serve">@messages("exploreApis.filter.selfServe")</strong>
             } else {
                 <strong class="hip-tag">@apiDetail.platform.replace("_", " ")</strong>
             }
