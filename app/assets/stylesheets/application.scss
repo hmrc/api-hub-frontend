@@ -711,6 +711,15 @@ nav.hip-pagination--centered {
     }
 }
 
+.hip-platform-filters {
+    .govuk-hint {
+        font-size: 1rem;
+    }
+    summary {
+        display: none;
+    }
+}
+
 header {
     @media (min-width: 48.0625em) {
         .govuk-header__logo {

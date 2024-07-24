@@ -3,6 +3,7 @@ import {buildDomainFilters} from "./exploreApisDomainFilters.js";
 import {buildStatusFilters} from "./exploreApisStatusFilters.js";
 import {buildHodsFilters} from "./exploreApisHodsFilters.js";
 import {buildNameFilter} from "./exploreApisNameFilter.js";
+import {buildPlatformFilters} from "./exploreApisPlatformFilters.js";
 import {setVisible, noop} from "./utils.js";
 
 export function onPageShow() {
@@ -10,7 +11,8 @@ export function onPageShow() {
             buildDomainFilters(),
             buildStatusFilters(),
             buildHodsFilters(),
-            buildNameFilter()
+            buildNameFilter(),
+            buildPlatformFilters()
         ];
 
     const view = (() => {
@@ -70,6 +72,7 @@ export function onPageShow() {
                 subdomain: el.dataset['subdomain'],
                 hods: new Set(el.dataset['hods'].split(',').filter(h => h)),
                 apiName: el.dataset['apiname'],
+                platform: el.dataset['platform']
             },
             el,
             hiddenByFilters: false

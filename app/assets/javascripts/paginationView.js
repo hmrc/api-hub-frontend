@@ -1,4 +1,4 @@
-import {setVisible, noop} from "./utils.js";
+import {setVisible, noop, removeElement} from "./utils.js";
 
 export function buildPaginationView() {
     const elContainer = document.getElementById('paginationContainer'),
@@ -11,9 +11,9 @@ export function buildPaginationView() {
         elDisplayCount = elContainer.querySelector('.hip-pagination__showing-count'),
         elTotalCount = elContainer.querySelector('.hip-pagination__total-count');
 
-    elList.removeChild(elPageLink);
-    elList.removeChild(elPageLinkCurrent);
-    elList.removeChild(elEllipsis);
+    removeElement(elPageLink);
+    removeElement(elPageLinkCurrent);
+    removeElement(elEllipsis);
 
     function buildPageNumberLink(pageNumber, isCurrentPage) {
         const elLinkBox = (isCurrentPage ? elPageLinkCurrent :  elPageLink).cloneNode(true),

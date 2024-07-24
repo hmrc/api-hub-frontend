@@ -139,11 +139,20 @@
 @hodsFilters() = {
     <div id="hodFilters" class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
     @for(hod <- hods.hods) {
-        <div>
-            <div class="govuk-checkboxes__item">
-                <input class="govuk-checkboxes__input hodFilter" id="filter_@hod.code" name="filter_@hod.code" type="checkbox" value="@normalise(hod.code)">
-                <label class="govuk-label govuk-checkboxes__label" for="filter_@hod.code">@hod.description</label>
-            </div>
+        <div class="govuk-checkboxes__item">
+            <input class="govuk-checkboxes__input hodFilter" id="filter_@hod.code" name="filter_@hod.code" type="checkbox" value="@normalise(hod.code)">
+            <label class="govuk-label govuk-checkboxes__label" for="filter_@hod.code">@hod.description</label>
+        </div>
+    }
+    </div>
+}
+
+@platformsFilters() = {
+    <div id="platformFilters" class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+    @for(platform <- platforms.platforms) {
+        <div class="govuk-checkboxes__item">
+            <input class="govuk-checkboxes__input platformFilter" id="filter_@platform.code" name="filter_@platform.code" type="checkbox" value="@normalise(platform.code)" @if(platforms.isSelfServe(platform.code)){data-selfserve="true"}>
+            <label class="govuk-label govuk-checkboxes__label" for="filter_@platform.code">@platform.description</label>
         </div>
     }
     </div>
@@ -167,9 +176,45 @@
                 <div class="govuk-body">
                     <a href="#" class="govuk-link govuk-link--no-visited-state" id="resetFilters">@messages("exploreApis.filter.reset")</a>
                 </div>
+
                 <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible hip-color-override govuk-!-margin-top-5">
                 @searchBox(messages("exploreApis.filter.byName"), "nameFilter")
+
                 <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible hip-color-override govuk-!-margin-top-5">
+                <fieldset class="govuk-fieldset hip-platform-filters ">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                        <h2 class="govuk-fieldset__heading">
+                        @messages("exploreApis.filter.byApiType")
+                        </h2>
+                    </legend>
+                    <div class="govuk-checkboxes govuk-checkboxes--small">
+                        <div class="govuk-checkboxes__item">
+                            <input class="govuk-checkboxes__input" id="filterPlatformSelfServe" name="filter-platform" type="checkbox" checked="checked">
+                            <label class="govuk-label govuk-checkboxes__label" for="filterPlatformSelfServe">
+                                <strong class="govuk-tag govuk-tag--green">Self serve</strong>
+                            </label>
+                            <div class="govuk-hint govuk-checkboxes__hint">
+                                APIs that you can use and consume now.
+                            </div>
+                        </div>
+                        <div class="govuk-checkboxes__item">
+                            <input class="govuk-checkboxes__input" id="filterPlatformNonSelfServe" name="filter-platform" type="checkbox">
+                            <label class="govuk-label govuk-checkboxes__label" for="filterPlatformNonSelfServe">
+                                <strong class="govuk-tag govuk-tag--grey">Other APIs</strong>
+                            </label>
+                            <div class="govuk-hint govuk-checkboxes__hint">
+                                APIs that cannot be consumed via the Integration Hub and require communication with the owning team.
+                            </div>
+                        </div>
+                    </div>
+                    @govukDetails(Details(
+                        id = Some("viewPlatformFilters"),
+                        classes = "govuk-!-margin-bottom-1",
+                        content = HtmlContent(platformsFilters())
+                    ))
+                </fieldset>
+
+                <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible hip-color-override govuk-!-margin-top-3">
                 <fieldset class="govuk-fieldset">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                         <h2 class="govuk-fieldset__heading">
@@ -186,7 +231,8 @@
                         <strong id="domainFilterCount">0</strong> @messages("exploreApis.filter.selected")
                     </div>
                 </fieldset>
-                <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible hip-color-override govuk-!-margin-top-5">
+
+                <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible hip-color-override govuk-!-margin-top-1">
                 <fieldset class="govuk-fieldset">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                         <h2 class="govuk-fieldset__heading">
@@ -203,7 +249,8 @@
                         <strong id="hodFilterCount">0</strong> @messages("exploreApis.filter.selected")
                     </div>
                 </fieldset>
-                <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible hip-color-override govuk-!-margin-top-5">
+
+                <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible hip-color-override govuk-!-margin-top-1">
                 <fieldset class="govuk-fieldset">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                         <h2 class="govuk-fieldset__heading">

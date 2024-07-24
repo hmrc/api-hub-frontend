@@ -322,6 +322,7 @@ exploreApis.filter.byHods.view = View HoD/Backend filters
 exploreApis.filter.byName = Filter by API name
 exploreApis.filter.byStatus = Filter by status
 exploreApis.filter.byStatus.view = View status filters
+exploreApis.filter.byApiType = Filter by API type
 
 support.link.text = Get Support
 support.title = Get Support
