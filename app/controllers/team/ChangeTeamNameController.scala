@@ -19,17 +19,13 @@ package controllers.team
 import controllers.actions._
 import controllers.helpers.ErrorResultBuilder
 import forms.ChangeTeamNameFormProvider
-import models.Mode
 import models.exception.TeamNameNotUniqueException
-import models.requests.{OptionalIdentifierRequest, TeamRequest}
-import models.team.Team
+import models.requests.TeamRequest
 import models.user.UserModel
 import play.api.data.{Form, FormError}
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc.{request, _}
+import play.api.mvc._
 import services.ApiHubService
-import uk.gov.hmrc.auth.core.NoActiveSession
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.team.{ChangeTeamNameView, TeamUpdatedSuccessfullyView}
 
