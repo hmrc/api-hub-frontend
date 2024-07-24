@@ -22,12 +22,14 @@ trait ApiViewModel {
   def domainDescription: Option[String]
   def subDomainDescription: Option[String]
   def hodDescriptions: Seq[String]
+  def platformDescription: String
 }
 
 case class SelfServeApiViewModel(
   domainDescription: Option[String],
   subDomainDescription: Option[String],
   hodDescriptions: Seq[String],
+  platformDescription: String,
   teamName: Option[String],
   deploymentStatuses: ApiDeploymentStatuses
 ) extends ApiViewModel
@@ -36,6 +38,7 @@ case class NonSelfServeApiViewModel(
   domainDescription: Option[String],
   subDomainDescription: Option[String],
   hodDescriptions: Seq[String],
+  platformDescription: String,
   contactEmail: ApiContactEmail
 ) extends ApiViewModel
 

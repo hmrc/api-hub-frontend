@@ -18,7 +18,7 @@
 
 @()(implicit messages: Messages)
 
-<div id="paginationContainer">
+<div id="paginationContainer" class="govuk-!-display-none">
     <p class="govuk-body govuk-!-margin-top-4 hip-text--centered hip-pagination__message">
         @Html(messages("site.displayCount", <strong class="hip-pagination__showing-count"></strong>, <strong class="hip-pagination__total-count"></strong>))
     </p>

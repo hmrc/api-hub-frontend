@@ -37,6 +37,14 @@ export function buildPlatformFilters() {
     }
 
     function setupCheckboxes(){
+        function syncFiltersWithNonSelfServeCheckbox(checkAllFilters) {
+            const showNonSelfServe = elShowNonSelfServe.checked;
+            collapseNonSelfServeFilterSection(!showNonSelfServe);
+            if (showNonSelfServe && checkAllFilters) {
+                forEachPlatformFilterCheckbox(el => el.checked = true);
+            }
+        }
+
         forEachPlatformFilterCheckbox(el => {
             el.addEventListener('change', onFiltersChangedHandler);
         });
@@ -44,14 +52,14 @@ export function buildPlatformFilters() {
         elShowSelfServe.addEventListener('change', onFiltersChangedHandler);
 
         elShowNonSelfServe.addEventListener('change', event => {
-            const showNonSelfServe = event.target.checked;
-            collapseNonSelfServeFilterSection(!showNonSelfServe);
-            if (showNonSelfServe) {
-                forEachPlatformFilterCheckbox(el => el.checked = true);
-            }
-
+            syncFiltersWithNonSelfServeCheckbox(true);
             onFiltersChangedHandler();
         });
+
+        /* When we return to the page via Back button make sure the non-self-serve filter section is collapsed/expanded
+        as appropriate but don't automatically check all the checkboxes, we want the state to match what it was before
+        the user navigated away */
+        syncFiltersWithNonSelfServeCheckbox(false);
     }
 
     function getSelected(){

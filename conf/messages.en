@@ -323,6 +323,10 @@ exploreApis.filter.byName = Filter by API name
 exploreApis.filter.byStatus = Filter by status
 exploreApis.filter.byStatus.view = View status filters
 exploreApis.filter.byApiType = Filter by API type
+exploreApis.filter.selfServe = Self-serve
+exploreApis.filter.selfServe.info = APIs that you can use and consume now.
+exploreApis.filter.nonSelfServe = Other APIs
+exploreApis.filter.nonSelfServe.info = APIs that cannot be consumed via the Integration Hub and require communication with the owning team.
 
 support.link.text = Get Support
 support.title = Get Support

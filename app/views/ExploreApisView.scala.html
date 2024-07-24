@@ -79,26 +79,28 @@
             <span class="call-out-type information govuk-!-margin-bottom-0">
                 <a class="govuk-link govuk-link--no-visited-state" href="@routes.ApiDetailsController.onPageLoad(apiDetail.id)" data-api-id="@apiDetail.id">@apiDetail.title</a>
             </span>
-            <strong class="hip-tag--api-status" data-status="@apiDetail.apiStatus">
-                @apiDetail.apiStatus
-            </strong>
+            @if(platforms.isSelfServe(apiDetail.platform)){
+                <strong class="hip-tag--platform__self-serve">Self serve</strong>
+            } else {
+                <strong class="hip-tag">@apiDetail.platform.replace("_", " ")</strong>
+            }
         </div>
 
         <p class="govuk-body additional-message">@apiDetail.shortDescription</p>
         <ul class="govuk-list hip-inline-list">
             @(apiDetail.domain.map(_ =>
                 <li>
-                    <strong class="hip-tag--domain">{domains.getDomainDescription(apiDetail).getOrElse("")}</strong>
+                    <strong class="hip-tag">{domains.getDomainDescription(apiDetail).getOrElse("")}</strong>
                 </li>
             ))
             @(apiDetail.subDomain.map(_ =>
                 <li>
-                    <strong class="hip-tag--subdomain">{domains.getSubDomainDescription(apiDetail).getOrElse("")}</strong>
+                    <strong class="hip-tag">{domains.getSubDomainDescription(apiDetail).getOrElse("")}</strong>
                 </li>
             ))
             @for(hod <- apiDetail.hods) {
                 <li>
-                    <strong class="hip-tag--hod">@hods.getDescription(hod)</strong>
+                    <strong class="hip-tag">@hods.getDescription(hod)</strong>
                 </li>
             }
         </ul>
@@ -191,19 +193,19 @@
                         <div class="govuk-checkboxes__item">
                             <input class="govuk-checkboxes__input" id="filterPlatformSelfServe" name="filter-platform" type="checkbox" checked="checked">
                             <label class="govuk-label govuk-checkboxes__label" for="filterPlatformSelfServe">
-                                <strong class="govuk-tag govuk-tag--green">Self serve</strong>
+                                <strong class="govuk-tag govuk-tag--green">@messages("exploreApis.filter.selfServe")</strong>
                             </label>
                             <div class="govuk-hint govuk-checkboxes__hint">
-                                APIs that you can use and consume now.
+                                @messages("exploreApis.filter.selfServe.info")
                             </div>
                         </div>
                         <div class="govuk-checkboxes__item">
                             <input class="govuk-checkboxes__input" id="filterPlatformNonSelfServe" name="filter-platform" type="checkbox">
                             <label class="govuk-label govuk-checkboxes__label" for="filterPlatformNonSelfServe">
-                                <strong class="govuk-tag govuk-tag--grey">Other APIs</strong>
+                                <strong class="govuk-tag govuk-tag--grey">@messages("exploreApis.filter.nonSelfServe")</strong>
                             </label>
                             <div class="govuk-hint govuk-checkboxes__hint">
-                                APIs that cannot be consumed via the Integration Hub and require communication with the owning team.
+                                @messages("exploreApis.filter.nonSelfServe.info")
                             </div>
                         </div>
                     </div>
@@ -269,7 +271,7 @@
                 </fieldset>
             </div>
         </div>
-        <div class="govuk-grid-column-two-thirds api-results-container">
+        <div id="apiResultsContainer" class="govuk-grid-column-two-thirds govuk-!-display-none">
             <h3 class="govuk-!-margin-0 govuk-label govuk-label--s">@messages("exploreApis.searchResults.heading") (<span id="searchResultsSize">@apiDetails.size</span>)</h3>
             <div class="govuk-body" id="apiList">
                 @apis(apiDetails)
