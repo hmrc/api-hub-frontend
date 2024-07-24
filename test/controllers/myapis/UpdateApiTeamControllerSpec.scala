@@ -114,7 +114,7 @@ class UpdateApiTeamControllerSpec
         val fixture = buildFixture(user)
         when(fixture.apiAuthActionProvider.apply(any)(any)).thenReturn(successfulApiAuthAction(FakeApiDetail))
         when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(allTeams))
-        when(fixture.apiHubService.updateApiTeam(any, any)(any)).thenReturn(Future.successful(FakeApiDetail))
+        when(fixture.apiHubService.updateApiTeam(any, any)(any)).thenReturn(Future.successful(Right(())))
 
         running(fixture.playApplication) {
           val request = FakeRequest(controllers.myapis.routes.UpdateApiTeamController.onSubmit(FakeApiDetail.id))
@@ -136,7 +136,7 @@ class UpdateApiTeamControllerSpec
         val fixture = buildFixture(user)
         when(fixture.apiAuthActionProvider.apply(any)(any)).thenReturn(successfulApiAuthAction(FakeApiDetail))
         when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(allTeams))
-        when(fixture.apiHubService.updateApiTeam(any, any)(any)).thenReturn(Future.successful(FakeApiDetail))
+        when(fixture.apiHubService.updateApiTeam(any, any)(any)).thenReturn(Future.successful(Right(())))
 
         running(fixture.playApplication) {
           val request = FakeRequest(controllers.myapis.routes.UpdateApiTeamController.onSubmit(FakeApiDetail.id))

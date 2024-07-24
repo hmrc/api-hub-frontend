@@ -161,7 +161,7 @@ class ApiHubService @Inject()(
     applicationsConnector.getUserContactDetails()
   }
 
-  def updateApiTeam(apiId: String, teamId: String)(implicit hc: HeaderCarrier): Future[ApiDetail] = {
+  def updateApiTeam(apiId: String, teamId: String)(implicit hc: HeaderCarrier): Future[Either[ApplicationsException,Unit]]  = {
     applicationsConnector.updateApiTeam(apiId, teamId)
   }
 

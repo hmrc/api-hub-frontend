@@ -1306,11 +1306,26 @@ class ApplicationsConnectorSpec
 
       buildConnector(this).updateApiTeam(apiDetails.id, teamId)(HeaderCarrier()) map {
         actual =>
-          actual mustBe apiDetails
+          actual mustBe Right(())
       }
     }
 
-    "must fail with an exception when integration catalogue returns a failure response" in {
+    "must handle 404 response from Applications" in {
+      stubFor(
+        put(urlEqualTo(s"/api-hub-applications/apis/${apiDetails.id}/teams/$teamId"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+          )
+      )
+
+      buildConnector(this).updateApiTeam(apiDetails.id, teamId)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe Right(())
+      }
+    }
+
+    "must fail with an exception when applications returns a failure response" in {
       stubFor(
         put(urlEqualTo(s"/api-hub-applications/apis/${apiDetails.id}/teams/$teamId"))
           .willReturn(

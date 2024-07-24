@@ -637,12 +637,12 @@ class ApiHubServiceSpec
       val teamId = "test-team-id"
       val apiId = "test-api-id"
 
-      when(fixture.applicationsConnector.updateApiTeam(eqTo(apiId), eqTo(teamId))(any())).thenReturn(Future.successful(FakeApiDetail))
+      when(fixture.applicationsConnector.updateApiTeam(eqTo(apiId), eqTo(teamId))(any())).thenReturn(Future.successful(Right(())))
 
       fixture.service.updateApiTeam(apiId, teamId)(HeaderCarrier()).map {
         result =>
           verify(fixture.applicationsConnector).updateApiTeam(eqTo(apiId), eqTo(teamId))(any())
-          result mustBe FakeApiDetail
+          result mustBe Right(())
       }
     }
   }
