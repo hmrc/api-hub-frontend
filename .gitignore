@@ -34,3 +34,4 @@ bin
 *.iws
 /.bsp/
 /node_modules
+/jsTest/local

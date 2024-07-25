@@ -103,6 +103,7 @@ describe('exploreApis', () => {
                 data-subdomain="${panel.subdomain || ''}" 
                 data-index="${i}" 
                 data-hods="${panel.hods || ''}" 
+                data-platform="${panel.platform || ''}" 
                 data-apiname="${panel.name}"></div>`;
         }).join('');
     }
@@ -162,9 +163,11 @@ describe('exploreApis', () => {
         onPageShow();
 
         clickNonSelfServePlatformFilter();
-        clickNonSelfServePlatformFilter('sdes');
 
-        fail() //TODO
+        expect(new Set(paginationHelper.getVisiblePanelData('.api-panel', 'platform').map(({platform}) => platform))).toEqual(new Set(['sdes', 'digi']));
+
+        clickNonSelfServePlatformFilter('sdes');
+        expect(new Set(paginationHelper.getVisiblePanelData('.api-panel', 'platform').map(({platform}) => platform))).toEqual(new Set(['digi']));
     });
 
     it("when page initially displayed then only panels with selected statuses are visible",  () => {
