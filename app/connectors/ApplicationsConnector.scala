@@ -441,14 +441,14 @@ class ApplicationsConnector @Inject()(
       .execute[Seq[UserContactDetails]]
   }
 
-  def updateApiTeam(apiId: String, teamId: String)(implicit hc: HeaderCarrier): Future[Either[ApplicationsException, Unit]] = {
+  def updateApiTeam(apiId: String, teamId: String)(implicit hc: HeaderCarrier): Future[Either[ApplicationsException, Option[Unit]]] = {
     httpClient.put(url"$applicationsBaseUrl/api-hub-applications/apis/$apiId/teams/$teamId")
       .setHeader((ACCEPT, JSON))
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Either[UpstreamErrorResponse, ApiDetail]]
       .flatMap {
-        case Right(_) => Future.successful(Right())
-        case Left(e) if e.statusCode == NOT_FOUND => Future.successful(Right())
+        case Right(_) => Future.successful(Right(Some(())))
+        case Left(e) if e.statusCode == NOT_FOUND => Future.successful(Right(None))
         case Left(e) => Future.failed(e)
       }
   }

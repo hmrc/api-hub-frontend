@@ -18,11 +18,12 @@ package controllers.myapis
 
 import com.google.inject.{Inject, Singleton}
 import controllers.actions.{ApiAuthActionProvider, IdentifierAction}
+import controllers.helpers.ErrorResultBuilder
 import forms.myapis.UpdateApiTeamFormProvider
 import models.requests.ApiRequest
 import play.api.data.Form
-import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.i18n.{I18nSupport, Messages}
+import play.api.mvc._
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.myapis.{UpdateApiTeamSuccessView, UpdateApiTeamView}
@@ -37,8 +38,10 @@ class UpdateApiTeamController @Inject()(
   formProvider: UpdateApiTeamFormProvider,
   apiHubService: ApiHubService,
   view: UpdateApiTeamView,
-  successView: UpdateApiTeamSuccessView
-)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+  successView: UpdateApiTeamSuccessView,
+  errorResultBuilder: ErrorResultBuilder
+  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+
   private val form = formProvider()
 
   def onPageLoad(apiId: String): Action[AnyContent] = (identify andThen apiAuth(apiId)) async {
@@ -55,12 +58,21 @@ class UpdateApiTeamController @Inject()(
   def onSubmit(apiId: String): Action[AnyContent] = (identify andThen apiAuth(apiId)).async {
     implicit request =>
       form.bindFromRequest().fold(
-        formWithErrors => showView(BAD_REQUEST, formWithErrors),
+        formWithErrors => {
+          showView(BAD_REQUEST, formWithErrors)
+        },
         teamId =>
-          apiHubService.updateApiTeam(apiId, teamId).map { _ =>
-            Ok(successView(request.apiDetails, request.identifierRequest.user))
+          apiHubService.updateApiTeam(apiId, teamId) map   {
+            case Right(Some(())) => Ok(successView(request.apiDetails, request.identifierRequest.user))
+            case Right(None) => somethingNotFound
           }
       )
   }
 
+  private def somethingNotFound()(implicit request: Request[_]): Result = {
+    errorResultBuilder.notFound(
+      heading = Messages("myApis.update.team.something.not.found.heading"),
+      message = Messages("myApis.update.team.something.not.found.message")
+    )
+  }
 }
