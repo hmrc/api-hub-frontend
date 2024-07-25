@@ -72,7 +72,6 @@ export function buildPlatformFilters() {
         }
         if (showNonSelfServe) {
             const checkedValues = getPlatformFilterCheckboxes().filter(el => el.checked).map(el => el.value);
-
             if (checkedValues.length === 0) {
                 // If all checkboxes in the list are unchecked, then we should assume that the user wants to see all non-self-serve platforms
                 selections.push(...nonSelfServePlatformsInUseByApis);
