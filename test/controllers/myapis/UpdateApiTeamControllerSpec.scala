@@ -154,7 +154,7 @@ class UpdateApiTeamControllerSpec
       }
     }
 
-    "must return a Not Found page when the api does not exist" in {
+    "must return a Not Found page when the api or team does not exist" in {
       forAll(usersWhoCanSupport) { user =>
         val fixture = buildFixture(user)
 
