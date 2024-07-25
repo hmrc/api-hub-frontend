@@ -16,9 +16,9 @@
 
 package base
 
-import config.{Domains, Hods}
+import config.{Domains, Hods, Platforms}
 import controllers.actions._
-import fakes.{FakeDomains, FakeHods}
+import fakes.{FakeDomains, FakeHods, FakePlatforms}
 import models.UserAnswers
 import models.user.UserModel
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -58,7 +58,8 @@ trait SpecBase
         bind[AddAnApiDataRetrievalAction].toInstance(new FakeAddAnApiDataRetrievalAction(userAnswers)),
         bind[CreateTeamDataRetrievalAction].toInstance(new FakeCreateTeamDataRetrievalAction(userAnswers)),
         bind[Domains].toInstance(FakeDomains),
-        bind[Hods].toInstance(FakeHods)
+        bind[Hods].toInstance(FakeHods),
+        bind[Platforms].toInstance(FakePlatforms)
   )
 
 }

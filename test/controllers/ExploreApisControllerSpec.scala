@@ -18,7 +18,7 @@ package controllers
 
 import base.OptionallyAuthenticatedSpecBase
 import controllers.actions.FakeUser
-import fakes.{FakeDomains, FakeHods}
+import fakes.{FakeDomains, FakeHods, FakePlatforms}
 import generators.ApiDetailGenerators
 import models.api.{ApiDetail, Live, Maintainer}
 import models.user.UserModel
@@ -60,7 +60,7 @@ class ExploreApisControllerSpec
           val result = route(fixture.application, request).value
 
           status(result) mustBe OK
-          contentAsString(result) mustBe view(None, Seq(apiDetail), FakeDomains, FakeHods)(request, messages(fixture.application)).toString()
+          contentAsString(result) mustBe view(None, Seq(apiDetail), FakeDomains, FakeHods, FakePlatforms)(request, messages(fixture.application)).toString()
           contentAsString(result) must validateAsHtml
         }
       }
@@ -80,7 +80,7 @@ class ExploreApisControllerSpec
           val result = route(fixture.application, request).value
 
           status(result) mustBe OK
-          contentAsString(result) mustBe view(Some(FakeUser), Seq(apiDetail), FakeDomains, FakeHods)(request, messages(fixture.application)).toString()
+          contentAsString(result) mustBe view(Some(FakeUser), Seq(apiDetail), FakeDomains, FakeHods, FakePlatforms)(request, messages(fixture.application)).toString()
           contentAsString(result) must validateAsHtml
         }
       }
@@ -106,7 +106,7 @@ class ExploreApisControllerSpec
         val result = route(fixture.application, request).value
 
         status(result) mustBe OK
-        contentAsString(result) mustBe view(None, Seq(aardvarks, molluscs, pigeons, zebras), FakeDomains, FakeHods)(request, messages(fixture.application)).toString()
+        contentAsString(result) mustBe view(None, Seq(aardvarks, molluscs, pigeons, zebras), FakeDomains, FakeHods, FakePlatforms)(request, messages(fixture.application)).toString()
         contentAsString(result) must validateAsHtml
       }
     }
