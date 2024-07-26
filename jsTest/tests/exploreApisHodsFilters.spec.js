@@ -1,7 +1,7 @@
 import {JSDOM} from 'jsdom';
-import {buildHodsFilters} from "../../app/assets/javascripts/hipApisHodsFilters.js";
+import {buildHodsFilters} from "../../app/assets/javascripts/exploreApisHodsFilters.js";
 
-describe('hipApisHodsFilters', () => {
+describe('exploreApisHodsFilters', () => {
     let document, hodsFilters, apis;
 
     beforeEach(() => {

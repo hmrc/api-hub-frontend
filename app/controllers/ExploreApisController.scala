@@ -17,31 +17,32 @@
 package controllers
 
 import com.google.inject.{Inject, Singleton}
-import config.{Domains, Hods}
+import config.{Domains, Hods, Platforms}
 import controllers.actions.OptionalIdentifierAction
 import models.api.ApiDetail
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.HipApisView
+import views.html.ExploreApisView
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class HipApisController @Inject()(
+class ExploreApisController @Inject()(
   override val controllerComponents: MessagesControllerComponents,
   apiHubService: ApiHubService,
-  view: HipApisView,
+  view: ExploreApisView,
   optionallyIdentified: OptionalIdentifierAction,
   domains: Domains,
-  hods: Hods
+  hods: Hods,
+  platforms: Platforms
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = optionallyIdentified.async {
     implicit request =>
-      apiHubService.getAllHipApis().map {
-        case apiDetails: Seq[ApiDetail] => Ok(view(request.user, apiDetails.sortWith( _.title.toUpperCase < _.title.toUpperCase), domains, hods))
+      apiHubService.getApis().map {
+        case apiDetails: Seq[ApiDetail] => Ok(view(request.user, apiDetails.sortWith( _.title.toUpperCase < _.title.toUpperCase), domains, hods, platforms))
         case _ => InternalServerError
       }
   }

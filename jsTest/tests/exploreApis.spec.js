@@ -1,8 +1,8 @@
 import {JSDOM} from 'jsdom';
-import {onPageShow} from '../../app/assets/javascripts/hipApis.js';
+import {onPageShow} from '../../app/assets/javascripts/exploreApis.js';
 import {paginationHelper, paginationContainerHtml, isVisible} from "./testUtils.js";
 
-describe('hipApis', () => {
+describe('exploreApis', () => {
     let document;
 
     beforeEach(() => {
@@ -40,9 +40,15 @@ describe('hipApis', () => {
                 <div><input class="hodFilter" type="checkbox" value="internal"></div>
                 <div><input class="hodFilter" type="checkbox" value="apim"></div>
             </div>            
-            <div id="apiList"></div>
-            <div id="searchResultsSize"></div>
-            <div id="noResultsPanel"></div>
+            <div>
+                <div><input class="platformFilter" type="checkbox" value="sdes"></div>
+                <div><input class="platformFilter" type="checkbox" value="digi"></div>
+            </div>
+            <div id="apiResultsContainer" class="govuk-!-display-none">
+                <div id="apiList"></div>
+                <div id="searchResultsSize"></div>
+                <div id="noResultsPanel"></div>
+            </div>
             <div id="resetFilters"></div>
             <div id="noResultsClearFilters"></div>
             <div id="domainFilterCount"></div>
@@ -51,6 +57,9 @@ describe('hipApis', () => {
             <details id="viewHodFilters"><summary></summary></details>
             <div id="statusFilterCount"></div>
             <details id="viewStatusFilters"><summary></summary></details>
+            <input id="filterPlatformSelfServe" type="checkbox">
+            <input id="filterPlatformNonSelfServe" type="checkbox">
+            <details id="viewPlatformFilters"><summary></summary></details>
             ${paginationContainerHtml}
         `));
         document = dom.window.document;
@@ -72,14 +81,16 @@ describe('hipApis', () => {
                 ['', ''],
             ],
             hodsValues = ['', 'ems', 'internal,ems,invalid', 'apim', 'invalid'],
+            platformValues = ['hip', 'sdes', 'digi'],
             names = [...Array(count)].map((_, i) => `api number ${i + 1}`);
         let i= 0;
         while (i < count) {
             const apistatus = statuses[i % statuses.length],
                 [domain, subdomain] = domainValues[i % domainValues.length],
                 hods = hodsValues[i % hodsValues.length],
-                name = names[i];
-            panels.push({apistatus, domain, subdomain, hods, name})
+                name = names[i],
+                platform = platformValues[i % platformValues.length];
+            panels.push({apistatus, domain, subdomain, hods, name, platform})
             i++;
         }
         buildApiPanels(...panels);
@@ -92,6 +103,7 @@ describe('hipApis', () => {
                 data-subdomain="${panel.subdomain || ''}" 
                 data-index="${i}" 
                 data-hods="${panel.hods || ''}" 
+                data-platform="${panel.platform || ''}" 
                 data-apiname="${panel.name}"></div>`;
         }).join('');
     }
@@ -138,7 +150,26 @@ describe('hipApis', () => {
     function getNameFilterText() {
         return document.getElementById('nameFilter').value;
     }
-    
+    function clickNonSelfServePlatformFilter(value) {
+        if (value) {
+            document.querySelector(`input[value="${value}"].platformFilter`).click();
+        } else {
+            document.querySelector('#filterPlatformNonSelfServe').click();
+        }
+    }
+
+    it("when platform filter is applied then correct panels are shown",  () => {
+        buildApiPanelsByCount(100);
+        onPageShow();
+
+        clickNonSelfServePlatformFilter();
+
+        expect(new Set(paginationHelper.getVisiblePanelData('.api-panel', 'platform').map(({platform}) => platform))).toEqual(new Set(['sdes', 'digi']));
+
+        clickNonSelfServePlatformFilter('sdes');
+        expect(new Set(paginationHelper.getVisiblePanelData('.api-panel', 'platform').map(({platform}) => platform))).toEqual(new Set(['digi']));
+    });
+
     it("when page initially displayed then only panels with selected statuses are visible",  () => {
         buildApiPanels({apistatus: 'ALPHA'}, {apistatus: 'BETA'}, {apistatus: 'LIVE'}, {apistatus: 'DEPRECATED'});
 
@@ -146,6 +177,15 @@ describe('hipApis', () => {
 
         expect(paginationHelper.getVisiblePanelData('.api-panel', 'apistatus')).toEqual([{apistatus: 'ALPHA', index: 0}, {apistatus: 'BETA', index: 1}, {apistatus: 'LIVE', index: 2}]);
         expect(getResultCount()).toBe(3);
+    });
+
+    it("api results are visible after onPageShow runs",  () => {
+        const elApiResultsContainer = document.getElementById('apiResultsContainer');
+        expect(isVisible(elApiResultsContainer)).toBe(false);
+
+        onPageShow();
+
+        expect(isVisible(elApiResultsContainer)).toBe(true);
     });
 
     it("when status is deselected then panels with that status are hidden",  () => {

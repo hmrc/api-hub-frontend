@@ -17,7 +17,7 @@
 package controllers
 
 import com.google.inject.{Inject, Singleton}
-import config.{Domains, FrontendAppConfig, Hods}
+import config.{Domains, FrontendAppConfig, Hods, Platforms}
 import controllers.actions.OptionalIdentifierAction
 import controllers.helpers.ErrorResultBuilder
 import models.api.{ApiDetail, Maintainer}
@@ -40,6 +40,7 @@ class ApiDetailsController @Inject()(
   optionallyIdentified: OptionalIdentifierAction,
   domains: Domains,
   hods: Hods,
+  platforms: Platforms,
   frontendAppConfig: FrontendAppConfig
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
@@ -72,6 +73,7 @@ class ApiDetailsController @Inject()(
             domains.getDomainDescription(apiDetail),
             domains.getSubDomainDescription(apiDetail),
             apiDetail.hods.map(hods.getDescription(_)),
+            platforms.getDescription(apiDetail.platform),
             maybeTeamName,
             apiDeploymentStatuses,
           )
@@ -89,6 +91,7 @@ class ApiDetailsController @Inject()(
           domains.getDomainDescription(apiDetail),
           domains.getSubDomainDescription(apiDetail),
           apiDetail.hods.map(hods.getDescription(_)),
+          platforms.getDescription(apiDetail.platform),
           getContactEmailAddress(apiDetail.maintainer)
         )
       )))

@@ -19,7 +19,7 @@ package controllers
 import base.OptionallyAuthenticatedSpecBase
 import config.FrontendAppConfig
 import controllers.actions.FakeUser
-import fakes.{FakeDomains, FakeHods}
+import fakes.{FakeDomains, FakeHods, FakePlatforms}
 import generators.ApiDetailGenerators
 import models.api.{ApiDeploymentStatuses, ApiDetail, ContactInformation}
 import models.team.Team
@@ -69,7 +69,8 @@ class ApiDetailsControllerSpec
           val domain = FakeDomains.getDomainDescription(apiDetail)
           val subDomain = FakeDomains.getSubDomainDescription(apiDetail)
           val hods = apiDetail.hods.map(FakeHods.getDescription(_))
-          val apiView = SelfServeApiViewModel(domain, subDomain, hods, None, apiDeploymentStatuses)
+          val platform = FakePlatforms.getDescription(apiDetail.platform)
+          val apiView = SelfServeApiViewModel(domain, subDomain, hods, platform, None, apiDeploymentStatuses)
 
           status(result) mustBe OK
           contentAsString(result) mustBe view(apiDetail, None, apiView)(request, messages(fixture.application)).toString()
@@ -100,7 +101,8 @@ class ApiDetailsControllerSpec
           val domain = FakeDomains.getDomainDescription(apiDetail)
           val subDomain = FakeDomains.getSubDomainDescription(apiDetail)
           val hods = apiDetail.hods.map(FakeHods.getDescription(_))
-          val apiView = NonSelfServeApiViewModel(domain, subDomain, hods, HubSupportContactEmail(config.supportEmailAddress))
+          val platform = FakePlatforms.getDescription(apiDetail.platform)
+          val apiView = NonSelfServeApiViewModel(domain, subDomain, hods, platform, HubSupportContactEmail(config.supportEmailAddress))
 
           status(result) mustBe OK
           contentAsString(result) mustBe view(apiDetail, None, apiView)(request, messages(fixture.application)).toString()
@@ -132,7 +134,8 @@ class ApiDetailsControllerSpec
           val domain = FakeDomains.getDomainDescription(apiDetail)
           val subDomain = FakeDomains.getSubDomainDescription(apiDetail)
           val hods = apiDetail.hods.map(FakeHods.getDescription(_))
-          val apiView = NonSelfServeApiViewModel(domain, subDomain, hods, ApiTeamContactEmail(apiTeamEmail))
+          val platform = FakePlatforms.getDescription(apiDetail.platform)
+          val apiView = NonSelfServeApiViewModel(domain, subDomain, hods, platform, ApiTeamContactEmail(apiTeamEmail))
 
           status(result) mustBe OK
           contentAsString(result) mustBe view(apiDetail, None, apiView)(request, messages(fixture.application)).toString()
@@ -158,7 +161,8 @@ class ApiDetailsControllerSpec
           val domain = FakeDomains.getDomainDescription(apiDetail)
           val subDomain = FakeDomains.getSubDomainDescription(apiDetail)
           val hods = apiDetail.hods.map(FakeHods.getDescription(_))
-          val apiView = NonSelfServeApiViewModel(domain, subDomain, hods, HubSupportContactEmail(config.supportEmailAddress))
+          val platform = FakePlatforms.getDescription(apiDetail.platform)
+          val apiView = NonSelfServeApiViewModel(domain, subDomain, hods, platform, HubSupportContactEmail(config.supportEmailAddress))
 
           status(result) mustBe OK
           contentAsString(result) mustBe view(apiDetail, Some(FakeUser), apiView)(request, messages(fixture.application)).toString()
@@ -241,7 +245,8 @@ class ApiDetailsControllerSpec
         val domain = FakeDomains.getDomainDescription(apiDetail)
         val subDomain = FakeDomains.getSubDomainDescription(apiDetail)
         val hods = apiDetail.hods.map(FakeHods.getDescription(_))
-        val apiView = SelfServeApiViewModel(domain, subDomain, hods, Some(team.name), apiDeploymentStatuses)
+        val platform = FakePlatforms.getDescription(apiDetail.platform)
+        val apiView = SelfServeApiViewModel(domain, subDomain, hods, platform, Some(team.name), apiDeploymentStatuses)
 
         status(result) mustBe OK
         contentAsString(result) mustBe view(apiDetail, None, apiView)(request, messages(fixture.application)).toString()
@@ -272,7 +277,8 @@ class ApiDetailsControllerSpec
         val domain = FakeDomains.getDomainDescription(apiDetail)
         val subDomain = FakeDomains.getSubDomainDescription(apiDetail)
         val hods = apiDetail.hods.map(FakeHods.getDescription(_))
-        val apiView = SelfServeApiViewModel(domain, subDomain, hods, Some("Team details could not be retrieved"), apiDeploymentStatuses)
+        val platform = FakePlatforms.getDescription(apiDetail.platform)
+        val apiView = SelfServeApiViewModel(domain, subDomain, hods, platform, Some("Team details could not be retrieved"), apiDeploymentStatuses)
 
         status(result) mustBe OK
         contentAsString(result) mustBe view(apiDetail, None, apiView)(request, messages(fixture.application)).toString()

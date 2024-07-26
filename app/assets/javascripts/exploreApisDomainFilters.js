@@ -1,4 +1,4 @@
-import {noop} from "./utils.js";
+import {noop, removeElement} from "./utils.js";
 
 export function buildDomainFilters() {
     const domainFilterEls = [],
@@ -10,10 +10,6 @@ export function buildDomainFilters() {
 
     function toggleSubdomainCheckboxes(domain, visible) {
         document.querySelector(`.subdomainCheckboxes[data-domain="${domain}"]`).style.display = visible ? 'block' : 'none';
-    }
-
-    function removeElement(el) {
-        el.parentElement.removeChild(el);
     }
 
     function updateDomainFilterCount() {

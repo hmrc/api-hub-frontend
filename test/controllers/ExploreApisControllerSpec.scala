@@ -18,7 +18,7 @@ package controllers
 
 import base.OptionallyAuthenticatedSpecBase
 import controllers.actions.FakeUser
-import fakes.{FakeDomains, FakeHods}
+import fakes.{FakeDomains, FakeHods, FakePlatforms}
 import generators.ApiDetailGenerators
 import models.api.{ApiDetail, Live, Maintainer}
 import models.user.UserModel
@@ -32,12 +32,12 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.ApiHubService
 import utils.HtmlValidation
-import views.html.HipApisView
+import views.html.ExploreApisView
 
 import java.time.Instant
 import scala.concurrent.Future
 
-class HipApisControllerSpec
+class ExploreApisControllerSpec
   extends OptionallyAuthenticatedSpecBase
     with MockitoSugar
     with ScalaCheckDrivenPropertyChecks
@@ -50,17 +50,17 @@ class HipApisControllerSpec
       val fixture = buildFixture()
 
       running(fixture.application) {
-        val view = fixture.application.injector.instanceOf[HipApisView]
+        val view = fixture.application.injector.instanceOf[ExploreApisView]
 
         forAll { (apiDetail: ApiDetail) =>
-          when(fixture.apiHubService.getAllHipApis()(any()))
+          when(fixture.apiHubService.getApis(any())(any()))
             .thenReturn(Future.successful(Seq(apiDetail)))
 
-          val request = FakeRequest(GET, routes.HipApisController.onPageLoad().url)
+          val request = FakeRequest(GET, routes.ExploreApisController.onPageLoad().url)
           val result = route(fixture.application, request).value
 
           status(result) mustBe OK
-          contentAsString(result) mustBe view(None, Seq(apiDetail), FakeDomains, FakeHods)(request, messages(fixture.application)).toString()
+          contentAsString(result) mustBe view(None, Seq(apiDetail), FakeDomains, FakeHods, FakePlatforms)(request, messages(fixture.application)).toString()
           contentAsString(result) must validateAsHtml
         }
       }
@@ -70,17 +70,17 @@ class HipApisControllerSpec
       val fixture = buildFixture(userModel = Some(FakeUser))
 
       running(fixture.application) {
-        val view = fixture.application.injector.instanceOf[HipApisView]
+        val view = fixture.application.injector.instanceOf[ExploreApisView]
 
         forAll { (apiDetail: ApiDetail) =>
-          when(fixture.apiHubService.getAllHipApis()(any()))
+          when(fixture.apiHubService.getApis(any())(any()))
             .thenReturn(Future.successful(Seq(apiDetail)))
 
-          val request = FakeRequest(GET, routes.HipApisController.onPageLoad().url)
+          val request = FakeRequest(GET, routes.ExploreApisController.onPageLoad().url)
           val result = route(fixture.application, request).value
 
           status(result) mustBe OK
-          contentAsString(result) mustBe view(Some(FakeUser), Seq(apiDetail), FakeDomains, FakeHods)(request, messages(fixture.application)).toString()
+          contentAsString(result) mustBe view(Some(FakeUser), Seq(apiDetail), FakeDomains, FakeHods, FakePlatforms)(request, messages(fixture.application)).toString()
           contentAsString(result) must validateAsHtml
         }
       }
@@ -90,7 +90,7 @@ class HipApisControllerSpec
       val fixture = buildFixture()
 
       running(fixture.application) {
-        val view = fixture.application.injector.instanceOf[HipApisView]
+        val view = fixture.application.injector.instanceOf[ExploreApisView]
 
         val platform = "HIP"
         val maintainer = Maintainer("name", "#slack", List.empty)
@@ -99,14 +99,14 @@ class HipApisControllerSpec
         val aardvarks = ApiDetail("id3", "ref3", "aardvarks", "aardvarks api", "1.0.0", Seq.empty, None, "oas", Live, reviewedDate = Instant.now(), platform = platform, maintainer = maintainer)
         val pigeons = ApiDetail("id4", "ref4", "PIGEONS", "pigeons api", "1.0.0", Seq.empty, None, "oas", Live, reviewedDate = Instant.now(), platform = platform, maintainer = maintainer)
 
-        when(fixture.apiHubService.getAllHipApis()(any()))
+        when(fixture.apiHubService.getApis(any())(any()))
           .thenReturn(Future.successful(Seq(molluscs, zebras, aardvarks, pigeons)))
 
-        val request = FakeRequest(GET, routes.HipApisController.onPageLoad().url)
+        val request = FakeRequest(GET, routes.ExploreApisController.onPageLoad().url)
         val result = route(fixture.application, request).value
 
         status(result) mustBe OK
-        contentAsString(result) mustBe view(None, Seq(aardvarks, molluscs, pigeons, zebras), FakeDomains, FakeHods)(request, messages(fixture.application)).toString()
+        contentAsString(result) mustBe view(None, Seq(aardvarks, molluscs, pigeons, zebras), FakeDomains, FakeHods, FakePlatforms)(request, messages(fixture.application)).toString()
         contentAsString(result) must validateAsHtml
       }
     }

@@ -1,5 +1,5 @@
 import {JSDOM} from 'jsdom';
-import {onDomLoaded} from '../../app/assets/javascripts/adminManageApis.js';
+import {onPageShow} from '../../app/assets/javascripts/adminManageApis.js';
 import {paginationHelper, paginationContainerHtml, arrayFromTo} from "./testUtils.js";
 
 describe('adminManageApis', () => {
@@ -36,7 +36,7 @@ describe('adminManageApis', () => {
     it("if 10 apis are present on the page then all are visible and pagination is not available",  () => {
         buildApiPanels(10);
 
-        onDomLoaded();
+        onPageShow();
 
         expect(paginationHelper.paginationIsAvailable()).toBeFalse();
     });
@@ -44,7 +44,7 @@ describe('adminManageApis', () => {
     it("if 11 apis are present on the page then only the first 10 are visible and pagination is available",  () => {
         buildApiPanels(11);
 
-        onDomLoaded();
+        onPageShow();
 
         expect(paginationHelper.paginationIsAvailable()).toBeTrue();
         expect(paginationHelper.getVisiblePanelIndexes('.hip-api')).toEqual(arrayFromTo(1, 10));
@@ -53,7 +53,7 @@ describe('adminManageApis', () => {
     it("when the user enters some filter text then only the APIs that match the filter are shown",  () => {
         buildApiPanels(100);
 
-        onDomLoaded();
+        onPageShow();
         enterNameFilterText('Api 1');
 
         expect(paginationHelper.getVisiblePanelData('.hip-api', 'apiname').map(o => o.apiname)).toEqual([

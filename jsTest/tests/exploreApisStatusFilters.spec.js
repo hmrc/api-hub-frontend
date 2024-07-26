@@ -1,7 +1,7 @@
 import {JSDOM} from 'jsdom';
-import {buildStatusFilters} from "../../app/assets/javascripts/hipApisStatusFilters.js";
+import {buildStatusFilters} from "../../app/assets/javascripts/exploreApisStatusFilters.js";
 
-describe('hipApisStatusFilters', () => {
+describe('exploreApisStatusFilters', () => {
     let document, statusFilters;
 
     beforeEach(() => {

@@ -59,8 +59,11 @@ class IntegrationCatalogueConnector @Inject()(
     }
   }
 
-  def getAllHipApis()(implicit hc: HeaderCarrier): Future[Seq[ApiDetail]] = {
-    httpClient.get(url"$integrationCatalogueBaseUrl/integration-catalogue/integrations?platformFilter=hip&integrationType=api")
+  def getApis(platformFilter: Option[String])(implicit hc: HeaderCarrier): Future[Seq[ApiDetail]] = {
+    val getApisUrl = s"$integrationCatalogueBaseUrl/integration-catalogue/integrations?integrationType=api" +
+      platformFilter.fold("")(platform => s"&platformFilter=$platform")
+
+    httpClient.get(url"$getApisUrl")
       .setHeader((ACCEPT, JSON))
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Either[UpstreamErrorResponse, IntegrationResponse]]

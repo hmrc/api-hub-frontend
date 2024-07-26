@@ -1,8 +1,9 @@
 import {buildPaginator} from './paginationController.js';
-import {buildDomainFilters} from "./hipApisDomainFilters.js";
-import {buildStatusFilters} from "./hipApisStatusFilters.js";
-import {buildHodsFilters} from "./hipApisHodsFilters.js";
-import {buildNameFilter} from "./hipApisNameFilter.js";
+import {buildDomainFilters} from "./exploreApisDomainFilters.js";
+import {buildStatusFilters} from "./exploreApisStatusFilters.js";
+import {buildHodsFilters} from "./exploreApisHodsFilters.js";
+import {buildNameFilter} from "./exploreApisNameFilter.js";
+import {buildPlatformFilters} from "./exploreApisPlatformFilters.js";
 import {setVisible, noop} from "./utils.js";
 
 export function onPageShow() {
@@ -10,12 +11,14 @@ export function onPageShow() {
             buildDomainFilters(),
             buildStatusFilters(),
             buildHodsFilters(),
-            buildNameFilter()
+            buildNameFilter(),
+            buildPlatformFilters()
         ];
 
     const view = (() => {
         const apiDetailPanelEls = Array.from(document.querySelectorAll('#apiList .api-panel')),
             elSearchResultsSize = document.getElementById('searchResultsSize'),
+            elApiResultsContainer = document.getElementById('apiResultsContainer'),
             elNoResultsPanel = document.getElementById('noResultsPanel'),
             elResetFiltersLink = document.getElementById('resetFilters'),
             elNoResultsResetFiltersLink = document.getElementById('noResultsClearFilters');
@@ -33,6 +36,10 @@ export function onPageShow() {
         elNoResultsResetFiltersLink.addEventListener('click', clearAllFilters);
 
         return {
+            displayResults() {
+                // Only display results after all filters have been applied
+                setVisible(elApiResultsContainer, true);
+            },
             onFiltersChanged(handler) {
                 onFiltersChangedHandler = handler;
             },
@@ -70,6 +77,7 @@ export function onPageShow() {
                 subdomain: el.dataset['subdomain'],
                 hods: new Set(el.dataset['hods'].split(',').filter(h => h)),
                 apiName: el.dataset['apiname'],
+                platform: el.dataset['platform']
             },
             el,
             hiddenByFilters: false
@@ -99,6 +107,7 @@ export function onPageShow() {
     view.initialiseFilters(model.apis);
 
     applyFilters();
+    view.displayResults();
 }
 
 if (typeof window !== 'undefined') {

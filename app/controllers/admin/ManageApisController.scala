@@ -22,7 +22,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.admin.{ManageApisView, ManageApplicationsView}
+import views.html.admin.ManageApisView
 
 import scala.concurrent.ExecutionContext
 
@@ -37,7 +37,7 @@ class ManageApisController @Inject()(
 
   def onPageLoad(): Action[AnyContent] = (identify andThen isSupport).async {
     implicit request =>
-      apiHubService.getAllHipApis().map(apiDetails => Ok(view(apiDetails, request.user)))
+      apiHubService.getApis().map(apiDetails => Ok(view(apiDetails, request.user)))
   }
 
 }

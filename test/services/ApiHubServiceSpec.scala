@@ -246,16 +246,31 @@ class ApiHubServiceSpec
     }
   }
 
-  "getAllApis" - {
-    "must call the integration catalogue connector and some API details" in {
+  "getApis" - {
+    "must call the integration catalogue connector and return API details if no filter specified" in {
       val expected = Seq(sampleApiDetail())
 
       val fixture = buildFixture()
 
-      when(fixture.integrationCatalogueConnector.getAllHipApis()(any()))
+      when(fixture.integrationCatalogueConnector.getApis(ArgumentMatchers.eq(None))(any()))
         .thenReturn(Future.successful(expected))
 
-      fixture.service.getAllHipApis()(HeaderCarrier()) map {
+      fixture.service.getApis()(HeaderCarrier()) map {
+        actual =>
+          actual mustBe expected
+      }
+    }
+
+    "must call the integration catalogue connector and return API details if a platform filter is specified" in {
+      val expected = Seq(sampleApiDetail())
+
+      val fixture = buildFixture()
+      val platform = "test-platform"
+
+      when(fixture.integrationCatalogueConnector.getApis(ArgumentMatchers.eq(Some(platform)))(any()))
+        .thenReturn(Future.successful(expected))
+
+      fixture.service.getApis(Some(platform))(HeaderCarrier()) map {
         actual =>
           actual mustBe expected
       }

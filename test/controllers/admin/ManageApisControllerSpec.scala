@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.routes
 import generators.ApiDetailGenerators
 import models.user.UserModel
-import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+import org.mockito.{ArgumentMatchers, ArgumentMatchersSugar, MockitoSugar}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -45,7 +45,7 @@ class ManageApisControllerSpec
         val fixture = buildFixture(user)
         val apis = Seq(sampleApiDetail())
 
-        when(fixture.apiHubService.getAllHipApis()(any)).thenReturn(Future.successful(apis))
+        when(fixture.apiHubService.getApis(any)(any)).thenReturn(Future.successful(apis))
 
         running(fixture.playApplication) {
           val request = FakeRequest(controllers.admin.routes.ManageApisController.onPageLoad())
@@ -53,7 +53,7 @@ class ManageApisControllerSpec
 
           status(result) mustBe OK
 
-          verify(fixture.apiHubService).getAllHipApis()(any)
+          verify(fixture.apiHubService).getApis(ArgumentMatchers.eq(None))(any)
 
           val view = fixture.playApplication.injector.instanceOf[ManageApisView]
           contentAsString(result) mustBe view(apis, user)(request, messages(fixture.playApplication)).toString()
