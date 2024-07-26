@@ -63,8 +63,8 @@ class UpdateApiTeamController @Inject()(
         },
         teamId =>
           apiHubService.updateApiTeam(apiId, teamId) map   {
-            case Right(Some(())) => Ok(successView(request.apiDetails, request.identifierRequest.user))
-            case Right(None) => somethingNotFound
+            case Some(()) => Ok(successView(request.apiDetails, request.identifierRequest.user))
+            case None => somethingNotFound
           }
       )
   }

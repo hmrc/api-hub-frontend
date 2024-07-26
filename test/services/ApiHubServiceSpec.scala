@@ -632,17 +632,17 @@ class ApiHubServiceSpec
   }
 
   "updateApiTeam" - {
-    "must make the correct request to the integration catalogue connector and return the response" in {
+    "must make the correct request to the integration catalogue connector and return successfully" in {
       val fixture = buildFixture()
       val teamId = "test-team-id"
       val apiId = "test-api-id"
 
-      when(fixture.applicationsConnector.updateApiTeam(eqTo(apiId), eqTo(teamId))(any())).thenReturn(Future.successful(Right(Some(()))))
+      when(fixture.applicationsConnector.updateApiTeam(eqTo(apiId), eqTo(teamId))(any())).thenReturn(Future.successful(Some(())))
 
       fixture.service.updateApiTeam(apiId, teamId)(HeaderCarrier()).map {
         result =>
           verify(fixture.applicationsConnector).updateApiTeam(eqTo(apiId), eqTo(teamId))(any())
-          result mustBe Right(Some(()))
+          result mustBe Some(())
       }
     }
   }
