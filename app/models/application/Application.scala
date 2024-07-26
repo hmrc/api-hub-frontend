@@ -36,13 +36,23 @@ case class Application (
 
 object Application {
 
+  def apply(id: String, name: String, createdBy: Creator, teamId: Option[String], teamMembers: Seq[TeamMember]): Application = {
+    val now = LocalDateTime.now()
+    Application(id, name, now, createdBy, now, teamId, teamMembers, Environments(), Seq.empty)
+  }
+
   def apply(id: String, name: String, createdBy: Creator, teamMembers: Seq[TeamMember]): Application = {
     val now = LocalDateTime.now()
     Application(id, name, now, createdBy, now, None, teamMembers, Environments(), Seq.empty)
   }
 
+  def apply(id: String, name: String, createdBy: Creator, teamId: String): Application = {
+    val now = LocalDateTime.now()
+    Application(id, name, now, createdBy, now, Some(teamId), Seq.empty, Environments(), Seq.empty)
+  }
+
   def apply(id: String, newApplication: NewApplication): Application = {
-    apply(id, newApplication.name, newApplication.createdBy, newApplication.teamMembers)
+    apply(id, newApplication.name, newApplication.createdBy, newApplication.teamId, newApplication.teamMembers)
   }
 
   def apply(id: String, name: String, createdBy: Creator, environments: Environments): Application = {
