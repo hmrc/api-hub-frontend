@@ -1306,7 +1306,7 @@ class ApplicationsConnectorSpec
 
       buildConnector(this).updateApiTeam(apiDetails.id, teamId)(HeaderCarrier()) map {
         actual =>
-          actual mustBe Right(Some(()))
+          actual mustBe Some(())
       }
     }
 
@@ -1321,7 +1321,7 @@ class ApplicationsConnectorSpec
 
       buildConnector(this).updateApiTeam(apiDetails.id, teamId)(HeaderCarrier()) map {
         actual =>
-          actual mustBe Right(None)
+          actual mustBe None
       }
     }
 
