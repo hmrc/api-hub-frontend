@@ -643,6 +643,8 @@ myApis.update.team.success.title = Team ownership changed successfully
 myApis.update.team.success.mainHeading = Team ownership changed successfully
 myApis.update.team.success.subHeading = What you can do now
 myApis.update.team.success.text = Return to {0}
+myApis.update.team.something.not.found.heading = Unable to update owning team for this API.
+myApis.update.team.something.not.found.message = The API or team cannot be found.
 
 removeApiConfirmation.title = Confirm remove API
 removeApiConfirmation.heading = You are about to remove the following API from this application

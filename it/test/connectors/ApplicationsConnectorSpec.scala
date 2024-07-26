@@ -23,6 +23,7 @@ import connectors.ApplicationsConnectorSpec.ApplicationGetterBehaviours
 import models.UserEmail
 import models.accessrequest._
 import models.api.ApiDeploymentStatuses
+import models.api.ApiDetailLensesSpec.sampleApiDetail
 import models.application._
 import models.application.ApplicationLenses._
 import models.deployment.{DeploymentsRequest, Error, FailuresResponse, InvalidOasResponse, RedeploymentRequest, SuccessfulDeploymentsResponse}
@@ -1287,6 +1288,58 @@ class ApplicationsConnectorSpec
       }
     }
   }
+
+  "updateApiTeam" - {
+    val teamId = "team1"
+    val apiDetails = sampleApiDetail().copy(teamId = Some(teamId))
+
+    "must place the correct request and return an ApiDetail" in {
+      stubFor(
+        put(urlEqualTo(s"/api-hub-applications/apis/${apiDetails.id}/teams/$teamId"))
+          .withHeader("Accept", equalTo("application/json"))
+          .withHeader("Authorization", equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withBody(Json.toJson(apiDetails).toString())
+          )
+      )
+
+      buildConnector(this).updateApiTeam(apiDetails.id, teamId)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe Some(())
+      }
+    }
+
+    "must handle 404 response from Applications" in {
+      stubFor(
+        put(urlEqualTo(s"/api-hub-applications/apis/${apiDetails.id}/teams/$teamId"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+          )
+      )
+
+      buildConnector(this).updateApiTeam(apiDetails.id, teamId)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe None
+      }
+    }
+
+    "must fail with an exception when applications returns a failure response" in {
+      stubFor(
+        put(urlEqualTo(s"/api-hub-applications/apis/${apiDetails.id}/teams/$teamId"))
+          .willReturn(
+            aResponse()
+              .withStatus(INTERNAL_SERVER_ERROR)
+          )
+      )
+
+      recoverToSucceededIf[UpstreamErrorResponse] {
+        buildConnector(this).updateApiTeam(apiDetails.id, teamId)(HeaderCarrier())
+      }
+    }
+  }
+
 }
 
 object ApplicationsConnectorSpec extends HttpClientV2Support {

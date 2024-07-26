@@ -31,6 +31,7 @@ import play.api.test.Helpers._
 import play.api.{Application => PlayApplication}
 import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
+import views.html.ErrorTemplate
 import views.html.myapis.{UpdateApiTeamSuccessView, UpdateApiTeamView}
 
 import java.time.LocalDateTime
@@ -54,7 +55,7 @@ class UpdateApiTeamControllerSpec
 
   "onPageLoad" - {
     "must return 200 Ok and the correct view for a support user" in {
-      forAll(usersWhoCanSupport) {user =>
+      forAll(usersWhoCanSupport) { user =>
         val fixture = buildFixture(user)
         when(fixture.apiAuthActionProvider.apply(any)(any)).thenReturn(successfulApiAuthAction(FakeApiDetail))
         when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(allTeams))
@@ -73,7 +74,7 @@ class UpdateApiTeamControllerSpec
     }
 
     "must return 200 Ok and the correct view for a non-support user who is on the API team" in {
-      forAll(usersWhoCannotSupport) {user =>
+      forAll(usersWhoCannotSupport) { user =>
         val fixture = buildFixture(user)
         when(fixture.apiAuthActionProvider.apply(any)(any)).thenReturn(successfulApiAuthAction(FakeApiDetail))
         when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(allTeams))
@@ -86,13 +87,13 @@ class UpdateApiTeamControllerSpec
           status(result) mustBe OK
           contentAsString(result) mustBe view(form, FakeApiDetail, None, allTeams, user)(request, messages(fixture.playApplication)).toString()
           contentAsString(result) must validateAsHtml
-          contentAsString(result) must not include("Select which team owns this API")
+          contentAsString(result) must not include ("Select which team owns this API")
         }
       }
     }
 
     "must redirect to Unauthorised page for a non-support user not on the api team" in {
-      forAll(usersWhoCannotSupport) {user =>
+      forAll(usersWhoCannotSupport) { user =>
         val fixture = buildFixture(user)
         when(fixture.apiAuthActionProvider.apply(any)(any)).thenReturn(unauthorisedApiAuthAction())
         when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(allTeams))
@@ -114,7 +115,7 @@ class UpdateApiTeamControllerSpec
         val fixture = buildFixture(user)
         when(fixture.apiAuthActionProvider.apply(any)(any)).thenReturn(successfulApiAuthAction(FakeApiDetail))
         when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(allTeams))
-        when(fixture.apiHubService.updateApiTeam(any, any)(any)).thenReturn(Future.successful(FakeApiDetail))
+        when(fixture.apiHubService.updateApiTeam(any, any)(any)).thenReturn(Future.successful(Some(())))
 
         running(fixture.playApplication) {
           val request = FakeRequest(controllers.myapis.routes.UpdateApiTeamController.onSubmit(FakeApiDetail.id))
@@ -136,7 +137,7 @@ class UpdateApiTeamControllerSpec
         val fixture = buildFixture(user)
         when(fixture.apiAuthActionProvider.apply(any)(any)).thenReturn(successfulApiAuthAction(FakeApiDetail))
         when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(allTeams))
-        when(fixture.apiHubService.updateApiTeam(any, any)(any)).thenReturn(Future.successful(FakeApiDetail))
+        when(fixture.apiHubService.updateApiTeam(any, any)(any)).thenReturn(Future.successful(Some(())))
 
         running(fixture.playApplication) {
           val request = FakeRequest(controllers.myapis.routes.UpdateApiTeamController.onSubmit(FakeApiDetail.id))
@@ -152,13 +153,40 @@ class UpdateApiTeamControllerSpec
         }
       }
     }
+
+    "must return a Not Found page when the api or team does not exist" in {
+      forAll(usersWhoCanSupport) { user =>
+        val fixture = buildFixture(user)
+
+        when(fixture.apiAuthActionProvider.apply(any)(any)).thenReturn(successfulApiAuthAction(FakeApiDetail))
+        when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(allTeams))
+        when(fixture.apiHubService.updateApiTeam(any, any)(any)).thenReturn(Future.successful(None))
+
+        running(fixture.playApplication) {
+          val request = FakeRequest(controllers.myapis.routes.UpdateApiTeamController.onSubmit(FakeApiDetail.id))
+            .withFormUrlEncodedBody(("owningTeam", teamId))
+          val result = route(fixture.playApplication, request).value
+          val view = fixture.playApplication.injector.instanceOf[ErrorTemplate]
+
+          status(result) mustBe NOT_FOUND
+          contentAsString(result) mustBe
+            view(
+              "Page not found - 404",
+              "Unable to update owning team for this API.",
+              "The API or team cannot be found."
+            )(request, messages(fixture.playApplication))
+              .toString()
+          contentAsString(result) must validateAsHtml
+        }
+      }
+    }
   }
 
   private case class Fixture(
-    playApplication: PlayApplication,
-    apiHubService: ApiHubService,
-    apiAuthActionProvider: ApiAuthActionProvider,
-  )
+                              playApplication: PlayApplication,
+                              apiHubService: ApiHubService,
+                              apiAuthActionProvider: ApiAuthActionProvider,
+                            )
 
   private def buildFixture(user: UserModel): Fixture = {
     val apiHubService = mock[ApiHubService]

@@ -20,7 +20,7 @@ import com.google.inject.{Inject, Singleton}
 import config.FrontendAppConfig
 import models.UserEmail
 import models.accessrequest.{AccessRequest, AccessRequestDecisionRequest, AccessRequestRequest, AccessRequestStatus}
-import models.api.ApiDeploymentStatuses
+import models.api.{ApiDeploymentStatuses, ApiDetail}
 import models.application._
 import models.deployment._
 import models.exception.{ApplicationCredentialLimitException, ApplicationsException, TeamNameNotUniqueException}
@@ -439,6 +439,18 @@ class ApplicationsConnector @Inject()(
       .setHeader((ACCEPT, JSON))
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Seq[UserContactDetails]]
+  }
+
+  def updateApiTeam(apiId: String, teamId: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    httpClient.put(url"$applicationsBaseUrl/api-hub-applications/apis/$apiId/teams/$teamId")
+      .setHeader((ACCEPT, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Either[UpstreamErrorResponse, ApiDetail]]
+      .flatMap {
+        case Right(_) => Future.successful(Some(()))
+        case Left(e) if e.statusCode == NOT_FOUND => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
   }
 
   private def handleSuccessfulDeploymentsResponse(response: HttpResponse): Future[SuccessfulDeploymentsResponse] = {
