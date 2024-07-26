@@ -154,6 +154,10 @@ object ApplicationLenses {
       }
     }
 
+    def setTeamId(teamId: String): Application = {
+      application.copy(teamId = Some(teamId))
+    }
+
     def hasTeamMember(email: String): Boolean =
       applicationTeamMembers.get(application)
         .exists(teamMember => teamMember.email.equalsIgnoreCase(email))
@@ -170,11 +174,19 @@ object ApplicationLenses {
         applicationTeamMembers.get(application) :+ TeamMember(email)
       )
 
+    def setTeamMembers(teamMembers: Seq[TeamMember]): Application = {
+      applicationTeamMembers.set(application, teamMembers)
+    }
+
     def withSortedTeam(): Application =
       applicationTeamMembers.set(
         application,
         application.teamMembers.sortWith(_.email.toUpperCase() < _.email.toUpperCase())
       )
+
+    def isTeamMigrated: Boolean = {
+      application.teamId.isDefined
+    }
 
     def getRequiredScopeNames: Set[String] = {
       application
