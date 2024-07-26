@@ -445,7 +445,7 @@ class ApplicationsConnector @Inject()(
     httpClient.put(url"$applicationsBaseUrl/api-hub-applications/apis/$apiId/teams/$teamId")
       .setHeader((ACCEPT, JSON))
       .setHeader(AUTHORIZATION -> clientAuthToken)
-      .execute[Either[UpstreamErrorResponse, ApiDetail]]
+      .execute[Either[UpstreamErrorResponse, Unit]]
       .flatMap {
         case Right(_) => Future.successful(Some(()))
         case Left(e) if e.statusCode == NOT_FOUND => Future.successful(None)
