@@ -15,6 +15,8 @@
  *@
 
 @import models.application._
+@import models.team.Team
+@import models.team.TeamLenses._
 @import models.user.UserModel
 @import viewmodels.application.{ApplicationApi, ApplicationSideNavPages, ApplicationNavItems}
 @import views.ViewUtils
@@ -26,9 +28,9 @@
     iconsLink: IconsLink
 )
 
-@(application: Application, maybeApplicationApis: Option[Seq[ApplicationApi]], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+@(application: Application, maybeApplicationApis: Option[Seq[ApplicationApi]], team: Option[Team], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
-@applicationDetail(id: String, titleKey: String, value: String, classes: String) = {
+@applicationDetail(id: String, titleKey: String, value: Html, classes: String) = {
     <div class="govuk-grid-row govuk-!-margin-bottom-2">
         <div class="govuk-grid-column-one-quarter">
             <span class="govuk-body govuk-!-font-weight-bold govuk-!-margin-0">@messages(titleKey):</span>
@@ -57,19 +59,38 @@
     <span class="govuk-!-font-weight-bold">@number</span>
 }
 
+@isTeamAccessible(team: Team) = @{
+    user
+        .map(team.isAccessible(_))
+        .getOrElse(false)
+}
+
+@teamName(team: Team) = {
+    @if(isTeamAccessible(team)) {
+        <a class="govuk-link govuk-link--no-visited-state" href='@controllers.team.routes.ManageTeamController.onPageLoad(team.id).url'>@team.name</a>
+    } else {
+        @team.name
+    }
+}
+
 @layout(pageTitle = titleNoForm(messages("applicationDetails.title")), user = user, fullWidth = true, customScriptsBlock = Some(iconsLink())) {
 
     @views.html.templates.SideNav(application.name, ApplicationNavItems(application, ApplicationSideNavPages.DetailsPage)) {
 
         <h1 class="govuk-heading-l">@messages("applicationDetails.heading")</h1>
 
-        @applicationDetail("applicationName", "applicationDetails.application.application", application.name, "")
-        @applicationDetail("applicationCreated", "applicationDetails.application.created", ViewUtils.formatLocalDateTimeContainingUtc(application.created), "utcDateLong")
-        @applicationDetail("applicationId", "applicationDetails.application.applicationId", application.id, "")
+        @applicationDetail("applicationName", "applicationDetails.application.application", Html(application.name), "")
+        @applicationDetail("applicationCreated", "applicationDetails.application.created", Html(ViewUtils.formatLocalDateTimeContainingUtc(application.created)), "utcDateLong")
+        @applicationDetail("applicationId", "applicationDetails.application.applicationId", Html(application.id), "")
+
+        @for(owningTeam <- team) {
+            @applicationDetail("owningTeam", "applicationDetails.application.owningTeam", teamName(owningTeam), "")
+        }
 
         <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
 
         @if(!application.issues.isEmpty) {
+
             <div class="govuk-grid-row govuk-!-margin-bottom-0">
                 <div class="govuk-grid-column-two-thirds">
                     <h2 class="govuk-heading-m govuk-!-margin-bottom-4 govuk-!-margin-top-2">
@@ -109,8 +130,6 @@
                 <p id="noApisMessage" class="govuk-body">
                     @Html(messages("applicationDetails.apis.noApis", exploreApisLink("applicationDetails.apis.exploreApis")))
                 </p>
-
-                <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-top-5">
             } else {
                 @if(maybeApplicationApis.exists(_.exists(_.hasPendingAccessRequest))) {
                     <div class="call-out-panel call-out-panel__small govuk-!-margin-top-2">
@@ -153,31 +172,34 @@
             <p class="govuk-body">
                 @Html(messages("applicationDetails.apis.manageOrAddMore", applicationApisLink(), exploreApisLink("applicationDetails.apis.addMore")))
             </p>
-            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
             }
         }
 
-        <div class="govuk-grid-row">
-            <div class="govuk-grid-column-one-half">
-                <h2 id="teamMembersHeading" class="govuk-heading-m govuk-!-margin-top-2">
-                    @messages("applicationDetails.teamMembers.heading", application.teamMembers.size)
-                </h2>
-            </div>
-        </div>
+        @if(team.isEmpty) {
+            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
 
-        @govukTable(
-            Table(
-                caption = None,
-                head = Some(Seq(HeadCell(messages("applicationDetails.teamMembers.emailAddress")))),
-                rows = application.teamMembers.map(
-                    teamMember =>
-                        Seq(TableRow(
-                            content = teamMember.email,
-                            attributes = Map("data-team-member-email" -> teamMember.email)
-                        ))
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-one-half">
+                    <h2 id="teamMembersHeading" class="govuk-heading-m govuk-!-margin-top-2">
+                        @messages("applicationDetails.teamMembers.heading", application.teamMembers.size)
+                    </h2>
+                </div>
+            </div>
+
+            @govukTable(
+                Table(
+                    caption = None,
+                    head = Some(Seq(HeadCell(messages("applicationDetails.teamMembers.emailAddress")))),
+                    rows = application.teamMembers.map(
+                        teamMember =>
+                            Seq(TableRow(
+                                content = teamMember.email,
+                                attributes = Map("data-team-member-email" -> teamMember.email)
+                            ))
+                    )
                 )
             )
-        )
+        }
     }
 
 }

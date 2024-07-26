@@ -117,6 +117,7 @@ applicationDetails.heading = Application details
 applicationDetails.application.application = Application
 applicationDetails.application.applicationId = Application ID
 applicationDetails.application.created = Created
+applicationDetails.application.owningTeam = Owning team
 applicationDetails.apis.heading.noApis = Application APIs
 applicationDetails.apis.heading = Application APIs ({0})
 applicationDetails.apis.exploreApis = add APIs

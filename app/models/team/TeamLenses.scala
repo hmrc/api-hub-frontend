@@ -18,6 +18,7 @@ package models.team
 
 import models.Lens
 import models.application.TeamMember
+import models.user.UserModel
 
 object TeamLenses {
 
@@ -55,6 +56,12 @@ object TeamLenses {
     def withSortedTeam(): Team = {
       setTeamMembers(team.teamMembers.sortWith(_.email.toUpperCase() < _.email.toUpperCase()))
     }
+
+    def isAccessible(user: UserModel): Boolean = {
+      user.permissions.canSupport ||
+        user.email.exists(hasTeamMember)
+    }
+
   }
 
 }
