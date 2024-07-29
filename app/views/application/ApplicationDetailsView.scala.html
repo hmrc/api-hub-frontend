@@ -67,7 +67,7 @@
 
 @teamName(team: Team) = {
     @if(isTeamAccessible(team)) {
-        <a class="govuk-link govuk-link--no-visited-state" href='@controllers.team.routes.ManageTeamController.onPageLoad(team.id).url'>@team.name</a>
+        <a class="govuk-link govuk-link--no-visited-state" href='@controllers.team.routes.ManageTeamController.onPageLoad(team.id, Some(application.id)).url'>@team.name</a>
     } else {
         @team.name
     }

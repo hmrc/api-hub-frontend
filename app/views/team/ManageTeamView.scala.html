@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import models.application.Application
 @import models.team.Team
 @import models.user.UserModel
 
@@ -23,7 +24,7 @@
     govukButton: GovukButton
 )
 
-@(team: Team, user: UserModel)(implicit request: Request[_], messages: Messages)
+@(team: Team, application: Option[Application], user: UserModel)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("manageTeam.title", team.name)), user = Some(user)) {
 
@@ -54,12 +55,23 @@
         )
     )
 
-    @govukButton(
-        Button(
-            href = Some(controllers.team.routes.ManageMyTeamsController.onPageLoad().url),
-            content = Text(messages("manageTeam.return")),
-            classes = "govuk-button--secondary govuk-!-margin-top-5"
-        )
-    )
+    @{application match {
+        case Some(application) =>
+            govukButton(
+                Button(
+                    href = Some(controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url),
+                    content = Text(messages("manageTeam.returnToApplication", application.name)),
+                    classes = "govuk-button--secondary govuk-!-margin-top-5"
+                )
+            )
+        case None =>
+            govukButton(
+                Button(
+                    href = Some(controllers.team.routes.ManageMyTeamsController.onPageLoad().url),
+                    content = Text(messages("manageTeam.return")),
+                    classes = "govuk-button--secondary govuk-!-margin-top-5"
+                )
+            )
+    }}
 
 }
