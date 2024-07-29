@@ -97,6 +97,7 @@ trait ApplicationGenerator {
         created,
         createdBy,
         lastUpdated,
+        None,
         teamMembers,
         environments,
         Seq.empty
