@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.application.register
 
 import com.google.inject.Inject
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.checkAnswers.{ApplicationNameSummary, TeamMembersSummary}
+import viewmodels.checkAnswers.application.register.{ApplicationNameSummary, TeamMembersSummary}
 import views.html.CheckYourAnswersView
 
 class CheckYourAnswersController @Inject()(
-                                            override val messagesApi: MessagesApi,
-                                            identify: IdentifierAction,
-                                            getData: DataRetrievalAction,
-                                            requireData: DataRequiredAction,
-                                            val controllerComponents: MessagesControllerComponents,
-                                            view: CheckYourAnswersView
-                                          ) extends FrontendBaseController with I18nSupport {
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val controllerComponents: MessagesControllerComponents,
+  view: CheckYourAnswersView
+) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
@@ -39,7 +39,7 @@ class CheckYourAnswersController @Inject()(
       val applicationDetails = ApplicationNameSummary.summary(request.userAnswers)
       val teamMemberDetails = TeamMembersSummary.summary(request.userAnswers)
 
-      val postCall = routes.RegisterApplicationController.create()
+      val postCall = controllers.application.register.routes.RegisterApplicationController.register()
 
       Ok(view(applicationDetails, teamMemberDetails, postCall, Some(request.user)))
   }

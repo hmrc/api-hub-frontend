@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.application.register
 
 import controllers.actions._
 import forms.ApplicationNameFormProvider
-
-import javax.inject.Inject
 import models.Mode
 import navigation.Navigator
-import pages.ApplicationNamePage
+import pages.application.register.RegisterApplicationApplicationNamePage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -30,30 +28,31 @@ import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.ApplicationNameView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class ApplicationNameController @Inject()(
-                                        override val messagesApi: MessagesApi,
-                                        sessionRepository: SessionRepository,
-                                        navigator: Navigator,
-                                        identify: IdentifierAction,
-                                        getData: DataRetrievalAction,
-                                        requireData: DataRequiredAction,
-                                        formProvider: ApplicationNameFormProvider,
-                                        val controllerComponents: MessagesControllerComponents,
-                                        view: ApplicationNameView
-                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+  override val messagesApi: MessagesApi,
+  sessionRepository: SessionRepository,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: ApplicationNameFormProvider,
+  val controllerComponents: MessagesControllerComponents,
+  view: ApplicationNameView
+)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form: Form[String] = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
-      val preparedForm = request.userAnswers.get(ApplicationNamePage) match {
+      val preparedForm = request.userAnswers.get(RegisterApplicationApplicationNamePage) match {
         case None => form
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode, routes.ApplicationNameController.onSubmit(mode), Some(request.user)))
+      Ok(view(preparedForm, mode, controllers.application.register.routes.ApplicationNameController.onSubmit(mode), Some(request.user)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
@@ -61,13 +60,13 @@ class ApplicationNameController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode, routes.ApplicationNameController.onSubmit(mode), Some(request.user)))),
+          Future.successful(BadRequest(view(formWithErrors, mode, controllers.application.register.routes.ApplicationNameController.onSubmit(mode), Some(request.user)))),
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(ApplicationNamePage, value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(RegisterApplicationApplicationNamePage, value))
             _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(ApplicationNamePage, mode, updatedAnswers))
+          } yield Redirect(navigator.nextPage(RegisterApplicationApplicationNamePage, mode, updatedAnswers))
       )
   }
 }

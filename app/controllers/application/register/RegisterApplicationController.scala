@@ -14,29 +14,25 @@
  * limitations under the License.
  */
 
-package controllers.team
+package controllers.application.register
 
 import com.google.inject.{Inject, Singleton}
-import controllers.actions.{IdentifierAction, TeamAuthActionProvider}
-import models.team.TeamLenses._
-import play.api.i18n.I18nSupport
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.team.ManageTeamView
-
-import scala.concurrent.ExecutionContext
 
 @Singleton
-class ManageTeamController @Inject()(
-  override val controllerComponents: MessagesControllerComponents,
+class RegisterApplicationController @Inject()(
+  override val messagesApi: MessagesApi,
   identify: IdentifierAction,
-  teamAuth: TeamAuthActionProvider,
-  view: ManageTeamView
-)(implicit ex: ExecutionContext) extends FrontendBaseController with I18nSupport {
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val controllerComponents: MessagesControllerComponents
+) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(id: String, applicationId: Option[String]): Action[AnyContent] = (identify andThen teamAuth(id)) {
-    implicit request =>
-      Ok(view(request.team.withSortedTeam(), applicationId, request.identifierRequest.user))
+  def register(): Action[AnyContent] = (identify andThen getData andThen requireData){
+    Ok("All done")
   }
 
 }
