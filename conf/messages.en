@@ -117,6 +117,7 @@ applicationDetails.heading = Application details
 applicationDetails.application.application = Application
 applicationDetails.application.applicationId = Application ID
 applicationDetails.application.created = Created
+applicationDetails.application.owningTeam = Owning team
 applicationDetails.apis.heading.noApis = Application APIs
 applicationDetails.apis.heading = Application APIs ({0})
 applicationDetails.apis.exploreApis = add APIs
@@ -547,6 +548,7 @@ manageTeam.heading = Manage {0}
 manageTeam.teamMembers = Team members ({0})
 manageTeam.teamMembers.emailAddress = Email address
 manageTeam.return = Return to all teams
+manageTeam.returnToApplication = Return to {0}
 manageTeam.addTeamMember = Add team member
 
 createTeam.title = Team created successfully

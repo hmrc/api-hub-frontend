@@ -17,6 +17,7 @@
 package viewmodels.application
 
 import models.application.Application
+import models.application.ApplicationLenses._
 import play.api.i18n.Messages
 import viewmodels.{SideNavItem, SideNavPage}
 
@@ -68,6 +69,10 @@ object ApplicationNavItems {
         link = controllers.application.routes.DeleteApplicationConfirmationController.onPageLoad(application.id),
         isCurrentPage = currentPage == DeleteApplicationPage
       )
+    ).filter(
+      navItem =>
+        !navItem.page.equals(ManageTeamMembersPage) ||
+          !application.isTeamMigrated
     )
   }
 

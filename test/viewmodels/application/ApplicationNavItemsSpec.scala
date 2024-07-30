@@ -18,6 +18,7 @@ package viewmodels.application
 
 import base.SpecBase
 import controllers.actions.FakeApplication
+import models.application.ApplicationLenses._
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages
@@ -95,6 +96,19 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TableDrivenPro
 
             actual mustBe Seq(page)
         }
+      }
+    }
+
+    "must not return the Manage team members item for applications with a global team" in {
+      val playApplication = applicationBuilder(None).build()
+
+      running(playApplication) {
+        implicit val implicitMessages: Messages = messages(playApplication)
+
+        val actual = ApplicationNavItems(FakeApplication.setTeamId("test-team-id"), DetailsPage)
+          .filter(_.page.equals(ManageTeamMembersPage))
+
+        actual mustBe empty
       }
     }
   }

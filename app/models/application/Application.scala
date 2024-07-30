@@ -26,6 +26,7 @@ case class Application (
   created: LocalDateTime,
   createdBy: Creator,
   lastUpdated: LocalDateTime,
+  teamId: Option[String],
   teamMembers: Seq[TeamMember],
   environments: Environments,
   apis: Seq[Api],
@@ -35,18 +36,26 @@ case class Application (
 
 object Application {
 
-  def apply(id: String, name: String, createdBy: Creator, teamMembers: Seq[TeamMember]): Application = {
+  def apply(id: String, name: String, createdBy: Creator, teamId: Option[String], teamMembers: Seq[TeamMember]): Application = {
     val now = LocalDateTime.now()
-    Application(id, name, now, createdBy, now, teamMembers, Environments(), Seq.empty)
+    Application(id, name, now, createdBy, now, teamId, teamMembers, Environments(), Seq.empty)
+  }
+
+  def apply(id: String, name: String, createdBy: Creator, teamId: String): Application = {
+    Application(id, name, createdBy, Some(teamId), Seq.empty)
+  }
+
+  def apply(id: String, name: String, createdBy: Creator, teamMembers: Seq[TeamMember]): Application = {
+    Application(id, name, createdBy, None, teamMembers)
   }
 
   def apply(id: String, newApplication: NewApplication): Application = {
-    apply(id, newApplication.name, newApplication.createdBy, newApplication.teamMembers)
+    apply(id, newApplication.name, newApplication.createdBy, newApplication.teamId, newApplication.teamMembers)
   }
 
   def apply(id: String, name: String, createdBy: Creator, environments: Environments): Application = {
     val now = LocalDateTime.now()
-    Application(id, name, now, createdBy, now, Seq.empty, environments, Seq.empty)
+    Application(id, name, now, createdBy, now, None, Seq.empty, environments, Seq.empty)
   }
 
   implicit val applicationFormat: Format[Application] = Json.format[Application]

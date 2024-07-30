@@ -17,7 +17,7 @@
 package controllers.team
 
 import base.SpecBase
-import controllers.actions.{FakeUser, FakeUserNotTeamMember}
+import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
 import controllers.routes
 import models.application.TeamMember
 import models.team.Team
@@ -55,11 +55,34 @@ class ManageTeamControllerSpec extends SpecBase with MockitoSugar with ArgumentM
             status(result) mustBe OK
 
             val view = fixture.playApplication.injector.instanceOf[ManageTeamView]
-            contentAsString(result) mustBe view(team, user)(request, messages(fixture.playApplication)).toString()
+            contentAsString(result) mustBe view(team, None, user)(request, messages(fixture.playApplication)).toString()
             contentAsString(result) must validateAsHtml
 
             verify(fixture.apiHubService).findTeamById(eqTo(team.id))(any)
           }
+      }
+    }
+
+    "must return OK and the correct view and return to an application when requested" in {
+      val fixture = buildFixture()
+
+      val team = Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email.value)))
+
+      when(fixture.apiHubService.findTeamById(any)(any)).thenReturn(Future.successful(Some(team)))
+      when(fixture.apiHubService.getApplication(any, any)(any)).thenReturn(Future.successful(Some(FakeApplication)))
+
+      running(fixture.playApplication) {
+        val request = FakeRequest(controllers.team.routes.ManageTeamController.onPageLoad(team.id, Some(FakeApplication.id)))
+        val result = route(fixture.playApplication, request).value
+
+        status(result) mustBe OK
+
+        val view = fixture.playApplication.injector.instanceOf[ManageTeamView]
+        contentAsString(result) mustBe view(team, Some(FakeApplication), FakeUser)(request, messages(fixture.playApplication)).toString()
+        contentAsString(result) must validateAsHtml
+
+        verify(fixture.apiHubService).findTeamById(eqTo(team.id))(any)
+        verify(fixture.apiHubService).getApplication(eqTo(FakeApplication.id), eqTo(false))(any)
       }
     }
 
@@ -101,7 +124,7 @@ class ManageTeamControllerSpec extends SpecBase with MockitoSugar with ArgumentM
           )
         )
 
-        contentAsString(result) mustBe view(sortedTeam, user)(request, messages(fixture.playApplication)).toString()
+        contentAsString(result) mustBe view(sortedTeam, None, user)(request, messages(fixture.playApplication)).toString()
       }
     }
 
@@ -123,6 +146,31 @@ class ManageTeamControllerSpec extends SpecBase with MockitoSugar with ArgumentM
             "Page not found - 404",
             "Team not found",
             s"Cannot find a team with Id $teamId."
+          )(request, messages(fixture.playApplication))
+            .toString()
+        contentAsString(result) must validateAsHtml
+      }
+    }
+
+    "must return 404 Not Found when the application does not exist" in {
+      val fixture = buildFixture()
+
+      val team = Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email.value)))
+
+      when(fixture.apiHubService.findTeamById(any)(any)).thenReturn(Future.successful(Some(team)))
+      when(fixture.apiHubService.getApplication(any, any)(any)).thenReturn(Future.successful(None))
+
+      running(fixture.playApplication) {
+        val request = FakeRequest(controllers.team.routes.ManageTeamController.onPageLoad(team.id, Some(FakeApplication.id)))
+        val result = route(fixture.playApplication, request).value
+        val view = fixture.playApplication.injector.instanceOf[ErrorTemplate]
+
+        status(result) mustBe NOT_FOUND
+        contentAsString(result) mustBe
+          view(
+            "Page not found - 404",
+            "Application not found",
+            s"Cannot find an application with Id ${FakeApplication.id}."
           )(request, messages(fixture.playApplication))
             .toString()
         contentAsString(result) must validateAsHtml
