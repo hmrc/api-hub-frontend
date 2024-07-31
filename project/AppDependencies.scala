@@ -15,7 +15,8 @@ object AppDependencies {
     "uk.gov.hmrc"       %% "internal-auth-client-play-30"   % "2.0.0",
     "uk.gov.hmrc"       %% "crypto-json-play-30"            % "8.0.0",
     "org.commonmark"    %  "commonmark"                     % "0.22.0",
-    "org.commonmark"    %  "commonmark-ext-gfm-tables"      % "0.22.0"
+    "org.commonmark"    %  "commonmark-ext-gfm-tables"      % "0.22.0",
+    "uk.gov.hmrc"       % "layouttemplate_2.13"             % "0.1.0-SNAPSHOT"
   )
 
   val test = Seq(
