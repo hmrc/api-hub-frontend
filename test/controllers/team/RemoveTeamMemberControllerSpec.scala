@@ -17,20 +17,28 @@
 package controllers.team
 
 import base.SpecBase
+import forms.YesNoFormProvider
 import models.UserAnswers
 import models.application.TeamMember
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify, when}
+import models.team.Team
+import models.user.{LdapUser, UserModel}
+import org.mockito.ArgumentMatchers.{any, matches, same}
+import org.mockito.Mockito.{never, verify, when}
 import org.scalatest.{OptionValues, TryValues}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.CreateTeamMembersPage
+import play.api.data.FormError
+import play.api.i18n.Messages
 import play.api.inject
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.CreateTeamSessionRepository
+import services.ApiHubService
 import utils.HtmlValidation
 import views.html.ErrorTemplate
+import views.html.team.{RemoveTeamMemberConfirmationView, RemoveTeamMemberSuccessView}
 
+import java.time.LocalDateTime
 import scala.concurrent.Future
 
 class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with OptionValues with TryValues with HtmlValidation {
@@ -127,6 +135,278 @@ class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with Opt
           )(request, messages(application))
             .toString()
         contentAsString(result) must validateAsHtml
+      }
+    }
+
+    "must render the success view on a successful removal of team member from an existing team" in {
+      val teamMember1 = TeamMember("creator@hmrc.gov.uk")
+      val teamMember2 = TeamMember("new.member@hmrc.gov.uk")
+
+      val user = UserModel("test-user-id", "test-user-name", LdapUser, Some(teamMember1.email))
+
+      val team = Team(
+        "test-team-id",
+        "test-team-name",
+        LocalDateTime.now(),
+        Seq(
+          teamMember1,
+          teamMember2
+        )
+      )
+      
+      val mockApiHubService = mock[ApiHubService]
+      
+      when(mockApiHubService.findTeamById(any)(any)).thenReturn(Future.successful(Some(team)))
+      when(mockApiHubService.removeTeamMemberFromTeam(any(), any())(any())) thenReturn Future.successful(Some(()))
+
+      val application = applicationBuilder(user = user)
+        .overrides(
+          inject.bind[ApiHubService].toInstance(mockApiHubService)
+        )
+        .build()
+
+      running(application) {
+        val view = application.injector.instanceOf[RemoveTeamMemberSuccessView]
+        val request = FakeRequest(POST, routes.RemoveTeamMemberController.onRemovalSubmit(team.id, 1).url)
+          .withFormUrlEncodedBody(("value", "true"))
+        val msgs: Messages = messages(application)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual OK
+        contentAsString(result) mustBe view(team, user)(request, msgs).toString
+
+        verify(mockApiHubService).removeTeamMemberFromTeam(matches(team.id), same(teamMember2))(any())
+      }
+    }
+
+    "must redirect to the manage team page on a negative confirmation" in {
+      val teamMember1 = TeamMember("creator@hmrc.gov.uk")
+      val teamMember2 = TeamMember("new.member@hmrc.gov.uk")
+
+      val user = UserModel("test-user-id", "test-user-name", LdapUser, Some(teamMember1.email))
+
+      val team = Team(
+        "test-team-id",
+        "test-team-name",
+        LocalDateTime.now(),
+        Seq(
+          teamMember1,
+          teamMember2
+        )
+      )
+      
+      val mockApiHubService = mock[ApiHubService]
+      
+      when(mockApiHubService.findTeamById(any)(any)).thenReturn(Future.successful(Some(team)))
+
+      val application = applicationBuilder(user = user)
+        .overrides(
+          inject.bind[ApiHubService].toInstance(mockApiHubService)
+        )
+        .build()
+
+      running(application) {
+        val request = FakeRequest(POST, routes.RemoveTeamMemberController.onRemovalSubmit(team.id, 1).url)
+          .withFormUrlEncodedBody(("value", "false"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.ManageTeamController.onPageLoad(team.id).url
+      }
+    }
+
+    "must return an error on a self removal attempt" in {
+      val teamMember1 = TeamMember("creator@hmrc.gov.uk")
+      val teamMember2 = TeamMember("new.member@hmrc.gov.uk")
+
+      val user = UserModel("test-user-id", "test-user-name", LdapUser, Some(teamMember1.email))
+
+      val team = Team(
+        "test-team-id",
+        "test-team-name",
+        LocalDateTime.now(),
+        Seq(
+          teamMember1,
+          teamMember2
+        )
+      )
+      
+      val mockApiHubService = mock[ApiHubService]
+      
+      when(mockApiHubService.findTeamById(any)(any)).thenReturn(Future.successful(Some(team)))
+      when(mockApiHubService.removeTeamMemberFromTeam(any(), any())(any())) thenReturn Future.successful(Some(()))
+
+      val application = applicationBuilder(user = user)
+        .overrides(
+          inject.bind[ApiHubService].toInstance(mockApiHubService)
+        )
+        .build()
+
+      running(application) {
+        val view = application.injector.instanceOf[ErrorTemplate]
+        val request = FakeRequest(POST, routes.RemoveTeamMemberController.onRemovalSubmit(team.id, 0).url)
+          .withFormUrlEncodedBody(("value", "true"))
+        val msgs: Messages = messages(application)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual BAD_REQUEST
+        contentAsString(result) mustBe
+          view(
+            "Bad request - 400",
+            "Bad request",
+            "Cannot delete the authenticated user."
+          )(request, msgs)
+            .toString()
+
+        verify(mockApiHubService, never).removeTeamMemberFromTeam(matches(team.id), same(teamMember1))(any())
+      }
+    }
+
+    "must return an error if there is no removal confirmation on form submission" in {
+      val teamMember1 = TeamMember("creator@hmrc.gov.uk")
+      val teamMember2 = TeamMember("new.member@hmrc.gov.uk")
+
+      val user = UserModel("test-user-id", "test-user-name", LdapUser, Some(teamMember1.email))
+
+      val team = Team(
+        "test-team-id",
+        "test-team-name",
+        LocalDateTime.now(),
+        Seq(
+          teamMember1,
+          teamMember2
+        )
+      )
+      
+      val mockApiHubService = mock[ApiHubService]
+      
+      when(mockApiHubService.findTeamById(any)(any)).thenReturn(Future.successful(Some(team)))
+      when(mockApiHubService.removeTeamMemberFromTeam(any(), any())(any())) thenReturn Future.successful(Some(()))
+
+      val application = applicationBuilder(user = user)
+        .overrides(
+          inject.bind[ApiHubService].toInstance(mockApiHubService)
+        )
+        .build()
+
+      running(application) {
+        val view = application.injector.instanceOf[RemoveTeamMemberConfirmationView]
+        val request = FakeRequest(POST, routes.RemoveTeamMemberController.onRemovalSubmit(team.id, 1).url)
+          .withFormUrlEncodedBody(("value", ""))
+        val msgs: Messages = messages(application)
+        val form = new YesNoFormProvider()("")
+          .withError(FormError("value", "manageTeam.teamMembers.removeTeamMember.error"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual BAD_REQUEST
+        contentAsString(result) mustBe
+          view(
+            team,
+            teamMember2,
+            1,
+            user,
+            form
+          )(request, msgs)
+            .toString()
+
+        verify(mockApiHubService, never).removeTeamMemberFromTeam(matches(team.id), same(teamMember1))(any())
+      }
+    }
+
+    "must return an error when the team member does not exist" in {
+      val teamMember1 = TeamMember("creator@hmrc.gov.uk")
+      val teamMember2 = TeamMember("new.member@hmrc.gov.uk")
+
+      val user = UserModel("test-user-id", "test-user-name", LdapUser, Some(teamMember1.email))
+
+      val team = Team(
+        "test-team-id",
+        "test-team-name",
+        LocalDateTime.now(),
+        Seq(
+          teamMember1,
+          teamMember2
+        )
+      )
+      
+      val mockApiHubService = mock[ApiHubService]
+      
+      when(mockApiHubService.findTeamById(any)(any)).thenReturn(Future.successful(Some(team)))
+      when(mockApiHubService.removeTeamMemberFromTeam(any(), any())(any())) thenReturn Future.successful(None)
+
+      val application = applicationBuilder(user = user)
+        .overrides(
+          inject.bind[ApiHubService].toInstance(mockApiHubService)
+        )
+        .build()
+
+      running(application) {
+        val view = application.injector.instanceOf[ErrorTemplate]
+        val request = FakeRequest(POST, routes.RemoveTeamMemberController.onRemovalSubmit(team.id, 1).url)
+          .withFormUrlEncodedBody(("value", "true"))
+        val msgs: Messages = messages(application)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual NOT_FOUND
+        contentAsString(result) mustBe
+          view(
+            "Page not found - 404",
+            "This page can’t be found",
+            "Cannot find this team member."
+          )(request, msgs)
+            .toString()
+
+        verify(mockApiHubService).removeTeamMemberFromTeam(matches(team.id), same(teamMember2))(any())
+      }
+    }
+
+    "must return an error when the team member index is out of bounds" in {
+      val teamMember1 = TeamMember("creator@hmrc.gov.uk")
+      val teamMember2 = TeamMember("new.member@hmrc.gov.uk")
+
+      val user = UserModel("test-user-id", "test-user-name", LdapUser, Some(teamMember1.email))
+
+      val team = Team(
+        "test-team-id",
+        "test-team-name",
+        LocalDateTime.now(),
+        Seq(
+          teamMember1,
+          teamMember2
+        )
+      )
+      
+      val mockApiHubService = mock[ApiHubService]
+      
+      when(mockApiHubService.findTeamById(any)(any)).thenReturn(Future.successful(Some(team)))
+
+      val application = applicationBuilder(user = user)
+        .overrides(
+          inject.bind[ApiHubService].toInstance(mockApiHubService)
+        )
+        .build()
+
+      running(application) {
+        val view = application.injector.instanceOf[ErrorTemplate]
+        val request = FakeRequest(POST, routes.RemoveTeamMemberController.onRemovalSubmit(team.id, 3).url)
+          .withFormUrlEncodedBody(("value", "true"))
+        val msgs: Messages = messages(application)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual NOT_FOUND
+        contentAsString(result) mustBe
+          view(
+            "Page not found - 404",
+            "This page can’t be found",
+            "Cannot find this team member."
+          )(request, msgs)
+            .toString()
       }
     }
   }

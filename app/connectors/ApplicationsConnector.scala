@@ -417,6 +417,21 @@ class ApplicationsConnector @Inject()(
       }
   }
 
+  def removeTeamMemberFromTeam(id: String, teamMember: TeamMember)(implicit hc:HeaderCarrier): Future[Option[Unit]] = {
+    val encryptedEmail = crypto.QueryParameterCrypto.encrypt(PlainText(teamMember.email)).value
+
+    httpClient
+      .delete(url"$applicationsBaseUrl/api-hub-applications/teams/$id/members/$encryptedEmail")
+      .setHeader((CONTENT_TYPE, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Either[UpstreamErrorResponse, Unit]]
+      .flatMap {
+        case Right(_) => Future.successful(Some(()))
+        case Left(e) if e.statusCode == NOT_FOUND => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
+  }
+
   def changeTeamName(id: String, newName: String)(implicit hc:HeaderCarrier): Future[Either[ApplicationsException,Unit]] = {
     val request = ChangeTeamNameRequest(newName)
 

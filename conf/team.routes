@@ -15,6 +15,8 @@ GET     /create-team/check-your-answers                     controllers.team.Cre
 GET     /manage-my-teams                                    controllers.team.ManageMyTeamsController.onPageLoad()
 
 GET     /:id                                                controllers.team.ManageTeamController.onPageLoad(id: String, applicationId: Option[String] ?= None)
+GET     /remove-team-member/:teamMemberIndex/team/:id       controllers.team.RemoveTeamMemberController.removeTeamMemberFromExistingTeam(id: String, teamMemberIndex: Int)
+POST    /remove-team-member/:teamMemberIndex/team/:id       controllers.team.RemoveTeamMemberController.onRemovalSubmit(id: String, teamMemberIndex: Int)
 
 GET     /add-team-member/:id                                controllers.team.AddTeamMemberController.onPageLoad(id: String)
 POST    /add-team-member/:id                                controllers.team.AddTeamMemberController.onSubmit(id: String)

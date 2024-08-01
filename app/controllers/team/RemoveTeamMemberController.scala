@@ -21,8 +21,12 @@ import controllers.helpers.ErrorResultBuilder
 import pages.CreateTeamMembersPage
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc._
+import models.team.TeamLenses._
 import repositories.CreateTeamSessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import views.html.team.{RemoveTeamMemberConfirmationView, RemoveTeamMemberSuccessView}
+import forms.YesNoFormProvider
+import services.ApiHubService
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,8 +37,15 @@ class RemoveTeamMemberController @Inject()(override val messagesApi: MessagesApi
                                            getData: CreateTeamDataRetrievalAction,
                                            requireData: DataRequiredAction,
                                            val controllerComponents: MessagesControllerComponents,
-                                           errorResultBuilder: ErrorResultBuilder
+                                           errorResultBuilder: ErrorResultBuilder,
+                                           teamAuth: TeamAuthActionProvider,
+                                           confirmationView: RemoveTeamMemberConfirmationView,
+                                           successView: RemoveTeamMemberSuccessView,
+                                           formProvider: YesNoFormProvider,
+                                           apiHubService: ApiHubService,
                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+
+  private val form = formProvider("manageTeam.teamMembers.removeTeamMember.error")
 
   def removeTeamMember(index: Int): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
@@ -53,10 +64,55 @@ class RemoveTeamMemberController @Inject()(override val messagesApi: MessagesApi
       )
   }
 
+  def removeTeamMemberFromExistingTeam(teamId: String, teamMemberIndex: Int): Action[AnyContent] = (identify andThen teamAuth(teamId)) {
+    implicit request =>
+      val team = request.team.withSortedTeam()
+      Ok(confirmationView(team, team.teamMembers(teamMemberIndex), teamMemberIndex, request.identifierRequest.user, form))
+  }
+
+  def onRemovalSubmit(teamId: String, teamMemberIndex: Int): Action[AnyContent] = (identify andThen teamAuth(teamId)).async {
+    implicit request =>
+      form.bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(
+            BadRequest(confirmationView(request.team, request.team.teamMembers(teamMemberIndex), teamMemberIndex, request.identifierRequest.user, formWithErrors))
+          ),
+        value =>
+          if (value) {
+            val team = request.team.withSortedTeam()
+            val user = request.identifierRequest.user
+            if (team.teamMembers.length > teamMemberIndex)
+              if (
+                user.email.map(_.equalsIgnoreCase(
+                  team.teamMembers(teamMemberIndex).email
+                )).getOrElse(false)
+              )
+                teamMemberToRemoveSameAsUser()
+              else
+                apiHubService.removeTeamMemberFromTeam(teamId, team.teamMembers(teamMemberIndex)).map {
+                  case Some(_) => Ok(successView(team, user))
+                  case None => teamMemberToRemoveNotFound()
+                }
+            else
+              Future.successful(teamMemberToRemoveNotFound())
+          }
+          else {
+            Future.successful(Redirect(controllers.team.routes.ManageTeamController.onPageLoad(teamId)))
+          }
+      )
+  }
+
   private def teamMemberNotFound()(implicit request: Request[_]): Future[Result] = {
     Future.successful(
       errorResultBuilder.notFound(Messages("addTeamMemberDetails.notFound"))
     )
   }
 
+  private def teamMemberToRemoveNotFound()(implicit request: Request[_]): Result =
+    errorResultBuilder.notFound(Messages("manageTeam.teamMembers.removeTeamMember.notFound"))
+
+  private def teamMemberToRemoveSameAsUser()(implicit request: Request[_]): Future[Result] =
+    Future.successful(
+      errorResultBuilder.badRequest(Messages("manageTeam.teamMembers.removeTeamMember.cantDeleteAuthenticatedUser"))
+    )
 }

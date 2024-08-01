@@ -1,0 +1,75 @@
+@*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.application.{Application, TeamMember}
+@import models.team.Team
+@import models.user.UserModel
+
+@this(
+    formHelper: FormWithCSRF,
+    layout: templates.Layout,
+    govukButton: GovukButton,
+    govukRadios: GovukRadios,
+    govukTable: GovukTable
+)
+
+@(team: Team, teamMember: TeamMember, teamMemberIndex: Int, user: UserModel, form: Form[_])(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = titleNoForm(messages("manageTeam.removeTeamMember.title", team.name)), user = Some(user)) {
+
+    <h1 class="govuk-heading-l">@messages("manageTeam.removeTeamMember.heading", team.name)</h1>
+
+    @govukTable(
+        Table(
+            caption = None,
+            head = None,
+            rows =
+                Seq(Seq(
+                    TableRow(
+                        content = messages("manageTeam.teamMembers.removeTeamMember.emailAddress"),
+                        classes = "govuk-!-font-weight-bold"
+                    ),
+                    TableRow(content = teamMember.email)
+                ),Seq(
+                    TableRow(
+                        content = messages("manageTeam.teamMembers.removeTeamMember.teamName"),
+                        classes = "govuk-!-font-weight-bold"
+                    ),
+                    TableRow(content = team.name)
+                ))
+        )
+    )
+
+    <p class="govuk-body">@messages("manageTeam.teamMembers.removeTeamMember.paragraph.1")</p>
+    <p class="govuk-body">@messages("manageTeam.teamMembers.removeTeamMember.paragraph.2")</p>
+    <p class="govuk-body">@messages("manageTeam.teamMembers.removeTeamMember.paragraph.3")</p>
+
+    <hr class="govuk-!-margin-top-6 govuk-!-margin-bottom-6 govuk-section-break govuk-section-break--m govuk-section-break--visible">
+
+    @formHelper(action = controllers.team.routes.RemoveTeamMemberController.onRemovalSubmit(team.id, teamMemberIndex), Symbol("autoComplete") -> "off") {
+        @govukRadios(
+            RadiosViewModel.yesNo(
+                field = form("value"),
+                legend = LegendViewModel(messages("manageTeam.teamMembers.removeTeamMember.legend")).withCssClass("govuk-fieldset__legend--m")
+            )
+        )
+
+        @govukButton(
+            ButtonViewModel(messages("site.continue"))
+                .withId("continueButton")
+        )
+    }
+}

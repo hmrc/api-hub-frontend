@@ -145,6 +145,11 @@ class ApiHubService @Inject()(
     applicationsConnector.addTeamMemberToTeam(id, teamMember)
   }
 
+  def removeTeamMemberFromTeam(id: String, teamMember: TeamMember)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    logger.debug(s"Removing team member from team $id")
+    applicationsConnector.removeTeamMemberFromTeam(id, teamMember)
+  }
+
   def getUserApis(teamMember: TeamMember)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[ApiDetail]] = {
     findTeams(Some(teamMember.email)) flatMap {
       case teams if teams.nonEmpty => integrationCatalogueConnector.filterApis(teams.map(_.id))
