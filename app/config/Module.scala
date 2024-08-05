@@ -20,6 +20,7 @@ import controllers.actions._
 import play.api.inject.{Binding, bind => bindz}
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
+import uk.gov.hmrc.integrationhub.LayoutConfig
 
 import java.time.{Clock, ZoneOffset}
 import scala.collection.immutable.Seq
@@ -44,7 +45,8 @@ class Module extends play.api.inject.Module {
       bindz[Encrypter with Decrypter].toProvider[CryptoProvider],
       bindz[Domains].to(classOf[DomainsImpl]).eagerly(),
       bindz[Hods].to(classOf[HodsImpl]).eagerly(),
-      bindz[Platforms].to(classOf[PlatformsImpl]).eagerly()
+      bindz[Platforms].to(classOf[PlatformsImpl]).eagerly(),
+      bindz[LayoutConfig].to(classOf[LayoutConfigImpl]).eagerly(),
     )
 
     val authTokenInitialiserBindings: Seq[Binding[_]] = if (configuration.get[Boolean]("create-internal-auth-token-on-start")) {

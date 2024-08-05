@@ -23,10 +23,10 @@
 @import views.html.components.IconsLink
 @import views.html.components.SearchBox
 @import views.html.components.Paginator
-@import uk.gov.hmrc.integrationhub.html.IntegrationHubLayout
+@import views.html.templates.Layout
 
 @this(
-    layout: templates.Layout,
+    layout: Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukInput: GovukInput,
@@ -37,7 +37,6 @@
     searchBox: SearchBox,
     paginator: Paginator
 )
-
 
 @(user: Option[UserModel], apiDetails: Seq[ApiDetail] = Seq.empty, domains: Domains, hods: Hods, platforms: Platforms)(implicit request: Request[_], messages: Messages)
 
@@ -171,10 +170,7 @@
 ) {
     <h2 class="govuk-heading-l">@messages("exploreApis.title")</h2>
     <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible hip-color-override">
-    @{IntegrationHubLayout(
-        title = "HELLO",
-        content = Html("YES")
-    )}
+
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-one-third filters-container">
             <div class="govuk-form-group">
