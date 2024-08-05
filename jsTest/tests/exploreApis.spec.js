@@ -143,13 +143,6 @@ describe('exploreApis', () => {
     function noResultsPanelIsVisible() {
         return isVisible(document.getElementById('noResultsPanel'));
     }
-    function enterNameFilterText(value) {
-        document.getElementById('nameFilter').value = value;
-        document.getElementById('nameFilter').dispatchEvent(new Event('input'));
-    }
-    function getNameFilterText() {
-        return document.getElementById('nameFilter').value;
-    }
     function clickNonSelfServePlatformFilter(value) {
         if (value) {
             document.querySelector(`input[value="${value}"].platformFilter`).click();
@@ -318,24 +311,6 @@ describe('exploreApis', () => {
         ]);
     });
 
-    it("when name filter is applied then correct panels are shown",  () => {
-        buildApiPanelsByCount(100);
-        onPageShow();
-
-        enterNameFilterText('api number 1');
-        expect(paginationHelper.getVisiblePanelData('.api-panel', 'apiname')).toEqual([
-            { index: 0, apiname: 'api number 1'},
-            { index: 9, apiname: 'api number 10'},
-            { index: 10, apiname: 'api number 11'},
-            { index: 12, apiname: 'api number 13'},
-            { index: 13, apiname: 'api number 14'},
-            { index: 14, apiname: 'api number 15'},
-            { index: 16, apiname: 'api number 17'},
-            { index: 17, apiname: 'api number 18'},
-            { index: 18, apiname: 'api number 19'},
-        ]);
-    });
-
     describe("domain filter selection counter", () => {
         beforeEach(() => {
             buildApiPanelsByCount(100);
@@ -475,15 +450,6 @@ describe('exploreApis', () => {
             clickResetFiltersLink();
 
             expect(hodFiltersCollapsed()).toBe(true);
-        });
-
-        it("when reset filters link is clicked then name filter is cleared",  () => {
-            onPageShow();
-            enterNameFilterText('some api');
-
-            clickResetFiltersLink();
-
-            expect(getNameFilterText()).toBe('');
         });
 
         it("when second page of results is displayed and reset filters link and is clicked then we return to the first page",  () => {
