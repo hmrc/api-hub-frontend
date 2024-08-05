@@ -18,7 +18,7 @@ package connectors
 
 import com.google.inject.{Inject, Singleton}
 import config.FrontendAppConfig
-import models.api.{ApiDetail, IntegrationId, IntegrationResponse}
+import models.api.{ApiDetail, IntegrationId, IntegrationResponse, PlatformContact}
 import play.api.Logging
 import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION}
 import play.api.http.MimeTypes.JSON
@@ -69,6 +69,17 @@ class IntegrationCatalogueConnector @Inject()(
       .execute[Either[UpstreamErrorResponse, IntegrationResponse]]
       .flatMap {
         case Right(integrationResponse) => Future.successful(integrationResponse.results)
+        case Left(e) => Future.failed(e)
+      }
+  }
+
+  def getPlatformContacts()(implicit hc: HeaderCarrier): Future[Seq[PlatformContact]] = {
+    httpClient.get(url"$integrationCatalogueBaseUrl/integration-catalogue/platform/contacts")
+      .setHeader((ACCEPT, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Either[UpstreamErrorResponse, Seq[PlatformContact]]]
+      .flatMap {
+        case Right(platformContacts) => Future.successful(platformContacts)
         case Left(e) => Future.failed(e)
       }
   }

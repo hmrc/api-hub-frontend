@@ -19,7 +19,7 @@ package connectors
 import com.github.tomakehurst.wiremock.client.WireMock._
 import config.FrontendAppConfig
 import generators.ApiDetailGenerators
-import models.api.IntegrationResponse
+import models.api.{ContactInfo, IntegrationResponse, PlatformContact}
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.Configuration
@@ -215,6 +215,60 @@ class IntegrationCatalogueConnectorSpec
 
         recoverToSucceededIf[UpstreamErrorResponse] {
           buildConnector().filterApis(Seq("team1", "team2"))(HeaderCarrier())
+        }
+      }
+    }
+    "getPlatformContacts" - {
+      "must place the correct request and return some PlatformContacts" in {
+        val expected = Seq(
+          PlatformContact("A_PLATFORM", ContactInfo("a name", "an email"), false),
+          PlatformContact("ANOTHER_PLATFORM", ContactInfo("another name", "another email"), false)
+        )
+
+        stubFor(
+          get(urlEqualTo("/integration-catalogue/platform/contacts"))
+            .withHeader("Accept", equalTo("application/json"))
+            .withHeader("Authorization", equalTo("An authentication token"))
+            .willReturn(
+              aResponse()
+                .withBody(Json.toJson(expected).toString())
+            )
+        )
+
+        buildConnector().getPlatformContacts()(HeaderCarrier()) map {
+          actual =>
+            actual mustBe expected
+        }
+      }
+
+      "Must return empty Seq if no search results" in {
+        stubFor(
+          get(urlEqualTo("/integration-catalogue/platform/contacts"))
+            .withHeader("Accept", equalTo("application/json"))
+            .withHeader("Authorization", equalTo("An authentication token"))
+            .willReturn(
+              aResponse()
+                .withBody("[]")
+            )
+        )
+
+        buildConnector().getPlatformContacts()(HeaderCarrier()) map {
+          actual =>
+            actual mustBe Seq.empty
+        }
+      }
+
+      "must fail with an exception when integration catalogue returns a failure response" in {
+        stubFor(
+          get(urlEqualTo("/integration-catalogue/platform/contacts"))
+            .willReturn(
+              aResponse()
+                .withStatus(INTERNAL_SERVER_ERROR)
+            )
+        )
+
+        recoverToSucceededIf[UpstreamErrorResponse] {
+          buildConnector().getPlatformContacts()(HeaderCarrier())
         }
       }
     }

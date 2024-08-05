@@ -20,13 +20,13 @@ import com.google.inject.{Inject, Singleton}
 import config.{Domains, FrontendAppConfig, Hods, Platforms}
 import controllers.actions.OptionalIdentifierAction
 import controllers.helpers.ErrorResultBuilder
-import models.api.{ApiDetail, Maintainer}
+import models.api.ApiDetail
 import models.requests.OptionalIdentifierRequest
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.{ApiContactEmail, ApiTeamContactEmail, HubSupportContactEmail, NonSelfServeApiViewModel, SelfServeApiViewModel}
+import viewmodels._
 import views.html.ApiDetailsView
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -84,7 +84,8 @@ class ApiDetailsController @Inject()(
   }
 
   private def processNonSelfServeApiDetail(apiDetail: ApiDetail)(implicit request: OptionalIdentifierRequest[_]) = {
-      Future.successful(Ok(view(
+    getContactEmailAddress(apiDetail.platform).flatMap(
+      contactEmail => Future.successful(Ok(view(
         apiDetail,
         request.user,
         NonSelfServeApiViewModel(
@@ -92,9 +93,9 @@ class ApiDetailsController @Inject()(
           domains.getSubDomainDescription(apiDetail),
           apiDetail.hods.map(hods.getDescription(_)),
           platforms.getDescription(apiDetail.platform),
-          getContactEmailAddress(apiDetail.maintainer)
+          contactEmail
         )
-      )))
+      ))))
   }
 
   private def getTeamNameForApi(maybeTeamId: Option[String])(implicit request: OptionalIdentifierRequest[_]) = {
@@ -107,10 +108,13 @@ class ApiDetailsController @Inject()(
     }
   }
 
-  private def getContactEmailAddress(maintainer: Maintainer): ApiContactEmail = {
-    maintainer.contactInfo.flatMap(_.emailAddress) match {
-      case email :: Nil => ApiTeamContactEmail(email)
-      case _ => HubSupportContactEmail(frontendAppConfig.supportEmailAddress)
+  private def getContactEmailAddress(forPlatform: String)(implicit request: OptionalIdentifierRequest[_]): Future[ApiContactEmail] = {
+    val eventualMaybeContact = apiHubService.getPlatformContact(forPlatform)
+    eventualMaybeContact map  {
+      case Some(platformContact) =>
+        ApiTeamContactEmail(platformContact.contactInfo.emailAddress)
+      case _ =>
+        HubSupportContactEmail(frontendAppConfig.supportEmailAddress)
     }
   }
 
