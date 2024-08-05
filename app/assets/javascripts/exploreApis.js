@@ -2,7 +2,6 @@ import {buildPaginator} from './paginationController.js';
 import {buildDomainFilters} from "./exploreApisDomainFilters.js";
 import {buildStatusFilters} from "./exploreApisStatusFilters.js";
 import {buildHodsFilters} from "./exploreApisHodsFilters.js";
-import {buildNameFilter} from "./exploreApisNameFilter.js";
 import {buildPlatformFilters} from "./exploreApisPlatformFilters.js";
 import {setVisible, noop} from "./utils.js";
 
@@ -11,7 +10,6 @@ export function onPageShow() {
             buildDomainFilters(),
             buildStatusFilters(),
             buildHodsFilters(),
-            buildNameFilter(),
             buildPlatformFilters()
         ];
 
@@ -108,6 +106,7 @@ export function onPageShow() {
 
     applyFilters();
     view.displayResults();
+    // fetch("apis/deep-search/api").then(response => response.json()).then(x => console.log(x))
 }
 
 if (typeof window !== 'undefined') {
