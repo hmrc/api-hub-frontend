@@ -1,4 +1,4 @@
 # Add all the application routes to the app.routes file
-->         /integration-hub           app.Routes
 ->         /api-hub                   app.Routes
+->         /integration-hub           app.Routes
 ->         /                          health.Routes
