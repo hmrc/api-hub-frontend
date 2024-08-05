@@ -157,6 +157,10 @@ class ApiHubService @Inject()(
     }
   }
 
+  def deepSearchApis(searchText: String)(implicit hc: HeaderCarrier): Future[Seq[ApiDetail]]  = {
+    integrationCatalogueConnector.deepSearchApis(searchText)
+  }
+
   def changeTeamName(id: String, newName: String)(implicit hc: HeaderCarrier): Future[Either[ApplicationsException, Unit]] = {
     logger.debug(s"Changing team name for team $id to $newName")
     applicationsConnector.changeTeamName(id, newName)

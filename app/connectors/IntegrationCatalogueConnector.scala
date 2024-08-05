@@ -85,17 +85,26 @@ class IntegrationCatalogueConnector @Inject()(
   }
 
   def filterApis(teamIds: Seq[String])(implicit hc: HeaderCarrier): Future[Seq[ApiDetail]] = {
+    getApis(teamIds.map(id => ("teamIds", id)))
+  }
 
-    val queryParams = teamIds.map(id => ("teamIds", id))
+  def deepSearchApis(searchText: String)(implicit hc: HeaderCarrier): Future[Seq[ApiDetail]] = {
+    getApis(Seq(("searchTerm", searchText)))
+  }
 
+  private def getApis(queryParams: Seq[(String,String)])(implicit hc: HeaderCarrier): Future[Seq[ApiDetail]] = {
     httpClient.get(url"$integrationCatalogueBaseUrl/integration-catalogue/integrations")
       .transform(wsRq => wsRq.withQueryStringParameters(queryParams: _*))
       .setHeader((ACCEPT, JSON))
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Either[UpstreamErrorResponse, IntegrationResponse]]
       .flatMap {
-        case Right(integrationResponse) => Future.successful(integrationResponse.results)
-        case Left(e) => Future.failed(e)
+        case Right(integrationResponse) => {
+          Future.successful(integrationResponse.results)
+        }
+        case Left(e) => {
+          Future.failed(e)
+        }
       }
   }
 }
