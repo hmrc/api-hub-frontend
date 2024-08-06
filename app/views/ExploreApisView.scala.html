@@ -68,12 +68,12 @@
 
 @anApi(apiDetail: ApiDetail) = {
     <div class="api-panel"
+            data-id="@apiDetail.id"
             data-apistatus="@apiDetail.apiStatus"
             data-domain='@normalise(apiDetail.domain.getOrElse(""))'
             data-subdomain='@normalise(apiDetail.subDomain.getOrElse(""))'
             data-hods='@apiDetail.hods.map(normalise).mkString(",")'
-            data-platform='@normalise(apiDetail.platform)'
-            data-apiname="@normalise(apiDetail.title)">
+            data-platform='@normalise(apiDetail.platform)'>
 
         <div class="api-panel-top">
             <span class="call-out-type information govuk-!-margin-bottom-0">
@@ -272,7 +272,9 @@
             <h3 class="govuk-!-margin-0 govuk-label govuk-label--s">@messages("exploreApis.searchResults.heading") (<span id="searchResultsSize">@apiDetails.size</span>)</h3>
 
             <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible hip-color-override govuk-!-margin-top-5">
-            @searchBox("Search for an API", Some("Search by API name, ref, ID or data attribute"), "search")
+            <form id="deepSearch">
+                @searchBox("Search for an API", Some("Search by API name, ref, ID or data attribute"), "search")
+            </form>
 
             <div class="govuk-body" id="apiList">
                 @apis(apiDetails)

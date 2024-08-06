@@ -37,7 +37,9 @@ class DeepSearchApisController @Inject()(
     implicit request =>
       apiHubService
         .deepSearchApis(text)
-        .map(apiDetails => Json.toJson(apiDetails))
+        .map(apiDetails => apiDetails.map(_.id))
+        .map(apiIds => Json.toJson(apiIds))
         .map(Ok(_))
   }
+
 }
