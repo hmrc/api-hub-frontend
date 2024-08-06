@@ -7,6 +7,12 @@ export function buildPaginator(itemsPerPage) {
     const view = buildPaginationView(),
         model = {};
 
+    let paginationHandler = itemsVisibility => {
+        itemsVisibility.forEach(([item, isVisible]) => {
+            setVisible(item, isVisible);
+        });
+    };
+
     view.onNextLinkClick(() => {
         if (model.currentPage < model.totalPages) {
             model.currentPage++;
@@ -38,12 +44,14 @@ export function buildPaginator(itemsPerPage) {
         const startIndex = (model.currentPage - 1) * itemsPerPage,
             endIndex = startIndex + itemsPerPage;
 
-        model.items.forEach((item, index) => {
-            setVisible(item, index >= startIndex && index < endIndex);
-        });
+        const itemsVisibility = model.items.map((item, index) => [item, index >= startIndex && index < endIndex]);
+        paginationHandler(itemsVisibility);
     }
 
     return {
+        onPagination(handler) {
+            paginationHandler = handler;
+        },
         render(items) {
             model.items = items;
             model.currentPage = 1;

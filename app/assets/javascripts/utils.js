@@ -16,3 +16,7 @@ export function removeElement(el) {
 }
 
 export function noop() {}
+
+export function normaliseText(text) {
+    return text.trim().toLowerCase();
+}

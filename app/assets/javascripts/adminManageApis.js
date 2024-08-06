@@ -1,5 +1,5 @@
 import {buildPaginator} from './paginationController.js';
-import {noop, setVisible} from "./utils.js";
+import {noop, normaliseText, setVisible} from "./utils.js";
 
 export function onPageShow() {
     const view = (() => {
@@ -46,14 +46,10 @@ export function onPageShow() {
 
     const paginator = buildPaginator(10);
 
-    function normalise(value) {
-        return value.trim().toLowerCase();
-    }
-
     function applyFilter() {
-        const normalisedNameFilterValue = normalise(view.nameFilterValue);
+        const normalisedNameFilterValue = normaliseText(view.nameFilterValue);
         apiPanels.forEach(apiDetail => {
-            apiDetail.hiddenByFilter = ! normalise(apiDetail.apiName).includes(normalisedNameFilterValue);
+            apiDetail.hiddenByFilter = ! normaliseText(apiDetail.apiName).includes(normalisedNameFilterValue);
         });
 
         const filteredPanels = apiPanels.filter(apiDetail => ! apiDetail.hiddenByFilter);

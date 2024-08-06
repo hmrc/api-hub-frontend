@@ -1,14 +1,10 @@
 import {buildPaginator, HIDDEN_BY_PAGINATION} from './paginationController.js';
-import {setVisible, noop} from "./utils.js";
+import {setVisible, noop, normaliseText} from "./utils.js";
 
 function buildNameFilter() {
     const elFilterText = document.getElementById('nameFilter');
 
     let onFiltersChangedHandler = noop;
-
-    function normalise(value) {
-        return value.trim().toLowerCase();
-    }
 
     return {
         initialise() {
@@ -21,7 +17,7 @@ function buildNameFilter() {
             elFilterText.value = '';
         },
         buildFilterFunction() {
-            const normalisedValue = normalise(elFilterText.value);
+            const normalisedValue = normaliseText(elFilterText.value);
 
             return data => data.apiName.includes(normalisedValue);
         }
