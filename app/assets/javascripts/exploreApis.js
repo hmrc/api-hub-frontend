@@ -106,7 +106,15 @@ export function onPageShow() {
         const encodedSearchTerm = encodeURIComponent(searchTerm);
         fetch(`apis/deep-search/${encodedSearchTerm}`)
             .then(response => response.json())
-            .then(x => console.log(x))
+            .then(matchingIds => {
+                const matchingIdsSet = new Set(matchingIds);
+                model.apis.forEach(apiDetail => {
+                    apiDetail.hiddenBySearch = !matchingIdsSet.has(apiDetail.data.id);
+                });
+
+                filters.forEach(filter => filter.clear());
+                applyFilters();
+            })
             .catch(e => console.error(e));
     });
 }
