@@ -167,7 +167,7 @@ class ApiHubService @Inject()(
 
   def getPlatformContact(forPlatform: String)(implicit hc: HeaderCarrier, ec: ExecutionContext) = {
     integrationCatalogueConnector.getPlatformContacts() flatMap {
-      platformContacts => Future.successful(platformContacts.find(platformContact => forPlatform == platformContact.platformType))
+      platformContacts => Future.successful(platformContacts.find(_.platformType == forPlatform))
     }
   }
 
