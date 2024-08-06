@@ -100,7 +100,8 @@ export function onPageShow() {
     applyFilters();
     view.displayResults();
 
-    const search = buildSearch(model);
+    const search = buildSearch();
+    search.initialise(model);
     search.onSearch(searchTerm => {
         const encodedSearchTerm = encodeURIComponent(searchTerm);
         fetch(`apis/deep-search/${encodedSearchTerm}`)
