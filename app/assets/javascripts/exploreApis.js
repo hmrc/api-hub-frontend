@@ -3,7 +3,9 @@ import {buildDomainFilters} from "./exploreApisDomainFilters.js";
 import {buildStatusFilters} from "./exploreApisStatusFilters.js";
 import {buildHodsFilters} from "./exploreApisHodsFilters.js";
 import {buildPlatformFilters} from "./exploreApisPlatformFilters.js";
+import {buildModel} from "./exploreApisModel.js";
 import {setVisible, noop} from "./utils.js";
+import {buildSearch} from "./exploreApisSearch.js";
 
 export function onPageShow() {
     const filters = [
@@ -63,27 +65,18 @@ export function onPageShow() {
 
     const paginator = buildPaginator(15)
 
+    paginator.onPagination(itemsVisibility => {
+        itemsVisibility.forEach(([el, visibleOnCurrentPage]) => {
+            const api = model.getApiForElement(el);
+            api.hiddenByPagination = !visibleOnCurrentPage;
+        });
+    });
+
     function buildFilterFunctions() {
         return filters.map(filter=> filter.buildFilterFunction());
     }
 
-    const model = {
-        apis: view.apiDetailPanels.map(el => ({
-            data: {
-                apiStatus: el.dataset['apistatus'],
-                domain: el.dataset['domain'],
-                subdomain: el.dataset['subdomain'],
-                hods: new Set(el.dataset['hods'].split(',').filter(h => h)),
-                apiName: el.dataset['apiname'],
-                platform: el.dataset['platform']
-            },
-            el,
-            hiddenByFilters: false
-        })),
-        get resultCount() {
-            return this.apis.filter(apiDetail => ! apiDetail.hiddenByFilters).length;
-        }
-    };
+    const model = buildModel(view.apiDetailPanels);
 
     function applyFilters() {
         const filterFns = buildFilterFunctions();
@@ -91,8 +84,8 @@ export function onPageShow() {
             apiDetail.hiddenByFilters = ! filterFns.every(fn => fn(apiDetail.data));
         });
 
+        paginator.render(model.apis.filter(apiDetail => apiDetail.includeInResults).map(panel => panel.el));
         view.setApiPanelVisibility(model.apis);
-        paginator.render(model.apis.filter(apiDetail => ! apiDetail.hiddenByFilters).map(panel => panel.el));
 
         view.setResultCount(model.resultCount);
         view.toggleNoResultsPanel(model.resultCount === 0);
@@ -106,7 +99,15 @@ export function onPageShow() {
 
     applyFilters();
     view.displayResults();
-    // fetch("apis/deep-search/api").then(response => response.json()).then(x => console.log(x))
+
+    const search = buildSearch(model);
+    search.onSearch(searchTerm => {
+        const encodedSearchTerm = encodeURIComponent(searchTerm);
+        fetch(`apis/deep-search/${encodedSearchTerm}`)
+            .then(response => response.json())
+            .then(x => console.log(x))
+            .catch(e => console.error(e));
+    });
 }
 
 if (typeof window !== 'undefined') {
