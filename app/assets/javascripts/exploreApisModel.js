@@ -5,7 +5,8 @@ export function buildModel(apiDetailPanels) {
                 domain: el.dataset['domain'],
                 subdomain: el.dataset['subdomain'],
                 hods: new Set(el.dataset['hods'].split(',').filter(h => h)),
-                platform: el.dataset['platform']
+                platform: el.dataset['platform'],
+                id: el.dataset['id'],
             },
             el,
             hiddenByFilters: false,
