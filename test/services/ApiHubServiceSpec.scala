@@ -21,7 +21,7 @@ import controllers.actions.FakeApplication
 import generators.{AccessRequestGenerator, ApiDetailGenerators}
 import models.AvailableEndpoint
 import models.accessrequest._
-import models.api.{ApiDeploymentStatuses, EndpointMethod}
+import models.api.{ApiDeploymentStatuses, ContactInfo, EndpointMethod, PlatformContact}
 import models.application.ApplicationLenses._
 import models.application._
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
@@ -658,6 +658,24 @@ class ApiHubServiceSpec
         result =>
           verify(fixture.applicationsConnector).updateApiTeam(eqTo(apiId), eqTo(teamId))(any())
           result mustBe Some(())
+      }
+    }
+  }
+
+  "getPlatformContact" - {
+
+    "must make the correct request to the integration catalogue connector and return successfully" in {
+      val fixture = buildFixture()
+      val expected = Seq(
+        PlatformContact("A_PLATFORM", ContactInfo("a name", "an email"), false),
+        PlatformContact("ANOTHER_PLATFORM", ContactInfo("another name", "another email"), false)
+      )
+      when(fixture.integrationCatalogueConnector.getPlatformContacts()(any())).thenReturn(Future.successful(expected))
+
+      fixture.service.getPlatformContact("A_PLATFORM")(HeaderCarrier(), executionContext).map {
+        result =>
+          verify(fixture.integrationCatalogueConnector).getPlatformContacts()(any())
+          result mustBe Some(PlatformContact("A_PLATFORM", ContactInfo("a name", "an email"), false))
       }
     }
   }

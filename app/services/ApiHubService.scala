@@ -20,7 +20,7 @@ import com.google.inject.{Inject, Singleton}
 import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
 import models.AvailableEndpoint
 import models.accessrequest.{AccessRequest, AccessRequestRequest, AccessRequestStatus}
-import models.api.{ApiDeploymentStatuses, ApiDetail}
+import models.api.{ApiDeploymentStatuses, ApiDetail, PlatformContact}
 import models.application._
 import models.exception.ApplicationsException
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
@@ -33,9 +33,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ApiHubService @Inject()(
-  applicationsConnector: ApplicationsConnector,
-  integrationCatalogueConnector: IntegrationCatalogueConnector
-) extends Logging {
+                               applicationsConnector: ApplicationsConnector,
+                               integrationCatalogueConnector: IntegrationCatalogueConnector
+                             ) extends Logging {
 
   def registerApplication(newApplication: NewApplication)(implicit hc: HeaderCarrier): Future[Application] = {
     logger.debug(s"Registering application named '${newApplication.name}', created by user with email '${newApplication.createdBy.email}''")
@@ -50,7 +50,7 @@ class ApiHubService @Inject()(
     applicationsConnector.getApplicationsUsingApi(apiId, includeDeleted)
   }
 
-  def getApplication(id:String, enrich: Boolean)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
+  def getApplication(id: String, enrich: Boolean)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
     applicationsConnector.getApplication(id, enrich)
   }
 
@@ -90,18 +90,18 @@ class ApiHubService @Inject()(
   }
 
   def deleteCredential(
-    id: String,
-    environmentName: EnvironmentName,
-    clientId: String
-  )(implicit hc: HeaderCarrier): Future[Either[ApplicationsException, Option[Unit]]] = {
+                        id: String,
+                        environmentName: EnvironmentName,
+                        clientId: String
+                      )(implicit hc: HeaderCarrier): Future[Either[ApplicationsException, Option[Unit]]] = {
     applicationsConnector.deleteCredential(id, environmentName, clientId)
   }
 
-  def getAccessRequests(applicationId: Option[String], status: Option[AccessRequestStatus])(implicit hc:HeaderCarrier): Future[Seq[AccessRequest]] = {
+  def getAccessRequests(applicationId: Option[String], status: Option[AccessRequestStatus])(implicit hc: HeaderCarrier): Future[Seq[AccessRequest]] = {
     applicationsConnector.getAccessRequests(applicationId, status)
   }
 
-  def getAccessRequest(id: String)(implicit hc:HeaderCarrier): Future[Option[AccessRequest]] = {
+  def getAccessRequest(id: String)(implicit hc: HeaderCarrier): Future[Option[AccessRequest]] = {
     applicationsConnector.getAccessRequest(id)
   }
 
@@ -145,24 +145,30 @@ class ApiHubService @Inject()(
     applicationsConnector.addTeamMemberToTeam(id, teamMember)
   }
 
-  def getUserApis(teamMember: TeamMember)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[ApiDetail]]  = {
-    findTeams(Some(teamMember.email)) flatMap  {
+  def getUserApis(teamMember: TeamMember)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[ApiDetail]] = {
+    findTeams(Some(teamMember.email)) flatMap {
       case teams if teams.nonEmpty => integrationCatalogueConnector.filterApis(teams.map(_.id))
       case _ => Future.successful(Seq.empty)
     }
   }
 
-  def changeTeamName(id: String, newName: String)(implicit hc: HeaderCarrier): Future[Either[ApplicationsException,Unit]] = {
-      logger.debug(s"Changing team name for team $id to $newName")
-      applicationsConnector.changeTeamName(id, newName)
+  def changeTeamName(id: String, newName: String)(implicit hc: HeaderCarrier): Future[Either[ApplicationsException, Unit]] = {
+    logger.debug(s"Changing team name for team $id to $newName")
+    applicationsConnector.changeTeamName(id, newName)
   }
 
   def getUserContactDetails()(implicit hc: HeaderCarrier): Future[Seq[UserContactDetails]] = {
     applicationsConnector.getUserContactDetails()
   }
 
-  def updateApiTeam(apiId: String, teamId: String)(implicit hc: HeaderCarrier): Future[Option[Unit]]  = {
+  def updateApiTeam(apiId: String, teamId: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
     applicationsConnector.updateApiTeam(apiId, teamId)
+  }
+
+  def getPlatformContact(forPlatform: String)(implicit hc: HeaderCarrier, ec: ExecutionContext) = {
+    integrationCatalogueConnector.getPlatformContacts() flatMap {
+      platformContacts => Future.successful(platformContacts.find(_.platformType == forPlatform))
+    }
   }
 
 }

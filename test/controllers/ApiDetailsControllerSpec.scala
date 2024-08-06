@@ -21,7 +21,7 @@ import config.FrontendAppConfig
 import controllers.actions.FakeUser
 import fakes.{FakeDomains, FakeHods, FakePlatforms}
 import generators.ApiDetailGenerators
-import models.api.{ApiDeploymentStatuses, ApiDetail, ContactInformation}
+import models.api.{ApiDeploymentStatuses, ApiDetail, ContactInfo, ContactInformation, PlatformContact}
 import models.team.Team
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
@@ -94,6 +94,7 @@ class ApiDetailsControllerSpec
             .thenReturn(Future.successful(Some(apiDetail)))
           when(fixture.apiHubService.getApiDeploymentStatuses(ArgumentMatchers.eq(apiDetail.publisherReference))(any()))
             .thenReturn(Future.successful(Some(apiDeploymentStatuses)))
+          when(fixture.apiHubService.getPlatformContact(any)(any, any)).thenReturn(Future.successful(None))
 
           val request = FakeRequest(GET, routes.ApiDetailsController.onPageLoad(apiDetail.id).url)
           val result = route(fixture.application, request).value
@@ -127,6 +128,7 @@ class ApiDetailsControllerSpec
             .thenReturn(Future.successful(Some(apiDetail)))
           when(fixture.apiHubService.getApiDeploymentStatuses(ArgumentMatchers.eq(apiDetail.publisherReference))(any()))
             .thenReturn(Future.successful(Some(apiDeploymentStatuses)))
+          when(fixture.apiHubService.getPlatformContact(any)(any, any)).thenReturn(Future.successful(Some(PlatformContact("", ContactInfo("", "team@example.com"), false))))
 
           val request = FakeRequest(GET, routes.ApiDetailsController.onPageLoad(apiDetail.id).url)
           val result = route(fixture.application, request).value
@@ -155,6 +157,7 @@ class ApiDetailsControllerSpec
           when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
             .thenReturn(Future.successful(Some(apiDetail)))
 
+          when(fixture.apiHubService.getPlatformContact(any)(any, any)).thenReturn(Future.successful(None))
           val request = FakeRequest(GET, routes.ApiDetailsController.onPageLoad(apiDetail.id).url)
           val result = route(fixture.application, request).value
 
