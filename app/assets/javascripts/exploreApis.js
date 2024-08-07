@@ -21,7 +21,6 @@ export function onPageShow() {
             elApiResultsContainer = document.getElementById('apiResultsContainer'),
             elApiList = document.getElementById('apiList'),
             elNoResultsPanel = document.getElementById('noResultsPanel'),
-            elResetFiltersLink = document.getElementById('resetFilters'),
             elNoResultsResetFiltersLink = document.getElementById('noResultsClearFilters');
 
         let onFiltersChangedHandler = noop;
@@ -33,7 +32,6 @@ export function onPageShow() {
             onFiltersChangedHandler();
         }
 
-        elResetFiltersLink.addEventListener('click', clearAllFilters);
         elNoResultsResetFiltersLink.addEventListener('click', clearAllFilters);
 
         return {
