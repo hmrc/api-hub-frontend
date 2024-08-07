@@ -8,15 +8,15 @@ export function buildSearch() {
     let onSearchHandler = noop;
 
     return {
-        initialise(model) {
+        initialise() {
             function triggerSearch(e) {
                 e.preventDefault();
 
                 const searchTerm = elSearchInputBox.value,
                     normalisedSearchTerm = normaliseText(searchTerm);
 
-                if (normalisedSearchTerm && normaliseText !== model.currentSearchText) {
-                    onSearchHandler(model.currentSearchText = searchTerm);
+                if (normalisedSearchTerm) {
+                    onSearchHandler(searchTerm);
                 }
             }
 
@@ -25,6 +25,9 @@ export function buildSearch() {
         },
         onSearch(handler) {
             onSearchHandler = handler;
+        },
+        clear() {
+            elSearchInputBox.value = '';
         }
     };
 }

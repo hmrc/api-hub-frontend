@@ -27,11 +27,14 @@ export function buildModel(apiDetailPanels) {
         getApiForElement(el) {
             return elToApiLookup.get(el);
         },
+        get searchResultCount() {
+            return apis.filter(apiDetail => !apiDetail.hiddenBySearch).length;
+        },
         get resultCount() {
             return apis.filter(apiDetail => apiDetail.includeInResults).length;
         },
         get filteredCount() {
-            return apis.filter(apiDetail => apiDetail.hiddenByFilters).length;
+            return apis.filter(apiDetail => apiDetail.hiddenByFilters && !apiDetail.hiddenBySearch).length;
         },
         currentSearchText: null
     };
