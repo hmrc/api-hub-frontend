@@ -211,6 +211,10 @@ object ApplicationLenses {
         Some(deleted)
       )
 
+    def isDeleted: Boolean = {
+      application.deleted.isDefined
+    }
+
   }
 
 }
