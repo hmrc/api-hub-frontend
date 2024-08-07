@@ -19,6 +19,7 @@ export function onPageShow() {
         const apiDetailPanelEls = Array.from(document.querySelectorAll('#apiList .api-panel')),
             elSearchResultsSize = document.getElementById('searchResultsSize'),
             elApiResultsContainer = document.getElementById('apiResultsContainer'),
+            elApiList = document.getElementById('apiList'),
             elNoResultsPanel = document.getElementById('noResultsPanel'),
             elResetFiltersLink = document.getElementById('resetFilters'),
             elNoResultsResetFiltersLink = document.getElementById('noResultsClearFilters');
@@ -51,6 +52,12 @@ export function onPageShow() {
                     setVisible(apiDetail.el, apiDetail.visible);
                 });
             },
+            orderApiPanelsByIndex(apis) {
+                const panelsToReorder = apis.filter(apiDetail => Number.isFinite(apiDetail.index))
+                    .toSorted((a, b) => a.index - b.index)
+                    .map(apiDetail => apiDetail.el);
+                elApiList.prepend(...panelsToReorder); // move all panels in single DOM operation to minimise reflows
+            },
             initialiseFilters(apis) {
                 filters.forEach(filter => filter.initialise(apis));
             },
@@ -70,6 +77,9 @@ export function onPageShow() {
             const api = model.getApiForElement(el);
             api.hiddenByPagination = !visibleOnCurrentPage;
         });
+        view.setApiPanelVisibility(model.apis);
+        //TODO remove
+        console.log(model.apis.map(a => `${a.index} [${a.hiddenByFilters ? 'F' : '.'}${a.hiddenBySearch ? 'S' : '.'}${a.hiddenByPagination ? 'P' : '.'}] ${a.el.querySelector('a').innerText}`))
     });
 
     function buildFilterFunctions() {
@@ -85,7 +95,6 @@ export function onPageShow() {
         });
 
         paginator.render(model.apis.filter(apiDetail => apiDetail.includeInResults).map(panel => panel.el));
-        view.setApiPanelVisibility(model.apis);
 
         view.setResultCount(model.resultCount);
         view.toggleNoResultsPanel(model.resultCount === 0);
@@ -107,11 +116,18 @@ export function onPageShow() {
         fetch(`apis/deep-search/${encodedSearchTerm}`)
             .then(response => response.json())
             .then(matchingIds => {
-                const matchingIdsSet = new Set(matchingIds);
+                const matchingIdLookup = new Map(matchingIds.map((id, index) => [id, index]));
                 model.apis.forEach(apiDetail => {
-                    apiDetail.hiddenBySearch = !matchingIdsSet.has(apiDetail.data.id);
+                    if (matchingIdLookup.has(apiDetail.data.id)) {
+                        apiDetail.index = matchingIdLookup.get(apiDetail.data.id);
+                        apiDetail.hiddenBySearch = false;
+                    } else {
+                        apiDetail.index = Number.POSITIVE_INFINITY;
+                        apiDetail.hiddenBySearch = true;
+                    }
                 });
 
+                view.orderApiPanelsByIndex(model.apis);
                 filters.forEach(filter => filter.clear());
                 applyFilters();
             })
