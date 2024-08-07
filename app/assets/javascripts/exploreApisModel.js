@@ -30,6 +30,9 @@ export function buildModel(apiDetailPanels) {
         get resultCount() {
             return apis.filter(apiDetail => apiDetail.includeInResults).length;
         },
+        get filteredCount() {
+            return apis.filter(apiDetail => apiDetail.hiddenByFilters).length;
+        },
         currentSearchText: null
     };
 }

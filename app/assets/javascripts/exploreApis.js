@@ -6,6 +6,7 @@ import {buildPlatformFilters} from "./exploreApisPlatformFilters.js";
 import {buildModel} from "./exploreApisModel.js";
 import {setVisible, noop} from "./utils.js";
 import {buildSearch} from "./exploreApisSearch.js";
+import {buildSearchResultPanel, buildFilterResultPanel} from "./exploreApisResultPanels.js";
 
 export function onPageShow() {
     const filters = [
@@ -20,8 +21,8 @@ export function onPageShow() {
             elSearchResultsSize = document.getElementById('searchResultsSize'),
             elApiResultsContainer = document.getElementById('apiResultsContainer'),
             elApiList = document.getElementById('apiList'),
-            elNoResultsPanel = document.getElementById('noResultsPanel'),
-            elNoResultsResetFiltersLink = document.getElementById('noResultsClearFilters');
+            searchResultsPanel = buildSearchResultPanel(),
+            filterResultsPanel = buildFilterResultPanel();
 
         let onFiltersChangedHandler = noop;
 
@@ -31,8 +32,6 @@ export function onPageShow() {
             filters.forEach(filter => filter.clear());
             onFiltersChangedHandler();
         }
-
-        elNoResultsResetFiltersLink.addEventListener('click', clearAllFilters);
 
         return {
             displayResults() {
@@ -62,23 +61,16 @@ export function onPageShow() {
             setResultCount(count) {
                 elSearchResultsSize.textContent = count;
             },
-            toggleNoResultsPanel(visible) {
-                setVisible(elNoResultsPanel, visible);
-            }
+            showSearchResultsPanel: searchResultsPanel.show,
+            hideSearchResultsPanel: searchResultsPanel.hide,
+            onClearSearch: searchResultsPanel.onClear,
+            showFilterResultsPanel: filterResultsPanel.show,
+            hideFilterResultsPanel: filterResultsPanel.hide,
+            onClearFilters: filterResultsPanel.onClear
         };
     })();
 
     const paginator = buildPaginator(15)
-
-    paginator.onPagination(itemsVisibility => {
-        itemsVisibility.forEach(([el, visibleOnCurrentPage]) => {
-            const api = model.getApiForElement(el);
-            api.hiddenByPagination = !visibleOnCurrentPage;
-        });
-        view.setApiPanelVisibility(model.apis);
-        //TODO remove
-        console.log(model.apis.map(a => `${a.index} [${a.hiddenByFilters ? 'F' : '.'}${a.hiddenBySearch ? 'S' : '.'}${a.hiddenByPagination ? 'P' : '.'}] ${a.el.querySelector('a').innerText}`))
-    });
 
     function buildFilterFunctions() {
         return filters.map(filter=> filter.buildFilterFunction());
@@ -86,25 +78,31 @@ export function onPageShow() {
 
     const model = buildModel(view.apiDetailPanels);
 
-    function applyFilters() {
+    function applyFiltersAndPagination() {
         const filterFns = buildFilterFunctions();
         model.apis.forEach(apiDetail => {
             apiDetail.hiddenByFilters = ! filterFns.every(fn => fn(apiDetail.data));
         });
 
-        paginator.render(model.apis.filter(apiDetail => apiDetail.includeInResults).map(panel => panel.el));
+        const apiPanelsToShowAfterFiltering = model.apis.filter(apiDetail => apiDetail.includeInResults).map(panel => panel.el);
+        paginator.render(apiPanelsToShowAfterFiltering, itemsVisibility => {
+            itemsVisibility.forEach(([el, visibleOnCurrentPage]) => {
+                const api = model.getApiForElement(el);
+                api.hiddenByPagination = !visibleOnCurrentPage;
+            });
+            view.setApiPanelVisibility(model.apis);
+        });
 
         view.setResultCount(model.resultCount);
-        view.toggleNoResultsPanel(model.resultCount === 0);
     }
 
     view.onFiltersChanged(() => {
-        applyFilters();
+        applyFiltersAndPagination();
     });
 
     view.initialiseFilters(model.apis);
 
-    applyFilters();
+    applyFiltersAndPagination();
     view.displayResults();
 
     const search = buildSearch();
@@ -128,7 +126,7 @@ export function onPageShow() {
                 view.orderApiPanelsByIndex(model.apis);
 
                 filters.forEach(filter => filter.clear());
-                applyFilters();
+                applyFiltersAndPagination();
             })
             .catch(e => console.error(e));
     });
