@@ -1,5 +1,5 @@
 export function buildModel(apiDetailPanels) {
-    const apis =  apiDetailPanels.map(el => ({
+    const apis = apiDetailPanels.map((el, index) => ({
             data: {
                 apiStatus: el.dataset['apistatus'],
                 domain: el.dataset['domain'],
@@ -9,6 +9,8 @@ export function buildModel(apiDetailPanels) {
                 id: el.dataset['id'],
             },
             el,
+            index,
+            originalIndex: index,
             hiddenByFilters: false,
             hiddenBySearch: false,
             hiddenByPagination: false,
