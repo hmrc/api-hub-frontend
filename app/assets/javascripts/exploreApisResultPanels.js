@@ -54,7 +54,7 @@ export function buildFilterResultPanel() {
             setVisible(elFilterResultsPanel, true);
         },
         hide() {
-            setVisible(elFilterResultsCount, false);
+            setVisible(elFilterResultsPanel, false);
         },
         onClear(handler) {
             onClearFiltersHandler = handler;

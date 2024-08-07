@@ -4,7 +4,7 @@ import {buildStatusFilters} from "./exploreApisStatusFilters.js";
 import {buildHodsFilters} from "./exploreApisHodsFilters.js";
 import {buildPlatformFilters} from "./exploreApisPlatformFilters.js";
 import {buildModel} from "./exploreApisModel.js";
-import {setVisible, noop} from "./utils.js";
+import {setVisible, noop, normaliseText} from "./utils.js";
 import {buildSearch} from "./exploreApisSearch.js";
 import {buildSearchResultPanel, buildFilterResultPanel} from "./exploreApisResultPanels.js";
 
@@ -21,12 +21,14 @@ export function onPageShow() {
             elSearchResultsSize = document.getElementById('searchResultsSize'),
             elApiResultsContainer = document.getElementById('apiResultsContainer'),
             elApiList = document.getElementById('apiList'),
+            searchBox = buildSearch(),
             searchResultsPanel = buildSearchResultPanel(),
             filterResultsPanel = buildFilterResultPanel();
 
         let onFiltersChangedHandler = noop;
-
         filters.forEach(filter=> filter.onChange(() => onFiltersChangedHandler()));
+
+        searchBox.initialise();
 
         function clearAllFilters() {
             filters.forEach(filter => filter.clear());
@@ -61,16 +63,28 @@ export function onPageShow() {
             setResultCount(count) {
                 elSearchResultsSize.textContent = count;
             },
+            clearSearch() {
+                searchBox.clear();
+            },
             showSearchResultsPanel: searchResultsPanel.show,
             hideSearchResultsPanel: searchResultsPanel.hide,
             onClearSearch: searchResultsPanel.onClear,
             showFilterResultsPanel: filterResultsPanel.show,
             hideFilterResultsPanel: filterResultsPanel.hide,
-            onClearFilters: filterResultsPanel.onClear
+            onClearFilters: filterResultsPanel.onClear,
+            onSearch: searchBox.onSearch
         };
     })();
 
-    const paginator = buildPaginator(15)
+    function updateHiddenByPaginationValues(itemsVisibility) {
+        itemsVisibility.forEach(([el, visibleOnCurrentPage]) => {
+            const api = model.getApiForElement(el);
+            api.hiddenByPagination = !visibleOnCurrentPage;
+        });
+        view.setApiPanelVisibility(model.apis);
+    }
+
+    const paginator = buildPaginator(15, updateHiddenByPaginationValues)
 
     function buildFilterFunctions() {
         return filters.map(filter=> filter.buildFilterFunction());
@@ -85,16 +99,35 @@ export function onPageShow() {
         });
 
         const apiPanelsToShowAfterFiltering = model.apis.filter(apiDetail => apiDetail.includeInResults).map(panel => panel.el);
-        paginator.render(apiPanelsToShowAfterFiltering, itemsVisibility => {
-            itemsVisibility.forEach(([el, visibleOnCurrentPage]) => {
-                const api = model.getApiForElement(el);
-                api.hiddenByPagination = !visibleOnCurrentPage;
-            });
-            view.setApiPanelVisibility(model.apis);
-        });
+        paginator.render(apiPanelsToShowAfterFiltering);
 
         view.setResultCount(model.resultCount);
+
+        const filteredCount = model.filteredCount;
+        if (model.currentSearchText) {
+            const showingAllResults = filteredCount === 0;
+            view.showSearchResultsPanel(showingAllResults, model.searchResultCount, model.currentSearchText);
+        } else {
+            view.hideSearchResultsPanel();
+        }
+
+        if (model.filteredCount > 0) {
+            view.showFilterResultsPanel(model.resultCount, model.filteredCount);
+        } else {
+            view.hideFilterResultsPanel();
+        }
     }
+
+    view.onClearSearch(() => {
+        view.clearSearch();
+        model.currentSearchText = null;
+        model.apis.forEach(apiDetail => {
+            apiDetail.hiddenBySearch = false;
+            apiDetail.index = apiDetail.originalIndex;
+        });
+        view.orderApiPanelsByIndex(model.apis);
+        applyFiltersAndPagination();
+    });
 
     view.onFiltersChanged(() => {
         applyFiltersAndPagination();
@@ -105,9 +138,12 @@ export function onPageShow() {
     applyFiltersAndPagination();
     view.displayResults();
 
-    const search = buildSearch();
-    search.initialise(model);
-    search.onSearch(searchTerm => {
+    view.onSearch(searchTerm => {
+        if (normaliseText(searchTerm) === model.currentSearchText) {
+            return;
+        }
+        model.currentSearchText = normaliseText(searchTerm);
+
         const encodedSearchTerm = encodeURIComponent(searchTerm);
         fetch(`apis/deep-search/${encodedSearchTerm}`)
             .then(response => response.json())
