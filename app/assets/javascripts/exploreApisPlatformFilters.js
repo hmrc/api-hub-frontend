@@ -36,15 +36,15 @@ export function buildPlatformFilters() {
         });
     }
 
-    function setupCheckboxes(){
-        function syncFiltersWithNonSelfServeCheckbox(checkAllFilters) {
-            const showNonSelfServe = elShowNonSelfServe.checked;
-            collapseNonSelfServeFilterSection(!showNonSelfServe);
-            if (showNonSelfServe && checkAllFilters) {
-                forEachPlatformFilterCheckbox(el => el.checked = true);
-            }
+    function syncFiltersWithNonSelfServeCheckbox(checkAllFilters) {
+        const showNonSelfServe = elShowNonSelfServe.checked;
+        collapseNonSelfServeFilterSection(!showNonSelfServe);
+        if (showNonSelfServe && checkAllFilters) {
+            forEachPlatformFilterCheckbox(el => el.checked = true);
         }
+    }
 
+    function setupCheckboxes(){
         forEachPlatformFilterCheckbox(el => {
             el.addEventListener('change', onFiltersChangedHandler);
         });
@@ -111,8 +111,8 @@ export function buildPlatformFilters() {
         },
         clear() {
             elShowSelfServe.checked = true;
-            elShowNonSelfServe.checked = false;
-            collapseNonSelfServeFilterSection(true);
+            elShowNonSelfServe.checked = true;
+            syncFiltersWithNonSelfServeCheckbox(true);
         },
         buildFilterFunction() {
             const selectedPlatforms = getSelected(),

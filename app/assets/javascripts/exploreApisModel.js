@@ -9,7 +9,6 @@ export function buildModel(apiDetailPanels) {
                 id: el.dataset['id'],
             },
             el,
-            index,
             originalIndex: index,
             hiddenByFilters: false,
             hiddenBySearch: false,
