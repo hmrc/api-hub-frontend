@@ -17,6 +17,7 @@
 package controllers.team
 
 import com.google.inject.{Inject, Singleton}
+import config.CryptoProvider
 import controllers.actions.{IdentifierAction, TeamAuthActionProvider}
 import controllers.helpers.ErrorResultBuilder
 import models.application.Application
@@ -36,14 +37,17 @@ class ManageTeamController @Inject()(
   teamAuth: TeamAuthActionProvider,
   view: ManageTeamView,
   apiHubService: ApiHubService,
-  errorResultBuilder: ErrorResultBuilder
+  errorResultBuilder: ErrorResultBuilder,
+  cryptoProvider: CryptoProvider
 )(implicit ex: ExecutionContext) extends FrontendBaseController with I18nSupport {
+
+  private lazy val crypto = cryptoProvider.get()
 
   def onPageLoad(id: String, applicationId: Option[String]): Action[AnyContent] = (identify andThen teamAuth(id)).async {
     implicit request =>
       fetchApplication(applicationId).map {
         case Right(application) =>
-            Ok(view(request.team.withSortedTeam(), application, request.identifierRequest.user))
+            Ok(view(request.team.withSortedTeam(), application, request.identifierRequest.user, crypto))
         case Left(result) => result
       }
   }

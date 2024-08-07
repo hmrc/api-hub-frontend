@@ -17,6 +17,7 @@
 package controllers.team
 
 import base.SpecBase
+import config.CryptoProvider
 import forms.YesNoFormProvider
 import models.UserAnswers
 import models.application.TeamMember
@@ -27,19 +28,23 @@ import org.mockito.Mockito.{never, verify, when}
 import org.scalatest.{OptionValues, TryValues}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.CreateTeamMembersPage
+import play.api.{Application => PlayApplication}
 import play.api.data.FormError
 import play.api.i18n.Messages
 import play.api.inject
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.CreateTeamSessionRepository
 import services.ApiHubService
+import uk.gov.hmrc.crypto.SymmetricCryptoFactory
 import utils.HtmlValidation
 import views.html.ErrorTemplate
 import views.html.team.{RemoveTeamMemberConfirmationView, RemoveTeamMemberSuccessView}
 
 import java.time.LocalDateTime
 import scala.concurrent.Future
+import uk.gov.hmrc.crypto.PlainText
 
 class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with OptionValues with TryValues with HtmlValidation {
 
@@ -154,20 +159,18 @@ class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with Opt
         )
       )
       
-      val mockApiHubService = mock[ApiHubService]
+      val fixture = buildFixture(user)
+      val mockApiHubService = fixture.apiHubService
       
       when(mockApiHubService.findTeamById(any)(any)).thenReturn(Future.successful(Some(team)))
       when(mockApiHubService.removeTeamMemberFromTeam(any(), any())(any())) thenReturn Future.successful(Some(()))
 
-      val application = applicationBuilder(user = user)
-        .overrides(
-          inject.bind[ApiHubService].toInstance(mockApiHubService)
-        )
-        .build()
+      val application = fixture.playApplication
+      val crypto = fixture.cryptoProvider.get()
 
       running(application) {
         val view = application.injector.instanceOf[RemoveTeamMemberSuccessView]
-        val request = FakeRequest(POST, routes.RemoveTeamMemberController.onRemovalSubmit(team.id, 1).url)
+        val request = FakeRequest(POST, routes.RemoveTeamMemberController.onRemovalSubmit(team.id, crypto.encrypt(PlainText(teamMember2.email)).value).url)
           .withFormUrlEncodedBody(("value", "true"))
         val msgs: Messages = messages(application)
 
@@ -196,18 +199,16 @@ class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with Opt
         )
       )
       
-      val mockApiHubService = mock[ApiHubService]
+      val fixture = buildFixture(user)
+      val mockApiHubService = fixture.apiHubService
       
       when(mockApiHubService.findTeamById(any)(any)).thenReturn(Future.successful(Some(team)))
 
-      val application = applicationBuilder(user = user)
-        .overrides(
-          inject.bind[ApiHubService].toInstance(mockApiHubService)
-        )
-        .build()
+      val application = fixture.playApplication
+      val crypto = fixture.cryptoProvider.get()
 
       running(application) {
-        val request = FakeRequest(POST, routes.RemoveTeamMemberController.onRemovalSubmit(team.id, 1).url)
+        val request = FakeRequest(POST, routes.RemoveTeamMemberController.onRemovalSubmit(team.id, crypto.encrypt(PlainText(teamMember2.email)).value).url)
           .withFormUrlEncodedBody(("value", "false"))
 
         val result = route(application, request).value
@@ -233,20 +234,18 @@ class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with Opt
         )
       )
       
-      val mockApiHubService = mock[ApiHubService]
+      val fixture = buildFixture(user)
+      val mockApiHubService = fixture.apiHubService
       
       when(mockApiHubService.findTeamById(any)(any)).thenReturn(Future.successful(Some(team)))
       when(mockApiHubService.removeTeamMemberFromTeam(any(), any())(any())) thenReturn Future.successful(Some(()))
 
-      val application = applicationBuilder(user = user)
-        .overrides(
-          inject.bind[ApiHubService].toInstance(mockApiHubService)
-        )
-        .build()
+      val application = fixture.playApplication
+      val crypto = fixture.cryptoProvider.get()
 
       running(application) {
         val view = application.injector.instanceOf[ErrorTemplate]
-        val request = FakeRequest(POST, routes.RemoveTeamMemberController.onRemovalSubmit(team.id, 0).url)
+        val request = FakeRequest(POST, routes.RemoveTeamMemberController.onRemovalSubmit(team.id, crypto.encrypt(PlainText(teamMember1.email)).value).url)
           .withFormUrlEncodedBody(("value", "true"))
         val msgs: Messages = messages(application)
 
@@ -281,20 +280,18 @@ class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with Opt
         )
       )
       
-      val mockApiHubService = mock[ApiHubService]
+      val fixture = buildFixture(user)
+      val mockApiHubService = fixture.apiHubService
       
       when(mockApiHubService.findTeamById(any)(any)).thenReturn(Future.successful(Some(team)))
       when(mockApiHubService.removeTeamMemberFromTeam(any(), any())(any())) thenReturn Future.successful(Some(()))
 
-      val application = applicationBuilder(user = user)
-        .overrides(
-          inject.bind[ApiHubService].toInstance(mockApiHubService)
-        )
-        .build()
+      val application = fixture.playApplication
+      val crypto = fixture.cryptoProvider.get()
 
       running(application) {
         val view = application.injector.instanceOf[RemoveTeamMemberConfirmationView]
-        val request = FakeRequest(POST, routes.RemoveTeamMemberController.onRemovalSubmit(team.id, 1).url)
+        val request = FakeRequest(POST, routes.RemoveTeamMemberController.onRemovalSubmit(team.id, crypto.encrypt(PlainText(teamMember2.email)).value).url)
           .withFormUrlEncodedBody(("value", ""))
         val msgs: Messages = messages(application)
         val form = new YesNoFormProvider()("")
@@ -307,7 +304,7 @@ class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with Opt
           view(
             team,
             teamMember2,
-            1,
+            crypto.encrypt(PlainText(teamMember2.email)).value,
             user,
             form
           )(request, msgs)
@@ -333,20 +330,18 @@ class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with Opt
         )
       )
       
-      val mockApiHubService = mock[ApiHubService]
+      val fixture = buildFixture(user)
+      val mockApiHubService = fixture.apiHubService
       
       when(mockApiHubService.findTeamById(any)(any)).thenReturn(Future.successful(Some(team)))
       when(mockApiHubService.removeTeamMemberFromTeam(any(), any())(any())) thenReturn Future.successful(None)
 
-      val application = applicationBuilder(user = user)
-        .overrides(
-          inject.bind[ApiHubService].toInstance(mockApiHubService)
-        )
-        .build()
+      val application = fixture.playApplication
+      val crypto = fixture.cryptoProvider.get()
 
       running(application) {
         val view = application.injector.instanceOf[ErrorTemplate]
-        val request = FakeRequest(POST, routes.RemoveTeamMemberController.onRemovalSubmit(team.id, 1).url)
+        val request = FakeRequest(POST, routes.RemoveTeamMemberController.onRemovalSubmit(team.id, crypto.encrypt(PlainText(teamMember2.email)).value).url)
           .withFormUrlEncodedBody(("value", "true"))
         val msgs: Messages = messages(application)
 
@@ -364,50 +359,23 @@ class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with Opt
         verify(mockApiHubService).removeTeamMemberFromTeam(matches(team.id), same(teamMember2))(any())
       }
     }
+  }
 
-    "must return an error when the team member index is out of bounds" in {
-      val teamMember1 = TeamMember("creator@hmrc.gov.uk")
-      val teamMember2 = TeamMember("new.member@hmrc.gov.uk")
+  private case class Fixture(playApplication: PlayApplication, apiHubService: ApiHubService, cryptoProvider: CryptoProvider)
 
-      val user = UserModel("test-user-id", "test-user-name", LdapUser, Some(teamMember1.email))
+  private def buildFixture(userModel: UserModel): Fixture = {
+    val apiHubService = mock[ApiHubService]
+    val cryptoProvider = mock[CryptoProvider]
 
-      val team = Team(
-        "test-team-id",
-        "test-team-name",
-        LocalDateTime.now(),
-        Seq(
-          teamMember1,
-          teamMember2
-        )
-      )
-      
-      val mockApiHubService = mock[ApiHubService]
-      
-      when(mockApiHubService.findTeamById(any)(any)).thenReturn(Future.successful(Some(team)))
+    when(cryptoProvider.get()).thenReturn(SymmetricCryptoFactory.aesCrypto("gvB1GdgzqG1AarzF1LY0zQ=="))
 
-      val application = applicationBuilder(user = user)
+    val playApplication = applicationBuilder(user = userModel)
         .overrides(
-          inject.bind[ApiHubService].toInstance(mockApiHubService)
+          bind[ApiHubService].toInstance(apiHubService),
+          bind[CryptoProvider].toInstance(cryptoProvider),
         )
         .build()
 
-      running(application) {
-        val view = application.injector.instanceOf[ErrorTemplate]
-        val request = FakeRequest(POST, routes.RemoveTeamMemberController.onRemovalSubmit(team.id, 3).url)
-          .withFormUrlEncodedBody(("value", "true"))
-        val msgs: Messages = messages(application)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual NOT_FOUND
-        contentAsString(result) mustBe
-          view(
-            "Page not found - 404",
-            "This page can’t be found",
-            "Cannot find this team member."
-          )(request, msgs)
-            .toString()
-      }
-    }
+    Fixture(playApplication, apiHubService, cryptoProvider)
   }
 }

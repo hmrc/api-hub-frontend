@@ -17,6 +17,7 @@
 @import models.application.{Application, TeamMember}
 @import models.team.Team
 @import models.user.UserModel
+@import uk.gov.hmrc.crypto.{Decrypter, Encrypter, PlainText}
 
 @this(
     layout: templates.Layout,
@@ -24,12 +25,12 @@
     govukButton: GovukButton
 )
 
-@(team: Team, application: Option[Application], user: UserModel)(implicit request: Request[_], messages: Messages)
+@(team: Team, application: Option[Application], user: UserModel, crypto: Encrypter with Decrypter)(implicit request: Request[_], messages: Messages)
 
-@teamMemberRemoveLink(teamId: String, teamMember: TeamMember, teamMemberIndex: Int, membersInTeam: Int) = {
+@teamMemberRemoveLink(teamId: String, teamMember: TeamMember, membersInTeam: Int) = {
     @* Hide the link if there is just one member on the team or if it's the user's member *@
     @if(membersInTeam > 1 && !user.email.fold(false)(_.equalsIgnoreCase(teamMember.email))) {
-        <a href="@controllers.team.routes.RemoveTeamMemberController.removeTeamMemberFromExistingTeam(teamId, teamMemberIndex)" class="govuk-body govuk-link govuk-link--no-visited-state">@messages("manageTeam.teamMembers.removeMember")</a>
+        <a href="@controllers.team.routes.RemoveTeamMemberController.removeTeamMemberFromExistingTeam(teamId, crypto.encrypt(PlainText(teamMember.email)).value)" class="govuk-body govuk-link govuk-link--no-visited-state">@messages("manageTeam.teamMembers.removeMember")</a>
     }
 }
 
@@ -58,15 +59,14 @@
                     HeadCell(messages("manageTeam.teamMembers.emailAddress")),
                     HeadCell()
                 )),
-            rows = team.teamMembers.zipWithIndex.map {
-                case (teamMember, index) =>
+            rows = team.teamMembers.map(teamMember =>
                     Seq(
                         TableRow(content = teamMember.email),
                         TableRow(content = HtmlContent(
-                                teamMemberRemoveLink(team.id, teamMember, index, team.teamMembers.size))
+                                teamMemberRemoveLink(team.id, teamMember, team.teamMembers.size))
                             )
                     )
-            }
+            )
         )
     )
 

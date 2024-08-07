@@ -16,17 +16,18 @@
 
 package controllers.team
 
+import config.CryptoProvider
 import controllers.actions._
 import controllers.helpers.ErrorResultBuilder
 import pages.CreateTeamMembersPage
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc._
-import models.team.TeamLenses._
 import repositories.CreateTeamSessionRepository
+import services.ApiHubService
+import uk.gov.hmrc.crypto.Crypted
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.team.{RemoveTeamMemberConfirmationView, RemoveTeamMemberSuccessView}
 import forms.YesNoFormProvider
-import services.ApiHubService
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -43,9 +44,11 @@ class RemoveTeamMemberController @Inject()(override val messagesApi: MessagesApi
                                            successView: RemoveTeamMemberSuccessView,
                                            formProvider: YesNoFormProvider,
                                            apiHubService: ApiHubService,
+                                           cryptoProvider: CryptoProvider,
                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider("manageTeam.teamMembers.removeTeamMember.error")
+  private lazy val crypto = cryptoProvider.get
 
   def removeTeamMember(index: Int): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
@@ -64,42 +67,46 @@ class RemoveTeamMemberController @Inject()(override val messagesApi: MessagesApi
       )
   }
 
-  def removeTeamMemberFromExistingTeam(teamId: String, teamMemberIndex: Int): Action[AnyContent] = (identify andThen teamAuth(teamId)) {
+  def removeTeamMemberFromExistingTeam(teamId: String, encryptedEmail: String): Action[AnyContent] = (identify andThen teamAuth(teamId)) {
     implicit request =>
-      val team = request.team.withSortedTeam()
-      Ok(confirmationView(team, team.teamMembers(teamMemberIndex), teamMemberIndex, request.identifierRequest.user, form))
+      val email = decrypt(encryptedEmail)
+      val team = request.team
+      team.teamMembers.find(_.email.equalsIgnoreCase(email)).map(teamMember =>
+        Ok(confirmationView(team, teamMember, encryptedEmail, request.identifierRequest.user, form))
+      ).getOrElse(teamMemberToRemoveNotFound())
   }
 
-  def onRemovalSubmit(teamId: String, teamMemberIndex: Int): Action[AnyContent] = (identify andThen teamAuth(teamId)).async {
+  def onRemovalSubmit(teamId: String, encryptedEmail: String): Action[AnyContent] = (identify andThen teamAuth(teamId)).async {
     implicit request =>
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(
-            BadRequest(confirmationView(request.team, request.team.teamMembers(teamMemberIndex), teamMemberIndex, request.identifierRequest.user, formWithErrors))
-          ),
-        value =>
-          if (value) {
-            val team = request.team.withSortedTeam()
-            val user = request.identifierRequest.user
-            if (team.teamMembers.length > teamMemberIndex)
-              if (
-                user.email.map(_.equalsIgnoreCase(
-                  team.teamMembers(teamMemberIndex).email
-                )).getOrElse(false)
-              )
+      val email = decrypt(encryptedEmail)
+      val team = request.team
+      team.teamMembers.find(_.email.equalsIgnoreCase(email)).map(teamMember =>
+        form.bindFromRequest().fold(
+          formWithErrors =>
+            Future.successful(
+                BadRequest(confirmationView(request.team, teamMember, encryptedEmail, request.identifierRequest.user, formWithErrors))
+            ),
+          value =>
+            if (value) {
+              val user = request.identifierRequest.user
+              val isSelfRemoval = user.email.map(_.equalsIgnoreCase(email)).getOrElse(false)
+              if (isSelfRemoval)
                 teamMemberToRemoveSameAsUser()
               else
-                apiHubService.removeTeamMemberFromTeam(teamId, team.teamMembers(teamMemberIndex)).map {
+                apiHubService.removeTeamMemberFromTeam(teamId, teamMember).map {
                   case Some(_) => Ok(successView(team, user))
                   case None => teamMemberToRemoveNotFound()
                 }
-            else
-              Future.successful(teamMemberToRemoveNotFound())
-          }
-          else {
-            Future.successful(Redirect(controllers.team.routes.ManageTeamController.onPageLoad(teamId)))
-          }
-      )
+            }
+            else {
+              Future.successful(Redirect(controllers.team.routes.ManageTeamController.onPageLoad(teamId)))
+            }
+        )
+      ).getOrElse(Future.successful(teamMemberToRemoveNotFound()))
+  }
+
+  private def decrypt(encrypted: String): String = {
+    crypto.decrypt(Crypted(encrypted)).value
   }
 
   private def teamMemberNotFound()(implicit request: Request[_]): Future[Result] = {

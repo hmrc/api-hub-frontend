@@ -26,7 +26,7 @@
     govukTable: GovukTable
 )
 
-@(team: Team, teamMember: TeamMember, teamMemberIndex: Int, user: UserModel, form: Form[_])(implicit request: Request[_], messages: Messages)
+@(team: Team, teamMember: TeamMember, encryptedEmail: String, user: UserModel, form: Form[_])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("manageTeam.removeTeamMember.title", team.name)), user = Some(user)) {
 
@@ -59,7 +59,7 @@
 
     <hr class="govuk-!-margin-top-6 govuk-!-margin-bottom-6 govuk-section-break govuk-section-break--m govuk-section-break--visible">
 
-    @formHelper(action = controllers.team.routes.RemoveTeamMemberController.onRemovalSubmit(team.id, teamMemberIndex), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.team.routes.RemoveTeamMemberController.onRemovalSubmit(team.id, encryptedEmail), Symbol("autoComplete") -> "off") {
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = form("value"),
