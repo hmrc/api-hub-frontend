@@ -126,8 +126,9 @@ export function onPageShow() {
                         apiDetail.hiddenBySearch = true;
                     }
                 });
-
+                model.apis.sort((a, b) => a.index - b.index);
                 view.orderApiPanelsByIndex(model.apis);
+
                 filters.forEach(filter => filter.clear());
                 applyFilters();
             })
