@@ -1214,7 +1214,6 @@ class ApplicationsConnectorSpec
       stubFor(
         delete(urlEqualTo(s"/api-hub-applications/teams/$teamId/members/$encryptedEmail"))
           .withHeader(AUTHORIZATION, equalTo("An authentication token"))
-          .withHeader(CONTENT_TYPE, equalTo(ContentTypes.JSON))
           .willReturn(
             aResponse()
               .withStatus(NO_CONTENT)

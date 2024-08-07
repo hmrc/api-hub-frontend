@@ -24,7 +24,7 @@
 
 @(team: Team, user: UserModel)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("manageTeam.removeTeamMember.success.title", team.name)), user = Some(user)) {
+@layout(pageTitle = titleNoForm(messages("manageTeam.removeTeamMember.success.title", team.name)), user = Some(user), showBackLink = false) {
     @govukPanel(Panel(
         title = Text(messages("manageTeam.removeTeamMember.successMessage"))
     ))

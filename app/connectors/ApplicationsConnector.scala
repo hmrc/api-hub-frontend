@@ -422,7 +422,6 @@ class ApplicationsConnector @Inject()(
 
     httpClient
       .delete(url"$applicationsBaseUrl/api-hub-applications/teams/$id/members/$encryptedEmail")
-      .setHeader((CONTENT_TYPE, JSON))
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Either[UpstreamErrorResponse, Unit]]
       .flatMap {
