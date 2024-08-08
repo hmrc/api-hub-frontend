@@ -1204,6 +1204,48 @@ class ApplicationsConnectorSpec
     }
   }
 
+  "ApplicationsConnector.removeTeamMemberFromTeam" - {
+    val crypto = new ApplicationCrypto(ConfigFactory.parseResources("application.conf"))
+    "must place the correct request" in {
+      val teamId = "test-id"
+      val teamMember = TeamMember("test-email")
+      val encryptedEmail = crypto.QueryParameterCrypto.encrypt(PlainText(teamMember.email)).value
+
+      stubFor(
+        delete(urlEqualTo(s"/api-hub-applications/teams/$teamId/members/$encryptedEmail"))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withStatus(NO_CONTENT)
+          )
+      )
+
+      buildConnector(this).removeTeamMemberFromTeam(teamId, teamMember)(HeaderCarrier()).map(
+        result =>
+          result mustBe Some(())
+      )
+    }
+
+    "must return None when the team or team member cannot be found" in {
+      val teamId = "test-id"
+      val teamMember = TeamMember("test-email")
+      val encryptedEmail = crypto.QueryParameterCrypto.encrypt(PlainText(teamMember.email)).value
+
+      stubFor(
+        delete(urlEqualTo(s"/api-hub-applications/teams/$teamId/members/$encryptedEmail"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+          )
+      )
+
+      buildConnector(this).removeTeamMemberFromTeam(teamId, teamMember)(HeaderCarrier()).map(
+        result =>
+          result mustBe None
+      )
+    }
+  }
+
   "ApplicationsConnector.changeTeamName" - {
     "must place the correct request" in {
       val teamId = "test-id"

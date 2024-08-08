@@ -17,6 +17,7 @@
 package controllers.team
 
 import base.SpecBase
+import config.CryptoProvider
 import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
 import controllers.routes
 import models.application.TeamMember
@@ -29,6 +30,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Application => PlayApplication}
 import services.ApiHubService
+import uk.gov.hmrc.crypto.SymmetricCryptoFactory
 import utils.{HtmlValidation, TestHelpers}
 import views.html.ErrorTemplate
 import views.html.team.ManageTeamView
@@ -55,7 +57,8 @@ class ManageTeamControllerSpec extends SpecBase with MockitoSugar with ArgumentM
             status(result) mustBe OK
 
             val view = fixture.playApplication.injector.instanceOf[ManageTeamView]
-            contentAsString(result) mustBe view(team, None, user)(request, messages(fixture.playApplication)).toString()
+            val crypto = fixture.playApplication.injector.instanceOf[CryptoProvider].get()
+            contentAsString(result) mustBe view(team, None, user, crypto)(request, messages(fixture.playApplication)).toString()
             contentAsString(result) must validateAsHtml
 
             verify(fixture.apiHubService).findTeamById(eqTo(team.id))(any)
@@ -78,7 +81,8 @@ class ManageTeamControllerSpec extends SpecBase with MockitoSugar with ArgumentM
         status(result) mustBe OK
 
         val view = fixture.playApplication.injector.instanceOf[ManageTeamView]
-        contentAsString(result) mustBe view(team, Some(FakeApplication), FakeUser)(request, messages(fixture.playApplication)).toString()
+        val crypto = fixture.playApplication.injector.instanceOf[CryptoProvider].get()
+        contentAsString(result) mustBe view(team, Some(FakeApplication), FakeUser, crypto)(request, messages(fixture.playApplication)).toString()
         contentAsString(result) must validateAsHtml
 
         verify(fixture.apiHubService).findTeamById(eqTo(team.id))(any)
@@ -115,6 +119,7 @@ class ManageTeamControllerSpec extends SpecBase with MockitoSugar with ArgumentM
         status(result) mustBe OK
 
         val view = fixture.playApplication.injector.instanceOf[ManageTeamView]
+        val crypto = fixture.playApplication.injector.instanceOf[CryptoProvider].get()
 
         val sortedTeam = team.setTeamMembers(
           Seq(
@@ -124,7 +129,7 @@ class ManageTeamControllerSpec extends SpecBase with MockitoSugar with ArgumentM
           )
         )
 
-        contentAsString(result) mustBe view(sortedTeam, None, user)(request, messages(fixture.playApplication)).toString()
+        contentAsString(result) mustBe view(sortedTeam, None, user, crypto)(request, messages(fixture.playApplication)).toString()
       }
     }
 
@@ -197,10 +202,14 @@ class ManageTeamControllerSpec extends SpecBase with MockitoSugar with ArgumentM
 
   private def buildFixture(userModel: UserModel = FakeUser): Fixture = {
     val apiHubService = mock[ApiHubService]
+    val cryptoProvider = mock[CryptoProvider]
+
+    when(cryptoProvider.get()).thenReturn(SymmetricCryptoFactory.aesCrypto("gvB1GdgzqG1AarzF1LY0zQ=="))
 
     val playApplication = applicationBuilder(userAnswers = Some(emptyUserAnswers), user = userModel)
       .overrides(
-        bind[ApiHubService].toInstance(apiHubService)
+        bind[ApiHubService].toInstance(apiHubService),
+        bind[CryptoProvider].toInstance(cryptoProvider),
       ).build()
 
     Fixture(playApplication, apiHubService)

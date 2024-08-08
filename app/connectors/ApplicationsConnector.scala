@@ -20,7 +20,7 @@ import com.google.inject.{Inject, Singleton}
 import config.FrontendAppConfig
 import models.UserEmail
 import models.accessrequest.{AccessRequest, AccessRequestDecisionRequest, AccessRequestRequest, AccessRequestStatus}
-import models.api.{ApiDeploymentStatuses, ApiDetail}
+import models.api.ApiDeploymentStatuses
 import models.application._
 import models.deployment._
 import models.exception.{ApplicationCredentialLimitException, ApplicationsException, TeamNameNotUniqueException}
@@ -409,6 +409,20 @@ class ApplicationsConnector @Inject()(
       .setHeader((CONTENT_TYPE, JSON))
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .withBody(Json.toJson(request))
+      .execute[Either[UpstreamErrorResponse, Unit]]
+      .flatMap {
+        case Right(_) => Future.successful(Some(()))
+        case Left(e) if e.statusCode == NOT_FOUND => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
+  }
+
+  def removeTeamMemberFromTeam(id: String, teamMember: TeamMember)(implicit hc:HeaderCarrier): Future[Option[Unit]] = {
+    val encryptedEmail = crypto.QueryParameterCrypto.encrypt(PlainText(teamMember.email)).value
+
+    httpClient
+      .delete(url"$applicationsBaseUrl/api-hub-applications/teams/$id/members/$encryptedEmail")
+      .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Either[UpstreamErrorResponse, Unit]]
       .flatMap {
         case Right(_) => Future.successful(Some(()))

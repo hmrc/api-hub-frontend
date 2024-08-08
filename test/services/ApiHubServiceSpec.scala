@@ -628,6 +628,23 @@ class ApiHubServiceSpec
     }
   }
 
+  "removeTeamMemberFromTeam" - {
+    "must make the correct request to the applications connector and return the response" in {
+      val fixture = buildFixture()
+
+      val teamId = "test-id"
+      val teamMember = TeamMember("test-email")
+
+      when(fixture.applicationsConnector.removeTeamMemberFromTeam(any(), any())(any())).thenReturn(Future.successful(Some(())))
+
+      fixture.service.removeTeamMemberFromTeam(teamId, teamMember)(HeaderCarrier()).map {
+        result =>
+          verify(fixture.applicationsConnector).removeTeamMemberFromTeam(ArgumentMatchers.eq(teamId), ArgumentMatchers.eq(teamMember))(any())
+          result.value mustBe ()
+      }
+    }
+  }
+
   "getUserContactDetails" - {
     "must make the correct request to the applications connector and return the response" in {
       val fixture = buildFixture()

@@ -20,7 +20,7 @@ import com.google.inject.{Inject, Singleton}
 import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
 import models.AvailableEndpoint
 import models.accessrequest.{AccessRequest, AccessRequestRequest, AccessRequestStatus}
-import models.api.{ApiDeploymentStatuses, ApiDetail, PlatformContact}
+import models.api.{ApiDeploymentStatuses, ApiDetail}
 import models.application._
 import models.exception.ApplicationsException
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
@@ -143,6 +143,11 @@ class ApiHubService @Inject()(
   def addTeamMemberToTeam(id: String, teamMember: TeamMember)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
     logger.debug(s"Adding team member to team $id")
     applicationsConnector.addTeamMemberToTeam(id, teamMember)
+  }
+
+  def removeTeamMemberFromTeam(id: String, teamMember: TeamMember)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    logger.debug(s"Removing team member from team $id")
+    applicationsConnector.removeTeamMemberFromTeam(id, teamMember)
   }
 
   def getUserApis(teamMember: TeamMember)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[ApiDetail]] = {
