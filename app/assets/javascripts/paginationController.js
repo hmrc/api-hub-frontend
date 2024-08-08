@@ -3,6 +3,12 @@ import {setVisible} from "./utils.js";
 
 export const HIDDEN_BY_PAGINATION = 'hiddenByPagination';
 
+function defaultItemVisibilityHandler(itemsVisibility) {
+    itemsVisibility.forEach(([item, isVisible]) => {
+        setVisible(item, isVisible);
+    });
+}
+
 export function buildPaginator(itemsPerPage, itemVisibilityHandler = defaultItemVisibilityHandler) {
     const view = buildPaginationView(),
         model = {};
@@ -39,12 +45,6 @@ export function buildPaginator(itemsPerPage, itemVisibilityHandler = defaultItem
             endIndex = startIndex + itemsPerPage;
 
         itemVisibilityHandler(model.items.map((item, index) => [item, index >= startIndex && index < endIndex]));
-    }
-
-    function defaultItemVisibilityHandler(itemsVisibility) {
-        itemsVisibility.forEach(([item, isVisible]) => {
-            setVisible(item, isVisible);
-        });
     }
 
     return {
