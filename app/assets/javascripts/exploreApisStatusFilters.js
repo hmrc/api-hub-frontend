@@ -34,6 +34,9 @@ export function buildStatusFilters() {
             collapseStatusFilterSection(!anyStatusesSelected);
             updateStatusFilterCount();
         },
+        syncWithApis(apis) {
+            //TODO
+        },
         onChange(handler) {
             onFiltersChangedHandler = () => {
                 updateStatusFilterCount();

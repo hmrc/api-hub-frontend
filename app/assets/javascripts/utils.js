@@ -7,8 +7,13 @@ export function addIntersectionMethodToSet() {
     }
 }
 
+const GOV_UK_HIDDEN_CLASS = 'govuk-!-display-none';
 export function setVisible(el, isVisible) {
-    el.classList.toggle('govuk-!-display-none', !isVisible);
+    el.classList.toggle(GOV_UK_HIDDEN_CLASS, !isVisible);
+}
+
+export function isVisible(el) {
+    return !el.classList.contains(GOV_UK_HIDDEN_CLASS);
 }
 
 export function removeElement(el) {

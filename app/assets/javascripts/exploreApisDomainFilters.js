@@ -104,6 +104,9 @@ export function buildDomainFilters() {
             collapseDomainFilterSection(!anyDomainsSelected);
             updateDomainFilterCount();
         },
+        syncWithApis(apis) {
+            //TODO
+        },
         onChange(handler) {
             onFiltersChangedHandler = () => {
                 updateDomainFilterCount();
