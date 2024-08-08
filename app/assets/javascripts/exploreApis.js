@@ -119,6 +119,7 @@ export function onPageShow() {
             apiDetail.index = apiDetail.originalIndex;
         });
         view.orderApiPanelsByIndex(model.apis);
+        filters.forEach(filter => filter.syncWithApis(model.apis.filter(apiDetail => !apiDetail.hiddenBySearch)));
         applyFiltersAndPagination();
     });
 
@@ -153,7 +154,7 @@ export function onPageShow() {
                 view.orderApiPanelsByIndex(model.apis);
 
                 filters.forEach(filter => filter.clear());
-                filters.forEach(filter => filter.initialise(model.apis.filter(apiDetail => !apiDetail.hiddenBySearch)));
+                filters.forEach(filter => filter.syncWithApis(model.apis.filter(apiDetail => !apiDetail.hiddenBySearch)));
                 applyFiltersAndPagination();
             })
             .catch(e => console.error(e));

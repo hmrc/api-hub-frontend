@@ -1,9 +1,10 @@
-import {addIntersectionMethodToSet, noop, removeElement} from "./utils.js";
+import {addIntersectionMethodToSet, isVisible, noop, removeElement, setVisible} from "./utils.js";
 
 addIntersectionMethodToSet();
 
 export function buildHodsFilters() {
     const hodFilterEls = [],
+        elHodFiltersContainer = document.getElementById('hodFilters'),
         elHodFilterCount = document.getElementById('hodFilterCount'),
         elViewHodFilters = document.getElementById('viewHodFilters');
 
@@ -33,21 +34,15 @@ export function buildHodsFilters() {
         return hods;
     }
 
-    function removeUnusedCheckboxes(apiHods) {
+    function setCheckboxVisibility(apiHods) {
+        hodFilterEls.length = 0;
         document.querySelectorAll('input.hodFilter').forEach(elHodsCheckbox => {
-            const hod = elHodsCheckbox.value;
-            if (! apiHods.has(hod)) {
-                removeElement(elHodsCheckbox.parentElement);
+            const hod = elHodsCheckbox.value,
+                hodInUse = apiHods.has(hod);
+            setVisible(elHodsCheckbox.parentElement, hodInUse);
+            if (hodInUse) {
+                hodFilterEls.push(elHodsCheckbox);
             }
-        });
-    }
-
-    function setupCheckboxes() {
-        document.querySelectorAll('input.hodFilter').forEach(elHodCheckbox => {
-            hodFilterEls.push(elHodCheckbox);
-            elHodCheckbox.addEventListener('change', () => {
-                onFiltersChangedHandler();
-            });
         });
     }
 
@@ -61,13 +56,25 @@ export function buildHodsFilters() {
 
     return {
         initialise(apis) {
+            document.querySelectorAll('input.hodFilter')
+                .forEach(elHodCheckbox => {
+                    elHodCheckbox.addEventListener('change', () => {
+                        onFiltersChangedHandler();
+                    });
+                });
+            this.syncWithApis(apis);
+        },
+        syncWithApis(apis) {
             const apiHods = getHodsInUseByApis(apis);
-            removeUnusedCheckboxes(apiHods);
-            setupCheckboxes();
+            setCheckboxVisibility(apiHods);
 
-            const anyHodsSelected = hodFilterEls.some(el => el.checked);
-            collapseHodFilterSection(!anyHodsSelected);
-            updateHodFilterCount();
+            const anyHodsInUse = hodFilterEls.length > 0;
+            setVisible(elHodFiltersContainer, anyHodsInUse);
+            if (anyHodsInUse) {
+                const anyHodsSelected = hodFilterEls.some(el => el.checked);
+                collapseHodFilterSection(!anyHodsSelected);
+                updateHodFilterCount();
+            }
         },
         onChange(handler) {
             onFiltersChangedHandler = () => {

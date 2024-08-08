@@ -104,6 +104,9 @@ export function buildPlatformFilters() {
             removeUnusedCheckboxes();
             setupCheckboxes();
         },
+        syncWithApis(apis) {
+            //TODO
+        },
         onChange(handler) {
             onFiltersChangedHandler = () => {
                 handler();
