@@ -19,7 +19,7 @@ export function onPageShow() {
     const view = (() => {
         const apiDetailPanelEls = Array.from(document.querySelectorAll('#apiList .api-panel')),
             elSearchResultsSize = document.getElementById('searchResultsSize'),
-            elApiResultsContainer = document.getElementById('apiResultsContainer'),
+            elSearchResults = document.getElementById('searchResults'),
             elApiList = document.getElementById('apiList'),
             searchBox = buildSearch(),
             searchResultsPanel = buildSearchResultPanel(),
@@ -28,10 +28,6 @@ export function onPageShow() {
         searchBox.initialise();
 
         return {
-            displayResults() {
-                // Only display results after all filters have been applied
-                setVisible(elApiResultsContainer, true);
-            },
             get apiDetailPanels() {
                 return [...apiDetailPanelEls];
             },
@@ -47,7 +43,7 @@ export function onPageShow() {
                 elApiList.prepend(...panelsToReorder); // move all panels in single DOM operation to minimise reflows
             },
             setResultCount(count) {
-                elSearchResultsSize.textContent = count;
+                elSearchResultsSize.textContent = `(${count})`;
             },
             clearSearch() {
                 searchBox.clear();
@@ -61,6 +57,13 @@ export function onPageShow() {
             onSearch: searchBox.onSearch,
             get searchTerm() {
                 return searchBox.searchTerm;
+            },
+            set displayResults(visible) {
+                setVisible(elSearchResults, visible);
+                setVisible(elSearchResultsSize, visible);
+            },
+            set enableFilters(enabled) {
+                document.querySelectorAll('input[type=checkbox]').forEach(checkbox => checkbox.disabled = !enabled);
             }
         };
     })();
@@ -131,10 +134,13 @@ export function onPageShow() {
     });
 
     applyFiltersAndPagination();
-    view.displayResults();
+    // Only display results after all filters have been applied
+    view.displayResults = true;
 
     function performSearch(searchTerm, clearFilters = true) {
         model.currentSearchText = normaliseText(searchTerm);
+        view.enableFilters = false;
+        view.displayResults = false;
 
         const encodedSearchTerm = encodeURIComponent(searchTerm);
         fetch(`apis/deep-search/${encodedSearchTerm}`)
@@ -159,7 +165,11 @@ export function onPageShow() {
                 filters.forEach(filter => filter.syncWithApis(model.apis.filter(apiDetail => !apiDetail.hiddenBySearch)));
                 applyFiltersAndPagination();
             })
-            .catch(e => console.error(e));
+            .catch(e => console.error(e))
+            .finally(() => {
+                view.enableFilters = true;
+                view.displayResults = true;
+            });
     }
 
     view.onSearch(searchTerm => {
@@ -170,9 +180,6 @@ export function onPageShow() {
     });
 
     if (view.searchTerm) {
-        /* This happens when the user performs a search, clicks through to an API and then navigates back to this
-        page again. We want to restore the page to the same state the user left it in, so we need to repeat the search
-        and not clear the filters. */
         performSearch(view.searchTerm, false);
     }
 }
