@@ -25,23 +25,12 @@ export function onPageShow() {
             searchResultsPanel = buildSearchResultPanel(),
             filterResultsPanel = buildFilterResultPanel();
 
-        let onFiltersChangedHandler = noop;
-        filters.forEach(filter=> filter.onChange(() => onFiltersChangedHandler()));
-
         searchBox.initialise();
-
-        function clearAllFilters() {
-            filters.forEach(filter => filter.clear());
-            onFiltersChangedHandler();
-        }
 
         return {
             displayResults() {
                 // Only display results after all filters have been applied
                 setVisible(elApiResultsContainer, true);
-            },
-            onFiltersChanged(handler) {
-                onFiltersChangedHandler = handler;
             },
             get apiDetailPanels() {
                 return [...apiDetailPanelEls];
@@ -56,9 +45,6 @@ export function onPageShow() {
                     .toSorted((a, b) => a.index - b.index)
                     .map(apiDetail => apiDetail.el);
                 elApiList.prepend(...panelsToReorder); // move all panels in single DOM operation to minimise reflows
-            },
-            initialiseFilters(apis) {
-                filters.forEach(filter => filter.initialise(apis));
             },
             setResultCount(count) {
                 elSearchResultsSize.textContent = count;
@@ -85,12 +71,11 @@ export function onPageShow() {
     }
 
     const paginator = buildPaginator(15, updateHiddenByPaginationValues)
+    const model = buildModel(view.apiDetailPanels);
 
     function buildFilterFunctions() {
         return filters.map(filter=> filter.buildFilterFunction());
     }
-
-    const model = buildModel(view.apiDetailPanels);
 
     function applyFiltersAndPagination() {
         const filterFns = buildFilterFunctions();
@@ -118,6 +103,14 @@ export function onPageShow() {
         }
     }
 
+    filters.forEach(filter => filter.initialise(model.apis));
+    filters.forEach(filter=> filter.onChange(applyFiltersAndPagination));
+
+    function clearAllFilters() {
+        filters.forEach(filter => filter.clear());
+        applyFiltersAndPagination();
+    }
+
     view.onClearSearch(() => {
         view.clearSearch();
         model.currentSearchText = null;
@@ -129,11 +122,9 @@ export function onPageShow() {
         applyFiltersAndPagination();
     });
 
-    view.onFiltersChanged(() => {
-        applyFiltersAndPagination();
+    view.onClearFilters(() => {
+        clearAllFilters();
     });
-
-    view.initialiseFilters(model.apis);
 
     applyFiltersAndPagination();
     view.displayResults();
@@ -162,6 +153,7 @@ export function onPageShow() {
                 view.orderApiPanelsByIndex(model.apis);
 
                 filters.forEach(filter => filter.clear());
+                filters.forEach(filter => filter.initialise(model.apis.filter(apiDetail => !apiDetail.hiddenBySearch)));
                 applyFiltersAndPagination();
             })
             .catch(e => console.error(e));
