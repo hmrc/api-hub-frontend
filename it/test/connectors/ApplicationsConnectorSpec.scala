@@ -753,7 +753,7 @@ class ApplicationsConnectorSpec
   "ApplicationsConnector.generateDeployment" - {
     "must place the correct request and return the response" in {
       val request = DeploymentsRequest("test-lob", "test-name", "test-description", "test-egress", "test-team-id",
-        "test-oas", false, "ALPHA", "domain", "subdomain", Seq("hod1", "hod2"))
+        "test-oas", false, "ALPHA", "domain", "subdomain", Seq("hod1", "hod2"), Seq("test-prefix-1", "test-prefix-2"), Some("test-egress-prefix"))
       val response = SuccessfulDeploymentsResponse("test-id", "1.0.0", 102, "test-url")
 
       stubFor(
@@ -776,7 +776,7 @@ class ApplicationsConnectorSpec
 
     "must handle a 400 bad Request response with invalid OAS payload" in {
       val request = DeploymentsRequest("test-lob", "test-name", "test-description", "test-egress", "test-team-id",
-        "test-oas", true, "BETA", "domain", "subdomain", Seq("hod1", "hod2"))
+        "test-oas", true, "BETA", "domain", "subdomain", Seq("hod1", "hod2"), Seq("test-prefix-1", "test-prefix-2"), Some("test-egress-prefix"))
 
       stubFor(
         post(urlEqualTo("/api-hub-applications/deployments"))
