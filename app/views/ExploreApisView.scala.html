@@ -50,7 +50,7 @@
 
 @statusFilter(status: String, isChecked: Boolean = false) = {
     <div class="govuk-checkboxes__item">
-        <input class="govuk-checkboxes__input" id="filter@status" name="filter-status" type="checkbox" value="@status" @if(isChecked){checked="checked"}>
+        <input class="govuk-checkboxes__input statusFilter" id="filter@status" name="filter-status" type="checkbox" value="@status" @if(isChecked){checked="checked"}>
         <label class="govuk-label govuk-checkboxes__label" for="filter@status">
             @status
         </label>
@@ -58,7 +58,7 @@
 }
 
 @statusFilters() = {
-    <div id="statusFilters" class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+    <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
         @statusFilter("ALPHA", true)
         @statusFilter("BETA", true)
         @statusFilter("LIVE", true)
@@ -116,7 +116,7 @@
 }
 
 @domainsAndSubDomains() = {
-    <div id="domainFilters" class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+    <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
     @for(domain <- domains.domains) {
         <div>
             <div class="govuk-checkboxes__item">
@@ -211,7 +211,7 @@
                 </fieldset>
 
                 <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible hip-color-override govuk-!-margin-top-3">
-                <fieldset class="govuk-fieldset">
+                <fieldset id="domainFilters" class="govuk-fieldset">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                         <h2 class="govuk-fieldset__heading">
                             @messages("exploreApis.filter.byDomain")
@@ -226,9 +226,9 @@
                     <div class="govuk-body filterSelectionCount">
                         <strong id="domainFilterCount">0</strong> @messages("exploreApis.filter.selected")
                     </div>
+                    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible hip-color-override govuk-!-margin-top-1">
                 </fieldset>
 
-                <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible hip-color-override govuk-!-margin-top-1">
                 <fieldset id="hodFilters" class="govuk-fieldset">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                         <h2 class="govuk-fieldset__heading">
@@ -247,7 +247,7 @@
                     <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible hip-color-override govuk-!-margin-top-1">
                 </fieldset>
 
-                <fieldset class="govuk-fieldset">
+                <fieldset id="statusFilters" class="govuk-fieldset">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                         <h2 class="govuk-fieldset__heading">
                         @messages("exploreApis.filter.byStatus")
