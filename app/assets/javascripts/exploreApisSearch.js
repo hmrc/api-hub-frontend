@@ -28,6 +28,9 @@ export function buildSearch() {
         },
         clear() {
             elSearchInputBox.value = '';
+        },
+        get searchTerm() {
+            return elSearchInputBox.value;
         }
     };
 }
