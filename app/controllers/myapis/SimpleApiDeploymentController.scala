@@ -24,7 +24,7 @@ import forms.mappings.Mappings
 import models.deployment.{DeploymentsRequest, InvalidOasResponse, SuccessfulDeploymentsResponse}
 import models.requests.IdentifierRequest
 import play.api.Logging
-import play.api.data.Forms.mapping
+import play.api.data.Forms.{mapping, optional}
 import play.api.data._
 import play.api.i18n.I18nSupport
 import play.api.libs.json.Json
@@ -102,10 +102,24 @@ object SimpleApiDeploymentController {
         "status" -> text("Enter an API status"),
         "domain" -> text("Enter a domain"),
         "subdomain" -> text("Enter a subdomain"),
-        "hods" -> Forms.seq(text())
+        "hods" -> Forms.seq(text()),
+        "prefixesToRemove" -> optional(text()).transform[Seq[String]](toPrefixesToRemove, fromPrefixesToRemove),
+        "egressPrefix" -> optional(text())
         )(DeploymentsRequest.apply)(DeploymentsRequest.unapply)
       )
 
+    private def toPrefixesToRemove(text: Option[String]): Seq[String] = {
+      Seq.from(text.getOrElse("").split("""\R""")).map(_.trim)
+    }
+
+    private def fromPrefixesToRemove(prefixes: Seq[String]): Option[String] = {
+      if (prefixes.nonEmpty) {
+        Some(prefixes.mkString(System.lineSeparator()))
+      }
+      else {
+        None
+      }
+    }
   }
 
 }

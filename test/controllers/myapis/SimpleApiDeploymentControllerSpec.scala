@@ -22,7 +22,7 @@ import controllers.actions.FakeUser
 import controllers.myapis.SimpleApiDeploymentController.DeploymentsRequestFormProvider
 import fakes.{FakeDomains, FakeHods}
 import models.application.TeamMember
-import models.deployment.{Error, FailuresResponse, InvalidOasResponse, SuccessfulDeploymentsResponse}
+import models.deployment.{DeploymentsRequest, Error, FailuresResponse, InvalidOasResponse, SuccessfulDeploymentsResponse}
 import models.team.Team
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 import org.scalatest.prop.TableDrivenPropertyChecks
@@ -92,6 +92,7 @@ class SimpleApiDeploymentControllerSpec
         contentAsString(result) mustBe view(FakeUser, response)(request, messages(fixture.playApplication)).toString()
         contentAsString(result) must validateAsHtml
 
+        verify(fixture.applicationsConnector).generateDeployment(eqTo(deploymentsRequest))(any)
       }
     }
 
@@ -181,19 +182,43 @@ object SimpleApiDeploymentControllerSpec {
 
   val form = new DeploymentsRequestFormProvider()()
 
-  val validForm = Seq(
-    "lineOfBusiness" -> "test-line-of-business",
-    "name" -> "test-name",
-    "description" -> "test-description",
-    "egress" -> "test-egress",
-    "teamId" -> "test-team-id",
-    "oas" -> "test-oas",
-    "passthrough" -> "false",
-    "status" -> "test-status",
-    "domain" -> "1",
-    "subdomain" -> "1.1",
-    "hods[]" -> "1",
-    "hods[]" -> "2",
+  val hod1 = "test-hod-1"
+  val hod2 = "test-hod-2"
+  val prefix1 = "test-prefix-1"
+  val prefix2 = "test-prefix-2"
+  val prefix3 = "test-prefix-3"
+
+  val deploymentsRequest: DeploymentsRequest = DeploymentsRequest(
+    lineOfBusiness = "test-line-of-business",
+    name = "test-name",
+    description = "test-description",
+    egress = "test-egress",
+    teamId = "test-team-id",
+    oas = "test-oas",
+    passthrough = false,
+    status = "test-status",
+    domain = "test-domain",
+    subDomain = "test-sub-domain",
+    hods = Seq(hod1, hod2),
+    prefixesToRemove = Seq(prefix1, prefix2, prefix3),
+    egressPrefix = Some("test-egress-prefix")
+  )
+
+  val validForm: Seq[(String, String)] = Seq(
+    "lineOfBusiness" -> deploymentsRequest.lineOfBusiness,
+    "name" -> deploymentsRequest.name,
+    "description" -> deploymentsRequest.description,
+    "egress" -> deploymentsRequest.egress,
+    "teamId" -> deploymentsRequest.teamId,
+    "oas" -> deploymentsRequest.oas,
+    "passthrough" -> deploymentsRequest.passthrough.toString,
+    "status" -> deploymentsRequest.status,
+    "domain" -> deploymentsRequest.domain,
+    "subdomain" -> deploymentsRequest.subDomain,
+    "hods[]" -> hod1,
+    "hods[]" -> hod2,
+    "prefixesToRemove" -> s"$prefix1\n$prefix2\r\n$prefix3",    // Deliberate mix of UNIX and Windows newlines
+    "egressPrefix" -> deploymentsRequest.egressPrefix.get
   )
 
   def invalidForm(missingField: String): Seq[(String, String)] =
