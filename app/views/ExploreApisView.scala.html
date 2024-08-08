@@ -265,51 +265,53 @@
                 </fieldset>
             </div>
         </div>
-        <div id="apiResultsContainer" class="govuk-grid-column-two-thirds govuk-!-display-none">
-            <h3 class="govuk-!-margin-0 govuk-label govuk-label--s">@messages("exploreApis.searchResults.heading") (<span id="searchResultsSize">@apiDetails.size</span>)</h3>
+        <div class="govuk-grid-column-two-thirds">
+            <h3 class="govuk-!-margin-0 govuk-label govuk-label--s">@messages("exploreApis.searchResults.heading") <span id="searchResultsSize" class="govuk-!-display-none"></span></h3>
 
             <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible hip-color-override govuk-!-margin-top-5">
             <form id="deepSearch" class="govuk-!-margin-bottom-2">
                 @searchBox(messages("exploreApis.search.title"), Some(messages("exploreApis.search.hint")), "search")
             </form>
 
-            <div id="searchResultsPanel" class="call-out-panel call-out-panel__small govuk-!-display-none">
-                <p class="govuk-body information--general-tag govuk-!-margin-bottom-1">
-                    <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
-                    <span class="call-out-type govuk-!-font-weight-regular">
-                        <span id="searchResultsShowing">Showing</span>
-                        <span id="searchResultsCount" class="govuk-!-font-weight-bold">0</span> result<span id="searchResultsCountPlural">s</span>
-                        for the search
-                        <span id="searchResultsTerm" class="govuk-!-font-weight-bold"></span>
-                    </span>
-                </p>
-                <p class="govuk-body additional-message govuk-!-margin-top-1">
-                    <a href="#" class="govuk-link govuk-link--no-visited-state" id="clearSearch">@messages("exploreApis.search.clear")</a>
-                </p>
-            </div>
+            <div id="searchResults" class=" govuk-!-display-none">
+                <div id="searchResultsPanel" class="call-out-panel call-out-panel__small govuk-!-display-none">
+                    <p class="govuk-body information--general-tag govuk-!-margin-bottom-1">
+                        <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                        <span class="call-out-type govuk-!-font-weight-regular">
+                            <span id="searchResultsShowing">Showing</span>
+                            <span id="searchResultsCount" class="govuk-!-font-weight-bold">0</span> result<span id="searchResultsCountPlural">s</span>
+                            for the search
+                            <span id="searchResultsTerm" class="govuk-!-font-weight-bold"></span>
+                        </span>
+                    </p>
+                    <p class="govuk-body additional-message govuk-!-margin-top-1">
+                        <a href="#" class="govuk-link govuk-link--no-visited-state" id="clearSearch">@messages("exploreApis.search.clear")</a>
+                    </p>
+                </div>
 
-            <div id="filterResultsPanel" class="call-out-panel call-out-panel__small govuk-!-display-none">
-                <p class="govuk-body information--general-tag govuk-!-margin-bottom-1">
-                    <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
-                    <span class="call-out-type govuk-!-font-weight-regular">
-                        Your results are being filtered, showing <span id="filterResultsCount" class="govuk-!-font-weight-bold">0</span> result<span id="filterResultsCountPlural">s</span>.
-                    </span>
-                </p>
-                <p class="govuk-body additional-message govuk-!-margin-top-1">
-                    <span id="filterResultsHiddenCount" class="govuk-!-font-weight-bold">0</span>
-                    <span id="filterResultsSingleApi">API is</span>
-                    <span id="filterResultsMultipleApis">APIs are</span>
-                    being hidden by your filters.
-                </p>
-                <p class="govuk-body additional-message govuk-!-margin-top-1">
-                    <a href="#" class="govuk-link govuk-link--no-visited-state" id="clearFilters">@messages("exploreApis.filter.clear")</a>
-                </p>
-            </div>
+                <div id="filterResultsPanel" class="call-out-panel call-out-panel__small govuk-!-display-none">
+                    <p class="govuk-body information--general-tag govuk-!-margin-bottom-1">
+                        <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                        <span class="call-out-type govuk-!-font-weight-regular">
+                            Your results are being filtered, showing <span id="filterResultsCount" class="govuk-!-font-weight-bold">0</span> result<span id="filterResultsCountPlural">s</span>.
+                        </span>
+                    </p>
+                    <p class="govuk-body additional-message govuk-!-margin-top-1">
+                        <span id="filterResultsHiddenCount" class="govuk-!-font-weight-bold">0</span>
+                        <span id="filterResultsSingleApi">API is</span>
+                        <span id="filterResultsMultipleApis">APIs are</span>
+                        being hidden by your filters.
+                    </p>
+                    <p class="govuk-body additional-message govuk-!-margin-top-1">
+                        <a href="#" class="govuk-link govuk-link--no-visited-state" id="clearFilters">@messages("exploreApis.filter.clear")</a>
+                    </p>
+                </div>
 
-            <div class="govuk-body" id="apiList">
-                @apis(apiDetails)
+                <div class="govuk-body" id="apiList">
+                    @apis(apiDetails)
+                </div>
+                @paginator()
             </div>
-            @paginator()
         </div>
     </div>
 }
