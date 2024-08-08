@@ -58,7 +58,10 @@ export function onPageShow() {
             showFilterResultsPanel: filterResultsPanel.show,
             hideFilterResultsPanel: filterResultsPanel.hide,
             onClearFilters: filterResultsPanel.onClear,
-            onSearch: searchBox.onSearch
+            onSearch: searchBox.onSearch,
+            get searchTerm() {
+                return searchBox.searchTerm;
+            }
         };
     })();
 
@@ -130,10 +133,7 @@ export function onPageShow() {
     applyFiltersAndPagination();
     view.displayResults();
 
-    view.onSearch(searchTerm => {
-        if (normaliseText(searchTerm) === model.currentSearchText) {
-            return;
-        }
+    function performSearch(searchTerm, clearFilters = true) {
         model.currentSearchText = normaliseText(searchTerm);
 
         const encodedSearchTerm = encodeURIComponent(searchTerm);
@@ -153,14 +153,34 @@ export function onPageShow() {
                 model.apis.sort((a, b) => a.index - b.index);
                 view.orderApiPanelsByIndex(model.apis);
 
-                filters.forEach(filter => filter.clear());
+                if (clearFilters) {
+                    filters.forEach(filter => filter.clear());
+                }
                 filters.forEach(filter => filter.syncWithApis(model.apis.filter(apiDetail => !apiDetail.hiddenBySearch)));
                 applyFiltersAndPagination();
             })
             .catch(e => console.error(e));
+    }
+
+    view.onSearch(searchTerm => {
+        if (normaliseText(searchTerm) === model.currentSearchText) {
+            return;
+        }
+        performSearch(searchTerm);
     });
+
+    if (view.searchTerm) {
+        /* This happens when the user performs a search, clicks through to an API and then navigates back to this
+        page again. We want to restore the page to the same state the user left it in, so we need to repeat the search
+        and not clear the filters. */
+        performSearch(view.searchTerm, false);
+    }
 }
 
 if (typeof window !== 'undefined') {
+    /* When navigating back to a page containing form elements browsers will automatically re-populate the inputs with the values
+    that the user set previously. We need to be able to see these values when setting up the page because if the filters or search box
+    are populated we need to make sure the APIs are shown/hidden/sorted appropriately. For this reason we use the 'pageshow' event
+    here rather than 'DOMContentLoaded'. */
     window.addEventListener('pageshow', onPageShow);
 }
