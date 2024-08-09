@@ -10,7 +10,7 @@ export function buildDomainFilters() {
     let onFiltersChangedHandler = noop;
 
     function toggleSubdomainCheckboxes(domain, visible) {
-        document.querySelector(`.subdomainCheckboxes[data-domain="${domain}"]`).style.display = visible ? 'block' : 'none';
+        setVisible(document.querySelector(`.subdomainCheckboxes[data-domain="${domain}"]`), visible);
     }
 
     function updateDomainFilterCount() {
@@ -42,19 +42,6 @@ export function buildDomainFilters() {
     }
 
     function setCheckboxVisibility(apiDomains) {
-        domainFilterEls.length = 0;
-        document.querySelectorAll('input.domainFilter').forEach(elDomainCheckbox => {
-            const domain = elDomainCheckbox.value,
-                domainInUse = apiDomains.some(api => api.domain === domain);
-
-            setVisible(elDomainCheckbox.parentElement, domainInUse);
-            setVisible(document.querySelector(`.subdomainCheckboxes[data-domain="${domain}"]`), domainInUse);
-
-            if (domainInUse) {
-                domainFilterEls.push(elDomainCheckbox);
-            }
-        });
-
         subdomainFilterEls.length = 0;
         document.querySelectorAll('input.subDomainFilter').forEach(elSubDomainCheckbox => {
             const subDomain = elSubDomainCheckbox.value,
@@ -65,6 +52,19 @@ export function buildDomainFilters() {
             if (subDomainInUse) {
                 subdomainFilterEls.push(elSubDomainCheckbox);
             }
+        });
+
+        domainFilterEls.length = 0;
+        document.querySelectorAll('input.domainFilter').forEach(elDomainCheckbox => {
+            const domain = elDomainCheckbox.value,
+                domainInUse = apiDomains.some(api => api.domain === domain);
+
+            setVisible(elDomainCheckbox.parentElement, domainInUse);
+
+            if (domainInUse) {
+                domainFilterEls.push(elDomainCheckbox);
+            }
+            toggleSubdomainCheckboxes(domain, elDomainCheckbox.checked);
         });
     }
 
@@ -93,7 +93,6 @@ export function buildDomainFilters() {
                     toggleSubdomainCheckboxes(domain, isDomainSelected);
                     onFiltersChangedHandler();
                 });
-                toggleSubdomainCheckboxes(domain, elDomainCheckbox.checked);
             });
 
             document.querySelectorAll('input.subDomainFilter').forEach(elSubDomainCheckbox => {
@@ -128,7 +127,7 @@ export function buildDomainFilters() {
             subdomainFilterEls.forEach(el => {
                 el.checked = false;
             });
-            document.querySelectorAll('.subdomainCheckboxes').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.subdomainCheckboxes').forEach(el => setVisible(el, false));
             collapseDomainFilterSection(true);
             updateDomainFilterCount();
         },

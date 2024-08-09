@@ -1,5 +1,6 @@
 import {JSDOM} from 'jsdom';
 import {buildPlatformFilters} from "../../app/assets/javascripts/exploreApisPlatformFilters.js";
+import {isVisible} from "./testUtils.js";
 
 describe('exploreApisPlatformFilters', () => {
     let document, platformFilters, apis;
@@ -35,7 +36,7 @@ describe('exploreApisPlatformFilters', () => {
     });
 
     function getNonSelfServeCheckboxValues() {
-        return [...document.querySelectorAll('.platformFilter')].map(el => el.value);
+        return [...document.querySelectorAll('.platformFilter')].filter(el => isVisible(el.parentElement)).map(el => el.value);
     }
     function selfServeApiCheckbox() {
         return document.getElementById('filterPlatformSelfServe');
@@ -54,7 +55,7 @@ describe('exploreApisPlatformFilters', () => {
     }
 
     describe("initialise", () => {
-        it("removes checkboxes for platform not in use by any APIs, and for self-serve APIs",  () => {
+        it("removes checkboxes for platforms not in use by any APIs, and for self-serve APIs",  () => {
             expect(getNonSelfServeCheckboxValues()).toEqual(['hip', 'api_platform', 'sdes', 'cma']);
 
             const apis = buildApisWithPlatforms('sdes', 'sdes', 'cma', 'hip')
@@ -93,7 +94,7 @@ describe('exploreApisPlatformFilters', () => {
         });
 
         it("the list of platform filters is toggled on and off by the correct checkbox",  () => {
-            platformFilters.initialise([]);
+            platformFilters.initialise(buildApisWithPlatforms('sdes', 'sdes', 'cma', 'hip'));
 
             expect(listOfPlatformFiltersIsVisible()).toBe(false);
 
@@ -132,18 +133,18 @@ describe('exploreApisPlatformFilters', () => {
 
             platformFilters.clear();
 
-            expect(selfServeApiCheckbox().checked).toBe(true);
+            expect(selfServeApiCheckbox().checked).toBe(false);
             expect(nonSelfServeApiCheckbox().checked).toBe(false);
 
             selfServeApiCheckbox().click();
             nonSelfServeApiCheckbox().click();
 
-            expect(selfServeApiCheckbox().checked).toBe(false);
+            expect(selfServeApiCheckbox().checked).toBe(true);
             expect(nonSelfServeApiCheckbox().checked).toBe(true);
 
             platformFilters.clear();
 
-            expect(selfServeApiCheckbox().checked).toBe(true);
+            expect(selfServeApiCheckbox().checked).toBe(false);
             expect(nonSelfServeApiCheckbox().checked).toBe(false);
         });
 

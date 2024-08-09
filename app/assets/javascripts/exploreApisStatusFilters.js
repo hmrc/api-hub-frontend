@@ -79,6 +79,7 @@ export function buildStatusFilters() {
         },
         buildFilterFunction() {
             const selectedStatuses = new Set(getSelected());
+            console.log('selectedStatuses', selectedStatuses, statusFilterEls);
             return data => selectedStatuses.size === 0 || selectedStatuses.has(data.apiStatus);
         }
     };

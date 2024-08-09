@@ -1,5 +1,6 @@
 import {JSDOM} from 'jsdom';
 import {buildHodsFilters} from "../../app/assets/javascripts/exploreApisHodsFilters.js";
+import {isVisible} from "./testUtils.js";
 
 describe('exploreApisHodsFilters', () => {
     let document, hodsFilters, apis;
@@ -19,17 +20,7 @@ describe('exploreApisHodsFilters', () => {
         document = dom.window.document;
         globalThis.document = document;
 
-        apis = [
-            {data: {hods: 'h1'}},
-            {data: {hods: 'h2'}},
-            {data: {hods: 'h3'}},
-            {data: {hods: 'invalid'}},
-            {data: {hods: 'invalid,h1'}},
-            {data: {hods: ''}},
-            {data: {hods: 'h1,h2,h3'}},
-            {data: {hods: 'h1,h2'}},
-        ].map(o => ({data: {hods: new Set(o.data.hods.split(',').filter(f=>f))}}));
-
+        apis = buildApis('h1', 'h2', 'h3', 'invalid', 'invalid,h1', '', 'h1,h2,h3', 'h1,h2');
         hodsFilters = buildHodsFilters();
     });
 
@@ -37,11 +28,36 @@ describe('exploreApisHodsFilters', () => {
         return document.querySelector(`.hodFilter[value="${hod}"]`);
     }
 
+    function buildApis(...hods) {
+        return hods.map(o => ({data: {hods: new Set(o.split(',').filter(f=>f))}}));
+    }
+
     describe("initialise", () => {
         it("removes checkboxes for hods not in use by any APIs",  () => {
+            console.log(apis)
             hodsFilters.initialise(apis);
 
-            expect([...document.querySelectorAll('.hodFilter')].map(el => el.value)).toEqual(['h1', 'h2', 'h3']);
+            expect([...document.querySelectorAll('.hodFilter')].filter(el => isVisible(el.parentElement)).map(el => el.value)).toEqual(['h1', 'h2', 'h3']);
+        });
+
+        it("should hide the entire filter if no hods in use by any APIs",  () => {
+            expect(isVisible(document.getElementById('hodFilters'))).toEqual(true);
+
+            hodsFilters.initialise([{data: {hods: ''}}, {data: {hods: ''}}]);
+
+            expect(isVisible(document.getElementById('hodFilters'))).toEqual(false);
+        });
+
+        it("should hide the entire filter if no APIs are present",  () => {
+            expect(isVisible(document.getElementById('hodFilters'))).toEqual(true);
+
+            hodsFilters.initialise([]);
+
+            expect(isVisible(document.getElementById('hodFilters'))).toEqual(false);
+        });
+
+        it("should show/hide individual filters correctly as the list of APIs changes",  () => {
+            //TODO
         });
 
         it("after initialisation clicking a checkbox triggers the onChange handler",  () => {
