@@ -4,7 +4,7 @@ import {buildStatusFilters} from "./exploreApisStatusFilters.js";
 import {buildHodsFilters} from "./exploreApisHodsFilters.js";
 import {buildPlatformFilters} from "./exploreApisPlatformFilters.js";
 import {buildModel} from "./exploreApisModel.js";
-import {setVisible, noop, normaliseText} from "./utils.js";
+import {setVisible, addToSortedMethodToArray, normaliseText} from "./utils.js";
 import {buildSearch} from "./exploreApisSearch.js";
 import {buildSearchResultPanel, buildFilterResultPanel} from "./exploreApisResultPanels.js";
 
@@ -15,6 +15,8 @@ export function onPageShow() {
             buildHodsFilters(),
             buildPlatformFilters()
         ];
+
+    addToSortedMethodToArray();
 
     const view = (() => {
         const apiDetailPanelEls = Array.from(document.querySelectorAll('#apiList .api-panel')),

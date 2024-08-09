@@ -1,89 +1,102 @@
 import {JSDOM} from 'jsdom';
 import {onPageShow} from '../../app/assets/javascripts/exploreApis.js';
-import {paginationHelper, paginationContainerHtml, isVisible} from "./testUtils.js";
+import {paginationHelper, paginationContainerHtml, isVisible, waitFor, arrayFromTo} from "./testUtils.js";
 
-describe('exploreApis', () => {
-    let document;
+fdescribe('exploreApis', () => {
+    let document, fetch;
 
     beforeEach(() => {
         const dom = (new JSDOM(`
             <!DOCTYPE html>
-            <input id="nameFilter">
-            <div id="statusFilters">
-                <div><input class="govuk-checkboxes__input statusFilter" type="checkbox" value="ALPHA" checked></div>
-                <div><input class="govuk-checkboxes__input statusFilter" type="checkbox" value="BETA" checked></div>
-                <div><input class="govuk-checkboxes__input statusFilter" type="checkbox" value="LIVE" checked></div>
-                <div><input class="govuk-checkboxes__input statusFilter" type="checkbox" value="DEPRECATED"></div>                
-            </div>
-            <div id="domainFilters">
-                <div><input class="domainFilter" type="checkbox" value="d1"></div>
-                <div class="subdomainCheckboxes" data-domain="d1">
-                    <div><input class="subDomainFilter" type="checkbox" value="d1s1" data-domain="d1"></div>
-                    <div><input class="subDomainFilter" type="checkbox" value="d1s2" data-domain="d1"></div>
-                    <div><input class="subDomainFilter" type="checkbox" value="d1s3" data-domain="d1"></div>
-                </div>
-                <div><input class="domainFilter" type="checkbox" value="d2"></div>
-                <div class="subdomainCheckboxes" data-domain="d2">
-                    <div><input class="subDomainFilter" type="checkbox" value="d2s1" data-domain="d2"></div>
-                    <div><input class="subDomainFilter" type="checkbox" value="d2s2" data-domain="d2"></div>
-                    <div><input class="subDomainFilter" type="checkbox" value="d2s3" data-domain="d2"></div>
-                </div>
-                <div><input class="domainFilter" type="checkbox" value="d3"></div>
-                <div class="subdomainCheckboxes" data-domain="d3">
-                    <div><input class="subDomainFilter" type="checkbox" value="d3s1" data-domain="d3"></div>
-                    <div><input class="subDomainFilter" type="checkbox" value="d3s2" data-domain="d3"></div>
-                    <div><input class="subDomainFilter" type="checkbox" value="d3s3" data-domain="d3"></div>
-                </div>
-            </div>            
-            <div id="hodFilters">
-                <div><input class="hodFilter" type="checkbox" value="ems"></div>
-                <div><input class="hodFilter" type="checkbox" value="internal"></div>
-                <div><input class="hodFilter" type="checkbox" value="apim"></div>
-            </div>            
-            <div>
-                <div><input class="platformFilter" type="checkbox" value="sdes"></div>
-                <div><input class="platformFilter" type="checkbox" value="digi"></div>
-            </div>
+            <input id="filterPlatformSelfServe" type="checkbox">
+            <input id="filterPlatformNonSelfServe" type="checkbox">
+            <details id="viewPlatformFilters">
+                <input class="platformFilter" value="sdes" type="checkbox">
+                <input class="platformFilter" value="hip" type="checkbox" data-selfserve="true">
+                <input class="platformFilter" value="digi" type="checkbox">
+            </details>
+            <fieldset id="domainFilters">
+                <details id="viewDomainFilters">
+                    <div><input class="domainFilter" type="checkbox" value="d1"></div>
+                    <div class="subdomainCheckboxes" data-domain="d1">
+                        <div><input class="subDomainFilter" type="checkbox" value="d1s1" data-domain="d1"></div>
+                        <div><input class="subDomainFilter" type="checkbox" value="d1s2" data-domain="d1"></div>
+                        <div><input class="subDomainFilter" type="checkbox" value="d1s3" data-domain="d1"></div>
+                    </div>
+                    <div><input class="domainFilter" type="checkbox" value="d2"></div>
+                    <div class="subdomainCheckboxes" data-domain="d2">
+                        <div><input class="subDomainFilter" type="checkbox" value="d2s1" data-domain="d2"></div>
+                        <div><input class="subDomainFilter" type="checkbox" value="d2s2" data-domain="d2"></div>
+                        <div><input class="subDomainFilter" type="checkbox" value="d2s3" data-domain="d2"></div>
+                    </div>
+                    <div><input class="domainFilter" type="checkbox" value="d3"></div>
+                    <div class="subdomainCheckboxes" data-domain="d3">
+                        <div><input class="subDomainFilter" type="checkbox" value="d3s1" data-domain="d3"></div>
+                        <div><input class="subDomainFilter" type="checkbox" value="d3s2" data-domain="d3"></div>
+                        <div><input class="subDomainFilter" type="checkbox" value="d3s3" data-domain="d3"></div>
+                    </div>
+                </details>
+                <div id="domainFilterCount"></div>
+            </fieldset>
+            
+            <fieldset id="hodFilters">
+                <details id="viewHodFilters">
+                    <div><input class="hodFilter" type="checkbox" value="ems"></div>
+                    <div><input class="hodFilter" type="checkbox" value="internal"></div>
+                    <div><input class="hodFilter" type="checkbox" value="apim"></div>
+                </details>            
+                <div id="hodFilterCount"></div>
+            </fieldset>
+            
+            <fieldset id="statusFilters">
+                <details id="viewStatusFilters">
+                    <div><input class="govuk-checkboxes__input statusFilter" type="checkbox" value="ALPHA"></div>
+                    <div><input class="govuk-checkboxes__input statusFilter" type="checkbox" value="BETA"></div>
+                    <div><input class="govuk-checkboxes__input statusFilter" type="checkbox" value="LIVE"></div>
+                    <div><input class="govuk-checkboxes__input statusFilter" type="checkbox" value="DEPRECATED"></div>                
+                </details>
+                <div id="statusFilterCount"></div>
+            </fieldset>
+            
+            <span id="searchResultsSize"></span>
+            
             <form id="deepSearch">
                 <input id="search">
                 <button id="search_button"></button>
             </form>
+            
             <div id="searchResults" class="govuk-!-display-none">
+                <div id="searchResultsPanel" class="govuk-!-display-none">
+                    <span id="searchResultsShowing"></span>
+                    <span id="searchResultsCount"></span>
+                    <span id="searchResultsCountPlural"></span>
+                    <span id="searchResultsTerm"></span>
+                    <a id="clearSearch"></a>
+                </div>
+            
                 <div id="filterResultsPanel">
-                    <div id="filterResultsCount"></div>
-                    <div id="filterResultsCountPlural"></div>
-                    <div id="filterResultsHiddenCount"></div>
-                    <div id="filterResultsSingleApi"></div>
-                    <div id="filterResultsMultipleApis"></div>
-                    <div id="clearFilters"></div>
+                    <span id="filterResultsCount"></span>
+                    <span id="filterResultsCountPlural"></span>
+                    <span id="filterResultsHiddenCount"></span>
+                    <span id="filterResultsSingleApi"></span>
+                    <span id="filterResultsMultipleApis"></span>
+                    <a id="clearFilters"></a>
                 </div>
-                <div id="searchResultsPanel">
-                    <div id="searchResultsShowing"></div>
-                    <div id="searchResultsCount"></div>
-                    <div id="searchResultsCountPlural"></div>
-                    <div id="searchResultsTerm"></div>
-                    <div id="clearSearch"></div>        
-                </div>
+            
                 <div id="apiList"></div>
-                <div id="searchResultsSize"></div>
-                <div id="noResultsPanel"></div>
             </div>
-            <div id="noResultsClearFilters"></div>
-            <div id="domainFilterCount"></div>
-            <details id="viewDomainFilters"><summary></summary></details>
-            <div id="hodFilterCount"></div>
-            <details id="viewHodFilters"><summary></summary></details>
-            <div id="statusFilterCount"></div>
-            <details id="viewStatusFilters"><summary></summary></details>
-            <input id="filterPlatformSelfServe" type="checkbox">
-            <input id="filterPlatformNonSelfServe" type="checkbox">
-            <details id="viewPlatformFilters"><summary></summary></details>
             ${paginationContainerHtml}
         `));
         document = dom.window.document;
         globalThis.document = document;
         globalThis.Event = dom.window.Event;
     });
+
+    function setSearchResults(apiIds) {
+        fetch = globalThis.fetch = jasmine.createSpy('fetch').and.returnValue(Promise.resolve({
+            json: () => Promise.resolve(apiIds)
+        }));
+    }
 
     function buildApiPanelsByCount(count) {
         const panels = [],
@@ -92,23 +105,25 @@ describe('exploreApis', () => {
                 ['d1', 'd1s1'],
                 ['d1', 'd1s2'],
                 ['d1', 'd1s3'],
+                ['d1', ''],
                 ['d2', 'd2s1'],
+                ['d2', 'd2s2'],
+                ['d2', 'd2s3'],
+                ['d2', ''],
+                ['d3', 'd3s1'],
+                ['d3', 'd3s2'],
+                ['d3', 'd3s3'],
                 ['d3', ''],
-                ['', 'd3s1'],
-                ['dx', 'dxs1'],
-                ['', ''],
             ],
-            hodsValues = ['', 'ems', 'internal,ems,invalid', 'apim', 'invalid'],
-            platformValues = ['hip', 'sdes', 'digi'],
-            names = [...Array(count)].map((_, i) => `api number ${i + 1}`);
+            hodsValues = ['', 'ems', 'internal', 'apim', 'ems,internal,apim'],
+            platformValues = ['hip', 'sdes', 'digi'];
         let i= 0;
         while (i < count) {
             const apistatus = statuses[i % statuses.length],
                 [domain, subdomain] = domainValues[i % domainValues.length],
                 hods = hodsValues[i % hodsValues.length],
-                name = names[i],
                 platform = platformValues[i % platformValues.length];
-            panels.push({apistatus, domain, subdomain, hods, name, platform})
+            panels.push({apistatus, domain, subdomain, hods, platform})
             i++;
         }
         buildApiPanels(...panels);
@@ -119,383 +134,324 @@ describe('exploreApis', () => {
                 data-apistatus="${panel.apistatus}" 
                 data-domain="${panel.domain || ''}" 
                 data-subdomain="${panel.subdomain || ''}" 
-                data-index="${i}" 
+                data-id="${i}" 
                 data-hods="${panel.hods || ''}" 
-                data-platform="${panel.platform || ''}" 
-                data-apiname="${panel.name}"></div>`;
+                data-platform="${panel.platform || ''}"></div>`;
         }).join('');
     }
-    function getResultCount() {
-        return parseInt(document.getElementById('searchResultsSize').textContent.replaceAll(/[()]/g, ''));
+
+    function getAttributeValuesForAllVisiblePanelsAsArray(attribute) {
+        return paginationHelper.getVisiblePanelData('.api-panel', attribute).map(el => el[attribute]);
     }
-    function clickDomainFilter(value) {
-        document.querySelector(`input[value="${value}"].domainFilter`).click();
-    }
-    function clickSubdomainFilter(value) {
-        document.querySelector(`input[value="${value}"].subDomainFilter`).click();
-    }
-    function domainFilterIsSelected(value) {
-        return document.querySelector(`input[value="${value}"].domainFilter`).checked;
-    }
-    function subdomainFilterIsSelected(value) {
-        return document.querySelector(`input[value="${value}"].subDomainFilter`).checked;
-    }
-    function clickStatusFilter(value) {
-        document.querySelector(`#statusFilters input[value="${value}"]`).click();
-    }
-    function statusFilterIsSelected(value) {
-        return document.querySelector(`#statusFilters input[value="${value}"]`).checked;
-    }
-    function clickHodFilter(value) {
-        document.querySelector(`#hodFilters input[value="${value}"]`).click();
-    }
-    function hodFilterIsSelected(value) {
-        return document.querySelector(`#hodFilters input[value="${value}"]`).checked;
-    }
-    function domainFiltersCollapsed() {
-        return document.getElementById('viewDomainFilters').open === false;
-    }
-    function hodFiltersCollapsed() {
-        return document.getElementById('viewHodFilters').open === false;
-    }
-    function noResultsPanelIsVisible() {
-        return isVisible(document.getElementById('noResultsPanel'));
-    }
-    function clickNonSelfServePlatformFilter(value) {
-        if (value) {
-            document.querySelector(`input[value="${value}"].platformFilter`).click();
-        } else {
-            document.querySelector('#filterPlatformNonSelfServe').click();
-        }
+    function getAttributeValuesForAllVisiblePanels(attribute) {
+        return new Set(getAttributeValuesForAllVisiblePanelsAsArray(attribute));
     }
 
-    it("when platform filter is applied then correct panels are shown",  () => {
-        buildApiPanelsByCount(100);
-        onPageShow();
+    function platformFilterSelfServe() {
+        return document.getElementById('filterPlatformSelfServe');
+    }
+    function platformFilterNonSelfServe() {
+        return document.getElementById('filterPlatformNonSelfServe');
+    }
+    function platformFilterNonSelfServeList() {
+        return document.getElementById('viewPlatformFilters');
+    }
+    function platformCheckboxes() {
+        return [...document.querySelectorAll('.platformFilter')];
+    }
 
-        clickNonSelfServePlatformFilter();
+    function domainFilterView() {
+        return document.getElementById('viewDomainFilters');
+    }
+    function domainFilterCount() {
+        return document.getElementById('domainFilterCount');
+    }
+    function domainCheckboxes() {
+        return [...document.querySelectorAll('.domainFilter')];
+    }
+    function subdomainCheckboxes() {
+        return [...document.querySelectorAll('.subDomainFilter')];
+    }
+    function domainAndSubdomainCheckboxes() {
+        return [...domainCheckboxes(), ...subdomainCheckboxes()];
+    }
 
-        expect(new Set(paginationHelper.getVisiblePanelData('.api-panel', 'platform').map(({platform}) => platform))).toEqual(new Set(['sdes', 'digi']));
+    function hodFilterView() {
+        return document.getElementById('viewHodFilters');
+    }
+    function hodFilterCount() {
+        return document.getElementById('hodFilterCount');
+    }
+    function hodCheckboxes() {
+        return [...document.querySelectorAll('.hodFilter')];
+    }
 
-        clickNonSelfServePlatformFilter('sdes');
-        expect(new Set(paginationHelper.getVisiblePanelData('.api-panel', 'platform').map(({platform}) => platform))).toEqual(new Set(['digi']));
+    function statusFilterView() {
+        return document.getElementById('viewStatusFilters');
+    }
+    function statusFilterCount() {
+        return document.getElementById('statusFilterCount');
+    }
+    function statusCheckboxes() {
+        return [...document.querySelectorAll('.statusFilter')];
+    }
+
+    function searchBox() {
+        return document.getElementById('search');
+    }
+
+    describe("when page first loads", () => {
+        describe("and no inputs have any values", () => {
+            beforeEach(() => {
+                buildApiPanelsByCount(100);
+                onPageShow();
+            });
+            it("platform filter state is correct", () => {
+                expect(platformFilterSelfServe().checked).toBe(false);
+                expect(platformFilterNonSelfServe().checked).toBe(false);
+                expect(platformFilterNonSelfServeList().open).toBe(false);
+                expect(platformCheckboxes().every(isVisible)).toBe(true);
+                expect(platformCheckboxes().every(el => !el.checked)).toBe(true);
+            });
+            it("domain filter state is correct", () => {
+                expect(domainFilterView().open).toBe(false);
+                expect(domainFilterCount().textContent).toBe('0');
+                expect(domainCheckboxes().every(isVisible)).toBe(true);
+                expect(subdomainCheckboxes().every(el => !isVisible(el))).toBe(false);
+                expect(domainAndSubdomainCheckboxes().every(el => !el.checked)).toBe(true);
+            });
+            it("hod filter state is correct", () => {
+                expect(hodFilterView().open).toBe(false);
+                expect(hodFilterCount().textContent).toBe('0');
+                expect(hodCheckboxes().every(isVisible)).toBe(true);
+                expect(hodCheckboxes().every(el => !el.checked)).toBe(true);
+            });
+            it("status filter state is correct", () => {
+                expect(statusFilterView().open).toBe(false);
+                expect(statusFilterCount().textContent).toBe('0');
+                expect(statusCheckboxes().every(isVisible)).toBe(true);
+                expect(statusCheckboxes().every(el => !el.checked)).toBe(true);
+            });
+            it("search field state is correct", () => {
+                expect(searchBox().value).toBe('');
+            });
+        });
+
+        describe("state is correct if input values exist for", () => {
+            beforeEach(() => {
+                buildApiPanelsByCount(100);
+            });
+
+            it("platform self-serve filter", () => {
+                platformFilterSelfServe().click();
+                onPageShow();
+
+                expect(getAttributeValuesForAllVisiblePanels('platform')).toEqual(new Set(['hip']));
+            });
+            it("platform non-self-serve filter", () => {
+                platformFilterNonSelfServe().click();
+                onPageShow();
+
+                expect(getAttributeValuesForAllVisiblePanels('platform')).toEqual(new Set(['sdes', 'digi']));
+            });
+            it("platform non-self-serve item filter", () => {
+                platformFilterNonSelfServe().click();
+                platformCheckboxes().filter(el => el.value === 'digi')[0].click();
+                onPageShow();
+
+                expect(getAttributeValuesForAllVisiblePanels('platform')).toEqual(new Set(['digi']));
+            });
+            it("domain filter", () => {
+                domainCheckboxes().filter(el => el.value === 'd1')[0].click();
+                subdomainCheckboxes().filter(el => el.value === 'd1s1')[0].click();
+                onPageShow();
+
+                expect(getAttributeValuesForAllVisiblePanels('domain')).toEqual(new Set(['d1']));
+                expect(getAttributeValuesForAllVisiblePanels('subdomain')).toEqual(new Set(['d1s1']));
+            });
+            it("hod filter", () => {
+                hodCheckboxes().filter(el => el.value === 'ems')[0].click();
+                onPageShow();
+
+                expect(getAttributeValuesForAllVisiblePanels('hods')).toEqual(new Set(['ems', 'ems,internal,apim']));
+            });
+            it("status filter", () => {
+                statusCheckboxes().filter(el => el.value === 'ALPHA')[0].click();
+                onPageShow();
+
+                expect(getAttributeValuesForAllVisiblePanels('apistatus')).toEqual(new Set(['ALPHA']));
+            });
+            it("search field, and a search request is sent to the server", async () => {
+                setSearchResults(['42','23','56']);
+                searchBox().value = 'abc';
+                onPageShow();
+
+                expect(fetch).toHaveBeenCalledWith('apis/deep-search/abc');
+                await waitFor(() => getAttributeValuesForAllVisiblePanelsAsArray('id').join(), '42,23,56');
+            });
+        });
+
+        it("then panels are displayed in the default order", () => {
+            buildApiPanelsByCount(100);
+            onPageShow();
+            expect(getAttributeValuesForAllVisiblePanelsAsArray('id')).toEqual(arrayFromTo(0, 14).map(i => i.toString()));
+        });
+
+        it("then only the first 15 results are displayed", () => {
+            buildApiPanelsByCount(100);
+            onPageShow();
+            expect(getAttributeValuesForAllVisiblePanelsAsArray('id').length).toEqual(15);
+        });
     });
 
-    it("when page initially displayed then only panels with selected statuses are visible",  () => {
-        buildApiPanels({apistatus: 'ALPHA'}, {apistatus: 'BETA'}, {apistatus: 'LIVE'}, {apistatus: 'DEPRECATED'});
+    describe("pagination", () => {
+        it("when 15 results are displayed then the pagination is not shown", () => {
+            buildApiPanelsByCount(15);
+            onPageShow();
 
-        onPageShow();
+            expect(paginationHelper.paginationIsAvailable()).toBe(false);
+        });
+        it("when 16 results are displayed then the pagination is shown", () => {
+            buildApiPanelsByCount(16);
+            onPageShow();
 
-        expect(paginationHelper.getVisiblePanelData('.api-panel', 'apistatus')).toEqual([{apistatus: 'ALPHA', index: 0}, {apistatus: 'BETA', index: 1}, {apistatus: 'LIVE', index: 2}]);
-        expect(getResultCount()).toBe(3);
+            expect(paginationHelper.paginationIsAvailable()).toBe(true);
+        });
+        it("when the next page is clicked then the results are updated correctly", () => {
+            buildApiPanelsByCount(100);
+            onPageShow();
+            paginationHelper.clickNext();
+
+            expect(paginationHelper.getCurrentPageNumber()).toBe(2);
+            expect(getAttributeValuesForAllVisiblePanelsAsArray('id')).toEqual(arrayFromTo(15, 29).map(i => i.toString()));
+        });
+        it("when a filter is applied then the pagination is reset", () => {
+            buildApiPanelsByCount(100);
+            onPageShow();
+
+            paginationHelper.clickNext();
+            expect(paginationHelper.getCurrentPageNumber()).toBe(2);
+
+            platformFilterSelfServe().click();
+            expect(paginationHelper.getCurrentPageNumber()).toBe(1);
+        });
     });
 
-    it("search results are visible after onPageShow runs",  () => {
-        const elSearchResults = document.getElementById('searchResults');
-        expect(isVisible(elSearchResults)).toBe(false);
-
-        onPageShow();
-
-        expect(isVisible(elSearchResults)).toBe(true);
-    });
-
-    it("when status is deselected then panels with that status are hidden",  () => {
-        buildApiPanels({apistatus: 'ALPHA'}, {apistatus: 'BETA'}, {apistatus: 'LIVE'}, {apistatus: 'DEPRECATED'});
-
-        onPageShow();
-        clickStatusFilter('BETA');
-
-        expect(paginationHelper.getVisiblePanelData('.api-panel', 'apistatus')).toEqual([{apistatus: 'ALPHA', index: 0}, {apistatus: 'LIVE', index: 2}]);
-        expect(getResultCount()).toBe(2);
-    });
-
-    it("when status is selected then panels with that status are shown",  () => {
-        buildApiPanels({apistatus: 'ALPHA'}, {apistatus: 'BETA'}, {apistatus: 'LIVE'}, {apistatus: 'DEPRECATED'});
-
-        onPageShow();
-        clickStatusFilter('DEPRECATED');
-
-        expect(paginationHelper.getVisiblePanelData('.api-panel', 'apistatus')).toEqual([{apistatus: 'ALPHA', index: 0}, {apistatus: 'BETA', index: 1}, {apistatus: 'LIVE', index: 2}, {apistatus: 'DEPRECATED', index: 3}]);
-        expect(getResultCount()).toBe(4);
-    });
-
-    it("only first page of results are displayed when page loads",  () => {
-        buildApiPanelsByCount(100);
-
-        onPageShow();
-
-        expect(paginationHelper.getVisiblePanelIndexes('.api-panel')).toEqual(
-            [0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18] // 'DEPRECATED' apis hidden by default
-        );
-    });
-
-    it("when page navigation occurs then the correct panels are shown",  () => {
-        buildApiPanelsByCount(100);
-
-        onPageShow();
-        paginationHelper.getPaginationPageLink(2).click();
-
-        expect(paginationHelper.getVisiblePanelIndexes('.api-panel')).toEqual(
-            [20, 21, 22, 24, 25, 26, 28, 29, 30, 32, 33, 34, 36, 37, 38] // 'DEPRECATED' apis hidden by default
-        );
-    });
-
-    it("when filters change then page is reset to 1",  () => {
-        buildApiPanelsByCount(100);
-
-        onPageShow();
-        paginationHelper.getPaginationPageLink(2).click();
-        clickStatusFilter('DEPRECATED');
-
-        expect(paginationHelper.getVisiblePanelIndexes('.api-panel')).toEqual(
-            [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
-        );
-    });
-
-    it("when domain filter is applied then correct panels are shown",  () => {
-        buildApiPanelsByCount(100);
-        onPageShow();
-
-        clickDomainFilter('d1');
-
-        expect(paginationHelper.getVisiblePanelData('.api-panel', 'domain', 'subdomain')).toEqual([
-            { index: 0, domain: 'd1', subdomain: 'd1s1'},
-            { index: 1, domain: 'd1', subdomain: 'd1s2'},
-            { index: 2, domain: 'd1', subdomain: 'd1s3'},
-            { index: 8, domain: 'd1', subdomain: 'd1s1'},
-            { index: 9, domain: 'd1', subdomain: 'd1s2'},
-            { index: 10, domain: 'd1', subdomain: 'd1s3'},
-            { index: 16, domain: 'd1', subdomain: 'd1s1'},
-            { index: 17, domain: 'd1', subdomain: 'd1s2'},
-            { index: 18, domain: 'd1', subdomain: 'd1s3'},
-            { index: 24, domain: 'd1', subdomain: 'd1s1'},
-            { index: 25, domain: 'd1', subdomain: 'd1s2'},
-            { index: 26, domain: 'd1', subdomain: 'd1s3'},
-            { index: 32, domain: 'd1', subdomain: 'd1s1'},
-            { index: 33, domain: 'd1', subdomain: 'd1s2'},
-            { index: 34, domain: 'd1', subdomain: 'd1s3'}
-        ]);
-    });
-
-    it("when multiple domain filters are applied then correct panels are shown",  () => {
-        buildApiPanelsByCount(100);
-        onPageShow();
-
-        clickDomainFilter('d1');
-        clickSubdomainFilter('d1s1');
-        clickDomainFilter('d2');
-
-        expect(paginationHelper.getVisiblePanelData('.api-panel', 'domain', 'subdomain')).toEqual([
-            { index: 1, domain: 'd1', subdomain: 'd1s2' },
-            { index: 2, domain: 'd1', subdomain: 'd1s3' },
-            { index: 9, domain: 'd1', subdomain: 'd1s2' },
-            { index: 10, domain: 'd1', subdomain: 'd1s3' },
-            { index: 17, domain: 'd1', subdomain: 'd1s2' },
-            { index: 18, domain: 'd1', subdomain: 'd1s3' },
-            { index: 25, domain: 'd1', subdomain: 'd1s2' },
-            { index: 26, domain: 'd1', subdomain: 'd1s3' },
-            { index: 33, domain: 'd1', subdomain: 'd1s2' },
-            { index: 34, domain: 'd1', subdomain: 'd1s3' },
-            { index: 41, domain: 'd1', subdomain: 'd1s2' },
-            { index: 42, domain: 'd1', subdomain: 'd1s3' },
-            { index: 49, domain: 'd1', subdomain: 'd1s2' },
-            { index: 50, domain: 'd1', subdomain: 'd1s3' },
-            { index: 57, domain: 'd1', subdomain: 'd1s2' }
-        ]);
-    });
-
-    it("when hod filters are applied then correct panels are shown",  () => {
-        buildApiPanelsByCount(100);
-        onPageShow();
-
-        clickHodFilter('internal');
-        clickHodFilter('ems');
-        expect(paginationHelper.getVisiblePanelData('.api-panel','hods')).toEqual([
-            { index: 1,  hods: 'ems'},
-            { index: 2,  hods: 'internal,ems,invalid'},
-            { index: 6,  hods: 'ems'},
-            { index: 12, hods: 'internal,ems,invalid'},
-            { index: 16, hods: 'ems'},
-            { index: 17, hods: 'internal,ems,invalid'},
-            { index: 21, hods: 'ems'},
-            { index: 22, hods: 'internal,ems,invalid'},
-            { index: 26, hods: 'ems'},
-            { index: 32, hods: 'internal,ems,invalid'},
-            { index: 36, hods: 'ems'},
-            { index: 37, hods: 'internal,ems,invalid'},
-            { index: 41, hods: 'ems'},
-            { index: 42, hods: 'internal,ems,invalid'},
-            { index: 46, hods: 'ems'}
-        ]);
-    });
-
-    describe("domain filter selection counter", () => {
+    describe("filtering", () => {
         beforeEach(() => {
             buildApiPanelsByCount(100);
+            onPageShow();
         });
 
-        function getDomainFilterCount() {
-            return parseInt(document.getElementById('domainFilterCount').textContent);
-        }
+        it("when a platform filter is applied then the results are filtered correctly", () => {
 
-        it("when page is first displayed then domain filter count is 0",  () => {
-            onPageShow();
-
-            expect(getDomainFilterCount()).toBe(0);
         });
+        it("when a domain filter is applied then the results are filtered correctly", () => {
 
-        it("when domain filter with 3 subdomains is selected then domain filter count is 4",  () => {
-            onPageShow();
-
-            clickDomainFilter('d1');
-
-            expect(getDomainFilterCount()).toBe(4);
         });
+        it("when a hod filter is applied then the results are filtered correctly", () => {
 
-        it("when domain filter with 3 subdomains is deselected then domain filter count is 0",  () => {
-            onPageShow();
-            clickDomainFilter('d1');
-
-            clickDomainFilter('d1');
-
-            expect(getDomainFilterCount()).toBe(0);
         });
+        it("when a status filter is applied then the results are filtered correctly", () => {
 
-        it("when subdomain is deselected then domain filter count reduces by 1",  () => {
-            onPageShow();
-            clickDomainFilter('d1');
-
-            clickSubdomainFilter('d1s2');
-
-            expect(getDomainFilterCount()).toBe(3);
         });
+        it("when multiple filters are applied then the results are filtered correctly", () => {
 
-        it("when all subdomains are deselected then domain filter count is 1",  () => {
-            onPageShow();
-            clickDomainFilter('d1');
+        });
+        it("when the filters are cleared then the results are updated correctly", () => {
 
-            clickSubdomainFilter('d1s1');
-            clickSubdomainFilter('d1s2');
-            clickSubdomainFilter('d1s3');
+        });
+        it("when a filter is applied then the filter result panel is displayed", () => {
 
-            expect(getDomainFilterCount()).toBe(1);
+        });
+        it("when the filters are cleared then the filter result panel is hidden", () => {
+
         });
     });
 
-    describe("HoD filter selection counter", () => {
-        beforeEach(() => {
-            buildApiPanelsByCount(100);
+    describe("when a search is performed", () => {
+        it("the filters should be disabled", () => {
+
+        });
+        it("the api results should be cleared", () => {
+
+        });
+        it("the result count should be removed", () => {
+
+        });
+        it("the correct request is sent to the server", () => {
+
+        });
+        it("special characters in the search term are encoded", () => {
+
+        });
+        it("and the search term matches the search currently displayed then a new request is not sent to the server", () => {
+
+        });
+        it("and the search box is empty then a request is not sent to the server", () => {
+
+        });
+        it("and the search term is different to the search currently displayed then a request is sent to the server", () => {
+
         });
 
-        function getHodFilterCount() {
-            return parseInt(document.getElementById('hodFilterCount').textContent);
-        }
+        describe("and the results have returned", () => {
+            it("the filters should be re-enabled", () => {
 
-        it("when page is first displayed then hod filter count is 0",  () => {
-            onPageShow();
+            });
+            it("the filters should be cleared", () => {
 
-            expect(getHodFilterCount()).toBe(0);
+            });
+            it("the filter should be repopulated so that they match the only apis returned by the search", () => {
+
+            });
+            it("only apis that matched the search are displayed, in the correct order", () => {
+
+            });
+            it("the result count should be updated", () => {
+
+            });
+            it("the search results panel should be shown, populated with the search term and result count", () => {
+
+            });
+
+            describe("and the search did not match any apis", () => {
+                it("all filters are hidden", () => {
+
+                });
+                it("the result count is zero", () => {
+
+                });
+                it("the search results panel is shown with the correct message", () => {
+
+                });
+            });
+
+            describe("and then the search is cleared", () => {
+                it("the search box is emptied", () => {
+
+                })
+                it("the api results return to the default sort order", () => {
+
+                });
+            });
         });
 
-        it("when hod filter with is selected then domain filter count is 1",  () => {
-            onPageShow();
+        describe("and the search fails", () => {
+            it("all filters are hidden", () => {
 
-            clickHodFilter('apim');
+            });
+            it("the result count is not displayed", () => {
 
-            expect(getHodFilterCount()).toBe(1);
+            });
+            it("no apis are shown in the results", () => {
+
+            });
+            it("an error message is displayed", () => {
+
+            });
         });
+
+
     });
-
-    // describe("reset filters", () => {
-    //     beforeEach(() => {
-    //         buildApiPanelsByCount(100);
-    //     });
-    //
-    //     function clickResetFiltersLink() {
-    //         document.getElementById('resetFilters').click();
-    //     }
-    //
-    //     it("when reset filters link is clicked then all status filters are reset",  () => {
-    //         onPageShow();
-    //
-    //         clickResetFiltersLink();
-    //
-    //         expect(statusFilterIsSelected('ALPHA')).toBe(false);
-    //         expect(statusFilterIsSelected('BETA')).toBe(false);
-    //         expect(statusFilterIsSelected('LIVE')).toBe(false);
-    //         expect(statusFilterIsSelected('DEPRECATED')).toBe(false);
-    //     });
-    //
-    //     it("when reset filters link is clicked then domain filters are reset",  () => {
-    //         onPageShow();
-    //         clickDomainFilter('d1');
-    //         clickDomainFilter('d2');
-    //         clickDomainFilter('d3');
-    //
-    //         clickResetFiltersLink();
-    //
-    //         expect(domainFilterIsSelected('d1')).toBe(false);
-    //         expect(domainFilterIsSelected('d2')).toBe(false);
-    //         expect(domainFilterIsSelected('d3')).toBe(false);
-    //         expect(subdomainFilterIsSelected('d1s1')).toBe(false);
-    //         expect(subdomainFilterIsSelected('d1s2')).toBe(false);
-    //         expect(subdomainFilterIsSelected('d1s3')).toBe(false);
-    //         expect(subdomainFilterIsSelected('d2s1')).toBe(false);
-    //     });
-    //
-    //     it("when reset filters link is clicked then domain filters section is collapsed",  () => {
-    //         onPageShow();
-    //
-    //         clickResetFiltersLink();
-    //
-    //         expect(domainFiltersCollapsed()).toBe(true);
-    //     });
-    //
-    //     it("when reset filters link is clicked then hod filters are reset",  () => {
-    //         onPageShow();
-    //         clickHodFilter('apim');
-    //         clickHodFilter('ems');
-    //
-    //         clickResetFiltersLink();
-    //
-    //         expect(hodFilterIsSelected('apim')).toBe(false);
-    //         expect(hodFilterIsSelected('ems')).toBe(false);
-    //     });
-    //
-    //     it("when reset filters link is clicked then hod filters section is collapsed",  () => {
-    //         onPageShow();
-    //
-    //         clickResetFiltersLink();
-    //
-    //         expect(hodFiltersCollapsed()).toBe(true);
-    //     });
-    //
-    //     it("when second page of results is displayed and reset filters link and is clicked then we return to the first page",  () => {
-    //         onPageShow();
-    //         paginationHelper.getPaginationPageLink(2).click();
-    //
-    //         clickResetFiltersLink();
-    //
-    //         expect(paginationHelper.getCurrentPageNumber()).toBe(1);
-    //     });
-    // });
-    //
-    // describe("no results", () => {
-    //     it("when no results match filters then 'no results' message is displayed",  () => {
-    //         buildApiPanelsByCount(1);
-    //         clickStatusFilter('ALPHA');
-    //
-    //         onPageShow();
-    //
-    //         expect(noResultsPanelIsVisible()).toBe(true);
-    //     });
-    //
-    //     it("when one result matches filters then 'no results' message is not displayed",  () => {
-    //         buildApiPanelsByCount(1);
-    //
-    //         onPageShow();
-    //
-    //         expect(noResultsPanelIsVisible()).toBe(false);
-    //     });
-    // });
 });

@@ -34,7 +34,6 @@ describe('exploreApisHodsFilters', () => {
 
     describe("initialise", () => {
         it("removes checkboxes for hods not in use by any APIs",  () => {
-            console.log(apis)
             hodsFilters.initialise(apis);
 
             expect([...document.querySelectorAll('.hodFilter')].filter(el => isVisible(el.parentElement)).map(el => el.value)).toEqual(['h1', 'h2', 'h3']);
