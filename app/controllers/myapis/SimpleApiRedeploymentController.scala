@@ -24,7 +24,7 @@ import forms.mappings.Mappings
 import models.deployment.{InvalidOasResponse, RedeploymentRequest, SuccessfulDeploymentsResponse}
 import models.requests.ApiRequest
 import play.api.data.{Form, Forms}
-import play.api.data.Forms.mapping
+import play.api.data.Forms.{mapping, optional}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -87,10 +87,24 @@ object SimpleApiRedeploymentController {
           "status" -> text("Enter an API status"),
           "domain" -> text("Enter a domain"),
           "subdomain" -> text("Enter a subdomain"),
-          "hods" -> Forms.seq(text())
+          "hods" -> Forms.seq(text()),
+          "prefixesToRemove" -> optional(text()).transform[Seq[String]](toPrefixesToRemove, fromPrefixesToRemove),
+          "egressPrefix" -> optional(text())
         )(RedeploymentRequest.apply)(RedeploymentRequest.unapply)
       )
 
+    private def toPrefixesToRemove(text: Option[String]): Seq[String] = {
+      Seq.from(text.getOrElse("").split("""\R""")).map(_.trim).filter(_.nonEmpty)
+    }
+
+    private def fromPrefixesToRemove(prefixes: Seq[String]): Option[String] = {
+      if (prefixes.nonEmpty) {
+        Some(prefixes.mkString(System.lineSeparator()))
+      }
+      else {
+        None
+      }
+    }
   }
 
 }

@@ -347,6 +347,18 @@ class ApplicationsConnector @Inject()(
       }
   }
 
+  def getDeploymentDetails(publisherReference: String)(implicit hc: HeaderCarrier): Future[Option[DeploymentDetails]] = {
+    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/deployments/$publisherReference")
+      .setHeader((ACCEPT, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Either[UpstreamErrorResponse, DeploymentDetails]]
+      .flatMap {
+        case Right(deploymentDetails) => Future.successful(Some(deploymentDetails))
+        case Left(e) if e.statusCode == NOT_FOUND => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
+  }
+
   def findTeamById(id: String)(implicit hc: HeaderCarrier): Future[Option[Team]] = {
     httpClient.get(url"$applicationsBaseUrl/api-hub-applications/teams/$id")
       .setHeader((ACCEPT, JSON))

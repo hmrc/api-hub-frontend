@@ -19,6 +19,7 @@ package controllers.myapis
 import base.SpecBase
 import connectors.ApplicationsConnector
 import controllers.actions.{ApiAuthActionProvider, FakeApiAuthActions, FakeApiDetail, FakeUser}
+import controllers.myapis.SimpleApiDeploymentControllerSpec.{deploymentsRequest, prefix1, prefix2, prefix3}
 import controllers.myapis.SimpleApiRedeploymentController.RedeploymentRequestFormProvider
 import fakes.{FakeDomains, FakeHods}
 import models.deployment._
@@ -185,23 +186,33 @@ object SimpleApiRedeploymentControllerSpec extends OptionValues {
 
   private val form = new RedeploymentRequestFormProvider()()
 
+  val hod1 = "test-hod-1"
+  val hod2 = "test-hod-2"
+  val prefix1 = "test-prefix-1"
+  val prefix2 = "test-prefix-2"
+  val prefix3 = "test-prefix-3"
+
   private val redeploymentRequest = RedeploymentRequest(
     description = "test-description",
     oas = "test-oas",
     status = "test-status",
     domain = "1",
     subDomain = "1.1",
-    hods = Seq("1", "2")
+    hods = Seq(hod1, hod2),
+    prefixesToRemove = Seq(prefix1, prefix2, prefix3),
+    egressPrefix = Some("test-egress-prefix")
   )
 
   private val validForm = Seq(
     "description" -> redeploymentRequest.description,
     "oas" -> redeploymentRequest.oas,
     "status" -> redeploymentRequest.status,
-    "domain" -> "1",
-    "subdomain" -> "1.1",
-    "hods[]" -> "1",
-    "hods[]" -> "2",
+    "domain" -> redeploymentRequest.domain,
+    "subdomain" -> redeploymentRequest.subDomain,
+    "hods[]" -> hod1,
+    "hods[]" -> hod2,
+    "prefixesToRemove" -> s"$prefix1 \n $prefix2  \r\n$prefix3",    // Deliberate mix of UNIX and Windows newlines with surplus whitespace
+    "egressPrefix" -> redeploymentRequest.egressPrefix.get
   )
 
   private def invalidForm(missingField: String): Seq[(String, String)] =

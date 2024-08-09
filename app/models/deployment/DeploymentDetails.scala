@@ -18,19 +18,18 @@ package models.deployment
 
 import play.api.libs.json.{Format, Json}
 
-case class RedeploymentRequest(
+case class DeploymentDetails (
   description: String,
-  oas: String,
   status: String,
   domain: String,
   subDomain: String,
   hods: Seq[String],
-  prefixesToRemove: Seq[String],
-  egressPrefix: Option[String]
+  egressPrefix: Option[String],
+  prefixesToRemove: Seq[String]
 )
 
-object RedeploymentRequest {
+object DeploymentDetails {
 
-  implicit val formatRedeploymentRequest: Format[RedeploymentRequest] = Json.format[RedeploymentRequest]
+  implicit val formatDeploymentDetails: Format[DeploymentDetails] = Json.format[DeploymentDetails]
 
 }

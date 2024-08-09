@@ -24,6 +24,7 @@ import models.accessrequest._
 import models.api.{ApiDeploymentStatuses, ContactInfo, EndpointMethod, PlatformContact}
 import models.application.ApplicationLenses._
 import models.application._
+import models.deployment.DeploymentDetails
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
 import models.team.{NewTeam, Team}
 import models.user.UserContactDetails
@@ -243,6 +244,32 @@ class ApiHubServiceSpec
         actual =>
           actual mustBe Some(expected)
       }
+    }
+  }
+
+  "getDeploymentDetails" - {
+    "must call the applications connector and return the deployment detail" in {
+      val publisherReference = "ref123"
+
+      val deploymentDetails = DeploymentDetails(
+        description = "test-description",
+        status = "test-status",
+        domain = "test-domain",
+        subDomain = "test-dub-domain",
+        hods = Seq("test-backend-1", "test-backend-2"),
+        egressPrefix = Some("test-egress-prefix"),
+        prefixesToRemove = Seq("test-prefix-1", "test-prefix-2")
+      )
+
+      val fixture = buildFixture()
+
+      when(fixture.applicationsConnector.getDeploymentDetails(ArgumentMatchers.eq(publisherReference))(any()))
+        .thenReturn(Future.successful(Some(deploymentDetails)))
+
+      fixture.service.getDeploymentDetails(publisherReference)(HeaderCarrier()).map(
+        actual =>
+          actual.value mustBe deploymentDetails
+      )
     }
   }
 
