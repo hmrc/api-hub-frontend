@@ -109,7 +109,7 @@ object SimpleApiDeploymentController {
       )
 
     private def toPrefixesToRemove(text: Option[String]): Seq[String] = {
-      Seq.from(text.getOrElse("").split("""\R""")).map(_.trim)
+      Seq.from(text.getOrElse("").split("""\R""")).map(_.trim).filter(_.nonEmpty)
     }
 
     private def fromPrefixesToRemove(prefixes: Seq[String]): Option[String] = {

@@ -96,6 +96,34 @@ class SimpleApiDeploymentControllerSpec
       }
     }
 
+    "must bind an empty prefixesToRemove value correctly to an empty list" in {
+      val fixture = buildFixture()
+
+      val response = SuccessfulDeploymentsResponse(
+        id = "test-id",
+        version = "test-version",
+        mergeRequestIid = 101,
+        uri = "test-uri"
+      )
+
+      val form = validForm
+        .filterNot(_._1.equals("prefixesToRemove"))
+        .appended("prefixesToRemove" -> "")
+
+      when(fixture.applicationsConnector.generateDeployment(any)(any)).thenReturn(Future.successful(response))
+
+      running(fixture.playApplication) {
+        val request = FakeRequest(controllers.myapis.routes.SimpleApiDeploymentController.onSubmit())
+          .withFormUrlEncodedBody(form: _*)
+        val result = route(fixture.playApplication, request).value
+
+        status(result) mustBe OK
+
+        val expected = deploymentsRequest.copy(prefixesToRemove = Seq.empty)
+        verify(fixture.applicationsConnector).generateDeployment(eqTo(expected))(any)
+      }
+    }
+
     "must return 400 Bad Request and a failure view response when errors returned by APIM" in {
       val fixture = buildFixture()
 
@@ -217,7 +245,7 @@ object SimpleApiDeploymentControllerSpec {
     "subdomain" -> deploymentsRequest.subDomain,
     "hods[]" -> hod1,
     "hods[]" -> hod2,
-    "prefixesToRemove" -> s"$prefix1\n$prefix2\r\n$prefix3",    // Deliberate mix of UNIX and Windows newlines
+    "prefixesToRemove" -> s"$prefix1 \n $prefix2  \r\n$prefix3",    // Deliberate mix of UNIX and Windows newlines with surplus whitespace
     "egressPrefix" -> deploymentsRequest.egressPrefix.get
   )
 
