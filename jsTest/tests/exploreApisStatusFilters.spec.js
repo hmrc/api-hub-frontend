@@ -2,16 +2,16 @@ import {JSDOM} from 'jsdom';
 import {buildStatusFilters} from "../../app/assets/javascripts/exploreApisStatusFilters.js";
 
 describe('exploreApisStatusFilters', () => {
-    let document, statusFilters;
+    let document, statusFilters, apis;
 
     beforeEach(() => {
         const dom = (new JSDOM(`
             <!DOCTYPE html>
             <div id="statusFilters">
-                <input class="govuk-checkboxes__input" type="checkbox" value="ALPHA">
-                <input class="govuk-checkboxes__input" type="checkbox" value="BETA">
-                <input class="govuk-checkboxes__input" type="checkbox" value="LIVE">
-                <input class="govuk-checkboxes__input" type="checkbox" value="DEPRECATED">                
+                <div><input class="govuk-checkboxes__input statusFilter" type="checkbox" value="ALPHA"></div>
+                <div><input class="govuk-checkboxes__input statusFilter" type="checkbox" value="BETA"></div>
+                <div><input class="govuk-checkboxes__input statusFilter" type="checkbox" value="LIVE"></div>
+                <div><input class="govuk-checkboxes__input statusFilter" type="checkbox" value="DEPRECATED"></div>                
             </div>
             <div id="statusFilterCount"></div>
             <details id="viewStatusFilters"><summary></summary></details>            
@@ -20,7 +20,13 @@ describe('exploreApisStatusFilters', () => {
         globalThis.document = document;
 
         statusFilters = buildStatusFilters();
+
+        apis = buildApis('ALPHA', 'BETA', 'LIVE', 'DEPRECATED');
     });
+
+    function buildApis(...statuses) {
+        return statuses.map(o => ({data: {apiStatus: o}}));
+    }
 
     describe("initialise", () => {
         it("after initialisation clicking a checkbox triggers the onChange handler", () => {
@@ -32,32 +38,32 @@ describe('exploreApisStatusFilters', () => {
             elCheckbox.click();
             expect(changeCount).toBe(0);
 
-            statusFilters.initialise();
+            statusFilters.initialise(apis);
 
             elCheckbox.click();
             expect(changeCount).toBe(1);
         });
 
         it("if no statuses are selected then the status filter section is collapsed",  () => {
-            statusFilters.initialise();
+            statusFilters.initialise(apis);
             expect(document.getElementById('viewStatusFilters').open).toBe(false);
         });
 
         it("if statuses are selected then the status filter section is open",  () => {
             document.querySelector('[value="ALPHA"]').click();
-            statusFilters.initialise();
+            statusFilters.initialise(apis);
             expect(document.getElementById('viewStatusFilters').open).toBe(true);
         });
 
         it("if no statuses are selected then the status filter count is zero",  () => {
-            statusFilters.initialise();
+            statusFilters.initialise(apis);
             expect(document.getElementById('statusFilterCount').textContent).toBe('0');
         });
 
         it("if statuses are selected then the status filter count is the number of selected statuses",  () => {
             document.querySelector('[value="ALPHA"]').click();
             document.querySelector('[value="BETA"]').click();
-            statusFilters.initialise();
+            statusFilters.initialise(apis);
             expect(document.getElementById('statusFilterCount').textContent).toBe('2');
         });
 
@@ -65,7 +71,7 @@ describe('exploreApisStatusFilters', () => {
 
     describe("clear", () => {
         beforeEach(() => {
-            statusFilters.initialise();
+            statusFilters.initialise(apis);
         });
 
         it("unchecks all checkboxes", () => {
@@ -96,12 +102,11 @@ describe('exploreApisStatusFilters', () => {
     });
 
     describe('the filter function', () => {
-        const data = [
-            {apiStatus: "ALPHA"},
-            {apiStatus: "BETA"},
-            {apiStatus: "LIVE"},
-            {apiStatus: "DEPRECATED"},
-        ];
+        let data;
+        beforeEach(() => {
+            statusFilters.initialise(apis);
+            data = apis.map(api => api.data);
+        });
 
         it("returns true for all items if no checkboxes are selected",  () => {
             let filterFunction = statusFilters.buildFilterFunction();
@@ -115,8 +120,8 @@ describe('exploreApisStatusFilters', () => {
         });
 
         it("returns true only for matching items if no checkboxes are selected",  () => {
-            document.querySelector('.govuk-checkboxes__input[value="ALPHA"]').checked = true;
-            document.querySelector('.govuk-checkboxes__input[value="LIVE"]').checked = true;
+            document.querySelector('.statusFilter[value="ALPHA"]').checked = true;
+            document.querySelector('.statusFilter[value="LIVE"]').checked = true;
 
             let filterFunction = statusFilters.buildFilterFunction();
             expect(data.map(filterFunction)).toEqual([true, false, true, false]);

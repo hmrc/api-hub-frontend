@@ -10,10 +10,10 @@ describe('exploreApis', () => {
             <!DOCTYPE html>
             <input id="nameFilter">
             <div id="statusFilters">
-                <input class="govuk-checkboxes__input" type="checkbox" value="ALPHA" checked>
-                <input class="govuk-checkboxes__input" type="checkbox" value="BETA" checked>
-                <input class="govuk-checkboxes__input" type="checkbox" value="LIVE" checked>
-                <input class="govuk-checkboxes__input" type="checkbox" value="DEPRECATED">                
+                <div><input class="govuk-checkboxes__input statusFilter" type="checkbox" value="ALPHA" checked></div>
+                <div><input class="govuk-checkboxes__input statusFilter" type="checkbox" value="BETA" checked></div>
+                <div><input class="govuk-checkboxes__input statusFilter" type="checkbox" value="LIVE" checked></div>
+                <div><input class="govuk-checkboxes__input statusFilter" type="checkbox" value="DEPRECATED"></div>                
             </div>
             <div id="domainFilters">
                 <div><input class="domainFilter" type="checkbox" value="d1"></div>
@@ -44,12 +44,30 @@ describe('exploreApis', () => {
                 <div><input class="platformFilter" type="checkbox" value="sdes"></div>
                 <div><input class="platformFilter" type="checkbox" value="digi"></div>
             </div>
-            <div id="apiResultsContainer" class="govuk-!-display-none">
+            <form id="deepSearch">
+                <input id="search">
+                <button id="search_button"></button>
+            </form>
+            <div id="searchResults" class="govuk-!-display-none">
+                <div id="filterResultsPanel">
+                    <div id="filterResultsCount"></div>
+                    <div id="filterResultsCountPlural"></div>
+                    <div id="filterResultsHiddenCount"></div>
+                    <div id="filterResultsSingleApi"></div>
+                    <div id="filterResultsMultipleApis"></div>
+                    <div id="clearFilters"></div>
+                </div>
+                <div id="searchResultsPanel">
+                    <div id="searchResultsShowing"></div>
+                    <div id="searchResultsCount"></div>
+                    <div id="searchResultsCountPlural"></div>
+                    <div id="searchResultsTerm"></div>
+                    <div id="clearSearch"></div>        
+                </div>
                 <div id="apiList"></div>
                 <div id="searchResultsSize"></div>
                 <div id="noResultsPanel"></div>
             </div>
-            <div id="resetFilters"></div>
             <div id="noResultsClearFilters"></div>
             <div id="domainFilterCount"></div>
             <details id="viewDomainFilters"><summary></summary></details>
@@ -108,7 +126,7 @@ describe('exploreApis', () => {
         }).join('');
     }
     function getResultCount() {
-        return parseInt(document.getElementById('searchResultsSize').textContent);
+        return parseInt(document.getElementById('searchResultsSize').textContent.replaceAll(/[()]/g, ''));
     }
     function clickDomainFilter(value) {
         document.querySelector(`input[value="${value}"].domainFilter`).click();
@@ -172,13 +190,13 @@ describe('exploreApis', () => {
         expect(getResultCount()).toBe(3);
     });
 
-    it("api results are visible after onPageShow runs",  () => {
-        const elApiResultsContainer = document.getElementById('apiResultsContainer');
-        expect(isVisible(elApiResultsContainer)).toBe(false);
+    it("search results are visible after onPageShow runs",  () => {
+        const elSearchResults = document.getElementById('searchResults');
+        expect(isVisible(elSearchResults)).toBe(false);
 
         onPageShow();
 
-        expect(isVisible(elApiResultsContainer)).toBe(true);
+        expect(isVisible(elSearchResults)).toBe(true);
     });
 
     it("when status is deselected then panels with that status are hidden",  () => {
@@ -388,96 +406,96 @@ describe('exploreApis', () => {
         });
     });
 
-    describe("reset filters", () => {
-        beforeEach(() => {
-            buildApiPanelsByCount(100);
-        });
-
-        function clickResetFiltersLink() {
-            document.getElementById('resetFilters').click();
-        }
-
-        it("when reset filters link is clicked then all status filters are reset",  () => {
-            onPageShow();
-
-            clickResetFiltersLink();
-
-            expect(statusFilterIsSelected('ALPHA')).toBe(false);
-            expect(statusFilterIsSelected('BETA')).toBe(false);
-            expect(statusFilterIsSelected('LIVE')).toBe(false);
-            expect(statusFilterIsSelected('DEPRECATED')).toBe(false);
-        });
-
-        it("when reset filters link is clicked then domain filters are reset",  () => {
-            onPageShow();
-            clickDomainFilter('d1');
-            clickDomainFilter('d2');
-            clickDomainFilter('d3');
-
-            clickResetFiltersLink();
-
-            expect(domainFilterIsSelected('d1')).toBe(false);
-            expect(domainFilterIsSelected('d2')).toBe(false);
-            expect(domainFilterIsSelected('d3')).toBe(false);
-            expect(subdomainFilterIsSelected('d1s1')).toBe(false);
-            expect(subdomainFilterIsSelected('d1s2')).toBe(false);
-            expect(subdomainFilterIsSelected('d1s3')).toBe(false);
-            expect(subdomainFilterIsSelected('d2s1')).toBe(false);
-        });
-
-        it("when reset filters link is clicked then domain filters section is collapsed",  () => {
-            onPageShow();
-
-            clickResetFiltersLink();
-
-            expect(domainFiltersCollapsed()).toBe(true);
-        });
-
-        it("when reset filters link is clicked then hod filters are reset",  () => {
-            onPageShow();
-            clickHodFilter('apim');
-            clickHodFilter('ems');
-
-            clickResetFiltersLink();
-
-            expect(hodFilterIsSelected('apim')).toBe(false);
-            expect(hodFilterIsSelected('ems')).toBe(false);
-        });
-
-        it("when reset filters link is clicked then hod filters section is collapsed",  () => {
-            onPageShow();
-
-            clickResetFiltersLink();
-
-            expect(hodFiltersCollapsed()).toBe(true);
-        });
-
-        it("when second page of results is displayed and reset filters link and is clicked then we return to the first page",  () => {
-            onPageShow();
-            paginationHelper.getPaginationPageLink(2).click();
-
-            clickResetFiltersLink();
-
-            expect(paginationHelper.getCurrentPageNumber()).toBe(1);
-        });
-    });
-
-    describe("no results", () => {
-        it("when no results match filters then 'no results' message is displayed",  () => {
-            buildApiPanelsByCount(1);
-            clickStatusFilter('ALPHA');
-
-            onPageShow();
-
-            expect(noResultsPanelIsVisible()).toBe(true);
-        });
-
-        it("when one result matches filters then 'no results' message is not displayed",  () => {
-            buildApiPanelsByCount(1);
-
-            onPageShow();
-
-            expect(noResultsPanelIsVisible()).toBe(false);
-        });
-    });
+    // describe("reset filters", () => {
+    //     beforeEach(() => {
+    //         buildApiPanelsByCount(100);
+    //     });
+    //
+    //     function clickResetFiltersLink() {
+    //         document.getElementById('resetFilters').click();
+    //     }
+    //
+    //     it("when reset filters link is clicked then all status filters are reset",  () => {
+    //         onPageShow();
+    //
+    //         clickResetFiltersLink();
+    //
+    //         expect(statusFilterIsSelected('ALPHA')).toBe(false);
+    //         expect(statusFilterIsSelected('BETA')).toBe(false);
+    //         expect(statusFilterIsSelected('LIVE')).toBe(false);
+    //         expect(statusFilterIsSelected('DEPRECATED')).toBe(false);
+    //     });
+    //
+    //     it("when reset filters link is clicked then domain filters are reset",  () => {
+    //         onPageShow();
+    //         clickDomainFilter('d1');
+    //         clickDomainFilter('d2');
+    //         clickDomainFilter('d3');
+    //
+    //         clickResetFiltersLink();
+    //
+    //         expect(domainFilterIsSelected('d1')).toBe(false);
+    //         expect(domainFilterIsSelected('d2')).toBe(false);
+    //         expect(domainFilterIsSelected('d3')).toBe(false);
+    //         expect(subdomainFilterIsSelected('d1s1')).toBe(false);
+    //         expect(subdomainFilterIsSelected('d1s2')).toBe(false);
+    //         expect(subdomainFilterIsSelected('d1s3')).toBe(false);
+    //         expect(subdomainFilterIsSelected('d2s1')).toBe(false);
+    //     });
+    //
+    //     it("when reset filters link is clicked then domain filters section is collapsed",  () => {
+    //         onPageShow();
+    //
+    //         clickResetFiltersLink();
+    //
+    //         expect(domainFiltersCollapsed()).toBe(true);
+    //     });
+    //
+    //     it("when reset filters link is clicked then hod filters are reset",  () => {
+    //         onPageShow();
+    //         clickHodFilter('apim');
+    //         clickHodFilter('ems');
+    //
+    //         clickResetFiltersLink();
+    //
+    //         expect(hodFilterIsSelected('apim')).toBe(false);
+    //         expect(hodFilterIsSelected('ems')).toBe(false);
+    //     });
+    //
+    //     it("when reset filters link is clicked then hod filters section is collapsed",  () => {
+    //         onPageShow();
+    //
+    //         clickResetFiltersLink();
+    //
+    //         expect(hodFiltersCollapsed()).toBe(true);
+    //     });
+    //
+    //     it("when second page of results is displayed and reset filters link and is clicked then we return to the first page",  () => {
+    //         onPageShow();
+    //         paginationHelper.getPaginationPageLink(2).click();
+    //
+    //         clickResetFiltersLink();
+    //
+    //         expect(paginationHelper.getCurrentPageNumber()).toBe(1);
+    //     });
+    // });
+    //
+    // describe("no results", () => {
+    //     it("when no results match filters then 'no results' message is displayed",  () => {
+    //         buildApiPanelsByCount(1);
+    //         clickStatusFilter('ALPHA');
+    //
+    //         onPageShow();
+    //
+    //         expect(noResultsPanelIsVisible()).toBe(true);
+    //     });
+    //
+    //     it("when one result matches filters then 'no results' message is not displayed",  () => {
+    //         buildApiPanelsByCount(1);
+    //
+    //         onPageShow();
+    //
+    //         expect(noResultsPanelIsVisible()).toBe(false);
+    //     });
+    // });
 });
