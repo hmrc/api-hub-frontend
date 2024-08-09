@@ -27,6 +27,21 @@ export function arrayFromTo(from, to) {
     return Array.from({length: to - from + 1}, (_, i) => i + from);
 }
 
+export async function waitFor(fnTest, expectedResult) {
+    // by default this will timeout after 5 seconds
+    await new Promise(resolve => {
+        function poll() {
+            const result = fnTest();
+            if (result === expectedResult) {
+                resolve();
+            } else {
+                setTimeout(poll, 50);
+            }
+        }
+        poll();
+    });
+}
+
 export const paginationHelper = {
     paginationIsAvailable() {
         return isVisible(document.getElementById('paginationContainer'));
@@ -46,7 +61,7 @@ export const paginationHelper = {
     getVisiblePanelData(selector, ...props) {
         return Array.from(document.querySelectorAll(selector))
             .filter(isVisible)
-            .map(el => props.reduce((acc, prop) => ({...acc, [prop]: el.dataset[prop]}), {index: parseInt(el.dataset.index)}));
+            .map(el => props.reduce((acc, prop) => ({...acc, [prop]: el.dataset[prop]}), {id: parseInt(el.dataset.id)}));
     },
     getVisiblePanelIndexes(selector) {
         return this.getVisiblePanelData(selector, 'index').map(({index}) => parseInt(index));

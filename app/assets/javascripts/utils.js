@@ -7,6 +7,14 @@ export function addIntersectionMethodToSet() {
     }
 }
 
+export function addToSortedMethodToArray() {
+    if (!Array.prototype.toSorted) {
+        Array.prototype.toSorted = function(compareFn) {
+            return [...this].sort(compareFn);
+        }
+    }
+}
+
 const GOV_UK_HIDDEN_CLASS = 'govuk-!-display-none';
 export function setVisible(el, isVisible) {
     el.classList.toggle(GOV_UK_HIDDEN_CLASS, !isVisible);
