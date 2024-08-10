@@ -23,6 +23,7 @@ export function buildPlatformFilters() {
     function setNonSelfServeCheckboxVisibility() {
         // Initially we have one checkbox for each platform, but we only want to show non-self-serve platforms that are in use by at least one API
         nonSelfServePlatformFilterEls.length = 0;
+
         document.querySelectorAll('input.platformFilter').forEach(elPlatformCheckbox => {
             const platform = elPlatformCheckbox.value,
                 platformInUse = nonSelfServePlatformsInUseByApis.has(platform);
