@@ -4,7 +4,7 @@ import {buildStatusFilters} from "./exploreApisStatusFilters.js";
 import {buildHodsFilters} from "./exploreApisHodsFilters.js";
 import {buildPlatformFilters} from "./exploreApisPlatformFilters.js";
 import {buildModel} from "./exploreApisModel.js";
-import {setVisible, addToSortedMethodToArray, normaliseText} from "./utils.js";
+import {setVisible, addToSortedMethodToArray, normaliseText, isVisible} from "./utils.js";
 import {buildSearch} from "./exploreApisSearch.js";
 import {buildSearchResultPanel, buildFilterResultPanel} from "./exploreApisResultPanels.js";
 
@@ -20,8 +20,8 @@ export function onPageShow() {
 
     const view = (() => {
         const apiDetailPanelEls = Array.from(document.querySelectorAll('#apiList .api-panel')),
-            elSearchResultsSize = document.getElementById('searchResultsSize'),
-            elSearchResults = document.getElementById('searchResults'),
+            elApiResultsSize = document.getElementById('apiResultsSize'),
+            elApiResults = document.getElementById('apiResults'),
             elApiList = document.getElementById('apiList'),
             searchBox = buildSearch(),
             searchResultsPanel = buildSearchResultPanel(),
@@ -45,12 +45,13 @@ export function onPageShow() {
                 elApiList.prepend(...panelsToReorder); // move all panels in single DOM operation to minimise reflows
             },
             setResultCount(count) {
-                elSearchResultsSize.textContent = `(${count})`;
+                elApiResultsSize.textContent = `(${count})`;
             },
             clearSearch() {
                 searchBox.clear();
             },
-            showSearchResultsPanel: searchResultsPanel.show,
+            showSearchResultsPanelSuccess: searchResultsPanel.showSuccess,
+            showSearchResultsPanelError: searchResultsPanel.showError,
             hideSearchResultsPanel: searchResultsPanel.hide,
             onClearSearch: searchResultsPanel.onClear,
             showFilterResultsPanel: filterResultsPanel.show,
@@ -61,8 +62,8 @@ export function onPageShow() {
                 return searchBox.searchTerm;
             },
             set displayResults(visible) {
-                setVisible(elSearchResults, visible);
-                setVisible(elSearchResultsSize, visible);
+                setVisible(elApiResults, visible);
+                setVisible(elApiResultsSize, visible);
             },
             set enableFilters(enabled) {
                 document.querySelectorAll('input[type=checkbox]').forEach(checkbox => checkbox.disabled = !enabled);
@@ -99,7 +100,7 @@ export function onPageShow() {
         const filteredCount = model.filteredCount;
         if (model.currentSearchText) {
             const showingAllResults = filteredCount === 0;
-            view.showSearchResultsPanel(showingAllResults, model.searchResultCount, model.currentSearchText);
+            view.showSearchResultsPanelSuccess(showingAllResults, model.searchResultCount, model.currentSearchText);
         } else {
             view.hideSearchResultsPanel();
         }
@@ -126,6 +127,7 @@ export function onPageShow() {
             apiDetail.hiddenBySearch = false;
             apiDetail.index = apiDetail.originalIndex;
         });
+        model.sortApisByIndex();
         view.orderApiPanelsByIndex(model.apis);
         filters.forEach(filter => filter.syncWithApis(model.apis.filter(apiDetail => !apiDetail.hiddenBySearch)));
         applyFiltersAndPagination();
@@ -158,17 +160,23 @@ export function onPageShow() {
                         apiDetail.hiddenBySearch = true;
                     }
                 });
-                model.apis.sort((a, b) => a.index - b.index);
+                model.sortApisByIndex();
                 view.orderApiPanelsByIndex(model.apis);
 
+            })
+            .catch(e => {
+                model.apis.forEach(apiDetail => apiDetail.hiddenBySearch = true);
+                model.currentSearchText = null;
+                view.showSearchResultsPanelError();
+                console.error(e)
+            })
+            .finally(() => {
                 if (clearFilters) {
                     filters.forEach(filter => filter.clear());
                 }
                 filters.forEach(filter => filter.syncWithApis(model.apis.filter(apiDetail => !apiDetail.hiddenBySearch)));
                 applyFiltersAndPagination();
-            })
-            .catch(e => console.error(e))
-            .finally(() => {
+
                 view.enableFilters = true;
                 view.displayResults = true;
             });
