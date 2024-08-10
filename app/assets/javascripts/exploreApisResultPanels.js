@@ -6,7 +6,9 @@ export function buildSearchResultPanel() {
         elSearchResultsCount = document.getElementById('searchResultsCount'),
         elSearchResultsCountPlural = document.getElementById('searchResultsCountPlural'),
         elSearchResultsTerm = document.getElementById('searchResultsTerm'),
-        elClearSearch = document.getElementById('clearSearch');
+        elClearSearch = document.getElementById('clearSearch'),
+        elSuccessDetails = document.getElementById('resultsSuccess'),
+        elErrorDetails = document.getElementById('resultsError');
 
     let onClearSearchHandler = noop;
     elClearSearch.addEventListener('click', () => {
@@ -14,11 +16,18 @@ export function buildSearchResultPanel() {
     });
 
     return {
-        show(isShowing, resultCount, searchTerm) {
+        showSuccess(isShowing, resultCount, searchTerm) {
+            setVisible(elErrorDetails, false);
+            setVisible(elSuccessDetails, true);
             setVisible(elSearchResultsShowing, isShowing);
             elSearchResultsCount.textContent = resultCount;
             elSearchResultsCountPlural.textContent = resultCount === 1 ? '' : 's';
             elSearchResultsTerm.textContent = searchTerm;
+            setVisible(elSearchResultsPanel, true);
+        },
+        showError() {
+            setVisible(elErrorDetails, true);
+            setVisible(elSuccessDetails, false);
             setVisible(elSearchResultsPanel, true);
         },
         hide() {

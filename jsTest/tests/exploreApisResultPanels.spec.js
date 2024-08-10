@@ -100,7 +100,7 @@ describe('exploreApisResultPanels', () => {
         });
     });
 
-    fdescribe('buildFilterResultPanel', () => {
+    describe('buildFilterResultPanel', () => {
         beforeEach(() => {
             const dom = (new JSDOM(`
             <!DOCTYPE html>
