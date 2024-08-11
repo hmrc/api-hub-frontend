@@ -33,6 +33,7 @@ describe('myApis', () => {
     function buildApiPanels(...panels) {
         document.getElementById('myApisPanels').innerHTML = panels.map((panel, i) => {
             return `<div class="hip-api" 
+                data-id="${i}"
                 data-apiname="${panel}" data-index="${i}"></div>`;
         }).join('');
     }
@@ -71,17 +72,18 @@ describe('myApis', () => {
 
         enterMyApiNameFilterText('api number 1');
         let myApisVisiblePanelData = paginationHelper.getVisiblePanelData('.hip-api', 'apiname');
+        console.log('===', myApisVisiblePanelData)
         expect(myApisVisiblePanelData).toEqual([
-            { index: 0, apiname: 'api number 1'},
-            { index: 9, apiname: 'api number 10'},
-            { index: 10, apiname: 'api number 11'},
-            { index: 11, apiname: 'api number 12'},
-            { index: 12, apiname: 'api number 13'},
-            { index: 13, apiname: 'api number 14'},
-            { index: 14, apiname: 'api number 15'},
-            { index: 15, apiname: 'api number 16'},
-            { index: 16, apiname: 'api number 17'},
-            { index: 17, apiname: 'api number 18'}
+            { id: 0, apiname: 'api number 1'},
+            { id: 9, apiname: 'api number 10'},
+            { id: 10, apiname: 'api number 11'},
+            { id: 11, apiname: 'api number 12'},
+            { id: 12, apiname: 'api number 13'},
+            { id: 13, apiname: 'api number 14'},
+            { id: 14, apiname: 'api number 15'},
+            { id: 15, apiname: 'api number 16'},
+            { id: 16, apiname: 'api number 17'},
+            { id: 17, apiname: 'api number 18'}
         ]);
         expect(isVisible(document.querySelector('[id=noSearchResults]'))).toBeFalse();
     });

@@ -1,5 +1,6 @@
 import {JSDOM} from 'jsdom';
 import {buildStatusFilters} from "../../app/assets/javascripts/exploreApisStatusFilters.js";
+import {isVisible} from "./testUtils.js";
 
 describe('exploreApisStatusFilters', () => {
     let document, statusFilters, apis;
@@ -8,10 +9,10 @@ describe('exploreApisStatusFilters', () => {
         const dom = (new JSDOM(`
             <!DOCTYPE html>
             <div id="statusFilters">
-                <div><input class="govuk-checkboxes__input statusFilter" type="checkbox" value="ALPHA"></div>
-                <div><input class="govuk-checkboxes__input statusFilter" type="checkbox" value="BETA"></div>
-                <div><input class="govuk-checkboxes__input statusFilter" type="checkbox" value="LIVE"></div>
-                <div><input class="govuk-checkboxes__input statusFilter" type="checkbox" value="DEPRECATED"></div>                
+                <div><input class="statusFilter" type="checkbox" value="ALPHA"></div>
+                <div><input class="statusFilter" type="checkbox" value="BETA"></div>
+                <div><input class="statusFilter" type="checkbox" value="LIVE"></div>
+                <div><input class="statusFilter" type="checkbox" value="DEPRECATED"></div>                
             </div>
             <div id="statusFilterCount"></div>
             <details id="viewStatusFilters"><summary></summary></details>            
@@ -29,11 +30,16 @@ describe('exploreApisStatusFilters', () => {
     }
 
     describe("initialise", () => {
+        it("removes checkboxes for statuses not in use by any APIs",  () => {
+            statusFilters.initialise(buildApis('ALPHA', 'BETA'));
+            expect([...document.querySelectorAll('.statusFilter')].filter(el => isVisible(el.parentElement)).map(el => el.value)).toEqual(['ALPHA', 'BETA']);
+        });
+
         it("after initialisation clicking a checkbox triggers the onChange handler", () => {
             let changeCount = 0;
             statusFilters.onChange(() => changeCount++);
 
-            const elCheckbox = document.querySelector('.govuk-checkboxes__input');
+            const elCheckbox = document.querySelector('.statusFilter');
 
             elCheckbox.click();
             expect(changeCount).toBe(0);
@@ -75,7 +81,7 @@ describe('exploreApisStatusFilters', () => {
         });
 
         it("unchecks all checkboxes", () => {
-            const elCheckboxes = document.querySelectorAll('.govuk-checkboxes__input');
+            const elCheckboxes = document.querySelectorAll('.statusFilter');
             elCheckboxes.forEach(el => {
                 el.checked = true;
             });
@@ -114,7 +120,7 @@ describe('exploreApisStatusFilters', () => {
         });
 
         it("returns true for all items if all checkboxes are selected",  () => {
-            document.querySelectorAll('.govuk-checkboxes__input').forEach(el => el.checked = true);
+            document.querySelectorAll('.statusFilter').forEach(el => el.checked = true);
             let filterFunction = statusFilters.buildFilterFunction();
             expect(data.every(filterFunction)).toBe(true);
         });

@@ -2,7 +2,7 @@ import {JSDOM} from 'jsdom';
 import {onPageShow} from '../../app/assets/javascripts/exploreApis.js';
 import {paginationHelper, paginationContainerHtml, isVisible, waitFor, arrayFromTo} from "./testUtils.js";
 
-fdescribe('exploreApis', () => {
+describe('exploreApis', () => {
     let document, fetch;
 
     beforeEach(() => {
@@ -58,19 +58,22 @@ fdescribe('exploreApis', () => {
                 <div id="statusFilterCount"></div>
             </fieldset>
             
-            <span id="searchResultsSize"></span>
+            <span id="apiResultsSize"></span>
             
             <form id="deepSearch">
                 <input id="search">
                 <button id="search_button"></button>
             </form>
             
-            <div id="searchResults" class="govuk-!-display-none">
+            <div id="apiResults" class="govuk-!-display-none">
                 <div id="searchResultsPanel" class="govuk-!-display-none">
-                    <span id="searchResultsShowing"></span>
-                    <span id="searchResultsCount"></span>
-                    <span id="searchResultsCountPlural"></span>
-                    <span id="searchResultsTerm"></span>
+                    <div id="resultsSuccess">
+                        <span id="searchResultsShowing"></span>
+                        <span id="searchResultsCount"></span>
+                        <span id="searchResultsCountPlural">s</span>
+                        <span id="searchResultsTerm"></span>
+                    </div>
+                    <div id="resultsError"></div>
                     <a id="clearSearch"></a>
                 </div>
             
@@ -96,6 +99,9 @@ fdescribe('exploreApis', () => {
         fetch = globalThis.fetch = jasmine.createSpy('fetch').and.returnValue(Promise.resolve({
             json: () => Promise.resolve(apiIds)
         }));
+    }
+    function setSearchError(reason) {
+        fetch = globalThis.fetch = jasmine.createSpy('fetch').and.returnValue(Promise.reject(reason));
     }
 
     function buildApiPanelsByCount(count) {
@@ -199,6 +205,59 @@ fdescribe('exploreApis', () => {
     function searchBox() {
         return document.getElementById('search');
     }
+    function clearFiltersLink() {
+        return document.getElementById('clearFilters');
+    }
+    function filterResultsPanel() {
+        return document.getElementById('filterResultsPanel');
+    }
+    async function runSearch(searchTerm, expectError = false) {
+        searchBox().value = searchTerm;
+        document.getElementById('search_button').click();
+
+        const elSearchTerm = document.getElementById('searchResultsTerm');
+        if (expectError) {
+            await waitFor(() => isVisible(resultsError()), true);
+        } else {
+            await waitFor(() => elSearchTerm.textContent, searchTerm);
+        }
+    }
+    function apiResults() {
+        return document.getElementById('apiResults');
+    }
+    function getApiResultSize() {
+        return document.getElementById('apiResultsSize');
+    }
+    function searchResultsPanel() {
+        return document.getElementById('searchResultsPanel');
+    }
+    function searchResultsCount() {
+        return document.getElementById('searchResultsCount');
+    }
+    function searchResultsTerm() {
+        return document.getElementById('searchResultsTerm');
+    }
+    function resultsSuccess() {
+        return document.getElementById('resultsSuccess');
+    }
+    function resultsError() {
+        return document.getElementById('resultsError');
+    }
+    function clearSearchLink() {
+        return document.getElementById('clearSearch');
+    }
+    function viewPlatformFilters() {
+        return document.getElementById('viewPlatformFilters');
+    }
+    function domainFilters() {
+        return document.getElementById('domainFilters');
+    }
+    function hodFilters() {
+        return document.getElementById('hodFilters');
+    }
+    function statusFilters() {
+        return document.getElementById('statusFilters');
+    }
 
     describe("when page first loads", () => {
         describe("and no inputs have any values", () => {
@@ -282,12 +341,14 @@ fdescribe('exploreApis', () => {
                 expect(getAttributeValuesForAllVisiblePanels('apistatus')).toEqual(new Set(['ALPHA']));
             });
             it("search field, and a search request is sent to the server", async () => {
-                setSearchResults(['42','23','56']);
-                searchBox().value = 'abc';
+                const searchTerm = 'abc',
+                    searchResults = ['42','23','56'];
+                setSearchResults(searchResults);
+                searchBox().value = searchTerm;
                 onPageShow();
 
-                expect(fetch).toHaveBeenCalledWith('apis/deep-search/abc');
-                await waitFor(() => getAttributeValuesForAllVisiblePanelsAsArray('id').join(), '42,23,56');
+                expect(fetch).toHaveBeenCalledWith(`apis/deep-search/${searchTerm}`);
+                await waitFor(() => getAttributeValuesForAllVisiblePanelsAsArray('id').join(), ['42','23','56'].join(','));
             });
         });
 
@@ -302,6 +363,7 @@ fdescribe('exploreApis', () => {
             onPageShow();
             expect(getAttributeValuesForAllVisiblePanelsAsArray('id').length).toEqual(15);
         });
+
     });
 
     describe("pagination", () => {
@@ -344,114 +406,223 @@ fdescribe('exploreApis', () => {
         });
 
         it("when a platform filter is applied then the results are filtered correctly", () => {
-
+            platformFilterSelfServe().click();
+            expect(getAttributeValuesForAllVisiblePanels('platform')).toEqual(new Set(['hip']));
         });
         it("when a domain filter is applied then the results are filtered correctly", () => {
-
+            domainCheckboxes().filter(el => el.value === 'd1')[0].click();
+            expect(getAttributeValuesForAllVisiblePanels('domain')).toEqual(new Set(['d1']));
+        });
+        it("when a subdomain filter is applied then the results are filtered correctly", () => {
+            domainCheckboxes().filter(el => el.value === 'd1')[0].click();
+            subdomainCheckboxes().filter(el => el.value === 'd1s1')[0].click(); // deselecting d1s1
+            expect(getAttributeValuesForAllVisiblePanels('subdomain')).toEqual(new Set(['d1s2', 'd1s3']));
         });
         it("when a hod filter is applied then the results are filtered correctly", () => {
-
+            hodCheckboxes().filter(el => el.value === 'ems')[0].click();
+            expect(getAttributeValuesForAllVisiblePanels('hods')).toEqual(new Set(['ems', 'ems,internal,apim']));
         });
         it("when a status filter is applied then the results are filtered correctly", () => {
-
+            statusCheckboxes().filter(el => el.value === 'ALPHA')[0].click();
+            expect(getAttributeValuesForAllVisiblePanels('apistatus')).toEqual(new Set(['ALPHA']));
         });
         it("when multiple filters are applied then the results are filtered correctly", () => {
+            platformFilterSelfServe().click();
+            domainCheckboxes().filter(el => el.value === 'd1')[0].click();
+            statusCheckboxes().filter(el => el.value === 'ALPHA')[0].click();
 
+            expect(getAttributeValuesForAllVisiblePanels('platform')).toEqual(new Set(['hip']));
+            expect(getAttributeValuesForAllVisiblePanels('domain')).toEqual(new Set(['d1']));
+            expect(getAttributeValuesForAllVisiblePanels('apistatus')).toEqual(new Set(['ALPHA']));
         });
         it("when the filters are cleared then the results are updated correctly", () => {
+            platformFilterSelfServe().click();
+            clearFiltersLink().click();
 
+            expect(getAttributeValuesForAllVisiblePanelsAsArray('id')).toEqual(arrayFromTo(0, 14).map(i => i.toString()));
         });
         it("when a filter is applied then the filter result panel is displayed", () => {
+            expect(isVisible(filterResultsPanel())).toBe(false);
+            platformFilterSelfServe().click();
 
+            expect(isVisible(filterResultsPanel())).toBe(true);
         });
         it("when the filters are cleared then the filter result panel is hidden", () => {
+            platformFilterSelfServe().click();
+            expect(isVisible(filterResultsPanel())).toBe(true);
 
+            clearFiltersLink().click();
+            expect(isVisible(filterResultsPanel())).toBe(false);
         });
     });
 
     describe("when a search is performed", () => {
+        beforeEach(() => {
+            buildApiPanelsByCount(100);
+            onPageShow();
+            setSearchResults(['1', '2', '3']);
+        });
         it("the filters should be disabled", () => {
-
+            runSearch('abc');
+            expect(platformCheckboxes().every(el => el.disabled)).toBe(true);
+            expect(domainAndSubdomainCheckboxes().every(el => el.disabled)).toBe(true);
+            expect(hodCheckboxes().every(el => el.disabled)).toBe(true);
+            expect(statusCheckboxes().every(el => el.disabled)).toBe(true);
         });
         it("the api results should be cleared", () => {
-
+            runSearch('abc');
+            expect(isVisible(apiResults())).toBe(false);
         });
         it("the result count should be removed", () => {
-
+            runSearch('abc');
+            expect(isVisible(getApiResultSize())).toBe(false);
         });
-        it("the correct request is sent to the server", () => {
-
+        it("the correct request is sent to the server", async () => {
+            await runSearch('abc');
+            expect(fetch).toHaveBeenCalledWith('apis/deep-search/abc');
         });
-        it("special characters in the search term are encoded", () => {
-
+        it("special characters in the search term are encoded", async () => {
+            await runSearch('"abc & def"');
+            expect(fetch).toHaveBeenCalledWith('apis/deep-search/%22abc%20%26%20def%22');
         });
-        it("and the search term matches the search currently displayed then a new request is not sent to the server", () => {
-
+        it("and the search term matches the search currently displayed then a new request is not sent to the server", async () => {
+            await runSearch('abc');
+            fetch.calls.reset();
+            await runSearch('abc');
+            expect(fetch).not.toHaveBeenCalled();
         });
-        it("and the search box is empty then a request is not sent to the server", () => {
-
+        it("and the search box is empty then a request is not sent to the server", async () => {
+            await runSearch('');
+            expect(fetch).not.toHaveBeenCalled();
         });
-        it("and the search term is different to the search currently displayed then a request is sent to the server", () => {
-
+        it("and the search term is different to the search currently displayed then a request is sent to the server", async () => {
+            await runSearch('abc');
+            fetch.calls.reset();
+            await runSearch('def');
+            expect(fetch).toHaveBeenCalledWith('apis/deep-search/def');
         });
 
         describe("and the results have returned", () => {
-            it("the filters should be re-enabled", () => {
-
+            beforeEach(async () => {
+                platformFilterNonSelfServe().click();
+                domainCheckboxes().forEach(el => el.checked = true);
+                hodCheckboxes().forEach(el => el.checked = true);
+                statusCheckboxes().forEach(el => el.checked = true);
             });
-            it("the filters should be cleared", () => {
+            async function search(searchResults = ['2', '1']) {
+                setSearchResults(searchResults);
+                await runSearch('abc');
+            }
+            it("the filters should be re-enabled", async () => {
+                await search();
 
+                expect(platformCheckboxes().every(el => !el.disabled)).toBe(true);
+                expect(domainAndSubdomainCheckboxes().every(el => !el.disabled)).toBe(true);
+                expect(hodCheckboxes().every(el => !el.disabled)).toBe(true);
+                expect(statusCheckboxes().every(el => !el.disabled)).toBe(true);
             });
-            it("the filter should be repopulated so that they match the only apis returned by the search", () => {
-
+            it("the filters should be cleared", async () => {
+                await search();
+                expect(platformFilterNonSelfServe().checked).toBe(false);
+                expect(domainAndSubdomainCheckboxes().every(el => !el.checked)).toBe(true);
+                expect(hodCheckboxes().every(el => !el.checked)).toBe(true);
+                expect(statusCheckboxes().every(el => !el.checked)).toBe(true);
             });
-            it("only apis that matched the search are displayed, in the correct order", () => {
-
+            it("the filter should be repopulated so that they match only the apis returned by the search", async () => {
+                await search();
+                expect(new Set(platformCheckboxes().filter(el => isVisible(el.parentElement) && !el.dataset.selfserve).map(el => el.value))).toEqual(new Set(['sdes', 'digi']));
+                expect(new Set(domainAndSubdomainCheckboxes().filter(el => isVisible(el.parentElement)).map(el => el.value))).toEqual(new Set(['d1', 'd1s2', 'd1s3']));
+                expect(new Set(hodCheckboxes().filter(el => isVisible(el.parentElement)).map(el => el.value))).toEqual(new Set(['ems', 'internal']));
+                expect(new Set(statusCheckboxes().filter(el => isVisible(el.parentElement)).map(el => el.value))).toEqual(new Set(['BETA', 'LIVE']));
             });
-            it("the result count should be updated", () => {
-
+            it("only apis that matched the search are displayed, in the correct order", async () => {
+                const searchResults = ['99', '6', '11', '80', '42', '43', '10', '65', '77', '33', '30', '1', '2', '3', '50', '51', '52'];
+                await search(searchResults);
+                expect(getAttributeValuesForAllVisiblePanelsAsArray('id')).toEqual(searchResults.slice(0, 15));
+                paginationHelper.clickNext();
+                expect(getAttributeValuesForAllVisiblePanelsAsArray('id')).toEqual(searchResults.slice(15, 17));
             });
-            it("the search results panel should be shown, populated with the search term and result count", () => {
-
+            it("the result count should be updated", async () => {
+                await search();
+                expect(getApiResultSize().textContent).toBe('(2)');
+            });
+            it("the search results panel should be shown, populated with the search term and result count", async () => {
+                await search();
+                expect(isVisible(resultsSuccess())).toBe(true);
+                expect(isVisible(resultsError())).toBe(false);
+                expect(isVisible(searchResultsPanel())).toBe(true);
+                expect(searchResultsCount().textContent).toBe('2');
+                expect(searchResultsTerm().textContent).toBe('abc');
             });
 
-            describe("and the search did not match any apis", () => {
-                it("all filters are hidden", () => {
-
-                });
-                it("the result count is zero", () => {
-
-                });
-                it("the search results panel is shown with the correct message", () => {
-
-                });
+        });
+        describe("and the search did not match any apis", () => {
+            beforeEach(async () => {
+                setSearchResults([]);
+                await runSearch('no matches');
             });
-
-            describe("and then the search is cleared", () => {
-                it("the search box is emptied", () => {
-
-                })
-                it("the api results return to the default sort order", () => {
-
-                });
+            it("all filters are hidden", () => {
+                expect(isVisible(viewPlatformFilters())).toBe(false);
+                expect(isVisible(domainFilters())).toBe(false);
+                expect(isVisible(hodFilters())).toBe(false);
+                expect(isVisible(statusFilters())).toBe(false);
+            });
+            it("the result count is zero", () => {
+                expect(getApiResultSize().textContent).toBe('(0)');
+            });
+            it("the search results panel is shown with the correct message", () => {
+                expect(isVisible(resultsSuccess())).toBe(true);
+                expect(isVisible(resultsError())).toBe(false);
+                expect(isVisible(searchResultsPanel())).toBe(true);
+                expect(searchResultsCount().textContent).toBe('0');
+                expect(searchResultsTerm().textContent).toBe('no matches');
             });
         });
 
         describe("and the search fails", () => {
-            it("all filters are hidden", () => {
-
+            beforeEach(async () => {
+                setSearchError('error');
+                await runSearch('abc', true);
             });
-            it("the result count is not displayed", () => {
-
+            it("all filters are hidden", () => {
+                expect(isVisible(viewPlatformFilters())).toBe(false);
+                expect(isVisible(domainFilters())).toBe(false);
+                expect(isVisible(hodFilters())).toBe(false);
+                expect(isVisible(statusFilters())).toBe(false);
+            });
+            it("a result count of 0 is displayed", () => {
+                expect(getApiResultSize().textContent).toBe('(0)');
             });
             it("no apis are shown in the results", () => {
-
+                expect(getAttributeValuesForAllVisiblePanels('id')).toEqual(new Set());
             });
             it("an error message is displayed", () => {
-
+                expect(isVisible(resultsSuccess())).toBe(false);
+                expect(isVisible(resultsError())).toBe(true);
             });
         });
-
-
     });
+
+    describe("when a search is cleared", () => {
+        beforeEach(async () => {
+            buildApiPanelsByCount(100);
+            onPageShow();
+            setSearchResults(['50', '9', '27', '13']);
+            await runSearch('abc');
+            clearSearchLink().click();
+        });
+        it("the search box is emptied", () => {
+            expect(searchBox().value).toBe('');
+        })
+        it("the api results return to the default sort order", () => {
+            expect(getAttributeValuesForAllVisiblePanelsAsArray('id')).toEqual(arrayFromTo(0, 14).map(i => i.toString()));
+        });
+        it("all filters are restored to their default state", () => {
+            expect(platformCheckboxes().every(el => isVisible(el.parentElement))).toBe(true);
+            expect(domainAndSubdomainCheckboxes().every(el => isVisible(el.parentElement))).toBe(true);
+            expect(hodCheckboxes().every(el => isVisible(el.parentElement))).toBe(true);
+            expect(statusCheckboxes().every(el => isVisible(el.parentElement))).toBe(true);
+        });
+    });
+
 });

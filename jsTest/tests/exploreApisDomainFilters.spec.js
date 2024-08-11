@@ -135,9 +135,12 @@ describe('exploreApisDomainFilters', () => {
 
         it("if domains and sub-domains are selected then the domain filter count is the number of selected domains and sub-domains",  () => {
             domainCheckbox('d1').click();
-            fail() // add subdomain checkboxes, see other tests in exploreApis
+            subdomainCheckbox('d1s1').click();
+            subdomainCheckbox('d1s2').click();
+
             domainFilters.initialise(apis);
-            expect(document.getElementById('domainFilterCount').textContent).toBe('1');
+
+            expect(document.getElementById('domainFilterCount').textContent).toBe('3');
         });
     });
 
