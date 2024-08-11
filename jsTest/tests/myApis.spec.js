@@ -72,7 +72,7 @@ describe('myApis', () => {
 
         enterMyApiNameFilterText('api number 1');
         let myApisVisiblePanelData = paginationHelper.getVisiblePanelData('.hip-api', 'apiname');
-        console.log('===', myApisVisiblePanelData)
+
         expect(myApisVisiblePanelData).toEqual([
             { id: 0, apiname: 'api number 1'},
             { id: 9, apiname: 'api number 10'},
