@@ -139,7 +139,7 @@
 }
 
 @hodsFilters() = {
-    <div id="hodFilters" class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+    <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
     @for(hod <- hods.hods) {
         <div class="govuk-checkboxes__item">
             <input class="govuk-checkboxes__input hodFilter" id="filter_@hod.code" name="filter_@hod.code" type="checkbox" value="@normalise(hod.code)">

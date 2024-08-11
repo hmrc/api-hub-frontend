@@ -19,7 +19,7 @@ package controllers
 import com.google.inject.{Inject, Singleton}
 import config.{Domains, Hods, Platforms}
 import controllers.actions.OptionalIdentifierAction
-import models.api.{Alpha, ApiDetail, Beta, Live, Deprecated}
+import models.api.ApiDetail
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
@@ -42,11 +42,7 @@ class ExploreApisController @Inject()(
   def onPageLoad(): Action[AnyContent] = optionallyIdentified.async {
     implicit request =>
       apiHubService.getApis().map {
-        case apiDetails: Seq[ApiDetail] => Ok(view(
-          request.user,
-          apiDetails.sortWith( _.title.toUpperCase < _.title.toUpperCase).zipWithIndex.map { case(a,i) => updateApiDetail(a)},
-          domains, hods, platforms
-        ))
+        case apiDetails: Seq[ApiDetail] => Ok(view(request.user, apiDetails.sortWith( _.title.toUpperCase < _.title.toUpperCase), domains, hods, platforms))
         case _ => InternalServerError
       }
   }
@@ -55,32 +51,4 @@ class ExploreApisController @Inject()(
     Future.successful(NotImplemented)
   }
 
-  val statuses = Seq(Alpha, Beta, Live, Deprecated)
-  val dms = Seq(
-    ("1", "1.15"),
-    ("1", "1.10"),
-    ("1", "1.3"),
-    ("2", "2.2"),
-    ("3", ""),
-    ("", "HMRC"),
-    ("invalid", "invalid"),
-    ("invalid", ""),
-    ("", "invalid"),
-    ("", ""),
-  )
-  val hodsList = Seq("invalid", "ADR", "APIM", "BARS", "CBI", "CBS", "CDCS", "CISR", "COTAX", "GFORMS", "VDP", "DTR", "EDH", "EMS", "ETMP", "IDMS", "ISA", "ITMP", "ITSD", "NPS", "NTC", "ODS", "RCM", "RTI", "SLS", "TPSS")
-  val platformsList = Seq("HIP", "API_PLATFORM", "CDS_CLASSIC", "DIGI", "HIP", "DIGI", "HIP", "DAPI")
-
-  def updateApiDetail(apiDetail: ApiDetail): ApiDetail = {
-    val i = apiDetail.title.hashCode.abs
-    val (dm, sdm) = dms(i % dms.size)
-    val hods = hodsList.slice(i % hodsList.size, i % hodsList.size + (i % 3))
-    apiDetail.copy(
-      apiStatus = statuses(i % statuses.length),
-      domain =  if (dm.isEmpty) None else Some(dm),
-      subDomain =  if (sdm.isEmpty) None else Some(sdm),
-      hods = hods,
-      platform = platformsList(i % platformsList.length)
-    )
-  }
 }
