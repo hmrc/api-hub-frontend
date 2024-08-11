@@ -29,6 +29,10 @@ describe('exploreApisStatusFilters', () => {
         return statuses.map(o => ({data: {apiStatus: o}}));
     }
 
+    function statusCheckbox(status) {
+        return document.querySelector(`.statusFilter[value="${status}"]`);
+    }
+
     describe("initialise", () => {
         it("removes checkboxes for statuses not in use by any APIs",  () => {
             statusFilters.initialise(buildApis('ALPHA', 'BETA'));
@@ -75,6 +79,35 @@ describe('exploreApisStatusFilters', () => {
 
     });
 
+    describe('syncWithApis', () => {
+        it("when new APIs are added, hidden checkboxes are shown",  () => {
+            statusFilters.initialise(buildApis('ALPHA', 'BETA', 'LIVE'));
+            expect(isVisible(statusCheckbox('DEPRECATED').parentElement)).toBe(false);
+
+            statusFilters.syncWithApis([...apis, {data: {apiStatus: 'DEPRECATED'}}]);
+
+            expect(isVisible(statusCheckbox('DEPRECATED').parentElement)).toBe(true);
+        });
+
+        it("when old APIs are removed, visible checkboxes are hidden",  () => {
+            statusFilters.initialise(apis);
+            expect(isVisible(statusCheckbox('ALPHA').parentElement)).toBe(true);
+
+            statusFilters.syncWithApis(apis.filter(api => api.data.apiStatus !== 'ALPHA'));
+
+            expect(isVisible(statusCheckbox('ALPHA').parentElement)).toBe(false);
+        });
+
+        it("when no APIs are present the filter is hidden",  () => {
+            statusFilters.initialise(apis);
+
+            expect(isVisible(document.getElementById('statusFilters'))).toBe(true);
+            statusFilters.syncWithApis([]);
+
+            expect(isVisible(document.getElementById('statusFilters'))).toBe(false);
+        });
+    });
+    
     describe("clear", () => {
         beforeEach(() => {
             statusFilters.initialise(apis);

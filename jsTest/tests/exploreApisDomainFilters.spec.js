@@ -144,6 +144,44 @@ describe('exploreApisDomainFilters', () => {
         });
     });
 
+    describe('syncWithApis', () => {
+        it("when new APIs are added, hidden checkboxes are shown",  () => {
+            domainFilters.initialise(apis);
+            expect(isVisible(domainCheckbox('d4').parentElement)).toBe(false);
+            expect(isVisible(subdomainCheckbox('d4s1').parentElement)).toBe(false);
+
+            domainFilters.syncWithApis([...apis, {data: {domain: 'd4', subdomain: 'd4s1'}}]);
+
+            expect(isVisible(domainCheckbox('d4').parentElement)).toBe(true);
+            expect(isVisible(subdomainCheckbox('d4s1').parentElement)).toBe(true);
+        });
+
+        it("when old APIs are removed, visible checkboxes are hidden",  () => {
+            domainFilters.initialise(apis);
+            expect(isVisible(domainCheckbox('d1').parentElement)).toBe(true);
+            expect(isVisible(subdomainCheckbox('d1s1').parentElement)).toBe(true);
+
+            domainFilters.syncWithApis(apis.filter(api => api.data.subdomain !== 'd1s1'));
+
+            expect(isVisible(domainCheckbox('d1').parentElement)).toBe(true);
+            expect(isVisible(subdomainCheckbox('d1s1').parentElement)).toBe(false);
+
+            domainFilters.syncWithApis(apis.filter(api => api.data.domain !== 'd1'));
+
+            expect(isVisible(domainCheckbox('d1').parentElement)).toBe(false);
+            expect(isVisible(subdomainCheckbox('d1s1').parentElement)).toBe(false);
+        });
+
+        it("when no APIs are present the filter is hidden",  () => {
+            domainFilters.initialise(apis);
+
+            expect(isVisible(document.getElementById('domainFilters'))).toBe(true);
+            domainFilters.syncWithApis([]);
+
+            expect(isVisible(document.getElementById('domainFilters'))).toBe(false);
+        });
+    });
+
     describe("clear", () => {
         beforeEach(() => {
             domainFilters.initialise(apis);

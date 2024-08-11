@@ -122,6 +122,43 @@ describe('exploreApisPlatformFilters', () => {
         });
     });
 
+    describe('syncWithApis', () => {
+        let apis;
+        beforeEach(() => {
+            apis = buildApisWithPlatforms('sdes', 'sdes', 'hip')
+        });
+
+        it("when new APIs are added, hidden checkboxes are shown",  () => {
+            platformFilters.initialise(apis);
+            expect(isVisible(platformCheckbox('cma').parentElement)).toBe(false);
+
+            platformFilters.syncWithApis([...apis, {data: {platform: 'cma'}}]);
+
+            expect(isVisible(platformCheckbox('cma').parentElement)).toBe(true);
+        });
+
+        it("when old APIs are removed, visible checkboxes are hidden",  () => {
+            platformFilters.initialise(apis);
+            expect(isVisible(platformCheckbox('sdes').parentElement)).toBe(true);
+
+            platformFilters.syncWithApis(apis.filter(api => api.data.platform !== 'sdes'));
+
+            expect(isVisible(platformCheckbox('sdes').parentElement)).toBe(false);
+        });
+
+        it("when no APIs are present the filter is disabled",  () => {
+            platformFilters.initialise(apis);
+
+            expect(document.getElementById('filterPlatformSelfServe').disabled).toBe(false);
+            expect(document.getElementById('filterPlatformNonSelfServe').disabled).toBe(false);
+
+            platformFilters.syncWithApis([]);
+
+            expect(document.getElementById('filterPlatformSelfServe').disabled).toBe(true);
+            expect(document.getElementById('filterPlatformNonSelfServe').disabled).toBe(true);
+        });
+    });
+    
     describe("clear", () => {
         beforeEach(() => {
             platformFilters.initialise(buildApisWithPlatforms('sdes', 'api_platform', 'cma', 'hip'));

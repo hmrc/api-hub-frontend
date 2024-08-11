@@ -97,6 +97,35 @@ describe('exploreApisHodsFilters', () => {
         });
     });
 
+    describe('syncWithApis', () => {
+        it("when new APIs are added, hidden checkboxes are shown",  () => {
+            hodsFilters.initialise(apis);
+            expect(isVisible(hodCheckbox('h4').parentElement)).toBe(false);
+
+            hodsFilters.syncWithApis([...apis, {data: {hods: new Set(['h4'])}}]);
+
+            expect(isVisible(hodCheckbox('h4').parentElement)).toBe(true);
+        });
+
+        it("when old APIs are removed, visible checkboxes are hidden",  () => {
+            hodsFilters.initialise(apis);
+            expect(isVisible(hodCheckbox('h1').parentElement)).toBe(true);
+
+            hodsFilters.syncWithApis(apis.filter(api => !api.data.hods.has('h1')));
+
+            expect(isVisible(hodCheckbox('h1').parentElement)).toBe(false);
+        });
+
+        it("when no APIs are present the filter is hidden",  () => {
+            hodsFilters.initialise(apis);
+
+            expect(isVisible(document.getElementById('hodFilters'))).toBe(true);
+            hodsFilters.syncWithApis([]);
+
+            expect(isVisible(document.getElementById('hodFilters'))).toBe(false);
+        });
+    });
+    
     describe("clear", () => {
         beforeEach(() => {
             hodsFilters.initialise(apis);
