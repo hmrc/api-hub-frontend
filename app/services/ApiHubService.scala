@@ -20,8 +20,9 @@ import com.google.inject.{Inject, Singleton}
 import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
 import models.AvailableEndpoint
 import models.accessrequest.{AccessRequest, AccessRequestRequest, AccessRequestStatus}
-import models.api.{ApiDeploymentStatuses, ApiDetail}
+import models.api.{ApiDeploymentStatuses, ApiDetail, PlatformContact}
 import models.application._
+import models.deployment.DeploymentDetails
 import models.exception.ApplicationsException
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
 import models.team.{NewTeam, Team}
@@ -79,6 +80,10 @@ class ApiHubService @Inject()(
 
   def getApiDeploymentStatuses(publisherReference: String)(implicit hc: HeaderCarrier): Future[Option[ApiDeploymentStatuses]] = {
     applicationsConnector.getApiDeploymentStatuses(publisherReference)
+  }
+
+  def getDeploymentDetails(publisherReference: String)(implicit hc: HeaderCarrier): Future[Option[DeploymentDetails]] = {
+    applicationsConnector.getDeploymentDetails(publisherReference)
   }
 
   def getApis(platform: Option[String] = None)(implicit hc: HeaderCarrier): Future[Seq[ApiDetail]] = {
@@ -174,7 +179,7 @@ class ApiHubService @Inject()(
     applicationsConnector.updateApiTeam(apiId, teamId)
   }
 
-  def getPlatformContact(forPlatform: String)(implicit hc: HeaderCarrier, ec: ExecutionContext) = {
+  def getPlatformContact(forPlatform: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[PlatformContact]] = {
     integrationCatalogueConnector.getPlatformContacts() flatMap {
       platformContacts => Future.successful(platformContacts.find(_.platformType == forPlatform))
     }

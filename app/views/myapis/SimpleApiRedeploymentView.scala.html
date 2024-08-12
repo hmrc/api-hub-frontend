@@ -69,6 +69,14 @@
             .withWidth(Full)
         )
 
+        @govukInput(
+            InputViewModel(
+                field = form("egressPrefix"),
+                label = LabelViewModel("Egress prefix")
+            )
+            .withWidth(Full)
+        )
+
         @govukSelect(
             SelectViewModel(
                 field = form("status"),
@@ -127,6 +135,13 @@
                 value = hod.code
             )}
         ))
+
+        @govukTextarea(
+            TextareaViewModel(
+                field = form("prefixesToRemove"),
+                label = LabelViewModel("Prefixes to remove")
+            ).withHint(HintViewModel(messages("This is a line-separated list of prefixes to remove")))
+        )
 
         @govukTextarea(
             TextareaViewModel(

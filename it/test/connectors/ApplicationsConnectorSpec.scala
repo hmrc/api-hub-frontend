@@ -26,7 +26,7 @@ import models.api.ApiDeploymentStatuses
 import models.api.ApiDetailLensesSpec.sampleApiDetail
 import models.application._
 import models.application.ApplicationLenses._
-import models.deployment.{DeploymentsRequest, Error, FailuresResponse, InvalidOasResponse, RedeploymentRequest, SuccessfulDeploymentsResponse}
+import models.deployment.{DeploymentDetails, DeploymentsRequest, Error, FailuresResponse, InvalidOasResponse, RedeploymentRequest, SuccessfulDeploymentsResponse}
 import models.exception.{ApplicationCredentialLimitException, TeamNameNotUniqueException}
 import models.requests.{AddApiRequest, AddApiRequestEndpoint, ChangeTeamNameRequest, TeamMemberRequest}
 import models.team.{NewTeam, Team}
@@ -804,7 +804,9 @@ class ApplicationsConnectorSpec
         status = "test-status",
         domain = "test-domain",
         subDomain = "test-subdomain",
-        hods = Seq("test-hod")
+        hods = Seq("test-hod"),
+        prefixesToRemove = Seq("test-prefix-1", "test-prefix-2"),
+        egressPrefix = Some("test-egress-prefix")
       )
 
       val response = SuccessfulDeploymentsResponse("test-id", "1.0.0", 102, "test-url")
@@ -836,7 +838,9 @@ class ApplicationsConnectorSpec
         status = "test-status",
         domain = "test-domain",
         subDomain = "test-subdomain",
-        hods = Seq("test-hod")
+        hods = Seq("test-hod"),
+        prefixesToRemove = Seq("test-prefix-1", "test-prefix-2"),
+        egressPrefix = Some("test-egress-prefix")
       )
 
       stubFor(
@@ -863,7 +867,9 @@ class ApplicationsConnectorSpec
         status = "test-status",
         domain = "test-domain",
         subDomain = "test-subdomain",
-        hods = Seq("test-hod")
+        hods = Seq("test-hod"),
+        prefixesToRemove = Seq("test-prefix-1", "test-prefix-2"),
+        egressPrefix = Some("test-egress-prefix")
       )
 
       stubFor(
@@ -995,6 +1001,55 @@ class ApplicationsConnectorSpec
       recoverToExceptionIf[UpstreamErrorResponse](result).map { e =>
         e.statusCode mustBe INTERNAL_SERVER_ERROR
       }
+    }
+  }
+
+  "ApplicationsConnector.getDeploymentDetails" - {
+    "must place the correct request and return the deployment details when they exist" in {
+      val publisherReference = "test-publisher-ref"
+      val deploymentDetails = DeploymentDetails(
+        description = "test-description",
+        status = "test-status",
+        domain = "test-domain",
+        subDomain = "test-dub-domain",
+        hods = Seq("test-backend-1", "test-backend-2"),
+        egressPrefix = Some("test-egress-prefix"),
+        prefixesToRemove = Seq("test-prefix-1", "test-prefix-2")
+      )
+
+      stubFor(
+        get(urlEqualTo(s"/api-hub-applications/deployments/$publisherReference"))
+          .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withBody(Json.toJson(deploymentDetails).toString())
+          )
+      )
+
+      buildConnector(this).getDeploymentDetails(publisherReference)(HeaderCarrier()).map(
+        result =>
+          result.value mustBe deploymentDetails
+      )
+    }
+
+    "must return None when the service cannot be found" in {
+      val publisherReference = "test-publisher-ref"
+
+      stubFor(
+        get(urlEqualTo(s"/api-hub-applications/deployments/$publisherReference"))
+          .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+          )
+      )
+
+      buildConnector(this).getDeploymentDetails(publisherReference)(HeaderCarrier()).map(
+        result =>
+          result mustBe empty
+      )
     }
   }
 

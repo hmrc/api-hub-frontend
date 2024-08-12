@@ -55,6 +55,7 @@ class SimpleApiRedeploymentControllerSpec
       val fixture = buildFixture()
 
       when(fixture.apiAuthActionProvider.apply(any)(any)).thenReturn(successfulApiAuthAction(FakeApiDetail))
+      when(fixture.apiHubService.getDeploymentDetails(any)(any)).thenReturn(Future.successful(None))
 
       running(fixture.playApplication) {
         val request = FakeRequest(controllers.myapis.routes.SimpleApiRedeploymentController.onPageLoad(FakeApiDetail.id))
@@ -66,6 +67,36 @@ class SimpleApiRedeploymentControllerSpec
         contentAsString(result) must validateAsHtml
 
         verify(fixture.apiAuthActionProvider).apply(eqTo(FakeApiDetail.id))(any)
+        verify(fixture.apiHubService).getDeploymentDetails(eqTo(FakeApiDetail.publisherReference))(any)
+      }
+    }
+
+    "must pre-populate fields when the data is available in APIM" in {
+      val fixture = buildFixture()
+
+      val deploymentDetails = DeploymentDetails(
+        description = redeploymentRequest.description,
+        status = redeploymentRequest.status,
+        domain = redeploymentRequest.domain,
+        subDomain = redeploymentRequest.subDomain,
+        hods = redeploymentRequest.hods,
+        egressPrefix = redeploymentRequest.egressPrefix,
+        prefixesToRemove = redeploymentRequest.prefixesToRemove
+      )
+
+      when(fixture.apiAuthActionProvider.apply(any)(any)).thenReturn(successfulApiAuthAction(FakeApiDetail))
+      when(fixture.apiHubService.getDeploymentDetails(any)(any)).thenReturn(Future.successful(Some(deploymentDetails)))
+
+      running(fixture.playApplication) {
+        val request = FakeRequest(controllers.myapis.routes.SimpleApiRedeploymentController.onPageLoad(FakeApiDetail.id))
+        val result = route(fixture.playApplication, request).value
+        val view = fixture.playApplication.injector.instanceOf[SimpleApiRedeploymentView]
+
+        val filledForm = form.fill(redeploymentRequest.copy(oas = ""))
+
+        status(result) mustBe OK
+        contentAsString(result) mustBe view(filledForm, FakeApiDetail, FakeDomains, FakeHods, FakeUser)(request, messages(fixture.playApplication)).toString()
+        contentAsString(result) must validateAsHtml
       }
     }
   }
@@ -185,23 +216,33 @@ object SimpleApiRedeploymentControllerSpec extends OptionValues {
 
   private val form = new RedeploymentRequestFormProvider()()
 
+  val hod1 = "test-hod-1"
+  val hod2 = "test-hod-2"
+  val prefix1 = "test-prefix-1"
+  val prefix2 = "test-prefix-2"
+  val prefix3 = "test-prefix-3"
+
   private val redeploymentRequest = RedeploymentRequest(
     description = "test-description",
     oas = "test-oas",
     status = "test-status",
     domain = "1",
     subDomain = "1.1",
-    hods = Seq("1", "2")
+    hods = Seq(hod1, hod2),
+    prefixesToRemove = Seq(prefix1, prefix2, prefix3),
+    egressPrefix = Some("test-egress-prefix")
   )
 
   private val validForm = Seq(
     "description" -> redeploymentRequest.description,
     "oas" -> redeploymentRequest.oas,
     "status" -> redeploymentRequest.status,
-    "domain" -> "1",
-    "subdomain" -> "1.1",
-    "hods[]" -> "1",
-    "hods[]" -> "2",
+    "domain" -> redeploymentRequest.domain,
+    "subdomain" -> redeploymentRequest.subDomain,
+    "hods[]" -> hod1,
+    "hods[]" -> hod2,
+    "prefixesToRemove" -> s"$prefix1 \n $prefix2  \r\n$prefix3",    // Deliberate mix of UNIX and Windows newlines with surplus whitespace
+    "egressPrefix" -> redeploymentRequest.egressPrefix.get
   )
 
   private def invalidForm(missingField: String): Seq[(String, String)] =
