@@ -1,4 +1,4 @@
-import {setVisible, noop} from "./utils.js";
+import {setVisible, noop, pluralise} from "./utils.js";
 
 export function buildSearchResultPanel() {
     const elSearchResultsPanel = document.getElementById('searchResultsPanel'),
@@ -21,7 +21,7 @@ export function buildSearchResultPanel() {
             setVisible(elSuccessDetails, true);
             setVisible(elSearchResultsShowing, isShowing);
             elSearchResultsCount.textContent = resultCount;
-            elSearchResultsCountPlural.textContent = resultCount === 1 ? '' : 's';
+            elSearchResultsCountPlural.textContent = pluralise('', resultCount);
             elSearchResultsTerm.textContent = searchTerm;
             setVisible(elSearchResultsPanel, true);
         },
@@ -56,7 +56,7 @@ export function buildFilterResultPanel() {
     return {
         show(showingCount, hiddenCount) {
             elFilterResultsCount.textContent = showingCount;
-            elFilterResultsCountPlural.textContent = showingCount === 1 ? '' : 's';
+            elFilterResultsCountPlural.textContent = pluralise('', showingCount);
             elFilterResultsHiddenCount.textContent = hiddenCount;
             setVisible(elFilterResultsSingleApi, hiddenCount === 1);
             setVisible(elFilterResultsMultipleApis, hiddenCount !== 1);

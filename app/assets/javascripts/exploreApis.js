@@ -112,8 +112,10 @@ export function onPageShow() {
         }
     }
 
-    filters.forEach(filter => filter.initialise(model.apis));
-    filters.forEach(filter=> filter.onChange(applyFiltersAndPagination));
+    filters.forEach(filter => {
+        filter.initialise(model.apis);
+        filter.onChange(applyFiltersAndPagination);
+    });
 
     function clearAllFilters() {
         filters.forEach(filter => filter.clear());

@@ -33,3 +33,7 @@ export function noop() {}
 export function normaliseText(text) {
     return text.trim().toLowerCase();
 }
+
+export function pluralise(text, count, pluralSuffix = 's') {
+    return Number(count) === 1 ? text : text + pluralSuffix;
+}
