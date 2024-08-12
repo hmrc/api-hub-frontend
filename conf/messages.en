@@ -321,7 +321,7 @@ exploreApis.filter.nonSelfServe = Other APIs
 exploreApis.filter.nonSelfServe.info = APIs that cannot be consumed via the Integration Hub and require communication with the owning team.
 exploreApis.filter.active = Your results are being filtered, showing {0}
 exploreApis.search.title = Search for an API
-exploreApis.search.hint = Search by API name, ref, ID or data attribute.
+exploreApis.search.hint = The search will include API name, description, ref, ID. Click the Search icon to search. Deprecated APIs will be included in your search results.
 exploreApis.search.clear = Clear search
 exploreApis.search.error = An error occurred when performing your search
 

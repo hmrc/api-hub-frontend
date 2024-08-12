@@ -748,3 +748,6 @@ header {
 .autocomplete__option {
     @include govuk-font($size: 19);
 }
+#deepSearch .govuk-hint {
+    font-size: 1rem;
+}
