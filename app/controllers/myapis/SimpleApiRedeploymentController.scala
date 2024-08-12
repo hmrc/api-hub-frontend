@@ -20,6 +20,7 @@ import com.google.inject.{Inject, Singleton}
 import config.{Domains, Hods}
 import connectors.ApplicationsConnector
 import controllers.actions.{ApiAuthActionProvider, IdentifierAction}
+import controllers.myapis.SimpleApiDeploymentController.{transformFromPrefixesToRemove, transformToPrefixesToRemove}
 import forms.mappings.Mappings
 import models.deployment.{InvalidOasResponse, RedeploymentRequest, SuccessfulDeploymentsResponse}
 import models.requests.ApiRequest
@@ -27,6 +28,7 @@ import play.api.data.{Form, Forms}
 import play.api.data.Forms.{mapping, optional}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.myapis.{DeploymentFailureView, DeploymentSuccessView, SimpleApiRedeploymentView}
 
@@ -37,6 +39,7 @@ class SimpleApiRedeploymentController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   identify: IdentifierAction,
   apiAuth: ApiAuthActionProvider,
+  apiHubService: ApiHubService,
   applicationsConnector: ApplicationsConnector,
   view: SimpleApiRedeploymentView,
   successView: DeploymentSuccessView,
@@ -49,9 +52,27 @@ class SimpleApiRedeploymentController @Inject()(
 
   private val form = new RedeploymentRequestFormProvider()()
 
-  def onPageLoad(id: String): Action[AnyContent] = (identify andThen apiAuth(id)) {
+  def onPageLoad(id: String): Action[AnyContent] = (identify andThen apiAuth(id)).async {
     implicit request =>
-      showView(OK, form)
+      apiHubService.getDeploymentDetails(request.apiDetails.publisherReference).map {
+        case Some(deploymentDetails) =>
+          val filledForm = form.fill(
+            RedeploymentRequest(
+              description = deploymentDetails.description,
+              oas = "", // We don't get this back with DeploymentDetails
+              status = deploymentDetails.status,
+              domain = deploymentDetails.domain,
+              subDomain = deploymentDetails.subDomain,
+              hods = deploymentDetails.hods,
+              prefixesToRemove = deploymentDetails.prefixesToRemove,
+              egressPrefix = deploymentDetails.egressPrefix
+            )
+          )
+
+          showView(OK, filledForm)
+        case None =>
+          showView(OK, form)
+      }
   }
 
   def onSubmit(id: String): Action[AnyContent] = (identify andThen apiAuth(id)).async {
@@ -88,23 +109,11 @@ object SimpleApiRedeploymentController {
           "domain" -> text("Enter a domain"),
           "subdomain" -> text("Enter a subdomain"),
           "hods" -> Forms.seq(text()),
-          "prefixesToRemove" -> optional(text()).transform[Seq[String]](toPrefixesToRemove, fromPrefixesToRemove),
+          "prefixesToRemove" -> optional(text()).transform[Seq[String]](transformToPrefixesToRemove, transformFromPrefixesToRemove),
           "egressPrefix" -> optional(text())
         )(RedeploymentRequest.apply)(RedeploymentRequest.unapply)
       )
 
-    private def toPrefixesToRemove(text: Option[String]): Seq[String] = {
-      Seq.from(text.getOrElse("").split("""\R""")).map(_.trim).filter(_.nonEmpty)
-    }
-
-    private def fromPrefixesToRemove(prefixes: Seq[String]): Option[String] = {
-      if (prefixes.nonEmpty) {
-        Some(prefixes.mkString(System.lineSeparator()))
-      }
-      else {
-        None
-      }
-    }
   }
 
 }

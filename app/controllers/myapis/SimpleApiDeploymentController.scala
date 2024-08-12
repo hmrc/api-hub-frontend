@@ -103,22 +103,23 @@ object SimpleApiDeploymentController {
         "domain" -> text("Enter a domain"),
         "subdomain" -> text("Enter a subdomain"),
         "hods" -> Forms.seq(text()),
-        "prefixesToRemove" -> optional(text()).transform[Seq[String]](toPrefixesToRemove, fromPrefixesToRemove),
+        "prefixesToRemove" -> optional(text()).transform[Seq[String]](transformToPrefixesToRemove, transformFromPrefixesToRemove),
         "egressPrefix" -> optional(text())
         )(DeploymentsRequest.apply)(DeploymentsRequest.unapply)
       )
 
-    private def toPrefixesToRemove(text: Option[String]): Seq[String] = {
-      Seq.from(text.getOrElse("").split("""\R""")).map(_.trim).filter(_.nonEmpty)
-    }
+  }
 
-    private def fromPrefixesToRemove(prefixes: Seq[String]): Option[String] = {
-      if (prefixes.nonEmpty) {
-        Some(prefixes.mkString(System.lineSeparator()))
-      }
-      else {
-        None
-      }
+  def transformToPrefixesToRemove(text: Option[String]): Seq[String] = {
+    Seq.from(text.getOrElse("").split("""\R""")).map(_.trim).filter(_.nonEmpty)
+  }
+
+  def transformFromPrefixesToRemove(prefixes: Seq[String]): Option[String] = {
+    if (prefixes.nonEmpty) {
+      Some(prefixes.mkString(System.lineSeparator()))
+    }
+    else {
+      None
     }
   }
 

@@ -19,7 +19,6 @@ package controllers.myapis
 import base.SpecBase
 import connectors.ApplicationsConnector
 import controllers.actions.{ApiAuthActionProvider, FakeApiAuthActions, FakeApiDetail, FakeUser}
-import controllers.myapis.SimpleApiDeploymentControllerSpec.{deploymentsRequest, prefix1, prefix2, prefix3}
 import controllers.myapis.SimpleApiRedeploymentController.RedeploymentRequestFormProvider
 import fakes.{FakeDomains, FakeHods}
 import models.deployment._
@@ -56,6 +55,7 @@ class SimpleApiRedeploymentControllerSpec
       val fixture = buildFixture()
 
       when(fixture.apiAuthActionProvider.apply(any)(any)).thenReturn(successfulApiAuthAction(FakeApiDetail))
+      when(fixture.apiHubService.getDeploymentDetails(any)(any)).thenReturn(Future.successful(None))
 
       running(fixture.playApplication) {
         val request = FakeRequest(controllers.myapis.routes.SimpleApiRedeploymentController.onPageLoad(FakeApiDetail.id))
@@ -67,6 +67,36 @@ class SimpleApiRedeploymentControllerSpec
         contentAsString(result) must validateAsHtml
 
         verify(fixture.apiAuthActionProvider).apply(eqTo(FakeApiDetail.id))(any)
+        verify(fixture.apiHubService).getDeploymentDetails(eqTo(FakeApiDetail.publisherReference))(any)
+      }
+    }
+
+    "must pre-populate fields when the data is available in APIM" in {
+      val fixture = buildFixture()
+
+      val deploymentDetails = DeploymentDetails(
+        description = redeploymentRequest.description,
+        status = redeploymentRequest.status,
+        domain = redeploymentRequest.domain,
+        subDomain = redeploymentRequest.subDomain,
+        hods = redeploymentRequest.hods,
+        egressPrefix = redeploymentRequest.egressPrefix,
+        prefixesToRemove = redeploymentRequest.prefixesToRemove
+      )
+
+      when(fixture.apiAuthActionProvider.apply(any)(any)).thenReturn(successfulApiAuthAction(FakeApiDetail))
+      when(fixture.apiHubService.getDeploymentDetails(any)(any)).thenReturn(Future.successful(Some(deploymentDetails)))
+
+      running(fixture.playApplication) {
+        val request = FakeRequest(controllers.myapis.routes.SimpleApiRedeploymentController.onPageLoad(FakeApiDetail.id))
+        val result = route(fixture.playApplication, request).value
+        val view = fixture.playApplication.injector.instanceOf[SimpleApiRedeploymentView]
+
+        val filledForm = form.fill(redeploymentRequest.copy(oas = ""))
+
+        status(result) mustBe OK
+        contentAsString(result) mustBe view(filledForm, FakeApiDetail, FakeDomains, FakeHods, FakeUser)(request, messages(fixture.playApplication)).toString()
+        contentAsString(result) must validateAsHtml
       }
     }
   }
