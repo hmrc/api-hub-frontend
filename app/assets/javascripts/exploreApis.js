@@ -174,11 +174,11 @@ export function onPageShow() {
                 if (clearFilters) {
                     filters.forEach(filter => filter.clear());
                 }
-                filters.forEach(filter => filter.syncWithApis(model.apis.filter(apiDetail => !apiDetail.hiddenBySearch)));
-                applyFiltersAndPagination();
-
                 view.enableFilters = true;
                 view.displayResults = true;
+
+                filters.forEach(filter => filter.syncWithApis(model.apis.filter(apiDetail => !apiDetail.hiddenBySearch)));
+                applyFiltersAndPagination();
             });
     }
 
