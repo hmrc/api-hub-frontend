@@ -29,6 +29,9 @@ site.teamNotFoundHeading = Team not found
 site.teamNotFoundMessage = Cannot find a team with Id {0}.
 site.opensInNewTab = opens in new tab
 site.displayCount = Showing {0} of {1}
+site.deleted = Deleted
+site.live = Live
+site.total = Total
 
 date.day = Day
 date.month = Month
@@ -300,6 +303,8 @@ apiDeployments.status.notDeployed = Not deployed
 apiDeployments.versionPrefix = Version
 apiDeployments.environment.primary = Production env
 apiDeployments.environment.secondary = Development env
+
+assignApplicationToTeam.title = Assign application to team
 
 exploreApis.title = Explore APIs
 exploreApis.searchResults.heading = API Results
@@ -678,3 +683,10 @@ getUsers.title = View users
 getUsers.heading = View users
 getUsers.copy = Copy to clipboard
 getUsers.admin = Integration Hub admin
+
+teamMigration.pageTitle = Global team migration
+teamMigration.title = Team migration
+teamMigration.nonMigrated.heading = Non-migrated applications
+teamMigration.migrated = Migrated
+teamMigration.nonMigrated = Non-migrated
+teamMigration.assignTeam = Assign team

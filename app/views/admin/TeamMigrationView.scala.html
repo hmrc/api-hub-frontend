@@ -1,0 +1,153 @@
+@*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import controllers.admin.TeamMigrationController.MigrationSummary
+@import models.application.Application
+@import models.user.UserModel
+@import viewmodels.admin.{AdminNavItems, AdminSideNavPages}
+
+@this(
+    layout: templates.Layout,
+    govukTag : GovukTag,
+    govukTable : GovukTable
+)
+
+@(applications: Seq[Application], summary: Seq[MigrationSummary], user: UserModel)(implicit request: Request[_], messages: Messages)
+
+@summaryCell(migrated: Option[Boolean], deleted: Option[Boolean]) = @{
+    Text(
+        summary
+            .filter(row => migrated.map(_.equals(row.migrated)).getOrElse(true))
+            .filter(row => deleted.map(_.equals(row.deleted)).getOrElse(true))
+            .map(_.count)
+            .sum
+            .toString
+    )
+}
+
+@layout(pageTitle = titleNoForm(messages("teamMigration.pageTitle")), user = Some(user), fullWidth = true) {
+
+    @views.html.templates.SideNav(messages("manageApplications.admin"), AdminNavItems(user, AdminSideNavPages.TeamMigrationPage)) {
+
+        <h1 class="govuk-heading-l">@messages("teamMigration.pageTitle")</h1>
+
+        @govukTable(Table(
+            rows = Seq(
+                Seq(
+                    TableRow(
+                        content = Text(messages("site.live"))
+                    ),
+                    TableRow(
+                        content = summaryCell(Some(true), Some(false)),
+                        format = Some("numeric")
+                    ),
+                    TableRow(
+                        content = summaryCell(Some(false), Some(false)),
+                        format = Some("numeric")
+                    ),
+                    TableRow(
+                        content = summaryCell(None, Some(false)),
+                        format = Some("numeric")
+                    )
+                ),
+                Seq(
+                    TableRow(
+                        content = Text(messages("site.deleted"))
+                    ),
+                    TableRow(
+                        content = summaryCell(Some(true), Some(true)),
+                        format = Some("numeric")
+                    ),
+                    TableRow(
+                        content = summaryCell(Some(false), Some(true)),
+                        format = Some("numeric")
+                    ),
+                    TableRow(
+                        content = summaryCell(None, Some(true)),
+                        format = Some("numeric")
+                    )
+                ),
+                Seq(
+                    TableRow(
+                        content = Text(messages("site.total"))
+                    ),
+                    TableRow(
+                        content = summaryCell(Some(true), None),
+                        format = Some("numeric")
+                    ),
+                    TableRow(
+                        content = summaryCell(Some(false), None),
+                        format = Some("numeric")
+                    ),
+                    TableRow(
+                        content = summaryCell(None, None),
+                        format = Some("numeric")
+                    )
+                )
+            ),
+            head = Some(Seq(
+                HeadCell(
+                    content = Text("")
+                ),
+                HeadCell(
+                    content = Text(messages("teamMigration.migrated")),
+                    format = Some("numeric")
+                ),
+                HeadCell(
+                    content = Text(messages("teamMigration.nonMigrated")),
+                    format = Some("numeric")
+                ),
+                HeadCell(
+                    content = Text(messages("site.total")),
+                    format = Some("numeric")
+                )
+            )),
+            caption = Some("Summary"),
+            captionClasses = "govuk-table__caption--m",
+            firstCellIsHeader = true
+          )
+        )
+
+        <h2 class="govuk-heading-m">@messages("teamMigration.nonMigrated.heading")</h2>
+
+        @for(application <- applications){
+            <div class="hip-inner-card flex hip-application">
+                <div class="left">
+                    <h5 class="govuk-heading-s hip-inner-card-title govuk-!-margin-bottom-4">
+                        <a class="govuk-link govuk-link--no-visited-state" href=@controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url>@application.name</a>
+                    </h5>
+                    <p class="govuk-body-s govuk-!-margin-top-1">
+                        <strong>@messages("manageApplications.application.id"): </strong>@application.id
+                    </p>
+                </div>
+                <div class="right ">
+                    <p class="govuk-body-s govuk-!-margin-top-1">
+                        <a class="govuk-link govuk-link--no-visited-state" href=@controllers.admin.routes.AssignApplicationTeamController.onPageLoad(application.id).url>@messages("teamMigration.assignTeam")</a>
+                    </p>
+                    @for(deleted <- application.deleted){
+                        <p class="govuk-body-s govuk-!-margin-top-1">
+                            @govukTag(Tag(
+                                content = Text(messages("site.deleted")),
+                                classes = "govuk-tag--grey"
+                            ))
+                        </p>
+                    }
+                </div>
+            </div>
+        }
+    }
+
+}
