@@ -55,10 +55,6 @@ describe('exploreApisHodsFilters', () => {
             expect(isVisible(document.getElementById('hodFilters'))).toEqual(false);
         });
 
-        it("should show/hide individual filters correctly as the list of APIs changes",  () => {
-            //TODO
-        });
-
         it("after initialisation clicking a checkbox triggers the onChange handler",  () => {
             let changeCount = 0;
             hodsFilters.onChange(() => changeCount++);
