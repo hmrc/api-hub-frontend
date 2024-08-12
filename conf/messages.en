@@ -323,6 +323,8 @@ exploreApis.filter.active = Your results are being filtered, showing {0}
 exploreApis.search.title = Search for an API
 exploreApis.search.hint = Search by API name, ref, ID or data attribute.
 exploreApis.search.clear = Clear search
+exploreApis.search.error = An error occurred when performing your search
+
 
 support.link.text = Get Support
 support.title = Get Support

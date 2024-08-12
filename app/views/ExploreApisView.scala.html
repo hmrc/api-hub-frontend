@@ -287,7 +287,7 @@
                     <p id="resultsError" class="govuk-body information--general-tag govuk-!-margin-bottom-1">
                         <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
                         <span class="call-out-type govuk-!-font-weight-regular">
-                            An error occurred when performing your search
+                            @messages("exploreApis.search.error")
                         </span>
                     </p>
                     <p class="govuk-body additional-message govuk-!-margin-top-1">
@@ -299,7 +299,7 @@
                     <p class="govuk-body information--general-tag govuk-!-margin-bottom-1">
                         <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
                         <span class="call-out-type govuk-!-font-weight-regular">
-                            Your results are being filtered, showing <span id="filterResultsCount" class="govuk-!-font-weight-bold">0</span> result<span id="filterResultsCountPlural">s</span>.
+                            @Html(messages("exploreApis.filter.active", <span><span id="filterResultsCount" class="govuk-!-font-weight-bold">0</span> result<span id="filterResultsCountPlural">s</span></span>))
                         </span>
                     </p>
                     <p class="govuk-body additional-message govuk-!-margin-top-1">
