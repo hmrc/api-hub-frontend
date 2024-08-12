@@ -1,22 +1,16 @@
-import {addIntersectionMethodToSet, noop, removeElement} from "./utils.js";
+import {addIntersectionMethodToSet, noop, setVisible} from "./utils.js";
 
 addIntersectionMethodToSet();
 
 export function buildPlatformFilters() {
-    const elViewNonSelfServePlatformFilters = document.getElementById('viewPlatformFilters'),
+    const nonSelfServePlatformFilterEls = [],
+        elViewNonSelfServePlatformFilters = document.getElementById('viewPlatformFilters'),
         elShowSelfServe = document.getElementById('filterPlatformSelfServe'),
         elShowNonSelfServe = document.getElementById('filterPlatformNonSelfServe'),
         selfServePlatformsInUseByApis = new Set(),
         nonSelfServePlatformsInUseByApis = new Set();
 
     let onFiltersChangedHandler = noop;
-
-    function getPlatformFilterCheckboxes() {
-        return [...document.querySelectorAll('input.platformFilter')];
-    }
-    function forEachPlatformFilterCheckbox(fn) {
-        return getPlatformFilterCheckboxes().forEach(fn);
-    }
 
     function collapseNonSelfServeFilterSection(isCollapsed) {
         if (isCollapsed) {
@@ -26,40 +20,26 @@ export function buildPlatformFilters() {
         }
     }
 
-    function removeUnusedCheckboxes() {
+    function setNonSelfServeCheckboxVisibility() {
         // Initially we have one checkbox for each platform, but we only want to show non-self-serve platforms that are in use by at least one API
-        forEachPlatformFilterCheckbox(el => {
-            const platform = el.value;
-            if (! nonSelfServePlatformsInUseByApis.has(platform)) {
-                removeElement(el.parentElement);
+        nonSelfServePlatformFilterEls.length = 0;
+
+        document.querySelectorAll('input.platformFilter').forEach(elPlatformCheckbox => {
+            const platform = elPlatformCheckbox.value,
+                platformInUse = nonSelfServePlatformsInUseByApis.has(platform);
+            setVisible(elPlatformCheckbox.parentElement, platformInUse);
+            if (platformInUse) {
+                nonSelfServePlatformFilterEls.push(elPlatformCheckbox);
             }
         });
     }
 
-    function setupCheckboxes(){
-        function syncFiltersWithNonSelfServeCheckbox(checkAllFilters) {
-            const showNonSelfServe = elShowNonSelfServe.checked;
-            collapseNonSelfServeFilterSection(!showNonSelfServe);
-            if (showNonSelfServe && checkAllFilters) {
-                forEachPlatformFilterCheckbox(el => el.checked = true);
-            }
+    function syncFiltersWithNonSelfServeCheckbox(checkAllFilters) {
+        const showNonSelfServe = elShowNonSelfServe.checked;
+        collapseNonSelfServeFilterSection(!showNonSelfServe);
+        if (showNonSelfServe && checkAllFilters) {
+            nonSelfServePlatformFilterEls.forEach(el => el.checked = true);
         }
-
-        forEachPlatformFilterCheckbox(el => {
-            el.addEventListener('change', onFiltersChangedHandler);
-        });
-
-        elShowSelfServe.addEventListener('change', onFiltersChangedHandler);
-
-        elShowNonSelfServe.addEventListener('change', event => {
-            syncFiltersWithNonSelfServeCheckbox(true);
-            onFiltersChangedHandler();
-        });
-
-        /* When we return to the page via Back button make sure the non-self-serve filter section is collapsed/expanded
-        as appropriate but don't automatically check all the checkboxes, we want the state to match what it was before
-        the user navigated away */
-        syncFiltersWithNonSelfServeCheckbox(false);
     }
 
     function getSelected(){
@@ -71,7 +51,7 @@ export function buildPlatformFilters() {
             selections.push(...selfServePlatformsInUseByApis);
         }
         if (showNonSelfServe) {
-            const checkedValues = getPlatformFilterCheckboxes().filter(el => el.checked).map(el => el.value);
+            const checkedValues = nonSelfServePlatformFilterEls.filter(el => el.checked).map(el => el.value);
             if (checkedValues.length === 0) {
                 // If all checkboxes in the list are unchecked, then we should assume that the user wants to see all non-self-serve platforms
                 selections.push(...nonSelfServePlatformsInUseByApis);
@@ -85,6 +65,25 @@ export function buildPlatformFilters() {
 
     return {
         initialise(apis) {
+            document.querySelectorAll('input.platformFilter').forEach(el => {
+                el.addEventListener('change', () => onFiltersChangedHandler());
+            });
+
+            elShowSelfServe.addEventListener('change', () => onFiltersChangedHandler());
+
+            elShowNonSelfServe.addEventListener('change', () => {
+                syncFiltersWithNonSelfServeCheckbox(true);
+                onFiltersChangedHandler();
+            });
+
+            /* When we return to the page via Back button make sure the non-self-serve filter section is collapsed/expanded
+            as appropriate but don't automatically check all the checkboxes, we want the state to match what it was before
+            the user navigated away */
+            syncFiltersWithNonSelfServeCheckbox(false);
+
+            this.syncWithApis(apis);
+        },
+        syncWithApis(apis) {
             const platformsInUseByApis= new Set(apis.map(api => api.data.platform)),
                 allPlatformDetails = [...document.querySelectorAll('input.platformFilter')].map(el => ({code: el.value, isSelfServe: el.dataset.selfserve === 'true'})),
                 allSelfServePlatforms = new Set(),
@@ -98,11 +97,17 @@ export function buildPlatformFilters() {
                 }
             });
 
+            selfServePlatformsInUseByApis.clear();
             allSelfServePlatforms.intersection(platformsInUseByApis).forEach(platform => selfServePlatformsInUseByApis.add(platform));
+
+            nonSelfServePlatformsInUseByApis.clear();
             allNonSelfServePlatforms.intersection(platformsInUseByApis).forEach(platform => nonSelfServePlatformsInUseByApis.add(platform));
 
-            removeUnusedCheckboxes();
-            setupCheckboxes();
+            setNonSelfServeCheckboxVisibility();
+            syncFiltersWithNonSelfServeCheckbox(false);
+
+            elShowSelfServe.disabled = selfServePlatformsInUseByApis.size === 0;
+            elShowNonSelfServe.disabled = nonSelfServePlatformsInUseByApis.size === 0;
         },
         onChange(handler) {
             onFiltersChangedHandler = () => {
@@ -110,9 +115,9 @@ export function buildPlatformFilters() {
             };
         },
         clear() {
-            elShowSelfServe.checked = true;
+            elShowSelfServe.checked = false;
             elShowNonSelfServe.checked = false;
-            collapseNonSelfServeFilterSection(true);
+            syncFiltersWithNonSelfServeCheckbox();
         },
         buildFilterFunction() {
             const selectedPlatforms = getSelected(),

@@ -1,6 +1,28 @@
 import {buildPaginator, HIDDEN_BY_PAGINATION} from './paginationController.js';
-import {buildNameFilter} from "./exploreApisNameFilter.js";
-import {setVisible, noop} from "./utils.js";
+import {setVisible, noop, normaliseText} from "./utils.js";
+
+function buildNameFilter() {
+    const elFilterText = document.getElementById('nameFilter');
+
+    let onFiltersChangedHandler = noop;
+
+    return {
+        initialise() {
+            elFilterText.addEventListener('input', onFiltersChangedHandler);
+        },
+        onChange(handler) {
+            onFiltersChangedHandler = handler;
+        },
+        clear() {
+            elFilterText.value = '';
+        },
+        buildFilterFunction() {
+            const normalisedValue = normaliseText(elFilterText.value);
+
+            return data => data.apiName.includes(normalisedValue);
+        }
+    };
+}
 
 export function onPageShow() {
     const filters = [

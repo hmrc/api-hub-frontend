@@ -1,7 +1,8 @@
-import {noop} from "./utils.js";
+import {noop, setVisible} from "./utils.js";
 
 export function buildStatusFilters() {
-    const statusFilterEls = Array.from(document.querySelectorAll('#statusFilters .govuk-checkboxes__input')),
+    const statusFilterEls = [],
+        elStatusFiltersContainer = document.getElementById('statusFilters'),
         elStatusFilterCount = document.getElementById('statusFilterCount'),
         elViewStatusFilters = document.getElementById('viewStatusFilters');
 
@@ -24,15 +25,44 @@ export function buildStatusFilters() {
         }
     }
 
-    return {
-        initialise() {
-            statusFilterEls.forEach(elCheckbox => {
-                elCheckbox.addEventListener('change', () => onFiltersChangedHandler());
-            });
+    function getStatusesInUseByApis(apis) {
+        return new Set(apis.map(apiDetail => apiDetail.data.apiStatus));
+    }
 
-            const anyStatusesSelected = statusFilterEls.some(el => el.checked);
-            collapseStatusFilterSection(!anyStatusesSelected);
-            updateStatusFilterCount();
+    function setCheckboxVisibility(apiStatuses) {
+        statusFilterEls.length = 0;
+        document.querySelectorAll('input.statusFilter').forEach(elStatusCheckbox => {
+            const status = elStatusCheckbox.value,
+                statusInUse = apiStatuses.has(status);
+            setVisible(elStatusCheckbox.parentElement, statusInUse);
+            if (statusInUse) {
+                statusFilterEls.push(elStatusCheckbox);
+            }
+        });
+    }
+
+    return {
+        initialise(apis) {
+            document.querySelectorAll('input.statusFilter')
+                .forEach(elStatusCheckbox => {
+                    elStatusCheckbox.addEventListener('change', () => {
+                        onFiltersChangedHandler();
+                    });
+                });
+            this.syncWithApis(apis);
+        },
+        syncWithApis(apis) {
+            const apiStatuses = getStatusesInUseByApis(apis);
+            setCheckboxVisibility(apiStatuses);
+
+            // Although all APIs have a status, if we run a search that return no matches we need to hide the status filters
+            const anyStatusesInUse = statusFilterEls.length > 0;
+            setVisible(elStatusFiltersContainer, anyStatusesInUse);
+            if (anyStatusesInUse) {
+                const anyStatusesSelected = statusFilterEls.some(el => el.checked);
+                collapseStatusFilterSection(!anyStatusesSelected);
+                updateStatusFilterCount();
+            }
         },
         onChange(handler) {
             onFiltersChangedHandler = () => {

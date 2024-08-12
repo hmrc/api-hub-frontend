@@ -60,17 +60,7 @@ class IntegrationCatalogueConnector @Inject()(
   }
 
   def getApis(platformFilter: Option[String])(implicit hc: HeaderCarrier): Future[Seq[ApiDetail]] = {
-    val getApisUrl = s"$integrationCatalogueBaseUrl/integration-catalogue/integrations?integrationType=api" +
-      platformFilter.fold("")(platform => s"&platformFilter=$platform")
-
-    httpClient.get(url"$getApisUrl")
-      .setHeader((ACCEPT, JSON))
-      .setHeader(AUTHORIZATION -> clientAuthToken)
-      .execute[Either[UpstreamErrorResponse, IntegrationResponse]]
-      .flatMap {
-        case Right(integrationResponse) => Future.successful(integrationResponse.results)
-        case Left(e) => Future.failed(e)
-      }
+    queryApis(platformFilter.map(f => Seq(("platformFilter", f))).toSeq.flatten)
   }
 
   def getPlatformContacts()(implicit hc: HeaderCarrier): Future[Seq[PlatformContact]] = {
@@ -85,17 +75,26 @@ class IntegrationCatalogueConnector @Inject()(
   }
 
   def filterApis(teamIds: Seq[String])(implicit hc: HeaderCarrier): Future[Seq[ApiDetail]] = {
+    queryApis(teamIds.map(id => ("teamIds", id)))
+  }
 
-    val queryParams = teamIds.map(id => ("teamIds", id))
+  def deepSearchApis(searchText: String)(implicit hc: HeaderCarrier): Future[Seq[ApiDetail]] = {
+    queryApis(Seq(("searchTerm", searchText)))
+  }
 
-    httpClient.get(url"$integrationCatalogueBaseUrl/integration-catalogue/integrations")
+  private def queryApis(queryParams: Seq[(String,String)])(implicit hc: HeaderCarrier): Future[Seq[ApiDetail]] = {
+    httpClient.get(url"$integrationCatalogueBaseUrl/integration-catalogue/integrations?integrationType=api")
       .transform(wsRq => wsRq.withQueryStringParameters(queryParams: _*))
       .setHeader((ACCEPT, JSON))
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Either[UpstreamErrorResponse, IntegrationResponse]]
       .flatMap {
-        case Right(integrationResponse) => Future.successful(integrationResponse.results)
-        case Left(e) => Future.failed(e)
+        case Right(integrationResponse) => {
+          Future.successful(integrationResponse.results)
+        }
+        case Left(e) => {
+          Future.failed(e)
+        }
       }
   }
 }

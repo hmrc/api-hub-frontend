@@ -75,6 +75,8 @@ POST        /apis/add-an-api/change-select-application                         c
 GET         /apis                                                              controllers.ExploreApisController.onPageLoad()
 POST        /apis                                                              controllers.ExploreApisController.onSubmit()
 
+GET         /apis/deep-search/:text                                            controllers.DeepSearchApisController.doSearch(text: String)
+
 GET         /apis/add-an-api/review-policy                                     controllers.ApiPolicyConditionsDeclarationPageController.onPageLoad(mode: Mode = NormalMode, context: AddAnApiContext = AddAnApi)
 POST        /apis/add-an-api/review-policy                                     controllers.ApiPolicyConditionsDeclarationPageController.onSubmit(mode: Mode = NormalMode, context: AddAnApiContext = AddAnApi)
 GET         /apis/add-an-api/change-review-policy                              controllers.ApiPolicyConditionsDeclarationPageController.onPageLoad(mode: Mode = CheckMode, context: AddAnApiContext = AddAnApi)

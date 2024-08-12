@@ -491,10 +491,6 @@ $active-link-color: govuk-colour("dark-blue");
     min-height: 400px;
 }
 
-#apiResultsContainer {
-    padding-left: 26px;
-}
-
 .filterSelectionCount, #resetFilters {
     font-size: 16px;
 }
@@ -691,11 +687,6 @@ nav.hip-pagination--centered {
     @extend .govuk-tag--green;
 }
 
-#apiResultsContainer .hip-tag {
-    font-size: 14px;
-    line-height: 20px;
-}
-
 .hip-tag--api-status {
     @extend .hip-tag;
     text-transform: capitalize;
@@ -756,4 +747,7 @@ header {
 }
 .autocomplete__option {
     @include govuk-font($size: 19);
+}
+#deepSearch .govuk-hint {
+    font-size: 1rem;
 }

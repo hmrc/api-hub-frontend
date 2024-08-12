@@ -1,5 +1,6 @@
 import {JSDOM} from 'jsdom';
 import {buildDomainFilters} from "../../app/assets/javascripts/exploreApisDomainFilters.js";
+import {isVisible} from "./testUtils.js";
 
 describe('exploreApisDomainFilters', () => {
     let document, domainFilters, apis;
@@ -65,8 +66,8 @@ describe('exploreApisDomainFilters', () => {
         it("removes checkboxes for domains not in use by any APIs",  () => {
             domainFilters.initialise(apis);
 
-            expect([...document.querySelectorAll('.domainFilter')].map(el => el.value)).toEqual(['d1', 'd2', 'd3']);
-            expect([...document.querySelectorAll('.subDomainFilter')].map(el => el.value)).toEqual(['d1s1', 'd1s2', 'd1s3', 'd2s1']);
+            expect([...document.querySelectorAll('.domainFilter')].filter(el => isVisible(el.parentElement)).map(el => el.value)).toEqual(['d1', 'd2', 'd3']);
+            expect([...document.querySelectorAll('.subDomainFilter')].filter(el => isVisible(el.parentElement)).map(el => el.value)).toEqual(['d1s1', 'd1s2', 'd1s3', 'd2s1']);
         });
 
         it("after initialisation clicking a checkbox triggers the onChange handler",  () => {
@@ -98,7 +99,7 @@ describe('exploreApisDomainFilters', () => {
             expect(subdomainCheckbox('d1s2').checked).toBe(true);
             expect(subdomainCheckbox('d1s3').checked).toBe(true);
 
-            expect(document.querySelector('.subdomainCheckboxes[data-domain="d1"]').style.display).toBe('block');
+            expect(isVisible(document.querySelector('.subdomainCheckboxes[data-domain="d1"]'))).toBe(true);
         });
 
         it("unchecking a domain checkbox hides and unchecks all associated subdomain checkboxes",  () => {
@@ -113,7 +114,7 @@ describe('exploreApisDomainFilters', () => {
             expect(subdomainCheckbox('d1s2').checked).toBe(false);
             expect(subdomainCheckbox('d1s3').checked).toBe(false);
 
-            expect(document.querySelector('.subdomainCheckboxes[data-domain="d1"]').style.display).toBe('none');
+            expect(isVisible(document.querySelector('.subdomainCheckboxes[data-domain="d1"]'))).toBe(false);
         });
 
         it("if no domains are selected then the domain filter section is collapsed",  () => {
@@ -132,10 +133,52 @@ describe('exploreApisDomainFilters', () => {
             expect(document.getElementById('domainFilterCount').textContent).toBe('0');
         });
 
-        it("if domains are selected then the domain filter count is the number of selected domains",  () => {
+        it("if domains and sub-domains are selected then the domain filter count is the number of selected domains and sub-domains",  () => {
             domainCheckbox('d1').click();
+            subdomainCheckbox('d1s1').click();
+            subdomainCheckbox('d1s2').click();
+
             domainFilters.initialise(apis);
-            expect(document.getElementById('domainFilterCount').textContent).toBe('1');
+
+            expect(document.getElementById('domainFilterCount').textContent).toBe('3');
+        });
+    });
+
+    describe('syncWithApis', () => {
+        it("when new APIs are added, hidden checkboxes are shown",  () => {
+            domainFilters.initialise(apis);
+            expect(isVisible(domainCheckbox('d4').parentElement)).toBe(false);
+            expect(isVisible(subdomainCheckbox('d4s1').parentElement)).toBe(false);
+
+            domainFilters.syncWithApis([...apis, {data: {domain: 'd4', subdomain: 'd4s1'}}]);
+
+            expect(isVisible(domainCheckbox('d4').parentElement)).toBe(true);
+            expect(isVisible(subdomainCheckbox('d4s1').parentElement)).toBe(true);
+        });
+
+        it("when old APIs are removed, visible checkboxes are hidden",  () => {
+            domainFilters.initialise(apis);
+            expect(isVisible(domainCheckbox('d1').parentElement)).toBe(true);
+            expect(isVisible(subdomainCheckbox('d1s1').parentElement)).toBe(true);
+
+            domainFilters.syncWithApis(apis.filter(api => api.data.subdomain !== 'd1s1'));
+
+            expect(isVisible(domainCheckbox('d1').parentElement)).toBe(true);
+            expect(isVisible(subdomainCheckbox('d1s1').parentElement)).toBe(false);
+
+            domainFilters.syncWithApis(apis.filter(api => api.data.domain !== 'd1'));
+
+            expect(isVisible(domainCheckbox('d1').parentElement)).toBe(false);
+            expect(isVisible(subdomainCheckbox('d1s1').parentElement)).toBe(false);
+        });
+
+        it("when no APIs are present the filter is hidden",  () => {
+            domainFilters.initialise(apis);
+
+            expect(isVisible(document.getElementById('domainFilters'))).toBe(true);
+            domainFilters.syncWithApis([]);
+
+            expect(isVisible(document.getElementById('domainFilters'))).toBe(false);
         });
     });
 
@@ -162,7 +205,7 @@ describe('exploreApisDomainFilters', () => {
 
             domainFilters.clear();
 
-            expect([...document.querySelectorAll('.subdomainCheckboxes')].map(el => el.style.display)).toEqual(['none', 'none', 'none']);
+            expect([...document.querySelectorAll('.subdomainCheckboxes')].map(isVisible)).toEqual([false, false, false, false]);
         });
 
         it("collapses the domain filter section",  () => {
