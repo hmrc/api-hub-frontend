@@ -320,6 +320,23 @@ class ApiHubServiceSpec
     }
   }
 
+  "deepSearchApis" - {
+    "must call the integration catalogue connector and return API details" in {
+      val expected = Seq(sampleApiDetail())
+      val searchTerm = "hello"
+
+      val fixture = buildFixture()
+
+      when(fixture.integrationCatalogueConnector.deepSearchApis(eqTo(searchTerm))(any()))
+        .thenReturn(Future.successful(expected))
+
+      fixture.service.deepSearchApis(searchTerm)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe expected
+      }
+    }
+  }
+
   "addApi" - {
     "must call the applications connector with correct request and return something" in {
       val fixture = buildFixture()
