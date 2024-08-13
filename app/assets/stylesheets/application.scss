@@ -751,3 +751,10 @@ header {
 #deepSearch .govuk-hint {
     font-size: 1rem;
 }
+
+.hip-api-info__summary, .hip-api-info__description {
+    pre {
+        overflow-x: scroll;
+        scrollbar-width: thin;
+    }
+}
