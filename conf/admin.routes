@@ -6,4 +6,3 @@ GET         /applications                                                       
 GET         /apis                                                                   controllers.admin.ManageApisController.onPageLoad()
 GET         /users                                                                  controllers.admin.GetUsersController.onPageLoad()
 GET         /team-migration                                                         controllers.admin.TeamMigrationController.onPageLoad()
-GET         /assign-application-team/:id                                            controllers.admin.AssignApplicationTeamController.onPageLoad(id: String)

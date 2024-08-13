@@ -689,4 +689,4 @@ teamMigration.title = Team migration
 teamMigration.nonMigrated.heading = Non-migrated applications
 teamMigration.migrated = Migrated
 teamMigration.nonMigrated = Non-migrated
-teamMigration.assignTeam = Assign team
+teamMigration.changeOwningTeam = Change owning team

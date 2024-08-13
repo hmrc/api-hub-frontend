@@ -44,7 +44,7 @@ class TeamMigrationControllerSpec
     with TeamGenerator {
 
   "TeamMigrationController" - {
-    "must return Ok and the correct view for an approver or support user" in {
+    "must return Ok and the correct view for a support user" in {
       forAll(usersWhoCanSupport) { (user: UserModel) =>
         val fixture = buildFixture(user)
         val migratedApplication = Application(
