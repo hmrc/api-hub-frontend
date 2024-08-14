@@ -31,7 +31,8 @@ case class Application (
   environments: Environments,
   apis: Seq[Api],
   issues: Seq[String] = Seq.empty,
-  deleted: Option[Deleted] = None
+  deleted: Option[Deleted] = None,
+  teamName: Option[String] = None,
 )
 
 object Application {

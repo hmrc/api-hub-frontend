@@ -60,7 +60,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
             val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
 
             status(result) mustEqual OK
-            contentAsString(result) mustBe view(FakeApplication, Some(Seq.empty), None, Some(user))(request, messages(fixture.playApplication)).toString
+            contentAsString(result) mustBe view(FakeApplication, Some(Seq.empty), Some(user))(request, messages(fixture.playApplication)).toString
             contentAsString(result) must validateAsHtml
           }
       }
@@ -70,7 +70,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
       val fixture = buildFixture()
 
       val team = Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email.value)))
-      val application = FakeApplication.setTeamId(team.id)
+      val application = FakeApplication.setTeamId(team.id).setTeamName(team.name)
 
       when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), ArgumentMatchers.eq(true))(any()))
         .thenReturn(Future.successful(Some(application)))
@@ -87,39 +87,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustBe view(application, Some(Seq.empty), Some(team), Some(FakeUser))(request, messages(fixture.playApplication)).toString
-        contentAsString(result) must validateAsHtml
-      }
-    }
-
-    "must return Not Found and a suitable message for a GET when the application has a global team that cannot be found" in {
-      val fixture = buildFixture()
-
-      val team = Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email.value)))
-      val application = FakeApplication.setTeamId(team.id)
-
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), ArgumentMatchers.eq(true))(any()))
-        .thenReturn(Future.successful(Some(application)))
-
-      when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(application.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
-        .thenReturn(Future.successful(Seq.empty))
-
-      when(fixture.apiHubService.findTeamById(ArgumentMatchers.eq(team.id))(any))
-        .thenReturn(Future.successful(None))
-
-      running(fixture.playApplication) {
-        val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url)
-        val result = route(fixture.playApplication, request).value
-        val view = fixture.playApplication.injector.instanceOf[ErrorTemplate]
-
-        status(result) mustEqual NOT_FOUND
-        contentAsString(result) mustBe
-          view(
-            "Page not found - 404",
-            "Team not found",
-            s"Cannot find a team with Id ${team.id}."
-          )(request, messages(fixture.playApplication))
-            .toString()
+        contentAsString(result) mustBe view(application, Some(Seq.empty), Some(FakeUser))(request, messages(fixture.playApplication)).toString
         contentAsString(result) must validateAsHtml
       }
     }
@@ -161,7 +129,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
 
         status(result) mustBe OK
-        contentAsString(result) mustBe view(expected, Some(Seq.empty), None, Some(FakeUser))(request, messages(fixture.playApplication)).toString
+        contentAsString(result) mustBe view(expected, Some(Seq.empty), Some(FakeUser))(request, messages(fixture.playApplication)).toString
       }
     }
 
@@ -206,7 +174,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustBe view(application, Some(applicationApis), None, Some(FakeUser))(request, messages(fixture.playApplication)).toString
+        contentAsString(result) mustBe view(application, Some(applicationApis), Some(FakeUser))(request, messages(fixture.playApplication)).toString
         contentAsString(result) must validateAsHtml
       }
     }
@@ -234,7 +202,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustBe view(application, None, None, Some(FakeUser))(request, messages(fixture.playApplication)).toString
+        contentAsString(result) mustBe view(application, None, Some(FakeUser))(request, messages(fixture.playApplication)).toString
         contentAsString(result) must validateAsHtml
       }
     }

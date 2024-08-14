@@ -19,16 +19,14 @@ package controllers.application
 import com.google.inject.Inject
 import controllers.actions.{ApplicationAuthActionProvider, IdentifierAction}
 import controllers.helpers.{ApplicationApiBuilder, ErrorResultBuilder}
-import models.application.Application
 import models.application.ApplicationLenses._
-import models.team.Team
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.application.ApplicationDetailsView
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext}
 
 class ApplicationDetailsController @Inject()(
   val controllerComponents: MessagesControllerComponents,
@@ -42,39 +40,19 @@ class ApplicationDetailsController @Inject()(
 
   def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id, enrich = true)).async {
     implicit request =>
-      fetchTeam(request.application).flatMap {
-        case Right(team) =>
-          applicationApiBuilder.build(request.application).map {
-            case Right(applicationApis) =>
-              Ok(view(
-                request.application.withSortedTeam(),
-                Some(applicationApis),
-                team,
-                Some(request.identifierRequest.user)
-              ))
-            case Left(_) => Ok(view(
-              request.application.withSortedTeam(),
-              None,
-              team,
-              Some(request.identifierRequest.user)
-            ))
-          }
-        case Left(result) => Future.successful(result)
+      applicationApiBuilder.build(request.application).map {
+        case Right(applicationApis) =>
+          Ok(view(
+            request.application.withSortedTeam(),
+            Some(applicationApis),
+            Some(request.identifierRequest.user)
+          ))
+        case Left(_) => Ok(view(
+          request.application.withSortedTeam(),
+          None,
+          Some(request.identifierRequest.user)
+        ))
       }
-  }
-
-  private def fetchTeam(application: Application)(implicit request: Request[_]): Future[Either[Result, Option[Team]]] = {
-    application.teamId match {
-      case Some(teamId) => apiHubService.findTeamById(teamId).map {
-        case Some(team) => Right(Some(team))
-        case None => Left(teamNotFound(teamId))
-      }
-      case None => Future.successful(Right(None))
-    }
-  }
-
-  private def teamNotFound(teamId: String)(implicit request: Request[_]): Result = {
-    errorResultBuilder.teamNotFound(teamId)
   }
 
 }
