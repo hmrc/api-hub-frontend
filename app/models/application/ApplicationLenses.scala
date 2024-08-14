@@ -158,6 +158,12 @@ object ApplicationLenses {
       application.copy(teamId = Some(teamId))
     }
 
+    def setTeamName(teamName: String): Application =
+      application.copy(teamName = Some(teamName))
+
+    def hasTeam: Boolean =
+      application.teamId.isDefined && application.teamName.isDefined
+
     def hasTeamMember(email: String): Boolean =
       applicationTeamMembers.get(application)
         .exists(teamMember => teamMember.email.equalsIgnoreCase(email))
@@ -167,6 +173,10 @@ object ApplicationLenses {
 
     def hasTeamMember(user: UserModel): Boolean =
       user.email.exists(application.hasTeamMember)
+
+    def isAccessible(user: UserModel): Boolean =
+      user.permissions.canSupport ||
+        user.email.exists(hasTeamMember)
 
     def addTeamMember(email: String): Application =
       applicationTeamMembers.set(

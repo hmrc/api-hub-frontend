@@ -15,8 +15,7 @@
  *@
 
 @import models.application._
-@import models.team.Team
-@import models.team.TeamLenses._
+@import models.application.ApplicationLenses._
 @import models.user.UserModel
 @import viewmodels.application.{ApplicationApi, ApplicationSideNavPages, ApplicationNavItems}
 @import views.ViewUtils
@@ -28,7 +27,7 @@
     iconsLink: IconsLink
 )
 
-@(application: Application, maybeApplicationApis: Option[Seq[ApplicationApi]], team: Option[Team], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+@(application: Application, maybeApplicationApis: Option[Seq[ApplicationApi]], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
 @applicationDetail(id: String, titleKey: String, value: Html, classes: String) = {
     <div class="govuk-grid-row govuk-!-margin-bottom-2">
@@ -59,17 +58,20 @@
     <span class="govuk-!-font-weight-bold">@number</span>
 }
 
-@isTeamAccessible(team: Team) = @{
+@isAccessible(application: Application) = @{
     user
-        .map(team.isAccessible(_))
+        .map(application.isAccessible(_))
         .getOrElse(false)
 }
 
-@teamName(team: Team) = {
-    @if(isTeamAccessible(team)) {
-        <a class="govuk-link govuk-link--no-visited-state" href='@controllers.team.routes.ManageTeamController.onPageLoad(team.id, Some(application.id)).url'>@team.name</a>
-    } else {
-        @team.name
+@teamName(application: Application) = @{
+    (application.teamId, application.teamName) match {
+        case (Some(teamId), Some(teamName)) =>
+            if(isAccessible(application)) {
+                Html(s"""<a class="govuk-link govuk-link--no-visited-state" href='${controllers.team.routes.ManageTeamController.onPageLoad(teamId, Some(application.id)).url}'>$teamName</a>""")
+            } else {
+                Html(teamName)
+            }
     }
 }
 
@@ -83,8 +85,8 @@
         @applicationDetail("applicationCreated", "applicationDetails.application.created", Html(ViewUtils.formatLocalDateTimeContainingUtc(application.created)), "utcDateLong")
         @applicationDetail("applicationId", "applicationDetails.application.applicationId", Html(application.id), "")
 
-        @for(owningTeam <- team) {
-            @applicationDetail("owningTeam", "applicationDetails.application.owningTeam", teamName(owningTeam), "")
+        @if(application.hasTeam) {
+            @applicationDetail("owningTeam", "applicationDetails.application.owningTeam", teamName(application), "")
         }
 
         <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
@@ -175,7 +177,7 @@
             }
         }
 
-        @if(team.isEmpty) {
+        @if(application.teamId.isEmpty) {
             <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
 
             <div class="govuk-grid-row">
