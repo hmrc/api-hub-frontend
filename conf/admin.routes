@@ -5,3 +5,4 @@ GET         /teams                                                              
 GET         /applications                                                           controllers.admin.ManageApplicationsController.onPageLoad()
 GET         /apis                                                                   controllers.admin.ManageApisController.onPageLoad()
 GET         /users                                                                  controllers.admin.GetUsersController.onPageLoad()
+GET         /team-migration                                                         controllers.admin.TeamMigrationController.onPageLoad()

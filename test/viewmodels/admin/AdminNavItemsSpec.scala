@@ -24,6 +24,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers.running
 import viewmodels.SideNavItem
 import viewmodels.admin.AdminSideNavPages.{AccessRequestsPage, GetUsersPage, ManageApisPage, ManageApplicationsPage, ManageTeamsPage}
+import viewmodels.admin.AdminSideNavPages.TeamMigrationPage
 
 class AdminNavItemsSpec extends SpecBase with Matchers with TableDrivenPropertyChecks {
 
@@ -36,7 +37,7 @@ class AdminNavItemsSpec extends SpecBase with Matchers with TableDrivenPropertyC
       running(playApplication) {
         implicit val implicitMessages: Messages = messages(playApplication)
         val actual = AdminNavItems(FakeSupporter, AccessRequestsPage)
-        val expected = Seq(manageApplicationsNavItem(), manageApisNavItem(), manageTeamsNavItem(), getUsersNavItem(), accessRequestsNavItem())
+        val expected = Seq(manageApplicationsNavItem(), manageApisNavItem(), manageTeamsNavItem(), teamMigrationNavItem(), getUsersNavItem(), accessRequestsNavItem())
 
         actual mustBe expected
       }
@@ -124,6 +125,15 @@ object AdminNavItemsSpec {
       page = ManageTeamsPage,
       title = "Manage teams",
       link = controllers.admin.routes.ManageTeamsController.onPageLoad(),
+      isCurrentPage = false
+    )
+  }
+
+  private def teamMigrationNavItem(): SideNavItem = {
+    SideNavItem(
+      page = TeamMigrationPage,
+      title = "Team migration",
+      link = controllers.admin.routes.TeamMigrationController.onPageLoad(),
       isCurrentPage = false
     )
   }
