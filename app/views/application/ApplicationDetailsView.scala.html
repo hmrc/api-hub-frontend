@@ -77,7 +77,7 @@
 
 @layout(pageTitle = titleNoForm(messages("applicationDetails.title")), user = user, fullWidth = true, customScriptsBlock = Some(iconsLink())) {
 
-    @views.html.templates.SideNav(application.name, ApplicationNavItems(application, ApplicationSideNavPages.DetailsPage)) {
+    @views.html.templates.SideNav(application.name, ApplicationNavItems(user, application, ApplicationSideNavPages.DetailsPage)) {
 
         <h1 class="govuk-heading-l">@messages("applicationDetails.heading")</h1>
 

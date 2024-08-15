@@ -190,7 +190,7 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
       val application = buildApplicationWithoutAccess()
       val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any())(any()))
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any(), any())(any()))
         .thenReturn(Future.successful(Some(application)))
       when(fixture.addAnApiSessionRepository.set(any()))
         .thenReturn(Future.successful(true))
@@ -210,7 +210,7 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
       val application = buildApplicationWithoutAccess()
       val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any())(any()))
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any(), any())(any()))
         .thenReturn(Future.successful(Some(application)))
       when(fixture.addAnApiSessionRepository.set(any()))
         .thenReturn(Future.successful(true))
@@ -285,7 +285,7 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
       val application = buildApplicationWithoutAccess()
       val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any())(any()))
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any(), any())(any()))
         .thenReturn(Future.successful(None))
 
       running(fixture.application) {

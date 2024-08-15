@@ -62,7 +62,7 @@ class AddAnApiSuccessControllerSpec extends SpecBase with MockitoSugar with Html
         when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
           .thenReturn(Future.successful(Some(apiDetail)))
 
-        when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(app.id), any())(any()))
+        when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(app.id), any(), any())(any()))
           .thenReturn(Future.successful(Some(app)))
 
         val request = FakeRequest(GET, routes.AddAnApiSuccessController.onPageLoad(app.id, apiDetail.id).url)
@@ -84,7 +84,7 @@ class AddAnApiSuccessControllerSpec extends SpecBase with MockitoSugar with Html
         when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
           .thenReturn(Future.successful(None))
 
-        when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(app.id), any())(any()))
+        when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(app.id), any(), any())(any()))
           .thenReturn(Future.successful(Some(app)))
 
         val request = FakeRequest(GET, routes.AddAnApiSuccessController.onPageLoad(app.id, apiDetail.id).url)
@@ -113,7 +113,7 @@ class AddAnApiSuccessControllerSpec extends SpecBase with MockitoSugar with Html
         when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
           .thenReturn(Future.successful(Some(apiDetail)))
 
-        when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(app.id), any())(any()))
+        when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(app.id), any(), any())(any()))
           .thenReturn(Future.successful(None))
 
         val request = FakeRequest(GET, routes.AddAnApiSuccessController.onPageLoad(app.id, apiDetail.id).url)
@@ -142,7 +142,7 @@ class AddAnApiSuccessControllerSpec extends SpecBase with MockitoSugar with Html
         when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
           .thenReturn(Future.successful(None))
 
-        when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(app.id), any())(any()))
+        when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(app.id), any(), any())(any()))
           .thenReturn(Future.successful(None))
 
         val request = FakeRequest(GET, routes.AddAnApiSuccessController.onPageLoad(app.id, apiDetail.id).url)

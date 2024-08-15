@@ -90,7 +90,7 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
 
       when(fixture.apiHubService.getApiDetail(any())(any())).thenReturn(Future.successful(Some(anApiDetail)))
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), ArgumentMatchers.eq(true))(any()))
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), ArgumentMatchers.eq(true), ArgumentMatchers.eq(false))(any()))
         .thenReturn(Future.successful(Some(application)))
 
       when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(application.id)), ArgumentMatchers.eq(Some(Pending)))(any()))

@@ -18,6 +18,7 @@ package viewmodels.application
 
 import models.application.Application
 import models.application.ApplicationLenses._
+import models.user.UserModel
 import play.api.i18n.Messages
 import viewmodels.{SideNavItem, SideNavPage}
 
@@ -30,6 +31,7 @@ object ApplicationSideNavPages {
   case object EditApplicationNamePage extends SideNavPage
   case object LeaveApplicationPage extends SideNavPage
   case object DeleteApplicationPage extends SideNavPage
+  case object ViewAsJsonApplicationPage extends SideNavPage
 
 }
 
@@ -37,7 +39,7 @@ object ApplicationNavItems {
 
   import ApplicationSideNavPages._
 
-  def apply(application: Application, currentPage: SideNavPage)(implicit messages: Messages): Seq[SideNavItem] = {
+  def apply(userModel: Option[UserModel], application: Application, currentPage: SideNavPage)(implicit messages: Messages): Seq[SideNavItem] = {
     Seq(
       SideNavItem(
         page = DetailsPage,
@@ -68,12 +70,24 @@ object ApplicationNavItems {
         title = messages("applicationNav.page.deleteApplication"),
         link = controllers.application.routes.DeleteApplicationConfirmationController.onPageLoad(application.id),
         isCurrentPage = currentPage == DeleteApplicationPage
+      ),
+      SideNavItem(
+        page = ViewAsJsonApplicationPage,
+        title = messages("applicationNav.page.viewJson"),
+        link = controllers.application.routes.ApplicationSupportController.onPageLoad(application.id),
+        isCurrentPage = currentPage == ViewAsJsonApplicationPage
       )
-    ).filter(
-      navItem =>
-        !navItem.page.equals(ManageTeamMembersPage) ||
-          !application.isTeamMigrated
     )
+    .filter(dontShowManageTeamForMigratedApps(application))
+    .filter(onlyShowViewAsJsonForSupportUsers(userModel))
+  }
+
+  private def dontShowManageTeamForMigratedApps(application: Application)(navItem: SideNavItem): Boolean = {
+    !navItem.page.equals(ManageTeamMembersPage) || !application.isTeamMigrated
+  }
+
+  private def onlyShowViewAsJsonForSupportUsers(userModel: Option[UserModel])(navItem: SideNavItem): Boolean = {
+    !navItem.page.equals(ViewAsJsonApplicationPage) || userModel.exists(_.permissions.canSupport)
   }
 
 }

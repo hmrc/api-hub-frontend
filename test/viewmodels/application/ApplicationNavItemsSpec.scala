@@ -17,7 +17,7 @@
 package viewmodels.application
 
 import base.SpecBase
-import controllers.actions.FakeApplication
+import controllers.actions.{FakeApplication, FakeSupporter, FakeUser}
 import models.application.ApplicationLenses._
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
@@ -35,7 +35,7 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TableDrivenPro
       running(playApplication) {
         implicit val implicitMessages: Messages = messages(playApplication)
 
-        val actual = ApplicationNavItems(FakeApplication, DetailsPage)
+        val actual = ApplicationNavItems(Some(FakeSupporter), FakeApplication, DetailsPage)
         val expected = Seq(
           SideNavItem(
             DetailsPage,
@@ -66,6 +66,12 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TableDrivenPro
             "Delete application",
             controllers.application.routes.DeleteApplicationConfirmationController.onPageLoad(FakeApplication.id),
             isCurrentPage = false
+          ),
+          SideNavItem(
+            page = ViewAsJsonApplicationPage,
+            title = "View as JSON",
+            link = controllers.application.routes.ApplicationSupportController.onPageLoad(FakeApplication.id),
+            isCurrentPage = false
           )
         )
 
@@ -90,7 +96,7 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TableDrivenPro
 
         forAll(pages) {
           page =>
-            val actual = ApplicationNavItems(FakeApplication, page)
+            val actual = ApplicationNavItems(None, FakeApplication, page)
               .filter(_.isCurrentPage)
               .map(_.page)
 
@@ -105,8 +111,21 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TableDrivenPro
       running(playApplication) {
         implicit val implicitMessages: Messages = messages(playApplication)
 
-        val actual = ApplicationNavItems(FakeApplication.setTeamId("test-team-id"), DetailsPage)
+        val actual = ApplicationNavItems(Some(FakeSupporter), FakeApplication.setTeamId("test-team-id"), DetailsPage)
           .filter(_.page.equals(ManageTeamMembersPage))
+
+        actual mustBe empty
+      }
+    }
+
+    "must not display the View as JSON item for non-support users" in {
+      val playApplication = applicationBuilder(None).build()
+
+      running(playApplication) {
+        implicit val implicitMessages: Messages = messages(playApplication)
+
+        val actual = ApplicationNavItems(Some(FakeUser), FakeApplication.setTeamId("test-team-id"), DetailsPage)
+          .filter(_.page.equals(ViewAsJsonApplicationPage))
 
         actual mustBe empty
       }

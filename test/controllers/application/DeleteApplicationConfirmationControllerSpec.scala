@@ -48,7 +48,7 @@ class DeleteApplicationConfirmationControllerSpec extends SpecBase with MockitoS
     "must return OK and the confirmation view" in {
       val fixture = buildFixture
 
-      when(fixture.apiHubService.getApplication(any(), any())(any()))
+      when(fixture.apiHubService.getApplication(any(), any(), any())(any()))
         .thenReturn(Future.successful(Some(FakeApplication)))
 
       running(fixture.application) {
@@ -71,7 +71,7 @@ class DeleteApplicationConfirmationControllerSpec extends SpecBase with MockitoS
     "must return OK and the success view when the application has been successfully deleted" in {
       val fixture = buildFixture
 
-      when(fixture.apiHubService.getApplication(any(), any())(any()))
+      when(fixture.apiHubService.getApplication(any(), any(), any())(any()))
         .thenReturn(Future.successful(Some(FakeApplication)))
 
       when(fixture.apiHubService.deleteApplication(any(), any())(any()))
@@ -95,7 +95,7 @@ class DeleteApplicationConfirmationControllerSpec extends SpecBase with MockitoS
     "must return a Bad Request and errors when invalid data is submitted" in {
       val fixture = buildFixture
 
-      when(fixture.apiHubService.getApplication(any(), any())(any()))
+      when(fixture.apiHubService.getApplication(any(), any(), any())(any()))
         .thenReturn(Future.successful(Some(FakeApplication)))
 
       running(fixture.application) {

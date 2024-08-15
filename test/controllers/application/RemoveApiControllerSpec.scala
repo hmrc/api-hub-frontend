@@ -46,7 +46,7 @@ class RemoveApiControllerSpec extends SpecBase with MockitoSugar with ArgumentMa
         user: UserModel =>
           val fixture = buildFixture(user)
 
-          when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false))(any))
+          when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false), eqTo(false))(any))
             .thenReturn(Future.successful(Some(application)))
 
           when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any))
@@ -67,7 +67,7 @@ class RemoveApiControllerSpec extends SpecBase with MockitoSugar with ArgumentMa
     "must redirect to the Unauthorised page when the user is not support or a team member" in {
       val fixture = buildFixture(FakeApprover)
 
-      when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false))(any))
+      when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false), eqTo(false))(any))
         .thenReturn(Future.successful(Some(application)))
 
       running(fixture.playApplication) {
@@ -82,7 +82,7 @@ class RemoveApiControllerSpec extends SpecBase with MockitoSugar with ArgumentMa
     "must return a 404 Not Found with suitable message when the API has not been added to the application" in {
       val fixture = buildFixture(FakeUser)
 
-      when(fixture.apiHubService.getApplication(eqTo(applicationWithoutApis.id), eqTo(false))(any))
+      when(fixture.apiHubService.getApplication(eqTo(applicationWithoutApis.id), eqTo(false), eqTo(false))(any))
         .thenReturn(Future.successful(Some(applicationWithoutApis)))
 
       when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any))
@@ -109,7 +109,7 @@ class RemoveApiControllerSpec extends SpecBase with MockitoSugar with ArgumentMa
     "must return a 404 Not Found with suitable message when the API does not exist" in {
       val fixture = buildFixture(FakeUser)
 
-      when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false))(any))
+      when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false), eqTo(false))(any))
         .thenReturn(Future.successful(Some(application)))
 
       when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any))
@@ -140,7 +140,7 @@ class RemoveApiControllerSpec extends SpecBase with MockitoSugar with ArgumentMa
         user: UserModel =>
           val fixture = buildFixture(user)
 
-          when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false))(any))
+          when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false), eqTo(false))(any))
             .thenReturn(Future.successful(Some(application)))
 
           when(fixture.apiHubService.removeApi(eqTo(application.id), eqTo(apiDetail.id))(any))
@@ -163,7 +163,7 @@ class RemoveApiControllerSpec extends SpecBase with MockitoSugar with ArgumentMa
     "must return Bad Request and errors when the submitted data is invalid" in {
       val fixture = buildFixture(FakeUser)
 
-      when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false))(any))
+      when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false), eqTo(false))(any))
         .thenReturn(Future.successful(Some(application)))
 
       when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any))
@@ -187,7 +187,7 @@ class RemoveApiControllerSpec extends SpecBase with MockitoSugar with ArgumentMa
     "must redirect to the Unauthorised page when the user is not support or a team member" in {
       val fixture = buildFixture(FakeApprover)
 
-      when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false))(any))
+      when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false), eqTo(false))(any))
         .thenReturn(Future.successful(Some(application)))
 
       running(fixture.playApplication) {
@@ -204,7 +204,7 @@ class RemoveApiControllerSpec extends SpecBase with MockitoSugar with ArgumentMa
     "must return Not Found and a suitable message when the service responds that the API/application are not found" in {
       val fixture = buildFixture(FakeUser)
 
-      when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false))(any))
+      when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false), eqTo(false))(any))
         .thenReturn(Future.successful(Some(application)))
 
       when(fixture.apiHubService.removeApi(eqTo(application.id), eqTo(apiDetail.id))(any))
@@ -233,7 +233,7 @@ class RemoveApiControllerSpec extends SpecBase with MockitoSugar with ArgumentMa
     "must redirect to the application details page when the user answers no" in {
       val fixture = buildFixture(FakeUser)
 
-      when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false))(any))
+      when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false), eqTo(false))(any))
         .thenReturn(Future.successful(Some(application)))
 
       running(fixture.playApplication) {
