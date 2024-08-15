@@ -160,11 +160,11 @@ class ApiHubServiceSpec
 
   "getApplication" - {
     "must" - {
-      behave like successfulApplicationGetter(true)
+      behave like successfulApplicationGetter(true, false)
     }
 
     "must" - {
-      behave like successfulApplicationGetter(false)
+      behave like successfulApplicationGetter(false, false)
     }
   }
 
@@ -760,13 +760,13 @@ class ApiHubServiceSpec
 trait ApplicationGetterBehaviours {
   this: AsyncFreeSpec with Matchers with MockitoSugar =>
 
-  def successfulApplicationGetter(enrich: Boolean): Unit = {
+  def successfulApplicationGetter(enrich: Boolean, includeDeleted: Boolean): Unit = {
     s"must call the applications connector with enrich set to $enrich and return an application" in {
       val application = Application("id-1", "test-app-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1")))
       val expected = Some(application)
 
       val applicationsConnector = mock[ApplicationsConnector]
-      when(applicationsConnector.getApplication(ArgumentMatchers.eq("id-1"), ArgumentMatchers.eq(enrich))(any())).thenReturn(Future.successful(expected))
+      when(applicationsConnector.getApplication(ArgumentMatchers.eq("id-1"), ArgumentMatchers.eq(enrich), ArgumentMatchers.eq(includeDeleted))(any())).thenReturn(Future.successful(expected))
 
       val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
       val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
@@ -774,7 +774,7 @@ trait ApplicationGetterBehaviours {
       service.getApplication("id-1", enrich)(HeaderCarrier()) map {
         actual =>
           actual mustBe expected
-          verify(applicationsConnector).getApplication(ArgumentMatchers.eq("id-1"), ArgumentMatchers.eq(enrich))(any())
+          verify(applicationsConnector).getApplication(ArgumentMatchers.eq("id-1"), ArgumentMatchers.eq(enrich), ArgumentMatchers.eq(includeDeleted))(any())
           succeed
       }
     }

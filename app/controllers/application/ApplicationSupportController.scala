@@ -33,7 +33,7 @@ class ApplicationSupportController @Inject()(
   applicationAuth: ApplicationAuthActionProvider
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(id: String): Action[AnyContent] = (identify andThen isSupport andThen applicationAuth(id, enrich = true)) {
+  def onPageLoad(id: String): Action[AnyContent] = (identify andThen isSupport andThen applicationAuth(id, enrich = true, includeDeleted = true)) {
     implicit request =>
       Ok(Json.toJson(request.application))
   }

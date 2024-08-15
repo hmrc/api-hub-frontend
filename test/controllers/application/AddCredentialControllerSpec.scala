@@ -256,7 +256,7 @@ object AddCredentialControllerSpec extends SpecBase with MockitoSugar {
   private def buildFixture(userModel: UserModel = FakeUser, application: Option[Application] = Some(FakeApplication)): Fixture = {
     val apiHubService = mock[ApiHubService]
 
-    when(apiHubService.getApplication(any(), any())(any()))
+    when(apiHubService.getApplication(any(), any(), any())(any()))
       .thenReturn(Future.successful(application))
 
     val playApplication = applicationBuilder(userAnswers = Some(emptyUserAnswers), user = userModel)

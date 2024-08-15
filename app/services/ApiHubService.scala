@@ -51,8 +51,8 @@ class ApiHubService @Inject()(
     applicationsConnector.getApplicationsUsingApi(apiId, includeDeleted)
   }
 
-  def getApplication(id: String, enrich: Boolean)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
-    applicationsConnector.getApplication(id, enrich)
+  def getApplication(id: String, enrich: Boolean, includeDeleted: Boolean = false)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
+    applicationsConnector.getApplication(id, enrich, includeDeleted)
   }
 
   def deleteApplication(id: String, userEmail: Option[String])(implicit hc: HeaderCarrier): Future[Option[Unit]] = {

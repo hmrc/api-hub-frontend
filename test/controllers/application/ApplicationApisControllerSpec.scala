@@ -47,7 +47,7 @@ class ApplicationApisControllerSpec extends SpecBase with MockitoSugar with Test
         user: UserModel =>
           val fixture = buildFixture(userModel = user)
 
-          when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(true))(any()))
+          when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(true), ArgumentMatchers.eq(false))(any()))
             .thenReturn(Future.successful(Some(FakeApplication)))
 
           when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(FakeApplication.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
@@ -91,7 +91,7 @@ class ApplicationApisControllerSpec extends SpecBase with MockitoSugar with Test
         ApplicationApi(apiDetail, Seq(ApplicationEndpoint("GET", "/test", Seq("test-scope"), Inaccessible, Accessible)), false)
       )
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), ArgumentMatchers.eq(true))(any()))
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), ArgumentMatchers.eq(true), ArgumentMatchers.eq(false))(any()))
         .thenReturn(Future.successful(Some(application)))
 
       when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(FakeApplication.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
@@ -114,7 +114,7 @@ class ApplicationApisControllerSpec extends SpecBase with MockitoSugar with Test
     "must return 404 Not Found when the application does not exist" in {
       val fixture = buildFixture()
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), any())(any()))
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), any(), any())(any()))
         .thenReturn(Future.successful(None))
 
       running(fixture.playApplication) {
@@ -137,7 +137,7 @@ class ApplicationApisControllerSpec extends SpecBase with MockitoSugar with Test
     "must redirect to Unauthorised page for a GET when user is not a team member or supporter" in {
       val fixture = buildFixture(userModel = FakeUserNotTeamMember)
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(true))(any()))
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(true), ArgumentMatchers.eq(false))(any()))
         .thenReturn(Future.successful(Some(FakeApplication)))
 
       running(fixture.playApplication) {

@@ -91,7 +91,7 @@ class AddAnApiCheckYourAnswersControllerSpec extends SpecBase with SummaryListFl
 
       val fixture = buildFixture(Some(userAnswers))
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(false))(any()))
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(false), ArgumentMatchers.eq(false))(any()))
         .thenReturn(Future.successful(Some(FakeApplication)))
 
       when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))

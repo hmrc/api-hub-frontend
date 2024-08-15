@@ -218,6 +218,7 @@ applicationNav.page.manageTeamMembers = Manage team members
 applicationNav.page.editApplicationName = Edit application name
 applicationNav.page.leaveApplication = Leave application
 applicationNav.page.deleteApplication = Delete application
+applicationNav.page.viewJson = View as JSON
 
 fake-sign-in.username.error.required = Enter a principal
 fake-sign-in.title.lbl = Create test sign in

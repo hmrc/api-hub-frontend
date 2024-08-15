@@ -49,7 +49,7 @@ class RequestProductionAccessStartControllerSpec extends SpecBase with MockitoSu
       val fixture = buildFixture()
       val application: Application = anApplication
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any())(any()))
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any(), any())(any()))
         .thenReturn(Future.successful(Some(application)))
 
       when(fixture.accessRequestSessionRepository.set(any())).thenReturn(Future.successful(true))
@@ -71,7 +71,7 @@ class RequestProductionAccessStartControllerSpec extends SpecBase with MockitoSu
       val fixture = buildFixture()
       val application: Application = anApplication
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any())(any()))
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any(), any())(any()))
         .thenReturn(Future.successful(Some(application)))
 
 
@@ -90,7 +90,7 @@ class RequestProductionAccessStartControllerSpec extends SpecBase with MockitoSu
       val fixture = buildFixture(FakeUserNotTeamMember)
       val application: Application = FakeApplication
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any())(any()))
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any(), any())(any()))
         .thenReturn(Future.successful(Some(application)))
 
       running(fixture.application) {
