@@ -31,8 +31,10 @@ GET         /remove-api/:applicationId/:apiId                           controll
 POST        /remove-api/:applicationId/:apiId                           controllers.application.RemoveApiController.onSubmit(applicationId: String, apiId: String)
 
 GET         /register/start2                                            controllers.application.register.RegisterApplicationStartController.startRegisterApplication()
-
 GET         /register/name                                              controllers.application.register.RegisterApplicationNameController.onPageLoad(mode: Mode = NormalMode)
 POST        /register/name                                              controllers.application.register.RegisterApplicationNameController.onSubmit(mode: Mode = NormalMode)
 GET         /register/change-name                                       controllers.application.register.RegisterApplicationNameController.onPageLoad(mode: Mode = CheckMode)
 POST        /register/change-name                                       controllers.application.register.RegisterApplicationNameController.onSubmit(mode: Mode = CheckMode)
+
+GET         /update-team/:applicationId                                 controllers.application.UpdateApplicationTeamController.onPageLoad(applicationId: String)
+POST        /update-team/:applicationId                                 controllers.application.UpdateApplicationTeamController.onSubmit(applicationId: String)

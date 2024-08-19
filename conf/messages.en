@@ -676,6 +676,28 @@ myApis.update.team.success.text = Return to {0}
 myApis.update.team.something.not.found.heading = Unable to update owning team for this API.
 myApis.update.team.something.not.found.message = The API or team cannot be found.
 
+
+application.update.team.title = Change owning team
+application.update.team.heading = Change owning team
+application.update.team.applicationName = Name
+application.update.team.owningTeam = Owning team
+application.update.team.createdDate = Created
+application.update.team.id = ID
+application.update.team.noTeam = Not specified
+application.update.team.selectNew = Select which team owns this application
+application.update.team.error.required = Select an owning team
+application.update.team.save = Save and continue
+application.update.team.nonSupport.title = Change owning team
+application.update.team.nonSupport.text1 = The owning team of this application can only be changed by the Integration Hub Support team.
+application.update.team.nonSupport.text2 = If you wish to change the ownership of this application to a new team, please {0}.
+application.update.team.nonSupport.text3 = Contact support
+application.update.team.success.title = Team ownership changed successfully
+application.update.team.success.mainHeading = Team ownership changed successfully
+application.update.team.success.subHeading = What you can do now
+application.update.team.success.text = Return to {0}
+application.update.team.something.not.found.heading = Unable to update owning team for this application.
+application.update.team.something.not.found.message = The application or team cannot be found.
+
 removeApiConfirmation.title = Confirm remove API
 removeApiConfirmation.heading = You are about to remove the following API from this application
 removeApiConfirmation.error = Please make a selection
