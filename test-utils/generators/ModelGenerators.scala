@@ -24,6 +24,11 @@ import viewmodels.admin.Decision.{Approve, Reject}
 
 trait ModelGenerators {
 
+  implicit lazy val arbitraryRegisterApplicationTeam: Arbitrary[RegisterApplicationTeam] =
+    Arbitrary {
+      Gen.oneOf(RegisterApplicationTeam.values.toSeq)
+    }
+
   implicit lazy val arbitraryApiPolicyConditionsDeclaration: Arbitrary[ApiPolicyConditionsDeclaration] =
     Arbitrary {
       Gen.oneOf(ApiPolicyConditionsDeclaration.values)

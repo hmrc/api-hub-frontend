@@ -699,3 +699,11 @@ teamMigration.nonMigrated.heading = Non-migrated applications
 teamMigration.migrated = Migrated
 teamMigration.nonMigrated = Non-migrated
 teamMigration.changeOwningTeam = Change owning team
+
+registerApplicationTeam.title = registerApplicationTeam
+registerApplicationTeam.heading = registerApplicationTeam
+registerApplicationTeam.team1 = team1
+registerApplicationTeam.team2 = team2
+registerApplicationTeam.checkYourAnswersLabel = registerApplicationTeam
+registerApplicationTeam.error.required = Select registerApplicationTeam
+registerApplicationTeam.change.hidden = RegisterApplicationTeam

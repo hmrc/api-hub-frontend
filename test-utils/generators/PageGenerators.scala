@@ -21,6 +21,9 @@ import pages._
 
 trait PageGenerators {
 
+  implicit lazy val arbitraryRegisterApplicationTeamPage: Arbitrary[RegisterApplicationTeamPage.type] =
+    Arbitrary(RegisterApplicationTeamPage)
+
   implicit lazy val arbitraryCreateTeamMemberPage: Arbitrary[CreateTeamMemberPage.type] =
     Arbitrary(CreateTeamMemberPage)
 
