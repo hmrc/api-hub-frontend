@@ -21,6 +21,7 @@ import controllers.routes
 import pages._
 import models._
 import org.scalatest.TryValues
+import pages.application.register.RegisterApplicationStartPage
 
 class NavigatorSpec extends SpecBase with TryValues {
 
@@ -117,6 +118,12 @@ class NavigatorSpec extends SpecBase with TryValues {
 
         "must go from the Team Member page to the Team Members page" in {
           navigator.nextPage(CreateTeamMemberPage, NormalMode, emptyUserAnswers) mustBe controllers.team.routes.ManageTeamMembersController.onPageLoad()
+        }
+      }
+
+      "during the Register Application journey" - {
+        "must start with the Application Name page" in {
+          navigator.nextPage(RegisterApplicationStartPage, NormalMode, emptyUserAnswers) mustBe controllers.application.register.routes.RegisterApplicationNameController.onPageLoad(NormalMode)
         }
       }
     }
