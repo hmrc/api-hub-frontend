@@ -109,6 +109,14 @@ applicationName.error.required = Enter an application name
 applicationName.error.length = Application name must be 100 characters or less
 applicationName.change.hidden = ApplicationName
 
+registerApplicationName.title = Application Name
+registerApplicationName.heading = What is the name of your application?
+registerApplicationName.hint = This name will be used to identify your application to you and your team
+registerApplicationName.checkYourAnswersLabel = Application name
+registerApplicationName.error.required = Enter an application name
+registerApplicationName.error.length = Application name must be 100 characters or less
+registerApplicationName.change.hidden = ApplicationName
+
 registerApplicationSuccess.title = Register Application Success
 registerApplicationSuccess.heading = Application registered successfully
 registerApplicationSuccess.h2 = What you can do now

@@ -22,6 +22,7 @@ import controllers.routes
 import models.AddEndpoints
 import pages._
 import models._
+import pages.application.register.RegisterApplicationStartPage
 
 @Singleton
 class Navigator @Inject()() {
@@ -39,6 +40,7 @@ class Navigator @Inject()() {
     case CreateTeamNamePage => _ => controllers.team.routes.ManageTeamMembersController.onPageLoad()
     case CreateTeamMembersPage => _ => controllers.team.routes.CreateTeamCheckYourAnswersController.onPageLoad()
     case CreateTeamMemberPage => _ => controllers.team.routes.ManageTeamMembersController.onPageLoad()
+    case RegisterApplicationStartPage => _ => controllers.application.register.routes.RegisterApplicationNameController.onPageLoad(NormalMode)
     case _ => _ => routes.IndexController.onPageLoad
   }
 
