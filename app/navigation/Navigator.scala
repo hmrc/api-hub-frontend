@@ -22,7 +22,7 @@ import controllers.routes
 import models.AddEndpoints
 import pages._
 import models._
-import pages.application.register.{RegisterApplicationNamePage, RegisterApplicationStartPage}
+import pages.application.register.{RegisterApplicationNamePage, RegisterApplicationStartPage, RegisterApplicationTeamPage}
 
 @Singleton
 class Navigator @Inject()() {
@@ -42,6 +42,7 @@ class Navigator @Inject()() {
     case CreateTeamMemberPage => _ => controllers.team.routes.ManageTeamMembersController.onPageLoad()
     case RegisterApplicationStartPage => _ => controllers.application.register.routes.RegisterApplicationNameController.onPageLoad(NormalMode)
     case RegisterApplicationNamePage => _ => controllers.application.register.routes.RegisterApplicationTeamController.onPageLoad(NormalMode)
+    case RegisterApplicationTeamPage => _ => controllers.application.register.routes.RegisterApplicationCheckYourAnswersController.onPageLoad()
     case _ => _ => routes.IndexController.onPageLoad
   }
 
@@ -53,6 +54,8 @@ class Navigator @Inject()() {
     case AddAnApiSelectEndpointsPage => addAnApiSelectEndpointsNextPage(CheckMode)
     case ApiPolicyConditionsDeclarationPage => apiPolicyConditionsDeclarationNextPage(CheckMode)
     case CreateTeamNamePage => _ => controllers.team.routes.CreateTeamCheckYourAnswersController.onPageLoad()
+    case RegisterApplicationNamePage => _ => controllers.application.register.routes.RegisterApplicationCheckYourAnswersController.onPageLoad()
+    case RegisterApplicationTeamPage => _ => controllers.application.register.routes.RegisterApplicationCheckYourAnswersController.onPageLoad()
     case _ => _ => routes.CheckYourAnswersController.onPageLoad()
   }
 
