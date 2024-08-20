@@ -700,10 +700,8 @@ teamMigration.migrated = Migrated
 teamMigration.nonMigrated = Non-migrated
 teamMigration.changeOwningTeam = Change owning team
 
-registerApplicationTeam.title = registerApplicationTeam
-registerApplicationTeam.heading = registerApplicationTeam
-registerApplicationTeam.team1 = team1
-registerApplicationTeam.team2 = team2
-registerApplicationTeam.checkYourAnswersLabel = registerApplicationTeam
-registerApplicationTeam.error.required = Select registerApplicationTeam
+registerApplicationTeam.title = Select team
+registerApplicationTeam.heading = Select the team which will own the application
+registerApplicationTeam.checkYourAnswersLabel = Team
+registerApplicationTeam.error.required = Select a team
 registerApplicationTeam.change.hidden = RegisterApplicationTeam

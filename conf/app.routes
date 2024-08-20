@@ -107,8 +107,3 @@ POST        /apis/add-endpoints/add-endpoints                                   
 
 GET         /apis/view-specification/:apiId                                     controllers.OasRedocController.onPageLoad(apiId: String)
 GET         /apis/oas/:apiId                                                    controllers.OasRedocController.getOas(apiId: String)
-
-GET        /registerApplicationTeam                        controllers.RegisterApplicationTeamController.onPageLoad(mode: Mode = NormalMode)
-POST       /registerApplicationTeam                        controllers.RegisterApplicationTeamController.onSubmit(mode: Mode = NormalMode)
-GET        /changeRegisterApplicationTeam                  controllers.RegisterApplicationTeamController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeRegisterApplicationTeam                  controllers.RegisterApplicationTeamController.onSubmit(mode: Mode = CheckMode)
