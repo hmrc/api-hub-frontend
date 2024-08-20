@@ -179,6 +179,10 @@ class ApiHubService @Inject()(
     applicationsConnector.updateApiTeam(apiId, teamId)
   }
 
+  def changeOwningTeam(applicationId: String, teamId: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    applicationsConnector.changeOwningTeam(applicationId, teamId)
+  }
+
   def getPlatformContact(forPlatform: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[PlatformContact]] = {
     integrationCatalogueConnector.getPlatformContacts() flatMap {
       platformContacts => Future.successful(platformContacts.find(_.platformType == forPlatform))

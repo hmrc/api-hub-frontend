@@ -709,6 +709,45 @@ class ApplicationsConnectorSpec
     }
   }
 
+  "ApplicationsConnector.changeOwningTeam" - {
+    "must place the correct request" in {
+      val applicationId = "test-id"
+      val teamId = "test-api-id"
+
+      stubFor(
+        put(urlEqualTo(s"/api-hub-applications/applications/$applicationId/teams/$teamId"))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withStatus(NO_CONTENT)
+          )
+      )
+
+      buildConnector(this).changeOwningTeam(applicationId, teamId)(HeaderCarrier()).map(
+        result =>
+          result mustBe Some(())
+      )
+    }
+
+    "must return None when the application cannot be found" in {
+      val applicationId = "test-id"
+      val teamId = "test-api-id"
+
+      stubFor(
+        delete(urlEqualTo(s"/api-hub-applications/applications/$applicationId/teams/$teamId"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+          )
+      )
+
+      buildConnector(this).changeOwningTeam(applicationId, teamId)(HeaderCarrier()).map(
+        result =>
+          result mustBe None
+      )
+    }
+  }
+
   "ApplicationsConnector.addTeamMember" - {
     "must place the correct request" in {
       val applicationId = "test-id"

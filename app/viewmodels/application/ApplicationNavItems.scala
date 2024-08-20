@@ -32,6 +32,7 @@ object ApplicationSideNavPages {
   case object LeaveApplicationPage extends SideNavPage
   case object DeleteApplicationPage extends SideNavPage
   case object ViewAsJsonApplicationPage extends SideNavPage
+  case object ChangeOwningTeamPage extends SideNavPage
 
 }
 
@@ -76,6 +77,12 @@ object ApplicationNavItems {
         title = messages("applicationNav.page.viewJson"),
         link = controllers.application.routes.ApplicationSupportController.onPageLoad(application.id),
         isCurrentPage = currentPage == ViewAsJsonApplicationPage
+      ),
+      SideNavItem(
+        page = ChangeOwningTeamPage,
+        title = messages("application.update.team.title"),
+        link = controllers.application.routes.UpdateApplicationTeamController.onPageLoad(application.id),
+        isCurrentPage = currentPage == ChangeOwningTeamPage
       )
     )
     .filter(dontShowManageTeamForMigratedApps(application))

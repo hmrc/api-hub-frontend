@@ -135,7 +135,7 @@
                 </div>
                 <div class="right ">
                     <p class="govuk-body-s govuk-!-margin-top-1">
-                        <a class="govuk-link govuk-link--no-visited-state" href="/assign-application-team/@{application.id}">@messages("teamMigration.changeOwningTeam")</a>
+                        <a class="govuk-link govuk-link--no-visited-state" href=@controllers.application.routes.UpdateApplicationTeamController.onPageLoad(application.id).url>@messages("teamMigration.changeOwningTeam")</a>
                     </p>
                     @for(deleted <- application.deleted){
                         <p class="govuk-body-s govuk-!-margin-top-1">
