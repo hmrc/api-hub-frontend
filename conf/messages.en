@@ -128,6 +128,7 @@ registerApplicationSuccess.heading = Application registered successfully
 registerApplicationSuccess.h2 = What you can do now
 registerApplicationSuccess.text.line1 = Your application has now been registered you can view and manage your {0} application.
 registerApplicationSuccess.text.line2 = Your Application ID will be available on your applications page.
+registerApplicationSuccess.viewAndManage = View and manage your {0} application.
 
 applicationDetails.title = Application Details
 applicationDetails.heading = Application details
