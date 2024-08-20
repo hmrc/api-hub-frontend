@@ -42,5 +42,7 @@ POST        /register/team                                              controll
 GET         /register/change-team                                       controllers.application.register.RegisterApplicationTeamController.onPageLoad(mode: Mode = CheckMode)
 POST        /register/change-team                                       controllers.application.register.RegisterApplicationTeamController.onSubmit(mode: Mode = CheckMode)
 
+POST        /register/register                                          controllers.application.register.RegisterApplicationController.register()
+
 GET         /update-team/:applicationId                                 controllers.application.UpdateApplicationTeamController.onPageLoad(applicationId: String)
 POST        /update-team/:applicationId                                 controllers.application.UpdateApplicationTeamController.onSubmit(applicationId: String)
