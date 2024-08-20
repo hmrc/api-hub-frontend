@@ -29,12 +29,13 @@ object RegisterApplicationNameSummary  {
   def summary(answers: UserAnswers)(implicit messages: Messages): SummaryList = {
     SummaryListViewModel(
       rows = Seq(
-        row(answers)
+        applicationNameRow(answers),
+        applicationTeamRow(answers)
       ).flatten
     ).withAttribute("data-summary-for" -> "application-details")
   }
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def applicationNameRow(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(RegisterApplicationNamePage).map {
       answer =>
         SummaryListRowViewModel(
@@ -47,4 +48,5 @@ object RegisterApplicationNameSummary  {
         )
     }
 
+  def applicationTeamRow(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = None
 }

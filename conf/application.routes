@@ -35,6 +35,7 @@ GET         /register/name                                              controll
 POST        /register/name                                              controllers.application.register.RegisterApplicationNameController.onSubmit(mode: Mode = NormalMode)
 GET         /register/change-name                                       controllers.application.register.RegisterApplicationNameController.onPageLoad(mode: Mode = CheckMode)
 POST        /register/change-name                                       controllers.application.register.RegisterApplicationNameController.onSubmit(mode: Mode = CheckMode)
+GET         /register/check-your-answers2                               controllers.application.register.RegisterApplicationCheckYourAnswersController.onPageLoad()
 
 GET         /register/team                                              controllers.application.register.RegisterApplicationTeamController.onPageLoad(mode: Mode = NormalMode)
 POST        /register/team                                              controllers.application.register.RegisterApplicationTeamController.onSubmit(mode: Mode = NormalMode)
