@@ -35,8 +35,10 @@
         SummaryList(rows = Seq(applicationDetailsRow, teamMembersRow).flatten)
     )
 
-    @govukButton(
-        ButtonViewModel(messages("registerApplicationCheckYourAnswers.registerApplication")).withId("registerApplicationButton")
-    )
+    @formHelper(action = controllers.application.register.routes.RegisterApplicationController.register()) {
+        @govukButton(
+            ButtonViewModel(messages("registerApplicationCheckYourAnswers.registerApplication")).withId("registerApplicationButton")
+        )
+    }
 
 }
