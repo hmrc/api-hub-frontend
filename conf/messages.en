@@ -88,8 +88,6 @@ checkYourAnswers.registerApplication = Register application
 registerApplicationCheckYourAnswers.title = Check Your Answers
 registerApplicationCheckYourAnswers.heading = Check your answers before creating your application
 registerApplicationCheckYourAnswers.applicationDetails.heading = Application details
-registerApplicationCheckYourAnswers.complete.heading = Complete your application
-registerApplicationCheckYourAnswers.complete.guidance = Team members you have added will be notified by email that they have been added to this application.
 registerApplicationCheckYourAnswers.registerApplication = Register application
 
 journeyRecovery.continue.title = Sorry, there is a problem with the service
@@ -120,7 +118,7 @@ applicationName.change.hidden = ApplicationName
 registerApplicationName.title = Application Name
 registerApplicationName.heading = What is the name of your application?
 registerApplicationName.hint = This name will be used to identify your application to you and your team
-registerApplicationName.checkYourAnswersLabel = Application name
+registerApplicationName.checkYourAnswersLabel = Name
 registerApplicationName.error.required = Enter an application name
 registerApplicationName.error.length = Application name must be 100 characters or less
 registerApplicationName.change.hidden = ApplicationName

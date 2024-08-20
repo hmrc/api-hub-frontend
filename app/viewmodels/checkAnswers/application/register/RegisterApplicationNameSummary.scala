@@ -20,22 +20,13 @@ import models.{CheckMode, UserAnswers}
 import pages.application.register.RegisterApplicationNamePage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{SummaryList, SummaryListRow}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
 object RegisterApplicationNameSummary  {
 
-  def summary(answers: UserAnswers)(implicit messages: Messages): SummaryList = {
-    SummaryListViewModel(
-      rows = Seq(
-        applicationNameRow(answers),
-        applicationTeamRow(answers)
-      ).flatten
-    ).withAttribute("data-summary-for" -> "application-details")
-  }
-
-  def applicationNameRow(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(RegisterApplicationNamePage).map {
       answer =>
         SummaryListRowViewModel(
@@ -48,5 +39,4 @@ object RegisterApplicationNameSummary  {
         )
     }
 
-  def applicationTeamRow(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = None
 }

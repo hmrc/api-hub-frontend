@@ -21,7 +21,7 @@ import controllers.routes
 import pages._
 import models._
 import org.scalatest.TryValues
-import pages.application.register.RegisterApplicationStartPage
+import pages.application.register.{RegisterApplicationNamePage, RegisterApplicationStartPage, RegisterApplicationTeamPage}
 
 class NavigatorSpec extends SpecBase with TryValues {
 
@@ -125,6 +125,12 @@ class NavigatorSpec extends SpecBase with TryValues {
         "must start with the Application Name page" in {
           navigator.nextPage(RegisterApplicationStartPage, NormalMode, emptyUserAnswers) mustBe controllers.application.register.routes.RegisterApplicationNameController.onPageLoad(NormalMode)
         }
+        "must go from the Application Name page to the Application Team page" in {
+          navigator.nextPage(RegisterApplicationNamePage, NormalMode, emptyUserAnswers) mustBe controllers.application.register.routes.RegisterApplicationTeamController.onPageLoad(NormalMode)
+        }
+        "must go from the Application Team page to the Check Your Answers page" in {
+          navigator.nextPage(RegisterApplicationTeamPage, NormalMode, emptyUserAnswers) mustBe controllers.application.register.routes.RegisterApplicationCheckYourAnswersController.onPageLoad()
+        }
       }
     }
 
@@ -181,6 +187,16 @@ class NavigatorSpec extends SpecBase with TryValues {
           navigator.nextPage(CreateTeamNamePage, CheckMode, emptyUserAnswers) mustBe controllers.team.routes.CreateTeamCheckYourAnswersController.onPageLoad()
         }
       }
+
+      "during the Register Application journey" - {
+        "must go from the Application Name page to the Check Your Answers page" in {
+          navigator.nextPage(RegisterApplicationNamePage, CheckMode, emptyUserAnswers) mustBe controllers.application.register.routes.RegisterApplicationCheckYourAnswersController.onPageLoad()
+        }
+        "must go from the Application Team page to the Check Your Answers page" in {
+          navigator.nextPage(RegisterApplicationTeamPage, CheckMode, emptyUserAnswers) mustBe controllers.application.register.routes.RegisterApplicationCheckYourAnswersController.onPageLoad()
+        }
+      }
+
     }
   }
 

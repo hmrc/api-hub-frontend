@@ -22,7 +22,6 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.application.register.{RegisterApplicationNameSummary, RegisterApplicationTeamSummary}
-import views.html.CheckYourAnswersView
 import views.html.application.register.RegisterApplicationCheckYourAnswersView
 
 class RegisterApplicationCheckYourAnswersController @Inject()(
@@ -36,10 +35,13 @@ class RegisterApplicationCheckYourAnswersController @Inject()(
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
-
-      val applicationDetails = RegisterApplicationNameSummary.summary(request.userAnswers)
-
-      Ok(view(applicationDetails, Some(request.user)))
+      Ok(
+        view(
+          RegisterApplicationNameSummary.row(request.userAnswers),
+          RegisterApplicationTeamSummary.row(request.userAnswers),
+          Some(request.user)
+        )
+      )
   }
 
 }

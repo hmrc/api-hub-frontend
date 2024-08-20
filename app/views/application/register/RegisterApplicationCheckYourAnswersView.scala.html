@@ -23,7 +23,7 @@
     govukButton: GovukButton
 )
 
-@(applicationDetails: SummaryList, user: Some[UserModel])(implicit request: Request[_], messages: Messages)
+@(applicationDetailsRow: Option[SummaryListRow], teamMembersRow: Option[SummaryListRow], user: Some[UserModel])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("registerApplicationCheckYourAnswers.title")), user = user, fullWidth = true) {
 
@@ -31,11 +31,9 @@
 
     <h2 class="govuk-heading-m">@messages("registerApplicationCheckYourAnswers.applicationDetails.heading")</h2>
 
-    @govukSummaryList(applicationDetails)
-
-    <h2 class="govuk-heading-m govuk-!-margin-top-9">@messages("registerApplicationCheckYourAnswers.complete.heading")</h2>
-
-    <p class="govuk-body">@messages("registerApplicationCheckYourAnswers.complete.guidance")</p>
+    @govukSummaryList(
+        SummaryList(rows = Seq(applicationDetailsRow, teamMembersRow).flatten)
+    )
 
     @govukButton(
         ButtonViewModel(messages("registerApplicationCheckYourAnswers.registerApplication")).withId("registerApplicationButton")
