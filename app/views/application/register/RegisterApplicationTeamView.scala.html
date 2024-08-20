@@ -15,18 +15,40 @@
  *@
 
 @import models.team.Team
+@import views.html.components.IconsLink
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukRadios: GovukRadios,
-    govukButton: GovukButton
+    govukButton: GovukButton,
+    iconsLink: IconsLink
 )
 
 @(form: Form[_], mode: Mode, teams: Seq[Team])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("registerApplicationTeam.title"))) {
+@hintPanel() = {
+    <div class="call-out-panel govuk-!-margin-top-2 ">
+        <p class="govuk-body-s govuk-!-margin-bottom-1 govuk-!-margin-left-2">
+            <i class="fa-solid fa-circle-info govuk-!-margin-right-2" aria-hidden="true"></i><strong>@messages("registerApplicationTeam.hint.anotherTeam")</strong>.
+        </p>
+        <p class="govuk-body-s govuk-!-margin-left-2 govuk-!-margin-left-2 govuk-!-margin-bottom-2">
+            @Html(messages(
+                "registerApplicationTeam.hint.guidance",
+                createTeamLink()
+            ))
+        </p>
+    </div>
+}
+
+@createTeamLink() = {
+    <a href="@controllers.team.routes.CreateTeamStartController.startCreateTeam().url" class="govuk-link clear-link govuk-link--no-visited-state">
+        @messages("registerApplicationTeam.hint.link")
+    </a>
+}
+
+@layout(pageTitle = title(form, messages("registerApplicationTeam.title")), customScriptsBlock = Some(iconsLink())) {
 
     @formHelper(action = controllers.application.register.routes.RegisterApplicationTeamController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
@@ -46,7 +68,7 @@
                             attributes = Map("data-team-id" -> team.id)
                         )
                 )
-            )
+            ).withHint(Hint(content = HtmlContent(hintPanel())))
         )
 
         @govukButton(
