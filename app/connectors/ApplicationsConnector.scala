@@ -133,6 +133,18 @@ class ApplicationsConnector @Inject()(
       }
   }
 
+  def changeOwningTeam(applicationId: String, teamId: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    httpClient
+      .put(url"$applicationsBaseUrl/api-hub-applications/applications/$applicationId/teams/$teamId")
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Either[UpstreamErrorResponse, Unit]]
+      .flatMap {
+        case Right(_) => Future.successful(Some(()))
+        case Left(e) if e.statusCode == 404 => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
+  }
+
   def testConnectivity()(implicit hc:HeaderCarrier): Future[String] = {
     httpClient
       .get(url"$applicationsBaseUrl/api-hub-applications/test-connectivity")

@@ -72,6 +72,12 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TableDrivenPro
             title = "View as JSON",
             link = controllers.application.routes.ApplicationSupportController.onPageLoad(FakeApplication.id),
             isCurrentPage = false
+          ),
+          SideNavItem(
+            page = ChangeOwningTeamPage,
+            title = "Change owning team",
+            link = controllers.application.routes.UpdateApplicationTeamController.onPageLoad(FakeApplication.id),
+            isCurrentPage = false
           )
         )
 
