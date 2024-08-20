@@ -18,8 +18,12 @@ package generators
 
 import org.scalacheck.Arbitrary
 import pages._
+import pages.application.register.RegisterApplicationTeamPage
 
 trait PageGenerators {
+
+  implicit lazy val arbitraryRegisterApplicationTeamPage: Arbitrary[RegisterApplicationTeamPage.type] =
+    Arbitrary(RegisterApplicationTeamPage)
 
   implicit lazy val arbitraryCreateTeamMemberPage: Arbitrary[CreateTeamMemberPage.type] =
     Arbitrary(CreateTeamMemberPage)

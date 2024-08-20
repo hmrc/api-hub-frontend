@@ -18,12 +18,22 @@ package generators
 
 import models.ApiPolicyConditionsDeclaration
 import models.application.TeamMember
+import models.team.Team
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import pages._
+import pages.application.register.RegisterApplicationTeamPage
 import play.api.libs.json.{JsValue, Json}
 
-trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
+trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators with TeamGenerator {
+
+  implicit lazy val arbitraryRegisterApplicationTeamUserAnswersEntry: Arbitrary[(RegisterApplicationTeamPage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[RegisterApplicationTeamPage.type]
+        value <- arbitrary[Team].map(Json.toJson(_))
+      } yield (page, value)
+    }
 
   implicit lazy val arbitraryCreateTeamMemberUserAnswersEntry: Arbitrary[(CreateTeamMemberPage.type, JsValue)] =
     Arbitrary {

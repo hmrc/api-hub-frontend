@@ -1,0 +1,78 @@
+@*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.team.Team
+@import views.html.components.IconsLink
+
+@this(
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukRadios: GovukRadios,
+    govukButton: GovukButton,
+    iconsLink: IconsLink
+)
+
+@(form: Form[_], mode: Mode, teams: Seq[Team])(implicit request: Request[_], messages: Messages)
+
+@hintPanel() = {
+    <div class="call-out-panel govuk-!-margin-top-2 ">
+        <p class="govuk-body-s govuk-!-margin-bottom-1 govuk-!-margin-left-2">
+            <i class="fa-solid fa-circle-info govuk-!-margin-right-2" aria-hidden="true"></i><strong>@messages("registerApplicationTeam.hint.anotherTeam")</strong>.
+        </p>
+        <p class="govuk-body-s govuk-!-margin-left-2 govuk-!-margin-left-2 govuk-!-margin-bottom-2">
+            @Html(messages(
+                "registerApplicationTeam.hint.guidance",
+                createTeamLink()
+            ))
+        </p>
+    </div>
+}
+
+@createTeamLink() = {
+    <a href="@controllers.team.routes.CreateTeamStartController.startCreateTeam().url" class="govuk-link clear-link govuk-link--no-visited-state">
+        @messages("registerApplicationTeam.hint.link")
+    </a>
+}
+
+@layout(pageTitle = title(form, messages("registerApplicationTeam.title")), customScriptsBlock = Some(iconsLink())) {
+
+    @formHelper(action = controllers.application.register.routes.RegisterApplicationTeamController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))
+        }
+
+        @govukRadios(
+            RadiosViewModel(
+                field = form("value"),
+                legend = LegendViewModel(messages("registerApplicationTeam.heading")).asPageHeading(),
+                items = teams.map(
+                    team =>
+                        RadioItem(
+                            content = Text(team.name),
+                            value = Some(team.id),
+                            attributes = Map("data-team-id" -> team.id)
+                        )
+                )
+            ).withHint(Hint(content = HtmlContent(hintPanel())))
+        )
+
+        @govukButton(
+            ButtonViewModel(messages("site.continue"))
+        )
+    }
+}
