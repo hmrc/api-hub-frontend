@@ -20,4 +20,4 @@ import play.api.mvc.Call
 
 trait SideNavPage
 
-case class SideNavItem(page: SideNavPage, title: String, link: Call, isCurrentPage: Boolean)
+case class SideNavItem(page: SideNavPage, title: String, link: Call, isCurrentPage: Boolean, opensInNewTab: Boolean = false)
