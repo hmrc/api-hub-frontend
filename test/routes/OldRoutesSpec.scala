@@ -41,14 +41,14 @@ class OldRoutesSpec
 
   implicit override def newAppForTest(testData: TestData): Application =
     new GuiceApplicationBuilder()
-      .configure(testData.configMap ++ Map("play.http.router" -> "routes.OldRoutes"))
+      .configure(testData.configMap ++ Map("play.http.router" -> "prod.Routes"))
       .build()
 
   "OldRoutes" should {
     "redirect to the new url" in {
       forAll(genIntersperseString(Gen.alphaLowerStr, "/") -> "path") { path =>
         val response = route(app, FakeRequest("GET", s"/api-hub/$path")).get
-        status(response) shouldBe MOVED_PERMANENTLY
+        status(response) shouldBe SEE_OTHER
         redirectLocation(response) shouldBe Some(s"/integration-hub/$path")
       }
     }

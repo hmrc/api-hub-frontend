@@ -16,30 +16,17 @@
 
 package routes
 
-import play.api.mvc._
+import controllers.Default
 import play.api.routing.Router.Routes
 import play.api.routing.SimpleRouter
 import play.api.routing.sird._
 
 import javax.inject.Inject
 
-class OldRoutes @Inject()(
-                           val cc: MessagesControllerComponents
-                         ) extends SimpleRouter {
-  private val oldPath = "/api-hub"
-  private val newPath = "/integration-hub"
-
-  private object RedirectController extends ControllerHelpers {
-    private val Action = new ActionBuilder.IgnoringBody()(controllers.Execution.trampoline)
-
-    def redirect(to: String): Action[AnyContent] = Action {
-      Redirect(s"$newPath$to", statusCode = MOVED_PERMANENTLY)
-    }
-  }
-
+class OldRoutes @Inject()(defaultController: Default) extends SimpleRouter {
   override def routes: Routes = {
-    case GET(path) =>
-      RedirectController.redirect(path.path.replace(oldPath, ""))
+    case GET(request) =>
+      defaultController.redirect(s"/integration-hub${request.path}")
   }
 }
 
