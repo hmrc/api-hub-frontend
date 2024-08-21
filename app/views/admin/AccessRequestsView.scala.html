@@ -18,10 +18,12 @@
 @import models.user.UserModel
 @import viewmodels.admin.{AdminNavItems, AdminSideNavPages}
 @import views.ViewUtils
+@import views.html.components.AccessRequestPanel
 
 @this(
     layout: templates.Layout,
-    govukTable: GovukTable
+    govukTable: GovukTable,
+    accessRequestPanel: AccessRequestPanel
 )
 
 @(accessRequests: Seq[AccessRequest], user: UserModel)(implicit request: Request[_], messages: Messages)
@@ -39,43 +41,7 @@
         </h1>
 
         @for(accessRequest <- accessRequests) {
-            <div class="api-panel">
-                <p class="call-out-type">
-                    @ViewUtils.formatAccessRequestStatus(accessRequest.status)
-                    @accessRequest.apiName
-                </p>
-
-                <p class="govuk-body additional-message utcDateTime">
-                    @ViewUtils.formatLocalDateTimeContainingUtc(accessRequest.requested)
-                </p>
-
-                <p class="govuk-body additional-message">
-                    <strong>@messages("accessRequests.headings.requestedBy"):</strong>
-                    @accessRequest.requestedBy
-                </p>
-
-                <div class="text-overflow-ellipses">
-                    <p class="govuk-body additional-message">
-                        <strong>@messages("accessRequests.headings.supportingInformation"):</strong>
-                        @accessRequest.supportingInformation
-                    </p>
-                </div>
-
-                @for(rejectedReason <- accessRequest.decision.flatMap(_.rejectedReason)) {
-                    <div class="text-overflow-ellipses">
-                        <p class="govuk-body additional-message">
-                            <strong>@messages("accessRequests.headings.rejectedReason"):</strong>
-                            @rejectedReason
-                        </p>
-                    </div>
-                }
-
-                <p class="govuk-body-s govuk-!-margin-top-3 govuk-!-margin-bottom-2">
-                    <a href="@controllers.admin.routes.AccessRequestController.onPageLoad(accessRequest.id).url" class="govuk-link govuk-link--no-visited-state">
-                        @messages("accessRequests.headings.reviewRequest")
-                    </a>
-                </p>
-            </div>
+            @accessRequestPanel(accessRequest, showReviewLink = true)
         }
     }
 
