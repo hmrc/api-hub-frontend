@@ -45,18 +45,19 @@ class UpdateApplicationTeamController @Inject()(
 
   private val form = formProvider()
 
-  def onPageLoad(applicationId: String): Action[AnyContent] = (identify andThen applicationAuth(applicationId)) async {
+  def onPageLoad(applicationId: String): Action[AnyContent] = (identify andThen applicationAuth(applicationId, includeDeleted = true)) async {
     implicit request => showView(OK, form)
   }
 
   private def showView(code: Int, form: Form[_])(implicit request: ApplicationRequest[_]): Future[Result] = {
     apiHubService.findTeams(None).map(teams => {
+      val sortedTeams = teams.sortBy(_.name.toLowerCase)
       val owningTeam = teams.find(team => request.application.teamId.contains(team.id))
-      Status(code)(view(form, request.application, owningTeam, teams, request.identifierRequest.user))
+      Status(code)(view(form, request.application, owningTeam, sortedTeams, request.identifierRequest.user))
     })
   }
 
-  def onSubmit(applicationId: String): Action[AnyContent] = (identify andThen applicationAuth(applicationId)).async {
+  def onSubmit(applicationId: String): Action[AnyContent] = (identify andThen applicationAuth(applicationId, includeDeleted = true)).async {
     implicit request =>
       form.bindFromRequest().fold(
         formWithErrors => {
