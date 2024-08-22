@@ -132,10 +132,13 @@ registerApplicationSuccess.viewAndManage = View and manage your {0} application.
 
 applicationDetails.title = Application Details
 applicationDetails.heading = Application details
-applicationDetails.application.application = Application
+applicationDetails.application.application = Name
+applicationDetails.application.status = Status
 applicationDetails.application.applicationId = Application ID
 applicationDetails.application.created = Created
+applicationDetails.application.history = History
 applicationDetails.application.owningTeam = Owning team
+applicationDetails.application.noOwningTeam = Not assigned
 applicationDetails.apis.heading.noApis = Application APIs
 applicationDetails.apis.heading = Application APIs ({0})
 applicationDetails.apis.exploreApis = add APIs

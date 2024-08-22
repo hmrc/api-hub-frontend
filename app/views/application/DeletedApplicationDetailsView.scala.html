@@ -51,7 +51,7 @@
             rows = Seq(
                 SummaryListRow(
                     key = Key(
-                        content = Text("Name:")
+                        content = Text(messages("applicationDetails.application.application"))
                     ),
                     value = Value(
                         content = Text(application.name)
@@ -59,7 +59,7 @@
                 ),
                 SummaryListRow(
                     key = Key(
-                        content = Text("Status:")
+                        content = Text(messages("applicationDetails.application.status"))
                     ),
                     value = Value(
                         content = HtmlContent(govukTag(Tag(content = Text("Deleted"), classes = "govuk-tag--grey")))
@@ -67,15 +67,16 @@
                 ),
                 SummaryListRow(
                     key = Key(
-                        content = Text("Owning team:")
+                        content = Text(messages("applicationDetails.application.owningTeam"))
                     ),
                     value = Value(
-                        content = application.teamId.map(id => HtmlContent(owningTeamLink(id, application.teamName.getOrElse("Team")))).getOrElse(Text("Not assigned"))
+                        content = application.teamId.map(id => HtmlContent(owningTeamLink(id, application.teamName.getOrElse(""))))
+                                    .getOrElse(Text(messages("applicationDetails.application.noOwningTeam")))
                     )
                 ),
                 SummaryListRow(
                     key = Key(
-                        content = Text("Created:")
+                        content = Text(messages("applicationDetails.application.created"))
                     ),
                     value = Value(
                         content = HtmlContent(createdDate)
@@ -83,7 +84,7 @@
                 ),
                 SummaryListRow(
                     key = Key(
-                        content = Text("Application ID:")
+                        content = Text(messages("applicationDetails.application.applicationId"))
                     ),
                     value = Value(
                         content = Text(application.id)
@@ -95,7 +96,7 @@
 
         <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
 
-        <h2 class="govuk-heading-m">History</h2>
+        <h2 class="govuk-heading-m">@messages("applicationDetails.application.history")</h2>
 
         @for(accessRequest <- accessRequests) {
             @accessRequestPanel(accessRequest, showReviewLink = false)
