@@ -32,21 +32,25 @@
             <h1 class="govuk-heading-l">@messages("createTeamManageMembers.heading", teamMemberDetails.rows.size)</h1>
         </div>
         <div class="govuk-grid-column-one-half govuk-!-text-align-right">
-        @govukButton(Button(
-            classes = "govuk-button--secondary",
-            content = messages("createTeamManageMembers.addTeamMember"),
-            href = Some(controllers.team.routes.CreateTeamMemberController.onPageLoad().url)
-        ))
+        @govukButton(
+            Button(
+                classes = "govuk-button--secondary",
+                content = messages("createTeamManageMembers.addTeamMember"),
+                href = Some(controllers.team.routes.CreateTeamMemberController.onPageLoad().url)
+            ).withId("addTeamMemberButton")
+        )
         </div>
     </div>
 
     @govukSummaryList(teamMemberDetails)
 
     @formHelper(action = controllers.team.routes.ManageTeamMembersController.onContinue()) {
-        @govukButton(Button(
-            classes = "govuk-!-margin-top-6",
-            content = messages("site.continue"),
-        ))
+        @govukButton(
+            Button(
+                classes = "govuk-!-margin-top-6",
+                content = messages("site.continue"),
+            ).withId("continueButton")
+        )
     }
 
 }

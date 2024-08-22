@@ -38,7 +38,7 @@
             <h2 class="govuk-heading-m govuk-!-text-align-left">@messages("createTeamCheckYourAnswers.teamMembers.heading", teamMemberDetails.rows.size)</h2>
         </div>
         <div class="govuk-grid-column-one-half govuk-!-text-align-right govuk-!-padding-right-0">
-            <a class="govuk-link govuk-!-text-align-right" href="@{
+            <a id="changeTeamMembersLink" class="govuk-link govuk-!-text-align-right" href="@{
                 controllers.team.routes.ManageTeamMembersController.onPageLoad().url
             }">@messages("site.change")</a>
         </div>
@@ -53,7 +53,7 @@
 
     @formHelper(action = controllers.team.routes.CreateTeamController.onSubmit()) {
         @govukButton(
-            ButtonViewModel(messages("createTeamCheckYourAnswers.createTeam"))
+            ButtonViewModel(messages("createTeamCheckYourAnswers.createTeam")).withId("createTeamButton")
         )
     }
 

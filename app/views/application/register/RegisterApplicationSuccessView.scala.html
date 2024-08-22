@@ -25,7 +25,7 @@
 @(application: Application, user: UserModel)(implicit request: Request[_], messages: Messages)
 
 @applicationLink() = {
-    <a href="@controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url" class="govuk-link govuk-link--no-visited-state">
+    <a id="viewApplicationLink" data-application-id="@application.id" href="@controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url" class="govuk-link govuk-link--no-visited-state">
         @application.name
     </a>
 }

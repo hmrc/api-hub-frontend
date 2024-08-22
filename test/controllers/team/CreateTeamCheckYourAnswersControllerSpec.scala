@@ -89,9 +89,7 @@ object CreateTeamCheckYourAnswersControllerSpec extends SummaryListFluency {
   }
 
   def buildTeamMembersSummaryList(userAnswers: UserAnswers): SummaryList = {
-    SummaryListViewModel(
-      rows = CreateTeamAddTeamMemberSummary.rows(userAnswers)
-    )
+    CreateTeamAddTeamMemberSummary.summary(userAnswers)
   }
 
 }
