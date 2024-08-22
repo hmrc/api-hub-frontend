@@ -19,10 +19,11 @@ package controllers.application
 import base.SpecBase
 import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
 import controllers.routes
+import generators.AccessRequestGenerator
 import models.accessrequest.Pending
-import models.api.{ApiDetail, Endpoint, EndpointMethod, Live, Maintainer}
-import models.application.{Api, Scope, SelectedEndpoint, TeamMember}
+import models.api._
 import models.application.ApplicationLenses.ApplicationLensOps
+import models.application._
 import models.team.Team
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
@@ -35,175 +36,230 @@ import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
 import viewmodels.application.{Accessible, ApplicationApi, ApplicationEndpoint, Inaccessible}
 import views.html.ErrorTemplate
-import views.html.application.ApplicationDetailsView
+import views.html.application.{ApplicationDetailsView, DeletedApplicationDetailsView}
 
 import java.time.{Instant, LocalDateTime}
 import scala.concurrent.Future
 
-class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with TestHelpers with HtmlValidation{
+class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with TestHelpers with AccessRequestGenerator with HtmlValidation{
 
   "ApplicationDetails Controller" - {
-    "must return OK and the correct view for a GET for a team member or supporter" in {
-      forAll(teamMemberAndSupporterTable) {
-        user: UserModel =>
-          val fixture = buildFixture(userModel = user)
+    "for non-deleted applications" - {
+      "must return OK and the correct view for a GET for a team member or supporter" in {
+        forAll(teamMemberAndSupporterTable) {
+          user: UserModel =>
+            val fixture = buildFixture(userModel = user)
 
-          when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(true), ArgumentMatchers.eq(false))(any()))
-            .thenReturn(Future.successful(Some(FakeApplication)))
+            when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(true), ArgumentMatchers.eq(true))(any()))
+              .thenReturn(Future.successful(Some(FakeApplication)))
 
-          when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(FakeApplication.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
-            .thenReturn(Future.successful(Seq.empty))
+            when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(FakeApplication.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
+              .thenReturn(Future.successful(Seq.empty))
 
-          running(fixture.playApplication) {
-            val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id).url)
-            val result = route(fixture.playApplication, request).value
-            val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
+            running(fixture.playApplication) {
+              val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id).url)
+              val result = route(fixture.playApplication, request).value
+              val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
 
-            status(result) mustEqual OK
-            contentAsString(result) mustBe view(FakeApplication, Some(Seq.empty), Some(user))(request, messages(fixture.playApplication)).toString
-            contentAsString(result) must validateAsHtml
-          }
+              status(result) mustEqual OK
+              contentAsString(result) mustBe view(FakeApplication, Some(Seq.empty), Some(user))(request, messages(fixture.playApplication)).toString
+              contentAsString(result) must validateAsHtml
+            }
+        }
       }
-    }
 
-    "must return OK and the correct view for a GET when the application has a global team" in {
-      val fixture = buildFixture()
+      "must return OK and the correct view for a GET when the application has a global team" in {
+        val fixture = buildFixture()
 
-      val team = Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email.value)))
-      val application = FakeApplication.setTeamId(team.id).setTeamName(team.name)
+        val team = Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email.value)))
+        val application = FakeApplication.setTeamId(team.id).setTeamName(team.name)
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), ArgumentMatchers.eq(true), ArgumentMatchers.eq(false))(any()))
-        .thenReturn(Future.successful(Some(application)))
+        when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), ArgumentMatchers.eq(true), ArgumentMatchers.eq(true))(any()))
+          .thenReturn(Future.successful(Some(application)))
 
-      when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(application.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
-        .thenReturn(Future.successful(Seq.empty))
+        when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(application.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
+          .thenReturn(Future.successful(Seq.empty))
 
-      when(fixture.apiHubService.findTeamById(ArgumentMatchers.eq(team.id))(any))
-        .thenReturn(Future.successful(Some(team)))
+        when(fixture.apiHubService.findTeamById(ArgumentMatchers.eq(team.id))(any))
+          .thenReturn(Future.successful(Some(team)))
 
-      running(fixture.playApplication) {
-        val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url)
-        val result = route(fixture.playApplication, request).value
-        val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
+        running(fixture.playApplication) {
+          val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url)
+          val result = route(fixture.playApplication, request).value
+          val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
 
-        status(result) mustEqual OK
-        contentAsString(result) mustBe view(application, Some(Seq.empty), Some(FakeUser))(request, messages(fixture.playApplication)).toString
-        contentAsString(result) must validateAsHtml
+          status(result) mustEqual OK
+          contentAsString(result) mustBe view(application, Some(Seq.empty), Some(FakeUser))(request, messages(fixture.playApplication)).toString
+          contentAsString(result) must validateAsHtml
+        }
       }
-    }
 
-    "must sort the application's team members alphabetically" in {
-      val application = FakeApplication.copy(
-        teamMembers = Seq(
-          TeamMember(email = FakeUser.email.value),
-          TeamMember(email = "cc@hmrc.gov.uk"),
-          TeamMember(email = "ab@hmrc.gov.uk"),
-          TeamMember(email = "aa@hmrc.gov.uk"),
-          TeamMember(email = "Zb@hmrc.gov.uk"),
-          TeamMember(email = "za@hmrc.gov.uk")
+      "must sort the application's team members alphabetically" in {
+        val application = FakeApplication.copy(
+          teamMembers = Seq(
+            TeamMember(email = FakeUser.email.value),
+            TeamMember(email = "cc@hmrc.gov.uk"),
+            TeamMember(email = "ab@hmrc.gov.uk"),
+            TeamMember(email = "aa@hmrc.gov.uk"),
+            TeamMember(email = "Zb@hmrc.gov.uk"),
+            TeamMember(email = "za@hmrc.gov.uk")
+          )
         )
-      )
 
-      val expected = FakeApplication.copy(
-        teamMembers = Seq(
-          TeamMember(email = "aa@hmrc.gov.uk"),
-          TeamMember(email = "ab@hmrc.gov.uk"),
-          TeamMember(email = "cc@hmrc.gov.uk"),
-          TeamMember(email = FakeUser.email.value),
-          TeamMember(email = "za@hmrc.gov.uk"),
-          TeamMember(email = "Zb@hmrc.gov.uk")
+        val expected = FakeApplication.copy(
+          teamMembers = Seq(
+            TeamMember(email = "aa@hmrc.gov.uk"),
+            TeamMember(email = "ab@hmrc.gov.uk"),
+            TeamMember(email = "cc@hmrc.gov.uk"),
+            TeamMember(email = FakeUser.email.value),
+            TeamMember(email = "za@hmrc.gov.uk"),
+            TeamMember(email = "Zb@hmrc.gov.uk")
+          )
         )
-      )
 
-      val fixture = buildFixture()
+        val fixture = buildFixture()
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any(), any())(any()))
-        .thenReturn(Future.successful(Some(application)))
+        when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any(), any())(any()))
+          .thenReturn(Future.successful(Some(application)))
 
-      when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(application.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
-        .thenReturn(Future.successful(Seq.empty))
+        when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(application.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
+          .thenReturn(Future.successful(Seq.empty))
 
-      running(fixture.playApplication) {
-        val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url)
-        val result = route(fixture.playApplication, request).value
-        val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
+        running(fixture.playApplication) {
+          val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url)
+          val result = route(fixture.playApplication, request).value
+          val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
 
-        status(result) mustBe OK
-        contentAsString(result) mustBe view(expected, Some(Seq.empty), Some(FakeUser))(request, messages(fixture.playApplication)).toString
+          status(result) mustBe OK
+          contentAsString(result) mustBe view(expected, Some(Seq.empty), Some(FakeUser))(request, messages(fixture.playApplication)).toString
+        }
+      }
+
+      "must return the correct view when the application has APIs added" in {
+        val fixture = buildFixture()
+
+        val apiDetail = ApiDetail(
+          id = "test-id",
+          publisherReference = "test-pub-ref",
+          title = "test-title",
+          description = "test-description",
+          version = "test-version",
+          endpoints = Seq(Endpoint(path = "/test", methods = Seq(EndpointMethod("GET", None, None, Seq("test-scope"))))),
+          shortDescription = None,
+          openApiSpecification = "test-oas-spec",
+          apiStatus = Live,
+          reviewedDate = Instant.now(),
+          platform = "HIP",
+          maintainer = Maintainer("name", "#slack", List.empty)
+        )
+
+        val application = FakeApplication
+          .addApi(Api(apiDetail.id, Seq(SelectedEndpoint("GET", "/test"))))
+          .setSecondaryScopes(Seq(Scope("test-scope")))
+
+        val applicationApis = Seq(
+          ApplicationApi(apiDetail, Seq(ApplicationEndpoint("GET", "/test", Seq("test-scope"), Inaccessible, Accessible)), false)
+        )
+
+        when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), ArgumentMatchers.eq(true), ArgumentMatchers.eq(true))(any()))
+          .thenReturn(Future.successful(Some(application)))
+
+        when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(application.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
+          .thenReturn(Future.successful(Seq.empty))
+
+        when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+          .thenReturn(Future.successful(Some(apiDetail)))
+
+        running(fixture.playApplication) {
+          val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id).url)
+          val result = route(fixture.playApplication, request).value
+          val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
+
+          status(result) mustEqual OK
+          contentAsString(result) mustBe view(application, Some(applicationApis), Some(FakeUser))(request, messages(fixture.playApplication)).toString
+          contentAsString(result) must validateAsHtml
+        }
+      }
+
+      "must return the correct view when the application APIs are missing" in {
+        val fixture = buildFixture()
+        val apiId = "test-id"
+
+        val application = FakeApplication
+          .addApi(Api(apiId, Seq(SelectedEndpoint("GET", "/test"))))
+          .setSecondaryScopes(Seq(Scope("test-scope")))
+
+        when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), ArgumentMatchers.eq(true), ArgumentMatchers.eq(true))(any()))
+          .thenReturn(Future.successful(Some(application)))
+
+        when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(application.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
+          .thenReturn(Future.successful(Seq.empty))
+
+        when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiId))(any()))
+          .thenReturn(Future.successful(None))
+
+        running(fixture.playApplication) {
+          val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id).url)
+          val result = route(fixture.playApplication, request).value
+          val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
+
+          status(result) mustEqual OK
+          contentAsString(result) mustBe view(application, None, Some(FakeUser))(request, messages(fixture.playApplication)).toString
+          contentAsString(result) must validateAsHtml
+        }
       }
     }
 
-    "must return the correct view when the application has APIs added" in {
-      val fixture = buildFixture()
+    "for deleted applications" - {
+      "must return OK and the correct view for a GET for a team member or supporter" in {
+        forAll(teamMemberAndSupporterTable) {
+          user: UserModel =>
+            val fixture = buildFixture(userModel = user)
+            val deletedApplication = FakeApplication.copy(deleted = Some(Deleted(LocalDateTime.now, "delete@example.com")))
+            val accessRequests = Seq(sampleAccessRequest())
 
-      val apiDetail = ApiDetail(
-        id = "test-id",
-        publisherReference = "test-pub-ref",
-        title = "test-title",
-        description = "test-description",
-        version = "test-version",
-        endpoints = Seq(Endpoint(path = "/test", methods = Seq(EndpointMethod("GET", None, None, Seq("test-scope"))))),
-        shortDescription = None,
-        openApiSpecification = "test-oas-spec",
-        apiStatus = Live,
-        reviewedDate = Instant.now(),
-        platform = "HIP",
-        maintainer = Maintainer("name", "#slack", List.empty)
-      )
+            when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(deletedApplication.id), ArgumentMatchers.eq(true), ArgumentMatchers.eq(true))(any()))
+              .thenReturn(Future.successful(Some(deletedApplication)))
 
-      val application = FakeApplication
-        .addApi(Api(apiDetail.id, Seq(SelectedEndpoint("GET", "/test"))))
-        .setSecondaryScopes(Seq(Scope("test-scope")))
+            when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(deletedApplication.id)), ArgumentMatchers.eq(None))(any()))
+              .thenReturn(Future.successful(accessRequests))
 
-      val applicationApis = Seq(
-        ApplicationApi(apiDetail, Seq(ApplicationEndpoint("GET", "/test", Seq("test-scope"), Inaccessible, Accessible)), false)
-      )
+            running(fixture.playApplication) {
+              val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(deletedApplication.id).url)
+              val result = route(fixture.playApplication, request).value
+              val view = fixture.playApplication.injector.instanceOf[DeletedApplicationDetailsView]
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), ArgumentMatchers.eq(true), ArgumentMatchers.eq(false))(any()))
-        .thenReturn(Future.successful(Some(application)))
-
-      when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(application.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
-        .thenReturn(Future.successful(Seq.empty))
-
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
-        .thenReturn(Future.successful(Some(apiDetail)))
-
-      running(fixture.playApplication) {
-        val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id).url)
-        val result = route(fixture.playApplication, request).value
-        val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
-
-        status(result) mustEqual OK
-        contentAsString(result) mustBe view(application, Some(applicationApis), Some(FakeUser))(request, messages(fixture.playApplication)).toString
-        contentAsString(result) must validateAsHtml
+              status(result) mustEqual OK
+              contentAsString(result) mustBe view(deletedApplication, accessRequests, Some(user))(request, messages(fixture.playApplication)).toString
+              contentAsString(result) must validateAsHtml
+            }
+        }
       }
-    }
 
-    "must return the correct view when the application APIs are missing" in {
-      val fixture = buildFixture()
-      val apiId = "test-id"
+      "must sort the access requests, most recent first" in {
+        forAll(teamMemberAndSupporterTable) {
+          user: UserModel =>
+            val fixture = buildFixture(userModel = user)
+            val deletedApplication = FakeApplication.copy(deleted = Some(Deleted(LocalDateTime.now, "delete@example.com")))
+            val unsortedAccessRequests = Seq(sampleAccessRequest())
+            val sortedAccessRequests = unsortedAccessRequests.sortBy(_.requested).reverse
 
-      val application = FakeApplication
-        .addApi(Api(apiId, Seq(SelectedEndpoint("GET", "/test"))))
-        .setSecondaryScopes(Seq(Scope("test-scope")))
+            when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(deletedApplication.id), ArgumentMatchers.eq(true), ArgumentMatchers.eq(true))(any()))
+              .thenReturn(Future.successful(Some(deletedApplication)))
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), ArgumentMatchers.eq(true), ArgumentMatchers.eq(false))(any()))
-        .thenReturn(Future.successful(Some(application)))
+            when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(deletedApplication.id)), ArgumentMatchers.eq(None))(any()))
+              .thenReturn(Future.successful(unsortedAccessRequests))
 
-      when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(application.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
-        .thenReturn(Future.successful(Seq.empty))
+            running(fixture.playApplication) {
+              val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(deletedApplication.id).url)
+              val result = route(fixture.playApplication, request).value
+              val view = fixture.playApplication.injector.instanceOf[DeletedApplicationDetailsView]
 
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiId))(any()))
-        .thenReturn(Future.successful(None))
-
-      running(fixture.playApplication) {
-        val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id).url)
-        val result = route(fixture.playApplication, request).value
-        val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
-
-        status(result) mustEqual OK
-        contentAsString(result) mustBe view(application, None, Some(FakeUser))(request, messages(fixture.playApplication)).toString
-        contentAsString(result) must validateAsHtml
+              status(result) mustEqual OK
+              contentAsString(result) mustBe view(deletedApplication, sortedAccessRequests, Some(user))(request, messages(fixture.playApplication)).toString
+              contentAsString(result) must validateAsHtml
+            }
+        }
       }
     }
 
@@ -233,7 +289,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
     "must redirect to Unauthorised page for a GET when user is not a team member or supporter" in {
       val fixture = buildFixture(userModel = FakeUserNotTeamMember)
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(true), ArgumentMatchers.eq(false))(any()))
+      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(true), ArgumentMatchers.eq(true))(any()))
         .thenReturn(Future.successful(Some(FakeApplication)))
 
       running(fixture.playApplication) {
@@ -244,6 +300,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad.url)
       }
     }
+
   }
 
   private case class Fixture(playApplication: PlayApplication, apiHubService: ApiHubService)
