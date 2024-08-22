@@ -76,7 +76,8 @@ object ApplicationNavItems {
         page = ViewAsJsonApplicationPage,
         title = messages("applicationNav.page.viewJson"),
         link = controllers.application.routes.ApplicationSupportController.onPageLoad(application.id),
-        isCurrentPage = currentPage == ViewAsJsonApplicationPage
+        isCurrentPage = currentPage == ViewAsJsonApplicationPage,
+        opensInNewTab = true
       ),
       SideNavItem(
         page = ChangeOwningTeamPage,

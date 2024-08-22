@@ -14,41 +14,42 @@
  * limitations under the License.
  */
 
-package controllers.application
+package controllers.admin
 
 import com.google.inject.Inject
-import controllers.actions.{ApplicationAuthActionProvider, IdentifierAction}
-import controllers.helpers.ApplicationApiBuilder
-import models.application.ApplicationLenses._
+import controllers.actions.{ApplicationAuthActionProvider, AuthorisedSupportAction, IdentifierAction}
+import models.accessrequest.AccessRequest
 import play.api.i18n.I18nSupport
 import play.api.mvc._
+import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.application.ApplicationDetailsView
+import views.html.application.DeletedApplicationDetailsView
 
 import scala.concurrent.ExecutionContext
+import scala.math.Ordered.orderingToOrdered
 
-class ApplicationDetailsController @Inject()(
+class DeletedApplicationDetailsController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   identify: IdentifierAction,
+  isSupport: AuthorisedSupportAction,
   applicationAuth: ApplicationAuthActionProvider,
-  view: ApplicationDetailsView,
-  applicationApiBuilder: ApplicationApiBuilder,
+  deletedView: DeletedApplicationDetailsView,
+  apiHubService: ApiHubService
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id, enrich = true)).async {
+  private implicit val accessRequestOrdering: Ordering[AccessRequest] = (x: AccessRequest, y: AccessRequest) => {
+    y.requested compare x.requested
+  }
+
+  def onPageLoad(id: String): Action[AnyContent] = (identify andThen isSupport andThen applicationAuth(id, false, true)).async {
     implicit request =>
-      applicationApiBuilder.build(request.application).map {
-        case Right(applicationApis) =>
-          Ok(view(
-            request.application.withSortedTeam(),
-            Some(applicationApis),
+      apiHubService.getAccessRequests(Some(request.application.id), None).map {
+        accessRequests =>
+          Ok(deletedView(
+            request.application,
+            accessRequests.sorted,
             Some(request.identifierRequest.user)
           ))
-        case Left(_) => Ok(view(
-          request.application.withSortedTeam(),
-          None,
-          Some(request.identifierRequest.user)
-        ))
       }
   }
 

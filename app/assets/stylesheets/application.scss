@@ -758,3 +758,11 @@ header {
         scrollbar-width: thin;
     }
 }
+
+.hip-access-request-panel {
+    .hip-access-request-name-status {
+        display: flex;
+        align-items: flex-start;
+        gap: 5px;
+    }
+}

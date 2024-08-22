@@ -1,0 +1,106 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.application._
+@import models.user.UserModel
+@import views.ViewUtils
+@import views.html.components.IconsLink
+@import viewmodels.application.DeletedApplicationNavItems
+@import models.accessrequest.AccessRequest
+@import views.html.components.AccessRequestPanel
+
+@this(
+    layout: templates.Layout,
+    govukTable: GovukTable,
+    iconsLink: IconsLink,
+    govukSummaryList : GovukSummaryList,
+    govukTag : GovukTag,
+    accessRequestPanel: AccessRequestPanel
+)
+
+@(application: Application, accessRequests: Seq[AccessRequest], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+
+@owningTeamLink(teamId: String, teamName: String) = {
+    <a href="@controllers.team.routes.ManageTeamController.onPageLoad(teamId)" class="govuk-link">@teamName</a>
+}
+
+@createdDate = {
+    <span class="utcDateLong">@ViewUtils.formatLocalDateTimeContainingUtc(application.created)</span>
+}
+
+@layout(pageTitle = titleNoForm(messages("applicationDetails.title")), user = user, fullWidth = true, customScriptsBlock = Some(iconsLink())) {
+
+    @views.html.templates.SideNav(application.name, DeletedApplicationNavItems(application)) {
+
+        <h1 class="govuk-heading-l">@messages("applicationDetails.heading")</h1>
+
+        @govukSummaryList(SummaryList(
+            rows = Seq(
+                SummaryListRow(
+                    key = Key(
+                        content = Text(messages("applicationDetails.application.application"))
+                    ),
+                    value = Value(
+                        content = Text(application.name)
+                    )
+                ),
+                SummaryListRow(
+                    key = Key(
+                        content = Text(messages("applicationDetails.application.status"))
+                    ),
+                    value = Value(
+                        content = HtmlContent(govukTag(Tag(content = Text("Deleted"), classes = "govuk-tag--grey")))
+                    )
+                ),
+                SummaryListRow(
+                    key = Key(
+                        content = Text(messages("applicationDetails.application.owningTeam"))
+                    ),
+                    value = Value(
+                        content = application.teamId.map(id => HtmlContent(owningTeamLink(id, application.teamName.getOrElse(""))))
+                                    .getOrElse(Text(messages("applicationDetails.application.noOwningTeam")))
+                    )
+                ),
+                SummaryListRow(
+                    key = Key(
+                        content = Text(messages("applicationDetails.application.created"))
+                    ),
+                    value = Value(
+                        content = HtmlContent(createdDate)
+                    )
+                ),
+                SummaryListRow(
+                    key = Key(
+                        content = Text(messages("applicationDetails.application.applicationId"))
+                    ),
+                    value = Value(
+                        content = Text(application.id)
+                    )
+                )
+            ),
+            classes = "hip-summary-list__compact govuk-summary-list--no-border"
+        ))
+
+        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+
+        <h2 class="govuk-heading-m">@messages("applicationDetails.application.history")</h2>
+
+        @for(accessRequest <- accessRequests) {
+            @accessRequestPanel(accessRequest, showReviewLink = false)
+        }
+    }
+
+}
