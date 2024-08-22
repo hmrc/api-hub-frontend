@@ -43,9 +43,7 @@ class CreateTeamCheckYourAnswersController @Inject()(
         ).flatten
       )
 
-      val teamMemberDetails = SummaryListViewModel(
-        rows = CreateTeamAddTeamMemberSummary.rows(request.userAnswers)
-      )
+      val teamMemberDetails = CreateTeamAddTeamMemberSummary.summary(request.userAnswers)
 
       Ok(view(teamName, teamMemberDetails, Some(request.user)))
   }

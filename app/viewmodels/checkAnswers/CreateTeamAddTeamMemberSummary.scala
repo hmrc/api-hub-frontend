@@ -19,9 +19,16 @@ package viewmodels.checkAnswers
 import models.UserAnswers
 import pages.CreateTeamMembersPage
 import uk.gov.hmrc.govukfrontend.views.Aliases.Text
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{Key, SummaryListRow}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{Key, SummaryList, SummaryListRow}
+import viewmodels.govuk.all.{FluentSummaryList, SummaryListViewModel}
 
 object CreateTeamAddTeamMemberSummary  {
+
+  def summary(answers: UserAnswers): SummaryList = {
+    SummaryListViewModel(
+      rows = rows(answers)
+    ).withAttribute("data-summary-for" -> "team-members")
+  }
 
   def rows(answers: UserAnswers): Seq[SummaryListRow] =
     answers
@@ -34,4 +41,5 @@ object CreateTeamAddTeamMemberSummary  {
             key = Key(Text(zipped._1.email))
           )
       }
+
 }

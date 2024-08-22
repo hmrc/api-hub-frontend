@@ -49,10 +49,10 @@ class CreateTeamController @Inject()(
         call => Future.successful(Redirect(call)),
         newTeam =>
           apiHubService.createTeam(newTeam).flatMap {
-            case Right(_) =>
+            case Right(team) =>
               for {
                 _ <- sessionRepository.clear(request.userAnswers.id)
-              } yield Ok(view(Some(request.user)))
+              } yield Ok(view(team, Some(request.user)))
             case Left(_: TeamNameNotUniqueException) =>
               Future.successful(Redirect(controllers.team.routes.CreateTeamNameController.onPageLoad(CheckMode)))
             case Left(e) => throw e

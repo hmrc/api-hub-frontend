@@ -27,7 +27,7 @@
 @(teams: Seq[Team], user: UserModel)(implicit request: Request[_], messages: Messages)
 
 @teamNameLink(team: Team) = {
-    <a href="@controllers.team.routes.ManageTeamController.onPageLoad(team.id)" class="govuk-body govuk-link govuk-link--no-visited-state">@team.name</a>
+    <a data-team-id="@team.id" data-team-name="@team.name" href="@controllers.team.routes.ManageTeamController.onPageLoad(team.id)" class="govuk-body govuk-link govuk-link--no-visited-state">@team.name</a>
 }
 
 @layout(
@@ -52,7 +52,7 @@
                     href = Some(controllers.team.routes.CreateTeamStartController.startCreateTeam().url),
                     content = Text(messages("manageMyTeams.addNewTeam")),
                     classes = "hip-no-stretch"
-                )
+                ).withId("addNewTeamButton")
             )
         </div>
 

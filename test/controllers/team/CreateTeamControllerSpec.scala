@@ -59,7 +59,7 @@ class CreateTeamControllerSpec extends SpecBase with MockitoSugar with ArgumentM
 
         val view = fixture.playApplication.injector.instanceOf[CreateTeamSuccessView]
 
-        contentAsString(result) mustBe view(Some(FakeUser))(request, messages(fixture.playApplication)).toString()
+        contentAsString(result) mustBe view(team, Some(FakeUser))(request, messages(fixture.playApplication)).toString()
         contentAsString(result) must validateAsHtml
       }
     }
