@@ -32,14 +32,13 @@ import scala.concurrent.ExecutionContext
 import scala.math.Ordered.orderingToOrdered
 
 class ApplicationDetailsController @Inject()(
-                                              val controllerComponents: MessagesControllerComponents,
-                                              identify: IdentifierAction,
-                                              applicationAuth: ApplicationAuthActionProvider,
-                                              view: ApplicationDetailsView,
-                                              deletedView: DeletedApplicationDetailsView,
-                                              applicationApiBuilder: ApplicationApiBuilder,
-                                              apiHubService: ApiHubService,
-                                              errorResultBuilder: ErrorResultBuilder
+  val controllerComponents: MessagesControllerComponents,
+  identify: IdentifierAction,
+  applicationAuth: ApplicationAuthActionProvider,
+  view: ApplicationDetailsView,
+  deletedView: DeletedApplicationDetailsView,
+  applicationApiBuilder: ApplicationApiBuilder,
+  apiHubService: ApiHubService
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private implicit val accessRequestOrdering: Ordering[AccessRequest] = (x: AccessRequest, y: AccessRequest) => {
