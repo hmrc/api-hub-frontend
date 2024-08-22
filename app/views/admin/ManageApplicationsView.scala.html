@@ -52,7 +52,11 @@
             <div class="hip-inner-card flex hip-application">
                 <div class="left">
                     <h5 class="govuk-heading-s hip-inner-card-title govuk-!-margin-bottom-4">
+                      @if(application.deleted.isEmpty){
                         <a class="govuk-link govuk-link--no-visited-state" href=@controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url>@application.name</a>
+                      } else {
+                        <a class="govuk-link govuk-link--no-visited-state" href=@controllers.admin.routes.DeletedApplicationDetailsController.onPageLoad(application.id).url>@application.name</a>
+                      }
                     </h5>
                     <p class="govuk-body-s govuk-!-margin-top-1">
                         <strong>@messages("manageApplications.application.id"): </strong>@application.id
