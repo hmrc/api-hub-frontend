@@ -76,6 +76,8 @@ dashboard.teams.none = You are not a member of any teams
 dashboard.teams.createFirst = Register a team
 dashboard.teams.createAnother = Register another team
 dashboard.teams.viewAll = View all your teams
+dashboard.teams.teamMembers = Team members: {0}
+dashboard.teams.created = Registered:
 
 applications.title = Your applications
 applications.heading = Your applications

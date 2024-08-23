@@ -118,9 +118,11 @@
                 <div class="hip-card-container-top">
                 @teams.map( team =>
                     <div class="hip-inner-card flex">
-                    <h3 class="govuk-heading-s align-left hip-inner-card-title">
-                    <a class="govuk-link govuk-link--no-visited-state" href={controllers.team.routes.ManageTeamController.onPageLoad(team.id).url}>{team.name}</a>
-                    </h3>
+                        <h3 class="govuk-heading-s align-left hip-inner-card-title">
+                            <a class="govuk-link govuk-link--no-visited-state" href={controllers.team.routes.ManageTeamController.onPageLoad(team.id).url}>{team.name}</a>
+                        </h3>
+                        <p class="govuk-body align-left">{messages("dashboard.teams.teamMembers", {team.teamMembers.length})}</p>
+                        <p class="govuk-body align-left">{messages("dashboard.teams.created")} <span class="utcDateShort">{ViewUtils.formatLocalDateTimeContainingUtc(team.created)}</span></p>
                     </div>
                 )
                 </div>
