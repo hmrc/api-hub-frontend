@@ -8,8 +8,6 @@
 
 GET         /                                                                  controllers.ServiceStartController.onPageLoad
 GET         /dashboard                                                         controllers.IndexController.onPageLoad
-GET         /application/register/start                                        controllers.IndexController.createApplication
-POST        /dashboard                                                         controllers.IndexController.onSubmit
 
 GET         /applications                                                      controllers.ApplicationsController.onPageLoad
 

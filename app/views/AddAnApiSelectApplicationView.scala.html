@@ -72,7 +72,7 @@
                 </h1>
                 @govukButton(
                     Button(
-                        href = Some(routes.IndexController.createApplication.url),
+                        href = Some(controllers.application.register.routes.RegisterApplicationStartController.startRegisterApplication().url),
                         content = Text(messages("addAnApiSelectApplication.registerApplication"))
                     )
                 )

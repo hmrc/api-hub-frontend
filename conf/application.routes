@@ -30,7 +30,7 @@ POST        /add-team-member/:id                                        controll
 GET         /remove-api/:applicationId/:apiId                           controllers.application.RemoveApiController.onPageLoad(applicationId: String, apiId: String)
 POST        /remove-api/:applicationId/:apiId                           controllers.application.RemoveApiController.onSubmit(applicationId: String, apiId: String)
 
-GET         /register/start2                                            controllers.application.register.RegisterApplicationStartController.startRegisterApplication()
+GET         /register/start                                             controllers.application.register.RegisterApplicationStartController.startRegisterApplication()
 GET         /register/name                                              controllers.application.register.RegisterApplicationNameController.onPageLoad(mode: Mode = NormalMode)
 POST        /register/name                                              controllers.application.register.RegisterApplicationNameController.onSubmit(mode: Mode = NormalMode)
 GET         /register/change-name                                       controllers.application.register.RegisterApplicationNameController.onPageLoad(mode: Mode = CheckMode)
