@@ -41,14 +41,17 @@ class ManageMyTeamsControllerSpec extends SpecBase with MockitoSugar with HtmlVa
     "must return OK and the correct view for a GET when the user is in some teams" in {
       val fixture = buildFixture()
       val team1 = Team("id1", "team 1", LocalDateTime.now(), Seq(TeamMember(FakeUser.email.value)))
-      val team2 = Team("id2", "team 2", LocalDateTime.now(), Seq(TeamMember(FakeUser.email.value)))
-      when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(Seq(team2, team1)))
+      val team2 = Team("id2", "Team 2", LocalDateTime.now(), Seq(TeamMember(FakeUser.email.value)))
+      val team3 = Team("id3", "team 2", LocalDateTime.now(), Seq(TeamMember(FakeUser.email.value)))
+      val team4 = Team("id4", "A team 2", LocalDateTime.now(), Seq(TeamMember(FakeUser.email.value)))
+      val team5 = Team("id5", "a team 2", LocalDateTime.now(), Seq(TeamMember(FakeUser.email.value)))
+      when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(Seq(team2, team1, team3, team4, team5)))
 
       running(fixture.playApplication) {
         val request = FakeRequest(routes.ManageMyTeamsController.onPageLoad())
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[ManageMyTeamsView]
-        val teamsSortedByName = Seq(team1, team2)
+        val teamsSortedByName = Seq(team4, team5, team1, team2, team3)
 
         status(result) mustBe OK
         contentAsString(result) mustBe view(teamsSortedByName, FakeUser)(request, messages(fixture.playApplication)).toString

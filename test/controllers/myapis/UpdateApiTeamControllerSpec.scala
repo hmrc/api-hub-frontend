@@ -73,6 +73,32 @@ class UpdateApiTeamControllerSpec
       }
     }
 
+    "must render the correct view with ordered teams" in {
+      forAll(usersWhoCanSupport) { user =>
+        val unorderedTeams = Seq(
+          Team(teamId, "Team 1", LocalDateTime.now(), Seq(TeamMember("user@example.com"))),
+          Team(teamId, "A Team 1", LocalDateTime.now(), Seq(TeamMember("user@example.com"))),
+          Team(teamId, "team 1", LocalDateTime.now(), Seq(TeamMember("user@example.com"))),
+          Team(teamId, "a team 1", LocalDateTime.now(), Seq(TeamMember("user@example.com")))
+        )
+        val orderedTeams = unorderedTeams.sortBy(_.name.toLowerCase())
+        val fixture = buildFixture(user)
+        when(fixture.apiAuthActionProvider.apply(any)(any)).thenReturn(successfulApiAuthAction(FakeApiDetail))
+        when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(unorderedTeams))
+
+        running(fixture.playApplication) {
+          val request = FakeRequest(controllers.myapis.routes.UpdateApiTeamController.onPageLoad(FakeApiDetail.id))
+          val result = route(fixture.playApplication, request).value
+          val view = fixture.playApplication.injector.instanceOf[UpdateApiTeamView]
+
+          status(result) mustBe OK
+          contentAsString(result) mustBe view(form, FakeApiDetail, None, orderedTeams, user)(request, messages(fixture.playApplication)).toString()
+          contentAsString(result) must validateAsHtml
+          contentAsString(result) must include("Select which team owns this API")
+        }
+      }
+    }
+
     "must return 200 Ok and the correct view for a non-support user who is on the API team" in {
       forAll(usersWhoCannotSupport) { user =>
         val fixture = buildFixture(user)
