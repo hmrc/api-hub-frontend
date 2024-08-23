@@ -39,6 +39,6 @@ class ManageMyTeamsController @Inject()(
       (request.user.email match {
         case Some(email) => service.findTeams(Some(email))
         case None => Future.successful(Seq.empty)
-      }).map(teams => Ok(view(teams sortBy(_.name), request.user)))
+      }).map(teams => Ok(view(teams sortBy(_.name.toLowerCase), request.user)))
   }
 }

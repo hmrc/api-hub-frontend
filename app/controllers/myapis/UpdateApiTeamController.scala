@@ -51,7 +51,8 @@ class UpdateApiTeamController @Inject()(
   private def showView(code: Int, form: Form[_])(implicit request: ApiRequest[_]): Future[Result] = {
     apiHubService.findTeams(None).map(teams => {
       val owningTeam = teams.find(team => request.apiDetails.teamId.contains(team.id))
-      Status(code)(view(form, request.apiDetails, owningTeam, teams, request.identifierRequest.user))
+      val sortedTeams = teams.sortBy(_.name.toLowerCase)
+      Status(code)(view(form, request.apiDetails, owningTeam, sortedTeams, request.identifierRequest.user))
     })
   }
 
