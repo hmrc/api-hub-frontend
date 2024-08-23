@@ -17,7 +17,7 @@
 package controllers.admin
 
 import base.SpecBase
-import controllers.admin.TeamMigrationController.MigrationSummary
+import controllers.admin.TeamMigrationController.{MigrationSummary, TeamApplications}
 import generators.TeamGenerator
 import models.user.UserModel
 import models.application.{Application, Creator, Deleted, TeamMember}
@@ -87,6 +87,7 @@ class TeamMigrationControllerSpec
           MigrationSummary(migrated = false, deleted = false, count = 1),
           MigrationSummary(migrated = true, deleted = true, count = 1),
         )
+        val teamApplications = TeamApplications(applications)
 
         running(fixture.playApplication) {
           implicit val msgs: Messages = messages(fixture.playApplication)
@@ -104,7 +105,7 @@ class TeamMigrationControllerSpec
           val view = fixture.playApplication.injector.instanceOf[TeamMigrationView]
 
           status(result) mustBe OK
-          contentAsString(result) mustBe view(viewApplications, summary, user).toString()
+          contentAsString(result) mustBe view(viewApplications, summary, teamApplications, user).toString()
           contentAsString(result) must validateAsHtml
         }
       }

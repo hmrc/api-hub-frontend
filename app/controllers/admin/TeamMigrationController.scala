@@ -43,7 +43,12 @@ class TeamMigrationController @Inject()(
     implicit request =>
       apiHubService.getApplications(None, true).map(
         applications =>
-          Ok(view(applications.filterNot(_.isTeamMigrated).sortBy(_.name.toLowerCase), MigrationSummary(applications), request.user))
+          Ok(view(
+            applications.filterNot(_.isTeamMigrated).sortBy(_.name.toLowerCase),
+            MigrationSummary(applications),
+            TeamApplications(applications),
+            request.user
+          ))
       )
   }
 
@@ -65,6 +70,30 @@ object TeamMigrationController {
         .map { case ((isMigrated, isDeleted), count) =>
             MigrationSummary(isMigrated, isDeleted, count)
         }
+    }
+
+  }
+
+  case class TeamApplications(teamMembers: Seq[String], applications: Seq[Application])
+
+  object TeamApplications {
+
+    def apply(applications: Seq[Application]): Seq[TeamApplications] = {
+      applications
+        .filterNot(_.isTeamMigrated)
+        .groupMapReduce(
+          application =>
+            application.teamMembers.map(_.email).toSet
+        )(a => Seq(a))((b1, b2) => b1 ++ b2)
+        .map {
+          case (emails, applications) =>
+            TeamApplications(
+              emails.toSeq.sortBy(_.toLowerCase),
+              applications.sortBy(_.name.toLowerCase)
+            )
+        }
+        .toSeq
+        .sortBy(_.teamMembers.map(_.toLowerCase).mkString(" "))
     }
 
   }
