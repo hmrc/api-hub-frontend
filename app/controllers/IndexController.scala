@@ -44,13 +44,20 @@ class IndexController @Inject()(
 
   def onPageLoad: Action[AnyContent] = identify.async { implicit request =>
     val maxApplicationsToShow = 5
+    val maxTeamsToShow = 5
     request.user.email.fold[Future[Result]] {
       noEmail()
     }(email =>
-      apiHubService.getApplications(Some(email), false).map(userApps => Ok(view(
-        userApps.sortBy(_.name.toLowerCase).take(maxApplicationsToShow),
-        userApps.size,
-        Some(request.user))))
+      for {
+        userApps <- apiHubService.getApplications(Some(email), false)
+        userTeams <- apiHubService.findTeams(Some(email))
+      } yield Ok(view(
+          userApps.sortBy(_.name.toLowerCase).take(maxApplicationsToShow),
+          userApps.size,
+          userTeams.sortBy(_.name.toLowerCase).take(maxTeamsToShow),
+          userTeams.size,
+          Some(request.user)
+      ))
     )
   }
 

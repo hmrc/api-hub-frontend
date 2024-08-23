@@ -69,6 +69,13 @@ dashboard.applications.createAnother = Register another application
 dashboard.applications.teamMembers = Team members: {0}
 dashboard.applications.created = Registered:
 dashboard.applications.viewAll = View all your applications
+dashboard.teams.title.none = Registered teams
+dashboard.teams.title.one = 1 Registered team
+dashboard.teams.title.many = {0} Registered teams
+dashboard.teams.none = You are not a member of any teams
+dashboard.teams.createFirst = Create team
+dashboard.teams.createAnother = Create another team
+dashboard.teams.viewAll = View all your teams
 
 applications.title = Your applications
 applications.heading = Your applications
