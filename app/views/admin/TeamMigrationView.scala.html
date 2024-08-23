@@ -14,8 +14,9 @@
  * limitations under the License.
  *@
 
-@import controllers.admin.TeamMigrationController.MigrationSummary
+@import controllers.admin.TeamMigrationController.{MigrationSummary, TeamApplications}
 @import models.application.Application
+@import models.application.ApplicationLenses._
 @import models.user.UserModel
 @import viewmodels.admin.{AdminNavItems, AdminSideNavPages}
 
@@ -25,7 +26,7 @@
     govukTable : GovukTable
 )
 
-@(applications: Seq[Application], summary: Seq[MigrationSummary], user: UserModel)(implicit request: Request[_], messages: Messages)
+@(applications: Seq[Application], summary: Seq[MigrationSummary], teamApplications: Seq[TeamApplications], user: UserModel)(implicit request: Request[_], messages: Messages)
 
 @summaryCell(migrated: Option[Boolean], deleted: Option[Boolean]) = @{
     Text(
@@ -36,6 +37,41 @@
             .sum
             .toString
     )
+}
+
+@applicationLink(application: Application) = @{
+    if (application.isDeleted) {
+        controllers.application.routes.ApplicationSupportController.onPageLoad(application.id).url
+    }
+    else {
+        controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url
+    }
+}
+
+@displayApplication(application: Application) = {
+    <div class="hip-inner-card flex hip-application">
+        <div class="left">
+            <h5 class="govuk-heading-s hip-inner-card-title govuk-!-margin-bottom-4">
+                <a class="govuk-link govuk-link--no-visited-state" href="@applicationLink(application)">@application.name</a>
+            </h5>
+            <p class="govuk-body-s govuk-!-margin-top-1">
+                <strong>@messages("manageApplications.application.id"): </strong>@application.id
+            </p>
+        </div>
+        <div class="right ">
+            <p class="govuk-body-s govuk-!-margin-top-1">
+                <a class="govuk-link govuk-link--no-visited-state" href="@controllers.application.routes.UpdateApplicationTeamController.onPageLoad(application.id).url">@messages("teamMigration.changeOwningTeam")</a>
+            </p>
+            @for(deleted <- application.deleted){
+                <p class="govuk-body-s govuk-!-margin-top-1">
+                    @govukTag(Tag(
+                        content = Text(messages("site.deleted")),
+                        classes = "govuk-tag--grey"
+                    ))
+                </p>
+            }
+        </div>
+    </div>
 }
 
 @layout(pageTitle = titleNoForm(messages("teamMigration.pageTitle")), user = Some(user), fullWidth = true) {
@@ -121,32 +157,26 @@
           )
         )
 
-        <h2 class="govuk-heading-m">@messages("teamMigration.nonMigrated.heading")</h2>
+        <h2 class="govuk-heading-m">@messages("Non-migrated applications grouped by team members")</h2>
+
+        @for(team <- teamApplications){
+            <div>
+                <h3 class="govuk-heading-s">
+                    @for(teamMember <- team.teamMembers){
+                        @teamMember<br>
+                    }
+                </h3>
+
+                @for(application <- team.applications){
+                    @displayApplication(application)
+                }
+            </div>
+        }
+
+        <h2 class="govuk-heading-m">@messages("All non-migrated applications")</h2>
 
         @for(application <- applications){
-            <div class="hip-inner-card flex hip-application">
-                <div class="left">
-                    <h5 class="govuk-heading-s hip-inner-card-title govuk-!-margin-bottom-4">
-                        <a class="govuk-link govuk-link--no-visited-state" href=@controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url>@application.name</a>
-                    </h5>
-                    <p class="govuk-body-s govuk-!-margin-top-1">
-                        <strong>@messages("manageApplications.application.id"): </strong>@application.id
-                    </p>
-                </div>
-                <div class="right ">
-                    <p class="govuk-body-s govuk-!-margin-top-1">
-                        <a class="govuk-link govuk-link--no-visited-state" href=@controllers.application.routes.UpdateApplicationTeamController.onPageLoad(application.id).url>@messages("teamMigration.changeOwningTeam")</a>
-                    </p>
-                    @for(deleted <- application.deleted){
-                        <p class="govuk-body-s govuk-!-margin-top-1">
-                            @govukTag(Tag(
-                                content = Text(messages("site.deleted")),
-                                classes = "govuk-tag--grey"
-                            ))
-                        </p>
-                    }
-                </div>
-            </div>
+            @displayApplication(application)
         }
     }
 
