@@ -72,6 +72,31 @@ class UpdateApplicationTeamControllerSpec
                 }
             }
         }
+        "must render the correct view with ordered teams" in {
+            forAll(usersWhoCanSupport) { user =>
+                val unorderedTeams = Seq(
+                    Team(teamId, "Team 1", LocalDateTime.now(), Seq(TeamMember("user@example.com"))),
+                    Team(teamId, "A Team 1", LocalDateTime.now(), Seq(TeamMember("user@example.com"))),
+                    Team(teamId, "team 1", LocalDateTime.now(), Seq(TeamMember("user@example.com"))),
+                    Team(teamId, "a team 1", LocalDateTime.now(), Seq(TeamMember("user@example.com")))
+                )
+                val orderedTeams = unorderedTeams.sortBy(_.name.toLowerCase())
+                val fixture = buildFixture(user)
+                when(fixture.applicationAuthActionProvider.apply(any, eqTo(false), eqTo(true))(any)).thenReturn(successfulApplicationAuthAction(FakeApplication))
+                when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(unorderedTeams))
+
+                running(fixture.playApplication) {
+                    val request = FakeRequest(controllers.application.routes.UpdateApplicationTeamController.onPageLoad(FakeApplication.id))
+                    val result = route(fixture.playApplication, request).value
+                    val view = fixture.playApplication.injector.instanceOf[UpdateApplicationTeamView]
+
+                    status(result) mustBe OK
+                    contentAsString(result) mustBe view(form, FakeApplication, None, orderedTeams, user)(request, messages(fixture.playApplication)).toString()
+                    contentAsString(result) must validateAsHtml
+                    contentAsString(result) must include("Select which team owns this application")
+                }
+            }
+        }
 
         "must return 200 Ok and the correct view for a non-support user who is on the API team" in {
             forAll(usersWhoCannotSupport) { user =>
