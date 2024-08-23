@@ -101,7 +101,7 @@
 
                 <select id="owningTeam" name="owningTeam">
                     <option value="">Select an owning team</option>
-                    @for(team <- teams.sortBy(_.name)){
+                    @for(team <- teams.sortBy(_.name.toLowerCase)){
                       @if(!owningTeam.exists(_.id == team.id)){
                         <option value="@team.id">@team.name</option>
                       }
