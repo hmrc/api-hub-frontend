@@ -95,7 +95,7 @@ checkYourAnswers.complete.guidance = Team members you have added will be notifie
 checkYourAnswers.registerApplication = Register application
 
 registerApplicationCheckYourAnswers.title = Check Your Answers
-registerApplicationCheckYourAnswers.heading = Check your answers before creating your application
+registerApplicationCheckYourAnswers.heading = Check your answers before registering your application
 registerApplicationCheckYourAnswers.applicationDetails.heading = Application details
 registerApplicationCheckYourAnswers.registerApplication = Register application
 

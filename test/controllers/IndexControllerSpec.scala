@@ -17,37 +17,34 @@
 package controllers
 
 import base.SpecBase
-import controllers.IndexControllerSpec.{buildFixture, buildFixtureWithUser}
+import controllers.IndexControllerSpec.buildFixture
 import controllers.actions.FakeUser
+import generators.TeamGenerator
 import models.application.{Application, Creator, TeamMember}
-import models.user.UserModel
-import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.{ArgumentCaptor, ArgumentMatchers, MockitoSugar}
-import pages.TeamMembersPage
+import org.mockito.{ArgumentMatchers, MockitoSugar}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Application => PlayApplication}
-import repositories.SessionRepository
 import services.ApiHubService
 import utils.HtmlValidation
-import views.html.{ErrorTemplate, IndexView}
+import views.html.IndexView
 
 import scala.concurrent.Future
 
-class IndexControllerSpec extends SpecBase with MockitoSugar with HtmlValidation {
+class IndexControllerSpec extends SpecBase with MockitoSugar with TeamGenerator with HtmlValidation {
 
   "Index Controller" - {
 
-    "must return OK and the correct view for a GET" in {
-
+    "must return OK and the correct view when teams and applications exist for the user" in {
       val testEmail = "test-email"
       val creatorEmail = "creator-email-2"
       val applications = Seq(
         Application("id-1", "app-name-1", Creator(creatorEmail), Seq.empty).copy(teamMembers = Seq(TeamMember(testEmail))),
         Application("id-2", "app-name-2", Creator(creatorEmail), Seq.empty).copy(teamMembers = Seq(TeamMember(testEmail)))
       )
+      val teams = Seq(sampleTeam(), sampleTeam())
 
       val fixture = buildFixture()
 
@@ -55,6 +52,8 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with HtmlValidation
 
         when(fixture.mockApiHubService.getApplications(ArgumentMatchers.eq(Some(testEmail)), ArgumentMatchers.eq(false))(any()))
           .thenReturn(Future.successful(applications))
+        when(fixture.mockApiHubService.findTeams(ArgumentMatchers.eq(Some(testEmail)))(any()))
+          .thenReturn(Future.successful(teams))
 
         val request = FakeRequest(GET, routes.IndexController.onPageLoad.url)
 
@@ -64,118 +63,40 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with HtmlValidation
 
         status(result) mustEqual OK
 
-        contentAsString(result) mustEqual view(applications, applications.size, Some(FakeUser))(request, messages(fixture.application)).toString
+        val sortedApplications = applications.sortBy(_.created).reverse
+        val sortedTeams = teams.sortBy(_.created).reverse
+        contentAsString(result) mustEqual view(sortedApplications, applications.size, sortedTeams, teams.size, Some(FakeUser))(request, messages(fixture.application)).toString
         contentAsString(result) must validateAsHtml
       }
     }
 
-    "must initiate User Answers and redirect to the Application Name page for a POST" in {
-      val fixture = buildFixture()
-
-      when(fixture.mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-      running(fixture.application) {
-        val request = FakeRequest(POST, routes.IndexController.onSubmit.url)
-
-        val result = route(fixture.application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.ApplicationNameController.onPageLoad(NormalMode).url
-
-        val userAnswersCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
-        verify(fixture.mockSessionRepository).set(userAnswersCaptor.capture())
-
-        val actualUserAnswers = userAnswersCaptor.getValue
-        actualUserAnswers.id mustBe userAnswersId
-        actualUserAnswers.get(TeamMembersPage) mustBe Some(Seq(TeamMember(FakeUser.email.value)))
-      }
-    }
-
-    "must initiate User Answers and redirect to the Application Name page for a GET" in {
-      val fixture = buildFixture()
-
-      when(fixture.mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-      running(fixture.application) {
-        val request = FakeRequest(GET, routes.IndexController.createApplication.url)
-
-        val result = route(fixture.application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.ApplicationNameController.onPageLoad(NormalMode).url
-
-        val userAnswersCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
-        verify(fixture.mockSessionRepository).set(userAnswersCaptor.capture())
-
-        val actualUserAnswers = userAnswersCaptor.getValue
-        actualUserAnswers.id mustBe userAnswersId
-        actualUserAnswers.get(TeamMembersPage) mustBe Some(Seq(TeamMember(FakeUser.email.value)))
-      }
-    }
-
-    "must call apiHubService.getUserApplications()" in {
+    "must return OK and the correct view when no teams or applications exist for the user" in {
       val testEmail = "test-email"
-      val creatorEmail = "creator-email-2"
-      val applications = Seq(
-        Application("id-1", "app-name-1", Creator(creatorEmail), Seq.empty).copy(teamMembers = Seq(TeamMember(testEmail))),
-        Application("id-2", "app-name-2", Creator(creatorEmail), Seq.empty).copy(teamMembers = Seq(TeamMember(testEmail)))
-      )
+      val applications = Seq.empty
+      val teams = Seq.empty
+
       val fixture = buildFixture()
+
       running(fixture.application) {
 
         when(fixture.mockApiHubService.getApplications(ArgumentMatchers.eq(Some(testEmail)), ArgumentMatchers.eq(false))(any()))
           .thenReturn(Future.successful(applications))
+        when(fixture.mockApiHubService.findTeams(ArgumentMatchers.eq(Some(testEmail)))(any()))
+          .thenReturn(Future.successful(teams))
 
         val request = FakeRequest(GET, routes.IndexController.onPageLoad.url)
 
         val result = route(fixture.application, request).value
+
         val view = fixture.application.injector.instanceOf[IndexView]
+
         status(result) mustEqual OK
 
-        contentAsString(result) mustEqual view(applications, applications.size, Some(FakeUser))(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(applications, 0, teams, 0, Some(FakeUser))(request, messages(fixture.application)).toString
         contentAsString(result) must validateAsHtml
       }
     }
 
-    "must return Internal Server Error if the user has no email address for a GET" in {
-      val fixture = buildFixtureWithUser(FakeUser.copy(email = None))
-
-      running(fixture.application) {
-        val request = FakeRequest(GET, routes.IndexController.onPageLoad.url)
-        val result = route(fixture.application, request).value
-        val view = fixture.application.injector.instanceOf[ErrorTemplate]
-
-        status(result) mustEqual INTERNAL_SERVER_ERROR
-        contentAsString(result) mustBe
-          view(
-            "Sorry, we are experiencing technical difficulties - 500",
-            "Sorry, we’re experiencing technical difficulties",
-            "Please try again in a few minutes."
-          )(request, messages(fixture.application))
-            .toString()
-        contentAsString(result) must validateAsHtml
-      }
-    }
-
-    "must return Internal Server Error if the user has no email address while attempting to create an application" in {
-      val fixture = buildFixtureWithUser(FakeUser.copy(email = None))
-
-      running(fixture.application) {
-        val request = FakeRequest(POST, routes.IndexController.onSubmit.url)
-        val result = route(fixture.application, request).value
-        val view = fixture.application.injector.instanceOf[ErrorTemplate]
-
-        status(result) mustEqual INTERNAL_SERVER_ERROR
-        contentAsString(result) mustBe
-          view(
-            "Sorry, we are experiencing technical difficulties - 500",
-            "Sorry, we’re experiencing technical difficulties",
-            "Please try again in a few minutes."
-          )(request, messages(fixture.application))
-            .toString()
-        contentAsString(result) must validateAsHtml
-      }
-    }
   }
 
 }
@@ -184,33 +105,18 @@ object IndexControllerSpec extends SpecBase with MockitoSugar {
 
   case class Fixture(
     application: PlayApplication,
-    mockSessionRepository: SessionRepository,
     mockApiHubService: ApiHubService
   )
 
   def buildFixture(): Fixture = {
-    val mockSessionRepository = mock[SessionRepository]
     val mockApiHubService = mock[ApiHubService]
     val application =
       applicationBuilder(userAnswers = None)
         .overrides(
-          bind[SessionRepository].toInstance(mockSessionRepository),
           bind[ApiHubService].toInstance(mockApiHubService)
         )
         .build()
-    Fixture(application, mockSessionRepository, mockApiHubService)
-  }
-
-  def buildFixtureWithUser(userModel: UserModel = FakeUser): Fixture = {
-    val apiHubService = mock[ApiHubService]
-    val mockSessionRepository = mock[SessionRepository]
-    val application = applicationBuilder(userAnswers = None, user = userModel)
-      .overrides(
-        bind[ApiHubService].toInstance(apiHubService)
-      )
-      .build()
-
-    Fixture(application, mockSessionRepository, apiHubService)
+    Fixture(application, mockApiHubService)
   }
 
 }
