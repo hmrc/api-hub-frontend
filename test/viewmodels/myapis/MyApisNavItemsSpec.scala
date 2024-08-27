@@ -23,7 +23,7 @@ import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages
 import play.api.test.Helpers.running
 import viewmodels.SideNavItem
-import viewmodels.myapis.MyApisNavPages.{ApiUsagePage, ChangeOwningTeamPage, ProducerApiDetailsPage, UpdateApiPage}
+import viewmodels.myapis.MyApisNavPages.{ApiUsagePage, ChangeOwningTeamPage, ProducerApiDetailsPage, UpdateApiPage, ViewApiAsConsumerPage}
 
 class MyApisNavItemsSpec extends SpecBase with Matchers with TableDrivenPropertyChecks {
 
@@ -37,7 +37,7 @@ class MyApisNavItemsSpec extends SpecBase with Matchers with TableDrivenProperty
       running(playApplication) {
         implicit val implicitMessages: Messages = messages(playApplication)
         val actual = MyApisNavItems(apiId, FakeSupporter, ProducerApiDetailsPage)
-        val expected = Seq(producerApiDetailsPage(), updateApiPage(), changeOwningTeamPage(), apiUsagePage())
+        val expected = Seq(producerApiDetailsPage(), updateApiPage(), changeOwningTeamPage(), viewApiAsConsumerPage(), apiUsagePage())
 
         actual mustBe expected
       }
@@ -49,7 +49,7 @@ class MyApisNavItemsSpec extends SpecBase with Matchers with TableDrivenProperty
       running(playApplication) {
         implicit val implicitMessages: Messages = messages(playApplication)
         val actual = MyApisNavItems(apiId, FakeUser, ProducerApiDetailsPage)
-        val expected = Seq(producerApiDetailsPage(), updateApiPage(), changeOwningTeamPage())
+        val expected = Seq(producerApiDetailsPage(), updateApiPage(), changeOwningTeamPage(), viewApiAsConsumerPage())
 
         actual mustBe expected
       }
@@ -111,6 +111,16 @@ object MyApisNavItemsSpec {
       title = "Change owning team",
       link = controllers.myapis.routes.UpdateApiTeamController.onPageLoad(apiId),
       isCurrentPage = false
+    )
+  }
+
+  private def viewApiAsConsumerPage(): SideNavItem = {
+    SideNavItem(
+      page = ViewApiAsConsumerPage,
+      title = "View API as consumer",
+      link = controllers.routes.ApiDetailsController.onPageLoad(apiId),
+      isCurrentPage = false,
+      opensInNewTab = true
     )
   }
 
