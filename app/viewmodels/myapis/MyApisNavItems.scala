@@ -26,6 +26,8 @@ object MyApisNavPages {
   case object UpdateApiPage extends SideNavPage
   case object ChangeOwningTeamPage extends SideNavPage
   case object ApiUsagePage extends SideNavPage
+  case object ViewApiAsConsumerPage extends SideNavPage
+
 }
 
 object MyApisNavItems {
@@ -51,6 +53,13 @@ object MyApisNavItems {
         title = messages("myApis.update.team.title"),
         link = controllers.myapis.routes.UpdateApiTeamController.onPageLoad(apiId),
         isCurrentPage = currentPage == ChangeOwningTeamPage
+      ),
+      SideNavItem(
+        page = ViewApiAsConsumerPage,
+        title = messages("myApis.viewApiAsConsumer.title"),
+        link = controllers.routes.ApiDetailsController.onPageLoad(apiId),
+        isCurrentPage = currentPage == ViewApiAsConsumerPage,
+        opensInNewTab = true
       )
     ) ++ (
       if (user.permissions.canSupport) {
