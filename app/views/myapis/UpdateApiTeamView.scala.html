@@ -32,7 +32,7 @@
     iconsLink: IconsLink,
 )
 
-@(form: Form[_], apiDetail: ApiDetail, owningTeam: Option[Team], teams: Seq[Team], user: UserModel)(implicit request: Request[_], messages: Messages)
+@(form: Form[?], apiDetail: ApiDetail, owningTeam: Option[Team], teams: Seq[Team], user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @scripts() = {
     @iconsLink()

@@ -32,7 +32,7 @@ class AddAnApiApiIdSummarySpec extends AnyFreeSpec with Matchers with ApiDetailG
 
   "row" - {
     "must return the correct summary list row when an API exists" in {
-      forAll {apiDetail: ApiDetail =>
+      forAll { (apiDetail: ApiDetail) =>
         val actual = AddAnApiApiIdSummary.row(Some(apiDetail))
 
         val expected = SummaryListRow(

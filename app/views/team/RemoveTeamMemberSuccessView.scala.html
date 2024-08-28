@@ -22,7 +22,7 @@
     govukPanel: GovukPanel
 )
 
-@(team: Team, user: UserModel)(implicit request: Request[_], messages: Messages)
+@(team: Team, user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("manageTeam.removeTeamMember.success.title", team.name)), user = Some(user), showBackLink = false) {
     @govukPanel(Panel(

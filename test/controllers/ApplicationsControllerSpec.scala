@@ -21,8 +21,9 @@ import controllers.ApplicationsControllerSpec.buildFixture
 import controllers.actions.FakeUser
 import models.application.{Application, Creator, TeamMember}
 import models.user.UserModel
-import org.mockito.ArgumentMatchers.any
-import org.mockito.{ArgumentMatchers, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -51,7 +52,7 @@ class ApplicationsControllerSpec extends SpecBase with MockitoSugar with HtmlVal
 
       running(fixture.application) {
 
-        when(fixture.mockApiHubService.getApplications(ArgumentMatchers.eq(Some(testEmail)), ArgumentMatchers.eq(false))(any()))
+        when(fixture.mockApiHubService.getApplications(eqTo(Some(testEmail)), eqTo(false))(any()))
           .thenReturn(Future.successful(applications))
 
         val request = FakeRequest(GET, routes.ApplicationsController.onPageLoad.url)
@@ -78,9 +79,9 @@ class ApplicationsControllerSpec extends SpecBase with MockitoSugar with HtmlVal
         status(result) mustEqual INTERNAL_SERVER_ERROR
         contentAsString(result) mustBe
           view(
-            "Sorry, we are experiencing technical difficulties - 500",
-            "Sorry, we’re experiencing technical difficulties",
-            "Please try again in a few minutes."
+            "Sorry, there is a problem with the service - 500",
+            "Sorry, there is a problem with the service",
+            "Try again later."
           )(request, messages(fixture.application))
             .toString()
         contentAsString(result) must validateAsHtml

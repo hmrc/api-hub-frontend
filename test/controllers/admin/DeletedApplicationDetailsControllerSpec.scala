@@ -22,8 +22,9 @@ import controllers.routes
 import generators.AccessRequestGenerator
 import models.application._
 import models.user.UserModel
-import org.mockito.ArgumentMatchers.any
-import org.mockito.{ArgumentMatchers, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -41,15 +42,15 @@ class DeletedApplicationDetailsControllerSpec extends SpecBase with MockitoSugar
   "DeletedApplicationDetailsController Controller" - {
     "must return OK and the correct view for a GET for a support user" in {
       forAll(usersWhoCanSupport) {
-        user: UserModel =>
+        (user: UserModel) =>
           val fixture = buildFixture(userModel = user)
           val deletedApplication = FakeApplication.copy(deleted = Some(Deleted(LocalDateTime.now, "delete@example.com")))
           val accessRequests = Seq(sampleAccessRequest())
 
-          when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(deletedApplication.id), ArgumentMatchers.eq(false), ArgumentMatchers.eq(true))(any()))
+          when(fixture.apiHubService.getApplication(eqTo(deletedApplication.id), eqTo(false), eqTo(true))(any()))
             .thenReturn(Future.successful(Some(deletedApplication)))
 
-          when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(deletedApplication.id)), ArgumentMatchers.eq(None))(any()))
+          when(fixture.apiHubService.getAccessRequests(eqTo(Some(deletedApplication.id)), eqTo(None))(any()))
             .thenReturn(Future.successful(accessRequests))
 
           running(fixture.playApplication) {
@@ -66,16 +67,16 @@ class DeletedApplicationDetailsControllerSpec extends SpecBase with MockitoSugar
 
     "must sort the access requests, most recent first" in {
       forAll(usersWhoCanSupport) {
-        user: UserModel =>
+        (user: UserModel) =>
           val fixture = buildFixture(userModel = user)
           val deletedApplication = FakeApplication.copy(deleted = Some(Deleted(LocalDateTime.now, "delete@example.com")))
           val unsortedAccessRequests = Seq(sampleAccessRequest())
           val sortedAccessRequests = unsortedAccessRequests.sortBy(_.requested).reverse
 
-          when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(deletedApplication.id), ArgumentMatchers.eq(false), ArgumentMatchers.eq(true))(any()))
+          when(fixture.apiHubService.getApplication(eqTo(deletedApplication.id), eqTo(false), eqTo(true))(any()))
             .thenReturn(Future.successful(Some(deletedApplication)))
 
-          when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(deletedApplication.id)), ArgumentMatchers.eq(None))(any()))
+          when(fixture.apiHubService.getAccessRequests(eqTo(Some(deletedApplication.id)), eqTo(None))(any()))
             .thenReturn(Future.successful(unsortedAccessRequests))
 
           running(fixture.playApplication) {
@@ -92,10 +93,10 @@ class DeletedApplicationDetailsControllerSpec extends SpecBase with MockitoSugar
 
     "must return 404 Not Found when the application does not exist" in {
       forAll(usersWhoCanSupport) {
-        user: UserModel =>
+        (user: UserModel) =>
           val fixture = buildFixture(user)
 
-          when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), any(), any())(any()))
+          when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), any(), any())(any()))
             .thenReturn(Future.successful(None))
 
           running(fixture.playApplication) {
@@ -118,10 +119,10 @@ class DeletedApplicationDetailsControllerSpec extends SpecBase with MockitoSugar
 
     "must redirect to Unauthorised page for a GET when user is not a supporter" in {
       forAll(usersWhoCannotSupport) {
-        user: UserModel =>
+        (user: UserModel) =>
           val fixture = buildFixture(userModel = user)
 
-          when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(false), ArgumentMatchers.eq(true))(any()))
+          when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false), eqTo(true))(any()))
             .thenReturn(Future.successful(Some(FakeApplication)))
 
           running(fixture.playApplication) {

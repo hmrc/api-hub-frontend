@@ -85,7 +85,7 @@ object TestOnlySignInController {
         .verifying("fake-sign-in.username.error.required", _.trim.nonEmpty),
       "email" -> email,
       "token" -> optional(
-        text.transform(Token.apply, unlift(Token.unapply))
+        text.transform[Token](Token.apply, o => o.value)
       ),
       "redirectUrl" -> text
         .verifying("fake-sign-in.redirectUrl.error.required", value => Option(value).nonEmpty && value.trim.nonEmpty)
@@ -95,9 +95,9 @@ object TestOnlySignInController {
           "resourceTypes"     -> text,
           "resourceLocations" -> text,
           "actions"           -> text.transform[List[String]](_.split(",").toList, _.mkString(","))
-        )(Permission.apply)(Permission.unapply))
+        )(Permission.apply)(o => Some(Tuple.fromProductTyped(o))))
         .transform[List[Permission]](_.filter(p => p.resourceType.nonEmpty && p.resourceLocation.nonEmpty), identity)
-    )(TestOnlySignInData.apply)(TestOnlySignInData.unapply)
+    )(TestOnlySignInData.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 
   def signInFormWithRedirectUrl(redirectUrl: String): Form[TestOnlySignInData] =

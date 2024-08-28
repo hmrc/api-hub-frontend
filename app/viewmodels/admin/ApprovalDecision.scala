@@ -29,7 +29,7 @@ object Decision extends Enumerable.Implicits {
   val values: Seq[Decision] = Seq(Approve, Reject)
 
   implicit val enumerable: Enumerable[Decision] =
-    Enumerable(values.map(v => v.toString -> v): _*)
+    Enumerable(values.map(v => v.toString -> v)*)
 
 }
 

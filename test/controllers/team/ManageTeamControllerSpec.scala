@@ -24,7 +24,9 @@ import models.application.TeamMember
 import models.team.Team
 import models.team.TeamLenses._
 import models.user.{LdapUser, UserModel}
-import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{verify, when}
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -38,14 +40,14 @@ import views.html.team.ManageTeamView
 import java.time.LocalDateTime
 import scala.concurrent.Future
 
-class ManageTeamControllerSpec extends SpecBase with MockitoSugar with ArgumentMatchersSugar with TestHelpers with HtmlValidation {
+class ManageTeamControllerSpec extends SpecBase with MockitoSugar with TestHelpers with HtmlValidation {
 
   "ManageTeamController.onPageLoad" - {
     "must return OK and the correct view for a team member or supporter" in {
       val team = Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email.value)))
 
       forAll(teamMemberAndSupporterTable) {
-        user: UserModel =>
+        (user: UserModel) =>
           val fixture = buildFixture(userModel = user)
 
           when(fixture.apiHubService.findTeamById(any)(any)).thenReturn(Future.successful(Some(team)))

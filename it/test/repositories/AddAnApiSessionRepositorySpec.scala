@@ -28,7 +28,7 @@ class AddAnApiSessionRepositorySpec extends UserAnswersRepositoryBehaviours {
   )
 
   "AddAnApiSessionRepository" - {
-    behave like userAnswersRepository(repository)
+    behave like userAnswersRepository(repository.asInstanceOf[UserAnswersRepository])
   }
 
 }

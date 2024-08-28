@@ -24,7 +24,7 @@ govukButton: GovukButton,
 govukPanel: GovukPanel
 )
 
-@(application: Application, api: ApiDetail, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+@(application: Application, api: ApiDetail, user: Option[UserModel])(implicit request: Request[?], messages: Messages)
 
 @applicationLink(application: Application) = {
     <a id='applicationLink' href='@applicationLinkUrl(application)' class='govuk-link govuk-link--no-visited-state' data-application-id='@application.id'>

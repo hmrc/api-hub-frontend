@@ -20,7 +20,9 @@ import base.SpecBase
 import controllers.routes
 import generators.ApplicationGenerator
 import models.user.UserModel
-import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
@@ -34,7 +36,6 @@ import scala.concurrent.Future
 class ApplicationSupportControllerSpec
   extends SpecBase
     with MockitoSugar
-    with ArgumentMatchersSugar
     with TestHelpers
     with ApplicationGenerator {
 

@@ -24,8 +24,7 @@ import models.api.{ApiDetail, Endpoint, EndpointMethod, Live, Maintainer}
 import models.application.ApplicationLenses.ApplicationLensOps
 import models.application._
 import models.user.UserModel
-import org.mockito.ArgumentMatchers
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.AccessRequestApplicationIdPage
@@ -49,7 +48,7 @@ class RequestProductionAccessStartControllerSpec extends SpecBase with MockitoSu
       val fixture = buildFixture()
       val application: Application = anApplication
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any(), any())(any()))
+      when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))
         .thenReturn(Future.successful(Some(application)))
 
       when(fixture.accessRequestSessionRepository.set(any())).thenReturn(Future.successful(true))
@@ -63,7 +62,7 @@ class RequestProductionAccessStartControllerSpec extends SpecBase with MockitoSu
         val expected = UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
           .set(AccessRequestApplicationIdPage, application).toOption.value
 
-        verify(fixture.accessRequestSessionRepository).set(ArgumentMatchers.eq(expected))
+        verify(fixture.accessRequestSessionRepository).set(eqTo(expected))
       }
     }
 
@@ -71,7 +70,7 @@ class RequestProductionAccessStartControllerSpec extends SpecBase with MockitoSu
       val fixture = buildFixture()
       val application: Application = anApplication
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any(), any())(any()))
+      when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))
         .thenReturn(Future.successful(Some(application)))
 
 
@@ -90,7 +89,7 @@ class RequestProductionAccessStartControllerSpec extends SpecBase with MockitoSu
       val fixture = buildFixture(FakeUserNotTeamMember)
       val application: Application = FakeApplication
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any(), any())(any()))
+      when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))
         .thenReturn(Future.successful(Some(application)))
 
       running(fixture.application) {

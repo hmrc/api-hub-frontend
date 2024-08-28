@@ -19,7 +19,7 @@
     govukButton: GovukButton
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@()(implicit request: Request[?], messages: Messages)
 
 @layout(
     pageTitle    = titleNoForm(messages("signedOut.title")),
@@ -34,8 +34,8 @@
 
     <p class="govuk-body">
         @govukButton(
-            ButtonViewModel(messages("site.signIn"))
-                .asLink(routes.IndexController.onPageLoad.url)
+        ButtonViewModel(messages("site.signIn"))
+        .asLink(routes.IndexController.onPageLoad.url)
         )
     </p>
 }

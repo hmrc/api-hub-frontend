@@ -32,7 +32,7 @@ class ApprovalDecisionFormProvider @Inject() extends Mappings {
       mapping(
         "decision" -> enumerable[Decision](requiredKey = "accessRequest.decision.required", invalidKey = "accessRequest.decision.invalid"),
         "rejectedReason" -> Forms.optional(Forms.text)
-      )(ApprovalDecision.apply)(ApprovalDecision.unapply)
+      )(ApprovalDecision.apply)(o => Some(Tuple.fromProductTyped(o)))
     )
   }
 

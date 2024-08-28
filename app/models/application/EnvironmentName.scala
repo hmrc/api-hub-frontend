@@ -28,6 +28,6 @@ object EnvironmentName extends Enumerable.Implicits {
   val values: Seq[EnvironmentName] = Seq(Primary, Secondary)
 
   implicit val enumerable: Enumerable[EnvironmentName] =
-    Enumerable(values.map(value => value.toString -> value): _*)
+    Enumerable(values.map(value => value.toString -> value)*)
 
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package routes
+package oldRoutes
 
 import generators.Generators
 import org.scalacheck.Gen
@@ -31,7 +31,7 @@ import play.api.test._
 
 import scala.language.implicitConversions
 
-class OldRoutesSpec
+class RoutesSpec
   extends AnyWordSpec
     with Matchers
     with WsScalaTestClient
@@ -44,7 +44,7 @@ class OldRoutesSpec
       .configure(testData.configMap ++ Map("play.http.router" -> "prod.Routes"))
       .build()
 
-  "OldRoutes" should {
+  "Routes" should {
     "redirect to the new url" in {
       forAll(genIntersperseString(Gen.alphaLowerStr, "/") -> "path") { path =>
         val response = route(app, FakeRequest("GET", s"/api-hub/$path")).get

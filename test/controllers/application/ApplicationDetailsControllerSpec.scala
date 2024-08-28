@@ -25,8 +25,9 @@ import models.application.{Api, Scope, SelectedEndpoint, TeamMember}
 import models.application.ApplicationLenses.ApplicationLensOps
 import models.team.Team
 import models.user.UserModel
-import org.mockito.ArgumentMatchers.any
-import org.mockito.{ArgumentMatchers, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -45,13 +46,13 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
   "ApplicationDetails Controller" - {
     "must return OK and the correct view for a GET for a team member or supporter" in {
       forAll(teamMemberAndSupporterTable) {
-        user: UserModel =>
+        (user: UserModel) =>
           val fixture = buildFixture(userModel = user)
 
-          when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(true), ArgumentMatchers.eq(false))(any()))
+          when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(true), eqTo(false))(any()))
             .thenReturn(Future.successful(Some(FakeApplication)))
 
-          when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(FakeApplication.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
+          when(fixture.apiHubService.getAccessRequests(eqTo(Some(FakeApplication.id)), eqTo(Some(Pending)))(any()))
             .thenReturn(Future.successful(Seq.empty))
 
           running(fixture.playApplication) {
@@ -72,13 +73,13 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
       val team = Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email.value)))
       val application = FakeApplication.setTeamId(team.id).setTeamName(team.name)
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), ArgumentMatchers.eq(true), ArgumentMatchers.eq(false))(any()))
+      when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(true), eqTo(false))(any()))
         .thenReturn(Future.successful(Some(application)))
 
-      when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(application.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
+      when(fixture.apiHubService.getAccessRequests(eqTo(Some(application.id)), eqTo(Some(Pending)))(any()))
         .thenReturn(Future.successful(Seq.empty))
 
-      when(fixture.apiHubService.findTeamById(ArgumentMatchers.eq(team.id))(any))
+      when(fixture.apiHubService.findTeamById(eqTo(team.id))(any))
         .thenReturn(Future.successful(Some(team)))
 
       running(fixture.playApplication) {
@@ -117,10 +118,10 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
 
       val fixture = buildFixture()
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any(), any())(any()))
+      when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))
         .thenReturn(Future.successful(Some(application)))
 
-      when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(application.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
+      when(fixture.apiHubService.getAccessRequests(eqTo(Some(application.id)), eqTo(Some(Pending)))(any()))
         .thenReturn(Future.successful(Seq.empty))
 
       running(fixture.playApplication) {
@@ -159,13 +160,13 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         ApplicationApi(apiDetail, Seq(ApplicationEndpoint("GET", "/test", Seq("test-scope"), Inaccessible, Accessible)), false)
       )
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), ArgumentMatchers.eq(true), ArgumentMatchers.eq(false))(any()))
+      when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(true), eqTo(false))(any()))
         .thenReturn(Future.successful(Some(application)))
 
-      when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(application.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
+      when(fixture.apiHubService.getAccessRequests(eqTo(Some(application.id)), eqTo(Some(Pending)))(any()))
         .thenReturn(Future.successful(Seq.empty))
 
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+      when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
       running(fixture.playApplication) {
@@ -187,13 +188,13 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         .addApi(Api(apiId, Seq(SelectedEndpoint("GET", "/test"))))
         .setSecondaryScopes(Seq(Scope("test-scope")))
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), ArgumentMatchers.eq(true), ArgumentMatchers.eq(false))(any()))
+      when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(true), eqTo(false))(any()))
         .thenReturn(Future.successful(Some(application)))
 
-      when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(application.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
+      when(fixture.apiHubService.getAccessRequests(eqTo(Some(application.id)), eqTo(Some(Pending)))(any()))
         .thenReturn(Future.successful(Seq.empty))
 
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiId))(any()))
+      when(fixture.apiHubService.getApiDetail(eqTo(apiId))(any()))
         .thenReturn(Future.successful(None))
 
       running(fixture.playApplication) {
@@ -210,7 +211,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
     "must return 404 Not Found when the application does not exist" in {
       val fixture = buildFixture()
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), any(), any())(any()))
+      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), any(), any())(any()))
         .thenReturn(Future.successful(None))
 
       running(fixture.playApplication) {
@@ -233,7 +234,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
     "must redirect to Unauthorised page for a GET when user is not a team member or supporter" in {
       val fixture = buildFixture(userModel = FakeUserNotTeamMember)
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(true), ArgumentMatchers.eq(false))(any()))
+      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(true), eqTo(false))(any()))
         .thenReturn(Future.successful(Some(FakeApplication)))
 
       running(fixture.playApplication) {

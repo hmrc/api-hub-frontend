@@ -22,13 +22,15 @@ import models.{CheckMode, UserAnswers}
 import models.application.TeamMember
 import models.exception.TeamNameNotUniqueException
 import models.team.{NewTeam, Team}
-import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.{verify, verifyNoInteractions, when}
 import org.scalatest.OptionValues
+import org.scalatestplus.mockito.MockitoSugar
 import pages.{CreateTeamMembersPage, CreateTeamNamePage}
-import play.api.{Application => PlayApplication}
+import play.api.Application as PlayApplication
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.CreateTeamSessionRepository
 import services.ApiHubService
 import utils.HtmlValidation
@@ -37,7 +39,7 @@ import views.html.team.CreateTeamSuccessView
 import java.time.LocalDateTime
 import scala.concurrent.Future
 
-class CreateTeamControllerSpec extends SpecBase with MockitoSugar with ArgumentMatchersSugar with HtmlValidation {
+class CreateTeamControllerSpec extends SpecBase with MockitoSugar with HtmlValidation {
 
   import CreateTeamControllerSpec._
 
@@ -91,7 +93,7 @@ class CreateTeamControllerSpec extends SpecBase with MockitoSugar with ArgumentM
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe controllers.team.routes.CreateTeamNameController.onPageLoad(CheckMode).url
 
-        verifyZeroInteractions(fixture.sessionRepository)
+        verifyNoInteractions(fixture.sessionRepository)
       }
     }
 

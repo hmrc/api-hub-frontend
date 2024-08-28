@@ -21,7 +21,7 @@
     govukPanel : GovukPanel
 )
 
-@(user: UserModel)(implicit request: Request[_], messages: Messages)
+@(user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @manageMyTeamsLink() = {
     <a href="@controllers.team.routes.ManageMyTeamsController.onPageLoad().url">@messages("teamUpdatedSuccessfully.linkText")</a>

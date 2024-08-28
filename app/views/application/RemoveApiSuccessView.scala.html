@@ -22,7 +22,7 @@
     govukPanel: GovukPanel
 )
 
-@(application: Application, user: UserModel)(implicit request: Request[_], messages: Messages)
+@(application: Application, user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @applicationLink() = {
     <a id="applicationLink" class="govuk-link govuk-link--no-visited-state" href="@controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id)">

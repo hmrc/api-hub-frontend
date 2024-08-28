@@ -63,7 +63,7 @@ class EnvironmentAndCredentialsController @Inject()(
       deleteCredential(id, clientId, Secondary, url)
   }
 
-  private def deleteCredential(id: String, clientId: String, environmentName: EnvironmentName, url: String)(implicit request: Request[_]) = {
+  private def deleteCredential(id: String, clientId: String, environmentName: EnvironmentName, url: String)(implicit request: Request[?]) = {
     apiHubService.deleteCredential(id, environmentName, clientId).map {
       case Right(Some(())) => Redirect(url)
       case Right(None) => credentialNotFound(id, clientId)
@@ -72,14 +72,14 @@ class EnvironmentAndCredentialsController @Inject()(
     }
   }
 
-  private def credentialNotFound(applicationId: String, clientId: String)(implicit request: Request[_]): Result = {
+  private def credentialNotFound(applicationId: String, clientId: String)(implicit request: Request[?]): Result = {
     errorResultBuilder.notFound(
       heading = Messages("environmentAndCredentials.credentialNotFound.heading"),
       message = Messages("environmentAndCredentials.credentialNotFound.message", clientId, applicationId)
     )
   }
 
-  private def lastCredential()(implicit request: Request[_]): Result = {
+  private def lastCredential()(implicit request: Request[?]): Result = {
     errorResultBuilder.badRequest(
       heading = Messages("environmentAndCredentials.cannotDeleteLastCredential.heading"),
       message = Messages("environmentAndCredentials.cannotDeleteLastCredential.message")

@@ -23,7 +23,8 @@ import forms.admin.ApprovalDecisionFormProvider
 import generators.AccessRequestGenerator
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
-import org.mockito.{ArgumentMatchers, MockitoSugar}
+import org.mockito.Mockito.{verify, when}
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.FormError
 import play.api.i18n.Messages
 import play.api.inject.bind
@@ -65,8 +66,8 @@ class AccessRequestControllerSpec
           contentAsString(result) mustBe view(accessRequest, FakeApplication, AccessRequestEndpointGroups.group(accessRequest), form, user).toString()
           contentAsString(result) must validateAsHtml
 
-          verify(fixture.apiHubService).getAccessRequest(ArgumentMatchers.eq(accessRequest.id))(any())
-          verify(fixture.apiHubService).getApplication(ArgumentMatchers.eq(accessRequest.applicationId), eqTo(false), eqTo(true))(any())
+          verify(fixture.apiHubService).getAccessRequest(eqTo(accessRequest.id))(any())
+          verify(fixture.apiHubService).getApplication(eqTo(accessRequest.applicationId), eqTo(false), eqTo(true))(any())
         }
       }
     }
@@ -150,7 +151,7 @@ class AccessRequestControllerSpec
         status(result) mustBe OK
         contentAsString(result) mustBe view(FakeApprover).toString()
         contentAsString(result) must validateAsHtml
-        verify(fixture.apiHubService).approveAccessRequest(ArgumentMatchers.eq(id), ArgumentMatchers.eq(FakeApprover.email.value))(any())
+        verify(fixture.apiHubService).approveAccessRequest(eqTo(id), eqTo(FakeApprover.email.value))(any())
       }
     }
 
@@ -172,9 +173,9 @@ class AccessRequestControllerSpec
         contentAsString(result) mustBe view(FakeApprover).toString()
         contentAsString(result) must validateAsHtml
         verify(fixture.apiHubService).rejectAccessRequest(
-          ArgumentMatchers.eq(id),
-          ArgumentMatchers.eq(FakeApprover.email.value),
-          ArgumentMatchers.eq(rejectedReason)
+          eqTo(id),
+          eqTo(FakeApprover.email.value),
+          eqTo(rejectedReason)
         )(any())
       }
     }

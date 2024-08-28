@@ -26,7 +26,7 @@
     govukTable: GovukTable
 )
 
-@(team: Team, teamMember: TeamMember, encryptedEmail: String, user: UserModel, form: Form[_])(implicit request: Request[_], messages: Messages)
+@(team: Team, teamMember: TeamMember, encryptedEmail: String, user: UserModel, form: Form[?])(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("manageTeam.removeTeamMember.title", team.name)), user = Some(user)) {
 

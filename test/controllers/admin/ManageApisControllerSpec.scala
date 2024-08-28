@@ -20,12 +20,15 @@ import base.SpecBase
 import controllers.routes
 import generators.ApiDetailGenerators
 import models.user.UserModel
-import org.mockito.{ArgumentMatchers, ArgumentMatchersSugar, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any, same, eq as eqTo}
+import org.mockito.Mockito.{verify, when}
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import play.api.{Application => PlayApplication}
+import play.api.test.Helpers.*
+import play.api.Application as PlayApplication
 import services.ApiHubService
+import uk.gov.hmrc.http.HeaderCarrier
 import utils.{HtmlValidation, TestHelpers}
 import views.html.admin.ManageApisView
 
@@ -34,7 +37,6 @@ import scala.concurrent.Future
 class ManageApisControllerSpec
   extends SpecBase
     with MockitoSugar
-    with ArgumentMatchersSugar
     with TestHelpers
     with ApiDetailGenerators
     with HtmlValidation {
@@ -53,7 +55,7 @@ class ManageApisControllerSpec
 
           status(result) mustBe OK
 
-          verify(fixture.apiHubService).getApis(ArgumentMatchers.eq(None))(any)
+          verify(fixture.apiHubService).getApis(any)(any)
 
           val view = fixture.playApplication.injector.instanceOf[ManageApisView]
           contentAsString(result) mustBe view(apis, user)(request, messages(fixture.playApplication)).toString()

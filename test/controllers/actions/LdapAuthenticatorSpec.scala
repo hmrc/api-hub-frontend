@@ -18,9 +18,11 @@ package controllers.actions
 
 import controllers.actions.LdapAuthenticatorSpec._
 import models.user.{LdapUser, Permissions, UserModel}
-import org.mockito.{ArgumentMatchers, MockitoSugar}
+import org.mockito.ArgumentMatchers.{eq => eqTo}
+import org.mockito.Mockito.when
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.http.Status
 import play.api.mvc.{AnyContentAsEmpty, ControllerComponents}
 import play.api.test.FakeRequest
@@ -48,7 +50,7 @@ class LdapAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSuga
         permissions = Permissions(canApprove = false, canSupport = false, isPrivileged = false)
       )
 
-      when(mockStubBehaviour.stubAuth(ArgumentMatchers.eq(None), ArgumentMatchers.eq(retrieval)))
+      when(mockStubBehaviour.stubAuth(eqTo(None), eqTo(retrieval)))
         .thenReturn(Future.successful(retrievalsForUser(user)))
 
       ldapAuthenticator.authenticate()(requestWithAuthorisation).map {
@@ -71,7 +73,7 @@ class LdapAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSuga
         permissions = Permissions(canApprove = true, canSupport = false, isPrivileged = false)
       )
 
-      when(mockStubBehaviour.stubAuth(ArgumentMatchers.eq(None), ArgumentMatchers.eq(retrieval)))
+      when(mockStubBehaviour.stubAuth(eqTo(None), eqTo(retrieval)))
         .thenReturn(Future.successful(retrievalsForUser(user)))
 
       ldapAuthenticator.authenticate()(requestWithAuthorisation).map {
@@ -94,7 +96,7 @@ class LdapAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSuga
         permissions = Permissions(canApprove = false, canSupport = true, isPrivileged = false)
       )
 
-      when(mockStubBehaviour.stubAuth(ArgumentMatchers.eq(None), ArgumentMatchers.eq(retrieval)))
+      when(mockStubBehaviour.stubAuth(eqTo(None), eqTo(retrieval)))
         .thenReturn(Future.successful(retrievalsForUser(user)))
 
       ldapAuthenticator.authenticate()(requestWithAuthorisation).map {
@@ -117,7 +119,7 @@ class LdapAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSuga
         permissions = Permissions(canApprove = false, canSupport = false, isPrivileged = true)
       )
 
-      when(mockStubBehaviour.stubAuth(ArgumentMatchers.eq(None), ArgumentMatchers.eq(retrieval)))
+      when(mockStubBehaviour.stubAuth(eqTo(None), eqTo(retrieval)))
         .thenReturn(Future.successful(retrievalsForUser(user)))
 
       ldapAuthenticator.authenticate()(requestWithAuthorisation).map {
@@ -132,7 +134,7 @@ class LdapAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSuga
       val stubAuth = FrontendAuthComponentsStub(mockStubBehaviour)
       val ldapAuthenticator = new LdapAuthenticator(stubAuth)
 
-      when(mockStubBehaviour.stubAuth(ArgumentMatchers.eq(None), ArgumentMatchers.eq(retrieval)))
+      when(mockStubBehaviour.stubAuth(eqTo(None), eqTo(retrieval)))
         .thenReturn(Future.failed(UpstreamErrorResponse("Unauthorised", Status.UNAUTHORIZED)))
 
       ldapAuthenticator.authenticate()(requestWithAuthorisation).map {

@@ -106,14 +106,14 @@ class AddAnApiCompleteController @Inject()(
     }
   }
 
-  private def applicationNotFound(applicationId: String)(implicit request: Request[_]): Result = {
+  private def applicationNotFound(applicationId: String)(implicit request: Request[?]): Result = {
     errorResultBuilder.notFound(
       heading = Messages("site.applicationNotFoundHeading"),
       message = Messages("site.applicationNotFoundMessage", applicationId)
     )
   }
 
-  private def badGateway(t: Throwable)(implicit request: Request[_]): Result = {
+  private def badGateway(t: Throwable)(implicit request: Request[?]): Result = {
     errorResultBuilder.internalServerError(Messages("addAnApiComplete.failed"), t)
   }
 

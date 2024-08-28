@@ -20,8 +20,10 @@ import base.SpecBase
 import models.requests.{ApiRequest, IdentifierRequest}
 import models.team.Team
 import models.user.UserModel
-import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{never, verify, when}
 import org.scalatest.matchers.must.Matchers
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.Application
 import play.api.inject.bind
 import play.api.mvc.{AnyContentAsEmpty, Result, Results}
@@ -34,7 +36,7 @@ import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class ApiAuthActionSpec extends SpecBase with Matchers with MockitoSugar with ArgumentMatchersSugar {
+class ApiAuthActionSpec extends SpecBase with Matchers with MockitoSugar {
 
   "ApiAuthAction" - {
     "if API does not exist then it returns a 404" in {

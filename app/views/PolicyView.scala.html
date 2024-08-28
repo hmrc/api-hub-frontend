@@ -16,7 +16,7 @@
 
 @this()
 
-@()(implicit request: Request[_], messages: Messages)
+@()(implicit request: Request[?], messages: Messages)
 
 @bullet(i: Int) = {
  <li>@messages(s"policyDeclaration.bullet.$i")</li>

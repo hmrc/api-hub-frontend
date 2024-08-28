@@ -88,13 +88,13 @@ class RegisterApplicationTeamController @Inject()(
     )
   }
 
-  private def noEmail()(implicit request: Request[_]): Future[Result] = {
+  private def noEmail()(implicit request: Request[?]): Future[Result] = {
     Future.successful(
       errorResultBuilder.internalServerError(Messages("site.noEmail"))
     )
   }
 
-  private def teamNotFound(teamId: String)(implicit request: Request[_]): Future[Result] = {
+  private def teamNotFound(teamId: String)(implicit request: Request[?]): Future[Result] = {
     Future.successful(errorResultBuilder.teamNotFound(teamId))
   }
 

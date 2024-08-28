@@ -24,7 +24,7 @@
     govukSummaryList: GovukSummaryList,
 )
 
-@(teamMemberDetails: SummaryList, user: UserModel)(implicit request: Request[_], messages: Messages)
+@(teamMemberDetails: SummaryList, user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("createTeamManageMembers.title")), fullWidth = true, user = Some(user)) {
     <div class="govuk-grid-row">
@@ -32,13 +32,13 @@
             <h1 class="govuk-heading-l">@messages("createTeamManageMembers.heading", teamMemberDetails.rows.size)</h1>
         </div>
         <div class="govuk-grid-column-one-half govuk-!-text-align-right">
-        @govukButton(
+            @govukButton(
             Button(
-                classes = "govuk-button--secondary",
-                content = messages("createTeamManageMembers.addTeamMember"),
-                href = Some(controllers.team.routes.CreateTeamMemberController.onPageLoad().url)
+            classes = "govuk-button--secondary",
+            content = messages("createTeamManageMembers.addTeamMember"),
+            href = Some(controllers.team.routes.CreateTeamMemberController.onPageLoad().url)
             ).withId("addTeamMemberButton")
-        )
+            )
         </div>
     </div>
 

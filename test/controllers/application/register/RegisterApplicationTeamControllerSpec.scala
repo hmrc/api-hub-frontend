@@ -23,7 +23,9 @@ import forms.application.register.RegisterApplicationTeamFormProvider
 import generators.TeamGenerator
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{verify, when}
+import org.scalatestplus.mockito.MockitoSugar
 import pages.application.register.RegisterApplicationTeamPage
 import play.api.inject.bind
 import play.api.mvc.Call
@@ -38,7 +40,7 @@ import views.html.application.register.RegisterApplicationTeamView
 
 import scala.concurrent.Future
 
-class RegisterApplicationTeamControllerSpec extends SpecBase with MockitoSugar with ArgumentMatchersSugar with TeamGenerator with HtmlValidation {
+class RegisterApplicationTeamControllerSpec extends SpecBase with MockitoSugar with TeamGenerator with HtmlValidation {
 
   private def onwardRoute = Call("GET", "/foo")
 
@@ -94,7 +96,7 @@ class RegisterApplicationTeamControllerSpec extends SpecBase with MockitoSugar w
       val fixture = buildFixture(userAnswers = Some(emptyUserAnswers))
       val team = sampleTeam()
 
-      when(fixture.sessionRepository.set(any)) thenReturn Future.successful(true)
+      when(fixture.sessionRepository.set(any)).thenReturn(Future.successful(true))
       when(fixture.apiHubService.findTeamById(any)(any)).thenReturn(Future.successful(Some(team)))
 
       running(fixture.playApplication) {

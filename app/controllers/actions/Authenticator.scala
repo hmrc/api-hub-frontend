@@ -22,6 +22,6 @@ import scala.concurrent.Future
 
 trait Authenticator {
 
-  def authenticate()(implicit request: Request[_]): Future[UserAuthResult]
+  def authenticate()(implicit request: Request[?]): Future[UserAuthResult]
 
 }

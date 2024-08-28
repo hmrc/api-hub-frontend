@@ -35,11 +35,11 @@ case class TokenData(
 object TestOnlyAddTokenRequest {
   val format: OFormat[TestOnlyAddTokenRequest] = {
     implicit val pf: OFormat[Permission] = Permission.format
-    ( (__ \ "token"      ).formatNullable[String].inmap[Option[Token]](_.map(Token.apply), _.map(unlift(Token.unapply)))
+    ( (__ \ "token"      ).formatNullable[String].inmap[Option[Token]](_.map(Token.apply), _.map(_.value))
       ~ (__ \ "principal"  ).format[String]
       ~ (__ \ "email").format[String]
       ~ (__ \ "permissions").format[Set[Permission]]
-      )(TestOnlyAddTokenRequest.apply, unlift(TestOnlyAddTokenRequest.unapply))
+      )(TestOnlyAddTokenRequest.apply, o => Tuple.fromProductTyped(o))
   }
 }
 
@@ -49,6 +49,6 @@ object TokenData {
     ( (__ \ "principal"  ).format[String]
       ~ (__ \ "permissions").format[Set[Permission]]
       ~ (__ \ "email").format[String]
-      )(TokenData.apply, unlift(TokenData.unapply))
+      )(TokenData.apply, o => Tuple.fromProductTyped(o))
   }
 }

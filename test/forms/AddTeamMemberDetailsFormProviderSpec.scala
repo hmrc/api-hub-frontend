@@ -45,7 +45,7 @@ class AddTeamMemberDetailsFormProviderSpec extends StringFieldBehaviours {
 
     "must not accept invalid entry" in {
       forAll(Gen.alphaLowerStr -> "invalidEmail") {
-        email: String =>
+        (email: String) =>
           val result = form.bind(Map(fieldName -> email)).apply(fieldName)
           result.errors mustBe Seq(FormError(fieldName, invalidKey))
       }
@@ -53,7 +53,7 @@ class AddTeamMemberDetailsFormProviderSpec extends StringFieldBehaviours {
 
     "must not accept non-HMRC email addresses" in {
       forAll(arbitraryNonHmrcEmail.arbitrary -> "invalidEmail") {
-        email: String =>
+        (email: String) =>
           val result = form.bind(Map(fieldName -> email)).apply(fieldName)
           result.errors mustBe Seq(FormError(fieldName, invalidKey))
       }

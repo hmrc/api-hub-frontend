@@ -25,7 +25,9 @@ import models.exception.TeamNameNotUniqueException
 import models.team.Team
 import models.user.UserModel
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{verify, when}
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.Application
 import play.api.data.FormError
 import play.api.inject.bind
@@ -39,7 +41,7 @@ import views.html.team.{ChangeTeamNameView, TeamUpdatedSuccessfullyView}
 import java.time.LocalDateTime
 import scala.concurrent.Future
 
-class ChangeTeamNameControllerSpec extends SpecBase with MockitoSugar with ArgumentMatchersSugar with HtmlValidation{
+class ChangeTeamNameControllerSpec extends SpecBase with MockitoSugar with HtmlValidation{
 
   private def onwardRoute = Call("GET", "/foo")
 

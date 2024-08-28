@@ -30,7 +30,7 @@
     govukTextarea : GovukTextarea
 )
 
-@(accessRequest: AccessRequest, application: Application, endpointGroups: Seq[AccessRequestEndpointGroup], form: Form[_], user: UserModel)(implicit request: Request[_], messages: Messages)
+@(accessRequest: AccessRequest, application: Application, endpointGroups: Seq[AccessRequestEndpointGroup], form: Form[?], user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @canApprove() = @{
     accessRequest.status == Pending && user.permissions.canApprove
@@ -220,12 +220,12 @@
 
             <div class="govuk-button-group">
                 @govukButton(Button(
-                    content = Text(messages("site.continue"))
+                content = Text(messages("site.continue"))
                 ))
                 @govukButton(Button(
-                    classes = "govuk-button--secondary",
-                    content = Text(messages("site.cancel")),
-                    href = Some(controllers.admin.routes.AccessRequestsController.onPageLoad().url)
+                classes = "govuk-button--secondary",
+                content = Text(messages("site.cancel")),
+                href = Some(controllers.admin.routes.AccessRequestsController.onPageLoad().url)
                 ))
             </div>
         }

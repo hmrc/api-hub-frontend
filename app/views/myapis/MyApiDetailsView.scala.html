@@ -26,7 +26,7 @@
         apiDeployments: ApiDeployments
 )
 
-@(apiDetail: ApiDetail, deploymentStatuses: ApiDeploymentStatuses, user: UserModel, supportEmailAddress: String, teamName: Option[String])(implicit request: Request[_], messages: Messages)
+@(apiDetail: ApiDetail, deploymentStatuses: ApiDeploymentStatuses, user: UserModel, supportEmailAddress: String, teamName: Option[String])(implicit request: Request[?], messages: Messages)
 
 @supportEmailLink() = {
     <a href="mailto:@supportEmailAddress" class="govuk-link">@supportEmailAddress</a>

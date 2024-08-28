@@ -26,7 +26,7 @@
         policyView: PolicyView
 )
 
-@(form: Form[_], mode: Mode, context: AddAnApiContext, apiDetail: ApiDetail)(implicit request: Request[_], messages: Messages)
+@(form: Form[?], mode: Mode, context: AddAnApiContext, apiDetail: ApiDetail)(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = title(form, messages("apiPolicyConditionsDeclarationPage.title", apiDetail.title))) {
 
@@ -66,12 +66,12 @@
 
         <div class="govuk-button-group">
             @govukButton(
-                ButtonViewModel(messages("apiPolicyConditionsDeclarationPage.button.accept")).withId("acceptAndContinueButton")
+            ButtonViewModel(messages("apiPolicyConditionsDeclarationPage.button.accept")).withId("acceptAndContinueButton")
             )
             @govukButton(
-                ButtonViewModel(content = messages("apiPolicyConditionsDeclarationPage.button.cancel"))
-                        .asSecondaryButton()
-                        .asLink(routes.ApiDetailsController.onPageLoad(apiDetail.id).url)
+            ButtonViewModel(content = messages("apiPolicyConditionsDeclarationPage.button.cancel"))
+            .asSecondaryButton()
+            .asLink(routes.ApiDetailsController.onPageLoad(apiDetail.id).url)
             )
         </div>
 

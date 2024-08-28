@@ -30,7 +30,7 @@ class LdapAuthenticator @Inject()(
   auth: FrontendAuthComponents
 )(implicit ec: ExecutionContext) extends Authenticator with FrontendHeaderCarrierProvider {
 
-  def authenticate()(implicit request: Request[_]): Future[UserAuthResult] = {
+  def authenticate()(implicit request: Request[?]): Future[UserAuthResult] = {
     auth.verify(
       Retrieval.username ~
         Retrieval.email ~

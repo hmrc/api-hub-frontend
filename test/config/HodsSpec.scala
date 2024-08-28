@@ -16,13 +16,13 @@
 
 package config
 
-import controllers.IndexControllerSpec.convertToAnyMustWrapper
 import fakes.FakeHods
 import models.api.Hod
 import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.must.Matchers
 import play.api.Configuration
 
-class HodsSpec extends AnyFreeSpec {
+class HodsSpec extends AnyFreeSpec with Matchers {
 
   "getDescription" - {
     "returns item which matches specified code" in {

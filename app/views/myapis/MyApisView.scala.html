@@ -28,7 +28,7 @@
         paginator: Paginator
 )
 
-@(myApis: Seq[ApiDetail], user: UserModel)(implicit request: Request[_], messages: Messages)
+@(myApis: Seq[ApiDetail], user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @scripts() = {
     <script src='@routes.Assets.versioned("javascripts/myApis.js")' type="module" @{

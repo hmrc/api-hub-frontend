@@ -33,7 +33,7 @@
     applicationDetailsTable: ApplicationDetailsTable
 )
 
-@(form: Form[_], application: Application, owningTeam: Option[Team], teams: Seq[Team], user: UserModel)(implicit request: Request[_], messages: Messages)
+@(form: Form[?], application: Application, owningTeam: Option[Team], teams: Seq[Team], user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @scripts() = {
     @iconsLink()

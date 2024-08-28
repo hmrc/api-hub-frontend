@@ -103,13 +103,13 @@ class AddAnApiSelectApplicationController @Inject()(
     )
   }
 
-  private def noEmail()(implicit request: Request[_]): Future[Result] = {
+  private def noEmail()(implicit request: Request[?]): Future[Result] = {
     Future.successful(
       errorResultBuilder.internalServerError("The current user does not have an email address")
     )
   }
 
-  private def applicationNotFound(applicationId: String)(implicit request: Request[_]): Future[Result] = {
+  private def applicationNotFound(applicationId: String)(implicit request: Request[?]): Future[Result] = {
     Future.successful(
       errorResultBuilder.notFound(
         heading = Messages("site.applicationNotFoundHeading"),

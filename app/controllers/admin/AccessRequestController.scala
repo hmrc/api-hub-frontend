@@ -100,21 +100,21 @@ class AccessRequestController @Inject()(
     }
   }
 
-  private def accessRequestNotFound(accessRequestId: String)(implicit request: Request[_]): Result = {
+  private def accessRequestNotFound(accessRequestId: String)(implicit request: Request[?]): Result = {
     errorResultBuilder.notFound(
       heading = Messages("site.accessRequestNotFound.heading"),
       message = Messages("site.accessRequestNotFound.message", accessRequestId)
     )
   }
 
-  private def applicationNotFound(applicationId: String)(implicit request: Request[_]): Result = {
+  private def applicationNotFound(applicationId: String)(implicit request: Request[?]): Result = {
     errorResultBuilder.notFound(
       heading = Messages("site.applicationNotFoundHeading"),
       message = Messages("site.applicationNotFoundMessage", applicationId)
     )
   }
 
-  private def noEmail()(implicit request: Request[_]): Future[Result] = {
+  private def noEmail()(implicit request: Request[?]): Future[Result] = {
     Future.successful(
       errorResultBuilder.internalServerError("The current user does not have an email address")
     )

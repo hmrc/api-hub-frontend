@@ -24,7 +24,7 @@
     iconsLink: IconsLink
 )
 
-@(supportEmailAddress: String, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+@(supportEmailAddress: String, user: Option[UserModel])(implicit request: Request[?], messages: Messages)
 
  @whatInformationToProvide() = {
      <div class="govuk-details__text">

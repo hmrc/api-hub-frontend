@@ -26,7 +26,7 @@
         govukTextarea: GovukTextarea
 )
 
-@(form: Form[_], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+@(form: Form[?], user: Option[UserModel])(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = title(form, messages("provideSupportingInformation.title")), user = user) {
 
@@ -50,7 +50,7 @@
             value = form("value").value,
             errorMessage = form("value").error.map(
                 error =>
-                    ErrorMessage(content = Text(messages(error.message, error.args: _*))))
+                    ErrorMessage(content = Text(messages(error.message, error.args*))))
         ))
 
         @govukButton(

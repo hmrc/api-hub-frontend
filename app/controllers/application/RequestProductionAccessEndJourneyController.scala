@@ -115,7 +115,7 @@ class RequestProductionAccessEndJourneyController @Inject()(
     }
   }
 
-  private def badGateway(t: Throwable)(implicit request: Request[_]): Result = {
+  private def badGateway(t: Throwable)(implicit request: Request[?]): Result = {
     errorResultBuilder.internalServerError(Messages("addAnApiComplete.failed"), t)
   }
 }

@@ -39,7 +39,7 @@ class AddTeamMemberDetailsFormProvider @Inject() extends Mappings {
               hmrcEmailConstraint
             )
           )
-      )(email => TeamMember(email.trim.toLowerCase))(TeamMember.unapply)
+      )(email => TeamMember(email.trim.toLowerCase))(o => Some(o.email))
     )
 
 }

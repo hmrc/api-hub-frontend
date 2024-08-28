@@ -67,18 +67,18 @@ class AddTeamMemberController @Inject()(
       )
   }
 
-  private def badRequest(id: String, formWithErrors: Form[TeamMember])(implicit request: TeamRequest[_]): Future[Result] = {
+  private def badRequest(id: String, formWithErrors: Form[TeamMember])(implicit request: TeamRequest[?]): Future[Result] = {
     Future.successful(BadRequest(view(formWithErrors, controllers.team.routes.AddTeamMemberController.onSubmit(id), request.identifierRequest.user)))
   }
 
-  private def addTeamMember(id: String, teamMember: TeamMember, user: UserModel)(implicit request: Request[_]) = {
+  private def addTeamMember(id: String, teamMember: TeamMember, user: UserModel)(implicit request: Request[?]) = {
     apiHubService.addTeamMemberToTeam(id, teamMember).map {
       case Some(_) => Ok(successView(user))
       case _ => teamNotFound(id)
     }
   }
 
-  private def teamNotFound(id: String)(implicit request: Request[_]): Result = {
+  private def teamNotFound(id: String)(implicit request: Request[?]): Result = {
     errorResultBuilder.notFound(
       heading = Messages("site.teamNotFoundHeading"),
       message = Messages("site.teamNotFoundMessage", id)

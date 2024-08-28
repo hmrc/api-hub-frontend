@@ -76,7 +76,7 @@ class AddTeamMemberDetailsController @Inject()(
       )
   }
 
-  private def validateParameters(mode: Mode, index: Int, userAnswers: UserAnswers)(implicit request: Request[_]): Either[Result, Seq[TeamMember]] = {
+  private def validateParameters(mode: Mode, index: Int, userAnswers: UserAnswers)(implicit request: Request[?]): Either[Result, Seq[TeamMember]] = {
     (mode, index) match {
       case (NormalMode, 0) => Right(userAnswers.get(TeamMembersPage).getOrElse(Seq.empty))
       case (CheckMode, i) if i > 0 =>
@@ -97,7 +97,7 @@ class AddTeamMemberDetailsController @Inject()(
     }
   }
 
-  private def validateForm(index: Int, teamMembers: Seq[TeamMember])(implicit request: Request[_]): Form[TeamMember] = {
+  private def validateForm(index: Int, teamMembers: Seq[TeamMember])(implicit request: Request[?]): Form[TeamMember] = {
     form.bindFromRequest().fold(
       formWithErrors => formWithErrors,
       teamMember =>

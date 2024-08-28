@@ -27,7 +27,7 @@
     applicationDetailsTable: ApplicationDetailsTable
 )
 
-@(application: Application, maybeApplicationApis: Option[Seq[ApplicationApi]], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+@(application: Application, maybeApplicationApis: Option[Seq[ApplicationApi]], user: Option[UserModel])(implicit request: Request[?], messages: Messages)
 
 @exploreApisLink(messageId: String) = {
     <a id="addExploreApisLink" href="@{routes.ExploreApisController.onPageLoad().url}" class="govuk-link govuk-link--no-visited-state">

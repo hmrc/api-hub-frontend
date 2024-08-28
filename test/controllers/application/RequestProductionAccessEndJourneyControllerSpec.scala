@@ -24,8 +24,9 @@ import models.application.ApplicationLenses.ApplicationLensOps
 import models.application._
 import models.user.UserModel
 import models.{RequestProductionAccessDeclaration, UserAnswers}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.{ArgumentMatchers, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{verify, when}
+import org.scalatestplus.mockito.MockitoSugar
 import pages.{AccessRequestApplicationIdPage, ProvideSupportingInformationPage, RequestProductionAccessPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -49,7 +50,7 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
     "must return OK and the correct view for a GET for a team member or supporter and make the request and clear user answers " in {
 
       forAll(teamMemberAndSupporterTable) {
-        user: UserModel =>
+        (user: UserModel) =>
           val application = anApplication
           val userAnswers = buildUserAnswers(application)
           val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
@@ -62,10 +63,10 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
           )
           val expectedAccessRequest: AccessRequestRequest = AccessRequestRequest(application.id, "blah", user.email.get, accessRequestApis)
 
-          when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(application.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
+          when(fixture.apiHubService.getAccessRequests(eqTo(Some(application.id)), eqTo(Some(Pending)))(any()))
             .thenReturn(Future.successful(Seq.empty))
           when(fixture.apiHubService.getApiDetail(any())(any())).thenReturn(Future.successful(Some(anApiDetail)))
-          when(fixture.apiHubService.requestProductionAccess(ArgumentMatchers.eq(expectedAccessRequest))(any())).thenReturn(Future.successful(()))
+          when(fixture.apiHubService.requestProductionAccess(eqTo(expectedAccessRequest))(any())).thenReturn(Future.successful(()))
           when(fixture.accessRequestSessionRepository.clear(user.userId)).thenReturn(Future.successful(true))
 
           running(fixture.application) {
@@ -76,15 +77,15 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
             status(result) mustEqual OK
             contentAsString(result) mustBe view(application, Some(user), accessRequestApis)(request, messages(fixture.application)).toString
             contentAsString(result) must validateAsHtml
-            verify(fixture.apiHubService).requestProductionAccess(ArgumentMatchers.eq(expectedAccessRequest))(any())
-            verify(fixture.accessRequestSessionRepository).clear(ArgumentMatchers.eq(user.userId))
+            verify(fixture.apiHubService).requestProductionAccess(eqTo(expectedAccessRequest))(any())
+            verify(fixture.accessRequestSessionRepository).clear(eqTo(user.userId))
           }
       }
     }
 
     "will not request access for API endpoints whose scope is already held by the application " in {
       forAll(teamMemberAndSupporterTable) {
-        user: UserModel =>
+        (user: UserModel) =>
           val application = anApplication.setPrimaryScopes(Seq(Scope("test-scope"))) //decorate application with primary scope test-scope
           val userAnswers = buildUserAnswers(application)
           val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
@@ -96,10 +97,10 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
           )
           val expectedAccessRequest: AccessRequestRequest = AccessRequestRequest(application.id, "blah", user.email.get, accessRequestApis)
 
-          when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(application.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
+          when(fixture.apiHubService.getAccessRequests(eqTo(Some(application.id)), eqTo(Some(Pending)))(any()))
             .thenReturn(Future.successful(Seq.empty))
           when(fixture.apiHubService.getApiDetail(any())(any())).thenReturn(Future.successful(Some(anApiDetail)))
-          when(fixture.apiHubService.requestProductionAccess(ArgumentMatchers.eq(expectedAccessRequest))(any())).thenReturn(Future.successful(()))
+          when(fixture.apiHubService.requestProductionAccess(eqTo(expectedAccessRequest))(any())).thenReturn(Future.successful(()))
           when(fixture.accessRequestSessionRepository.clear(user.userId)).thenReturn(Future.successful(true))
 
           running(fixture.application) {
@@ -110,15 +111,15 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
             status(result) mustEqual OK
             contentAsString(result) mustBe view(application, Some(user), accessRequestApis)(request, messages(fixture.application)).toString
             contentAsString(result) must validateAsHtml
-            verify(fixture.apiHubService).requestProductionAccess(ArgumentMatchers.eq(expectedAccessRequest))(any())
-            verify(fixture.accessRequestSessionRepository).clear(ArgumentMatchers.eq(user.userId))
+            verify(fixture.apiHubService).requestProductionAccess(eqTo(expectedAccessRequest))(any())
+            verify(fixture.accessRequestSessionRepository).clear(eqTo(user.userId))
           }
       }
     }
 
     "must redirect to journey recovery when no application in user answers" in {
       forAll(teamMemberAndSupporterTable) {
-        user: UserModel =>
+        (user: UserModel) =>
 
           val userAnswers = UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
           val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
@@ -135,7 +136,7 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
 
     "must redirect to request production access page when no accept conditions in user answers" in {
       forAll(teamMemberAndSupporterTable) {
-        user: UserModel =>
+        (user: UserModel) =>
 
           val application = anApplication
           val userAnswers = UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant()).set(AccessRequestApplicationIdPage, application).toOption.value
@@ -153,7 +154,7 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
 
     "must redirect to provide supporting information page when no supporting information" in {
       forAll(teamMemberAndSupporterTable) {
-        user: UserModel =>
+        (user: UserModel) =>
 
           val application = anApplication
           val userAnswers = UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())

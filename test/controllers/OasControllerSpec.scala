@@ -21,10 +21,11 @@ import controllers.actions.FakeUser
 import generators.ApiDetailGenerators
 import models.api.{ApiDetail, Live, Maintainer}
 import models.user.UserModel
-import org.mockito.ArgumentMatchers.any
-import org.mockito.{ArgumentMatchers, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.when
 import org.scalatest.OptionValues
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.Application
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -53,7 +54,7 @@ class OasControllerSpec
 
         val apiDetail = ApiDetail("apiId", "pubRef", "an api", "a description", "1.0.0", Seq.empty, None, sampleOas, Live,
           reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
-        when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any())).thenReturn(Future.successful(Some(apiDetail)))
+        when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any())).thenReturn(Future.successful(Some(apiDetail)))
 
         val request = FakeRequest(GET, routes.OasRedocController.onPageLoad(apiDetail.id).url)
         val result = route(fixture.application, request).value
@@ -72,7 +73,7 @@ class OasControllerSpec
 
         val apiDetail = ApiDetail("apiId", "pubRef", "an api", "a description", "1.0.0", Seq.empty, None, sampleOas, Live,
           reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
-        when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+        when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
           .thenReturn(Future.successful(Some(apiDetail)))
 
         val request = FakeRequest(GET, routes.OasRedocController.onPageLoad(apiDetail.id).url)
@@ -92,7 +93,7 @@ class OasControllerSpec
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[ErrorTemplate]
 
-        when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(id))(any()))
+        when(fixture.apiHubService.getApiDetail(eqTo(id))(any()))
           .thenReturn(Future.successful(None))
 
         val request = FakeRequest(GET, routes.OasRedocController.onPageLoad(id).url)
@@ -120,7 +121,7 @@ class OasControllerSpec
 
           val apiDetail = ApiDetail("apiId", "pubRef", "an api", "a description", "1.0.0", Seq.empty, None, sampleOas, Live,
             reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
-          when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any())).thenReturn(Future.successful(Some(apiDetail)))
+          when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any())).thenReturn(Future.successful(Some(apiDetail)))
 
           val request = FakeRequest(GET, routes.OasRedocController.getOas(apiDetail.id).url)
           val result = route(fixture.application, request).value

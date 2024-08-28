@@ -28,7 +28,7 @@
     paginator: Paginator
 )
 
-@(applications: Seq[Application], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+@(applications: Seq[Application], user: Option[UserModel])(implicit request: Request[?], messages: Messages)
 
 @scripts() = {
     <script src='@routes.Assets.versioned("javascripts/yourApplications.js")' type="module" @{CSPNonce.attr}></script>

@@ -45,7 +45,7 @@ class ApiSupportController @Inject()(
         }
   }
 
-  private def buildApiDetail(apiDetail: ApiDetail)(implicit request: Request[_]): ApiDetail = {
+  private def buildApiDetail(apiDetail: ApiDetail)(implicit request: Request[?]): ApiDetail = {
     apiDetail.copy(
       openApiSpecification = controllers.routes.OasRedocController.getOas(apiDetail.id).absoluteURL()
     )

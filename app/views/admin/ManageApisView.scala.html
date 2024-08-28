@@ -31,7 +31,7 @@
     paginator: Paginator
 )
 
-@(apis: Seq[ApiDetail], user: UserModel)(implicit request: Request[_], messages: Messages)
+@(apis: Seq[ApiDetail], user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @scripts() = {
     @iconsLink()

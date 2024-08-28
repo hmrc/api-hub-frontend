@@ -23,7 +23,9 @@ import models.application.TeamMember
 import models.team.Team
 import models.team.TeamLenses._
 import models.user.UserModel
-import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{verify, when}
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.OptionValues
 import play.api.data.FormError
 import play.api.inject.bind
@@ -42,7 +44,6 @@ import scala.concurrent.Future
 class AddTeamMemberControllerSpec
   extends SpecBase
     with MockitoSugar
-    with ArgumentMatchersSugar
     with HtmlValidation
     with OptionValues
     with TestHelpers {
@@ -52,7 +53,7 @@ class AddTeamMemberControllerSpec
   "onPageLoad" - {
     "must return OK and the correct view for a GET" in {
       forAll(teamMemberAndSupporterTable) {
-        user: UserModel =>
+        (user: UserModel) =>
           val fixture = buildFixture(userModel = user)
 
           when(fixture.apiHubService.findTeamById(any)(any)).thenReturn(Future.successful(Some(team)))
@@ -87,7 +88,7 @@ class AddTeamMemberControllerSpec
   "onSubmit" - {
     "must add the team member and redirect to the Manage Team Members page when valid data is submitted" in {
       forAll(teamMemberAndSupporterTable) {
-        user: UserModel =>
+        (user: UserModel) =>
           val fixture = buildFixture(userModel = user)
 
           val email = "test.email@hmrc.gov.uk"

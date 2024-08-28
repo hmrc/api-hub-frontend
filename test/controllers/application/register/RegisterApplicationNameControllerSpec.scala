@@ -22,7 +22,9 @@ import controllers.routes
 import forms.application.register.RegisterApplicationNameFormProvider
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar
 import pages.application.register.RegisterApplicationNamePage
 import play.api.Application
 import play.api.inject.bind
@@ -36,7 +38,7 @@ import views.html.application.register.RegisterApplicationNameView
 
 import scala.concurrent.Future
 
-class RegisterApplicationNameControllerSpec extends SpecBase with MockitoSugar with ArgumentMatchersSugar with HtmlValidation{
+class RegisterApplicationNameControllerSpec extends SpecBase with MockitoSugar with HtmlValidation{
 
   private def onwardRoute = Call("GET", "/foo")
 
@@ -85,7 +87,7 @@ class RegisterApplicationNameControllerSpec extends SpecBase with MockitoSugar w
     "must redirect to the next page when valid data is submitted" in {
       val fixture = buildFixture(Some(emptyUserAnswers))
 
-      when(fixture.sessionRepository.set(any)) thenReturn Future.successful(true)
+      when(fixture.sessionRepository.set(any)).thenReturn(Future.successful(true))
 
       running(fixture.application) {
         val request = FakeRequest(POST, registerApplicationNameRoute).withFormUrlEncodedBody(("value", "answer"))

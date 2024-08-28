@@ -24,9 +24,10 @@ import generators.ApiDetailGenerators
 import models.api.{ApiDeploymentStatuses, ApiDetail, ContactInfo, ContactInformation, PlatformContact}
 import models.team.Team
 import models.user.UserModel
-import org.mockito.ArgumentMatchers.any
-import org.mockito.{ArgumentMatchers, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.when
 import org.scalatest.OptionValues
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import play.api.Application
 import play.api.inject.bind
@@ -58,9 +59,9 @@ class ApiDetailsControllerSpec
 
         forAll {(baseApiDetail: ApiDetail) =>
           val apiDetail = baseApiDetail.copy(platform = "HIP")
-          when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+          when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
             .thenReturn(Future.successful(Some(apiDetail)))
-          when(fixture.apiHubService.getApiDeploymentStatuses(ArgumentMatchers.eq(apiDetail.publisherReference))(any()))
+          when(fixture.apiHubService.getApiDeploymentStatuses(eqTo(apiDetail.publisherReference))(any()))
             .thenReturn(Future.successful(Some(apiDeploymentStatuses)))
 
           val request = FakeRequest(GET, routes.ApiDetailsController.onPageLoad(apiDetail.id).url)
@@ -90,9 +91,9 @@ class ApiDetailsControllerSpec
 
         forAll {(baseApiDetail: ApiDetail) =>
           val apiDetail = baseApiDetail.copy(platform = "OTHER", maintainer = baseApiDetail.maintainer.copy(contactInfo = List.empty))
-          when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+          when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
             .thenReturn(Future.successful(Some(apiDetail)))
-          when(fixture.apiHubService.getApiDeploymentStatuses(ArgumentMatchers.eq(apiDetail.publisherReference))(any()))
+          when(fixture.apiHubService.getApiDeploymentStatuses(eqTo(apiDetail.publisherReference))(any()))
             .thenReturn(Future.successful(Some(apiDeploymentStatuses)))
           when(fixture.apiHubService.getPlatformContact(any)(any, any)).thenReturn(Future.successful(None))
 
@@ -124,9 +125,9 @@ class ApiDetailsControllerSpec
         forAll {(baseApiDetail: ApiDetail) =>
           val apiDetail = baseApiDetail.copy(platform = "OTHER",
             maintainer = baseApiDetail.maintainer.copy(contactInfo = List(ContactInformation(name=None, emailAddress = Some(apiTeamEmail)))))
-          when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+          when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
             .thenReturn(Future.successful(Some(apiDetail)))
-          when(fixture.apiHubService.getApiDeploymentStatuses(ArgumentMatchers.eq(apiDetail.publisherReference))(any()))
+          when(fixture.apiHubService.getApiDeploymentStatuses(eqTo(apiDetail.publisherReference))(any()))
             .thenReturn(Future.successful(Some(apiDeploymentStatuses)))
           when(fixture.apiHubService.getPlatformContact(any)(any, any)).thenReturn(Future.successful(Some(PlatformContact("", ContactInfo("", "team@example.com"), false))))
 
@@ -154,7 +155,7 @@ class ApiDetailsControllerSpec
         val config = fixture.application.injector.instanceOf[FrontendAppConfig]
 
         forAll {(apiDetail: ApiDetail) =>
-          when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+          when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
             .thenReturn(Future.successful(Some(apiDetail)))
 
           when(fixture.apiHubService.getPlatformContact(any)(any, any)).thenReturn(Future.successful(None))
@@ -181,7 +182,7 @@ class ApiDetailsControllerSpec
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[ErrorTemplate]
 
-        when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(id))(any()))
+        when(fixture.apiHubService.getApiDetail(eqTo(id))(any()))
           .thenReturn(Future.successful(None))
 
         val request = FakeRequest(GET, routes.ApiDetailsController.onPageLoad(id).url)
@@ -205,9 +206,9 @@ class ApiDetailsControllerSpec
       val fixture = buildFixture(userModel = Some(FakeUser))
       val apiDetail = sampleApiDetail()
 
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+      when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail.copy(platform = "HIP"))))
-      when(fixture.apiHubService.getApiDeploymentStatuses(ArgumentMatchers.eq(apiDetail.publisherReference))(any()))
+      when(fixture.apiHubService.getApiDeploymentStatuses(eqTo(apiDetail.publisherReference))(any()))
         .thenReturn(Future.successful(None))
 
       running(fixture.application) {
@@ -217,9 +218,9 @@ class ApiDetailsControllerSpec
 
         status(result) mustBe INTERNAL_SERVER_ERROR
         contentAsString(result) mustBe view.apply(
-            pageTitle = "Sorry, we are experiencing technical difficulties - 500",
-            heading = "Sorry, we’re experiencing technical difficulties",
-            message = "Please try again in a few minutes."
+            pageTitle = "Sorry, there is a problem with the service - 500",
+            heading = "Sorry, there is a problem with the service",
+            message = "Try again later."
           )(request, messages(fixture.application))
           .toString()
         contentAsString(result) must validateAsHtml
@@ -235,9 +236,9 @@ class ApiDetailsControllerSpec
         val team = Team("teamId", "teamName", LocalDateTime.now(), List.empty)
         val apiDetail = sampleApiDetail().copy(teamId = Some(team.id), platform = "HIP")
 
-        when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+        when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
           .thenReturn(Future.successful(Some(apiDetail)))
-        when(fixture.apiHubService.getApiDeploymentStatuses(ArgumentMatchers.eq(apiDetail.publisherReference))(any()))
+        when(fixture.apiHubService.getApiDeploymentStatuses(eqTo(apiDetail.publisherReference))(any()))
           .thenReturn(Future.successful(Some(apiDeploymentStatuses)))
         when(fixture.apiHubService.findTeamById(any())(any()))
           .thenReturn(Future.successful(Some(team)))
@@ -267,9 +268,9 @@ class ApiDetailsControllerSpec
         val apiDeploymentStatuses =  ApiDeploymentStatuses(Some("1"), None)
         val apiDetail = sampleApiDetail().copy(teamId = Some("teamId"), platform = "HIP")
 
-        when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+        when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
           .thenReturn(Future.successful(Some(apiDetail)))
-        when(fixture.apiHubService.getApiDeploymentStatuses(ArgumentMatchers.eq(apiDetail.publisherReference))(any()))
+        when(fixture.apiHubService.getApiDeploymentStatuses(eqTo(apiDetail.publisherReference))(any()))
           .thenReturn(Future.successful(Some(apiDeploymentStatuses)))
         when(fixture.apiHubService.findTeamById(any())(any()))
           .thenReturn(Future.successful(None))

@@ -21,7 +21,7 @@
     govukButton : GovukButton
 )
 
-@(user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+@(user: Option[UserModel])(implicit request: Request[?], messages: Messages)
 
 @layout(
     pageTitle    = titleNoForm(messages("serviceStart.title")),

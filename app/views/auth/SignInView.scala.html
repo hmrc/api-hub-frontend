@@ -20,7 +20,7 @@
     newTabLink: components.NewTabLink
 )
 
-@(ldapSignInUrl: String, strideSignInUrl: String, apiHubGuideUrl: String)(implicit request: Request[_], messages: Messages)
+@(ldapSignInUrl: String, strideSignInUrl: String, apiHubGuideUrl: String)(implicit request: Request[?], messages: Messages)
 
 @layout(
     pageTitle    = titleNoForm(messages("signIn.title")),

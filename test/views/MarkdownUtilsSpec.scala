@@ -255,7 +255,7 @@ class MarkdownUtilsSpec extends AnyFreeSpec with Matchers {
               | baz | bim |""".stripMargin,
           """|   foo | bar    |
              |--- | -----------
-             |baz | bim  """.stripMargin)) { markdown: String =>
+             |baz | bim  """.stripMargin)) { (markdown: String) =>
           MarkdownUtils.parse(markdown) must matchTheHtml(tableHtml)
         }
       }

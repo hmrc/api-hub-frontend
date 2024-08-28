@@ -24,7 +24,9 @@ import generators.ApiDetailGenerators
 import models.api.ApiDeploymentStatuses
 import models.team.Team
 import models.user.UserModel
-import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{never, verify, when}
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.Application
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -40,7 +42,6 @@ import scala.concurrent.Future
 class MyApiDetailsControllerSpec
   extends SpecBase
     with MockitoSugar
-    with ArgumentMatchersSugar
     with ApiDetailGenerators
     with HtmlValidation {
 
@@ -159,9 +160,9 @@ class MyApiDetailsControllerSpec
 
       status(result) mustBe INTERNAL_SERVER_ERROR
       contentAsString(result) mustBe view.apply(
-          pageTitle = "Sorry, we are experiencing technical difficulties - 500",
-          heading = "Sorry, we’re experiencing technical difficulties",
-          message = "Please try again in a few minutes."
+          pageTitle = "Sorry, there is a problem with the service - 500",
+          heading = "Sorry, there is a problem with the service",
+          message = "Try again later."
         )(request, messages(fixture.application))
         .toString()
       contentAsString(result) must validateAsHtml

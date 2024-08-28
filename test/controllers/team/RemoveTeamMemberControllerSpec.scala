@@ -58,7 +58,7 @@ class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with Opt
 
       val mockSessionRepository = mock[CreateTeamSessionRepository]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
       val application = applicationBuilder(userAnswers = Some(userAnswers))
         .overrides(
@@ -163,7 +163,7 @@ class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with Opt
       val mockApiHubService = fixture.apiHubService
       
       when(mockApiHubService.findTeamById(any)(any)).thenReturn(Future.successful(Some(team)))
-      when(mockApiHubService.removeTeamMemberFromTeam(any(), any())(any())) thenReturn Future.successful(Some(()))
+      when(mockApiHubService.removeTeamMemberFromTeam(any(), any())(any())).thenReturn(Future.successful(Some(())))
 
       val application = fixture.playApplication
       val crypto = fixture.cryptoProvider.get()
@@ -238,7 +238,7 @@ class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with Opt
       val mockApiHubService = fixture.apiHubService
       
       when(mockApiHubService.findTeamById(any)(any)).thenReturn(Future.successful(Some(team)))
-      when(mockApiHubService.removeTeamMemberFromTeam(any(), any())(any())) thenReturn Future.successful(Some(()))
+      when(mockApiHubService.removeTeamMemberFromTeam(any(), any())(any())).thenReturn(Future.successful(Some(())))
 
       val application = fixture.playApplication
       val crypto = fixture.cryptoProvider.get()
@@ -284,7 +284,7 @@ class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with Opt
       val mockApiHubService = fixture.apiHubService
       
       when(mockApiHubService.findTeamById(any)(any)).thenReturn(Future.successful(Some(team)))
-      when(mockApiHubService.removeTeamMemberFromTeam(any(), any())(any())) thenReturn Future.successful(Some(()))
+      when(mockApiHubService.removeTeamMemberFromTeam(any(), any())(any())).thenReturn(Future.successful(Some(())))
 
       val application = fixture.playApplication
       val crypto = fixture.cryptoProvider.get()
@@ -334,7 +334,7 @@ class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with Opt
       val mockApiHubService = fixture.apiHubService
       
       when(mockApiHubService.findTeamById(any)(any)).thenReturn(Future.successful(Some(team)))
-      when(mockApiHubService.removeTeamMemberFromTeam(any(), any())(any())) thenReturn Future.successful(None)
+      when(mockApiHubService.removeTeamMemberFromTeam(any(), any())(any())).thenReturn(Future.successful(None))
 
       val application = fixture.playApplication
       val crypto = fixture.cryptoProvider.get()

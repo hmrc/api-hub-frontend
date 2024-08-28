@@ -48,7 +48,7 @@ class UpdateApiTeamController @Inject()(
     implicit request => showView(OK, form)
   }
 
-  private def showView(code: Int, form: Form[_])(implicit request: ApiRequest[_]): Future[Result] = {
+  private def showView(code: Int, form: Form[?])(implicit request: ApiRequest[?]): Future[Result] = {
     apiHubService.findTeams(None).map(teams => {
       val owningTeam = teams.find(team => request.apiDetails.teamId.contains(team.id))
       val sortedTeams = teams.sortBy(_.name.toLowerCase)
@@ -70,7 +70,7 @@ class UpdateApiTeamController @Inject()(
       )
   }
 
-  private def somethingNotFound()(implicit request: Request[_]): Result = {
+  private def somethingNotFound()(implicit request: Request[?]): Result = {
     errorResultBuilder.notFound(
       heading = Messages("myApis.update.team.something.not.found.heading"),
       message = Messages("myApis.update.team.something.not.found.message")

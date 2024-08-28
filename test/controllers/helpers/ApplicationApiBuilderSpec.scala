@@ -22,8 +22,7 @@ import models.accessrequest.{AccessRequest, Pending}
 import models.api.{ApiDetail, Endpoint, EndpointMethod, Live, Maintainer}
 import models.application.{Api, Scope, SelectedEndpoint}
 import models.application.ApplicationLenses.ApplicationLensOps
-import org.mockito.ArgumentMatchers
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
@@ -54,17 +53,17 @@ class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
         .setPrimaryScopes(scopes("all:test-scope-1", "get:test-scope-1-1", "get:test-scope-1-2"))
         .setSecondaryScopes(scopes("all:test-scope-1", "get:test-scope-1-1", "post:test-scope-1-1", "get:test-scope-1-2", "get:test-scope-3-1"))
 
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiId1))(any()))
+      when(fixture.apiHubService.getApiDetail(eqTo(apiId1))(any()))
         .thenReturn(Future.successful(Some(apiDetail1)))
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiId2))(any()))
+      when(fixture.apiHubService.getApiDetail(eqTo(apiId2))(any()))
         .thenReturn(Future.successful(Some(apiDetail2)))
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiId3))(any()))
+      when(fixture.apiHubService.getApiDetail(eqTo(apiId3))(any()))
         .thenReturn(Future.successful(Some(apiDetail3)))
-      when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(FakeApplication.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
+      when(fixture.apiHubService.getAccessRequests(eqTo(Some(FakeApplication.id)), eqTo(Some(Pending)))(any()))
         .thenReturn(Future.successful(Seq(accessRequest)))
 
       running(fixture.application) {
-        implicit val request: Request[_] = FakeRequest()
+        implicit val request: Request[?] = FakeRequest()
 
         val actual = fixture.applicationApiBuilder.build(application).futureValue
 
@@ -102,11 +101,11 @@ class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
       val fixture = buildFixture()
       val application = FakeApplication
 
-      when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(FakeApplication.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
+      when(fixture.apiHubService.getAccessRequests(eqTo(Some(FakeApplication.id)), eqTo(Some(Pending)))(any()))
         .thenReturn(Future.successful(Seq.empty))
 
       running(fixture.application) {
-        implicit val request: Request[_] = FakeRequest()
+        implicit val request: Request[?] = FakeRequest()
 
         val actual = fixture.applicationApiBuilder.build(application).futureValue
 
@@ -119,13 +118,13 @@ class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
       val apiId = "test-id"
       val application = FakeApplication.addApi(Api(apiId, Seq.empty))
 
-      when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(FakeApplication.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
+      when(fixture.apiHubService.getAccessRequests(eqTo(Some(FakeApplication.id)), eqTo(Some(Pending)))(any()))
         .thenReturn(Future.successful(Seq.empty))
       when(fixture.apiHubService.getApiDetail(any())(any()))
         .thenReturn(Future.successful(None))
 
       running(fixture.application) {
-        implicit val request: Request[_] = FakeRequest()
+        implicit val request: Request[?] = FakeRequest()
         implicit val msgs: Messages = messages(fixture.application)
 
         val actual = fixture.applicationApiBuilder.build(application).futureValue

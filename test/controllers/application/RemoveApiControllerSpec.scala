@@ -23,7 +23,9 @@ import models.api.ApiDetail
 import models.application.{Api, Application}
 import models.application.ApplicationLenses._
 import models.user.UserModel
-import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{verify, when}
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -36,14 +38,14 @@ import views.html.application.{RemoveApiConfirmationView, RemoveApiSuccessView}
 
 import scala.concurrent.Future
 
-class RemoveApiControllerSpec extends SpecBase with MockitoSugar with ArgumentMatchersSugar with HtmlValidation with TestHelpers {
+class RemoveApiControllerSpec extends SpecBase with MockitoSugar with HtmlValidation with TestHelpers {
 
   import RemoveApiControllerSpec._
 
   "onPageLoad" - {
     "must display the correct confirmation view for a given application and API for a team member or supporter" in {
       forAll(teamMemberAndSupporterTable) {
-        user: UserModel =>
+        (user: UserModel) =>
           val fixture = buildFixture(user)
 
           when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false), eqTo(false))(any))
@@ -137,7 +139,7 @@ class RemoveApiControllerSpec extends SpecBase with MockitoSugar with ArgumentMa
   "onSubmit" - {
     "must process the request and show the success page for a team member or support" in {
       forAll(teamMemberAndSupporterTable) {
-        user: UserModel =>
+        (user: UserModel) =>
           val fixture = buildFixture(user)
 
           when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false), eqTo(false))(any))
@@ -265,7 +267,7 @@ class RemoveApiControllerSpec extends SpecBase with MockitoSugar with ArgumentMa
 
 object RemoveApiControllerSpec {
 
-  val form: Form[_] = new YesNoFormProvider()("removeApiConfirmation.error")
+  val form: Form[?] = new YesNoFormProvider()("removeApiConfirmation.error")
   val apiDetail: ApiDetail = FakeApiDetail
   val application: Application = FakeApplication.addApi(Api(apiDetail.id, Seq.empty))
   val applicationWithoutApis: Application = FakeApplication

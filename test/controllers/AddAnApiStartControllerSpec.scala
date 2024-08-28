@@ -24,8 +24,7 @@ import models.application.{Api, SelectedEndpoint}
 import models.{AddAnApi, AddEndpoints, UserAnswers}
 import models.application.ApplicationLenses._
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.{AddAnApiApiPage, AddAnApiContextPage, AddAnApiSelectApplicationPage, AddAnApiSelectEndpointsPage}
@@ -51,7 +50,7 @@ class AddAnApiStartControllerSpec extends SpecBase with MockitoSugar with HtmlVa
       val fixture = buildFixture()
       val apiDetail = sampleApiDetail()
 
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+      when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
       when(fixture.addAnApiSessionRepository.set(any())).thenReturn(Future.successful(true))
@@ -67,7 +66,7 @@ class AddAnApiStartControllerSpec extends SpecBase with MockitoSugar with HtmlVa
           .flatMap(_.set(AddAnApiContextPage, AddAnApi))
           .toOption.value
 
-        verify(fixture.addAnApiSessionRepository).set(ArgumentMatchers.eq(expected))
+        verify(fixture.addAnApiSessionRepository).set(eqTo(expected))
       }
     }
 
@@ -84,9 +83,9 @@ class AddAnApiStartControllerSpec extends SpecBase with MockitoSugar with HtmlVa
           Api(apiDetail.id, Seq(SelectedEndpoint("GET", "/test-path-1")))
         )
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any(), any())(any()))
+      when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))
         .thenReturn(Future.successful(Some(application)))
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+      when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
       when(fixture.addAnApiSessionRepository.set(any())).thenReturn(Future.successful(true))
@@ -104,7 +103,7 @@ class AddAnApiStartControllerSpec extends SpecBase with MockitoSugar with HtmlVa
           .flatMap(_.set(AddAnApiSelectEndpointsPage, Set(Set("test-scope-1"))))
           .toOption.value
 
-        verify(fixture.addAnApiSessionRepository).set(ArgumentMatchers.eq(expected))
+        verify(fixture.addAnApiSessionRepository).set(eqTo(expected))
       }
     }
 
@@ -112,7 +111,7 @@ class AddAnApiStartControllerSpec extends SpecBase with MockitoSugar with HtmlVa
       val fixture = buildFixture()
       val apiDetail = sampleApiDetail()
 
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+      when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
       when(fixture.addAnApiSessionRepository.set(any())).thenReturn(Future.successful(true))
@@ -130,7 +129,7 @@ class AddAnApiStartControllerSpec extends SpecBase with MockitoSugar with HtmlVa
       val fixture = buildFixture()
       val apiDetail = sampleApiDetail()
 
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+      when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
         .thenReturn(Future.successful(None))
 
       running(fixture.application) {

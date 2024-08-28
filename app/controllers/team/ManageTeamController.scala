@@ -52,7 +52,7 @@ class ManageTeamController @Inject()(
       }
   }
 
-  private def fetchApplication(applicationId: Option[String])(implicit request: Request[_]): Future[Either[Result, Option[Application]]] = {
+  private def fetchApplication(applicationId: Option[String])(implicit request: Request[?]): Future[Either[Result, Option[Application]]] = {
     applicationId match {
       case Some(id) => apiHubService.getApplication(id, false).map{
         case Some(application) => Right(Some(application))

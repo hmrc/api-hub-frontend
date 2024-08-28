@@ -21,7 +21,9 @@ import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
 import controllers.routes
 import models.application.TeamMember
 import models.user.UserModel
-import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -33,12 +35,12 @@ import views.html.application.ManageTeamMembersView
 
 import scala.concurrent.Future
 
-class ManageTeamMembersControllerSpec extends SpecBase with MockitoSugar with ArgumentMatchersSugar with TestHelpers with HtmlValidation {
+class ManageTeamMembersControllerSpec extends SpecBase with MockitoSugar with TestHelpers with HtmlValidation {
 
   "ManageTeamMembersController.onPageLoad" - {
     "must return OK and the correct view for a GET for a team member or supporter" in {
       forAll(teamMemberAndSupporterTable) {
-        user: UserModel =>
+        (user: UserModel) =>
           val fixture = buildFixture(userModel = user)
 
           when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false), eqTo(false))(any))

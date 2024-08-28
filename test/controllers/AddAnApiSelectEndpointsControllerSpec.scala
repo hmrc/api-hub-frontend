@@ -25,8 +25,7 @@ import models.application.{Api, Application, SelectedEndpoint}
 import models.{AddAnApi, AvailableEndpoints, NormalMode, UserAnswers}
 import models.application.ApplicationLenses._
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.{AddAnApiApiPage, AddAnApiContextPage, AddAnApiSelectApplicationPage, AddAnApiSelectEndpointsPage}
@@ -59,7 +58,7 @@ class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar w
     "must return OK and the correct view for a GET" in {
       val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
 
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+      when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
       running(fixture.application) {
@@ -81,7 +80,7 @@ class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar w
 
       val fixture = buildFixture(Some(userAnswers))
 
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+      when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
       running(fixture.application) {
@@ -100,10 +99,10 @@ class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar w
     "must redirect to the next page when valid data is submitted" in {
       val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
 
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+      when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
-      when(fixture.addAnApiSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(fixture.addAnApiSessionRepository.set(any())).thenReturn(Future.successful(true))
 
       running(fixture.application) {
         val request =
@@ -120,10 +119,10 @@ class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar w
     "must save the answer when valid data is submitted" in {
       val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
 
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+      when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
-      when(fixture.addAnApiSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(fixture.addAnApiSessionRepository.set(any())).thenReturn(Future.successful(true))
 
       running(fixture.application) {
         val request =
@@ -137,7 +136,7 @@ class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar w
         val expected = buildUserAnswers(apiDetail)
           .set(AddAnApiSelectEndpointsPage, Set(AvailableEndpoints(apiDetail, FakeApplication).keySet.head)).toOption.value
 
-        verify(fixture.addAnApiSessionRepository).set(ArgumentMatchers.eq(expected))
+        verify(fixture.addAnApiSessionRepository).set(eqTo(expected))
       }
     }
 
@@ -158,10 +157,10 @@ class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar w
 
       val fixture = buildFixture(Some(buildUserAnswers(apiDetail, application)))
 
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+      when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
-      when(fixture.addAnApiSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(fixture.addAnApiSessionRepository.set(any())).thenReturn(Future.successful(true))
 
       running(fixture.application) {
         val request =
@@ -175,14 +174,14 @@ class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar w
         val expected = buildUserAnswers(apiDetail, application)
           .set(AddAnApiSelectEndpointsPage, Set(Set("test-scope-1"), Set("test-scope-2"))).toOption.value
 
-        verify(fixture.addAnApiSessionRepository).set(ArgumentMatchers.eq(expected))
+        verify(fixture.addAnApiSessionRepository).set(eqTo(expected))
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
       val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
 
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+      when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
       running(fixture.application) {

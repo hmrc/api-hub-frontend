@@ -33,7 +33,7 @@ class AuthorisedPrivilegedUserActionSpec extends AnyFreeSpec with Matchers {
     "must return the block's result when the user is a privileged user" in {
       val request = IdentifierRequest(FakeRequest(), FakePrivilegedUser)
       val action = new AuthorisedPrivilegedUserAction()
-      val block = (_: IdentifierRequest[_]) => Future.successful(Results.Ok)
+      val block = (_: IdentifierRequest[?]) => Future.successful(Results.Ok)
 
       val result = action.invokeBlock(request, block)
       status(result) mustBe OK
@@ -42,7 +42,7 @@ class AuthorisedPrivilegedUserActionSpec extends AnyFreeSpec with Matchers {
     "must return a redirection to the unauthorised page if the user is not a privileged user" in {
       val request = IdentifierRequest(FakeRequest(), FakeUser)
       val action = new AuthorisedPrivilegedUserAction()
-      val block = (_: IdentifierRequest[_]) => Future.successful(Results.Ok)
+      val block = (_: IdentifierRequest[?]) => Future.successful(Results.Ok)
 
       val result = action.invokeBlock(request, block)
       status(result) mustBe SEE_OTHER

@@ -22,7 +22,7 @@
     govukPanel: GovukPanel
 )
 
-@(apiDetail: ApiDetail, user: UserModel)(implicit request: Request[_], messages: Messages)
+@(apiDetail: ApiDetail, user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @apiLink() = {
     <a class="govuk-link govuk-link--no-visited-state" href="@controllers.myapis.routes.MyApiDetailsController.onPageLoad(apiDetail.id)">
