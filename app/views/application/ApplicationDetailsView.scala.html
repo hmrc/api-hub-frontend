@@ -15,32 +15,19 @@
  *@
 
 @import models.application._
-@import models.application.ApplicationLenses._
 @import models.user.UserModel
 @import viewmodels.application.{ApplicationApi, ApplicationSideNavPages, ApplicationNavItems}
-@import views.ViewUtils
 @import views.html.components.IconsLink
+@import views.html.components.ApplicationDetailsTable
 
 @this(
     layout: templates.Layout,
     govukTable: GovukTable,
-    iconsLink: IconsLink
+    iconsLink: IconsLink,
+    applicationDetailsTable: ApplicationDetailsTable
 )
 
 @(application: Application, maybeApplicationApis: Option[Seq[ApplicationApi]], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
-
-@applicationDetail(id: String, titleKey: String, value: Html, classes: String) = {
-    <div class="govuk-grid-row govuk-!-margin-bottom-2">
-        <div class="govuk-grid-column-one-quarter">
-            <span class="govuk-body govuk-!-font-weight-bold govuk-!-margin-0">@messages(titleKey):</span>
-        </div>
-        <div class="govuk-grid-column-three-quarters" data-app-name="">
-            <p id = "@id" class="govuk-body govuk-!-margin-0 @classes">
-                @value
-            </p>
-        </div>
-    </div>
-}
 
 @exploreApisLink(messageId: String) = {
     <a id="addExploreApisLink" href="@{routes.ExploreApisController.onPageLoad().url}" class="govuk-link govuk-link--no-visited-state">
@@ -58,38 +45,13 @@
     <span class="govuk-!-font-weight-bold">@number</span>
 }
 
-@isAccessible(application: Application) = @{
-    user
-        .map(application.isAccessible(_))
-        .getOrElse(false)
-}
-
-@teamName(application: Application) = @{
-    (application.teamId, application.teamName) match {
-        case (Some(teamId), Some(teamName)) =>
-            if(isAccessible(application)) {
-                Html(s"""<a class="govuk-link govuk-link--no-visited-state" href='${controllers.team.routes.ManageTeamController.onPageLoad(teamId, Some(application.id)).url}'>$teamName</a>""")
-            } else {
-                Html(teamName)
-            }
-    }
-}
-
 @layout(pageTitle = titleNoForm(messages("applicationDetails.title")), user = user, fullWidth = true, customScriptsBlock = Some(iconsLink())) {
 
     @views.html.templates.SideNav(application.name, ApplicationNavItems(user, application, ApplicationSideNavPages.DetailsPage)) {
 
         <h1 class="govuk-heading-l">@messages("applicationDetails.heading")</h1>
 
-        @applicationDetail("applicationName", "applicationDetails.application.application", Html(application.name), "")
-        @applicationDetail("applicationCreated", "applicationDetails.application.created", Html(ViewUtils.formatLocalDateTimeContainingUtc(application.created)), "utcDateLong")
-        @applicationDetail("applicationId", "applicationDetails.application.applicationId", Html(application.id), "")
-
-        @if(application.hasTeam) {
-            @applicationDetail("owningTeam", "applicationDetails.application.owningTeam", teamName(application), "")
-        }
-
-        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+        @applicationDetailsTable(application, user)
 
         @if(!application.issues.isEmpty) {
 
