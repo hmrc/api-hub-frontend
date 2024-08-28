@@ -33,7 +33,7 @@
 }
 
 @newApplicationLink = {
-    <a href='@controllers.routes.IndexController.createApplication.url' class='govuk-link govuk-link--no-visited-state'>
+    <a href='@controllers.application.register.routes.RegisterApplicationStartController.startRegisterApplication().url' class='govuk-link govuk-link--no-visited-state'>
     @messages("applicationDeletedSuccess.advice.newApplication")
     </a>
 }

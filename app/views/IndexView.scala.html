@@ -17,6 +17,7 @@
 @import models.application.Application
 @import models.user.UserModel
 @import views.ViewUtils
+@import models.team.Team
 
 @this(
     layout: templates.Layout,
@@ -25,7 +26,7 @@
     govukTable: GovukTable
 )
 
-@(applications: Seq[Application], totalApplicationCount: Int, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+@(applications: Seq[Application], totalApplicationCount: Int, teams: Seq[Team], totalTeamCount: Int, user: Option[UserModel])(implicit request: Request[_], messages: Messages)
 
 @layout(
     pageTitle    = titleNoForm(messages("dashboard.title")),
@@ -48,7 +49,7 @@
                 </div>
                 <div class="hip-card-container-top">
                     <p class="govuk-body">@messages("dashboard.applications.none")</p>
-                    @formHelper(action = routes.IndexController.onSubmit) {
+                    @formHelper(action = controllers.application.register.routes.RegisterApplicationStartController.startRegisterApplication()) {
                         @govukButton(
                             Button(content = messages("dashboard.applications.createFirst"), id=Some("registerAnApplicationButton"))
                         )
@@ -61,7 +62,7 @@
                     } else {
                         <h2 class="govuk-heading-m call-out-header">@messages("dashboard.applications.title.many", totalApplicationCount)</h2>
                     }
-                    @formHelper(action = routes.IndexController.onSubmit) {
+                    @formHelper(action = controllers.application.register.routes.RegisterApplicationStartController.startRegisterApplication()) {
                         @govukButton(
                             Button(content = messages("dashboard.applications.createAnother"), id=Some("registerAnApplicationButton"), classes="govuk-button--secondary")
                         )
@@ -82,6 +83,52 @@
                 @if(totalApplicationCount > applications.size) {
                     <a href="@routes.ApplicationsController.onPageLoad" class="govuk-link govuk-link--no-visited-state view-all-link">
                         @messages("dashboard.applications.viewAll")
+                    </a>
+                }
+            }
+            </div>
+
+            <div class="call-out-panel dashboard-cards">
+            @if(teams.isEmpty) {
+                <div class="hip-flex-container">
+                    <h2 class="govuk-heading-m call-out-header">@messages("dashboard.teams.title.none")</h2>
+                </div>
+                <div class="hip-card-container-top">
+                    <p class="govuk-body">@messages("dashboard.teams.none")</p>
+                    @formHelper(action = controllers.team.routes.CreateTeamStartController.startCreateTeam()) {
+                        @govukButton(
+                            Button(content = messages("dashboard.teams.createFirst"), id=Some("registerTeamButton"))
+                        )
+                    }
+                </div>
+            } else {
+                <div class="hip-flex-container">
+                    @if(teams.size == 1) {
+                        <h2 class="govuk-heading-m call-out-header">@messages("dashboard.teams.title.one")</h2>
+                    } else {
+                        <h2 class="govuk-heading-m call-out-header">@messages("dashboard.teams.title.many", totalTeamCount)</h2>
+                    }
+                    @formHelper(action = controllers.team.routes.CreateTeamStartController.startCreateTeam()) {
+                        @govukButton(
+                            Button(content = messages("dashboard.teams.createAnother"), id=Some("registerTeamButton"), classes="govuk-button--secondary")
+                        )
+                    }
+                </div>
+
+                <div class="hip-card-container-top">
+                @teams.map( team =>
+                    <div class="hip-inner-card flex">
+                        <h3 class="govuk-heading-s align-left hip-inner-card-title">
+                            <a class="govuk-link govuk-link--no-visited-state" href={controllers.team.routes.ManageTeamController.onPageLoad(team.id).url}>{team.name}</a>
+                        </h3>
+                        <p class="govuk-body align-left">{messages("dashboard.teams.teamMembers", {team.teamMembers.length})}</p>
+                        <p class="govuk-body align-left">{messages("dashboard.teams.created")} <span class="utcDateShort">{ViewUtils.formatLocalDateTimeContainingUtc(team.created)}</span></p>
+                    </div>
+                )
+                </div>
+                @if(totalTeamCount > teams.size) {
+                    <a href="@controllers.team.routes.ManageMyTeamsController.onPageLoad()" class="govuk-link govuk-link--no-visited-state view-all-link">
+                    @messages("dashboard.teams.viewAll")
                     </a>
                 }
             }

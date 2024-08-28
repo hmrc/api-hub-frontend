@@ -17,63 +17,37 @@
 package controllers
 
 import controllers.actions.IdentifierAction
-import controllers.helpers.ErrorResultBuilder
-import models.application.TeamMember
-import models.requests.IdentifierRequest
-import models.{NormalMode, UserAnswers}
-import pages.TeamMembersPage
 import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.mvc._
-import repositories.SessionRepository
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.IndexView
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class IndexController @Inject()(
                                  val controllerComponents: MessagesControllerComponents,
                                  identify: IdentifierAction,
-                                 sessionRepository: SessionRepository,
                                  view: IndexView,
-                                 apiHubService: ApiHubService,
-                                 errorResultBuilder: ErrorResultBuilder
+                                 apiHubService: ApiHubService
                                )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   def onPageLoad: Action[AnyContent] = identify.async { implicit request =>
     val maxApplicationsToShow = 5
-    request.user.email.fold[Future[Result]] {
-      noEmail()
-    }(email =>
-      apiHubService.getApplications(Some(email), false).map(userApps => Ok(view(
-        userApps.sortBy(_.name.toLowerCase).take(maxApplicationsToShow),
+    val maxTeamsToShow = 5
+
+    for {
+      userApps <- apiHubService.getApplications(request.user.email, false)
+      userTeams <- apiHubService.findTeams(request.user.email)
+    } yield Ok(view(
+        userApps.sortBy(_.created).reverse.take(maxApplicationsToShow),
         userApps.size,
-        Some(request.user))))
-    )
-  }
-
-  def onSubmit: Action[AnyContent] = identify.async { implicit request => createUserApplication }
-
-  def createApplication: Action[AnyContent] = identify.async { implicit request => createUserApplication }
-
-  private def createUserApplication(implicit request: IdentifierRequest[AnyContent]): Future[Result] = {
-    request.user.email.fold[Future[Result]] {
-      noEmail()
-    }(
-      email =>
-        for {
-          userAnswers <- Future.fromTry(UserAnswers(request.user.userId).set(TeamMembersPage, Seq(TeamMember(email))))
-          _ <- sessionRepository.set(userAnswers)
-        } yield Redirect(routes.ApplicationNameController.onPageLoad(NormalMode))
-    )
-  }
-
-  private def noEmail()(implicit request: Request[_]): Future[Result] = {
-    Future.successful(
-      errorResultBuilder.internalServerError("The current user does not have an email address")
-    )
+        userTeams.sortBy(_.created).reverse.take(maxTeamsToShow),
+        userTeams.size,
+        Some(request.user)
+    ))
   }
 
 }

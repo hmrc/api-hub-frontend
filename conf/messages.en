@@ -69,6 +69,15 @@ dashboard.applications.createAnother = Register another application
 dashboard.applications.teamMembers = Team members: {0}
 dashboard.applications.created = Registered:
 dashboard.applications.viewAll = View all your applications
+dashboard.teams.title.none = Registered teams
+dashboard.teams.title.one = 1 Registered team
+dashboard.teams.title.many = {0} Registered teams
+dashboard.teams.none = You are not a member of any teams
+dashboard.teams.createFirst = Register a team
+dashboard.teams.createAnother = Register another team
+dashboard.teams.viewAll = View all your teams
+dashboard.teams.teamMembers = Team members: {0}
+dashboard.teams.created = Registered:
 
 applications.title = Your applications
 applications.heading = Your applications
@@ -86,7 +95,7 @@ checkYourAnswers.complete.guidance = Team members you have added will be notifie
 checkYourAnswers.registerApplication = Register application
 
 registerApplicationCheckYourAnswers.title = Check Your Answers
-registerApplicationCheckYourAnswers.heading = Check your answers before creating your application
+registerApplicationCheckYourAnswers.heading = Check your answers before registering your application
 registerApplicationCheckYourAnswers.applicationDetails.heading = Application details
 registerApplicationCheckYourAnswers.registerApplication = Register application
 
@@ -541,8 +550,8 @@ serviceStart.beforeProducing.list.1 = Endpoint details
 manageMyTeams.title = Manage teams
 manageMyTeams.heading = Manage teams
 manageMyTeams.hint = Teams can be used to help you manage your applications and create APIs.
-manageMyTeams.noTeams = You have not created any teams
-manageMyTeams.addNewTeam = Add new team
+manageMyTeams.noTeams = You have not registered any teams
+manageMyTeams.addNewTeam = Register new team
 manageMyTeams.headings.teamName = Team name
 manageMyTeams.headings.members = Members
 manageMyTeams.headings.created = Created
@@ -592,8 +601,8 @@ manageTeam.return = Return to all teams
 manageTeam.returnToApplication = Return to {0}
 manageTeam.addTeamMember = Add team member
 
-createTeam.title = Team created successfully
-createTeam.successMessage = Team created successfully
+createTeam.title = Team registered successfully
+createTeam.successMessage = Team registered successfully
 createTeam.subheading = What you can do now
 createTeam.content.1 = View and manage your
 createTeam.content.2 = teams
@@ -605,13 +614,13 @@ teamUpdatedSuccessfully.guidance = View and manage your {0}
 teamUpdatedSuccessfully.linkText = teams
 
 createTeamCheckYourAnswers.title = Check your answers
-createTeamCheckYourAnswers.heading = Check your answers before creating your team
+createTeamCheckYourAnswers.heading = Check your answers before registering your team
 createTeamCheckYourAnswers.teamDetails.heading = Team details
 createTeamCheckYourAnswers.teamMembers.heading = Team members ({0})
 createTeamCheckYourAnswers.complete.heading = Complete your team
 createTeamCheckYourAnswers.complete.guidance.1 = Team members you have added will be notified by email that they have been added to this team.
 createTeamCheckYourAnswers.complete.guidance.2 = This team will be assignable to applications and APIs.
-createTeamCheckYourAnswers.createTeam = Create team
+createTeamCheckYourAnswers.createTeam = Register team
 
 manageApplications.title = Manage applications
 manageApplications.heading = Manage applications
@@ -632,7 +641,7 @@ manageTeams.admin = Integration Hub admin
 manageTeams.teams.caption = Teams
 manageTeams.teams.teamName = Team name
 manageTeams.teams.id = Id
-manageTeams.teams.created = Created
+manageTeams.teams.created = Registered
 
 api.deployment.success.title = Your API deployment request has been accepted.
 api.deployment.success = Your API deployment request has been accepted.
@@ -743,4 +752,4 @@ registerApplicationTeam.error.required = Select a team
 registerApplicationTeam.change.hidden = RegisterApplicationTeam
 registerApplicationTeam.hint.anotherTeam = Need to use another team?
 registerApplicationTeam.hint.guidance = If you need to use another team you can {0}, you will be navigated away from this page.
-registerApplicationTeam.hint.link = create a new team
+registerApplicationTeam.hint.link = register a new team

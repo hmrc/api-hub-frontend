@@ -17,7 +17,7 @@
 package controllers
 
 import base.SpecBase
-import controllers.IndexControllerSpec.buildFixture
+import controllers.TestConnectivityControllerSpec.buildFixture
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar
 import play.api.inject.bind
