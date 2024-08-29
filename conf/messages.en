@@ -753,3 +753,8 @@ registerApplicationTeam.change.hidden = RegisterApplicationTeam
 registerApplicationTeam.hint.anotherTeam = Need to use another team?
 registerApplicationTeam.hint.guidance = If you need to use another team you can {0}, you will be navigated away from this page.
 registerApplicationTeam.hint.link = register a new team
+
+applicationHistory.title = Application history
+applicationHistory.requests = Here are all the API Production access requests that have been made for this application.
+applicationHistory.noRequests = No production access requests have been made for this application:
+applicationHistory.secondaryTitle = Production access request history
