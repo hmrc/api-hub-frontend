@@ -14,29 +14,12 @@
  * limitations under the License.
  *@
 
-@import components.FullWidthMainContent
-@import config.FrontendAppConfig
 @import models.user.UserModel
-@import templates.ApiHubHeader
-@import uk.gov.hmrc.hmrcfrontend.views.config.StandardAlphaBanner
+@import uk.gov.hmrc.integrationhub.html.IntegrationHubLayout
 @import views.html.helper.CSPNonce
-@import views.html.util.FooterWithItems
 
 @this(
-    appConfig: FrontendAppConfig,
-    govukLayout: GovukLayout,
-    hmrcHead: HmrcHead,
-    footerWithItems: FooterWithItems,
-    hmrcTrackingConsentSnippet: HmrcTrackingConsentSnippet,
-    hmrcLanguageSelect: HmrcLanguageSelect,
-    hmrcTimeoutDialog: HmrcTimeoutDialog,
-    hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
-    hmrcScripts: HmrcScripts,
-    alphaBanner: StandardAlphaBanner,
-    twoThirdsMainContent: TwoThirdsMainContent,
-    fullWidthMainContentLayout: FullWidthMainContent,
-    header: ApiHubHeader,
-    hmrcInternalHead: HmrcInternalHead
+    integrationHubLayout: IntegrationHubLayout,
 )
 
 @(
@@ -51,68 +34,4 @@
     activeLink: Option[String] = None
 )(contentBlock: Html)(implicit request: Request[_], messages: Messages)
 
-@head = {
-
-    @hmrcHead(
-        headBlock = if(timeout) { Some(
-            hmrcTimeoutDialog(TimeoutDialog(
-                timeout             = Some(appConfig.timeout),
-                countdown           = Some(appConfig.countdown),
-                keepAliveUrl        = Some(routes.KeepAliveController.keepAlive.url),
-                keepAliveButtonText = Some(messages("timeout.keepAlive")),
-                signOutUrl          = Some(controllers.auth.routes.AuthController.signOut().url),
-                signOutButtonText   = Some(messages("timeout.signOut")),
-                title               = Some(messages("timeout.title")),
-                message             = Some(messages("timeout.message"))
-            )))
-        } else None
-    )
-
-    <link href='@routes.Assets.versioned("stylesheets/application.css")' media="all" rel="stylesheet" type="text/css"@CSPNonce.get.map {n=> nonce="@n"} />
-
-    @if(customStyles.isDefined) {
-        <style>
-            @customStyles.get
-        </style>
-    }
-}
-
-@additionalScripts = {
-    <script @{CSPNonce.attr} src='@controllers.routes.Assets.versioned("javascripts/app.js")' type="module"></script>
-    @{if (customScriptsBlock.isDefined) {
-        customScriptsBlock.get
-        }
-    }
-}
-
-@beforeContent = {
-
-    @if(appConfig.languageTranslationEnabled) {
-        @hmrcLanguageSelect(LanguageSelect(
-            if (messages.lang.code == "cy") Cy else En,
-            (En, routes.LanguageSwitchController.switchToLanguage("en").url),
-            (Cy, routes.LanguageSwitchController.switchToLanguage("cy").url)
-        ))
-    }
-
-}
-
-@content = {
-    @contentBlock
-
-    <div class="govuk-!-margin-top-8">
-        @hmrcReportTechnicalIssueHelper()
-    </div>
-}
-
-@govukLayout(
-    pageTitle   = Some(pageTitle),
-    headBlock   = Some(hmrcInternalHead(Some(head))),
-    headerBlock = Some(header(showBackLink, user, appConfig.helpDocsPath, activeLink)),
-    beforeContentBlock = Some(beforeContent),
-    footerBlock        = Some(footerWithItems()),
-    scriptsBlock       = Some(hmrcScripts(
-        scriptsBlock = Some(additionalScripts)
-    )),
-    mainContentLayout = Some(if (fullWidth) fullWidthMainContentLayout(_) else twoThirdsMainContent(_)),
-)(content)
+@integrationHubLayout(pageTitle, showBackLink, timeout, showSignOut, user, fullWidth, customScriptsBlock, customStyles, activeLink, routes.Assets.versioned("").url)(contentBlock)
