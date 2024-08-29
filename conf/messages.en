@@ -703,7 +703,7 @@ applicationDetailsTable.applicationName = Name
 applicationDetailsTable.owningTeam = Owning team
 applicationDetailsTable.noTeam = Not specified
 applicationDetailsTable.createdDate = Created
-applicationDetailsTable.id = ID
+applicationDetailsTable.id = Application ID
 
 application.update.team.title = Change owning team
 application.update.team.heading = Change owning team
