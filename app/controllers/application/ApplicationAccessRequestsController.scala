@@ -14,32 +14,33 @@
  * limitations under the License.
  */
 
-package controllers.admin
+package controllers.application
 
 import com.google.inject.{Inject, Singleton}
-import controllers.actions.{AuthorisedApproverOrSupportAction, IdentifierAction}
+import controllers.actions.{ApplicationAuthActionProvider, AuthorisedSupportAction, IdentifierAction}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.admin.AccessRequestsView
+import views.html.application.ApplicationAccessRequestsView
 
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class AccessRequestsController @Inject()(
+class ApplicationAccessRequestsController @Inject()(
   override val controllerComponents: MessagesControllerComponents,
   identify: IdentifierAction,
-  isApproverOrSupport: AuthorisedApproverOrSupportAction,
+  isSupport: AuthorisedSupportAction,
+  applicationAuth: ApplicationAuthActionProvider,
   apiHubService: ApiHubService,
-  accessRequestsView: AccessRequestsView
+  accessRequestsView: ApplicationAccessRequestsView
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen isApproverOrSupport).async {
+  def onPageLoad(id: String): Action[AnyContent] = (identify andThen isSupport andThen applicationAuth(id)).async {
     implicit request =>
-      apiHubService.getAccessRequests(None, None).map {
+      apiHubService.getAccessRequests(Some(id), None).map {
         requests =>
-          Ok(accessRequestsView(requests.sorted, request.user))
+          Ok(accessRequestsView(request.application, requests.sorted, request.identifierRequest.user))
       }
   }
 

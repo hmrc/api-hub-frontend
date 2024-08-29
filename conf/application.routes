@@ -46,3 +46,5 @@ POST        /register/register                                          controll
 
 GET         /update-team/:applicationId                                 controllers.application.UpdateApplicationTeamController.onPageLoad(applicationId: String)
 POST        /update-team/:applicationId                                 controllers.application.UpdateApplicationTeamController.onSubmit(applicationId: String)
+
+GET         /access-requests/:applicationId                             controllers.application.ApplicationAccessRequestsController.onPageLoad(applicationId: String)

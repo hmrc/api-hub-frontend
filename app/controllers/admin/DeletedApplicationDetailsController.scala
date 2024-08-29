@@ -18,7 +18,6 @@ package controllers.admin
 
 import com.google.inject.Inject
 import controllers.actions.{ApplicationAuthActionProvider, AuthorisedSupportAction, IdentifierAction}
-import models.accessrequest.AccessRequest
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import services.ApiHubService
@@ -26,7 +25,6 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.application.DeletedApplicationDetailsView
 
 import scala.concurrent.ExecutionContext
-import scala.math.Ordered.orderingToOrdered
 
 class DeletedApplicationDetailsController @Inject()(
   val controllerComponents: MessagesControllerComponents,
@@ -36,10 +34,6 @@ class DeletedApplicationDetailsController @Inject()(
   deletedView: DeletedApplicationDetailsView,
   apiHubService: ApiHubService
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
-
-  private implicit val accessRequestOrdering: Ordering[AccessRequest] = (x: AccessRequest, y: AccessRequest) => {
-    y.requested compare x.requested
-  }
 
   def onPageLoad(id: String): Action[AnyContent] = (identify andThen isSupport andThen applicationAuth(id, false, true)).async {
     implicit request =>

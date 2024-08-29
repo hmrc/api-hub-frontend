@@ -1,0 +1,65 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.accessrequest._
+@import models.user.UserModel
+@import views.html.components.AccessRequestPanel
+@import viewmodels.application.ApplicationNavItems
+@import models.application.Application
+@import views.html.components.ApplicationDetailsTable
+@import viewmodels.application.ApplicationSideNavPages
+
+@this(
+    layout: templates.Layout,
+    govukTable: GovukTable,
+    accessRequestPanel: AccessRequestPanel,
+    applicationDetailsTable: ApplicationDetailsTable
+)
+
+@(application: Application, accessRequests: Seq[AccessRequest], user: UserModel)(implicit request: Request[_], messages: Messages)
+
+@layout(
+    pageTitle = titleNoForm(messages("applicationHistory.title")),
+    user = Some(user),
+    fullWidth = true,
+    activeLink = Some("apiHubAdmin")
+) {
+    @views.html.templates.SideNav(application.name, ApplicationNavItems(Some(user), application, ApplicationSideNavPages.ApplicationHistoryPage)) {
+
+        <h1 class="govuk-heading-l">
+            @messages("applicationHistory.title")
+        </h1>
+
+        @applicationDetailsTable(application, Some(user))
+
+        <h2 class="govuk-heading-m">
+            @messages("applicationHistory.secondaryTitle")
+        </h2>
+
+        <p class="govuk-body">
+        @if(accessRequests.isEmpty) {
+            @messages("applicationHistory.noRequests")
+        } else {
+            @messages("applicationHistory.requests")
+        }
+        </p>
+
+        @for(accessRequest <- accessRequests) {
+            @accessRequestPanel(accessRequest, showReviewLink = false)
+        }
+    }
+
+}

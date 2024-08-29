@@ -28,11 +28,10 @@ object ApplicationSideNavPages {
   case object ApisPage extends SideNavPage
   case object EnvironmentsAndCredentialsPage extends SideNavPage
   case object ManageTeamMembersPage extends SideNavPage
-  case object EditApplicationNamePage extends SideNavPage
-  case object LeaveApplicationPage extends SideNavPage
   case object DeleteApplicationPage extends SideNavPage
   case object ViewAsJsonApplicationPage extends SideNavPage
   case object ChangeOwningTeamPage extends SideNavPage
+  case object ApplicationHistoryPage extends SideNavPage
 
 }
 
@@ -84,10 +83,17 @@ object ApplicationNavItems {
         title = messages("application.update.team.title"),
         link = controllers.application.routes.UpdateApplicationTeamController.onPageLoad(application.id),
         isCurrentPage = currentPage == ChangeOwningTeamPage
+      ),
+      SideNavItem(
+        page = ApplicationHistoryPage,
+        title = messages("applicationHistory.title"),
+        link = controllers.application.routes.ApplicationAccessRequestsController.onPageLoad(application.id),
+        isCurrentPage = currentPage == ApplicationHistoryPage
       )
     )
     .filter(dontShowManageTeamForMigratedApps(application))
     .filter(onlyShowViewAsJsonForSupportUsers(userModel))
+    .filter(onlyShowAppHistoryForSupportUsers(userModel))
   }
 
   private def dontShowManageTeamForMigratedApps(application: Application)(navItem: SideNavItem): Boolean = {
@@ -96,6 +102,10 @@ object ApplicationNavItems {
 
   private def onlyShowViewAsJsonForSupportUsers(userModel: Option[UserModel])(navItem: SideNavItem): Boolean = {
     !navItem.page.equals(ViewAsJsonApplicationPage) || userModel.exists(_.permissions.canSupport)
+  }
+
+  private def onlyShowAppHistoryForSupportUsers(userModel: Option[UserModel])(navItem: SideNavItem): Boolean = {
+    !navItem.page.equals(ApplicationHistoryPage) || userModel.exists(_.permissions.canSupport)
   }
 
 }
