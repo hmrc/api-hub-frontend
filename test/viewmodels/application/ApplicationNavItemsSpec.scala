@@ -19,14 +19,16 @@ package viewmodels.application
 import base.SpecBase
 import controllers.actions.{FakeApplication, FakeSupporter, FakeUser}
 import models.application.ApplicationLenses._
+import models.user.UserModel
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import utils.TestHelpers
 import viewmodels.SideNavItem
 import viewmodels.application.ApplicationSideNavPages._
 
-class ApplicationNavItemsSpec extends SpecBase with Matchers with TableDrivenPropertyChecks {
+class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers with TableDrivenPropertyChecks {
 
   "ApplicationNavItems" - {
     "must return the correct list of nav items" in {
@@ -132,28 +134,32 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TableDrivenPro
     }
 
     "must not display the View as JSON item for non-support users" in {
-      val playApplication = applicationBuilder(None).build()
+      forAll(usersWhoCannotSupport) { (user: UserModel) =>
+        val playApplication = applicationBuilder(None).build()
 
-      running(playApplication) {
-        implicit val implicitMessages: Messages = messages(playApplication)
+        running(playApplication) {
+          implicit val implicitMessages: Messages = messages(playApplication)
 
-        val actual = ApplicationNavItems(Some(FakeUser), FakeApplication.setTeamId("test-team-id"), DetailsPage)
-          .filter(_.page.equals(ViewAsJsonApplicationPage))
+          val actual = ApplicationNavItems(Some(user), FakeApplication.setTeamId("test-team-id"), DetailsPage)
+            .filter(_.page.equals(ViewAsJsonApplicationPage))
 
-        actual mustBe empty
+          actual mustBe empty
+        }
       }
     }
 
     "must not display the Application history item for non-support users" in {
-      val playApplication = applicationBuilder(None).build()
+      forAll(usersWhoCannotSupport) { (user: UserModel) =>
+        val playApplication = applicationBuilder(None).build()
 
-      running(playApplication) {
-        implicit val implicitMessages: Messages = messages(playApplication)
+        running(playApplication) {
+          implicit val implicitMessages: Messages = messages(playApplication)
 
-        val actual = ApplicationNavItems(Some(FakeUser), FakeApplication.setTeamId("test-team-id"), DetailsPage)
-          .filter(_.page.equals(ApplicationHistoryPage))
+          val actual = ApplicationNavItems(Some(FakeUser), FakeApplication.setTeamId("test-team-id"), DetailsPage)
+            .filter(_.page.equals(ApplicationHistoryPage))
 
-        actual mustBe empty
+          actual mustBe empty
+        }
       }
     }
   }
