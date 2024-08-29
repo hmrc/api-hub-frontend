@@ -19,7 +19,7 @@
 @import models.application.ApplicationLenses.ApplicationLensOps
 @import models.user.UserModel
 
-@this(govukSummaryList: GovukSummaryList)
+@this()
 
 @(application: Application, user: Option[UserModel])(implicit request: RequestHeader, messages: Messages)
 
@@ -41,43 +41,40 @@
     }
 }
 
-@govukSummaryList(SummaryList(
-    rows = Seq(
-        SummaryListRow(
-            key = Key(
-                content = Text(messages("applicationDetailsTable.applicationName"))
-            ),
-            value = Value(
-                content = application.name
-            ),
-        ),
-        SummaryListRow(
-            key = Key(
-                content = Text(messages("applicationDetailsTable.owningTeam"))
-            ),
-            value = Value(
-                content = HtmlContent(teamName(application))
-            ),
-        ),
-        SummaryListRow(
-            key = Key(
-                content = Text(messages("applicationDetailsTable.createdDate"))
-            ),
-            value = Value(
-                content = Text(ViewUtils.formatLocalDateTimeContainingUtc(application.created)),
-                classes = "utcDateLong"
-            ),
-        ),
-        SummaryListRow(
-            key = Key(
-                content = Text(messages("applicationDetailsTable.id"))
-            ),
-            value = Value(
-                content = application.id
-            ),
-        )
-    ),
-    classes = "govuk-summary-list--no-border hip-summary-list__compact"
-))
+<dl class="govuk-summary-list govuk-summary-list--no-border hip-summary-list__compact">
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+            @messages("applicationDetailsTable.applicationName")
+        </dt>
+        <dd class="govuk-summary-list__value" id="applicationName">
+            @application.name
+        </dd>
+    </div>
+
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+            @messages("applicationDetailsTable.owningTeam")
+        </dt>
+        <dd class="govuk-summary-list__value" id="owningTeam">
+            @teamName(application)
+        </dd>
+    </div>
+
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+            @messages("applicationDetailsTable.createdDate")
+        </dt>
+        <dd class="govuk-summary-list__value utcDateLong" id="applicationCreated">@ViewUtils.formatLocalDateTimeContainingUtc(application.created)</dd>
+    </div>
+
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+            @messages("applicationDetailsTable.id")
+        </dt>
+        <dd class="govuk-summary-list__value" id="applicationId">
+            @application.id
+        </dd>
+    </div>
+</dl>
 
 <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
