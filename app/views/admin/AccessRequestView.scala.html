@@ -52,6 +52,14 @@
             </dt>
             <dd class="govuk-summary-list__value">
                 @application.name
+                @for(deleted <- application.deleted){
+                    <strong
+                        class="govuk-body govuk-!-margin-left-2 govuk-tag govuk-tag--grey"
+                        title="@{s"Deleted by ${deleted.deletedBy} at ${deleted.deleted}"}"
+                    >
+                            @{messages("site.deleted").toUpperCase}
+                    </strong>
+                }
             </dd>
         </div>
         <div class="govuk-summary-list__row">

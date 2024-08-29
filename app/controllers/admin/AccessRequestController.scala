@@ -70,7 +70,7 @@ class AccessRequestController @Inject()(
   private def buildView(id: String, status: Int, form: Form[ApprovalDecision])(implicit request: IdentifierRequest[AnyContent]): Future[Result] = {
     apiHubService.getAccessRequest(id).flatMap {
       case Some(accessRequest) =>
-        apiHubService.getApplication(accessRequest.applicationId, enrich = false).map {
+        apiHubService.getApplication(accessRequest.applicationId, enrich = false, includeDeleted = true).map {
           case Some(application) => Status(status)(view(accessRequest, application, AccessRequestEndpointGroups.group(accessRequest), form, request.user))
           case _ => applicationNotFound(accessRequest.applicationId)
         }
