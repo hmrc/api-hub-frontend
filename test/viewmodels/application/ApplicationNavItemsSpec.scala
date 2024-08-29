@@ -79,6 +79,12 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TableDrivenPro
             title = "Change owning team",
             link = controllers.application.routes.UpdateApplicationTeamController.onPageLoad(FakeApplication.id),
             isCurrentPage = false
+          ),
+          SideNavItem(
+            page = ApplicationHistoryPage,
+            title = "Application history",
+            link = controllers.application.routes.ApplicationAccessRequestsController.onPageLoad(FakeApplication.id),
+            isCurrentPage = false
           )
         )
 
@@ -133,6 +139,19 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TableDrivenPro
 
         val actual = ApplicationNavItems(Some(FakeUser), FakeApplication.setTeamId("test-team-id"), DetailsPage)
           .filter(_.page.equals(ViewAsJsonApplicationPage))
+
+        actual mustBe empty
+      }
+    }
+
+    "must not display the Application history item for non-support users" in {
+      val playApplication = applicationBuilder(None).build()
+
+      running(playApplication) {
+        implicit val implicitMessages: Messages = messages(playApplication)
+
+        val actual = ApplicationNavItems(Some(FakeUser), FakeApplication.setTeamId("test-team-id"), DetailsPage)
+          .filter(_.page.equals(ApplicationHistoryPage))
 
         actual mustBe empty
       }
