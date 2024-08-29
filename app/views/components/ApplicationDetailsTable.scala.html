@@ -23,19 +23,6 @@
 
 @(application: Application, user: Option[UserModel])(implicit request: RequestHeader, messages: Messages)
 
-@applicationDetail(id: String, titleKey: String, value: Html, classes: String) = {
-    <div class="govuk-grid-row govuk-!-margin-bottom-2">
-        <div class="govuk-grid-column-one-quarter">
-            <span class="govuk-body govuk-!-font-weight-bold govuk-!-margin-0">@messages(titleKey):</span>
-        </div>
-        <div class="govuk-grid-column-three-quarters" data-app-name="">
-            <p id = "@id" class="govuk-body govuk-!-margin-0 @classes">
-            @value
-            </p>
-        </div>
-    </div>
-}
-
 @isAccessible(application: Application) = @{
     user
         .map(application.isAccessible(_))
@@ -50,7 +37,7 @@
             } else {
                 Html(teamName)
             }
-        case _ => Html(messages("application.update.team.noTeam"))
+        case _ => Html(messages("applicationDetailsTable.noTeam"))
     }
 }
 
@@ -58,7 +45,7 @@
     rows = Seq(
         SummaryListRow(
             key = Key(
-                content = Text(messages("application.update.team.applicationName"))
+                content = Text(messages("applicationDetailsTable.applicationName"))
             ),
             value = Value(
                 content = application.name
@@ -66,7 +53,7 @@
         ),
         SummaryListRow(
             key = Key(
-                content = Text(messages("application.update.team.owningTeam"))
+                content = Text(messages("applicationDetailsTable.owningTeam"))
             ),
             value = Value(
                 content = HtmlContent(teamName(application))
@@ -74,7 +61,7 @@
         ),
         SummaryListRow(
             key = Key(
-                content = Text(messages("application.update.team.createdDate"))
+                content = Text(messages("applicationDetailsTable.createdDate"))
             ),
             value = Value(
                 content = Text(ViewUtils.formatLocalDateTimeContainingUtc(application.created)),
@@ -83,7 +70,7 @@
         ),
         SummaryListRow(
             key = Key(
-                content = Text(messages("application.update.team.id"))
+                content = Text(messages("applicationDetailsTable.id"))
             ),
             value = Value(
                 content = application.id

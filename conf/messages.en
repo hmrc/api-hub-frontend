@@ -699,14 +699,14 @@ myApis.update.team.success.text = Return to {0}
 myApis.update.team.something.not.found.heading = Unable to update owning team for this API.
 myApis.update.team.something.not.found.message = The API or team cannot be found.
 
+applicationDetailsTable.applicationName = Name
+applicationDetailsTable.owningTeam = Owning team
+applicationDetailsTable.noTeam = Not specified
+applicationDetailsTable.createdDate = Created
+applicationDetailsTable.id = ID
 
 application.update.team.title = Change owning team
 application.update.team.heading = Change owning team
-application.update.team.applicationName = Name
-application.update.team.owningTeam = Owning team
-application.update.team.createdDate = Created
-application.update.team.id = ID
-application.update.team.noTeam = Not specified
 application.update.team.selectNew = Select which team owns this application
 application.update.team.error.required = Select an owning team
 application.update.team.save = Save and continue
