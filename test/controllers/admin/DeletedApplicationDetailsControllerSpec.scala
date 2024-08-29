@@ -17,7 +17,7 @@
 package controllers.admin
 
 import base.SpecBase
-import controllers.actions.{FakeApplication, FakeUser}
+import controllers.actions.FakeApplication
 import controllers.routes
 import generators.AccessRequestGenerator
 import models.application._
@@ -137,7 +137,7 @@ class DeletedApplicationDetailsControllerSpec extends SpecBase with MockitoSugar
 
   private case class Fixture(playApplication: PlayApplication, apiHubService: ApiHubService)
 
-  private def buildFixture(userModel: UserModel = FakeUser): Fixture = {
+  private def buildFixture(userModel: UserModel): Fixture = {
     val apiHubService = mock[ApiHubService]
 
     val playApplication = applicationBuilder(userAnswers = Some(emptyUserAnswers), user = userModel)

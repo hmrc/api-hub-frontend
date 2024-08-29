@@ -19,6 +19,7 @@ package models.accessrequest
 import play.api.libs.json.{Format, Json}
 
 import java.time.LocalDateTime
+import scala.math.Ordered.orderingToOrdered
 
 case class AccessRequest(
   id: String,
@@ -60,5 +61,9 @@ object AccessRequest {
   }
 
   implicit val formatAccessRequest: Format[AccessRequest] = Json.format[AccessRequest]
+
+  implicit val accessRequestOrdering: Ordering[AccessRequest] = (x: AccessRequest, y: AccessRequest) => {
+    (y.requested, x.applicationId, x.apiName) compare (x.requested, y.applicationId, y.apiName)
+  }
 
 }
