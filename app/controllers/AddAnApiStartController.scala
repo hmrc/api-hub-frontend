@@ -67,14 +67,14 @@ class AddAnApiStartController @Inject()(
       }
   }
 
-  private def fetchApiDetail(apiId: String)(implicit request: Request[_]): Future[Either[Result, ApiDetail]] = {
+  private def fetchApiDetail(apiId: String)(implicit request: Request[?]): Future[Either[Result, ApiDetail]] = {
     apiHubService.getApiDetail(apiId).map {
       case Some(apiDetail) => Right(apiDetail)
       case _ => Left(apiNotFound(apiId))
     }
   }
 
-  private def commonUserAnswers(apiDetail: ApiDetail, context: AddAnApiContext, request: IdentifierRequest[_]): Try[UserAnswers] = {
+  private def commonUserAnswers(apiDetail: ApiDetail, context: AddAnApiContext, request: IdentifierRequest[?]): Try[UserAnswers] = {
     UserAnswers(
       id = request.user.userId,
       lastUpdated = clock.instant()
@@ -90,7 +90,7 @@ class AddAnApiStartController @Inject()(
     } yield Redirect(navigator.nextPage(AddAnApiApiPage, NormalMode, userAnswers))
   }
 
-  private def apiNotFound(apiId: String)(implicit request: Request[_]): Result = {
+  private def apiNotFound(apiId: String)(implicit request: Request[?]): Result = {
     errorResultBuilder.notFound(
       Messages("site.apiNotFound.heading"),
       Messages("site.apiNotFound.message", apiId)

@@ -24,8 +24,10 @@ import models.api.{ApiDetail, Endpoint, EndpointMethod, Live, Maintainer}
 import models.application.ApplicationLenses.ApplicationLensOps
 import models.application._
 import models.user.UserModel
-import org.mockito.ArgumentMatchers.any
-import org.mockito.{ArgumentCaptor, ArgumentMatchers, MockitoSugar}
+import org.mockito.ArgumentCaptor
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{verify, when}
+import org.scalatestplus.mockito.MockitoSugar
 import pages.{AccessRequestApplicationIdPage, ProvideSupportingInformationPage}
 import play.api.data.FormError
 import play.api.inject.bind
@@ -48,12 +50,12 @@ class ProvideSupportingInformationControllerSpec extends SpecBase with MockitoSu
   "ProvideSupportingInformationController" - {
     "must return OK and the correct view for a GET for a team member or supporter" in {
       forAll(teamMemberAndSupporterTable) {
-        user: UserModel =>
+        (user: UserModel) =>
           val application = anApplication
           val userAnswers = buildUserAnswers(application)
           val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
 
-          when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), any(), any())(any()))
+          when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), any(), any())(any()))
             .thenReturn(Future.successful(Some(application)))
 
           running(fixture.application) {
@@ -70,12 +72,12 @@ class ProvideSupportingInformationControllerSpec extends SpecBase with MockitoSu
 
     "must return OK and the correct view for a GET for a team member or supporter when the question has already been answered" in {
       forAll(teamMemberAndSupporterTable) {
-        user: UserModel =>
+        (user: UserModel) =>
           val application = anApplication
           val userAnswers = buildUserAnswers(application).set(ProvideSupportingInformationPage, "blah").toOption.value
           val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
 
-          when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), any(), any())(any()))
+          when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), any(), any())(any()))
             .thenReturn(Future.successful(Some(application)))
 
           running(fixture.application) {
@@ -93,12 +95,12 @@ class ProvideSupportingInformationControllerSpec extends SpecBase with MockitoSu
 
     "must return 400 Bad Request and the correct view for a GET for a team member or supporter when the form contains errors" in {
       forAll(teamMemberAndSupporterTable) {
-        user: UserModel =>
+        (user: UserModel) =>
           val application = anApplication
           val userAnswers = buildUserAnswers(application)
           val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
 
-          when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), any(), any())(any()))
+          when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), any(), any())(any()))
             .thenReturn(Future.successful(Some(application)))
 
           running(fixture.application) {
@@ -118,7 +120,7 @@ class ProvideSupportingInformationControllerSpec extends SpecBase with MockitoSu
 
     "must set the user answers and navigate to next page on submit" in {
       forAll(teamMemberAndSupporterTable) {
-        user: UserModel =>
+        (user: UserModel) =>
 
           val application = anApplication
           val userAnswers = buildUserAnswers(application)

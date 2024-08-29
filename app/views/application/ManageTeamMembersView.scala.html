@@ -23,7 +23,7 @@
     govukButton : GovukButton
 )
 
-@(application: Application, user: UserModel)(implicit request: Request[_], messages: Messages)
+@(application: Application, user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("manageTeamMembers.title")), user = Some(user)) {
 
@@ -33,8 +33,8 @@
         </div>
         <div class="govuk-grid-column-one-third govuk-!-text-align-right">
             @govukButton(Button(
-                content = messages("manageTeamMembers.addTeamMember"),
-                href = Some(controllers.application.routes.AddTeamMemberController.onPageLoad(application.id).url)
+            content = messages("manageTeamMembers.addTeamMember"),
+            href = Some(controllers.application.routes.AddTeamMemberController.onPageLoad(application.id).url)
             ))
         </div>
     </div>

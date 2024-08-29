@@ -75,7 +75,7 @@ class SimpleApiDeploymentController @Inject()(
       )
   }
 
-  private def showView(code: Int, form: Form[_])(implicit request: IdentifierRequest[_]): Future[Result] = {
+  private def showView(code: Int, form: Form[?])(implicit request: IdentifierRequest[?]): Future[Result] = {
     request.user.email
       .map(email => apiHubService.findTeams(Some(email)))
       .getOrElse(Future.successful(Seq.empty))
@@ -105,7 +105,7 @@ object SimpleApiDeploymentController {
         "hods" -> Forms.seq(text()),
         "prefixesToRemove" -> optional(text()).transform[Seq[String]](transformToPrefixesToRemove, transformFromPrefixesToRemove),
         "egressPrefix" -> optional(text())
-        )(DeploymentsRequest.apply)(DeploymentsRequest.unapply)
+        )(DeploymentsRequest.apply)(o => Some(Tuple.fromProductTyped(o)))
       )
 
   }

@@ -46,7 +46,7 @@ class ApplicationsController @Inject()(
     )
   }
 
-  private def noEmail()(implicit request: Request[_]): Future[Result] = {
+  private def noEmail()(implicit request: Request[?]): Future[Result] = {
     Future.successful(
       errorResultBuilder.internalServerError("The current user does not have an email address")
     )

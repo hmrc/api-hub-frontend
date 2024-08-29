@@ -21,8 +21,9 @@ import controllers.RegisterApplicationControllerSpec.buildFixture
 import controllers.actions.FakeUser
 import models.application.{Application, Creator, NewApplication, TeamMember}
 import models.{CheckMode, UserAnswers}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.{ArgumentMatchers, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{verify, verifyNoInteractions, when}
+import org.scalatestplus.mockito.MockitoSugar
 import pages.{ApplicationNamePage, TeamMembersPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -50,7 +51,7 @@ class RegisterApplicationControllerSpec extends SpecBase with MockitoSugar {
 
       val fixture = buildFixture(userAnswers)
 
-      when(fixture.apiHubService.registerApplication(ArgumentMatchers.eq(newApplication))(any()))
+      when(fixture.apiHubService.registerApplication(eqTo(newApplication))(any()))
         .thenReturn(Future.successful(Application(testId, newApplication)))
 
       when(fixture.sessionRepository.clear(any())).thenReturn(Future.successful(true))
@@ -62,7 +63,7 @@ class RegisterApplicationControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.RegisterApplicationSuccessController.onPageLoad(testId).url)
 
-        verify(fixture.apiHubService).registerApplication(ArgumentMatchers.eq(newApplication))(any())
+        verify(fixture.apiHubService).registerApplication(eqTo(newApplication))(any())
       }
     }
 
@@ -76,7 +77,7 @@ class RegisterApplicationControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.ApplicationNameController.onPageLoad(CheckMode).url)
 
-        verifyZeroInteractions(fixture.apiHubService)
+        verifyNoInteractions(fixture.apiHubService)
       }
     }
 

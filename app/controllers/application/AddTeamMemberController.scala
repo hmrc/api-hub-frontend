@@ -66,18 +66,18 @@ class AddTeamMemberController @Inject()(
       )
   }
 
-  private def addTeamMember(id: String, teamMember: TeamMember)(implicit request: Request[_]) = {
+  private def addTeamMember(id: String, teamMember: TeamMember)(implicit request: Request[?]) = {
     apiHubService.addTeamMember(id, teamMember).map {
       case Some(_) => Redirect(routes.ManageTeamMembersController.onPageLoad(id))
       case _ => applicationNotFound(id)
     }
   }
 
-  private def badRequest(id: String, formWithErrors: Form[TeamMember])(implicit request: ApplicationRequest[_]) = {
+  private def badRequest(id: String, formWithErrors: Form[TeamMember])(implicit request: ApplicationRequest[?]) = {
     Future.successful(BadRequest(view(formWithErrors, routes.AddTeamMemberController.onSubmit(id), request.identifierRequest.user)))
   }
 
-  private def applicationNotFound(id: String)(implicit request: Request[_]): Result = {
+  private def applicationNotFound(id: String)(implicit request: Request[?]): Result = {
     errorResultBuilder.notFound(
       heading = Messages("site.applicationNotFoundHeading"),
       message = Messages("site.applicationNotFoundMessage", id)

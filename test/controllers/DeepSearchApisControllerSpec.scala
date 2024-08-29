@@ -20,8 +20,9 @@ import base.OptionallyAuthenticatedSpecBase
 import generators.ApiDetailGenerators
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
-import org.mockito.MockitoSugar
+import org.mockito.Mockito.when
 import org.scalatest.OptionValues
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import play.api.Application
 import play.api.inject.bind

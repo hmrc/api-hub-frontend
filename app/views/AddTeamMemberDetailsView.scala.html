@@ -25,7 +25,7 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], submitTo: Call, user: UserModel)(implicit request: Request[_], messages: Messages)
+@(form: Form[?], submitTo: Call, user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = title(form, messages("addTeamMemberDetails.title")), user = Some(user)) {
 

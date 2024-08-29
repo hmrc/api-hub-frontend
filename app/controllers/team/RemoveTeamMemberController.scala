@@ -109,16 +109,16 @@ class RemoveTeamMemberController @Inject()(override val messagesApi: MessagesApi
     crypto.decrypt(Crypted(encrypted)).value
   }
 
-  private def teamMemberNotFound()(implicit request: Request[_]): Future[Result] = {
+  private def teamMemberNotFound()(implicit request: Request[?]): Future[Result] = {
     Future.successful(
       errorResultBuilder.notFound(Messages("addTeamMemberDetails.notFound"))
     )
   }
 
-  private def teamMemberToRemoveNotFound()(implicit request: Request[_]): Result =
+  private def teamMemberToRemoveNotFound()(implicit request: Request[?]): Result =
     errorResultBuilder.notFound(Messages("manageTeam.teamMembers.removeTeamMember.notFound"))
 
-  private def teamMemberToRemoveSameAsUser()(implicit request: Request[_]): Future[Result] =
+  private def teamMemberToRemoveSameAsUser()(implicit request: Request[?]): Future[Result] =
     Future.successful(
       errorResultBuilder.badRequest(Messages("manageTeam.teamMembers.removeTeamMember.cantDeleteAuthenticatedUser"))
     )

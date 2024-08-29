@@ -35,7 +35,7 @@
     iconsLink: IconsLink
 )
 
-@(apiDetail: ApiDetail, user: Option[UserModel], apiViewModel: ApiViewModel)(implicit request: Request[_], messages: Messages)
+@(apiDetail: ApiDetail, user: Option[UserModel], apiViewModel: ApiViewModel)(implicit request: Request[?], messages: Messages)
 
 @endpointName(endpoint: Endpoint) = @{
     endpoint.path.replaceAll("""[^a-zA-Z0-9\-_:.]""", "-") match {
@@ -56,16 +56,16 @@
             @messages("apiDetails.selfServe.info")
         </p>
         <p class="govuk-body additional-message">
-        @if(user.isDefined) {
+            @if(user.isDefined) {
             @govukButton(
-                Button(
-                    id = Some("addToAnApplicationButton"),
-                    href = Some(routes.AddAnApiStartController.addAnApi(apiDetail.id).url),
-                    content = Text(messages("apiDetails.addToAnApplication")),
-                    classes = "govuk-!-margin-bottom-2"
-                )
+            Button(
+            id = Some("addToAnApplicationButton"),
+            href = Some(routes.AddAnApiStartController.addAnApi(apiDetail.id).url),
+            content = Text(messages("apiDetails.addToAnApplication")),
+            classes = "govuk-!-margin-bottom-2"
             )
-        }
+            )
+            }
         </p>
     </div>
 }
@@ -120,7 +120,8 @@
                     </li>
 
                     <li class="side-nav__list">
-                        @newTabLink(routes.OasRedocController.onPageLoad(apiDetail.id).url, messages("apiDetails.leftNav.viewApiSpec"), "side-nav__link", false)
+                        @newTabLink(routes.OasRedocController.onPageLoad(apiDetail.id).url,
+                        messages("apiDetails.leftNav.viewApiSpec"), "side-nav__link", false)
                     </li>
                 </ul>
             </div>
@@ -256,10 +257,11 @@
                 </p>
                 <p class="govuk-body additional-message">
                     @Html(
-                        messages(
-                            "apiDetails.viewApiSpec.message",
-                            newTabLink(routes.OasRedocController.onPageLoad(apiDetail.id).url, messages("apiDetails.viewApiSpec.link"), "govuk-link govuk-link--no-visited-state")
-                        )
+                    messages(
+                    "apiDetails.viewApiSpec.message",
+                    newTabLink(routes.OasRedocController.onPageLoad(apiDetail.id).url,
+                    messages("apiDetails.viewApiSpec.link"), "govuk-link govuk-link--no-visited-state")
+                    )
                     )
                 </p>
             </div>

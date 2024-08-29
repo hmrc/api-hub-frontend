@@ -21,8 +21,9 @@ import controllers.IndexControllerSpec.buildFixture
 import controllers.actions.FakeUser
 import generators.TeamGenerator
 import models.application.{Application, Creator, TeamMember}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.{ArgumentMatchers, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -50,9 +51,9 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with TeamGenerator 
 
       running(fixture.application) {
 
-        when(fixture.mockApiHubService.getApplications(ArgumentMatchers.eq(Some(testEmail)), ArgumentMatchers.eq(false))(any()))
+        when(fixture.mockApiHubService.getApplications(eqTo(Some(testEmail)), eqTo(false))(any()))
           .thenReturn(Future.successful(applications))
-        when(fixture.mockApiHubService.findTeams(ArgumentMatchers.eq(Some(testEmail)))(any()))
+        when(fixture.mockApiHubService.findTeams(eqTo(Some(testEmail)))(any()))
           .thenReturn(Future.successful(teams))
 
         val request = FakeRequest(GET, routes.IndexController.onPageLoad.url)
@@ -79,9 +80,9 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with TeamGenerator 
 
       running(fixture.application) {
 
-        when(fixture.mockApiHubService.getApplications(ArgumentMatchers.eq(Some(testEmail)), ArgumentMatchers.eq(false))(any()))
+        when(fixture.mockApiHubService.getApplications(eqTo(Some(testEmail)), eqTo(false))(any()))
           .thenReturn(Future.successful(applications))
-        when(fixture.mockApiHubService.findTeams(ArgumentMatchers.eq(Some(testEmail)))(any()))
+        when(fixture.mockApiHubService.findTeams(eqTo(Some(testEmail)))(any()))
           .thenReturn(Future.successful(teams))
 
         val request = FakeRequest(GET, routes.IndexController.onPageLoad.url)

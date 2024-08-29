@@ -43,5 +43,5 @@ object ApiPolicyConditionsDeclaration extends Enumerable.Implicits {
     }
 
   implicit val enumerable: Enumerable[ApiPolicyConditionsDeclaration] =
-    Enumerable(values.map(v => v.toString -> v): _*)
+    Enumerable(values.map(v => v.toString -> v)*)
 }

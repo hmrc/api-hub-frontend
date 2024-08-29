@@ -18,6 +18,7 @@ package repositories
 
 import config.{CryptoProvider, FrontendAppConfig}
 import models.UserAnswers
+import org.mongodb.scala.SingleObservableFuture
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, Indexes, ReplaceOptions, Updates}
 import play.api.libs.json.Format
@@ -45,7 +46,7 @@ class UserAnswersRepository (
         Indexes.ascending("lastUpdated"),
         IndexOptions()
           .name("lastUpdatedIdx")
-          .expireAfter(appConfig.cacheTtl, TimeUnit.SECONDS)
+          .expireAfter(appConfig.cacheTtl.toLong, TimeUnit.SECONDS)
       ),
       IndexModel(
         Indexes.ascending("userId"),

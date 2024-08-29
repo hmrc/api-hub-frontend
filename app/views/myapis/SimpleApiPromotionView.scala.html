@@ -24,7 +24,7 @@
     govukButton : GovukButton
 )
 
-@(apiDetail: ApiDetail, user: UserModel)(implicit request: Request[_], messages: Messages)
+@(apiDetail: ApiDetail, user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = titleNoForm("Promote to production"), user = Some(user)) {
 
@@ -54,17 +54,17 @@
     @formHelper(action = controllers.myapis.routes.SimpleApiPromotionController.onSubmit(apiDetail.id)) {
         <div class="govuk-button-group">
             @govukButton(
-                ButtonViewModel(
-                    content = Text("Deploy API")
-                )
+            ButtonViewModel(
+            content = Text("Deploy API")
+            )
             )
 
             @govukButton(
-                ButtonViewModel(
-                    content = Text("Cancel")
-                )
-                .asSecondaryButton()
-                .asLink(controllers.myapis.routes.MyApiDetailsController.onPageLoad(apiDetail.id).url)
+            ButtonViewModel(
+            content = Text("Cancel")
+            )
+            .asSecondaryButton()
+            .asLink(controllers.myapis.routes.MyApiDetailsController.onPageLoad(apiDetail.id).url)
             )
         </div>
     }

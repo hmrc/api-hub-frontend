@@ -51,10 +51,7 @@ import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext
 
 class ApplicationsConnectorSpec
-  extends AsyncFreeSpec
-  with Matchers
-  with WireMockSupport
-  with OptionValues
+  extends OptionValues
   with EitherValues
   with ApplicationGetterBehaviours
   with TableDrivenPropertyChecks {
@@ -1527,8 +1524,7 @@ object ApplicationsConnectorSpec extends HttpClientV2Support {
     )
   )
 
-  trait ApplicationGetterBehaviours {
-    this: AsyncFreeSpec with Matchers with WireMockSupport =>
+  trait ApplicationGetterBehaviours extends AsyncFreeSpec with Matchers with WireMockSupport {
 
     def successfulApplicationGetter(enrich: Boolean, includeDeleted: Boolean): Unit = {
       s"must place the correct request and return the application when enrich = $enrich" in {

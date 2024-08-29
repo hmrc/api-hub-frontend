@@ -28,7 +28,7 @@ class SessionRepositorySpec extends UserAnswersRepositoryBehaviours {
   )
 
   "SessionRepository" - {
-    behave like userAnswersRepository(repository)
+    behave.like(userAnswersRepository(repository.asInstanceOf[UserAnswersRepository]))
   }
 
 }

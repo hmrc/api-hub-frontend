@@ -23,8 +23,8 @@ import generators.ApiDetailGenerators
 import models.api.ApiDetail
 import models.{AddAnApi, ApiPolicyConditionsDeclaration, Mode, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.{ArgumentCaptor, ArgumentMatchers}
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentCaptor
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.{AddAnApiApiPage, AddAnApiContextPage, AddAnApiSelectApplicationPage, ApiPolicyConditionsDeclarationPage}
@@ -54,7 +54,7 @@ class ApiPolicyConditionsDeclarationPageControllerSpec extends SpecBase with Moc
       val apiDetail = sampleApiDetail()
       val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
 
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+      when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
       running(fixture.application) {
@@ -74,7 +74,7 @@ class ApiPolicyConditionsDeclarationPageControllerSpec extends SpecBase with Moc
       val userAnswers = buildUserAnswers(apiDetail).set(AddAnApiSelectApplicationPage, application).toOption.value
       val fixture = buildFixture(Some(userAnswers))
 
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+      when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
       running(fixture.application) {
@@ -92,7 +92,7 @@ class ApiPolicyConditionsDeclarationPageControllerSpec extends SpecBase with Moc
       val apiDetail = sampleApiDetail()
       val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
 
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+      when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
       when(fixture.addAnApiSessionRepository.set(any())).thenReturn(Future.successful(true))
@@ -137,10 +137,10 @@ class ApiPolicyConditionsDeclarationPageControllerSpec extends SpecBase with Moc
       val apiDetail = sampleApiDetail()
       val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
 
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+      when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
-      when(fixture.addAnApiSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(fixture.addAnApiSessionRepository.set(any())).thenReturn(Future.successful(true))
 
       running(fixture.application) {
         val request =
@@ -185,7 +185,7 @@ class ApiPolicyConditionsDeclarationPageControllerSpec extends SpecBase with Moc
 
   private def buildView(
     application: PlayApplication,
-    request: Request[_],
+    request: Request[?],
     form: Form[Set[ApiPolicyConditionsDeclaration]],
     mode: Mode,
     apiDetail: ApiDetail

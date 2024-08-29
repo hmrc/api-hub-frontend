@@ -23,7 +23,7 @@
     govukButton: GovukButton
 )
 
-@(userEmails: Seq[String], user: UserModel)(implicit request: Request[_], messages: Messages)
+@(userEmails: Seq[String], user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @scripts() = {
     <script src='@routes.Assets.versioned("javascripts/adminGetUsers.js")' type="module" @{CSPNonce.attr}></script>

@@ -19,7 +19,8 @@ package controllers.actions
 import base.SpecBase
 import models.user.{Permissions, StrideUser, UserModel}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.MockitoSugar
+import org.mockito.Mockito.{verifyNoMoreInteractions, when}
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.mvc.{Action, AnyContent, AnyContentAsEmpty, Results}
 import play.api.test.FakeRequest

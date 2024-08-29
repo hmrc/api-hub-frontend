@@ -21,8 +21,7 @@ import controllers.actions.{FakeApplication, FakeUser}
 import forms.ConfirmationFormProvider
 import generators.ApiDetailGenerators
 import models.application.Application
-import org.mockito.ArgumentMatchers
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
@@ -88,7 +87,7 @@ class DeleteApplicationConfirmationControllerSpec extends SpecBase with MockitoS
         status(result) mustBe OK
         contentAsString(result) mustBe view(FakeUser)(request, messages(fixture.application)).toString()
         contentAsString(result) must validateAsHtml
-        verify(fixture.apiHubService).deleteApplication(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(FakeUser.email))(any())
+        verify(fixture.apiHubService).deleteApplication(eqTo(FakeApplication.id), eqTo(FakeUser.email))(any())
       }
     }
 

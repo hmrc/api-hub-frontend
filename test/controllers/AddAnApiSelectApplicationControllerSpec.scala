@@ -25,8 +25,7 @@ import models.application.ApplicationLenses.ApplicationLensOps
 import models.application.{Api, Application}
 import models.{AddAnApi, Mode, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.{AddAnApiApiPage, AddAnApiContextPage, AddAnApiSelectApplicationPage}
@@ -55,10 +54,10 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
       val apiDetail = sampleApiDetail()
       val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
 
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+      when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
-      when(fixture.apiHubService.getApplications(ArgumentMatchers.eq(Some(FakeUser.email.value)), ArgumentMatchers.eq(false))(any()))
+      when(fixture.apiHubService.getApplications(eqTo(Some(FakeUser.email.value)), eqTo(false))(any()))
         .thenReturn(Future.successful(Seq.empty))
 
       running(fixture.application) {
@@ -77,10 +76,10 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
       val application = buildApplicationWithAccess(apiDetail)
       val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
 
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+      when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
-      when(fixture.apiHubService.getApplications(ArgumentMatchers.eq(Some(FakeUser.email.value)), ArgumentMatchers.eq(false))(any()))
+      when(fixture.apiHubService.getApplications(eqTo(Some(FakeUser.email.value)), eqTo(false))(any()))
         .thenReturn(Future.successful(Seq(application)))
 
       running(fixture.application) {
@@ -99,10 +98,10 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
       val applications = buildApplicationsWithoutAccess(3)
       val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
 
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+      when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
-      when(fixture.apiHubService.getApplications(ArgumentMatchers.eq(Some(FakeUser.email.value)), ArgumentMatchers.eq(false))(any()))
+      when(fixture.apiHubService.getApplications(eqTo(Some(FakeUser.email.value)), eqTo(false))(any()))
         .thenReturn(Future.successful(applications))
 
       running(fixture.application) {
@@ -121,10 +120,10 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
       val applications = buildApplicationsWithoutAccess(10)
       val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
 
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+      when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
-      when(fixture.apiHubService.getApplications(ArgumentMatchers.eq(Some(FakeUser.email.value)), ArgumentMatchers.eq(false))(any()))
+      when(fixture.apiHubService.getApplications(eqTo(Some(FakeUser.email.value)), eqTo(false))(any()))
         .thenReturn(Future.successful(applications))
 
       running(fixture.application) {
@@ -144,10 +143,10 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
       val application2 = buildApplicationWithoutAccess()
       val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
 
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+      when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
-      when(fixture.apiHubService.getApplications(ArgumentMatchers.eq(Some(FakeUser.email.value)), ArgumentMatchers.eq(false))(any()))
+      when(fixture.apiHubService.getApplications(eqTo(Some(FakeUser.email.value)), eqTo(false))(any()))
         .thenReturn(Future.successful(Seq(application1, application2)))
 
       running(fixture.application) {
@@ -168,10 +167,10 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
       val fixture = buildFixture(Some(userAnswers))
       val filledForm = form.fill(application.id)
 
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+      when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
-      when(fixture.apiHubService.getApplications(ArgumentMatchers.eq(Some(FakeUser.email.value)), ArgumentMatchers.eq(false))(any()))
+      when(fixture.apiHubService.getApplications(eqTo(Some(FakeUser.email.value)), eqTo(false))(any()))
         .thenReturn(Future.successful(Seq(application)))
 
       running(fixture.application) {
@@ -190,7 +189,7 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
       val application = buildApplicationWithoutAccess()
       val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any(), any())(any()))
+      when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))
         .thenReturn(Future.successful(Some(application)))
       when(fixture.addAnApiSessionRepository.set(any()))
         .thenReturn(Future.successful(true))
@@ -210,7 +209,7 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
       val application = buildApplicationWithoutAccess()
       val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any(), any())(any()))
+      when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))
         .thenReturn(Future.successful(Some(application)))
       when(fixture.addAnApiSessionRepository.set(any()))
         .thenReturn(Future.successful(true))
@@ -227,7 +226,7 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
           .set(AddAnApiApiPage, apiDetail).toOption.value
           .set(AddAnApiSelectApplicationPage, application).toOption.value
 
-        verify(fixture.addAnApiSessionRepository).set(ArgumentMatchers.eq(expected))
+        verify(fixture.addAnApiSessionRepository).set(eqTo(expected))
       }
     }
 
@@ -237,10 +236,10 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
       val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
       val boundForm = form.bind(Map("value" -> ""))
 
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+      when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
-      when(fixture.apiHubService.getApplications(ArgumentMatchers.eq(Some(FakeUser.email.value)), ArgumentMatchers.eq(false))(any()))
+      when(fixture.apiHubService.getApplications(eqTo(Some(FakeUser.email.value)), eqTo(false))(any()))
         .thenReturn(Future.successful(Seq(application)))
 
       running(fixture.application) {
@@ -285,7 +284,7 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
       val application = buildApplicationWithoutAccess()
       val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any(), any())(any()))
+      when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))
         .thenReturn(Future.successful(None))
 
       running(fixture.application) {
@@ -333,7 +332,7 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
 
   private def buildView(
     application: PlayApplication,
-    request: Request[_],
+    request: Request[?],
     form: Form[String],
     mode: Mode,
     apiDetail: ApiDetail,

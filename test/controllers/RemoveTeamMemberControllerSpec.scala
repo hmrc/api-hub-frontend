@@ -47,7 +47,7 @@ class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with Opt
 
       val mockSessionRepository = mock[SessionRepository]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
       val application = applicationBuilder(userAnswers = Some(userAnswers))
         .overrides(

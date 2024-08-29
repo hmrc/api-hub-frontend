@@ -28,7 +28,7 @@ object AddAnApiContext extends Enumerable.Implicits {
   val values: Seq[AddAnApiContext] = Seq(AddAnApi, AddEndpoints)
 
   implicit val enumerable: Enumerable[AddAnApiContext] =
-    Enumerable(values.map(v => v.toString -> v): _*)
+    Enumerable(values.map(v => v.toString -> v)*)
 
   implicit val jsLiteral: JavascriptLiteral[AddAnApiContext]= new JavascriptLiteral[AddAnApiContext]() {
     override def to(value: AddAnApiContext): String = value match {

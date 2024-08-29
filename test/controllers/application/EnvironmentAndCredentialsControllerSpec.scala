@@ -24,8 +24,9 @@ import models.application.{Primary, Secondary}
 import models.application.ApplicationLenses._
 import models.exception.ApplicationCredentialLimitException
 import models.user.UserModel
-import org.mockito.ArgumentMatchers.any
-import org.mockito.{ArgumentMatchers, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{verify, when}
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -42,10 +43,10 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
   "ApplicationDetails Controller" - {
     "must return OK and the correct view for a GET for a team member or supporter" in {
       forAll(teamMemberAndSupporterTable) {
-        user: UserModel =>
+        (user: UserModel) =>
           val fixture = buildFixture(userModel = user)
 
-          when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(true), ArgumentMatchers.eq(false))(any()))
+          when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(true), eqTo(false))(any()))
             .thenReturn(Future.successful(Some(FakeApplication)))
 
           running(fixture.playApplication) {
@@ -64,7 +65,7 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
     "must return 404 Not Found when the application does not exist" in {
       val fixture = buildFixture()
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), any(), any())(any()))
+      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), any(), any())(any()))
         .thenReturn(Future.successful(None))
 
       running(fixture.playApplication) {
@@ -87,7 +88,7 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
     "must redirect to Unauthorised page for a GET when user is not a team member or supporter" in {
       val fixture = buildFixture(userModel = FakeUserNotTeamMember)
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(true), ArgumentMatchers.eq(false))(any()))
+      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(true), eqTo(false))(any()))
         .thenReturn(Future.successful(Some(FakeApplication)))
 
       running(fixture.playApplication) {
@@ -108,7 +109,7 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
         val application = FakeApplication.addTeamMember(user.email.value)
         val fixture = buildFixture(user)
 
-        when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any(), any())(any()))
+        when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))
           .thenReturn(Future.successful(Some(application)))
 
         when(fixture.apiHubService.deleteCredential(any(), any(), any())(any())).thenReturn(Future.successful(Right(Some(()))))
@@ -123,9 +124,9 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe Some(expectedUrl)
           verify(fixture.apiHubService).deleteCredential(
-            ArgumentMatchers.eq(application.id),
-            ArgumentMatchers.eq(Primary),
-            ArgumentMatchers.eq(clientId))(any()
+            eqTo(application.id),
+            eqTo(Primary),
+            eqTo(clientId))(any()
           )
         }
       }
@@ -136,7 +137,7 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
         val application = FakeApplication.addTeamMember(user.email.value)
         val fixture = buildFixture(user)
 
-        when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any(), any())(any()))
+        when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))
           .thenReturn(Future.successful(Some(application)))
 
         running(fixture.playApplication) {
@@ -156,7 +157,7 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
       val application = FakeApplication.addTeamMember(FakePrivilegedUser.email.value)
       val fixture = buildFixture(FakePrivilegedUser)
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any(), any())(any()))
+      when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))
         .thenReturn(Future.successful(Some(application)))
 
       when(fixture.apiHubService.deleteCredential(any(), any(), any())(any())).thenReturn(Future.successful(Right(None)))
@@ -186,7 +187,7 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
       val application = FakeApplication.addTeamMember(FakePrivilegedUser.email.value)
       val fixture = buildFixture(FakePrivilegedUser)
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any(), any())(any()))
+      when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))
         .thenReturn(Future.successful(Some(application)))
 
       when(fixture.apiHubService.deleteCredential(any(), any(), any())(any()))
@@ -220,7 +221,7 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
         val application = FakeApplication.addTeamMember(user.email.value)
         val fixture = buildFixture(user)
 
-        when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any(), any())(any()))
+        when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))
           .thenReturn(Future.successful(Some(application)))
 
         when(fixture.apiHubService.deleteCredential(any(), any(), any())(any())).thenReturn(Future.successful(Right(Some(()))))
@@ -235,9 +236,9 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe Some(expectedUrl)
           verify(fixture.apiHubService).deleteCredential(
-            ArgumentMatchers.eq(application.id),
-            ArgumentMatchers.eq(Secondary),
-            ArgumentMatchers.eq(clientId))(any()
+            eqTo(application.id),
+            eqTo(Secondary),
+            eqTo(clientId))(any()
           )
         }
       }
@@ -247,7 +248,7 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
       forAll(usersWhoCannotDeleteSecondaryCredentials){(user: UserModel) =>
         val fixture = buildFixture(user)
 
-        when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), any(), any())(any()))
+        when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), any(), any())(any()))
           .thenReturn(Future.successful(Some(FakeApplication)))
 
         running(fixture.playApplication) {
@@ -267,7 +268,7 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
       val application = FakeApplication.addTeamMember(FakePrivilegedUser.email.value)
       val fixture = buildFixture(FakePrivilegedUser)
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any(), any())(any()))
+      when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))
         .thenReturn(Future.successful(Some(application)))
 
       when(fixture.apiHubService.deleteCredential(any(), any(), any())(any())).thenReturn(Future.successful(Right(None)))
@@ -297,7 +298,7 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
       val application = FakeApplication.addTeamMember(FakePrivilegedUser.email.value)
       val fixture = buildFixture(FakePrivilegedUser)
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), any(), any())(any()))
+      when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))
         .thenReturn(Future.successful(Some(application)))
 
       when(fixture.apiHubService.deleteCredential(any(), any(), any())(any()))

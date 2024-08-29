@@ -24,7 +24,7 @@
     govukButton: GovukButton
 )
 
-@(summaryList: SummaryList, user: Some[UserModel], context: AddAnApiContext)(implicit request: Request[_], messages: Messages)
+@(summaryList: SummaryList, user: Some[UserModel], context: AddAnApiContext)(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("addAnApiCheckYourAnswers.title")), user = user, fullWidth = true) {
 

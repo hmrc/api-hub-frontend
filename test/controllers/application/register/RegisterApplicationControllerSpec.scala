@@ -21,12 +21,14 @@ import controllers.actions.FakeUser
 import generators.{ApplicationGenerator, TeamGenerator}
 import models.{CheckMode, UserAnswers}
 import models.application.{Creator, NewApplication}
-import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.{verify, verifyNoInteractions, when}
+import org.scalatestplus.mockito.MockitoSugar
 import pages.application.register.{RegisterApplicationNamePage, RegisterApplicationTeamPage}
 import play.api.inject.bind
-import play.api.{Application => PlayApplication}
+import play.api.Application as PlayApplication
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.SessionRepository
 import services.ApiHubService
 import utils.HtmlValidation
@@ -34,7 +36,7 @@ import views.html.application.register.RegisterApplicationSuccessView
 
 import scala.concurrent.Future
 
-class RegisterApplicationControllerSpec extends SpecBase with MockitoSugar with ArgumentMatchersSugar with HtmlValidation with ApplicationGenerator with TeamGenerator {
+class RegisterApplicationControllerSpec extends SpecBase with MockitoSugar with HtmlValidation with ApplicationGenerator with TeamGenerator {
 
   "register" - {
     "must register an application and return the success view" in {
@@ -80,8 +82,8 @@ class RegisterApplicationControllerSpec extends SpecBase with MockitoSugar with 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.application.register.routes.RegisterApplicationNameController.onPageLoad(CheckMode).url)
 
-        verifyZeroInteractions(fixture.apiHubService)
-        verifyZeroInteractions(fixture.sessionRepository)
+        verifyNoInteractions(fixture.apiHubService)
+        verifyNoInteractions(fixture.sessionRepository)
       }
     }
 
@@ -100,8 +102,8 @@ class RegisterApplicationControllerSpec extends SpecBase with MockitoSugar with 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.application.register.routes.RegisterApplicationTeamController.onPageLoad(CheckMode).url)
 
-        verifyZeroInteractions(fixture.apiHubService)
-        verifyZeroInteractions(fixture.sessionRepository)
+        verifyNoInteractions(fixture.apiHubService)
+        verifyNoInteractions(fixture.sessionRepository)
       }
     }
   }

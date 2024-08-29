@@ -43,7 +43,7 @@ class ExploreApisController @Inject()(
     implicit request =>
       apiHubService.getApis().map {
         case apiDetails: Seq[ApiDetail] => Ok(view(request.user, apiDetails.sortWith( _.title.toUpperCase < _.title.toUpperCase), domains, hods, platforms))
-        case _ => InternalServerError
+        case null => InternalServerError
       }
   }
 

@@ -22,8 +22,9 @@ import controllers.routes
 import generators.AccessRequestGenerator
 import models.accessrequest.{AccessRequest, Pending}
 import models.user.UserModel
-import org.mockito.ArgumentMatchers.any
-import org.mockito.{ArgumentMatchers, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{verify, when}
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.mvc.AnyContentAsEmpty
@@ -57,7 +58,7 @@ class AccessRequestsControllerSpec
           status(result) mustBe OK
           contentAsString(result) mustBe view(accessRequests, user).toString()
           contentAsString(result) must validateAsHtml
-          verify(fixture.apiHubService).getAccessRequests(ArgumentMatchers.eq(None), ArgumentMatchers.eq(None))(any())
+          verify(fixture.apiHubService).getAccessRequests(eqTo(None), eqTo(None))(any())
         }
       }
     }

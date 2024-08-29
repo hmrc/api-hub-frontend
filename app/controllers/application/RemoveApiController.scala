@@ -68,7 +68,7 @@ class RemoveApiController @Inject()(
       )
   }
 
-  private def showConfirmationView(status: Status, apiId: String, form: Form[_])(implicit request: ApplicationRequest[_]): Future[Result] = {
+  private def showConfirmationView(status: Status, apiId: String, form: Form[?])(implicit request: ApplicationRequest[?]): Future[Result] = {
     apiHubService.getApiDetail(apiId).map {
       case Some(apiDetail) if request.application.hasApi(apiDetail.id) =>
         status(confirmationView(request.application, apiDetail, form, request.identifierRequest.user))

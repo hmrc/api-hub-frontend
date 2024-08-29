@@ -28,7 +28,7 @@ class AccessRequestSessionRepositorySpec extends UserAnswersRepositoryBehaviours
   )
 
   "AccessRequestSessionRepository" - {
-    behave like userAnswersRepository(repository)
+    behave.like(userAnswersRepository(repository.asInstanceOf[UserAnswersRepository]))
   }
 
 }

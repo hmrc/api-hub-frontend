@@ -21,7 +21,9 @@ import controllers.admin.TeamMigrationController.{MigrationSummary, TeamApplicat
 import generators.TeamGenerator
 import models.user.UserModel
 import models.application.{Application, Creator, Deleted, TeamMember}
-import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any, same}
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.mvc.AnyContentAsEmpty
@@ -38,7 +40,6 @@ import scala.concurrent.Future
 class TeamMigrationControllerSpec
   extends SpecBase
     with MockitoSugar
-    with ArgumentMatchersSugar
     with TestHelpers
     with HtmlValidation
     with TeamGenerator {

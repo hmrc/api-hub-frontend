@@ -53,7 +53,7 @@ class ChangeTeamNameController @Inject()(
       })
   }
 
-  private def getTeamName(id: String)(implicit request: TeamRequest[_]) = {
+  private def getTeamName(id: String)(implicit request: TeamRequest[?]) = {
     apiHubService.findTeamById(id).map {
         case Some(team) => team.name
         case None => Messages("apiDetails.details.team.error")
@@ -67,11 +67,11 @@ class ChangeTeamNameController @Inject()(
         name => changeTeamName(id, name, request.identifierRequest.user, form))
   }
 
-  private def badRequest(id: String, formWithErrors: Form[String])(implicit request: TeamRequest[_]): Future[Result] = {
+  private def badRequest(id: String, formWithErrors: Form[String])(implicit request: TeamRequest[?]): Future[Result] = {
     Future.successful(BadRequest(view(formWithErrors, controllers.team.routes.ChangeTeamNameController.onSubmit(id), request.identifierRequest.user)))
   }
 
-  private def changeTeamName(id: String, name: String, user: UserModel, form: Form[String])(implicit request: Request[_]) = {
+  private def changeTeamName(id: String, name: String, user: UserModel, form: Form[String])(implicit request: Request[?]) = {
     apiHubService.changeTeamName(id, name).map {
       case Right(_) => Ok(successView(user))
       case Left(_: TeamNameNotUniqueException) => nameNotUnique(form.fill(name), id, user)
@@ -79,14 +79,14 @@ class ChangeTeamNameController @Inject()(
     }
   }
 
-  private def teamNotFound(id: String)(implicit request: Request[_]): Result = {
+  private def teamNotFound(id: String)(implicit request: Request[?]): Result = {
     errorResultBuilder.notFound(
       heading = Messages("site.teamNotFoundHeading"),
       message = Messages("site.teamNotFoundMessage", id)
     )
   }
 
-  private def nameNotUnique(form: Form[String], id: String, user: UserModel)(implicit request: Request[_]) = {
+  private def nameNotUnique(form: Form[String], id: String, user: UserModel)(implicit request: Request[?]) = {
     BadRequest(view(form.withError(FormError("value", "createTeamName.error.nameNotUnique")), controllers.team.routes.ChangeTeamNameController.onSubmit(id), user))
   }
 

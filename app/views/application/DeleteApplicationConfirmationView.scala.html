@@ -25,7 +25,7 @@
     govukButton: GovukButton
 )
 
-@(applicationId: String, form: Form[_], summaryList: SummaryList)(implicit request: Request[_], messages: Messages)
+@(applicationId: String, form: Form[?], summaryList: SummaryList)(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = title(form, messages("deleteApplicationConfirmation.title"))) {
 
@@ -60,16 +60,16 @@
 
         <div class="govuk-button-group">
             @govukButton(
-                ButtonViewModel(messages("deleteApplicationConfirmation.accept"))
-                    .asWarningButton()
-                    .withId("acceptAndContinueButton")
+            ButtonViewModel(messages("deleteApplicationConfirmation.accept"))
+            .asWarningButton()
+            .withId("acceptAndContinueButton")
             )
 
             @govukButton(
-                ButtonViewModel(content = messages("site.cancel"))
-                    .asSecondaryButton()
-                    .asLink(controllers.application.routes.ApplicationDetailsController.onPageLoad(applicationId).url)
-                    .withId("cancelButton")
+            ButtonViewModel(content = messages("site.cancel"))
+            .asSecondaryButton()
+            .asLink(controllers.application.routes.ApplicationDetailsController.onPageLoad(applicationId).url)
+            .withId("cancelButton")
             )
         </div>
     }

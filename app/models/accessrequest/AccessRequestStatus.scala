@@ -30,6 +30,6 @@ object AccessRequestStatus extends Enumerable.Implicits {
   val values: Seq[AccessRequestStatus] = Seq(Pending, Approved, Rejected, Cancelled)
 
   implicit val enumerable: Enumerable[AccessRequestStatus] =
-    Enumerable(values.map(value => value.toString -> value): _*)
+    Enumerable(values.map(value => value.toString -> value)*)
 
 }

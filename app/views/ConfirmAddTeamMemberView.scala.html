@@ -24,7 +24,7 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], teamMemberDetails: SummaryList, user: Some[UserModel], mode:Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[?], teamMemberDetails: SummaryList, user: Some[UserModel], mode:Mode)(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("confirmAddTeamMember.title")), fullWidth = true, user = user) {
     <h1 id="teamMembersHeading" class="govuk-heading-xl">@messages("confirmAddTeamMember.membersCountHeader", teamMemberDetails.rows.length )</h1>

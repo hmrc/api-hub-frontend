@@ -19,7 +19,7 @@
     govukButton: GovukButton
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@()(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("journeyRecovery.startAgain.title"))) {
 
@@ -29,8 +29,8 @@
 
     <p class="govuk-body">
         @govukButton(
-            ButtonViewModel(messages("site.startAgain"))
-                .asLink(routes.IndexController.onPageLoad.url)
+        ButtonViewModel(messages("site.startAgain"))
+        .asLink(routes.IndexController.onPageLoad.url)
         )
     </p>
 }

@@ -34,7 +34,7 @@ class ApplicationApiBuilder @Inject()(
   override val messagesApi: MessagesApi
 )(implicit ec: ExecutionContext) extends FrontendHeaderCarrierProvider with I18nSupport {
 
-  def build(application: Application)(implicit request: Request[_]): Future[Either[Result, Seq[ApplicationApi]]] = {
+  def build(application: Application)(implicit request: Request[?]): Future[Either[Result, Seq[ApplicationApi]]] = {
     apiHubService.getAccessRequests(Some(application.id), Some(Pending)).flatMap (
       pendingAccessRequests =>
         fetchApiDetails(application).map {
@@ -74,7 +74,7 @@ class ApplicationApiBuilder @Inject()(
     pendingAccessRequests.exists(_.apiId == apiId)
   }
 
-  private def fetchApiDetails(application: Application)(implicit request: Request[_]): Future[Either[Result, Seq[ApiDetail]]] = {
+  private def fetchApiDetails(application: Application)(implicit request: Request[?]): Future[Either[Result, Seq[ApiDetail]]] = {
     Future
       .sequence(application.apis.map(fetchApiDetail(_)))
       .map(
@@ -90,7 +90,7 @@ class ApplicationApiBuilder @Inject()(
       )
   }
 
-  private def fetchApiDetail(api: Api)(implicit request: Request[_]): Future[Either[Result, ApiDetail]] = {
+  private def fetchApiDetail(api: Api)(implicit request: Request[?]): Future[Either[Result, ApiDetail]] = {
     apiHubService.getApiDetail(api.id).map(
       _.toRight(
         errorResultBuilder.notFound(

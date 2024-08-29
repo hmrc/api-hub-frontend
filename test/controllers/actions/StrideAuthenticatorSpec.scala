@@ -19,10 +19,11 @@ package controllers.actions
 import controllers.actions.StrideAuthenticator.{API_HUB_APPROVER_ROLE, API_HUB_PRIVILEGED_USER_ROLE, API_HUB_SUPPORT_ROLE, API_HUB_USER_ROLE}
 import controllers.actions.StrideAuthenticatorSpec._
 import models.user.{Permissions, StrideUser, UserModel}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.{ArgumentMatchers, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.when
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import uk.gov.hmrc.auth.core.AuthProvider.PrivilegedApplication
 import uk.gov.hmrc.auth.core.authorise.Predicate
@@ -47,7 +48,7 @@ class StrideAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSu
         permissions = Permissions(canApprove = false, canSupport = false, isPrivileged = false)
       )
 
-      when(authConnector.authorise(ArgumentMatchers.eq(userPredicate), ArgumentMatchers.eq(userRetrieval))(any(), any()))
+      when(authConnector.authorise(eqTo(userPredicate), eqTo(userRetrieval))(any(), any()))
         .thenReturn(Future.successful(retrievalsForUser(user)))
 
       strideAuthenticator.authenticate()(FakeRequest()).map {
@@ -68,7 +69,7 @@ class StrideAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSu
         permissions = Permissions(canApprove = true, canSupport = false, isPrivileged = false)
       )
 
-      when(authConnector.authorise(ArgumentMatchers.eq(userPredicate), ArgumentMatchers.eq(userRetrieval))(any(), any()))
+      when(authConnector.authorise(eqTo(userPredicate), eqTo(userRetrieval))(any(), any()))
         .thenReturn(Future.successful(retrievalsForUser(user)))
 
       strideAuthenticator.authenticate()(FakeRequest()).map {
@@ -89,7 +90,7 @@ class StrideAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSu
         permissions = Permissions(canApprove = false, canSupport = true, isPrivileged = false)
       )
 
-      when(authConnector.authorise(ArgumentMatchers.eq(userPredicate), ArgumentMatchers.eq(userRetrieval))(any(), any()))
+      when(authConnector.authorise(eqTo(userPredicate), eqTo(userRetrieval))(any(), any()))
         .thenReturn(Future.successful(retrievalsForUser(user)))
 
       strideAuthenticator.authenticate()(FakeRequest()).map {
@@ -110,7 +111,7 @@ class StrideAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSu
         permissions = Permissions(canApprove = false, canSupport = false, isPrivileged = true)
       )
 
-      when(authConnector.authorise(ArgumentMatchers.eq(userPredicate), ArgumentMatchers.eq(userRetrieval))(any(), any()))
+      when(authConnector.authorise(eqTo(userPredicate), eqTo(userRetrieval))(any(), any()))
         .thenReturn(Future.successful(retrievalsForUser(user)))
 
       strideAuthenticator.authenticate()(FakeRequest()).map {
@@ -131,7 +132,7 @@ class StrideAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSu
         permissions = Permissions(canApprove = false, canSupport = false, isPrivileged = false)
       )
 
-      when(authConnector.authorise(ArgumentMatchers.eq(userPredicate), ArgumentMatchers.eq(userRetrieval))(any(), any()))
+      when(authConnector.authorise(eqTo(userPredicate), eqTo(userRetrieval))(any(), any()))
         .thenReturn(Future.successful(retrievalsForUser(user)))
 
       strideAuthenticator.authenticate()(FakeRequest()).map {
@@ -144,7 +145,7 @@ class StrideAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSu
       val authConnector = mock[AuthConnector]
       val strideAuthenticator = new StrideAuthenticator(authConnector)
 
-      when(authConnector.authorise(ArgumentMatchers.eq(userPredicate), ArgumentMatchers.eq(userRetrieval))(any(), any()))
+      when(authConnector.authorise(eqTo(userPredicate), eqTo(userRetrieval))(any(), any()))
         .thenReturn(Future.failed(NoActiveSessionException))
 
       strideAuthenticator.authenticate()(FakeRequest()).map {
@@ -157,7 +158,7 @@ class StrideAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSu
       val authConnector = mock[AuthConnector]
       val strideAuthenticator = new StrideAuthenticator(authConnector)
 
-      when(authConnector.authorise(ArgumentMatchers.eq(userPredicate), ArgumentMatchers.eq(userRetrieval))(any(), any()))
+      when(authConnector.authorise(eqTo(userPredicate), eqTo(userRetrieval))(any(), any()))
         .thenReturn(Future.failed(InsufficientEnrolments("test-message")))
 
       strideAuthenticator.authenticate()(FakeRequest()).map {

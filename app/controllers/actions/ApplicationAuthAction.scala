@@ -48,7 +48,7 @@ class ApplicationAuthActionProviderImpl @Inject()(
   def apply(applicationId: String, enrich: Boolean = false, includeDeleted: Boolean = false)(implicit ec: ExecutionContext): ApplicationAuthAction = {
     new ApplicationAuthAction with FrontendHeaderCarrierProvider {
       override protected def refine[A](identifierRequest: IdentifierRequest[A]): Future[Either[Result, ApplicationRequest[A]]] = {
-        implicit val request: Request[_] = identifierRequest
+        implicit val request: Request[?] = identifierRequest
 
         apiHubService.getApplication(applicationId, enrich, includeDeleted) map {
           case Some(application) =>

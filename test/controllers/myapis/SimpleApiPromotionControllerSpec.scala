@@ -21,8 +21,10 @@ import connectors.ApplicationsConnector
 import controllers.actions.{FakeApiDetail, FakeSupporter}
 import models.deployment.{Error, FailuresResponse, InvalidOasResponse, SuccessfulDeploymentsResponse}
 import models.user.UserModel
-import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{never, verify, when}
 import org.scalatest.matchers.must.Matchers
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -38,7 +40,6 @@ class SimpleApiPromotionControllerSpec
   extends SpecBase
     with Matchers
     with MockitoSugar
-    with ArgumentMatchersSugar
     with HtmlValidation
     with TestHelpers {
 

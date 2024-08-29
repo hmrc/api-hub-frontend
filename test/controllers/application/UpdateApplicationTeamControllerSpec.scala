@@ -23,8 +23,10 @@ import forms.application.UpdateApplicationTeamFormProvider
 import models.application.TeamMember
 import models.team.Team
 import models.user.UserModel
-import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{never, verify, when}
 import org.scalatest.matchers.must.Matchers
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -42,7 +44,6 @@ class UpdateApplicationTeamControllerSpec
         extends SpecBase
     with Matchers
             with MockitoSugar
-            with ArgumentMatchersSugar
             with HtmlValidation
             with TestHelpers
             with FakeApplicationAuthActions {
@@ -134,7 +135,7 @@ class UpdateApplicationTeamControllerSpec
         }
     }
 
-  "onSubmit" - {
+    "onSubmit" - {
         "must return 200 Ok and the correct view for a support user when a team has been selected" in {
             forAll(usersWhoCanSupport) { user =>
                 val fixture = buildFixture(user)
@@ -199,8 +200,7 @@ class UpdateApplicationTeamControllerSpec
                             "Page not found - 404",
                             "Unable to update owning team for this application.",
                             "The application or team cannot be found."
-                    )(request, messages(fixture.playApplication))
-              .toString()
+                    )(request, messages(fixture.playApplication)).toString()
                     contentAsString(result) must validateAsHtml
                 }
             }

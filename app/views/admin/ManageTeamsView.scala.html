@@ -24,7 +24,7 @@
     govukTable: GovukTable
 )
 
-@(teams: Seq[Team], user: UserModel)(implicit request: Request[_], messages: Messages)
+@(teams: Seq[Team], user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @teamLink(team: Team) = {
     <a href="@controllers.team.routes.ManageTeamController.onPageLoad(team.id)">@team.id</a>

@@ -49,7 +49,7 @@ class TeamAuthActionProviderImpl @Inject()(
   override def apply(teamId: String)(implicit ec: ExecutionContext): TeamAuthAction = {
     new TeamAuthAction with FrontendHeaderCarrierProvider {
       override protected def refine[A](identifierRequest: IdentifierRequest[A]): Future[Either[Result, TeamRequest[A]]] = {
-        implicit val request: Request[_] = identifierRequest
+        implicit val request: Request[?] = identifierRequest
 
         apiHubService.findTeamById(teamId) map {
           case Some(team) =>

@@ -43,7 +43,7 @@ class ApiAuthActionProviderImpl @Inject()(
   def apply(apiId: String)(implicit ec: ExecutionContext): ApiAuthAction = {
     new ApiAuthAction with FrontendHeaderCarrierProvider {
       override protected def refine[A](identifierRequest: IdentifierRequest[A]): Future[Either[Result, ApiRequest[A]]] = {
-        implicit val request: Request[_] = identifierRequest
+        implicit val request: Request[?] = identifierRequest
 
         apiHubService.getApiDetail(apiId).flatMap {
           case Some(apiDetail) if identifierRequest.user.permissions.canSupport =>

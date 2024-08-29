@@ -31,7 +31,7 @@
     accessRequestPanel: AccessRequestPanel
 )
 
-@(application: Application, accessRequests: Seq[AccessRequest], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+@(application: Application, accessRequests: Seq[AccessRequest], user: Option[UserModel])(implicit request: Request[?], messages: Messages)
 
 @owningTeamLink(teamId: String, teamName: String) = {
     <a href="@controllers.team.routes.ManageTeamController.onPageLoad(teamId)" class="govuk-link">@teamName</a>

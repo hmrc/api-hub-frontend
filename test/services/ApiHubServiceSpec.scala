@@ -20,31 +20,28 @@ import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
 import controllers.actions.FakeApplication
 import generators.{AccessRequestGenerator, ApiDetailGenerators}
 import models.AvailableEndpoint
-import models.accessrequest._
+import models.accessrequest.*
 import models.api.{ApiDeploymentStatuses, ContactInfo, EndpointMethod, PlatformContact}
-import models.application.ApplicationLenses._
-import models.application._
+import models.application.ApplicationLenses.*
+import models.application.*
 import models.deployment.DeploymentDetails
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
 import models.team.{NewTeam, Team}
 import models.user.UserContactDetails
-import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchersSugar.eqTo
-import org.mockito.{ArgumentMatchers, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.{verify, verifyNoInteractions, when}
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.{EitherValues, OptionValues}
+import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.LocalDateTime
 import scala.concurrent.Future
 
 class ApiHubServiceSpec
-  extends AsyncFreeSpec
-    with Matchers
-    with MockitoSugar
-    with OptionValues
+  extends OptionValues
     with EitherValues
     with ApplicationGetterBehaviours
     with ApiDetailGenerators
@@ -57,13 +54,13 @@ class ApiHubServiceSpec
       val expected = Application("id", newApplication)
 
       val fixture = buildFixture()
-      when(fixture.applicationsConnector.registerApplication(ArgumentMatchers.eq(newApplication))(any()))
+      when(fixture.applicationsConnector.registerApplication(eqTo(newApplication))(any()))
         .thenReturn(Future.successful(expected))
 
       fixture.service.registerApplication(newApplication)(HeaderCarrier()) map {
         actual =>
           actual mustBe expected
-          verify(fixture.applicationsConnector).registerApplication(ArgumentMatchers.eq(newApplication))(any())
+          verify(fixture.applicationsConnector).registerApplication(eqTo(newApplication))(any())
           succeed
       }
     }
@@ -81,7 +78,7 @@ class ApiHubServiceSpec
       fixture.service.getApplications(None, false)(HeaderCarrier()) map {
         actual =>
           actual mustBe expected
-          verify(fixture.applicationsConnector).getApplications(ArgumentMatchers.eq(None), ArgumentMatchers.eq(false))(any())
+          verify(fixture.applicationsConnector).getApplications(eqTo(None), eqTo(false))(any())
           succeed
       }
     }
@@ -98,7 +95,7 @@ class ApiHubServiceSpec
       fixture.service.getApplications(None, true)(HeaderCarrier()) map {
         actual =>
           actual mustBe expected
-          verify(fixture.applicationsConnector).getApplications(ArgumentMatchers.eq(None), ArgumentMatchers.eq(true))(any())
+          verify(fixture.applicationsConnector).getApplications(eqTo(None), eqTo(true))(any())
           succeed
       }
     }
@@ -110,13 +107,13 @@ class ApiHubServiceSpec
 
       val fixture = buildFixture()
 
-      when(fixture.applicationsConnector.getApplications(ArgumentMatchers.eq(Some("test-creator-email-2")), ArgumentMatchers.eq(false))(any()))
+      when(fixture.applicationsConnector.getApplications(eqTo(Some("test-creator-email-2")), eqTo(false))(any()))
         .thenReturn(Future.successful(expected))
 
       fixture.service.getApplications(Some("test-creator-email-2"), false)(HeaderCarrier()) map {
         actual =>
           actual mustBe expected
-          verify(fixture.applicationsConnector).getApplications(ArgumentMatchers.eq(Some("test-creator-email-2")), ArgumentMatchers.eq(false))(any())
+          verify(fixture.applicationsConnector).getApplications(eqTo(Some("test-creator-email-2")), eqTo(false))(any())
           succeed
       }
     }
@@ -135,7 +132,7 @@ class ApiHubServiceSpec
       fixture.service.getApplicationsUsingApi(apiId, false)(HeaderCarrier()) map {
         actual =>
           actual mustBe expected
-          verify(fixture.applicationsConnector).getApplicationsUsingApi(ArgumentMatchers.eq(apiId), ArgumentMatchers.eq(false))(any())
+          verify(fixture.applicationsConnector).getApplicationsUsingApi(eqTo(apiId), eqTo(false))(any())
           succeed
       }
     }
@@ -152,7 +149,7 @@ class ApiHubServiceSpec
       fixture.service.getApplicationsUsingApi(apiId, true)(HeaderCarrier()) map {
         actual =>
           actual mustBe expected
-          verify(fixture.applicationsConnector).getApplicationsUsingApi(ArgumentMatchers.eq(apiId), ArgumentMatchers.eq(true))(any())
+          verify(fixture.applicationsConnector).getApplicationsUsingApi(eqTo(apiId), eqTo(true))(any())
           succeed
       }
     }
@@ -174,13 +171,13 @@ class ApiHubServiceSpec
 
       val userEmail = Some("me@test.com")
       val fixture = buildFixture()
-      when(fixture.applicationsConnector.deleteApplication(ArgumentMatchers.eq(id), ArgumentMatchers.eq(userEmail))(any()))
+      when(fixture.applicationsConnector.deleteApplication(eqTo(id), eqTo(userEmail))(any()))
         .thenReturn(Future.successful(Some(())))
 
       fixture.service.deleteApplication(id, userEmail)(HeaderCarrier()) map {
         actual =>
           actual mustBe Some(())
-          verify(fixture.applicationsConnector).deleteApplication(any(), ArgumentMatchers.eq(userEmail))(any())
+          verify(fixture.applicationsConnector).deleteApplication(any(), eqTo(userEmail))(any())
           succeed
       }
     }
@@ -189,7 +186,7 @@ class ApiHubServiceSpec
       val id = "test-id"
 
       val fixture = buildFixture()
-      when(fixture.applicationsConnector.deleteApplication(ArgumentMatchers.eq(id), any())(any()))
+      when(fixture.applicationsConnector.deleteApplication(eqTo(id), any())(any()))
         .thenReturn(Future.successful(None))
 
       fixture.service.deleteApplication(id, None)(HeaderCarrier()) map {
@@ -220,7 +217,7 @@ class ApiHubServiceSpec
 
       val fixture = buildFixture()
 
-      when(fixture.integrationCatalogueConnector.getApiDetail(ArgumentMatchers.eq(expected.id))(any()))
+      when(fixture.integrationCatalogueConnector.getApiDetail(eqTo(expected.id))(any()))
         .thenReturn(Future.successful(Some(expected)))
 
       fixture.service.getApiDetail(expected.id)(HeaderCarrier()) map {
@@ -237,7 +234,7 @@ class ApiHubServiceSpec
 
       val fixture = buildFixture()
 
-      when(fixture.applicationsConnector.getApiDeploymentStatuses(ArgumentMatchers.eq(publisherReference))(any()))
+      when(fixture.applicationsConnector.getApiDeploymentStatuses(eqTo(publisherReference))(any()))
         .thenReturn(Future.successful(Some(expected)))
 
       fixture.service.getApiDeploymentStatuses(publisherReference)(HeaderCarrier()) map {
@@ -263,7 +260,7 @@ class ApiHubServiceSpec
 
       val fixture = buildFixture()
 
-      when(fixture.applicationsConnector.getDeploymentDetails(ArgumentMatchers.eq(publisherReference))(any()))
+      when(fixture.applicationsConnector.getDeploymentDetails(eqTo(publisherReference))(any()))
         .thenReturn(Future.successful(Some(deploymentDetails)))
 
       fixture.service.getDeploymentDetails(publisherReference)(HeaderCarrier()).map(
@@ -279,7 +276,7 @@ class ApiHubServiceSpec
 
       val fixture = buildFixture()
 
-      when(fixture.integrationCatalogueConnector.getApis(ArgumentMatchers.eq(None))(any()))
+      when(fixture.integrationCatalogueConnector.getApis(eqTo(None))(any()))
         .thenReturn(Future.successful(expected))
 
       fixture.service.getApis()(HeaderCarrier()) map {
@@ -294,7 +291,7 @@ class ApiHubServiceSpec
       val fixture = buildFixture()
       val platform = "test-platform"
 
-      when(fixture.integrationCatalogueConnector.getApis(ArgumentMatchers.eq(Some(platform)))(any()))
+      when(fixture.integrationCatalogueConnector.getApis(eqTo(Some(platform)))(any()))
         .thenReturn(Future.successful(expected))
 
       fixture.service.getApis(Some(platform))(HeaderCarrier()) map {
@@ -311,19 +308,19 @@ class ApiHubServiceSpec
 
       val fixture = buildFixture()
 
-      when(fixture.integrationCatalogueConnector.filterApis(ArgumentMatchers.eq(Seq(email)))(any()))
+      when(fixture.integrationCatalogueConnector.filterApis(eqTo(Seq(email)))(any()))
         .thenReturn(Future.successful(expected))
 
-      when(fixture.applicationsConnector.findTeams(ArgumentMatchers.eq(Some(email)))(any()))
+      when(fixture.applicationsConnector.findTeams(eqTo(Some(email)))(any()))
         .thenReturn(Future.successful(Seq(Team("teamId1", "Team 1", LocalDateTime.now(), Seq.empty))))
 
-      when(fixture.integrationCatalogueConnector.filterApis(ArgumentMatchers.eq(Seq("teamId1")))(any()))
+      when(fixture.integrationCatalogueConnector.filterApis(eqTo(Seq("teamId1")))(any()))
         .thenReturn(Future.successful(expected))
 
       fixture.service.getUserApis(TeamMember(email))(HeaderCarrier(), executionContext) map {
         actual => {
-          verify(fixture.applicationsConnector).findTeams(ArgumentMatchers.eq(Some(email)))(any())
-          verify(fixture.integrationCatalogueConnector).filterApis(ArgumentMatchers.eq(Seq("teamId1")))(any())
+          verify(fixture.applicationsConnector).findTeams(eqTo(Some(email)))(any())
+          verify(fixture.integrationCatalogueConnector).filterApis(eqTo(Seq("teamId1")))(any())
           actual mustBe expected
         }
       }
@@ -334,13 +331,13 @@ class ApiHubServiceSpec
 
       val fixture = buildFixture()
 
-      when(fixture.applicationsConnector.findTeams(ArgumentMatchers.eq(Some(email)))(any()))
+      when(fixture.applicationsConnector.findTeams(eqTo(Some(email)))(any()))
         .thenReturn(Future.successful(Seq.empty))
 
       fixture.service.getUserApis(TeamMember(email))(HeaderCarrier(), executionContext) map {
         actual => {
-          verify(fixture.applicationsConnector).findTeams(ArgumentMatchers.eq(Some(email)))(any())
-          verifyZeroInteractions(fixture.integrationCatalogueConnector)
+          verify(fixture.applicationsConnector).findTeams(eqTo(Some(email)))(any())
+          verifyNoInteractions(fixture.integrationCatalogueConnector)
           actual mustBe expected
         }
       }
@@ -378,7 +375,7 @@ class ApiHubServiceSpec
       val apiRequest = AddApiRequest(apiId, Seq(AddApiRequestEndpoint(verb, path)), scopes)
 
       val expected = Some(())
-      when(fixture.applicationsConnector.addApi(ArgumentMatchers.eq(applicationId), ArgumentMatchers.eq(apiRequest))(any())).thenReturn(Future.successful(expected))
+      when(fixture.applicationsConnector.addApi(eqTo(applicationId), eqTo(apiRequest))(any())).thenReturn(Future.successful(expected))
 
       fixture.service.addApi(applicationId, apiId, availableEndpoints)(HeaderCarrier()) map {
         actual =>
@@ -401,7 +398,7 @@ class ApiHubServiceSpec
       forAll(results){ response =>
         val fixture = buildFixture()
 
-        when(fixture.applicationsConnector.removeApi(ArgumentMatchers.eq(applicationId), ArgumentMatchers.eq(apiId))(any()))
+        when(fixture.applicationsConnector.removeApi(eqTo(applicationId), eqTo(apiId))(any()))
           .thenReturn(Future.successful(response))
 
         fixture.service.removeApi(applicationId, apiId)(HeaderCarrier()).map {
@@ -417,7 +414,7 @@ class ApiHubServiceSpec
       val fixture = buildFixture()
       val expected = Credential("test-client-id", LocalDateTime.now(), Some("test-secret"), Some("test-fragment"))
 
-      when(fixture.applicationsConnector.addCredential(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(Primary))(any()))
+      when(fixture.applicationsConnector.addCredential(eqTo(FakeApplication.id), eqTo(Primary))(any()))
         .thenReturn(Future.successful(Right(Some(expected))))
 
       fixture.service.addCredential(FakeApplication.id, Primary)(HeaderCarrier()).map {
@@ -438,9 +435,9 @@ class ApiHubServiceSpec
       fixture.service.deleteCredential(FakeApplication.id, Primary, clientId)(HeaderCarrier()).map {
         actual =>
           verify(fixture.applicationsConnector).deleteCredential(
-            ArgumentMatchers.eq(FakeApplication.id),
-            ArgumentMatchers.eq(Primary),
-            ArgumentMatchers.eq(clientId))(any()
+            eqTo(FakeApplication.id),
+            eqTo(Primary),
+            eqTo(clientId))(any()
           )
 
           actual mustBe Right(Some(()))
@@ -466,7 +463,7 @@ class ApiHubServiceSpec
 
         fixture.service.getAccessRequests(applicationIdFilter, statusFilter)(HeaderCarrier()).map {
           result =>
-            verify(fixture.applicationsConnector).getAccessRequests(ArgumentMatchers.eq(applicationIdFilter), ArgumentMatchers.eq(statusFilter))(any())
+            verify(fixture.applicationsConnector).getAccessRequests(eqTo(applicationIdFilter), eqTo(statusFilter))(any())
             result mustBe expected
         }
       }
@@ -490,7 +487,7 @@ class ApiHubServiceSpec
 
         fixture.service.getAccessRequest(id)(HeaderCarrier()).map {
           result =>
-            verify(fixture.applicationsConnector).getAccessRequest(ArgumentMatchers.eq(id))(any())
+            verify(fixture.applicationsConnector).getAccessRequest(eqTo(id))(any())
             result mustBe accessRequest
         }
       }
@@ -507,7 +504,7 @@ class ApiHubServiceSpec
 
       fixture.service.approveAccessRequest(id, decidedBy)(HeaderCarrier()).map {
         result =>
-          verify(fixture.applicationsConnector).approveAccessRequest(ArgumentMatchers.eq(id), ArgumentMatchers.eq(decidedBy))(any())
+          verify(fixture.applicationsConnector).approveAccessRequest(eqTo(id), eqTo(decidedBy))(any())
           result mustBe Some(())
       }
     }
@@ -524,7 +521,7 @@ class ApiHubServiceSpec
 
       fixture.service.rejectAccessRequest(id, decidedBy, rejectedReason)(HeaderCarrier()).map {
         result =>
-          verify(fixture.applicationsConnector).rejectAccessRequest(ArgumentMatchers.eq(id), ArgumentMatchers.eq(decidedBy), ArgumentMatchers.eq(rejectedReason))(any())
+          verify(fixture.applicationsConnector).rejectAccessRequest(eqTo(id), eqTo(decidedBy), eqTo(rejectedReason))(any())
           result mustBe Some(())
       }
     }
@@ -534,13 +531,13 @@ class ApiHubServiceSpec
     "must make the correct request to the applications connector and return the response" in {
       val fixture = buildFixture()
 
-      when(fixture.applicationsConnector.createAccessRequest(any())(any())).thenReturn(Future.successful(Some(())))
+      when(fixture.applicationsConnector.createAccessRequest(any())(any())).thenReturn(Future.successful(()))
 
       val anAccessRequest = AccessRequestRequest("appId", "blah", "me@here", Seq.empty)
 
       fixture.service.requestProductionAccess(anAccessRequest)(HeaderCarrier()).map {
         result =>
-          verify(fixture.applicationsConnector).createAccessRequest(ArgumentMatchers.eq(anAccessRequest))(any())
+          verify(fixture.applicationsConnector).createAccessRequest(eqTo(anAccessRequest))(any())
           result mustBe ()
       }
     }
@@ -557,7 +554,7 @@ class ApiHubServiceSpec
 
       fixture.service.addTeamMember(applicationId, teamMember)(HeaderCarrier()).map {
         result =>
-          verify(fixture.applicationsConnector).addTeamMember(ArgumentMatchers.eq(applicationId), ArgumentMatchers.eq(teamMember))(any())
+          verify(fixture.applicationsConnector).addTeamMember(eqTo(applicationId), eqTo(teamMember))(any())
           result.value mustBe ()
       }
     }
@@ -573,7 +570,7 @@ class ApiHubServiceSpec
 
       fixture.service.findTeamById(team.id)(HeaderCarrier()).map {
         result =>
-          verify(fixture.applicationsConnector).findTeamById(ArgumentMatchers.eq(team.id))(any())
+          verify(fixture.applicationsConnector).findTeamById(eqTo(team.id))(any())
           result mustBe Some(team)
       }
     }
@@ -602,7 +599,7 @@ class ApiHubServiceSpec
 
       fixture.service.findTeamByName(team.name)(HeaderCarrier()).map {
         result =>
-          verify(fixture.applicationsConnector).findTeamByName(ArgumentMatchers.eq(team.name))(any())
+          verify(fixture.applicationsConnector).findTeamByName(eqTo(team.name))(any())
           result mustBe Some(team)
       }
     }
@@ -628,11 +625,11 @@ class ApiHubServiceSpec
 
       val teams = Seq(Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember("test-email"))))
 
-      when(fixture.service.findTeams(ArgumentMatchers.eq(Some(teamMemberEmail)))(any())).thenReturn(Future.successful(teams))
+      when(fixture.service.findTeams(eqTo(Some(teamMemberEmail)))(any())).thenReturn(Future.successful(teams))
 
       fixture.service.findTeams(Some(teamMemberEmail))(HeaderCarrier()).map {
         result =>
-          verify(fixture.applicationsConnector).findTeams(ArgumentMatchers.eq(Some(teamMemberEmail)))(any())
+          verify(fixture.applicationsConnector).findTeams(eqTo(Some(teamMemberEmail)))(any())
           result mustBe teams
       }
     }
@@ -649,7 +646,7 @@ class ApiHubServiceSpec
 
       fixture.service.createTeam(newTeam)(HeaderCarrier()).map {
         result =>
-          verify(fixture.applicationsConnector).createTeam(ArgumentMatchers.eq(newTeam))(any())
+          verify(fixture.applicationsConnector).createTeam(eqTo(newTeam))(any())
           result.value mustBe team
       }
     }
@@ -666,7 +663,7 @@ class ApiHubServiceSpec
 
       fixture.service.addTeamMemberToTeam(teamId, teamMember)(HeaderCarrier()).map {
         result =>
-          verify(fixture.applicationsConnector).addTeamMemberToTeam(ArgumentMatchers.eq(teamId), ArgumentMatchers.eq(teamMember))(any())
+          verify(fixture.applicationsConnector).addTeamMemberToTeam(eqTo(teamId), eqTo(teamMember))(any())
           result.value mustBe ()
       }
     }
@@ -683,7 +680,7 @@ class ApiHubServiceSpec
 
       fixture.service.removeTeamMemberFromTeam(teamId, teamMember)(HeaderCarrier()).map {
         result =>
-          verify(fixture.applicationsConnector).removeTeamMemberFromTeam(ArgumentMatchers.eq(teamId), ArgumentMatchers.eq(teamMember))(any())
+          verify(fixture.applicationsConnector).removeTeamMemberFromTeam(eqTo(teamId), eqTo(teamMember))(any())
           result.value mustBe ()
       }
     }
@@ -757,8 +754,7 @@ class ApiHubServiceSpec
 
 }
 
-trait ApplicationGetterBehaviours {
-  this: AsyncFreeSpec with Matchers with MockitoSugar =>
+trait ApplicationGetterBehaviours extends AsyncFreeSpec with Matchers with MockitoSugar {
 
   def successfulApplicationGetter(enrich: Boolean, includeDeleted: Boolean): Unit = {
     s"must call the applications connector with enrich set to $enrich and return an application" in {
@@ -766,7 +762,7 @@ trait ApplicationGetterBehaviours {
       val expected = Some(application)
 
       val applicationsConnector = mock[ApplicationsConnector]
-      when(applicationsConnector.getApplication(ArgumentMatchers.eq("id-1"), ArgumentMatchers.eq(enrich), ArgumentMatchers.eq(includeDeleted))(any())).thenReturn(Future.successful(expected))
+      when(applicationsConnector.getApplication(eqTo("id-1"), eqTo(enrich), eqTo(includeDeleted))(any())).thenReturn(Future.successful(expected))
 
       val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
       val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
@@ -774,7 +770,7 @@ trait ApplicationGetterBehaviours {
       service.getApplication("id-1", enrich)(HeaderCarrier()) map {
         actual =>
           actual mustBe expected
-          verify(applicationsConnector).getApplication(ArgumentMatchers.eq("id-1"), ArgumentMatchers.eq(enrich), ArgumentMatchers.eq(includeDeleted))(any())
+          verify(applicationsConnector).getApplication(eqTo("id-1"), eqTo(enrich), eqTo(includeDeleted))(any())
           succeed
       }
     }

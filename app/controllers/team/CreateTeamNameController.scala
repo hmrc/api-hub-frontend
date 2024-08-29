@@ -94,7 +94,7 @@ class CreateTeamNameController @Inject()(
     apiHubService.findTeamByName(name).map(_.isEmpty)
   }
 
-  private def nameNotUnique(form: Form[String], mode: Mode)(implicit request: Request[_]) = {
+  private def nameNotUnique(form: Form[String], mode: Mode)(implicit request: Request[?]) = {
     BadRequest(view(form.withError(FormError("value", "createTeamName.error.nameNotUnique")), mode))
   }
 

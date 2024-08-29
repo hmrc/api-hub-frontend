@@ -23,7 +23,7 @@
         govukButton: GovukButton
 )
 
-@(teamName: SummaryList, teamMemberDetails: SummaryList, user: Some[UserModel])(implicit request: Request[_], messages: Messages)
+@(teamName: SummaryList, teamMemberDetails: SummaryList, user: Some[UserModel])(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("createTeamCheckYourAnswers.title")), user = user, fullWidth = true) {
 

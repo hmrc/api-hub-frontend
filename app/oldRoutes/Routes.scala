@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package routes
+package oldRoutes
 
 import controllers.Default
-import play.api.routing.Router.Routes
-import play.api.routing.SimpleRouter
-import play.api.routing.sird._
 
 import javax.inject.Inject
+import play.api.routing.{Router, SimpleRouter}
+import play.api.routing.sird.*
 
-class OldRoutes @Inject()(defaultController: Default) extends SimpleRouter {
-  override def routes: Routes = {
-    case GET(request) =>
-      defaultController.redirect(s"/integration-hub${request.path}")
+class Routes @Inject()(defaultController: Default) extends SimpleRouter {
+
+  override def routes: Router.Routes = {
+    case GET(route) =>
+      defaultController.redirect(s"/integration-hub${route.path}")
   }
 }
-

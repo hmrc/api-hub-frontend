@@ -28,7 +28,7 @@ class CreateTeamSessionRepositorySpec extends UserAnswersRepositoryBehaviours {
   )
 
   "CreateTeamSessionRepository" - {
-    behave like userAnswersRepository(repository)
+    behave like userAnswersRepository(repository.asInstanceOf[UserAnswersRepository])
   }
 
 }

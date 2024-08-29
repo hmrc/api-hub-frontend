@@ -27,7 +27,7 @@
     govukButton: GovukButton
 )
 
-@(application: Application, apiDetail: ApiDetail, form: Form[_], user: UserModel)(implicit request: Request[_], messages: Messages)
+@(application: Application, apiDetail: ApiDetail, form: Form[?], user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = title(form, messages("removeApiConfirmation.title")), user = Some(user)) {
 

@@ -26,7 +26,7 @@ import scala.collection.immutable.Seq
 
 class Module extends play.api.inject.Module {
 
-  override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[_]] = {
+  override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[?]] = {
 
     val bindings = Seq(
       bindz(classOf[DataRetrievalAction]).to(classOf[DataRetrievalActionImpl]).eagerly(),
@@ -41,13 +41,13 @@ class Module extends play.api.inject.Module {
       bindz(classOf[IdentifierAction]).to(classOf[AuthenticatedIdentifierAction]).eagerly(),
       bindz(classOf[OptionalIdentifierAction]).to(classOf[OptionallyAuthenticatedIdentifierAction]),
       bindz(classOf[Clock]).toInstance(Clock.systemDefaultZone.withZone(ZoneOffset.UTC)),
-      bindz[Encrypter with Decrypter].toProvider[CryptoProvider],
+      bindz[Encrypter & Decrypter].toProvider[CryptoProvider],
       bindz[Domains].to(classOf[DomainsImpl]).eagerly(),
       bindz[Hods].to(classOf[HodsImpl]).eagerly(),
       bindz[Platforms].to(classOf[PlatformsImpl]).eagerly()
     )
 
-    val authTokenInitialiserBindings: Seq[Binding[_]] = if (configuration.get[Boolean]("create-internal-auth-token-on-start")) {
+    val authTokenInitialiserBindings: Seq[Binding[?]] = if (configuration.get[Boolean]("create-internal-auth-token-on-start")) {
         Seq(bindz(classOf[InternalAuthTokenInitialiser]).to(classOf[InternalAuthTokenInitialiserImpl]).eagerly())
     } else {
         Seq(bindz(classOf[InternalAuthTokenInitialiser]).to(classOf[NoOpInternalAuthTokenInitialiser]).eagerly())

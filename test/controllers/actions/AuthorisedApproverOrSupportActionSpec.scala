@@ -42,7 +42,7 @@ class AuthorisedApproverOrSupportActionSpec extends AnyFreeSpec with Matchers wi
       forAll(users) {(user: UserModel) =>
         val request = IdentifierRequest(FakeRequest(), user)
         val action = new AuthorisedApproverOrSupportAction()
-        val block = (_: IdentifierRequest[_]) => Future.successful(Results.Ok)
+        val block = (_: IdentifierRequest[?]) => Future.successful(Results.Ok)
 
         val result = action.invokeBlock(request, block)
         status(result) mustBe OK
@@ -59,7 +59,7 @@ class AuthorisedApproverOrSupportActionSpec extends AnyFreeSpec with Matchers wi
       forAll(users) {(user: UserModel) =>
         val request = IdentifierRequest(FakeRequest(), user)
         val action = new AuthorisedApproverOrSupportAction()
-        val block = (_: IdentifierRequest[_]) => Future.successful(Results.Ok)
+        val block = (_: IdentifierRequest[?]) => Future.successful(Results.Ok)
 
         val result = action.invokeBlock(request, block)
         status(result) mustBe SEE_OTHER

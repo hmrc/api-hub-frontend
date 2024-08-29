@@ -72,11 +72,11 @@ class AddAnApiCheckYourAnswersController @Inject()(
   private def buildApplicationSummary(
     application: Option[Application],
     context: AddAnApiContext
-  )(implicit request: Request[_]): Future[Option[SummaryListRow]] = {
+  )(implicit request: Request[?]): Future[Option[SummaryListRow]] = {
     Future.successful(AddAnApiSelectApplicationSummary.row(application, context))
   }
 
-  private def buildApiDetailSummary(apiDetail: Option[ApiDetail])(implicit request: Request[_]): Future[Option[SummaryListRow]] = {
+  private def buildApiDetailSummary(apiDetail: Option[ApiDetail])(implicit request: Request[?]): Future[Option[SummaryListRow]] = {
     Future.successful(AddAnApiApiIdSummary.row(apiDetail))
   }
 
@@ -85,7 +85,7 @@ class AddAnApiCheckYourAnswersController @Inject()(
     apiDetail: Option[ApiDetail],
     application: Option[Application],
     context: AddAnApiContext
-  )(implicit request: Request[_]): Future[Option[SummaryListRow]] = {
+  )(implicit request: Request[?]): Future[Option[SummaryListRow]] = {
     Future.successful(
       (apiDetail, application) match {
         case (Some(api), Some(app)) => AddAnApiSelectEndpointsSummary.row(userAnswers, api, app, context)

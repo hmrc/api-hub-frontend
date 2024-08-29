@@ -22,8 +22,7 @@ import generators.ApiDetailGenerators
 import models.UserAnswers
 import models.application.TeamMember
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.CreateTeamMembersPage
@@ -58,7 +57,7 @@ class CreateTeamStartControllerSpec extends SpecBase with MockitoSugar with Html
           .set(CreateTeamMembersPage, Seq[TeamMember](TeamMember(FakeUser.email.get)))
           .toOption.value
 
-        verify(fixture.createTeamSessionRepository).set(ArgumentMatchers.eq(expected))
+        verify(fixture.createTeamSessionRepository).set(eqTo(expected))
       }
     }
 
@@ -86,9 +85,9 @@ class CreateTeamStartControllerSpec extends SpecBase with MockitoSugar with Html
         status(result) mustBe INTERNAL_SERVER_ERROR
         contentAsString(result) mustBe
           view(
-            "Sorry, we are experiencing technical difficulties - 500",
-            "Sorry, we’re experiencing technical difficulties",
-            "Please try again in a few minutes."
+            "Sorry, there is a problem with the service - 500",
+            "Sorry, there is a problem with the service",
+            "Try again later."
           )(request, messages(fixture.application)).toString()
         contentAsString(result) must validateAsHtml
       }

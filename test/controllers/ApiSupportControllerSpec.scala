@@ -19,7 +19,9 @@ package controllers
 import base.SpecBase
 import generators.ApiDetailGenerators
 import models.user.UserModel
-import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
@@ -33,7 +35,6 @@ import scala.concurrent.Future
 class ApiSupportControllerSpec
   extends SpecBase
     with MockitoSugar
-    with ArgumentMatchersSugar
     with TestHelpers
     with ApiDetailGenerators {
 

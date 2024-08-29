@@ -27,7 +27,10 @@ import models.application._
 import models.user.UserModel
 import models.{RequestProductionAccessDeclaration, UserAnswers}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.{ArgumentCaptor, ArgumentMatchers, MockitoSugar}
+import org.mockito.ArgumentCaptor
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{verify, when}
+import org.scalatestplus.mockito.MockitoSugar
 import pages.{AccessRequestApplicationIdPage, RequestProductionAccessPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -50,7 +53,7 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
   "RequestProductionAccessController" - {
     "must return OK and the correct view for a GET for a team member or supporter" in {
       forAll(teamMemberAndSupporterTable) {
-        user: UserModel =>
+        (user: UserModel) =>
 
           val application = anApplication
           val userAnswers = buildUserAnswers(application)
@@ -63,7 +66,7 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
 
           when(fixture.apiHubService.getApiDetail(any())(any())).thenReturn(Future.successful(Some(anApiDetail)))
 
-          when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(FakeApplication.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
+          when(fixture.apiHubService.getAccessRequests(eqTo(Some(FakeApplication.id)), eqTo(Some(Pending)))(any()))
             .thenReturn(Future.successful(Seq.empty))
 
           running(fixture.application) {
@@ -90,10 +93,10 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
 
       when(fixture.apiHubService.getApiDetail(any())(any())).thenReturn(Future.successful(Some(anApiDetail)))
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(application.id), ArgumentMatchers.eq(true), ArgumentMatchers.eq(false))(any()))
+      when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(true), eqTo(false))(any()))
         .thenReturn(Future.successful(Some(application)))
 
-      when(fixture.apiHubService.getAccessRequests(ArgumentMatchers.eq(Some(application.id)), ArgumentMatchers.eq(Some(Pending)))(any()))
+      when(fixture.apiHubService.getAccessRequests(eqTo(Some(application.id)), eqTo(Some(Pending)))(any()))
         .thenReturn(Future.successful(Seq.empty))
 
       running(fixture.application) {
@@ -121,7 +124,7 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
 
     "must set the user answers and navigate to next page on submit" in {
       forAll(teamMemberAndSupporterTable) {
-        user: UserModel =>
+        (user: UserModel) =>
 
           val application = anApplication
           val userAnswers = buildUserAnswers(application)
@@ -129,7 +132,7 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
           val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
 
           when(fixture.apiHubService.getApiDetail(any())(any())).thenReturn(Future.successful(Some(anApiDetail)))
-          when(fixture.accessRequestSessionRepository.set(any())) thenReturn Future.successful(true)
+          when(fixture.accessRequestSessionRepository.set(any())).thenReturn(Future.successful(true))
           running(fixture.application) {
             val request = FakeRequest(POST, controllers.application.routes.RequestProductionAccessController.onSubmit().url).withFormUrlEncodedBody(("accept[0]", "accept"))
             val result = route(fixture.application, request).value

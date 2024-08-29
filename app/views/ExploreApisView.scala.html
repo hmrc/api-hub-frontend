@@ -37,7 +37,7 @@
     paginator: Paginator
 )
 
-@(user: Option[UserModel], apiDetails: Seq[ApiDetail] = Seq.empty, domains: Domains, hods: Hods, platforms: Platforms)(implicit request: Request[_], messages: Messages)
+@(user: Option[UserModel], apiDetails: Seq[ApiDetail] = Seq.empty, domains: Domains, hods: Hods, platforms: Platforms)(implicit request: Request[?], messages: Messages)
 
 @scripts() = {
     @iconsLink()

@@ -35,7 +35,7 @@
     govukFieldset : GovukFieldset
 )
 
-@(form: Form[_], apiDetail: ApiDetail, domains: Domains, hods: Hods, user: UserModel)(implicit request: Request[_], messages: Messages)
+@(form: Form[?], apiDetail: ApiDetail, domains: Domains, hods: Hods, user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @scripts() = {
     <script src='@routes.Assets.versioned("javascripts/apiDeployment.js")' type="module" @{CSPNonce.attr}></script>

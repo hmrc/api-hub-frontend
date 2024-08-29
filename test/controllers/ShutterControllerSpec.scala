@@ -17,7 +17,7 @@
 package controllers
 
 import base.SpecBase
-import org.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.mvc.Call
 import play.api.test.FakeRequest

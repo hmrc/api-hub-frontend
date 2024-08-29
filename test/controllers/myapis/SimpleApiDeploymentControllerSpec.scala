@@ -24,8 +24,10 @@ import fakes.{FakeDomains, FakeHods}
 import models.application.TeamMember
 import models.deployment.{DeploymentsRequest, Error, FailuresResponse, InvalidOasResponse, SuccessfulDeploymentsResponse}
 import models.team.Team
-import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{verify, when}
 import org.scalatest.prop.TableDrivenPropertyChecks
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -41,7 +43,6 @@ import scala.concurrent.Future
 class SimpleApiDeploymentControllerSpec
   extends SpecBase
     with MockitoSugar
-    with ArgumentMatchersSugar
     with HtmlValidation
     with TableDrivenPropertyChecks {
 
@@ -83,7 +84,7 @@ class SimpleApiDeploymentControllerSpec
 
       running(fixture.playApplication) {
         val request = FakeRequest(controllers.myapis.routes.SimpleApiDeploymentController.onSubmit())
-          .withFormUrlEncodedBody(validForm: _*)
+          .withFormUrlEncodedBody(validForm*)
         val result = route(fixture.playApplication, request).value
 
         val view = fixture.playApplication.injector.instanceOf[DeploymentSuccessView]
@@ -114,7 +115,7 @@ class SimpleApiDeploymentControllerSpec
 
       running(fixture.playApplication) {
         val request = FakeRequest(controllers.myapis.routes.SimpleApiDeploymentController.onSubmit())
-          .withFormUrlEncodedBody(form: _*)
+          .withFormUrlEncodedBody(form*)
         val result = route(fixture.playApplication, request).value
 
         status(result) mustBe OK
@@ -139,7 +140,7 @@ class SimpleApiDeploymentControllerSpec
 
       running(fixture.playApplication) {
         val request = FakeRequest(controllers.myapis.routes.SimpleApiDeploymentController.onSubmit())
-          .withFormUrlEncodedBody(validForm: _*)
+          .withFormUrlEncodedBody(validForm*)
         val result = route(fixture.playApplication, request).value
 
         val view = fixture.playApplication.injector.instanceOf[DeploymentFailureView]
@@ -172,7 +173,7 @@ class SimpleApiDeploymentControllerSpec
       running(fixture.playApplication) {
         forAll(fieldNames){fieldName =>
           val request = FakeRequest(controllers.myapis.routes.SimpleApiDeploymentController.onSubmit())
-            .withFormUrlEncodedBody(invalidForm(fieldName): _*)
+            .withFormUrlEncodedBody(invalidForm(fieldName)*)
           val result = route(fixture.playApplication, request).value
 
           val boundForm = bindForm(form, invalidForm(fieldName))
@@ -252,7 +253,7 @@ object SimpleApiDeploymentControllerSpec {
   def invalidForm(missingField: String): Seq[(String, String)] =
     validForm.filterNot(_._1.equalsIgnoreCase(missingField)) :+ (missingField, "")
 
-  def bindForm(form: Form[_], values: Seq[(String, String)]): Form[_] = {
+  def bindForm(form: Form[?], values: Seq[(String, String)]): Form[?] = {
     form.bind(values.toMap)
   }
 

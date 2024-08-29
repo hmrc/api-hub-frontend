@@ -60,7 +60,7 @@ class ApiDetailsController @Inject()(
       } yield result
   }
 
-  private def processSelfServeApiDetail(apiDetail: ApiDetail)(implicit request: OptionalIdentifierRequest[_]) = {
+  private def processSelfServeApiDetail(apiDetail: ApiDetail)(implicit request: OptionalIdentifierRequest[?]) = {
     for {
       maybeApiDeploymentStatuses <- apiHubService.getApiDeploymentStatuses(apiDetail.publisherReference)
       maybeTeamName <- getTeamNameForApi(apiDetail.teamId)
@@ -83,7 +83,7 @@ class ApiDetailsController @Inject()(
     }
   }
 
-  private def processNonSelfServeApiDetail(apiDetail: ApiDetail)(implicit request: OptionalIdentifierRequest[_]) = {
+  private def processNonSelfServeApiDetail(apiDetail: ApiDetail)(implicit request: OptionalIdentifierRequest[?]) = {
     getContactEmailAddress(apiDetail.platform).flatMap(
       contactEmail => Future.successful(Ok(view(
         apiDetail,
@@ -98,7 +98,7 @@ class ApiDetailsController @Inject()(
       ))))
   }
 
-  private def getTeamNameForApi(maybeTeamId: Option[String])(implicit request: OptionalIdentifierRequest[_]) = {
+  private def getTeamNameForApi(maybeTeamId: Option[String])(implicit request: OptionalIdentifierRequest[?]) = {
     maybeTeamId match {
       case Some(teamId) => apiHubService.findTeamById(teamId).map {
         case Some(team) => Some(team.name)
@@ -108,7 +108,7 @@ class ApiDetailsController @Inject()(
     }
   }
 
-  private def getContactEmailAddress(forPlatform: String)(implicit request: OptionalIdentifierRequest[_]): Future[ApiContactEmail] = {
+  private def getContactEmailAddress(forPlatform: String)(implicit request: OptionalIdentifierRequest[?]): Future[ApiContactEmail] = {
     val eventualMaybeContact = apiHubService.getPlatformContact(forPlatform)
     eventualMaybeContact map  {
       case Some(platformContact) =>

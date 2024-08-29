@@ -29,7 +29,7 @@ object Retrievals {
       (JsPath \ "retrievals")(2).read[Boolean] and
       (JsPath \ "retrievals")(3).read[Boolean] and
       (JsPath \ "retrievals")(4).read[Boolean]
-  )(Retrievals.apply _)
+  )(Retrievals.apply)
 
   private val writes: Writes[Retrievals] = (retrievals: Retrievals) => {
     Json.obj(

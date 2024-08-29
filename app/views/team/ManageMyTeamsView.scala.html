@@ -24,7 +24,7 @@
     govukButton: GovukButton
 )
 
-@(teams: Seq[Team], user: UserModel)(implicit request: Request[_], messages: Messages)
+@(teams: Seq[Team], user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @teamNameLink(team: Team) = {
     <a data-team-id="@team.id" data-team-name="@team.name" href="@controllers.team.routes.ManageTeamController.onPageLoad(team.id)" class="govuk-body govuk-link govuk-link--no-visited-state">@team.name</a>

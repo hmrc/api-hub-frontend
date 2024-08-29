@@ -32,23 +32,23 @@ class ErrorResultBuilder @Inject()(
   override val messagesApi: MessagesApi
 ) extends I18nSupport with Logging {
 
-  def badRequest()(implicit request: Request[_]): Result = {
+  def badRequest()(implicit request: Request[?]): Result = {
     badRequest(None, None, None)
   }
 
-  def badRequest(message: String)(implicit request: Request[_]): Result = {
+  def badRequest(message: String)(implicit request: Request[?]): Result = {
     badRequest(None, None, Some(message))
   }
 
-  def badRequest(heading: String, message: String)(implicit request: Request[_]): Result = {
+  def badRequest(heading: String, message: String)(implicit request: Request[?]): Result = {
     badRequest(None, Some(heading), Some(message))
   }
 
-  def badRequest(title: String, heading: String, message: String)(implicit request: Request[_]): Result = {
+  def badRequest(title: String, heading: String, message: String)(implicit request: Request[?]): Result = {
     badRequest(Some(title), Some(heading), Some(message))
   }
 
-  private def badRequest(title: Option[String], heading: Option[String], message: Option[String])(implicit request: Request[_]): Result = {
+  private def badRequest(title: Option[String], heading: Option[String], message: Option[String])(implicit request: Request[?]): Result = {
     BadRequest(
       logAndBuildErrorTemplate(
         BAD_REQUEST,
@@ -59,62 +59,62 @@ class ErrorResultBuilder @Inject()(
     )
   }
 
-  def notFound()(implicit request: Request[_]): Result = {
+  def notFound()(implicit request: Request[?]): Result = {
     notFound(None, None, None)
   }
 
-  def notFound(message: String)(implicit request: Request[_]): Result = {
+  def notFound(message: String)(implicit request: Request[?]): Result = {
     notFound(None, None, Some(message))
   }
 
-  def notFound(heading: String, message: String)(implicit request: Request[_]): Result = {
+  def notFound(heading: String, message: String)(implicit request: Request[?]): Result = {
     notFound(None, Some(heading), Some(message))
   }
 
-  def applicationNotFound(id: String)(implicit request: Request[_]): Result = {
+  def applicationNotFound(id: String)(implicit request: Request[?]): Result = {
     notFound(
       Messages("site.applicationNotFoundHeading"),
       Messages("site.applicationNotFoundMessage", id)
     )
   }
 
-  def apiNotFound(id: String)(implicit request: Request[_]): Result = {
+  def apiNotFound(id: String)(implicit request: Request[?]): Result = {
     notFound(
       Messages("site.apiNotFound.heading"),
       Messages("site.apiNotFound.message", id)
     )
   }
 
-  def apiNotFoundInApim(apiDetail: ApiDetail)(implicit request: Request[_]): Result = {
+  def apiNotFoundInApim(apiDetail: ApiDetail)(implicit request: Request[?]): Result = {
     notFound(
       Messages("site.apiNotFound.heading"),
       Messages("site.apiNotFoundInApim.message", apiDetail.title)
     )
   }
 
-  def apiNotFoundInApplication(apiTitle: String, application: Application)(implicit request: Request[_]): Result = {
+  def apiNotFoundInApplication(apiTitle: String, application: Application)(implicit request: Request[?]): Result = {
     notFound(
       Messages("site.apiNotFound.heading"),
       Messages("site.apiNotFoundInApplication.message", apiTitle, application.name)
     )
   }
 
-  def apiNotFoundInApplication(apiDetail: ApiDetail, application: Application)(implicit request: Request[_]): Result = {
+  def apiNotFoundInApplication(apiDetail: ApiDetail, application: Application)(implicit request: Request[?]): Result = {
     apiNotFoundInApplication(apiDetail.title, application)
   }
 
-  def teamNotFound(teamId: String)(implicit request: Request[_]): Result = {
+  def teamNotFound(teamId: String)(implicit request: Request[?]): Result = {
     notFound(
       Messages("site.teamNotFoundHeading"),
       Messages("site.teamNotFoundMessage", teamId)
     )
   }
 
-  def notFound(title: String, heading: String, message: String)(implicit request: Request[_]): Result = {
+  def notFound(title: String, heading: String, message: String)(implicit request: Request[?]): Result = {
     notFound(Some(title), Some(heading), Some(message))
   }
 
-  private def notFound(title: Option[String], heading: Option[String], message: Option[String])(implicit request: Request[_]): Result = {
+  private def notFound(title: Option[String], heading: Option[String], message: Option[String])(implicit request: Request[?]): Result = {
     NotFound(
       logAndBuildErrorTemplate(
         NOT_FOUND,
@@ -125,22 +125,22 @@ class ErrorResultBuilder @Inject()(
     )
   }
 
-  def internalServerError(error: String)(implicit request: Request[_]): Result = {
+  def internalServerError(error: String)(implicit request: Request[?]): Result = {
     logger.warn(s"Internal server error: $error")
     internalServerError()
   }
 
-  def internalServerError(t: Throwable)(implicit request: Request[_]): Result = {
+  def internalServerError(t: Throwable)(implicit request: Request[?]): Result = {
     logger.warn("Internal server error", t)
     internalServerError()
   }
 
-  def internalServerError(message: String, t: Throwable)(implicit request: Request[_]): Result = {
+  def internalServerError(message: String, t: Throwable)(implicit request: Request[?]): Result = {
     logger.warn("Internal server error", t)
     internalServerError(Some(message))
   }
 
-  private def internalServerError(message: Option[String] = None)(implicit request: Request[_]): Result = {
+  private def internalServerError(message: Option[String] = None)(implicit request: Request[?]): Result = {
     InternalServerError(
       logAndBuildErrorTemplate(
         INTERNAL_SERVER_ERROR,
@@ -151,7 +151,7 @@ class ErrorResultBuilder @Inject()(
     )
   }
 
-  private def logAndBuildErrorTemplate(status: Int, title: String, heading: String, message: String)(implicit request: Request[_]) = {
+  private def logAndBuildErrorTemplate(status: Int, title: String, heading: String, message: String)(implicit request: Request[?]) = {
     logger.warn(s"Responding with error status $status. Title: $title Heading: $heading Message: $message")
 
     errorTemplate(

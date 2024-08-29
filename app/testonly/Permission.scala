@@ -26,5 +26,5 @@ object Permission {
     (__ \ "resourceType").format[String]
       ~ (__ \ "resourceLocation").format[String]
       ~ (__ \ "actions").format[List[String]]
-    )(Permission.apply, unlift(Permission.unapply))
+    )(Permission.apply,  o => Tuple.fromProductTyped(o))
 }

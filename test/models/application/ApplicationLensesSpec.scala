@@ -25,7 +25,7 @@ import models.application.ApplicationLensesSpec._
 import java.time.{Clock, Instant, LocalDateTime, ZoneId}
 import scala.util.Random
 
-class ApplicationLensesSpec extends AnyFreeSpec with Matchers with LensBehaviours {
+class ApplicationLensesSpec extends LensBehaviours {
 
   "applicationEnvironments" - {
     "must get the correct Environments" in {
@@ -454,8 +454,7 @@ object ApplicationLensesSpec {
 
   private def randomString(): String = Random.alphanumeric.take(Random.nextInt(10) + 1).mkString
 
-  trait LensBehaviours {
-    this: AnyFreeSpec with Matchers =>
+  trait LensBehaviours extends AnyFreeSpec with Matchers {
 
     def environmentsToEnvironmentLens(
                                        lens: Lens[Environments, Environment],

@@ -23,10 +23,12 @@ import controllers.myapis.SimpleApiRedeploymentController.RedeploymentRequestFor
 import fakes.{FakeDomains, FakeHods}
 import models.deployment._
 import models.user.UserModel
-import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{verify, when}
 import org.scalatest.OptionValues
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -43,7 +45,6 @@ class SimpleApiRedeploymentControllerSpec
   extends SpecBase
     with Matchers
     with MockitoSugar
-    with ArgumentMatchersSugar
     with HtmlValidation
     with TableDrivenPropertyChecks
     with FakeApiAuthActions {
@@ -117,7 +118,7 @@ class SimpleApiRedeploymentControllerSpec
 
       running(fixture.playApplication) {
         val request = FakeRequest(controllers.myapis.routes.SimpleApiRedeploymentController.onSubmit(FakeApiDetail.id))
-          .withFormUrlEncodedBody(validForm: _*)
+          .withFormUrlEncodedBody(validForm*)
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[DeploymentSuccessView]
 
@@ -146,7 +147,7 @@ class SimpleApiRedeploymentControllerSpec
 
       running(fixture.playApplication) {
         val request = FakeRequest(controllers.myapis.routes.SimpleApiRedeploymentController.onSubmit(FakeApiDetail.id))
-          .withFormUrlEncodedBody(validForm: _*)
+          .withFormUrlEncodedBody(validForm*)
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[DeploymentFailureView]
         val returnUrl = controllers.myapis.routes.SimpleApiRedeploymentController.onPageLoad(FakeApiDetail.id).url
@@ -174,7 +175,7 @@ class SimpleApiRedeploymentControllerSpec
       running(fixture.playApplication) {
         forAll(fieldNames){(fieldName: String) =>
           val request = FakeRequest(controllers.myapis.routes.SimpleApiRedeploymentController.onSubmit(FakeApiDetail.id))
-            .withFormUrlEncodedBody(invalidForm(fieldName): _*)
+            .withFormUrlEncodedBody(invalidForm(fieldName)*)
           val result = route(fixture.playApplication, request).value
           val boundForm = bindForm(form, invalidForm(fieldName))
 
@@ -248,7 +249,7 @@ object SimpleApiRedeploymentControllerSpec extends OptionValues {
   private def invalidForm(missingField: String): Seq[(String, String)] =
     validForm.filterNot(_._1.equalsIgnoreCase(missingField)) :+ (missingField, "")
 
-  private def bindForm(form: Form[_], values: Seq[(String, String)]): Form[_] = {
+  private def bindForm(form: Form[?], values: Seq[(String, String)]): Form[?] = {
     form.bind(values.toMap)
   }
 

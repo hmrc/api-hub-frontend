@@ -31,13 +31,13 @@
 )
 
 @(
-    form: Form[_],
+    form: Form[?],
     mode: Mode,
     user: Option[UserModel],
     apiDetail: ApiDetail,
     applicationsWithAccess: Seq[Application],
     applicationsWithoutAccess: Seq[Application]
-)(implicit request: Request[_], messages: Messages)
+)(implicit request: Request[?], messages: Messages)
 
 @displayApplicationsWithAccess() = {
     <div class="call-out-panel">

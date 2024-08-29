@@ -30,7 +30,7 @@
   errorSummary: GovukErrorSummary
 )
 
-@(form: Form[TestOnlySignInData])(implicit request: Request[_], messages: Messages)
+@(form: Form[TestOnlySignInData])(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = messages("fake-sign-in.title.lbl") + " – " + messages("site.service_name")) {
     <h1 class="govuk-heading-xl">@messages("fake-sign-in.header.lbl")</h1>

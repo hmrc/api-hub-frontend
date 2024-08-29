@@ -84,7 +84,7 @@ class IntegrationCatalogueConnector @Inject()(
 
   private def queryApis(queryParams: Seq[(String,String)])(implicit hc: HeaderCarrier): Future[Seq[ApiDetail]] = {
     httpClient.get(url"$integrationCatalogueBaseUrl/integration-catalogue/integrations?integrationType=api")
-      .transform(wsRq => wsRq.withQueryStringParameters(queryParams: _*))
+      .transform(wsRq => wsRq.withQueryStringParameters(queryParams*))
       .setHeader((ACCEPT, JSON))
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Either[UpstreamErrorResponse, IntegrationResponse]]

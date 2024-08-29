@@ -17,7 +17,7 @@
 @import viewmodels.SideNavItem
 @import views.html.helper.CSPNonce
 
-@(title: String, navItems: Seq[SideNavItem])(contentBlock: Html)(implicit request: Request[_], messages: Messages)
+@(title: String, navItems: Seq[SideNavItem])(contentBlock: Html)(implicit request: Request[?], messages: Messages)
 
 <div class="govuk-grid-row">
     <div id="navContent" class="govuk-grid-column-one-quarter sidebar stickySideMenu">

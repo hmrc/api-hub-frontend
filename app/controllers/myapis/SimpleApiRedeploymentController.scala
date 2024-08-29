@@ -90,7 +90,7 @@ class SimpleApiRedeploymentController @Inject()(
       )
   }
 
-  private def showView(code: Int, form: Form[_])(implicit request: ApiRequest[_]): Result = {
+  private def showView(code: Int, form: Form[?])(implicit request: ApiRequest[?]): Result = {
     Status(code)(view(form, request.apiDetails, domains, hods, request.identifierRequest.user))
   }
 
@@ -111,7 +111,7 @@ object SimpleApiRedeploymentController {
           "hods" -> Forms.seq(text()),
           "prefixesToRemove" -> optional(text()).transform[Seq[String]](transformToPrefixesToRemove, transformFromPrefixesToRemove),
           "egressPrefix" -> optional(text())
-        )(RedeploymentRequest.apply)(RedeploymentRequest.unapply)
+        )(RedeploymentRequest.apply)(o => Some(Tuple.fromProductTyped(o)))
       )
 
   }

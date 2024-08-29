@@ -23,8 +23,10 @@ import forms.myapis.UpdateApiTeamFormProvider
 import models.application.TeamMember
 import models.team.Team
 import models.user.UserModel
-import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{never, verify, when}
 import org.scalatest.matchers.must.Matchers
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -42,7 +44,6 @@ class UpdateApiTeamControllerSpec
   extends SpecBase
     with Matchers
     with MockitoSugar
-    with ArgumentMatchersSugar
     with HtmlValidation
     with TestHelpers
     with FakeApiAuthActions {

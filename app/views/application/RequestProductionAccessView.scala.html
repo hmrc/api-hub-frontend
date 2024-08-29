@@ -29,7 +29,7 @@
         policyView: PolicyView
 )
 
-@(form: Form[_], application: Application, applicationApis: Seq[ApplicationApi], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+@(form: Form[?], application: Application, applicationApis: Seq[ApplicationApi], user: Option[UserModel])(implicit request: Request[?], messages: Messages)
 
 @endpointScopes(scopes: Set[String]) = {
     <ul class="govuk-list govuk-list-inline scopes-list">

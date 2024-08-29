@@ -90,6 +90,6 @@ class AddAnApiCheckContextActionSpec extends AsyncFreeSpec with Matchers with Op
 
 object AddAnApiCheckContextActionSpec {
 
-  private val invokeBlock: DataRequest[_] => Future[Result] = _ => Future.successful(Ok)
+  private val invokeBlock: DataRequest[?] => Future[Result] = _ => Future.successful(Ok)
 
 }

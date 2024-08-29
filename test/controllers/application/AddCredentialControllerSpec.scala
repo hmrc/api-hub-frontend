@@ -24,8 +24,9 @@ import models.api.{ApiDetail, Live, Maintainer}
 import models.application.{Api, Application, Credential, Primary, Secondary}
 import models.exception.ApplicationCredentialLimitException
 import models.user.UserModel
-import org.mockito.ArgumentMatchers.any
-import org.mockito.{ArgumentMatchers, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{never, verify, when}
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded}
@@ -111,13 +112,13 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
           val fixture = buildFixture(user, Some(application))
           val credential = Credential("test-client-id", LocalDateTime.now(clock), Some("test-secret"), Some("test-fragment"))
 
-          when(fixture.apiHubService.addCredential(ArgumentMatchers.eq(application.id), ArgumentMatchers.eq(Primary))(any()))
+          when(fixture.apiHubService.addCredential(eqTo(application.id), eqTo(Primary))(any()))
             .thenReturn(Future.successful(Right(Some(credential))))
 
-          when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(api1.id))(any()))
+          when(fixture.apiHubService.getApiDetail(eqTo(api1.id))(any()))
             .thenReturn(Future.successful(Some(api1)))
 
-          when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(api2.id))(any()))
+          when(fixture.apiHubService.getApiDetail(eqTo(api2.id))(any()))
             .thenReturn(Future.successful(Some(api2)))
 
           running(fixture.playApplication) {
@@ -197,7 +198,7 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
 
       val credential = Credential("test-client-id", LocalDateTime.now(clock), Some("test-secret"), Some("test-fragment"))
 
-      when(fixture.apiHubService.addCredential(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(Secondary))(any()))
+      when(fixture.apiHubService.addCredential(eqTo(FakeApplication.id), eqTo(Secondary))(any()))
         .thenReturn(Future.successful(Right(Some(credential))))
 
       running(fixture.playApplication) {

@@ -47,12 +47,12 @@ class AuthenticatedIdentifierAction @Inject()(
     }
   }
 
-  private def handleMissingEmail(user: UserModel)(implicit request: Request[_]) = {
+  private def handleMissingEmail(user: UserModel)(implicit request: RequestHeader) = {
     logger.warn(s"Missing email address for user ${user.userName} with id ${user.userId}")
-    Future.successful(Ok(buildMissingEmailView(user.userType)))
+    buildMissingEmailView(user.userType).map(html => Ok(html))
   }
 
-  private def buildMissingEmailView(userType: UserType)(implicit request: Request[_]) = {
+  private def buildMissingEmailView(userType: UserType)(implicit request: RequestHeader) = {
     val messages = errorHandler.messagesApi.messages.getOrElse("en", Map.empty)
     val title = messages.getOrElse("unauthorised.title", "")
     val heading = messages.getOrElse("unauthorised.missingEmail.heading", "")

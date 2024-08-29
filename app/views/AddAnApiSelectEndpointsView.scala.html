@@ -26,7 +26,7 @@
     govukButton: GovukButton
 )
 
-@(form: Form[Set[Set[String]]], mode: Mode, context: AddAnApiContext, user: Option[UserModel], apiDetail: ApiDetail, application: Application)(implicit request: Request[_], messages: Messages)
+@(form: Form[Set[Set[String]]], mode: Mode, context: AddAnApiContext, user: Option[UserModel], apiDetail: ApiDetail, application: Application)(implicit request: Request[?], messages: Messages)
 
 @checked(scopes: Set[String]) = {
     @if(form.value.getOrElse(Set.empty).contains(scopes)) {

@@ -33,7 +33,7 @@ class StrideAuthenticator @Inject()(
   override val authConnector: AuthConnector
 )(implicit ec: ExecutionContext) extends Authenticator with AuthorisedFunctions with FrontendHeaderCarrierProvider {
 
-  def authenticate()(implicit request: Request[_]): Future[UserAuthResult] = {
+  def authenticate()(implicit request: Request[?]): Future[UserAuthResult] = {
     authorised(
       Enrolment(API_HUB_USER_ROLE) or
         Enrolment(API_HUB_APPROVER_ROLE) or

@@ -21,8 +21,10 @@ import models.application.TeamMember
 import models.requests.{IdentifierRequest, TeamRequest}
 import models.team.Team
 import models.user.UserModel
-import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.when
 import org.scalatest.matchers.must.Matchers
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.Application
 import play.api.inject.bind
 import play.api.mvc.{AnyContentAsEmpty, Result, Results}
@@ -35,7 +37,7 @@ import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class TeamAuthActionSpec extends SpecBase with Matchers with MockitoSugar with ArgumentMatchersSugar {
+class TeamAuthActionSpec extends SpecBase with Matchers with MockitoSugar {
 
   "TeamAuthAction" - {
     "must grant a user access to a team when they are a team member" in {

@@ -22,7 +22,9 @@ import forms.CreateTeamNameFormProvider
 import models.team.Team
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{verify, when}
+import org.scalatestplus.mockito.MockitoSugar
 import pages.CreateTeamNamePage
 import play.api.Application
 import play.api.data.FormError
@@ -38,7 +40,7 @@ import views.html.team.CreateTeamNameView
 import java.time.LocalDateTime
 import scala.concurrent.Future
 
-class CreateTeamNameControllerSpec extends SpecBase with MockitoSugar with ArgumentMatchersSugar with HtmlValidation{
+class CreateTeamNameControllerSpec extends SpecBase with MockitoSugar with HtmlValidation{
 
   private def onwardRoute = Call("GET", "/foo")
 
@@ -117,7 +119,7 @@ class CreateTeamNameControllerSpec extends SpecBase with MockitoSugar with Argum
       val fixture = buildFixture(Some(emptyUserAnswers))
 
       when(fixture.apiHubService.findTeamByName(any)(any)).thenReturn(Future.successful(None))
-      when(fixture.sessionRepository.set(any)) thenReturn Future.successful(true)
+      when(fixture.sessionRepository.set(any)).thenReturn(Future.successful(true))
 
       running(fixture.application) {
         val request =

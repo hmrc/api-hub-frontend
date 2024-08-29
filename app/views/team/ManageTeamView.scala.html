@@ -25,7 +25,7 @@
     govukButton: GovukButton
 )
 
-@(team: Team, application: Option[Application], user: UserModel, crypto: Encrypter with Decrypter)(implicit request: Request[_], messages: Messages)
+@(team: Team, application: Option[Application], user: UserModel, crypto: Encrypter & Decrypter)(implicit request: Request[?], messages: Messages)
 
 @teamMemberRemoveLink(teamId: String, teamMember: TeamMember, membersInTeam: Int) = {
     @* Hide the link if there is just one member on the team or if it's the user's member *@

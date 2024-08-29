@@ -21,8 +21,9 @@ import controllers.RegisterApplicationSuccessControllerSpec.buildFixture
 import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
 import models.application.{Application, Creator, TeamMember}
 import models.user.UserModel
-import org.mockito.ArgumentMatchers.any
-import org.mockito.{ArgumentMatchers, MockitoSugar}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -41,10 +42,10 @@ class RegisterApplicationSuccessControllerSpec extends SpecBase with MockitoSuga
       val app = Application("id-1", "test", Creator("creator-email"), Seq(TeamMember("test-email")))
 
       forAll(teamMemberAndSupporterTable) {
-        user: UserModel =>
+        (user: UserModel) =>
           val fixture = buildFixture(user)
 
-          when(fixture.apiHubService.getApplication(ArgumentMatchers.eq("id-1"), ArgumentMatchers.eq(false), ArgumentMatchers.eq(false))(any()))
+          when(fixture.apiHubService.getApplication(eqTo("id-1"), eqTo(false), eqTo(false))(any()))
             .thenReturn(Future.successful(Some(app)))
 
           running(fixture.application) {
@@ -68,7 +69,7 @@ class RegisterApplicationSuccessControllerSpec extends SpecBase with MockitoSuga
       val testId = "test-app-id"
       val fixture = buildFixture(userModel = FakeUserNotTeamMember)
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(testId), ArgumentMatchers.eq(false), ArgumentMatchers.eq(false))(any()))
+      when(fixture.apiHubService.getApplication(eqTo(testId), eqTo(false), eqTo(false))(any()))
         .thenReturn(Future.successful(Some(FakeApplication)))
 
       running(fixture.application) {

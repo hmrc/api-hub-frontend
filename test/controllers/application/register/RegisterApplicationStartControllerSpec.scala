@@ -21,8 +21,7 @@ import controllers.actions.FakeUser
 import generators.ApiDetailGenerators
 import models.UserAnswers
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.Application
@@ -53,7 +52,7 @@ class RegisterApplicationStartControllerSpec extends SpecBase with MockitoSugar 
 
         val expected = UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
 
-        verify(fixture.sessionRepository).set(ArgumentMatchers.eq(expected))
+        verify(fixture.sessionRepository).set(eqTo(expected))
       }
     }
 

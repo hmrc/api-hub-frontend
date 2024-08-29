@@ -25,7 +25,7 @@
     govukSummaryList: GovukSummaryList
 )
 
-@(app:Application, user: Option[UserModel], apis: Seq[AccessRequestApi])(implicit request: Request[_], messages: Messages)
+@(app:Application, user: Option[UserModel], apis: Seq[AccessRequestApi])(implicit request: Request[?], messages: Messages)
 
 @applicationLink(application: Application) = {
     <a href='@applicationLinkUrl(application)' class='govuk-link govuk-link--no-visited-state'>

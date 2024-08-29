@@ -26,7 +26,7 @@
         iconsLink: IconsLink
 )
 
-@(application: Application, applicationApis: Seq[ApplicationApi], user: Option[UserModel])(implicit request: Request[_], messages: Messages)
+@(application: Application, applicationApis: Seq[ApplicationApi], user: Option[UserModel])(implicit request: Request[?], messages: Messages)
 
 @exploreApisLink(messageId: String) = {
     <a href="@{routes.ExploreApisController.onPageLoad().url}" class="govuk-link govuk-link--no-visited-state">
@@ -94,16 +94,17 @@
                 </h2>
             </div>
             <div class="govuk-grid-column-one-half govuk-!-text-align-right">
-            @if(applicationApis.exists(_.needsProductionAccessRequest)) {
+                @if(applicationApis.exists(_.needsProductionAccessRequest)) {
                 @govukButton(
-                    Button(
-                        href = Some(controllers.application.routes.RequestProductionAccessStartController.onPageLoad(application.id).url),
-                        content = Text(messages("applicationApis.requestProductionAccess")),
-                        id = Some("requestProductionAccessButton"),
-                        classes = "govuk-!-margin-bottom-2"
-                    )
+                Button(
+                href =
+                Some(controllers.application.routes.RequestProductionAccessStartController.onPageLoad(application.id).url),
+                content = Text(messages("applicationApis.requestProductionAccess")),
+                id = Some("requestProductionAccessButton"),
+                classes = "govuk-!-margin-bottom-2"
                 )
-            }
+                )
+                }
             </div>
         }
         </div>

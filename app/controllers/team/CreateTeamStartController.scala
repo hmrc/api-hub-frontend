@@ -50,7 +50,7 @@ class CreateTeamStartController @Inject()(
       }
   }
 
-  private def buildUserAnswers(userEmail: String, request: IdentifierRequest[_]): Try[UserAnswers] = {
+  private def buildUserAnswers(userEmail: String, request: IdentifierRequest[?]): Try[UserAnswers] = {
     UserAnswers(
       id = request.user.userId,
       lastUpdated = clock.instant()

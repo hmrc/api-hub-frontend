@@ -21,10 +21,9 @@ import controllers.actions.{FakeApplication, FakeUser}
 import models.{AddAnApi, UserAnswers}
 import models.api.ApiDetailLensesSpec.sampleOas
 import models.api.{ApiDetail, Endpoint, EndpointMethod, Live, Maintainer}
-import org.mockito.ArgumentMatchers
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
-import org.mockito.MockitoSugar.mock
+import org.scalatestplus.mockito.MockitoSugar
 import pages.{AddAnApiApiPage, AddAnApiContextPage, AddAnApiSelectApplicationPage, AddAnApiSelectEndpointsPage}
 import play.api.Application
 import play.api.inject.bind
@@ -39,7 +38,7 @@ import views.html.AddAnApiCheckYourAnswersView
 import java.time.{Clock, Instant, ZoneId}
 import scala.concurrent.Future
 
-class AddAnApiCheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency with HtmlValidation {
+class AddAnApiCheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency with HtmlValidation with MockitoSugar {
 
   private val clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
 
@@ -91,10 +90,10 @@ class AddAnApiCheckYourAnswersControllerSpec extends SpecBase with SummaryListFl
 
       val fixture = buildFixture(Some(userAnswers))
 
-      when(fixture.apiHubService.getApplication(ArgumentMatchers.eq(FakeApplication.id), ArgumentMatchers.eq(false), ArgumentMatchers.eq(false))(any()))
+      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false), eqTo(false))(any()))
         .thenReturn(Future.successful(Some(FakeApplication)))
 
-      when(fixture.apiHubService.getApiDetail(ArgumentMatchers.eq(apiDetail.id))(any()))
+      when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
       running(fixture.application) {

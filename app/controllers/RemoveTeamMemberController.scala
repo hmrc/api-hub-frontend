@@ -56,7 +56,7 @@ class RemoveTeamMemberController @Inject()(     override val messagesApi: Messag
       )
   }
 
-  private def teamMemberNotFound()(implicit request: Request[_]): Future[Result] = {
+  private def teamMemberNotFound()(implicit request: Request[?]): Future[Result] = {
     Future.successful(
       errorResultBuilder.notFound(Messages("addTeamMemberDetails.notFound"))
     )

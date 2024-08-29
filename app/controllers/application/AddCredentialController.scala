@@ -102,7 +102,7 @@ class AddCredentialController @Inject()(
     apiNames: Seq[String],
     credential: Credential,
     user: UserModel
-  )(implicit request: Request[_]): Result = {
+  )(implicit request: Request[?]): Result = {
     val summaryList = AddCredentialSuccessViewModel.buildSummary(
       application,
       apiNames,
@@ -112,7 +112,7 @@ class AddCredentialController @Inject()(
     Ok(successView(application, summaryList, Some(user), credential))
   }
 
-  private def applicationNotFound(application: Application)(implicit request: Request[_]): Future[Result] = {
+  private def applicationNotFound(application: Application)(implicit request: Request[?]): Future[Result] = {
     Future.successful(
       errorResultBuilder.notFound(
         heading = Messages("site.applicationNotFoundHeading"),
@@ -121,7 +121,7 @@ class AddCredentialController @Inject()(
     )
   }
 
-  private def tooManyCredentials(application: Application)(implicit request: Request[_]): Future[Result] = {
+  private def tooManyCredentials(application: Application)(implicit request: Request[?]): Future[Result] = {
     val linkUrl = controllers.application.routes.EnvironmentAndCredentialsController.onPageLoad(application.id).url
     val link = s"<a class=\"govuk-link govuk-link--no-visited-state\" href=\"$linkUrl\">${application.name}</a>"
 
