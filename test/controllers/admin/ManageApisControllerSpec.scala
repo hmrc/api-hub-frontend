@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.routes
 import generators.ApiDetailGenerators
 import models.user.UserModel
-import org.mockito.ArgumentMatchers.{any, same, eq as eqTo}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo, isNull}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
@@ -55,7 +55,7 @@ class ManageApisControllerSpec
 
           status(result) mustBe OK
 
-          verify(fixture.apiHubService).getApis(any)(any)
+          verify(fixture.apiHubService).getApis(isNull)(any)
 
           val view = fixture.playApplication.injector.instanceOf[ManageApisView]
           contentAsString(result) mustBe view(apis, user)(request, messages(fixture.playApplication)).toString()
