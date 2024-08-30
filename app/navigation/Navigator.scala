@@ -28,10 +28,6 @@ import pages.application.register.{RegisterApplicationNamePage, RegisterApplicat
 class Navigator @Inject()() {
 
   private val normalRoutes: Page => UserAnswers => Call = {
-    case ApplicationNamePage => _ => routes.QuestionAddTeamMembersController.onPageLoad(NormalMode)
-    case QuestionAddTeamMembersPage => questionAddTeamMembersNextPage(NormalMode)
-    case TeamMembersPage => _ => routes.ConfirmAddTeamMemberController.onPageLoad(NormalMode)
-    case ConfirmAddTeamMemberPage => confirmAddTeamMemberNextPage(NormalMode)
     case AddAnApiApiPage => addAnApiApiIdNextPage
     case AddAnApiSelectApplicationPage => addAnApiSelectApplicationNextPage(NormalMode)
     case AddAnApiSelectEndpointsPage => addAnApiSelectEndpointsNextPage(NormalMode)
@@ -47,16 +43,13 @@ class Navigator @Inject()() {
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
-    case QuestionAddTeamMembersPage => questionAddTeamMembersNextPage(CheckMode)
-    case ConfirmAddTeamMemberPage => confirmAddTeamMemberNextPage(CheckMode)
-    case TeamMembersPage => _ => routes.ConfirmAddTeamMemberController.onPageLoad(CheckMode)
     case AddAnApiSelectApplicationPage => addAnApiSelectApplicationNextPage(CheckMode)
     case AddAnApiSelectEndpointsPage => addAnApiSelectEndpointsNextPage(CheckMode)
     case ApiPolicyConditionsDeclarationPage => apiPolicyConditionsDeclarationNextPage(CheckMode)
     case CreateTeamNamePage => _ => controllers.team.routes.CreateTeamCheckYourAnswersController.onPageLoad()
     case RegisterApplicationNamePage => _ => controllers.application.register.routes.RegisterApplicationCheckYourAnswersController.onPageLoad()
     case RegisterApplicationTeamPage => _ => controllers.application.register.routes.RegisterApplicationCheckYourAnswersController.onPageLoad()
-    case _ => _ => routes.CheckYourAnswersController.onPageLoad()
+    case _ => _ => routes.IndexController.onPageLoad
   }
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {
@@ -64,26 +57,6 @@ class Navigator @Inject()() {
       normalRoutes(page)(userAnswers)
     case CheckMode =>
       checkRouteMap(page)(userAnswers)
-  }
-
-  private def questionAddTeamMembersNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
-    (mode, userAnswers.get(QuestionAddTeamMembersPage)) match {
-      case (NormalMode, Some(true)) => routes.AddTeamMemberDetailsController.onPageLoad(NormalMode, 0)
-      case (NormalMode, Some(_)) => routes.CheckYourAnswersController.onPageLoad()
-      case (NormalMode, None) => routes.JourneyRecoveryController.onPageLoad()
-      case (CheckMode, Some(true)) => routes.AddTeamMemberDetailsController.onPageLoad(NormalMode, 0)
-      case _ => routes.CheckYourAnswersController.onPageLoad()
-    }
-  }
-
-  private def confirmAddTeamMemberNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
-    (mode, userAnswers.get(ConfirmAddTeamMemberPage)) match {
-      case (NormalMode, Some(true)) => routes.AddTeamMemberDetailsController.onPageLoad(NormalMode, 0)
-      case (NormalMode, Some(_)) => routes.CheckYourAnswersController.onPageLoad()
-      case (NormalMode, None) => routes.JourneyRecoveryController.onPageLoad()
-      case (CheckMode, Some(true)) => routes.AddTeamMemberDetailsController.onPageLoad(NormalMode, 0)
-      case _ => routes.CheckYourAnswersController.onPageLoad()
-    }
   }
 
   private def addAnApiApiIdNextPage(userAnswers: UserAnswers): Call = {

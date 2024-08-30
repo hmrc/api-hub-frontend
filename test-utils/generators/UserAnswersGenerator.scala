@@ -32,10 +32,6 @@ trait UserAnswersGenerator extends TryValues {
     arbitrary[(CreateTeamNamePage.type, JsValue)] ::
     arbitrary[(ApiPolicyConditionsDeclarationPage.type, JsValue)] ::
     arbitrary[(AddAnApiSelectEndpointsPage.type, JsValue)] ::
-    arbitrary[(ConfirmAddTeamMemberPage.type, JsValue)] ::
-    arbitrary[(TeamMembersPage.type, JsValue)] ::
-    arbitrary[(QuestionAddTeamMembersPage.type, JsValue)] ::
-    arbitrary[(ApplicationNamePage.type, JsValue)] ::
     Nil
 
   implicit lazy val arbitraryUserData: Arbitrary[UserAnswers] = {

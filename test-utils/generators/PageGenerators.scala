@@ -37,15 +37,4 @@ trait PageGenerators {
   implicit lazy val arbitraryAddAnApiSelectEndpointsPage: Arbitrary[AddAnApiSelectEndpointsPage.type] =
     Arbitrary(AddAnApiSelectEndpointsPage)
 
-  implicit lazy val arbitraryConfirmAddTeamMemberPage: Arbitrary[ConfirmAddTeamMemberPage.type] =
-    Arbitrary(ConfirmAddTeamMemberPage)
-
-  implicit lazy val arbitraryTeamMembersPage: Arbitrary[TeamMembersPage.type] =
-    Arbitrary(TeamMembersPage)
-
-  implicit lazy val arbitraryQuestionAddTeamMembersPage: Arbitrary[QuestionAddTeamMembersPage.type] =
-    Arbitrary(QuestionAddTeamMembersPage)
-
-  implicit lazy val arbitraryApplicationNamePage: Arbitrary[ApplicationNamePage.type] =
-    Arbitrary(ApplicationNamePage)
 }
