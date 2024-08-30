@@ -61,7 +61,7 @@ class ManageTeamMembersControllerSpec extends SpecBase with MockitoSugar with Te
     "must sort the application's team members alphabetically" in {
       val application = FakeApplication.copy(
         teamMembers = Seq(
-          TeamMember(email = FakeUser.email.value),
+          TeamMember(email = FakeUser.email),
           TeamMember(email = "cc@hmrc.gov.uk"),
           TeamMember(email = "ab@hmrc.gov.uk"),
           TeamMember(email = "aa@hmrc.gov.uk"),
@@ -75,7 +75,7 @@ class ManageTeamMembersControllerSpec extends SpecBase with MockitoSugar with Te
           TeamMember(email = "aa@hmrc.gov.uk"),
           TeamMember(email = "ab@hmrc.gov.uk"),
           TeamMember(email = "cc@hmrc.gov.uk"),
-          TeamMember(email = FakeUser.email.value),
+          TeamMember(email = FakeUser.email),
           TeamMember(email = "za@hmrc.gov.uk"),
           TeamMember(email = "Zb@hmrc.gov.uk")
         )

@@ -61,7 +61,7 @@ class RegisterApplicationControllerSpec extends SpecBase with MockitoSugar with 
         contentAsString(result) mustBe view(application, FakeUser)(request, messages(fixture.playApplication)).toString()
         contentAsString(result) must validateAsHtml
 
-        val newApplication = NewApplication(application.name, Creator(FakeUser.email.value), team.id)
+        val newApplication = NewApplication(application.name, Creator(FakeUser.email), team.id)
         verify(fixture.apiHubService).registerApplication(eqTo(newApplication))(any)
         verify(fixture.sessionRepository).clear(eqTo(userAnswersId))
       }

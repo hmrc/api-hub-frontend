@@ -43,10 +43,9 @@ class LdapAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSuga
       val ldapAuthenticator = new LdapAuthenticator(stubAuth)
 
       val user = UserModel(
-        userId = "LDAP-jo.bloggs",
-        userName = "jo.bloggs",
+        userId = s"LDAP-$username",
         userType = LdapUser,
-        email = Some("jo.bloggs@email.com"),
+        email = "jo.bloggs@email.com",
         permissions = Permissions(canApprove = false, canSupport = false, isPrivileged = false)
       )
 
@@ -66,10 +65,9 @@ class LdapAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSuga
       val ldapAuthenticator = new LdapAuthenticator(stubAuth)
 
       val user = UserModel(
-        userId = "LDAP-jo.bloggs",
-        userName = "jo.bloggs",
+        userId = s"LDAP-$username",
         userType = LdapUser,
-        email = Some("jo.bloggs@email.com"),
+        email = "jo.bloggs@email.com",
         permissions = Permissions(canApprove = true, canSupport = false, isPrivileged = false)
       )
 
@@ -89,10 +87,9 @@ class LdapAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSuga
       val ldapAuthenticator = new LdapAuthenticator(stubAuth)
 
       val user = UserModel(
-        userId = "LDAP-jo.bloggs",
-        userName = "jo.bloggs",
+        userId = s"LDAP-$username",
         userType = LdapUser,
-        email = Some("jo.bloggs@email.com"),
+        email = "jo.bloggs@email.com",
         permissions = Permissions(canApprove = false, canSupport = true, isPrivileged = false)
       )
 
@@ -112,10 +109,9 @@ class LdapAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSuga
       val ldapAuthenticator = new LdapAuthenticator(stubAuth)
 
       val user = UserModel(
-        userId = "LDAP-jo.bloggs",
-        userName = "jo.bloggs",
+        userId = s"LDAP-$username",
         userType = LdapUser,
-        email = Some("jo.bloggs@email.com"),
+        email = "jo.bloggs@email.com",
         permissions = Permissions(canApprove = false, canSupport = false, isPrivileged = true)
       )
 
@@ -163,6 +159,8 @@ object LdapAuthenticatorSpec {
   val requestWithAuthorisation: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withSession(SessionKeys.authToken -> "Open sesame")
   val requestWithoutAuthorisation: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
+  private val username = "test-user-name"
+
   private val canApprovePredicate = Predicate.Permission(
     Resource(
       ResourceType("api-hub-frontend"),
@@ -199,8 +197,8 @@ object LdapAuthenticatorSpec {
       uk.gov.hmrc.internalauth.client.~(
         uk.gov.hmrc.internalauth.client.~(
           uk.gov.hmrc.internalauth.client.~(
-            Retrieval.Username(user.userName),
-            user.email.map(Retrieval.Email)
+            Retrieval.Username(username),
+            Some(Retrieval.Email(user.email))
           ),
           user.permissions.canApprove
         ),

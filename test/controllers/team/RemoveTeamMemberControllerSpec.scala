@@ -147,7 +147,7 @@ class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with Opt
       val teamMember1 = TeamMember("creator@hmrc.gov.uk")
       val teamMember2 = TeamMember("new.member@hmrc.gov.uk")
 
-      val user = UserModel("test-user-id", "test-user-name", LdapUser, Some(teamMember1.email))
+      val user = UserModel("test-user-id", LdapUser, teamMember1.email)
 
       val team = Team(
         "test-team-id",
@@ -187,7 +187,7 @@ class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with Opt
       val teamMember1 = TeamMember("creator@hmrc.gov.uk")
       val teamMember2 = TeamMember("new.member@hmrc.gov.uk")
 
-      val user = UserModel("test-user-id", "test-user-name", LdapUser, Some(teamMember1.email))
+      val user = UserModel("test-user-id", LdapUser, teamMember1.email)
 
       val team = Team(
         "test-team-id",
@@ -222,7 +222,7 @@ class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with Opt
       val teamMember1 = TeamMember("creator@hmrc.gov.uk")
       val teamMember2 = TeamMember("new.member@hmrc.gov.uk")
 
-      val user = UserModel("test-user-id", "test-user-name", LdapUser, Some(teamMember1.email))
+      val user = UserModel("test-user-id", LdapUser, teamMember1.email)
 
       val team = Team(
         "test-team-id",
@@ -268,7 +268,7 @@ class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with Opt
       val teamMember1 = TeamMember("creator@hmrc.gov.uk")
       val teamMember2 = TeamMember("new.member@hmrc.gov.uk")
 
-      val user = UserModel("test-user-id", "test-user-name", LdapUser, Some(teamMember1.email))
+      val user = UserModel("test-user-id", LdapUser, teamMember1.email)
 
       val team = Team(
         "test-team-id",
@@ -318,7 +318,7 @@ class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with Opt
       val teamMember1 = TeamMember("creator@hmrc.gov.uk")
       val teamMember2 = TeamMember("new.member@hmrc.gov.uk")
 
-      val user = UserModel("test-user-id", "test-user-name", LdapUser, Some(teamMember1.email))
+      val user = UserModel("test-user-id", LdapUser, teamMember1.email)
 
       val team = Team(
         "test-team-id",

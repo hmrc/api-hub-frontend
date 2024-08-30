@@ -1092,7 +1092,7 @@ class ApplicationsConnectorSpec
   "ApplicationsConnector.findTeamById" - {
     "must place the correct request and return the team when it exists" in {
       val teamId = "test-team-id"
-      val expected = Team(teamId, "test-team-name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email.value)))
+      val expected = Team(teamId, "test-team-name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email)))
 
       stubFor(
         get(urlEqualTo(s"/api-hub-applications/teams/$teamId"))
@@ -1131,7 +1131,7 @@ class ApplicationsConnectorSpec
   "ApplicationsConnector.findTeamByName" - {
     "must place the correct request and return the team when it exists" in {
       val name = "test-team-name"
-      val expected = Team("test-team-id", name, LocalDateTime.now(), Seq(TeamMember(FakeUser.email.value)))
+      val expected = Team("test-team-id", name, LocalDateTime.now(), Seq(TeamMember(FakeUser.email)))
 
       stubFor(
         get(urlEqualTo(s"/api-hub-applications/teams/name/$name"))
@@ -1502,16 +1502,16 @@ object ApplicationsConnectorSpec extends HttpClientV2Support {
     Json.toJson(applications).toString()
   }
 
-  object FakeUser extends UserModel("id", "test-name", LdapUser, Some("test-email"))
+  object FakeUser extends UserModel("id", LdapUser, "test-email")
 
   object FakeApplication extends Application(
     "fake-application-id",
     "fake-application-name",
     LocalDateTime.now(),
-    Creator(FakeUser.email.get),
+    Creator(FakeUser.email),
     LocalDateTime.now(),
     None,
-    Seq(TeamMember(FakeUser.email.get)),
+    Seq(TeamMember(FakeUser.email)),
     Environments(),
     Seq.empty
   )

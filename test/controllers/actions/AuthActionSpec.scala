@@ -18,14 +18,14 @@ package controllers.actions
 
 import base.SpecBase
 import controllers.actions.AuthActionSpec.user
-import models.user.{Permissions, StrideUser, UserModel}
+import models.user.{LdapUser, Permissions, StrideUser, UserModel}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
-import play.api.mvc._
+import play.api.mvc.*
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 
 import scala.concurrent.Future
 
@@ -137,7 +137,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar {
 
     "must show error page if stride user without email address" in {
       val strideAuth = mock[StrideAuthenticator]
-      when(strideAuth.authenticate()(any())).thenReturn(Future.successful(UserAuthenticated(FakeUserStrideNoEmail)))
+      when(strideAuth.authenticate()(any())).thenReturn(Future.successful(UserMissingEmail(StrideUser)))
 
       val application = applicationBuilder(userAnswers = None)
         .overrides(
@@ -159,7 +159,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar {
 
     "must show error page if ldap user without email address" in {
       val ldapAuth = mock[LdapAuthenticator]
-      when(ldapAuth.authenticate()(any())).thenReturn(Future.successful(UserAuthenticated(FakeUserLdapNoEmail)))
+      when(ldapAuth.authenticate()(any())).thenReturn(Future.successful(UserMissingEmail(LdapUser)))
 
       val application = applicationBuilder(userAnswers = None)
         .overrides(
@@ -186,9 +186,8 @@ object AuthActionSpec {
 
   val user: UserModel = UserModel(
     userId = "test-user-id",
-    userName = "test-user-name",
     userType = StrideUser,
-    email = Some("test-email"),
+    email = "test-email",
     permissions = Permissions(canApprove = false, canSupport = false, isPrivileged = false)
   )
 

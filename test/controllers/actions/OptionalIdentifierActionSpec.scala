@@ -169,9 +169,8 @@ object OptionalIdentifierActionSpec {
 
   val testUser: UserModel = UserModel(
     userId = "test-user-id",
-    userName = "test-user-name",
     userType = StrideUser,
-    email = Some("test-email"),
+    email = "test-email",
     permissions = Permissions(canApprove = false, canSupport = false, isPrivileged = false)
   )
 

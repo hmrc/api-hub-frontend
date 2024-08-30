@@ -54,7 +54,7 @@ class CreateTeamStartControllerSpec extends SpecBase with MockitoSugar with Html
         status(result) mustBe SEE_OTHER
 
         val expected = UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
-          .set(CreateTeamMembersPage, Seq[TeamMember](TeamMember(FakeUser.email.get)))
+          .set(CreateTeamMembersPage, Seq[TeamMember](TeamMember(FakeUser.email)))
           .toOption.value
 
         verify(fixture.createTeamSessionRepository).set(eqTo(expected))
@@ -74,24 +74,6 @@ class CreateTeamStartControllerSpec extends SpecBase with MockitoSugar with Html
       }
     }
 
-    "must return an error if user has no email address" in {
-      val fixture = buildFixture(None)
-
-      running(fixture.application) {
-        val request = FakeRequest(GET, routes.CreateTeamStartController.startCreateTeam().url)
-        val result = route(fixture.application, request).value
-        val view = fixture.application.injector.instanceOf[ErrorTemplate]
-
-        status(result) mustBe INTERNAL_SERVER_ERROR
-        contentAsString(result) mustBe
-          view(
-            "Sorry, there is a problem with the service - 500",
-            "Sorry, there is a problem with the service",
-            "Try again later."
-          )(request, messages(fixture.application)).toString()
-        contentAsString(result) must validateAsHtml
-      }
-    }
   }
 
   private case class Fixture(
@@ -100,7 +82,7 @@ class CreateTeamStartControllerSpec extends SpecBase with MockitoSugar with Html
     createTeamStartController: CreateTeamStartController
   )
 
-  private def buildFixture(userEmail: Option[String] = FakeUser.email): Fixture = {
+  private def buildFixture(userEmail: String = FakeUser.email): Fixture = {
     val createTeamSessionRepository = mock[CreateTeamSessionRepository]
 
     val application = applicationBuilder(user = FakeUser.copy(email = userEmail))

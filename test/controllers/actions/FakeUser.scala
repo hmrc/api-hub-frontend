@@ -18,10 +18,10 @@ package controllers.actions
 
 import models.user.{LdapUser, StrideUser, UserModel}
 
-object FakeUser extends UserModel("id", "test-name", LdapUser, Some("test-email"))
+object FakeUser extends UserModel("id", LdapUser, "test-email")
 
-object FakeUserLdapNoEmail extends UserModel("id", "test-name", LdapUser, None)
+//object FakeUserLdapNoEmail extends UserModel("id", "test-name", LdapUser, None)
 
-object FakeUserStrideNoEmail extends UserModel("id", "test-name", StrideUser, None)
+//object FakeUserStrideNoEmail extends UserModel("id", "test-name", StrideUser, None)
 
-object FakeUserNotTeamMember extends UserModel("idx", "test-namex", LdapUser, Some("different-email"))
+object FakeUserNotTeamMember extends UserModel("idx", LdapUser, "different-email")

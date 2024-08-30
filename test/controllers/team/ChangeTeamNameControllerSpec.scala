@@ -48,8 +48,8 @@ class ChangeTeamNameControllerSpec extends SpecBase with MockitoSugar with HtmlV
   private val formProvider = new ChangeTeamNameFormProvider()
   private val form = formProvider()
   private val id = "a_team_id"
-  private val teamMember = TeamMember.apply(FakeUser.email.get)
-  val testTeam = Team.apply(id, "team name", LocalDateTime.now(), Seq(teamMember))
+  private val teamMember = TeamMember.apply(FakeUser.email)
+  private val testTeam = Team.apply(id, "team name", LocalDateTime.now(), Seq(teamMember))
 
   private lazy val changeTeamNameRoutePageLoad = team.routes.ChangeTeamNameController.onPageLoad(id).url
   private lazy val changeTeamNameRouteOnSubmit = team.routes.ChangeTeamNameController.onSubmit(id).url

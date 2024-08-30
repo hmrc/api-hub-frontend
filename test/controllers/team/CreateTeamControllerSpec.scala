@@ -137,7 +137,7 @@ class CreateTeamControllerSpec extends SpecBase with MockitoSugar with HtmlValid
 object CreateTeamControllerSpec extends OptionValues {
 
   private val teamName = "test-team-name"
-  private val teamMembers = Seq(TeamMember(FakeUser.email.value))
+  private val teamMembers = Seq(TeamMember(FakeUser.email))
   private val team = Team("test-team-id", teamName, LocalDateTime.now(), teamMembers)
 
   private val fullAnswers = UserAnswers(FakeUser.userId)

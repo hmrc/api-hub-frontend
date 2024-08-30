@@ -24,6 +24,7 @@ import uk.gov.hmrc.auth.core.AuthProvider.PrivilegedApplication
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthProviders, AuthorisedFunctions, Enrolment, InsufficientEnrolments, NoActiveSession}
+import uk.gov.hmrc.http.UnauthorizedException
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -41,28 +42,27 @@ class StrideAuthenticator @Inject()(
         Enrolment(API_HUB_PRIVILEGED_USER_ROLE) and
         AuthProviders(PrivilegedApplication)
     )
-      .retrieve(Retrievals.authorisedEnrolments and Retrievals.name and Retrievals.email and Retrievals.credentials) {
-        case authorisedEnrolments ~ name ~ email ~ credentials =>
-          Future.successful(UserAuthenticated(
-            UserModel(
-              userId = s"STRIDE-${credentials.map(_.providerId).getOrElse(name)}",
-              userName = name.map(_.name.getOrElse("")).getOrElse(""),
-              userType = StrideUser,
-              email = email.flatMap(
-                e => if (e.trim.isEmpty) {
-                  None
-                }
-                else {
-                  Some(e)
-                }
-              ),
-              permissions = Permissions(
-                canApprove = authorisedEnrolments.enrolments.exists(enrolment => enrolment.key.equals(API_HUB_APPROVER_ROLE)),
-                canSupport = authorisedEnrolments.enrolments.exists(enrolment => enrolment.key.equals(API_HUB_SUPPORT_ROLE)),
-                isPrivileged = authorisedEnrolments.enrolments.exists(enrolment => enrolment.key.equals(API_HUB_PRIVILEGED_USER_ROLE))
-              )
-            )
-          ))
+      .retrieve(Retrievals.authorisedEnrolments and Retrievals.internalId and Retrievals.email) {
+        case authorisedEnrolments ~ internalId ~ email =>
+          (internalId, email) match {
+            case (Some(internalId), Some(email)) if email.trim.nonEmpty =>
+              Future.successful(UserAuthenticated(
+                UserModel(
+                  userId = s"STRIDE-$internalId",
+                  userType = StrideUser,
+                  email = email.trim,
+                  permissions = Permissions(
+                    canApprove = authorisedEnrolments.enrolments.exists(enrolment => enrolment.key.equals(API_HUB_APPROVER_ROLE)),
+                    canSupport = authorisedEnrolments.enrolments.exists(enrolment => enrolment.key.equals(API_HUB_SUPPORT_ROLE)),
+                    isPrivileged = authorisedEnrolments.enrolments.exists(enrolment => enrolment.key.equals(API_HUB_PRIVILEGED_USER_ROLE))
+                  )
+                )
+              ))
+            case (_, Some(_)) | (_, None) =>
+              Future.successful(UserMissingEmail(StrideUser))
+            case (_, _) =>
+              Future.failed(new UnauthorizedException("Unable to retrieve internal Id"))
+          }
       }.recover {
       case _: NoActiveSession =>
         UserUnauthenticated

@@ -21,17 +21,17 @@ import controllers.ApplicationsControllerSpec.buildFixture
 import controllers.actions.FakeUser
 import models.application.{Application, Creator, TeamMember}
 import models.user.UserModel
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.Application as PlayApplication
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import play.api.{Application => PlayApplication}
+import play.api.test.Helpers.*
 import repositories.SessionRepository
 import services.ApiHubService
 import utils.HtmlValidation
-import views.html.{ApplicationsView, ErrorTemplate}
+import views.html.ApplicationsView
 
 import scala.concurrent.Future
 
@@ -67,27 +67,8 @@ class ApplicationsControllerSpec extends SpecBase with MockitoSugar with HtmlVal
         contentAsString(result) must validateAsHtml
       }
     }
-
-    "must return Internal Server Error if the user has no email address for a GET" in {
-      val fixture = buildFixture(FakeUser.copy(email = None))
-
-      running(fixture.application) {
-        val request = FakeRequest(GET, routes.ApplicationsController.onPageLoad.url)
-        val result = route(fixture.application, request).value
-        val view = fixture.application.injector.instanceOf[ErrorTemplate]
-
-        status(result) mustEqual INTERNAL_SERVER_ERROR
-        contentAsString(result) mustBe
-          view(
-            "Sorry, there is a problem with the service - 500",
-            "Sorry, there is a problem with the service",
-            "Try again later."
-          )(request, messages(fixture.application))
-            .toString()
-        contentAsString(result) must validateAsHtml
-      }
-    }
   }
+
 }
 
 object ApplicationsControllerSpec extends SpecBase with MockitoSugar {

@@ -20,8 +20,7 @@ import models.user.{LdapUser, Permissions, UserModel}
 
 object FakeApprover extends UserModel(
   userId ="fake-approver-id",
-  userName = "fake-approver-name",
   userType = LdapUser,
-  email = Some("fake-approver-email"),
+  email = "fake-approver-email",
   permissions = Permissions(canApprove = true, canSupport = false, isPrivileged = false)
 )
