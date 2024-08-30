@@ -89,7 +89,7 @@ class RemoveTeamMemberController @Inject()(override val messagesApi: MessagesApi
           value =>
             if (value) {
               val user = request.identifierRequest.user
-              val isSelfRemoval = user.email.map(_.equalsIgnoreCase(email)).getOrElse(false)
+              val isSelfRemoval = user.email.equalsIgnoreCase(email)
               if (isSelfRemoval)
                 teamMemberToRemoveSameAsUser()
               else

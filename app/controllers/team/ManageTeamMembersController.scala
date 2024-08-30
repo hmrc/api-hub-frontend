@@ -43,9 +43,8 @@ class ManageTeamMembersController @Inject()(
   def onPageLoad: Action[AnyContent] = { (identify andThen getData andThen requireData) {
     implicit request =>
       val maybeSummaryListRows = for {
-        currentUserEmail <- request.user.email
         teamMemberList <- request.userAnswers.get(CreateTeamMembersPage)
-      } yield SummaryList(rows=ManageTeamMembers.rows(currentUserEmail, teamMemberList))
+      } yield SummaryList(rows=ManageTeamMembers.rows(request.user.email, teamMemberList))
 
       maybeSummaryListRows match {
         case Some(summaryListRows) => Ok(view(summaryListRows, request.user))

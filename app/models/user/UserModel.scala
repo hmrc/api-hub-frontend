@@ -33,8 +33,7 @@ object Permissions {
 
 case class UserModel(
   userId: String,
-  userName: String,
   userType: UserType,
-  email: Option[String] = Option.empty,
+  email: String,
   permissions: Permissions = Permissions()
 )

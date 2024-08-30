@@ -172,11 +172,11 @@ object ApplicationLenses {
       hasTeamMember(teamMember.email)
 
     def hasTeamMember(user: UserModel): Boolean =
-      user.email.exists(application.hasTeamMember)
+      application.hasTeamMember(user.email)
 
     def isAccessible(user: UserModel): Boolean =
       user.permissions.canSupport ||
-        user.email.exists(hasTeamMember)
+        hasTeamMember(user.email)
 
     def addTeamMember(email: String): Application =
       applicationTeamMembers.set(

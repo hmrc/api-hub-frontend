@@ -59,7 +59,7 @@ object TeamLenses {
 
     def isAccessible(user: UserModel): Boolean = {
       user.permissions.canSupport ||
-        user.email.exists(hasTeamMember)
+        hasTeamMember(user.email)
     }
 
   }

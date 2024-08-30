@@ -76,9 +76,7 @@ class SimpleApiDeploymentController @Inject()(
   }
 
   private def showView(code: Int, form: Form[?])(implicit request: IdentifierRequest[?]): Future[Result] = {
-    request.user.email
-      .map(email => apiHubService.findTeams(Some(email)))
-      .getOrElse(Future.successful(Seq.empty))
+    apiHubService.findTeams(Some(request.user.email))
       .map(teams => teams.sortBy(_.name.toLowerCase))
       .map(teams => Status(code)(deploymentView(form, teams, domains, hods, request.user)))
   }
