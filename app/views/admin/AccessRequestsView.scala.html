@@ -18,20 +18,28 @@
 @import models.user.UserModel
 @import viewmodels.admin.{AdminNavItems, AdminSideNavPages}
 @import views.html.components.AccessRequestPanel
+@import views.html.helper.CSPNonce
+@import views.html.components.Paginator
 
 @this(
     layout: templates.Layout,
     govukTable: GovukTable,
-    accessRequestPanel: AccessRequestPanel
+    accessRequestPanel: AccessRequestPanel,
+    paginator: Paginator
 )
 
 @(accessRequests: Seq[AccessRequest], user: UserModel)(implicit request: Request[?], messages: Messages)
+
+@scripts() = {
+    <script src='@routes.Assets.versioned("javascripts/adminAccessRequests.js")' type="module" @{CSPNonce.attr}></script>
+}
 
 @layout(
     pageTitle = titleNoForm(messages("accessRequests.title")),
     user = Some(user),
     fullWidth = true,
-    activeLink = Some("apiHubAdmin")
+    activeLink = Some("apiHubAdmin"),
+    customScriptsBlock = Some(scripts()),
 ) {
     @views.html.templates.SideNav(messages("accessRequests.admin"), AdminNavItems(user, AdminSideNavPages.AccessRequestsPage)) {
 
@@ -39,9 +47,13 @@
             @messages("accessRequests.heading")
         </h1>
 
+        <div id="accessRequestList">
         @for(accessRequest <- accessRequests) {
             @accessRequestPanel(accessRequest, showReviewLink = true)
         }
+        </div>
+
+        @paginator()
     }
 
 }
