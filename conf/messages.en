@@ -84,16 +84,6 @@ applications.heading = Your applications
 applications.teamMembers = Team members: {0}
 applications.created = Registered:
 
-checkYourAnswers.title = Check Your Answers
-checkYourAnswers.heading = Check your answers before creating your application
-checkYourAnswers.applicationDetails.heading = Application details
-checkYourAnswers.teamMembers.heading = Team members
-checkYourAnswers.teamMembers.noTeamMembersAdded = No team members added
-checkYourAnswers.teamMembers.teamMembersAdded = Team members added
-checkYourAnswers.complete.heading = Complete your application
-checkYourAnswers.complete.guidance = Team members you have added will be notified by email that they have been added to this application.
-checkYourAnswers.registerApplication = Register application
-
 registerApplicationCheckYourAnswers.title = Check Your Answers
 registerApplicationCheckYourAnswers.heading = Check your answers before registering your application
 registerApplicationCheckYourAnswers.applicationDetails.heading = Application details
@@ -115,14 +105,6 @@ unauthorised.heading = You do not have permission to access this page
 unauthorised.missingEmail.stride = You do not have a valid email address associated with your Stride account.
 unauthorised.missingEmail.ldap = Your account does not have a linked email account.
 unauthorised.missingEmail.heading = You are not authorised to access this service
-
-applicationName.title = Application Name
-applicationName.heading = What is the name of your application?
-applicationName.hint = This name will be used to identify your application to you and your team
-applicationName.checkYourAnswersLabel = Application name
-applicationName.error.required = Enter an application name
-applicationName.error.length = Application name must be 100 characters or less
-applicationName.change.hidden = ApplicationName
 
 registerApplicationName.title = Application Name
 registerApplicationName.heading = What is the name of your application?
@@ -262,13 +244,6 @@ fake-sign-in.token.lbl = Token (optional)
 fake-sign-in.permissions.lbl = Permissions
 fake-sign-in.button = Sign in
 
-questionAddTeamMembers.title = Do you want to add team members?
-questionAddTeamMembers.heading = Do you want to add team members?
-questionAddTeamMembers.checkYourAnswersLabel = questionAddTeamMembers
-questionAddTeamMembers.error.required = Please make a selection
-questionAddTeamMembers.change.hidden = QuestionAddTeamMembers
-questionAddTeamMembers.hint = You can also add team members after your application has been created.
-
 addTeamMemberDetails.title = Add a team member
 addTeamMemberDetails.heading = Add a team member
 addTeamMemberDetails.checkYourAnswersLabel = Add team member
@@ -278,13 +253,6 @@ addTeamMemberDetails.email.label = Enter your team member''s email address
 addTeamMemberDetails.email.hint = Email address should be valid and either a @digital.hmrc.gov.uk or a @hmrc.gov.uk address
 addTeamMemberDetails.change.hidden = Add team member details
 addTeamMemberDetails.notFound = Cannot find this team member.
-
-confirmAddTeamMember.title = Confirm add team member
-confirmAddTeamMember.membersCountHeader = {0} Team members
-confirmAddTeamMember.heading = Do you need to add another team member?
-confirmAddTeamMember.checkYourAnswersLabel = Confirm add team member
-confirmAddTeamMember.error.required = Select yes if adding team member
-confirmAddTeamMember.change.hidden = Confirm add team member
 
 signIn.title = Sign-in
 signIn.ldap.heading = Sign in via LDAP
@@ -360,7 +328,6 @@ exploreApis.search.title = Search for an API
 exploreApis.search.hint = The search will include API name, description, ref, ID. Click the Search icon to search. Deprecated APIs will be included in your search results.
 exploreApis.search.clear = Clear search
 exploreApis.search.error = An error occurred when performing your search
-
 
 support.link.text = Get Support
 support.title = Get Support

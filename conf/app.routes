@@ -19,8 +19,6 @@ GET         /refresh-session                                                   c
 
 GET         /there-is-a-problem                                                controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
-GET         /application/register/check-your-answers-old                       controllers.CheckYourAnswersController.onPageLoad()
-
 GET         /account/sign-out-survey                                           controllers.auth.AuthController.signOut()
 GET         /account/sign-out                                                  controllers.auth.AuthController.signOutNoSurvey()
 GET         /account/signed-out                                                controllers.auth.SignedOutController.onPageLoad
@@ -29,31 +27,7 @@ GET         /get-support                                                       c
 
 GET         /unauthorised                                                      controllers.UnauthorisedController.onPageLoad
 
-GET         /application/register/application-name                             controllers.ApplicationNameController.onPageLoad(mode: Mode = NormalMode)
-POST        /application/register/application-name                             controllers.ApplicationNameController.onSubmit(mode: Mode = NormalMode)
-GET         /application/register/change-application-name                      controllers.ApplicationNameController.onPageLoad(mode: Mode = CheckMode)
-POST        /application/register/change-application-name                      controllers.ApplicationNameController.onSubmit(mode: Mode = CheckMode)
-
-POST        /application/register/register-application                         controllers.RegisterApplicationController.create()
-
 GET         /register-application-success/:id                                  controllers.RegisterApplicationSuccessController.onPageLoad(id:String)
-
-GET         /application/register/add-team-members                             controllers.QuestionAddTeamMembersController.onPageLoad(mode: Mode = NormalMode)
-POST        /application/register/add-team-members                             controllers.QuestionAddTeamMembersController.onSubmit(mode: Mode = NormalMode)
-GET         /application/register/change-add-team-members                      controllers.QuestionAddTeamMembersController.onPageLoad(mode: Mode = CheckMode)
-POST        /application/register/change-add-team-members                      controllers.QuestionAddTeamMembersController.onSubmit(mode: Mode = CheckMode)
-
-GET         /application/register/add-team-member-details                      controllers.AddTeamMemberDetailsController.onPageLoad(mode: Mode = NormalMode, index: Int = 0)
-POST        /application/register/add-team-member-details                      controllers.AddTeamMemberDetailsController.onSubmit(mode: Mode = NormalMode, index: Int = 0)
-GET         /application/register/change-add-team-member-details/:index        controllers.AddTeamMemberDetailsController.onPageLoad(mode: Mode = CheckMode, index: Int)
-POST        /application/register/change-add-team-member-details/:index        controllers.AddTeamMemberDetailsController.onSubmit(mode: Mode = CheckMode, index: Int)
-
-GET         /application/register/team-members-overview                        controllers.ConfirmAddTeamMemberController.onPageLoad(mode: Mode = NormalMode)
-POST        /application/register/team-members-overview                        controllers.ConfirmAddTeamMemberController.onSubmit(mode: Mode = NormalMode)
-GET         /application/register/change-team-members-overview                 controllers.ConfirmAddTeamMemberController.onPageLoad(mode: Mode = CheckMode)
-POST        /application/register/change-team-members-overview                 controllers.ConfirmAddTeamMemberController.onSubmit(mode: Mode = CheckMode)
-
-GET         /application/register/remove-team-member/:index                    controllers.RemoveTeamMemberController.removeTeamMember(mode: Mode = NormalMode, index: Int)
 
 GET         /sign-in                                                           controllers.auth.SignInController.onPageLoad()
 

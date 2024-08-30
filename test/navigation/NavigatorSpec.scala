@@ -35,42 +35,6 @@ class NavigatorSpec extends SpecBase with TryValues {
         navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad
       }
 
-      "must go from the Application Name page to the Do you want to add a team member? page" in {
-        navigator.nextPage(ApplicationNamePage, NormalMode, UserAnswers("id")) mustBe routes.QuestionAddTeamMembersController.onPageLoad(NormalMode)
-      }
-
-      "must go from the Do you want to add a team member? page to the Add a team member page when the user selects yes" in {
-        val userAnswers = UserAnswers("id").set(QuestionAddTeamMembersPage, true).success.value
-        navigator.nextPage(QuestionAddTeamMembersPage, NormalMode, userAnswers) mustBe routes.AddTeamMemberDetailsController.onPageLoad(NormalMode, 0)
-      }
-
-      "must go from the Do you want to add a team member? page to the Check Your Answers page when the user selects no" in {
-        val userAnswers = UserAnswers("id").set(QuestionAddTeamMembersPage, false).success.value
-        navigator.nextPage(QuestionAddTeamMembersPage, NormalMode, userAnswers) mustBe routes.CheckYourAnswersController.onPageLoad()
-      }
-
-      "must go from the Do you want to add a team member? page to the Journey recovery page when there is no selection" in {
-        navigator.nextPage(QuestionAddTeamMembersPage, NormalMode, UserAnswers("id")) mustBe routes.JourneyRecoveryController.onPageLoad()
-      }
-
-      "must go from the Team member details page to the Confirm add team member page" in {
-        navigator.nextPage(TeamMembersPage, NormalMode, UserAnswers("id")) mustBe routes.ConfirmAddTeamMemberController.onPageLoad(NormalMode)
-      }
-
-      "must go from the Confirm Add Team Member page to the Add a team member page when option form's value = true" in {
-        val userAnswers = UserAnswers("id").set(ConfirmAddTeamMemberPage, true).success.value
-        navigator.nextPage(ConfirmAddTeamMemberPage, NormalMode, userAnswers) mustBe routes.AddTeamMemberDetailsController.onPageLoad(NormalMode, 0)
-      }
-
-      "must go from the Confirm Add Team Member page to the Check Your Answers page when option form's value = false" in {
-        val userAnswers = UserAnswers("id").set(ConfirmAddTeamMemberPage, false).success.value
-        navigator.nextPage(ConfirmAddTeamMemberPage, NormalMode, userAnswers) mustBe routes.CheckYourAnswersController.onPageLoad()
-      }
-
-      "must go from the the Confirm Add Team Member page to the Journey recovery page when there is no selection" in {
-        navigator.nextPage(QuestionAddTeamMembersPage, NormalMode, UserAnswers("id")) mustBe routes.JourneyRecoveryController.onPageLoad()
-      }
-
       "during the Add an API journey" - {
         "must go from the Add An API API Id (start) page to the Select Application page" in {
           navigator.nextPage(AddAnApiApiPage, NormalMode, buildUserAnswers(AddAnApi)) mustBe routes.AddAnApiSelectApplicationController.onPageLoad(NormalMode)
@@ -135,27 +99,9 @@ class NavigatorSpec extends SpecBase with TryValues {
     }
 
     "in Check mode" - {
-      "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
+      "must go from a page that doesn't exist in the edit route map to Index" in {
         case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id")) mustBe routes.CheckYourAnswersController.onPageLoad()
-      }
-
-      "must go from the Application Name page to the Check Your Answers Page" in {
-        navigator.nextPage(ApplicationNamePage, CheckMode, UserAnswers("id")) mustBe routes.CheckYourAnswersController.onPageLoad()
-      }
-
-      "must go from the Do you want to add a team member? page to the Add a team member page when the user selects yes" in {
-        val userAnswers = UserAnswers("id").set(QuestionAddTeamMembersPage, true).success.value
-        navigator.nextPage(QuestionAddTeamMembersPage, CheckMode, userAnswers) mustBe routes.AddTeamMemberDetailsController.onPageLoad(NormalMode, 0)
-      }
-
-      "must go from the Do you need to add another team member? on Confirm Add Team Member page to the Check Your Answers page when the user selects no" in {
-        val userAnswers = UserAnswers("id").set(ConfirmAddTeamMemberPage, false).success.value
-        navigator.nextPage(ConfirmAddTeamMemberPage, CheckMode, userAnswers) mustBe routes.CheckYourAnswersController.onPageLoad()
-      }
-
-      "must go from the Team member details page to the Confirm add team member page" in {
-        navigator.nextPage(TeamMembersPage, CheckMode, UserAnswers("id")) mustBe routes.ConfirmAddTeamMemberController.onPageLoad(CheckMode)
+        navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad
       }
 
       "during the Add An Api journey" - {

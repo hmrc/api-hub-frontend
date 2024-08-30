@@ -67,36 +67,4 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators wit
       } yield (page, value)
     }
 
-  implicit lazy val arbitraryConfirmAddTeamMemberUserAnswersEntry: Arbitrary[(ConfirmAddTeamMemberPage.type, JsValue)] =
-    Arbitrary {
-      for {
-        page  <- arbitrary[ConfirmAddTeamMemberPage.type]
-        value <- arbitrary[Boolean].map(Json.toJson(_))
-      } yield (page, value)
-    }
-
-  implicit lazy val arbitraryTeamMembersUserAnswersEntry: Arbitrary[(TeamMembersPage.type, JsValue)] =
-    Arbitrary {
-      for {
-        page  <- arbitrary[TeamMembersPage.type]
-        value <- arbitrary[Seq[TeamMember]].suchThat(_.nonEmpty).map(Json.toJson(_))
-      } yield (page, value)
-    }
-
-  implicit lazy val arbitraryQuestionAddTeamMembersUserAnswersEntry: Arbitrary[(QuestionAddTeamMembersPage.type, JsValue)] =
-    Arbitrary {
-      for {
-        page  <- arbitrary[QuestionAddTeamMembersPage.type]
-        value <- arbitrary[Boolean].map(Json.toJson(_))
-      } yield (page, value)
-    }
-
-  implicit lazy val arbitraryApplicationNameUserAnswersEntry: Arbitrary[(ApplicationNamePage.type, JsValue)] =
-    Arbitrary {
-      for {
-        page  <- arbitrary[ApplicationNamePage.type]
-        value <- genLegalUnicodeString.map(Json.toJson(_))
-      } yield (page, value)
-    }
-
 }
