@@ -6,11 +6,11 @@ export function onPageShow() {
         const apiDetailPanelEls = Array.from(document.querySelectorAll('#apiDetailPanels .hip-api')),
             elNoResultsPanel = document.getElementById('noResultsPanel'),
             elApiCount = document.getElementById('apiCount'),
-            elNameFilter = document.getElementById('nameFilter');
+            elApiFilter = document.getElementById('apiFilter');
 
         let onFiltersChangedHandler = noop;
 
-        elNameFilter.addEventListener('input', () => {
+        elApiFilter.addEventListener('input', () => {
             onFiltersChangedHandler();
         });
 
@@ -26,8 +26,8 @@ export function onPageShow() {
                     setVisible(apiDetail.el, !apiDetail.hiddenByFilter);
                 });
             },
-            get nameFilterValue() {
-                return elNameFilter.value;
+            get apiFilterValue() {
+                return elApiFilter.value;
             },
             toggleNoResultsPanel(visible) {
                 setVisible(elNoResultsPanel, visible);
@@ -41,15 +41,19 @@ export function onPageShow() {
     const apiPanels = view.apiDetailPanels.map(el => ({
         el,
         apiName: el.dataset['apiname'],
+        apiRef: el.dataset['apiref'],
         hiddenByFilter: false
     }));
 
     const paginator = buildPaginator(10);
 
     function applyFilter() {
-        const normalisedNameFilterValue = normaliseText(view.nameFilterValue);
+        const normalisedFilterValue = normaliseText(view.apiFilterValue);
         apiPanels.forEach(apiDetail => {
-            apiDetail.hiddenByFilter = ! normaliseText(apiDetail.apiName).includes(normalisedNameFilterValue);
+            const filterMatchesName = normaliseText(apiDetail.apiName).includes(normalisedFilterValue),
+                filterMatchesRef = normaliseText(apiDetail.apiRef).includes(normalisedFilterValue),
+                filterMatchesAnything = filterMatchesName || filterMatchesRef;
+            apiDetail.hiddenByFilter = ! filterMatchesAnything;
         });
 
         const filteredPanels = apiPanels.filter(apiDetail => ! apiDetail.hiddenByFilter);

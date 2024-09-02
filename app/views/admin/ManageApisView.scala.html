@@ -51,11 +51,11 @@
             @Html(messages("manageApis.heading", <span id="apiCount"></span>))
         </h1>
 
-        @searchBox(messages("manageApis.search.label"), None, "nameFilter", "govuk-!-margin-bottom-5")
+        @searchBox(messages("manageApis.search.label"), Some(messages("manageApis.search.hint")), "apiFilter", "govuk-!-margin-bottom-5")
 
         <div id="apiDetailPanels">
         @for(api <- apis){
-            <div class="hip-inner-card flex hip-api" data-apiname="@api.title">
+            <div class="hip-inner-card flex hip-api" data-apiname="@api.title" data-apiref="@api.publisherReference">
                 <h5 class="govuk-heading-s hip-inner-card-title govuk-!-margin-bottom-2">
                     <a class="govuk-link govuk-link--no-visited-state" href=@controllers.myapis.routes.MyApiDetailsController.onPageLoad(api.id).url>@api.title</a>
                 </h5>
