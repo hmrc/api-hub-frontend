@@ -37,25 +37,29 @@
 @(team: Team, applications: Seq[Application], user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @scripts() = {
- <script src='@routes.Assets.versioned("javascripts/paginationController.js")' type="module" @{CSPNonce.attr}></script>
+ <script src='@routes.Assets.versioned("javascripts/paginationWithFilterController.js")' type="module" @{CSPNonce.attr}></script>
 }
 
 @layout(
  pageTitle = messages("viewTeamApplications.title"),
  user = Some(user),
  fullWidth = true,
- customScriptsBlock = Some(scripts())
+ customScriptsBlock = Some(scripts()),
 ) {
  @views.html.templates.SideNav(messages("manageApis.admin"), ManageTeamNavItems(team, ManageTeamSideNavPages.ViewTeamApplicationsPage)) {
   <h1 class="govuk-heading-m govuk-!-margin-bottom-7">
-   @messages("viewTeamApplications.heading")<span id="appCount">(@{applications.size})</span>
+   @messages("viewTeamApplications.heading") (<span data-paginator-count>@{applications.size}</span>)
   </h1>
 
   @searchBox(messages("viewTeamApplications.search.label"), Some(messages("viewTeamApplications.search.hint")), "nameFilter", "govuk-!-margin-bottom-5")
 
   <div id="appDetailPanels">
    @for(application <- applications){
-   <div class="hip-inner-card flex hip-application" data-application-name="@application.name" data-application-id="@application.id">
+   <div class="hip-inner-card flex hip-application"
+        data-has-pagination
+        data-filter-by="applicationName,applicationId"
+        data-application-name="@application.name"
+        data-application-id="@application.id">
     <div class="left">
      <h5 class="govuk-heading-s hip-inner-card-title govuk-!-margin-bottom-4">
       @if(application.deleted.isEmpty){
@@ -93,6 +97,6 @@
    </div>
   </div>
 
-  @paginator()
+  @paginator(paginationSize=2)
  }
 }
