@@ -1,0 +1,114 @@
+@*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.application.Application
+@import models.team.Team
+@import models.user.UserModel
+@import views.ViewUtils
+@import views.html.components.Paginator
+@import views.html.components.SearchBox
+@import views.html.helper.CSPNonce
+@import viewmodels.team.{ManageTeamNavItems, ManageTeamSideNavPages}
+
+@this(
+  layout: templates.Layout,
+  formHelper: FormWithCSRF,
+  govukErrorSummary: GovukErrorSummary,
+  govukInput: GovukInput,
+  govukButton: GovukButton,
+  govukTag: GovukTag,
+  searchBox: SearchBox,
+  paginator: Paginator
+)
+
+@(team: Team, applications: Seq[Application], user: UserModel)(implicit request: Request[?], messages: Messages)
+
+@scripts() = {
+ <script src='@routes.Assets.versioned("javascripts/viewTeamApplications.js")' type="module" @{CSPNonce.attr}></script>
+}
+
+@layout(
+ pageTitle = messages("viewTeamApplications.title"),
+ user = Some(user),
+ fullWidth = true,
+ customScriptsBlock = Some(scripts())
+) {
+ @views.html.templates.SideNav(messages("manageApis.admin"), ManageTeamNavItems(team, ManageTeamSideNavPages.ViewTeamApplicationsPage)) {
+  <h1 class="govuk-heading-m govuk-!-margin-bottom-7">
+   @messages("viewTeamApplications.heading") (<span id="appCount">@{applications.size}</span>)
+  </h1>
+
+  @searchBox(messages("viewTeamApplications.search.label"), Some(messages("viewTeamApplications.search.hint")), "appFilter", "govuk-!-margin-bottom-5")
+
+  <div id="appDetailPanels">
+   @for(application <- applications){
+    <div class="hip-inner-card flex hip-app" data-app-name="@application.name" data-app-id="@application.id">
+     <div class="left">
+      <h5 class="govuk-heading-s hip-inner-card-title govuk-!-margin-bottom-4">
+       @if(application.deleted.isEmpty){
+       <a class="govuk-link govuk-link--no-visited-state" href=@controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url>@application.name</a>
+       } else {
+       <a class="govuk-link govuk-link--no-visited-state" href=@controllers.admin.routes.DeletedApplicationDetailsController.onPageLoad(application.id).url>@application.name</a>
+       }
+      </h5>
+      <p class="govuk-body-s govuk-!-margin-top-1">
+       <strong>@messages("applicationDetailsTable.id"): </strong>@application.id
+      </p>
+     </div>
+     <div class="right ">
+      <p class="govuk-body-s govuk-!-margin-top-1">
+       <strong>@messages("manageApplications.application.created"):</strong>
+       <span class="utcDateShort">@ViewUtils.formatLocalDateTimeContainingUtc(application.created)</span>
+      </p>
+      @for(deleted <- application.deleted){
+      <p class="govuk-body-s govuk-!-margin-top-1">
+       @govukTag(Tag(
+        content = Text("Deleted"),
+        classes = "govuk-tag--grey"
+       ))
+      </p>
+      }
+     </div>
+    </div>
+   }
+
+   @if(applications.isEmpty){
+    <div class="call-out-panel call-out-panel__small ">
+     <p class="govuk-body information--general-tag govuk-!-margin-bottom-2">
+      <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+      <span class="call-out-type">
+          @messages("viewTeamApplications.noResults.title")
+      </span>
+     </p>
+     <p class="govuk-body additional-message govuk-!-margin-bottom-1 govuk-!-margin-top-1">@messages("viewTeamApplications.noResults.message")</p>
+    </div>
+   </div>
+   } else {
+    <div id="noResultsPanel" class="call-out-panel call-out-panel__small govuk-!-display-none ">
+     <p class="govuk-body information--general-tag govuk-!-margin-bottom-2">
+      <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+      <span class="call-out-type">
+          @messages("viewTeamApplications.search.noResults.title")
+      </span>
+     </p>
+     <p class="govuk-body additional-message govuk-!-margin-bottom-1 govuk-!-margin-top-1">@messages("viewTeamApplications.noResults.message")</p>
+    </div>
+   }
+  </div>
+
+  @paginator()
+ }
+}

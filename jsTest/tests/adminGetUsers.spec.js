@@ -12,7 +12,10 @@ describe('adminManageApps', () => {
         `));
         document = dom.window.document;
         globalThis.document = document;
-        globalThis.navigator = dom.window.navigator;
+        Object.defineProperty(globalThis, 'navigator', {
+           value: dom.window.navigator,
+           writable: true
+        });
 
         clipboardContents = null;
         Object.defineProperty(globalThis.navigator, 'clipboard', {
