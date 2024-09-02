@@ -48,7 +48,7 @@ class StrideAuthenticator @Inject()(
             case (Some(email), Some(providerId)) if email.trim.nonEmpty =>
               Future.successful(UserAuthenticated(
                 UserModel(
-                  userId = s"STRIDE-$providerId",
+                  userId = buildUserId(providerId),
                   userType = StrideUser,
                   email = email.trim,
                   permissions = Permissions(
@@ -60,8 +60,8 @@ class StrideAuthenticator @Inject()(
               ))
             case (_, None) =>
               Future.failed(new UnauthorizedException("Unable to retrieve Stride provider Id"))
-            case _ =>
-              Future.successful(UserMissingEmail(StrideUser))
+            case (_, Some(providerId)) =>
+              Future.successful(UserMissingEmail(buildUserId(providerId), StrideUser))
           }
       }.recover {
       case _: NoActiveSession =>
@@ -69,6 +69,10 @@ class StrideAuthenticator @Inject()(
       case _: InsufficientEnrolments =>
         UserUnauthorised
     }
+  }
+
+  private def buildUserId(providerId: String): String = {
+    s"STRIDE-$providerId"
   }
 
 }

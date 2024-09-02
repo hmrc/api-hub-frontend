@@ -132,7 +132,7 @@ class StrideAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSu
 
       strideAuthenticator.authenticate()(FakeRequest()).map {
         result =>
-          result mustBe UserMissingEmail(StrideUser)
+          result mustBe UserMissingEmail(user.userId, StrideUser)
       }
     }
 
@@ -152,7 +152,7 @@ class StrideAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSu
 
       strideAuthenticator.authenticate()(FakeRequest()).map {
         result =>
-          result mustBe UserMissingEmail(StrideUser)
+          result mustBe UserMissingEmail(user.userId, StrideUser)
       }
     }
 

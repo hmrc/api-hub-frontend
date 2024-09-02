@@ -26,4 +26,4 @@ case object UserUnauthorised extends UserAuthResult
 
 case class UserAuthenticated(userModel: UserModel) extends UserAuthResult
 
-case class UserMissingEmail(userType: UserType) extends UserAuthResult
+case class UserMissingEmail(userId: String, userType: UserType) extends UserAuthResult

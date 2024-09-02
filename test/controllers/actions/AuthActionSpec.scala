@@ -137,7 +137,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar {
 
     "must show error page if stride user without email address" in {
       val strideAuth = mock[StrideAuthenticator]
-      when(strideAuth.authenticate()(any())).thenReturn(Future.successful(UserMissingEmail(StrideUser)))
+      when(strideAuth.authenticate()(any())).thenReturn(Future.successful(UserMissingEmail(user.userId, StrideUser)))
 
       val application = applicationBuilder(userAnswers = None)
         .overrides(
@@ -159,7 +159,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar {
 
     "must show error page if ldap user without email address" in {
       val ldapAuth = mock[LdapAuthenticator]
-      when(ldapAuth.authenticate()(any())).thenReturn(Future.successful(UserMissingEmail(LdapUser)))
+      when(ldapAuth.authenticate()(any())).thenReturn(Future.successful(UserMissingEmail(user.userId, LdapUser)))
 
       val application = applicationBuilder(userAnswers = None)
         .overrides(

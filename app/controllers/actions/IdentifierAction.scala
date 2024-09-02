@@ -41,14 +41,14 @@ class AuthenticatedIdentifierAction @Inject()(
       case result: UserAuthResult => Future.successful(result)
     }.flatMap {
       case UserAuthenticated(user) => block(IdentifierRequest(request, user))
-      case UserMissingEmail(userType) => handleMissingEmail(userType)(request)
+      case UserMissingEmail(userId, userType) => handleMissingEmail(userId, userType)(request)
       case UserUnauthorised => Future.successful(Redirect(controllers.routes.UnauthorisedController.onPageLoad))
       case UserUnauthenticated => Future.successful(Redirect(controllers.auth.routes.SignInController.onPageLoad()))
     }
   }
 
-  private def handleMissingEmail(userType: UserType)(implicit request: RequestHeader) = {
-    logger.warn(s"Missing email address for user of type $userType")
+  private def handleMissingEmail(userId: String, userType: UserType)(implicit request: RequestHeader) = {
+    logger.warn(s"Missing email address for user withId $userId of type $userType")
     buildMissingEmailView(userType).map(html => Ok(html))
   }
 

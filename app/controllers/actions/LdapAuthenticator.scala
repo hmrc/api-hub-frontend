@@ -43,20 +43,24 @@ class LdapAuthenticator @Inject()(
           case Some(email) =>
             Future.successful(UserAuthenticated(
               UserModel(
-                s"LDAP-${username.value}",
+                buildUserId(username),
                 LdapUser,
                 email.value,
                 Permissions(canApprove = canApprove, canSupport = canSupport, isPrivileged = isPrivileged)
               )
             ))
           case None =>
-            Future.successful(UserMissingEmail(LdapUser))
+            Future.successful(UserMissingEmail(buildUserId(username), LdapUser))
         }
       case None =>
         Future.successful(
           UserUnauthenticated
         )
     }
+  }
+
+  private def buildUserId(username: Retrieval.Username): String = {
+    s"LDAP-${username.value}"
   }
 
 }

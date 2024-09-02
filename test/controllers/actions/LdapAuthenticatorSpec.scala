@@ -169,7 +169,7 @@ class LdapAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSuga
 
       ldapAuthenticator.authenticate()(requestWithAuthorisation).map {
         result =>
-          result mustBe UserMissingEmail(LdapUser)
+          result mustBe UserMissingEmail(user.userId, LdapUser)
       }
     }
   }
