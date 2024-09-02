@@ -599,7 +599,8 @@ manageApplications.application.created = Registered
 manageApis.title = Manage APIs
 manageApis.heading = Manage APIs ({0})
 manageApis.admin = Integration Hub admin
-manageApis.search.label = Filter APIs by name
+manageApis.search.label = Filter APIs
+manageApis.search.hint = You can filter by API name or publisher reference
 manageApis.noResults.title = No APIs found
 manageApis.noResults.message = No APIs have been found that match your filter criteria, try adjusting your filter.
 
