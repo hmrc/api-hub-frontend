@@ -53,6 +53,22 @@ class ManageTeamMembersController @Inject()(
       }
   }}
 
+  def onEditTeamMembersPageLoad(id: String): Action[AnyContent] = {
+  //TODO
+    (identify andThen getData andThen requireData) {
+      implicit request =>
+        val maybeSummaryListRows = for {
+          currentUserEmail <- request.user.email
+          teamMemberList <- request.userAnswers.get(CreateTeamMembersPage)
+        } yield SummaryList(rows = ManageTeamMembers.rows(currentUserEmail, teamMemberList))
+
+        maybeSummaryListRows match {
+          case Some(summaryListRows) => Ok(view(summaryListRows, request.user))
+          case None => Redirect(routes.JourneyRecoveryController.onPageLoad())
+        }
+    }
+  }
+
   def onContinue: Action[AnyContent] = { (identify andThen getData andThen requireData) {
     implicit request =>
       Redirect(navigator.nextPage(CreateTeamMembersPage, NormalMode, request.userAnswers))

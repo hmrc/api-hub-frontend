@@ -492,6 +492,13 @@ manageTeamMembers.heading = Team members ({0})
 manageTeamMembers.returnTo = Return to {0}
 manageTeamMembers.addTeamMember = Add team member +
 
+viewTeamApplications.title = View team applications
+viewTeamApplications.heading = Team applications
+viewTeamApplications.search.label = Search for an application
+viewTeamApplications.search.hint = Search by application name, or ID
+viewTeamApplications.search.noResults.title = No applications found
+viewTeamApplications.noResults.message = No applications have been found that match your filter criteria, try adjusting your filter.
+
 serviceStart.title = The Integration Hub
 serviceStart.heading = The Integration Hub
 serviceStart.introduction = The Integration Hub is a self-service portal offering users the chance to integrate their services with existing APIs within the EIS space.
