@@ -17,6 +17,7 @@
 @import models.application.{Application, TeamMember}
 @import models.team.Team
 @import models.user.UserModel
+@import viewmodels.team.{ManageTeamNavItems, ManageTeamSideNavPages}
 @import uk.gov.hmrc.crypto.{Decrypter, Encrypter, PlainText}
 
 @this(
@@ -34,59 +35,61 @@
     }
 }
 
-@layout(pageTitle = titleNoForm(messages("manageTeam.title", team.name)), user = Some(user)) {
+@layout(pageTitle = titleNoForm(messages("manageTeam.title", team.name)), user = Some(user), fullWidth = true) {
 
-    <h1 id="h1" class="govuk-heading-l">@messages("manageTeam.heading", team.name)</h1>
-    <a class="govuk-link govuk-link--no-visited-state" href = @Some(controllers.team.routes.ChangeTeamNameController.onPageLoad(team.id).url)>@messages("changeTeamName.link")</a>
+    @views.html.templates.SideNav(messages("manageApis.admin"), ManageTeamNavItems(team, ManageTeamSideNavPages.ManageTeamMembersPage)) {
+        <h1 id="h1" class="govuk-heading-l">@messages("manageTeam.heading", team.name)</h1>
+        <a class="govuk-link govuk-link--no-visited-state" href = @Some(controllers.team.routes.ChangeTeamNameController.onPageLoad(team.id).url)>@messages("changeTeamName.link")</a>
 
-    <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+        <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
 
-    <div class="hip-flex-container govuk-!-margin-bottom-2">
-        <h2 class="govuk-heading-m">@messages("manageTeam.teamMembers", team.teamMembers.size)</h2>
-        @govukButton(
-            Button(
-                href = Some(controllers.team.routes.AddTeamMemberController.onPageLoad(team.id).url),
-                content = Text(messages("manageTeam.addTeamMember")),
-                classes = "hip-no-stretch"
+        <div class="hip-flex-container govuk-!-margin-bottom-2">
+            <h2 class="govuk-heading-m">@messages("manageTeam.teamMembers", team.teamMembers.size)</h2>
+            @govukButton(
+                Button(
+                    href = Some(controllers.team.routes.AddTeamMemberController.onPageLoad(team.id).url),
+                    content = Text(messages("manageTeam.addTeamMember")),
+                    classes = "hip-no-stretch"
+                )
+            )
+        </div>
+
+        @govukTable(
+            Table(
+                caption = None,
+                head = Some(Seq(
+                        HeadCell(messages("manageTeam.teamMembers.emailAddress")),
+                        HeadCell()
+                    )),
+                rows = team.teamMembers.map(teamMember =>
+                        Seq(
+                            TableRow(content = teamMember.email, attributes = Map("data-team-member-email" -> teamMember.email)),
+                            TableRow(content = HtmlContent(
+                                    teamMemberRemoveLink(team.id, teamMember, team.teamMembers.size))
+                                )
+                        )
+                )
             )
         )
-    </div>
 
-    @govukTable(
-        Table(
-            caption = None,
-            head = Some(Seq(
-                    HeadCell(messages("manageTeam.teamMembers.emailAddress")),
-                    HeadCell()
-                )),
-            rows = team.teamMembers.map(teamMember =>
-                    Seq(
-                        TableRow(content = teamMember.email, attributes = Map("data-team-member-email" -> teamMember.email)),
-                        TableRow(content = HtmlContent(
-                                teamMemberRemoveLink(team.id, teamMember, team.teamMembers.size))
-                            )
+        @{application match {
+            case Some(application) =>
+                govukButton(
+                    Button(
+                        href = Some(controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url),
+                        content = Text(messages("manageTeam.returnToApplication", application.name)),
+                        classes = "govuk-button--secondary govuk-!-margin-top-5"
                     )
-            )
-        )
-    )
-
-    @{application match {
-        case Some(application) =>
-            govukButton(
-                Button(
-                    href = Some(controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url),
-                    content = Text(messages("manageTeam.returnToApplication", application.name)),
-                    classes = "govuk-button--secondary govuk-!-margin-top-5"
                 )
-            )
-        case None =>
-            govukButton(
-                Button(
-                    href = Some(controllers.team.routes.ManageMyTeamsController.onPageLoad().url),
-                    content = Text(messages("manageTeam.return")),
-                    classes = "govuk-button--secondary govuk-!-margin-top-5"
+            case None =>
+                govukButton(
+                    Button(
+                        href = Some(controllers.team.routes.ManageMyTeamsController.onPageLoad().url),
+                        content = Text(messages("manageTeam.return")),
+                        classes = "govuk-button--secondary govuk-!-margin-top-5"
+                    )
                 )
-            )
-    }}
+        }}
+    }
 
 }
