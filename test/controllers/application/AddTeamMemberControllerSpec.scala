@@ -144,7 +144,7 @@ class AddTeamMemberControllerSpec
 
         val formWithErrors = form
           .fill(TeamMember(email))
-          .withError(FormError("email", "addTeamMemberDetails.email.duplicate"))
+          .withError(FormError("email", "addTeamMemberDetails.email.duplicateInApplication"))
 
         status(result) mustBe BAD_REQUEST
         contentAsString(result) mustBe view(formWithErrors, submitTo(FakeApplication.id), FakeUser)(request, messages(fixture.playApplication)).toString

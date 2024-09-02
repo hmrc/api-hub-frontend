@@ -58,7 +58,7 @@ class AddTeamMemberController @Inject()(
         formWithErrors => badRequest(id, formWithErrors),
         teamMember =>
           if (request.team.hasTeamMember(teamMember)) {
-            val formWithErrors = form.fill(teamMember).withError(FormError("email", "addTeamMemberDetails.email.duplicate"))
+            val formWithErrors = form.fill(teamMember).withError(FormError("email", "addTeamMemberDetails.email.duplicateInTeam"))
             badRequest(id, formWithErrors)
           }
           else {
