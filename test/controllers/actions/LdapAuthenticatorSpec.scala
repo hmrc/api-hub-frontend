@@ -150,6 +150,28 @@ class LdapAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSuga
           result mustBe UserUnauthenticated
       }
     }
+
+    "must return UserMissingEmail for a missing email address" in {
+      implicit val cc: ControllerComponents = stubMessagesControllerComponents()
+      val mockStubBehaviour = mock[StubBehaviour]
+      val stubAuth = FrontendAuthComponentsStub(mockStubBehaviour)
+      val ldapAuthenticator = new LdapAuthenticator(stubAuth)
+
+      val user = UserModel(
+        userId = s"LDAP-$username",
+        userType = LdapUser,
+        email = "",
+        permissions = Permissions(canApprove = false, canSupport = false, isPrivileged = false)
+      )
+
+      when(mockStubBehaviour.stubAuth(eqTo(None), eqTo(retrieval)))
+        .thenReturn(Future.successful(retrievalsForUser(user)))
+
+      ldapAuthenticator.authenticate()(requestWithAuthorisation).map {
+        result =>
+          result mustBe UserMissingEmail(LdapUser)
+      }
+    }
   }
 
 }
@@ -193,12 +215,19 @@ object LdapAuthenticatorSpec {
     Retrieval.hasPredicate(isPrivilegedPredicate)
 
   def retrievalsForUser(user: UserModel): Retrieval.Username ~ Option[Retrieval.Email] ~ Boolean ~ Boolean ~ Boolean = {
+    val email = if (user.email.nonEmpty) {
+      Some(Retrieval.Email(user.email))
+    }
+    else {
+      None
+    }
+
     uk.gov.hmrc.internalauth.client.~(
       uk.gov.hmrc.internalauth.client.~(
         uk.gov.hmrc.internalauth.client.~(
           uk.gov.hmrc.internalauth.client.~(
             Retrieval.Username(username),
-            Some(Retrieval.Email(user.email))
+            email
           ),
           user.permissions.canApprove
         ),

@@ -29,7 +29,7 @@ import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.AuthProvider.PrivilegedApplication
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
-import uk.gov.hmrc.auth.core.retrieve.{Retrieval, ~}
+import uk.gov.hmrc.auth.core.retrieve.{Credentials, Retrieval, ~}
 
 import scala.concurrent.Future
 
@@ -41,7 +41,7 @@ class StrideAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSu
       val strideAuthenticator = new StrideAuthenticator(authConnector)
 
       val user = UserModel(
-        userId = s"STRIDE-$internalId",
+        userId = s"STRIDE-$providerId",
         userType = StrideUser,
         email = "jo.bloggs@email.com",
         permissions = Permissions(canApprove = false, canSupport = false, isPrivileged = false)
@@ -61,7 +61,7 @@ class StrideAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSu
       val strideAuthenticator = new StrideAuthenticator(authConnector)
 
       val user = UserModel(
-        userId = s"STRIDE-$internalId",
+        userId = s"STRIDE-$providerId",
         userType = StrideUser,
         email = "jo.bloggs@email.com",
         permissions = Permissions(canApprove = true, canSupport = false, isPrivileged = false)
@@ -81,7 +81,7 @@ class StrideAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSu
       val strideAuthenticator = new StrideAuthenticator(authConnector)
 
       val user = UserModel(
-        userId = s"STRIDE-$internalId",
+        userId = s"STRIDE-$providerId",
         userType = StrideUser,
         email = "jo.bloggs@email.com",
         permissions = Permissions(canApprove = false, canSupport = true, isPrivileged = false)
@@ -101,7 +101,7 @@ class StrideAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSu
       val strideAuthenticator = new StrideAuthenticator(authConnector)
 
       val user = UserModel(
-        userId = s"STRIDE-$internalId",
+        userId = s"STRIDE-$providerId",
         userType = StrideUser,
         email = "jo.bloggs@email.com",
         permissions = Permissions(canApprove = false, canSupport = false, isPrivileged = true)
@@ -116,12 +116,32 @@ class StrideAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSu
       }
     }
 
-    "must map an empty email address to None" in {
+    "must return UserMissingEmail for a missing email address" in {
       val authConnector = mock[AuthConnector]
       val strideAuthenticator = new StrideAuthenticator(authConnector)
 
       val user = UserModel(
-        userId = s"STRIDE-$internalId",
+        userId = s"STRIDE-$providerId",
+        userType = StrideUser,
+        email = "",
+        permissions = Permissions(canApprove = false, canSupport = false, isPrivileged = false)
+      )
+
+      when(authConnector.authorise(eqTo(userPredicate), eqTo(userRetrieval))(any(), any()))
+        .thenReturn(Future.successful(retrievalsForUserWithoutEmail(user)))
+
+      strideAuthenticator.authenticate()(FakeRequest()).map {
+        result =>
+          result mustBe UserMissingEmail(StrideUser)
+      }
+    }
+
+    "must return UserMissingEmail for an empty email address" in {
+      val authConnector = mock[AuthConnector]
+      val strideAuthenticator = new StrideAuthenticator(authConnector)
+
+      val user = UserModel(
+        userId = s"STRIDE-$providerId",
         userType = StrideUser,
         email = " ",
         permissions = Permissions(canApprove = false, canSupport = false, isPrivileged = false)
@@ -167,9 +187,9 @@ class StrideAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSu
 
 object StrideAuthenticatorSpec {
 
-  type UserRetrieval = Retrieval[Enrolments ~ Option[String] ~ Option[String]]
+  type UserRetrieval = Retrieval[Enrolments ~ Option[String] ~ Option[Credentials]]
 
-  val userRetrieval: UserRetrieval = Retrievals.authorisedEnrolments and Retrievals.internalId and Retrievals.email
+  val userRetrieval: UserRetrieval = Retrievals.authorisedEnrolments and Retrievals.email and Retrievals.credentials
 
   val userPredicate: Predicate =
     Enrolment(API_HUB_USER_ROLE) or
@@ -178,18 +198,28 @@ object StrideAuthenticatorSpec {
       Enrolment(API_HUB_PRIVILEGED_USER_ROLE) and
       AuthProviders(PrivilegedApplication)
 
-  val internalId: String = "test-internal-id"
+  val providerId: String = "test-provider-id"
 
   case object NoActiveSessionException extends NoActiveSession("test-message")
 
-  def retrievalsForUser(user: UserModel): Enrolments ~ Option[String] ~ Option[String] = {
+  def retrievalsForUser(user: UserModel): Enrolments ~ Option[String] ~ Option[Credentials] = {
       uk.gov.hmrc.auth.core.retrieve.~(
         uk.gov.hmrc.auth.core.retrieve.~(
           enrolmentsFor(user),
-          Some(internalId)
+          Some(user.email)
         ),
-        Some(user.email)
+        credentialsForUser()
       )
+  }
+
+  def retrievalsForUserWithoutEmail(user: UserModel): Enrolments ~ Option[String] ~ Option[Credentials] = {
+    uk.gov.hmrc.auth.core.retrieve.~(
+      uk.gov.hmrc.auth.core.retrieve.~(
+        enrolmentsFor(user),
+        None
+      ),
+      credentialsForUser()
+    )
   }
 
   private def enrolmentsFor(user: UserModel): Enrolments = {
@@ -213,6 +243,10 @@ object StrideAuthenticatorSpec {
         Set(Enrolment(key = API_HUB_USER_ROLE))
       )
     }
+  }
+
+  private def credentialsForUser(): Option[Credentials] = {
+    Some(Credentials(providerId, PrivilegedApplication.toString))
   }
 
 }

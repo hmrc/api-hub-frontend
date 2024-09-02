@@ -42,13 +42,13 @@ class StrideAuthenticator @Inject()(
         Enrolment(API_HUB_PRIVILEGED_USER_ROLE) and
         AuthProviders(PrivilegedApplication)
     )
-      .retrieve(Retrievals.authorisedEnrolments and Retrievals.internalId and Retrievals.email) {
-        case authorisedEnrolments ~ internalId ~ email =>
-          (internalId, email) match {
-            case (Some(internalId), Some(email)) if email.trim.nonEmpty =>
+      .retrieve(Retrievals.authorisedEnrolments and Retrievals.email and Retrievals.credentials) {
+        case authorisedEnrolments ~ email ~ credentials =>
+          (email, credentials.map(_.providerId)) match {
+            case (Some(email), Some(providerId)) if email.trim.nonEmpty =>
               Future.successful(UserAuthenticated(
                 UserModel(
-                  userId = s"STRIDE-$internalId",
+                  userId = s"STRIDE-$providerId",
                   userType = StrideUser,
                   email = email.trim,
                   permissions = Permissions(
@@ -58,10 +58,10 @@ class StrideAuthenticator @Inject()(
                   )
                 )
               ))
-            case (_, Some(_)) | (_, None) =>
+            case (_, None) =>
+              Future.failed(new UnauthorizedException("Unable to retrieve Stride provider Id"))
+            case _ =>
               Future.successful(UserMissingEmail(StrideUser))
-            case (_, _) =>
-              Future.failed(new UnauthorizedException("Unable to retrieve internal Id"))
           }
       }.recover {
       case _: NoActiveSession =>
