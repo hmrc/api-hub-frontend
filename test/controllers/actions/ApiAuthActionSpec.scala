@@ -69,7 +69,7 @@ class ApiAuthActionSpec extends SpecBase with Matchers with MockitoSugar {
         val result = fixture.provider.apply(FakeApiDetail.id).invokeBlock(buildRequest(FakeSupporter), buildInvokeBlock())
 
         status(result) mustBe OK
-        verify(fixture.apiHubService, never).findTeams(eqTo(FakeSupporter.email))(any)
+        verify(fixture.apiHubService, never).findTeams(eqTo(Some(FakeSupporter.email)))(any)
       }
     }
 
@@ -85,7 +85,7 @@ class ApiAuthActionSpec extends SpecBase with Matchers with MockitoSugar {
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.routes.UnauthorisedController.onPageLoad.url)
-        verify(fixture.apiHubService, never).findTeams(eqTo(FakeSupporter.email))(any)
+        verify(fixture.apiHubService, never).findTeams(eqTo(Some(FakeSupporter.email)))(any)
       }
     }
 
@@ -95,7 +95,7 @@ class ApiAuthActionSpec extends SpecBase with Matchers with MockitoSugar {
       when(fixture.apiHubService.getApiDetail(eqTo(FakeApiDetail.id))(any)).thenReturn(
         Future.successful(Some(FakeApiDetail))
       )
-      when(fixture.apiHubService.findTeams(eqTo(FakeUser.email))(any)).thenReturn(
+      when(fixture.apiHubService.findTeams(eqTo(Some(FakeUser.email)))(any)).thenReturn(
         Future.successful(Seq(Team(FakeApiDetail.teamId.get + "different", "team name", LocalDateTime.now(), Seq.empty)))
       )
 
@@ -113,7 +113,8 @@ class ApiAuthActionSpec extends SpecBase with Matchers with MockitoSugar {
       when(fixture.apiHubService.getApiDetail(eqTo(FakeApiDetail.id))(any)).thenReturn(
         Future.successful(Some(FakeApiDetail))
       )
-      when(fixture.apiHubService.findTeams(eqTo(FakeUser.email))(any)).thenReturn(
+
+      when(fixture.apiHubService.findTeams(eqTo(Some(FakeUser.email)))(any)).thenReturn(
         Future.successful(Seq(
           Team("id1", "team name 1", LocalDateTime.now(), Seq.empty),
           Team(FakeApiDetail.teamId.get, "team name 2", LocalDateTime.now(), Seq.empty),

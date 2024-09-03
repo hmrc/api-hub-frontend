@@ -59,7 +59,7 @@ class RegisterApplicationController @Inject()(
     for {
       applicationName <- validateApplicationName(userAnswers)
       teamId <- validateTeam(userAnswers)
-    } yield NewApplication(applicationName, Creator(email = user.email.getOrElse("")), teamId)
+    } yield NewApplication(applicationName, Creator(email = user.email), teamId)
   }
 
   private def validateApplicationName(userAnswers: UserAnswers): Either[Call, String] = {

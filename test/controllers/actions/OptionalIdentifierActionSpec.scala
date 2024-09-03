@@ -150,6 +150,53 @@ class OptionalIdentifierActionSpec extends SpecBase with MockitoSugar {
         status(result) mustBe NO_CONTENT
       }
     }
+
+    "must not identify a user with missing email in Stride" in {
+      val ldapAuth = mock[LdapAuthenticator]
+      val strideAuth = mock[StrideAuthenticator]
+
+      when(strideAuth.authenticate()(any())).thenReturn(Future.successful(UserMissingEmail(testUser.userId, testUser.userType)))
+
+      val application = applicationBuilder(userAnswers = None)
+        .overrides(
+          bind[LdapAuthenticator].toInstance(ldapAuth),
+          bind[StrideAuthenticator].toInstance(strideAuth)
+        )
+        .build()
+
+      running(application) {
+        val authAction = application.injector.instanceOf[OptionallyAuthenticatedIdentifierAction]
+        val controller = new Harness(authAction)
+
+        val result = controller.onPageLoad()(authenticatedRequest())
+
+        status(result) mustBe NO_CONTENT
+      }
+    }
+
+    "must not identify a user with missing email in LDAP" in {
+      val ldapAuth = mock[LdapAuthenticator]
+      val strideAuth = mock[StrideAuthenticator]
+
+      when(strideAuth.authenticate()(any())).thenReturn(Future.successful(UserUnauthenticated))
+      when(ldapAuth.authenticate()(any())).thenReturn(Future.successful(UserMissingEmail(testUser.userId, testUser.userType)))
+
+      val application = applicationBuilder(userAnswers = None)
+        .overrides(
+          bind[LdapAuthenticator].toInstance(ldapAuth),
+          bind[StrideAuthenticator].toInstance(strideAuth)
+        )
+        .build()
+
+      running(application) {
+        val authAction = application.injector.instanceOf[OptionallyAuthenticatedIdentifierAction]
+        val controller = new Harness(authAction)
+
+        val result = controller.onPageLoad()(authenticatedRequest())
+
+        status(result) mustBe NO_CONTENT
+      }
+    }
   }
 
 }
@@ -169,9 +216,8 @@ object OptionalIdentifierActionSpec {
 
   val testUser: UserModel = UserModel(
     userId = "test-user-id",
-    userName = "test-user-name",
     userType = StrideUser,
-    email = Some("test-email"),
+    email = "test-email",
     permissions = Permissions(canApprove = false, canSupport = false, isPrivileged = false)
   )
 

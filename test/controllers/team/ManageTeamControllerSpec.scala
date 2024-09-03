@@ -44,7 +44,7 @@ class ManageTeamControllerSpec extends SpecBase with MockitoSugar with TestHelpe
 
   "ManageTeamController.onPageLoad" - {
     "must return OK and the correct view for a team member or supporter" in {
-      val team = Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email.value)))
+      val team = Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email)))
 
       forAll(teamMemberAndSupporterTable) {
         (user: UserModel) =>
@@ -71,7 +71,7 @@ class ManageTeamControllerSpec extends SpecBase with MockitoSugar with TestHelpe
     "must return OK and the correct view and return to an application when requested" in {
       val fixture = buildFixture()
 
-      val team = Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email.value)))
+      val team = Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email)))
 
       when(fixture.apiHubService.findTeamById(any)(any)).thenReturn(Future.successful(Some(team)))
       when(fixture.apiHubService.getApplication(any, any, any)(any)).thenReturn(Future.successful(Some(FakeApplication)))
@@ -97,7 +97,7 @@ class ManageTeamControllerSpec extends SpecBase with MockitoSugar with TestHelpe
       val email2 = "test-email-2"
       val email3 = "test-email-3"
 
-      val user = UserModel("test-user-id", "test-user-name", LdapUser, Some(email1))
+      val user = UserModel("test-user-id", LdapUser, email1)
 
       val team = Team(
         "test-team-id",
@@ -162,7 +162,7 @@ class ManageTeamControllerSpec extends SpecBase with MockitoSugar with TestHelpe
     "must return 404 Not Found when the application does not exist" in {
       val fixture = buildFixture()
 
-      val team = Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email.value)))
+      val team = Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email)))
 
       when(fixture.apiHubService.findTeamById(any)(any)).thenReturn(Future.successful(Some(team)))
       when(fixture.apiHubService.getApplication(any, any, any)(any)).thenReturn(Future.successful(None))
@@ -185,7 +185,7 @@ class ManageTeamControllerSpec extends SpecBase with MockitoSugar with TestHelpe
     }
 
     "must redirect to Unauthorised page when the user is not a team member or supporter" in {
-      val team = Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email.value)))
+      val team = Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email)))
       val fixture = buildFixture(FakeUserNotTeamMember)
 
       when(fixture.apiHubService.findTeamById(any)(any)).thenReturn(Future.successful(Some(team)))

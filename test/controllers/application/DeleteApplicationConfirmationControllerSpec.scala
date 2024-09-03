@@ -87,7 +87,7 @@ class DeleteApplicationConfirmationControllerSpec extends SpecBase with MockitoS
         status(result) mustBe OK
         contentAsString(result) mustBe view(FakeUser)(request, messages(fixture.application)).toString()
         contentAsString(result) must validateAsHtml
-        verify(fixture.apiHubService).deleteApplication(eqTo(FakeApplication.id), eqTo(FakeUser.email))(any())
+        verify(fixture.apiHubService).deleteApplication(eqTo(FakeApplication.id), eqTo(Some(FakeUser.email)))(any())
       }
     }
 

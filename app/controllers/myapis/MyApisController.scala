@@ -40,8 +40,7 @@ class MyApisController @Inject()(
 
   def onPageLoad(): Action[AnyContent] = identified.async {
     implicit request =>
-      val eventualDetails = request.user.email.map(email => apiHubService.getUserApis(TeamMember(email))).getOrElse(Future.successful(Seq.empty))
-      eventualDetails flatMap {
+      apiHubService.getUserApis(TeamMember(request.user.email)).flatMap {
         case apiDetails: Seq[ApiDetail] if apiDetails.isEmpty =>
           Future.successful(errorResultBuilder.notFound(
             Messages("myApis.empty.heading")
@@ -50,4 +49,5 @@ class MyApisController @Inject()(
           Future.successful(Ok(view(apiDetails.sortWith( _.title.toUpperCase < _.title.toUpperCase), request.user)))
       }
   }
+
 }

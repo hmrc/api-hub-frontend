@@ -67,16 +67,11 @@ class RequestProductionAccessEndJourneyController @Inject()(
 
   private def validate(implicit request: DataRequest[AnyContent]): Either[Call, (Application, String, String)] = {
     for {
-      requestedBy <- validateEmail(request.user.email)
       application <- validateApplication(request.userAnswers)
       _ <- validateConditions(request.userAnswers)
       supportingInformation <- validateSupportingInformation(request.userAnswers)
-    } yield (application, supportingInformation, requestedBy)
+    } yield (application, supportingInformation, request.user.email)
 
-  }
-
-  private def validateEmail(maybeEmail: Option[String]): Either[Call, String] = {
-    maybeEmail.map(email => Right(email)).getOrElse(Left(controllers.routes.JourneyRecoveryController.onPageLoad()))
   }
 
   private def validateApplication(userAnswers: UserAnswers): Either[Call, Application] = {

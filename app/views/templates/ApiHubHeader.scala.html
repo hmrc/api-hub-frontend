@@ -64,8 +64,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </div>
                 <div class="govuk-grid-column-one half govuk-!-text-align-right">
                     @for(aUser <- user) {
-                        <div data-user-type="@aUser.userType" data-user-email="@aUser.email.getOrElse(aUser.userName)" class="hip-header__signed-in">
-                            Signed in as <strong>@aUser.email.getOrElse(aUser.userName)</strong> via
+                        <div data-user-type="@aUser.userType" data-user-email="@aUser.email" class="hip-header__signed-in">
+                            Signed in as <strong>@aUser.email</strong> via
                             <strong class="govuk-tag govuk-tag--blue small-tag">
                                 @aUser.userType
                             </strong>

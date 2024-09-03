@@ -67,7 +67,7 @@ class RegisterApplicationTeamControllerSpec extends SpecBase with MockitoSugar w
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, teams.sortBy(_.name.toLowerCase))(request, messages(fixture.playApplication)).toString
         contentAsString(result) must validateAsHtml
-        verify(fixture.apiHubService).findTeams(eqTo(Some(FakeUser.email.value)))(any)
+        verify(fixture.apiHubService).findTeams(eqTo(Some(FakeUser.email)))(any)
       }
     }
 

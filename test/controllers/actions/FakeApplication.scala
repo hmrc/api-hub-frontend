@@ -24,10 +24,10 @@ object FakeApplication extends Application(
   "fake-application-id",
   "fake-application-name",
   LocalDateTime.now(),
-  Creator(FakeUser.email.get),
+  Creator(FakeUser.email),
   LocalDateTime.now(),
   None,
-  Seq(TeamMember(FakeUser.email.get)),
+  Seq(TeamMember(FakeUser.email)),
   Environments(),
   Seq.empty
 )
@@ -36,10 +36,10 @@ object FakeApplicationWithSecrets extends Application(
   "fake-application-id",
   "fake-application-name",
   LocalDateTime.now(),
-  Creator(FakeUser.email.get),
+  Creator(FakeUser.email),
   LocalDateTime.now(),
   None,
-  Seq(TeamMember(FakeUser.email.get)),
+  Seq(TeamMember(FakeUser.email)),
   Environments(
     primary = Environment(scopes = Seq(Scope("scope_name")), credentials = Seq(Credential("primary_client_id", LocalDateTime.now(), None, Some("primary fragment")))),
     secondary = Environment(scopes = Seq(Scope("scope_name")), credentials = Seq(Credential("secondary_client_id", LocalDateTime.now(), Some("secondary secret"), Some("secondary fragment"))))
@@ -51,10 +51,10 @@ object FakeApplicationWithIdButNoSecrets extends Application(
   "fake-application-id",
   "fake-application-name",
   LocalDateTime.now(),
-  Creator(FakeUser.email.get),
+  Creator(FakeUser.email),
   LocalDateTime.now(),
   None,
-  Seq(TeamMember(FakeUser.email.get)),
+  Seq(TeamMember(FakeUser.email)),
   Environments(
     primary = Environment(scopes = Seq(Scope("scope_name")), credentials = Seq(Credential("primary_client_id", LocalDateTime.now(), None, None))),
     secondary = Environment(scopes = Seq(Scope("scope_name")), credentials = Seq(Credential("secondary_client_id", LocalDateTime.now(), None, None)))

@@ -64,7 +64,7 @@ class SimpleApiDeploymentControllerSpec
         contentAsString(result) mustBe view(form, teams, FakeDomains, FakeHods, FakeUser)(request, messages(fixture.playApplication)).toString()
         contentAsString(result) must validateAsHtml
 
-        verify(fixture.apiHubService).findTeams(eqTo(Some(FakeUser.email.value)))(any)
+        verify(fixture.apiHubService).findTeams(eqTo(Some(FakeUser.email)))(any)
       }
     }
   }

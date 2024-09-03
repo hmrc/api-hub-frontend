@@ -41,11 +41,11 @@ class ManageMyTeamsControllerSpec extends SpecBase with MockitoSugar with HtmlVa
   "ManageMyTeamsController" - {
     "must return OK and the correct view for a GET when the user is in some teams" in {
       val fixture = buildFixture()
-      val team1 = Team("id1", "team 1", LocalDateTime.now(), Seq(TeamMember(FakeUser.email.value)))
-      val team2 = Team("id2", "Team 2", LocalDateTime.now(), Seq(TeamMember(FakeUser.email.value)))
-      val team3 = Team("id3", "team 2", LocalDateTime.now(), Seq(TeamMember(FakeUser.email.value)))
-      val team4 = Team("id4", "A team 2", LocalDateTime.now(), Seq(TeamMember(FakeUser.email.value)))
-      val team5 = Team("id5", "a team 2", LocalDateTime.now(), Seq(TeamMember(FakeUser.email.value)))
+      val team1 = Team("id1", "team 1", LocalDateTime.now(), Seq(TeamMember(FakeUser.email)))
+      val team2 = Team("id2", "Team 2", LocalDateTime.now(), Seq(TeamMember(FakeUser.email)))
+      val team3 = Team("id3", "team 2", LocalDateTime.now(), Seq(TeamMember(FakeUser.email)))
+      val team4 = Team("id4", "A team 2", LocalDateTime.now(), Seq(TeamMember(FakeUser.email)))
+      val team5 = Team("id5", "a team 2", LocalDateTime.now(), Seq(TeamMember(FakeUser.email)))
       when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(Seq(team2, team1, team3, team4, team5)))
 
       running(fixture.playApplication) {

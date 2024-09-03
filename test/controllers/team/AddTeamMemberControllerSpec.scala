@@ -200,6 +200,6 @@ object AddTeamMemberControllerSpec extends OptionValues {
   private val form = formProvider()
 
   private val teamId = "test-team-id"
-  private val team = Team(teamId, "test-team.name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email.value)))
+  private val team = Team(teamId, "test-team.name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email)))
 
 }

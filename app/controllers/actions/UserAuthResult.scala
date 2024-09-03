@@ -16,7 +16,7 @@
 
 package controllers.actions
 
-import models.user.UserModel
+import models.user.{UserModel, UserType}
 
 sealed trait UserAuthResult
 
@@ -25,3 +25,5 @@ case object UserUnauthenticated extends UserAuthResult
 case object UserUnauthorised extends UserAuthResult
 
 case class UserAuthenticated(userModel: UserModel) extends UserAuthResult
+
+case class UserMissingEmail(userId: String, userType: UserType) extends UserAuthResult

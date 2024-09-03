@@ -81,32 +81,23 @@ class AddAnApiSelectApplicationController @Inject()(
   }
 
   private def buildView(mode: Mode, form: Form[String], status: Status)(implicit request: DataRequest[AnyContent]) = {
-    request.user.email.fold(noEmail())(
-      email =>
-        request.userAnswers.get(AddAnApiApiPage) match {
-          case Some(apiDetail) =>
-            apiHubService.getApplications(Some(email), false).map {
-              applications =>
-                status(
-                  view(
-                    form,
-                    mode,
-                    Some(request.user),
-                    apiDetail,
-                    applicationsWithAccess(apiDetail, applications),
-                    applicationsWithoutAccess(apiDetail, applications)
-                  )
-                )
-            }
-          case _ => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+    request.userAnswers.get(AddAnApiApiPage) match {
+      case Some(apiDetail) =>
+        apiHubService.getApplications(Some(request.user.email), false).map {
+          applications =>
+            status(
+              view(
+                form,
+                mode,
+                Some(request.user),
+                apiDetail,
+                applicationsWithAccess(apiDetail, applications),
+                applicationsWithoutAccess(apiDetail, applications)
+              )
+            )
         }
-    )
-  }
-
-  private def noEmail()(implicit request: Request[?]): Future[Result] = {
-    Future.successful(
-      errorResultBuilder.internalServerError("The current user does not have an email address")
-    )
+      case _ => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+    }
   }
 
   private def applicationNotFound(applicationId: String)(implicit request: Request[?]): Future[Result] = {

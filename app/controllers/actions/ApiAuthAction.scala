@@ -52,16 +52,15 @@ class ApiAuthActionProviderImpl @Inject()(
           case Some(apiDetail) if apiDetail.teamId.isEmpty =>
             Future.successful(Left(Redirect(routes.UnauthorisedController.onPageLoad)))
 
-          case Some(apiDetail) => identifierRequest.user.email match {
-            case Some(userEmail) => apiHubService.findTeams(Some(userEmail)).map(userTeams => {
-              if (userTeams.exists(team => apiDetail.teamId.contains(team.id))) {
-                Right(ApiRequest(identifierRequest, apiDetail))
-              } else {
-                Left(Redirect(routes.UnauthorisedController.onPageLoad))
-              }
-            })
-            case None => Future.successful(Left(Redirect(routes.UnauthorisedController.onPageLoad)))
-          }
+          case Some(apiDetail) =>
+            apiHubService.findTeams(Some(identifierRequest.user.email)).map(
+              userTeams =>
+                if (userTeams.exists(team => apiDetail.teamId.contains(team.id))) {
+                  Right(ApiRequest(identifierRequest, apiDetail))
+                } else {
+                  Left(Redirect(routes.UnauthorisedController.onPageLoad))
+                }
+            )
 
           case None =>
             Future.successful(Left(

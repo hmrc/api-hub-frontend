@@ -61,7 +61,7 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
             AccessRequestApi(apiDetail.id, apiDetail.title, Seq(AccessRequestEndpoint("GET", "/test", Seq("test-scope")),
             AccessRequestEndpoint("POST", "/anothertest", Seq("another-test-scope"))))
           )
-          val expectedAccessRequest: AccessRequestRequest = AccessRequestRequest(application.id, "blah", user.email.get, accessRequestApis)
+          val expectedAccessRequest: AccessRequestRequest = AccessRequestRequest(application.id, "blah", user.email, accessRequestApis)
 
           when(fixture.apiHubService.getAccessRequests(eqTo(Some(application.id)), eqTo(Some(Pending)))(any()))
             .thenReturn(Future.successful(Seq.empty))
@@ -95,7 +95,7 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
           val accessRequestApis = Seq(
             AccessRequestApi(apiDetail.id, apiDetail.title, Seq(AccessRequestEndpoint("POST", "/anothertest", Seq("another-test-scope"))))
           )
-          val expectedAccessRequest: AccessRequestRequest = AccessRequestRequest(application.id, "blah", user.email.get, accessRequestApis)
+          val expectedAccessRequest: AccessRequestRequest = AccessRequestRequest(application.id, "blah", user.email, accessRequestApis)
 
           when(fixture.apiHubService.getAccessRequests(eqTo(Some(application.id)), eqTo(Some(Pending)))(any()))
             .thenReturn(Future.successful(Seq.empty))
@@ -170,20 +170,6 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
             status(result) mustEqual SEE_OTHER
             redirectLocation(result) mustBe Some(controllers.application.routes.ProvideSupportingInformationController.onPageLoad().url)
           }
-      }
-    }
-
-    "must redirect to journey recovery when no user email" in {
-
-      val user = FakeUser.copy(email = None)
-      val fixture = buildFixture(userModel = user, userAnswers = None)
-
-      running(fixture.application) {
-        val request = FakeRequest(GET, controllers.application.routes.RequestProductionAccessEndJourneyController.submitRequest().url)
-        val result = route(fixture.application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result) mustBe Some(controllers.routes.JourneyRecoveryController.onPageLoad().url)
       }
     }
   }
