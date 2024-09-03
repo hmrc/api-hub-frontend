@@ -20,8 +20,4 @@ import models.user.{LdapUser, StrideUser, UserModel}
 
 object FakeUser extends UserModel("id", LdapUser, "test-email")
 
-//object FakeUserLdapNoEmail extends UserModel("id", "test-name", LdapUser, None)
-
-//object FakeUserStrideNoEmail extends UserModel("id", "test-name", StrideUser, None)
-
 object FakeUserNotTeamMember extends UserModel("idx", LdapUser, "different-email")
