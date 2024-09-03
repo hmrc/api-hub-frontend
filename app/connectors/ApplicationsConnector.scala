@@ -83,6 +83,14 @@ class ApplicationsConnector @Inject()(
       .execute[Seq[Application]]
   }
 
+  def getApplicationsByTeam(teamId: String, includeDeleted: Boolean = false)(implicit hc: HeaderCarrier): Future[Seq[Application]] = {
+    httpClient
+      .get(url"$applicationsBaseUrl/api-hub-applications/teams/$teamId/applications?includeDeleted=$includeDeleted")
+      .setHeader((ACCEPT, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Seq[Application]]
+  }
+
   def getApplication(id:String, enrich: Boolean, includeDeleted: Boolean)(implicit hc: HeaderCarrier): Future[Option[Application]] = {
     httpClient
       .get(url"$applicationsBaseUrl/api-hub-applications/applications/$id?enrich=$enrich&includeDeleted=$includeDeleted")
