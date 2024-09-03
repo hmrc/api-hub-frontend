@@ -151,7 +151,7 @@ class AccessRequestControllerSpec
         status(result) mustBe OK
         contentAsString(result) mustBe view(FakeApprover).toString()
         contentAsString(result) must validateAsHtml
-        verify(fixture.apiHubService).approveAccessRequest(eqTo(id), eqTo(FakeApprover.email.value))(any())
+        verify(fixture.apiHubService).approveAccessRequest(eqTo(id), eqTo(FakeApprover.email))(any())
       }
     }
 
@@ -174,7 +174,7 @@ class AccessRequestControllerSpec
         contentAsString(result) must validateAsHtml
         verify(fixture.apiHubService).rejectAccessRequest(
           eqTo(id),
-          eqTo(FakeApprover.email.value),
+          eqTo(FakeApprover.email),
           eqTo(rejectedReason)
         )(any())
       }

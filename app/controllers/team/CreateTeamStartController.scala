@@ -44,10 +44,7 @@ class CreateTeamStartController @Inject()(
 
   def startCreateTeam(): Action[AnyContent] = identify.async {
     implicit request =>
-      request.user.email match {
-        case Some(userEmail) => startJourney(buildUserAnswers(userEmail, request))
-        case None => Future.successful(errorResultBuilder.internalServerError(s"No email found for user '${request.user.userId}'"))
-      }
+      startJourney(buildUserAnswers(request.user.email, request))
   }
 
   private def buildUserAnswers(userEmail: String, request: IdentifierRequest[?]): Try[UserAnswers] = {

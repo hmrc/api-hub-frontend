@@ -77,7 +77,7 @@ class RegisterApplicationStartControllerSpec extends SpecBase with MockitoSugar 
     startController: RegisterApplicationStartController
   )
 
-  private def buildFixture(userEmail: Option[String] = FakeUser.email): Fixture = {
+  private def buildFixture(userEmail: String = FakeUser.email): Fixture = {
     val sessionRepository = mock[SessionRepository]
 
     val application = applicationBuilder(user = FakeUser.copy(email = userEmail))

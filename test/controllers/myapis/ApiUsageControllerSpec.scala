@@ -82,7 +82,7 @@ class ApiUsageControllerSpec
     running(fixture.application) {
       when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any))
         .thenReturn(Future.successful(Some(apiDetail)))
-      when(fixture.apiHubService.findTeams(eqTo(FakeUser.email))(any))
+      when(fixture.apiHubService.findTeams(eqTo(Some(FakeUser.email)))(any))
         .thenReturn(Future.successful(List(apiTeam)))
 
       val request = FakeRequest(GET, controllers.myapis.routes.ApiUsageController.onPageLoad(apiDetail.id).url)

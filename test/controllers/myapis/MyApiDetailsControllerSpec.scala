@@ -59,7 +59,7 @@ class MyApiDetailsControllerSpec
 
       when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any))
         .thenReturn(Future.successful(Some(apiDetail)))
-      when(fixture.apiHubService.findTeams(eqTo(FakeUser.email))(any))
+      when(fixture.apiHubService.findTeams(eqTo(Some(FakeUser.email)))(any))
         .thenReturn(Future.successful(List(apiTeam)))
       when(fixture.apiHubService.findTeamById(eqTo(teamId))(any))
         .thenReturn(Future.successful(Some(apiTeam)))
@@ -107,7 +107,7 @@ class MyApiDetailsControllerSpec
     running(fixture.application) {
       when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any))
         .thenReturn(Future.successful(Some(apiDetail)))
-      when(fixture.apiHubService.findTeams(eqTo(FakeUser.email))(any))
+      when(fixture.apiHubService.findTeams(eqTo(Some(FakeUser.email)))(any))
         .thenReturn(Future.successful(List(Team("userTeam", "teamName", LocalDateTime.now(), List.empty))))
 
       val request = FakeRequest(GET, controllers.myapis.routes.MyApiDetailsController.onPageLoad(apiDetail.id).url)
@@ -150,7 +150,7 @@ class MyApiDetailsControllerSpec
 
       when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any))
         .thenReturn(Future.successful(Some(apiDetail)))
-      when(fixture.apiHubService.findTeams(eqTo(FakeUser.email))(any))
+      when(fixture.apiHubService.findTeams(eqTo(Some(FakeUser.email)))(any))
         .thenReturn(Future.successful(List(apiTeam)))
       when(fixture.apiHubService.getApiDeploymentStatuses(eqTo(apiDetail.publisherReference))(any))
         .thenReturn(Future.successful(None))

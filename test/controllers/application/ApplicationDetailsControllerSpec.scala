@@ -70,7 +70,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
     "must return OK and the correct view for a GET when the application has a global team" in {
       val fixture = buildFixture()
 
-      val team = Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email.value)))
+      val team = Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email)))
       val application = FakeApplication.setTeamId(team.id).setTeamName(team.name)
 
       when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(true), eqTo(false))(any()))
@@ -96,7 +96,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
     "must sort the application's team members alphabetically" in {
       val application = FakeApplication.copy(
         teamMembers = Seq(
-          TeamMember(email = FakeUser.email.value),
+          TeamMember(email = FakeUser.email),
           TeamMember(email = "cc@hmrc.gov.uk"),
           TeamMember(email = "ab@hmrc.gov.uk"),
           TeamMember(email = "aa@hmrc.gov.uk"),
@@ -110,7 +110,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
           TeamMember(email = "aa@hmrc.gov.uk"),
           TeamMember(email = "ab@hmrc.gov.uk"),
           TeamMember(email = "cc@hmrc.gov.uk"),
-          TeamMember(email = FakeUser.email.value),
+          TeamMember(email = FakeUser.email),
           TeamMember(email = "za@hmrc.gov.uk"),
           TeamMember(email = "Zb@hmrc.gov.uk")
         )

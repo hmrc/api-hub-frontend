@@ -36,9 +36,10 @@ class ManageMyTeamsController @Inject()(
 
   def onPageLoad(): Action[AnyContent] = identify.async {
     implicit request =>
-      (request.user.email match {
-        case Some(email) => service.findTeams(Some(email))
-        case None => Future.successful(Seq.empty)
-      }).map(teams => Ok(view(teams sortBy(_.name.toLowerCase), request.user)))
+      service.findTeams(Some(request.user.email)).map(
+        teams => 
+          Ok(view(teams sortBy(_.name.toLowerCase), request.user))
+      )
   }
+
 }

@@ -106,7 +106,7 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
       val clientId = "test-client-id"
 
       forAll(usersWhoCanDeletePrimaryCredentials) {(user: UserModel) =>
-        val application = FakeApplication.addTeamMember(user.email.value)
+        val application = FakeApplication.addTeamMember(user.email)
         val fixture = buildFixture(user)
 
         when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))
@@ -134,7 +134,7 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
 
     "must redirect to the unauthorised page for users who cannot delete production credentials" in {
       forAll(usersWhoCannotDeletePrimaryCredentials){(user: UserModel) =>
-        val application = FakeApplication.addTeamMember(user.email.value)
+        val application = FakeApplication.addTeamMember(user.email)
         val fixture = buildFixture(user)
 
         when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))
@@ -154,7 +154,7 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
     "must display a Not Found page when the credential does not exist" in {
       val clientId = "test-client-id"
 
-      val application = FakeApplication.addTeamMember(FakePrivilegedUser.email.value)
+      val application = FakeApplication.addTeamMember(FakePrivilegedUser.email)
       val fixture = buildFixture(FakePrivilegedUser)
 
       when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))
@@ -184,7 +184,7 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
     "must display a Bad Request page when the user attempts to delete the last credential" in {
       val clientId = "test-client-id"
 
-      val application = FakeApplication.addTeamMember(FakePrivilegedUser.email.value)
+      val application = FakeApplication.addTeamMember(FakePrivilegedUser.email)
       val fixture = buildFixture(FakePrivilegedUser)
 
       when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))
@@ -218,7 +218,7 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
       val clientId = "test-client-id"
 
       forAll(usersWhoCanDeleteSecondaryCredentials) {(user: UserModel) =>
-        val application = FakeApplication.addTeamMember(user.email.value)
+        val application = FakeApplication.addTeamMember(user.email)
         val fixture = buildFixture(user)
 
         when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))
@@ -265,7 +265,7 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
     "must display a Not Found page when the credential does not exist" in {
       val clientId = "test-client-id"
 
-      val application = FakeApplication.addTeamMember(FakePrivilegedUser.email.value)
+      val application = FakeApplication.addTeamMember(FakePrivilegedUser.email)
       val fixture = buildFixture(FakePrivilegedUser)
 
       when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))
@@ -295,7 +295,7 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
     "must display a Bad Request page when the user attempts to delete the last credential" in {
       val clientId = "test-client-id"
 
-      val application = FakeApplication.addTeamMember(FakePrivilegedUser.email.value)
+      val application = FakeApplication.addTeamMember(FakePrivilegedUser.email)
       val fixture = buildFixture(FakePrivilegedUser)
 
       when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))

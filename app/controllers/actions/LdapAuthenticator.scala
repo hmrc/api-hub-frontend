@@ -39,20 +39,28 @@ class LdapAuthenticator @Inject()(
         Retrieval.hasPredicate(isPrivilegedPredicate)
     ) flatMap {
       case Some(username ~ maybeEmail ~ canApprove ~ canSupport ~ isPrivileged) =>
-        Future.successful(UserAuthenticated(
-          UserModel(
-            s"LDAP-${username.value}",
-            username.value,
-            LdapUser,
-            maybeEmail.map(email => email.value),
-            Permissions(canApprove = canApprove, canSupport = canSupport, isPrivileged = isPrivileged)
-          )
-        ))
+        maybeEmail match {
+          case Some(email) =>
+            Future.successful(UserAuthenticated(
+              UserModel(
+                buildUserId(username),
+                LdapUser,
+                email.value,
+                Permissions(canApprove = canApprove, canSupport = canSupport, isPrivileged = isPrivileged)
+              )
+            ))
+          case None =>
+            Future.successful(UserMissingEmail(buildUserId(username), LdapUser))
+        }
       case None =>
         Future.successful(
           UserUnauthenticated
         )
     }
+  }
+
+  private def buildUserId(username: Retrieval.Username): String = {
+    s"LDAP-${username.value}"
   }
 
 }

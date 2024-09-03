@@ -57,7 +57,7 @@ class DeleteApplicationConfirmationController @Inject()(
         formWithErrors =>
           Future.successful(BadRequest(confirmView(id, formWithErrors, applicationSummaryList(request.application)))),
         _ =>
-          apiHubService.deleteApplication(id, request.identifierRequest.user.email).map {
+          apiHubService.deleteApplication(id, Some(request.identifierRequest.user.email)).map {
             case Some(_) => Ok(successView(request.identifierRequest.user))
             case None => applicationNotFound(id)
           }

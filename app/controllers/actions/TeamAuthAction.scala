@@ -74,10 +74,7 @@ class TeamAuthActionProviderImpl @Inject()(
   }
 
   private def isTeamMember(team: Team, user: UserModel): Boolean = {
-    user.email match {
-      case Some(email) if team.hasTeamMember(email) => true
-      case _ => false
-    }
+    team.hasTeamMember(user.email)
   }
 
 }

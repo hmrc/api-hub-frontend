@@ -42,7 +42,7 @@ class TeamAuthActionSpec extends SpecBase with Matchers with MockitoSugar {
   "TeamAuthAction" - {
     "must grant a user access to a team when they are a team member" in {
       val fixture = buildFixture()
-      val team = Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email.value)))
+      val team = Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email)))
 
       when(fixture.apiHubService.findTeamById(eqTo(team.id))(any)).thenReturn(Future.successful(Some(team)))
 

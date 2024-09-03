@@ -79,24 +79,16 @@ class AccessRequestController @Inject()(
   }
 
   private def approve(id: String)(implicit request: IdentifierRequest[AnyContent]): Future[Result] = {
-    request.user.email match {
-      case Some(email) =>
-        apiHubService.approveAccessRequest(id, email).map {
-          case Some(_) => Ok(approvedSuccessView(request.user))
-          case _ => accessRequestNotFound(id)
-        }
-      case _ => noEmail()
+    apiHubService.approveAccessRequest(id, request.user.email).map {
+      case Some(_) => Ok(approvedSuccessView(request.user))
+      case _ => accessRequestNotFound(id)
     }
   }
 
   private def reject(id: String, rejectedReason: String)(implicit request: IdentifierRequest[AnyContent]): Future[Result] = {
-    request.user.email match {
-      case Some(email) =>
-        apiHubService.rejectAccessRequest(id, email, rejectedReason.trim).map {
-          case Some(_) => Ok(rejectedSuccessView(request.user))
-          case _ => accessRequestNotFound(id)
-        }
-      case _ => noEmail()
+    apiHubService.rejectAccessRequest(id, request.user.email, rejectedReason.trim).map {
+      case Some(_) => Ok(rejectedSuccessView(request.user))
+      case _ => accessRequestNotFound(id)
     }
   }
 
@@ -111,12 +103,6 @@ class AccessRequestController @Inject()(
     errorResultBuilder.notFound(
       heading = Messages("site.applicationNotFoundHeading"),
       message = Messages("site.applicationNotFoundMessage", applicationId)
-    )
-  }
-
-  private def noEmail()(implicit request: Request[?]): Future[Result] = {
-    Future.successful(
-      errorResultBuilder.internalServerError("The current user does not have an email address")
     )
   }
 

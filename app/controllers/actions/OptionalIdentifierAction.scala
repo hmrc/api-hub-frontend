@@ -40,6 +40,7 @@ class OptionallyAuthenticatedIdentifierAction @Inject()(
         case result: UserAuthResult => Future.successful(result)
       }.flatMap {
         case UserAuthenticated(user) => block(OptionalIdentifierRequest(request, Some(user)))
+        case UserMissingEmail(_, _) => block(OptionalIdentifierRequest(request, None))
         case UserUnauthorised => block(OptionalIdentifierRequest(request, None))
         case UserUnauthenticated => block(OptionalIdentifierRequest(request, None))
       }

@@ -40,16 +40,16 @@ class AuthenticatedIdentifierAction @Inject()(
       case UserUnauthenticated => ldapAuthenticator.authenticate()(request)
       case result: UserAuthResult => Future.successful(result)
     }.flatMap {
-      case UserAuthenticated(user) if !user.email.exists(_.trim.nonEmpty) => handleMissingEmail(user)(request)
       case UserAuthenticated(user) => block(IdentifierRequest(request, user))
+      case UserMissingEmail(userId, userType) => handleMissingEmail(userId, userType)(request)
       case UserUnauthorised => Future.successful(Redirect(controllers.routes.UnauthorisedController.onPageLoad))
       case UserUnauthenticated => Future.successful(Redirect(controllers.auth.routes.SignInController.onPageLoad()))
     }
   }
 
-  private def handleMissingEmail(user: UserModel)(implicit request: RequestHeader) = {
-    logger.warn(s"Missing email address for user ${user.userName} with id ${user.userId}")
-    buildMissingEmailView(user.userType).map(html => Ok(html))
+  private def handleMissingEmail(userId: String, userType: UserType)(implicit request: RequestHeader) = {
+    logger.warn(s"Missing email address for user withId $userId of type $userType")
+    buildMissingEmailView(userType).map(html => Ok(html))
   }
 
   private def buildMissingEmailView(userType: UserType)(implicit request: RequestHeader) = {

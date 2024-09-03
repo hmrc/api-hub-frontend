@@ -39,8 +39,8 @@ class IndexController @Inject()(
     val maxTeamsToShow = 5
 
     for {
-      userApps <- apiHubService.getApplications(request.user.email, false)
-      userTeams <- apiHubService.findTeams(request.user.email)
+      userApps <- apiHubService.getApplications(Some(request.user.email), false)
+      userTeams <- apiHubService.findTeams(Some(request.user.email))
     } yield Ok(view(
         userApps.sortBy(_.created).reverse.take(maxApplicationsToShow),
         userApps.size,

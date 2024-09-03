@@ -57,7 +57,7 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
       when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
-      when(fixture.apiHubService.getApplications(eqTo(Some(FakeUser.email.value)), eqTo(false))(any()))
+      when(fixture.apiHubService.getApplications(eqTo(Some(FakeUser.email)), eqTo(false))(any()))
         .thenReturn(Future.successful(Seq.empty))
 
       running(fixture.application) {
@@ -79,7 +79,7 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
       when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
-      when(fixture.apiHubService.getApplications(eqTo(Some(FakeUser.email.value)), eqTo(false))(any()))
+      when(fixture.apiHubService.getApplications(eqTo(Some(FakeUser.email)), eqTo(false))(any()))
         .thenReturn(Future.successful(Seq(application)))
 
       running(fixture.application) {
@@ -101,7 +101,7 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
       when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
-      when(fixture.apiHubService.getApplications(eqTo(Some(FakeUser.email.value)), eqTo(false))(any()))
+      when(fixture.apiHubService.getApplications(eqTo(Some(FakeUser.email)), eqTo(false))(any()))
         .thenReturn(Future.successful(applications))
 
       running(fixture.application) {
@@ -123,7 +123,7 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
       when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
-      when(fixture.apiHubService.getApplications(eqTo(Some(FakeUser.email.value)), eqTo(false))(any()))
+      when(fixture.apiHubService.getApplications(eqTo(Some(FakeUser.email)), eqTo(false))(any()))
         .thenReturn(Future.successful(applications))
 
       running(fixture.application) {
@@ -146,7 +146,7 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
       when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
-      when(fixture.apiHubService.getApplications(eqTo(Some(FakeUser.email.value)), eqTo(false))(any()))
+      when(fixture.apiHubService.getApplications(eqTo(Some(FakeUser.email)), eqTo(false))(any()))
         .thenReturn(Future.successful(Seq(application1, application2)))
 
       running(fixture.application) {
@@ -170,7 +170,7 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
       when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
-      when(fixture.apiHubService.getApplications(eqTo(Some(FakeUser.email.value)), eqTo(false))(any()))
+      when(fixture.apiHubService.getApplications(eqTo(Some(FakeUser.email)), eqTo(false))(any()))
         .thenReturn(Future.successful(Seq(application)))
 
       running(fixture.application) {
@@ -239,7 +239,7 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
       when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
-      when(fixture.apiHubService.getApplications(eqTo(Some(FakeUser.email.value)), eqTo(false))(any()))
+      when(fixture.apiHubService.getApplications(eqTo(Some(FakeUser.email)), eqTo(false))(any()))
         .thenReturn(Future.successful(Seq(application)))
 
       running(fixture.application) {

@@ -30,7 +30,7 @@
 
 @teamMemberRemoveLink(teamId: String, teamMember: TeamMember, membersInTeam: Int) = {
     @* Hide the link if there is just one member on the team or if it's the user's member *@
-    @if(membersInTeam > 1 && !user.email.fold(false)(_.equalsIgnoreCase(teamMember.email))) {
+    @if(membersInTeam > 1 && !user.email.equalsIgnoreCase(teamMember.email)) {
         <a href="@controllers.team.routes.RemoveTeamMemberController.removeTeamMemberFromExistingTeam(teamId, crypto.encrypt(PlainText(teamMember.email)).value)" class="govuk-body govuk-link govuk-link--no-visited-state">@messages("manageTeam.teamMembers.removeMember")</a>
     }
 }

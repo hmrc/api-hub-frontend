@@ -32,23 +32,12 @@ class ApplicationsController @Inject()(
                                  val controllerComponents: MessagesControllerComponents,
                                  identify: IdentifierAction,
                                  view: ApplicationsView,
-                                 apiHubService: ApiHubService,
-                                 errorResultBuilder: ErrorResultBuilder
+                                 apiHubService: ApiHubService
                                )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   def onPageLoad: Action[AnyContent] = identify.async { implicit request =>
-    request.user.email.fold[Future[Result]] {
-      noEmail()
-    }(email =>
-      apiHubService.getApplications(Some(email), false).map(userApps => Ok(view(
-        userApps.sortBy(_.name.toLowerCase),
-        Some(request.user))))
-    )
-  }
-
-  private def noEmail()(implicit request: Request[?]): Future[Result] = {
-    Future.successful(
-      errorResultBuilder.internalServerError("The current user does not have an email address")
+    apiHubService.getApplications(Some(request.user.email), false).map(
+      userApps => Ok(view(userApps.sortBy(_.name.toLowerCase), Some(request.user)))
     )
   }
 
