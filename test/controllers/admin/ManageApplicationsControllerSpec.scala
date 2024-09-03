@@ -63,6 +63,7 @@ class ManageApplicationsControllerSpec
           val view = fixture.playApplication.injector.instanceOf[ManageApplicationsView]
           contentAsString(result) mustBe view(applications.sortBy(_.name.toLowerCase), user)(request, messages(fixture.playApplication)).toString()
           contentAsString(result) must validateAsHtml
+          contentAsString(result) must include(s"Manage applications (${applications.size})")
         }
       }
     }

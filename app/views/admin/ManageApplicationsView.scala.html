@@ -44,7 +44,7 @@
     @views.html.templates.SideNav(messages("manageApplications.admin"), AdminNavItems(user, AdminSideNavPages.ManageApplicationsPage)) {
 
         <h1 class="govuk-heading-m govuk-!-margin-bottom-7">
-            @messages("manageApplications.heading")
+            @messages("manageApplications.heading", applications.size)
         </h1>
 
         <div id="appDetailPanels">

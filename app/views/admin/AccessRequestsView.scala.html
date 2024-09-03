@@ -44,7 +44,7 @@
     @views.html.templates.SideNav(messages("accessRequests.admin"), AdminNavItems(user, AdminSideNavPages.AccessRequestsPage)) {
 
         <h1 class="govuk-heading-m govuk-!-margin-bottom-7">
-            @messages("accessRequests.heading")
+            @messages("accessRequests.heading", accessRequests.size)
         </h1>
 
         <div id="accessRequestList">

@@ -39,7 +39,7 @@
     @views.html.templates.SideNav(messages("manageTeams.admin"), AdminNavItems(user, AdminSideNavPages.ManageTeamsPage)) {
 
         <h1 class="govuk-heading-m govuk-!-margin-bottom-7">
-            @messages("manageTeams.heading")
+            @messages("manageTeams.heading", teams.size)
         </h1>
 
         <div class="call-out-panel">

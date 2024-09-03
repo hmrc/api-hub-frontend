@@ -59,6 +59,7 @@ class ManageTeamsControllerSpec
           val view = fixture.playApplication.injector.instanceOf[ManageTeamsView]
           contentAsString(result) mustBe view(teams.sortBy(_.name.toLowerCase), user)(request, messages(fixture.playApplication)).toString()
           contentAsString(result) must validateAsHtml
+          contentAsString(result) must include(s"Manage teams (${teams.size})")
         }
       }
     }
