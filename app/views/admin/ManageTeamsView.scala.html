@@ -24,7 +24,6 @@
 
 @this(
     layout: templates.Layout,
-    govukTable: GovukTable,
     paginator: Paginator,
     searchBox: SearchBox,
 )
@@ -55,23 +54,25 @@
         <div id="teamsTable" class="call-out-panel">
             @searchBox(messages("manageTeams.filter.title"), None, "teamFilter", "govuk-!-margin-bottom-5", messages("manageTeams.filter.placeholder"))
 
-            @govukTable(
-                Table(
-                    head = Some(Seq(
-                        HeadCell(messages("manageTeams.teams.teamName")),
-                        HeadCell(messages("manageTeams.teams.id")),
-                        HeadCell(messages("manageTeams.teams.created")),
-                    )),
-                    rows = teams.map(
-                        team =>
-                            Seq(
-                                TableRow(content = Text(team.name)),
-                                TableRow(content = HtmlContent(teamLink(team))),
-                                TableRow(content = Text(ViewUtils.formatLocalDateTimeContainingUtc(team.created)), classes="utcDateShort")
-                            )
-                    )
-                )
-            )
+            <table class="govuk-table">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header">@messages("manageTeams.teams.teamName")</th>
+                        <th scope="col" class="govuk-table__header">@messages("manageTeams.teams.id")</th>
+                        <th scope="col" class="govuk-table__header">@messages("manageTeams.teams.created")</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    @for(team <- teams){
+                        <tr class="govuk-table__row" data-name="@team.name" data-id="@team.id" data-emails='@team.teamMembers.map(_.email).mkString(",")'>
+                            <td class="govuk-table__cell">@team.name</td>
+                            <td class="govuk-table__cell">@teamLink(team)</td>
+                            <td class="govuk-table__cell utcDateShort">@{ViewUtils.formatLocalDateTimeContainingUtc(team.created)}</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
             @paginator()
         </div>
 
