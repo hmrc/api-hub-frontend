@@ -2,25 +2,25 @@ import {noop, normaliseText, setVisible} from "./utils.js";
 
 export function dataAttribute(attr) {
     function dataAttributeTester(transformFns) {
-        function transform(initValue, fnTest) {
+        function applyTransformsAndTest(initValue, fnTest) {
             return transformFns.reduce((values, fnTransform) => values.flatMap(fnTransform), [initValue]).some(fnTest)
         }
 
         return {
             whenNormalised() {
-                return dataAttributeTester([...transformFns, val => [normaliseText(val)]]);
+                return dataAttributeTester([...transformFns, text => [normaliseText(text)]]);
             },
             whenSplitBy(separator) {
                 return dataAttributeTester([...transformFns, text => text.split(separator)]);
             },
             includesTheFilterText() {
                 return (filterText, el) => {
-                    return transform(el.dataset[attr], value => value.includes(filterText));
+                    return applyTransformsAndTest(el.dataset[attr], value => value.includes(filterText));
                 }
             },
             startsWithTheFilterText() {
                 return (filterText, el) => {
-                    return transform(el.dataset[attr], value => value.startsWith(filterText));
+                    return applyTransformsAndTest(el.dataset[attr], value => value.startsWith(filterText));
                 }
             },
         }
