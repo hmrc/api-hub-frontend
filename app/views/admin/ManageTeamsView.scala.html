@@ -18,13 +18,20 @@
 @import models.team.Team
 @import viewmodels.admin.{AdminNavItems, AdminSideNavPages}
 @import views.ViewUtils
+@import views.html.helper.CSPNonce
+@import views.html.components.Paginator
 
 @this(
     layout: templates.Layout,
-    govukTable: GovukTable
+    govukTable: GovukTable,
+    paginator: Paginator
 )
 
 @(teams: Seq[Team], user: UserModel)(implicit request: Request[?], messages: Messages)
+
+@scripts() = {
+    <script src='@routes.Assets.versioned("javascripts/adminManageTeams.js")' type="module" @{CSPNonce.attr}></script>
+}
 
 @teamLink(team: Team) = {
     <a href="@controllers.team.routes.ManageTeamController.onPageLoad(team.id)">@team.id</a>
@@ -34,7 +41,8 @@
     pageTitle = titleNoForm(messages("manageTeams.title")),
     user = Some(user),
     fullWidth = true,
-    activeLink = Some("apiHubAdmin")
+    activeLink = Some("apiHubAdmin"),
+    customScriptsBlock = Some(scripts()),
 ) {
     @views.html.templates.SideNav(messages("manageTeams.admin"), AdminNavItems(user, AdminSideNavPages.ManageTeamsPage)) {
 
@@ -42,11 +50,11 @@
             @messages("manageTeams.heading", teams.size)
         </h1>
 
-        <div class="call-out-panel">
+        <div id="teamsTable" class="call-out-panel">
             @govukTable(
                 Table(
                     caption = Some(messages("manageTeams.teams.caption")),
-                    captionClasses = "govuk-!-margin-bottom-7",
+                    captionClasses = "govuk-!-margin-bottom-4",
                     head = Some(Seq(
                         HeadCell(messages("manageTeams.teams.teamName")),
                         HeadCell(messages("manageTeams.teams.id")),
@@ -62,6 +70,7 @@
                     )
                 )
             )
+            @paginator()
         </div>
 
     }
