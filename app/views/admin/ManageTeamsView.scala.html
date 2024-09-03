@@ -20,11 +20,13 @@
 @import views.ViewUtils
 @import views.html.helper.CSPNonce
 @import views.html.components.Paginator
+@import views.html.components.SearchBox
 
 @this(
     layout: templates.Layout,
     govukTable: GovukTable,
-    paginator: Paginator
+    paginator: Paginator,
+    searchBox: SearchBox,
 )
 
 @(teams: Seq[Team], user: UserModel)(implicit request: Request[?], messages: Messages)
@@ -51,10 +53,10 @@
         </h1>
 
         <div id="teamsTable" class="call-out-panel">
+            @searchBox(messages("manageTeams.filter.title"), None, "teamFilter", "govuk-!-margin-bottom-5", messages("manageTeams.filter.placeholder"))
+
             @govukTable(
                 Table(
-                    caption = Some(messages("manageTeams.teams.caption")),
-                    captionClasses = "govuk-!-margin-bottom-4",
                     head = Some(Seq(
                         HeadCell(messages("manageTeams.teams.teamName")),
                         HeadCell(messages("manageTeams.teams.id")),
