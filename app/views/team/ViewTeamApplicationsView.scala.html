@@ -46,7 +46,7 @@
  fullWidth = true,
  customScriptsBlock = Some(scripts())
 ) {
- @views.html.templates.SideNav(messages("manageApis.admin"), ManageTeamNavItems(team, ManageTeamSideNavPages.ViewTeamApplicationsPage)) {
+ @views.html.templates.SideNav(team.name, ManageTeamNavItems(team, ManageTeamSideNavPages.ViewTeamApplicationsPage)) {
   <h1 class="govuk-heading-m govuk-!-margin-bottom-7">
    @messages("viewTeamApplications.heading") (<span id="appCount">@{applications.size}</span>)
   </h1>
