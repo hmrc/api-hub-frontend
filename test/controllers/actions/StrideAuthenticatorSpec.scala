@@ -30,6 +30,7 @@ import uk.gov.hmrc.auth.core.AuthProvider.PrivilegedApplication
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.retrieve.{Credentials, Retrieval, ~}
+import uk.gov.hmrc.http.UnauthorizedException
 
 import scala.concurrent.Future
 
@@ -181,6 +182,25 @@ class StrideAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSu
           result mustBe UserUnauthorised
       }
     }
+
+    "must throw UnauthorizedException when the providerId retrieval is missing" in {
+      val authConnector = mock[AuthConnector]
+      val strideAuthenticator = new StrideAuthenticator(authConnector)
+
+      val user = UserModel(
+        userId = s"STRIDE-$providerId",
+        userType = StrideUser,
+        email = "jo.bloggs@email.com",
+        permissions = Permissions(canApprove = false, canSupport = false, isPrivileged = false)
+      )
+
+      when(authConnector.authorise(eqTo(userPredicate), eqTo(userRetrieval))(any(), any()))
+        .thenReturn(Future.successful(retrievalsForUserWithoutCredentials(user)))
+
+      recoverToSucceededIf[UnauthorizedException] {
+        strideAuthenticator.authenticate()(FakeRequest())
+      }
+    }
   }
 
 }
@@ -219,6 +239,16 @@ object StrideAuthenticatorSpec {
         None
       ),
       credentialsForUser()
+    )
+  }
+
+  def retrievalsForUserWithoutCredentials(user: UserModel): Enrolments ~ Option[String] ~ Option[Credentials] = {
+    uk.gov.hmrc.auth.core.retrieve.~(
+      uk.gov.hmrc.auth.core.retrieve.~(
+        enrolmentsFor(user),
+        Some(user.email)
+      ),
+      None
     )
   }
 
