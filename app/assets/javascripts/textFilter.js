@@ -39,8 +39,10 @@ export function buildTextFilter(itemEls, elFilterInput, valueFns) {
     });
 
     function applyFilter() {
+        const filterValue = normaliseText(elFilterInput.value);
+
         itemModels.forEach(itemModel => {
-            itemModel.hiddenByFilter = ! valueFns.some(fn => fn(elFilterInput.value, itemModel.el));
+            itemModel.hiddenByFilter = ! valueFns.some(fn => fn(filterValue, itemModel.el));
             setVisible(itemModel.el, ! itemModel.hiddenByFilter);
         });
 

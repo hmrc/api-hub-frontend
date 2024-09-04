@@ -1,109 +1,25 @@
-import {buildPaginator, HIDDEN_BY_PAGINATION} from './paginationController.js';
-import {setVisible, noop, normaliseText} from "./utils.js";
-
-function buildNameFilter() {
-    const elFilterText = document.getElementById('nameFilter');
-
-    let onFiltersChangedHandler = noop;
-
-    return {
-        initialise() {
-            elFilterText.addEventListener('input', onFiltersChangedHandler);
-        },
-        onChange(handler) {
-            onFiltersChangedHandler = handler;
-        },
-        clear() {
-            elFilterText.value = '';
-        },
-        buildFilterFunction() {
-            const normalisedValue = normaliseText(elFilterText.value);
-
-            return data => data.apiName.includes(normalisedValue);
-        }
-    };
-}
+import {buildPaginator} from './paginationController.js';
+import {setVisible} from "./utils.js";
+import {buildTextFilter, dataAttribute} from "./textFilter.js";
 
 export function onPageShow() {
-    const filters = [
-        buildNameFilter()
-    ];
+    const elSearchResultsSize = document.getElementById('searchResultsSize'),
+        elNoSearchResults = document.getElementById('noSearchResults'),
+        paginator = buildPaginator(10),
+        filter = buildTextFilter(
+            document.querySelectorAll('#myApisPanels .hip-api'),
+            document.getElementById('nameFilter'),
+            [
+                dataAttribute('apiname').whenNormalised().includesTheFilterText()
+            ]
+        );
 
-    const view = (() => {
-        const myApiPanelEls = Array.from(document.querySelectorAll('#myApisPanels .hip-api')),
-            elSearchResultsSize = document.getElementById('searchResultsSize'),
-            elNoSearchResults = document.getElementById('noSearchResults');
-
-        let onFiltersChangedHandler = noop;
-
-        filters.forEach(filter=> filter.onChange(() => onFiltersChangedHandler()));
-
-        return {
-            onFiltersChanged(handler) {
-                onFiltersChangedHandler = handler;
-            },
-            get myApisPanels() {
-                return [...myApiPanelEls];
-            },
-            setApiPanelVisibility(apis) {
-                apis.forEach(apiDetail => {
-                    setVisible(apiDetail.el, apiDetail.visible);
-                });
-            },
-            setNoSearchResultsVisibility(apis) {
-                setVisible(elNoSearchResults, !apis.some(anyApi => anyApi.visible));
-            },
-            initialiseFilters(apis) {
-                filters.forEach(filter => filter.initialise(apis));
-            },
-            setResultCount(count) {
-                elSearchResultsSize.textContent = count;
-            }
-        };
-    })();
-
-    const paginator = buildPaginator(10)
-
-    function buildFilterFunctions() {
-        return filters.map(filter=> filter.buildFilterFunction());
-    }
-
-    const model = {
-        apis: view.myApisPanels.map(el => ({
-            data: {
-                apiName: el.dataset['apiname'],
-            },
-            el,
-            hiddenByFilters: false,
-            get visible() {
-                return !this.hiddenByFilters && !this[HIDDEN_BY_PAGINATION];
-            }
-        })),
-        get resultCount() {
-            return this.apis.filter(apiDetail => ! apiDetail.hiddenByFilters).length;
-        }
-    };
-
-    function applyMyApisFilters() {
-        const myApisFilterFns = buildFilterFunctions();
-        model.apis.forEach(apiDetail => {
-            apiDetail.hiddenByFilters = ! myApisFilterFns.every(fn => fn(apiDetail.data));
-        });
-
-        view.setApiPanelVisibility(model.apis);
-        paginator.render(model.apis.filter(apiDetail => ! apiDetail.hiddenByFilters).map(panel => panel.el));
-
-        view.setResultCount(model.resultCount);
-        view.setNoSearchResultsVisibility(model.apis);
-    }
-
-    view.onFiltersChanged(() => {
-        applyMyApisFilters();
+    filter.onChange(matchingEls => {
+        elSearchResultsSize.textContent = matchingEls.length;
+        setVisible(elNoSearchResults,matchingEls.length === 0);
+        paginator.render(matchingEls);
     });
 
-    view.initialiseFilters(model.apis);
-
-    applyMyApisFilters();
 }
 
 if (typeof window !== 'undefined') {

@@ -3,32 +3,12 @@ import {setVisible} from "./utils.js";
 import {buildTextFilter, dataAttribute} from "./textFilter.js";
 
 export function onPageShow() {
-    const view = (() => {
-        const apiDetailPanelEls = document.querySelectorAll('#apiDetailPanels .hip-api'),
-            elNoResultsPanel = document.getElementById('noResultsPanel'),
-            elApiCount = document.getElementById('apiCount'),
-            elApiFilter = document.getElementById('apiFilter');
-
-        return {
-            get apiDetailPanels() {
-                return [...apiDetailPanelEls];
-            },
-            get apiFilter() {
-                return elApiFilter;
-            },
-            toggleNoResultsPanel(visible) {
-                setVisible(elNoResultsPanel, visible);
-            },
-            set resultCount(value) {
-                elApiCount.textContent = value;
-            }
-        };
-    })();
-
-    const paginator = buildPaginator(10),
+    const elNoResultsPanel = document.getElementById('noResultsPanel'),
+        elApiCount = document.getElementById('apiCount'),
+        paginator = buildPaginator(10),
         filter = buildTextFilter(
-            view.apiDetailPanels,
-            view.apiFilter,
+            document.querySelectorAll('#apiDetailPanels .hip-api'),
+            document.getElementById('apiFilter'),
             [
                 dataAttribute('apiname').whenNormalised().includesTheFilterText(),
                 dataAttribute('apiref').whenNormalised().includesTheFilterText(),
@@ -36,8 +16,8 @@ export function onPageShow() {
         );
 
     filter.onChange(matchingEls => {
-        view.resultCount = matchingEls.length;
-        view.toggleNoResultsPanel(matchingEls.length === 0);
+        elApiCount.textContent = matchingEls.length;
+        setVisible(elNoResultsPanel,matchingEls.length === 0);
         paginator.render(matchingEls);
     });
 }
