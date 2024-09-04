@@ -1,5 +1,5 @@
 import {JSDOM} from 'jsdom';
-import {onDomLoaded} from '../../app/assets/javascripts/adminManageApps.js';
+import {onPageShow} from '../../app/assets/javascripts/adminManageApps.js';
 import {paginationHelper, paginationContainerHtml, arrayFromTo} from "./testUtils.js";
 
 describe('adminManageApps', () => {
@@ -11,6 +11,9 @@ describe('adminManageApps', () => {
             <div id="appDetailPanels">
                 <div class="hip-application"></div>
             </div>
+            <input id="appFilter" type="text">
+            <div id="noResultsPanel"></div>
+            <div id="appCount"></div>
             ${paginationContainerHtml}
         `));
         document = dom.window.document;
@@ -18,58 +21,63 @@ describe('adminManageApps', () => {
         globalThis.Event = dom.window.Event;
     });
 
-    function buildAppPanels(count) {
-        document.getElementById('appDetailPanels').innerHTML = Array.from(
-            {length: count},
-            (_, i) => `<div class="hip-application" data-index="${i+1}">App ${i+1}</div>`
-        ).join('');
+    function buildAppPanels(count, prefix = '', dataIndex = 0) {
+        const content = Array.from(
+                {length: count},
+                (_, i) => `<div class="hip-application" data-index="${i+1+dataIndex}" data-app-name="${prefix}App ${i+1+dataIndex}" data-app-id="${prefix}AppId${i+1+dataIndex}">${prefix}App ${i+1+dataIndex}</div>`
+            ).join('');
+        const htmlElement = document.getElementById('appDetailPanels');
+        dataIndex == 0 ? htmlElement.innerHTML = content : htmlElement.insertAdjacentHTML('beforeend', content);
     }
 
-    it("if 20 applications are present on the page then all are visible and pagination is not available",  () => {
+    function enterAppFilterText(value) {
+        document.getElementById('appFilter').value = value;
+        document.getElementById('appFilter').dispatchEvent(new Event('input'));
+    }
+
+    it("if 20 apps are present on the page then all are visible and pagination is not available",  () => {
         buildAppPanels(20);
 
-        onDomLoaded();
+        onPageShow();
 
         expect(paginationHelper.paginationIsAvailable()).toBeFalse();
     });
 
-    it("if 21 applications are present on the page then only the first 20 are visible and pagination is available",  () => {
+    it("if 21 apps are present on the page then only the first 20 are visible and pagination is available",  () => {
         buildAppPanels(21);
 
-        onDomLoaded();
+        onPageShow();
 
         expect(paginationHelper.paginationIsAvailable()).toBeTrue();
-    });
-
-    it("when the page loads only the first 20 applications are visible and the display message is correct",  () => {
-        buildAppPanels(101);
-
-        onDomLoaded();
-
-        expect(paginationHelper.getShowingCount()).toBe(20);
-        expect(paginationHelper.getTotalCount()).toBe(101);
         expect(paginationHelper.getVisiblePanelIndexes('.hip-application')).toEqual(arrayFromTo(1, 20));
     });
 
-    it("when we navigate to the second page the correct applications are visible and the display message is correct",  () => {
-        buildAppPanels(101);
+    it("when the user enters some filter text then only the apps that match the name filter are shown",  () => {
+        const prefixSearch = 'Foo';
+        buildAppPanels(100, prefixSearch);
+        buildAppPanels(100, 'Bar', 100);
 
-        onDomLoaded();
-        paginationHelper.getPaginationPageLink(2).click();
+        onPageShow();
+        enterAppFilterText(`${prefixSearch}App`);
 
-        expect(paginationHelper.getShowingCount()).toBe(20);
-        expect(paginationHelper.getTotalCount()).toBe(101);
-        expect(paginationHelper.getVisiblePanelIndexes('.hip-application')).toEqual(arrayFromTo(21, 40));
+        expect(paginationHelper.getVisiblePanelData('.hip-application', 'appName').map(o => o.appName)).toEqual(
+            [...Array(20).keys()].map(i => `${prefixSearch}App ${i+1}`)
+        );
+        expect(paginationHelper.paginationIsAvailable()).toBeTrue();
     });
 
-    it("when we navigate to the final page the correct applications are visible and the display message is correct",  () => {
-        buildAppPanels(101);
+    it("when the user enters some filter text then only the apps that match the id filter are shown",  () => {
+        const prefixSearch = 'Foo';
+        buildAppPanels(100, prefixSearch);
+        buildAppPanels(100, 'Bar', 100);
 
-        onDomLoaded();
-        paginationHelper.getPaginationPageLink(6).click();
+        onPageShow();
+        enterAppFilterText(`${prefixSearch}AppId`);
 
-        expect(paginationHelper.getShowingCount()).toBe(1);
-        expect(paginationHelper.getTotalCount()).toBe(101);
-        expect(paginationHelper.getVisiblePanelIndexes('.hip-application')).toEqual(arrayFromTo(101, 101));
+        expect(paginationHelper.getVisiblePanelData('.hip-application', 'appId').map(o => o.appId)).toEqual(
+           [...Array(20).keys()].map(i => `${prefixSearch}AppId${i+1}`)
+        );
+        expect(paginationHelper.paginationIsAvailable()).toBeTrue();
     });
+
 });

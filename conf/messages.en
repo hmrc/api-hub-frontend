@@ -603,6 +603,9 @@ manageApplications.heading = Manage applications ({0})
 manageApplications.admin = Integration Hub admin
 manageApplications.application.id = ID
 manageApplications.application.created = Registered
+manageApplications.search.label = Search for an application
+manageApplications.search.hint = Search by application name, or ID
+manageApplications.search.noResults.title = No applications found
 
 manageApis.title = Manage APIs
 manageApis.heading = Manage APIs ({0})

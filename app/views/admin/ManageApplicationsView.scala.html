@@ -17,6 +17,8 @@
 @import models.user.UserModel
 @import viewmodels.admin.{AdminNavItems, AdminSideNavPages}
 @import views.ViewUtils
+@import views.html.components.Paginator
+@import views.html.components.SearchBox
 @import models.application.Application
 @import views.html.helper.CSPNonce
 @import views.html.components.Paginator
@@ -25,6 +27,7 @@
     layout: templates.Layout,
     govukTable: GovukTable,
     govukTag : GovukTag,
+    searchBox: SearchBox,
     paginator: Paginator
 )
 
@@ -44,12 +47,14 @@
     @views.html.templates.SideNav(messages("manageApplications.admin"), AdminNavItems(user, AdminSideNavPages.ManageApplicationsPage)) {
 
         <h1 class="govuk-heading-m govuk-!-margin-bottom-7">
-            @messages("manageApplications.heading", applications.size)
+            @Html(messages("manageApplications.heading", <span id="appCount">{applications.size}</span>))
         </h1>
+
+        @searchBox(messages("manageApplications.search.label"), Some(messages("manageApplications.search.hint")), "appFilter", "govuk-!-margin-bottom-5")
 
         <div id="appDetailPanels">
         @for(application <- applications){
-            <div class="hip-inner-card flex hip-application">
+            <div class="hip-inner-card flex hip-application" data-app-name="@application.name" data-app-id="@application.id">
                 <div class="left">
                     <h5 class="govuk-heading-s hip-inner-card-title govuk-!-margin-bottom-4">
                       @if(application.deleted.isEmpty){
@@ -79,6 +84,18 @@
             </div>
         }
         </div>
+
+        @if(applications.nonEmpty){
+            <div id="noResultsPanel" class="call-out-panel call-out-panel__small govuk-!-display-none ">
+                <p class="govuk-body information--general-tag govuk-!-margin-bottom-2">
+                    <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                    <span class="call-out-type">
+                      @messages("manageApplications.search.noResults.title")
+                  </span>
+                </p>
+                <p class="govuk-body additional-message govuk-!-margin-bottom-1 govuk-!-margin-top-1">@messages("viewTeamApplications.noResults.message")</p>
+            </div>
+        }
 
         @paginator()
     }
