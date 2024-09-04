@@ -599,7 +599,7 @@ createTeamCheckYourAnswers.complete.guidance.2 = This team will be assignable to
 createTeamCheckYourAnswers.createTeam = Register team
 
 manageApplications.title = Manage applications
-manageApplications.heading = Manage applications
+manageApplications.heading = Manage applications ({0})
 manageApplications.admin = Integration Hub admin
 manageApplications.application.id = ID
 manageApplications.application.created = Registered
