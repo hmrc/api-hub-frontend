@@ -58,6 +58,7 @@ class AccessRequestsControllerSpec
           status(result) mustBe OK
           contentAsString(result) mustBe view(accessRequests, user).toString()
           contentAsString(result) must validateAsHtml
+          contentAsString(result) must include(s"API production access requests (${accessRequests.size})")
           verify(fixture.apiHubService).getAccessRequests(eqTo(None), eqTo(None))(any())
         }
       }

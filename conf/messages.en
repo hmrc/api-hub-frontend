@@ -399,7 +399,7 @@ requestProductionAccess.button.accept = Continue
 requestProductionAccess.error.required = You must confirm that you have read and meet the requirements outlined in the usage policies.
 
 accessRequests.title = API requests
-accessRequests.heading = API production access requests
+accessRequests.heading = API production access requests ({0})
 accessRequests.admin = Integration Hub admin
 accessRequests.headings.requestedBy = Requested by
 accessRequests.headings.supportingInformation = Supporting information
@@ -599,7 +599,7 @@ createTeamCheckYourAnswers.complete.guidance.2 = This team will be assignable to
 createTeamCheckYourAnswers.createTeam = Register team
 
 manageApplications.title = Manage applications
-manageApplications.heading = Manage applications
+manageApplications.heading = Manage applications ({0})
 manageApplications.admin = Integration Hub admin
 manageApplications.application.id = ID
 manageApplications.application.created = Registered
@@ -613,7 +613,7 @@ manageApis.noResults.title = No APIs found
 manageApis.noResults.message = No APIs have been found that match your filter criteria, try adjusting your filter.
 
 manageTeams.title = Manage teams
-manageTeams.heading = Manage teams
+manageTeams.heading = Manage teams ({0})
 manageTeams.admin = Integration Hub admin
 manageTeams.teams.caption = Teams
 manageTeams.teams.teamName = Team name
