@@ -19,6 +19,7 @@
 @import views.ViewUtils
 @import views.html.components.Paginator
 @import views.html.components.SearchBox
+@import views.html.components.IconsLink
 @import models.application.Application
 @import views.html.helper.CSPNonce
 @import views.html.components.Paginator
@@ -28,13 +29,15 @@
     govukTable: GovukTable,
     govukTag : GovukTag,
     searchBox: SearchBox,
-    paginator: Paginator
+    paginator: Paginator,
+    iconsLink: IconsLink,
 )
 
 @(applications: Seq[Application], user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @scripts() = {
     <script src='@routes.Assets.versioned("javascripts/adminManageApps.js")' type="module" @{CSPNonce.attr}></script>
+    @iconsLink()
 }
 
 @layout(

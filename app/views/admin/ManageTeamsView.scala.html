@@ -18,13 +18,21 @@
 @import models.team.Team
 @import viewmodels.admin.{AdminNavItems, AdminSideNavPages}
 @import views.ViewUtils
+@import views.html.helper.CSPNonce
+@import views.html.components.Paginator
+@import views.html.components.SearchBox
 
 @this(
     layout: templates.Layout,
-    govukTable: GovukTable
+    paginator: Paginator,
+    searchBox: SearchBox,
 )
 
 @(teams: Seq[Team], user: UserModel)(implicit request: Request[?], messages: Messages)
+
+@scripts() = {
+    <script src='@routes.Assets.versioned("javascripts/adminManageTeams.js")' type="module" @{CSPNonce.attr}></script>
+}
 
 @teamLink(team: Team) = {
     <a href="@controllers.team.routes.ManageTeamController.onPageLoad(team.id)">@team.id</a>
@@ -34,34 +42,38 @@
     pageTitle = titleNoForm(messages("manageTeams.title")),
     user = Some(user),
     fullWidth = true,
-    activeLink = Some("apiHubAdmin")
+    activeLink = Some("apiHubAdmin"),
+    customScriptsBlock = Some(scripts()),
 ) {
     @views.html.templates.SideNav(messages("manageTeams.admin"), AdminNavItems(user, AdminSideNavPages.ManageTeamsPage)) {
 
         <h1 class="govuk-heading-m govuk-!-margin-bottom-7">
-            @messages("manageTeams.heading", teams.size)
+            @Html(messages("manageTeams.heading", <span id="teamCount">{teams.size}</span>))
         </h1>
 
-        <div class="call-out-panel">
-            @govukTable(
-                Table(
-                    caption = Some(messages("manageTeams.teams.caption")),
-                    captionClasses = "govuk-!-margin-bottom-7",
-                    head = Some(Seq(
-                        HeadCell(messages("manageTeams.teams.teamName")),
-                        HeadCell(messages("manageTeams.teams.id")),
-                        HeadCell(messages("manageTeams.teams.created")),
-                    )),
-                    rows = teams.map(
-                        team =>
-                            Seq(
-                                TableRow(content = Text(team.name)),
-                                TableRow(content = HtmlContent(teamLink(team))),
-                                TableRow(content = Text(ViewUtils.formatLocalDateTimeContainingUtc(team.created)), classes="utcDateShort")
-                            )
-                    )
-                )
-            )
+        <div id="teamsTable" class="call-out-panel">
+            @searchBox(messages("manageTeams.filter.title"), None, "teamFilter", "govuk-!-margin-bottom-5", messages("manageTeams.filter.placeholder"))
+
+            <table class="govuk-table">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header">@messages("manageTeams.teams.teamName")</th>
+                        <th scope="col" class="govuk-table__header">@messages("manageTeams.teams.id")</th>
+                        <th scope="col" class="govuk-table__header">@messages("manageTeams.teams.created")</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    @for(team <- teams){
+                        <tr class="govuk-table__row" data-name="@team.name" data-id="@team.id" data-emails='@team.teamMembers.map(_.email).mkString(",")'>
+                            <td class="govuk-table__cell">@team.name</td>
+                            <td class="govuk-table__cell">@teamLink(team)</td>
+                            <td class="govuk-table__cell utcDateShort">@{ViewUtils.formatLocalDateTimeContainingUtc(team.created)}</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            @paginator()
         </div>
 
     }

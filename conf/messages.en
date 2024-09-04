@@ -618,10 +618,11 @@ manageApis.noResults.message = No APIs have been found that match your filter cr
 manageTeams.title = Manage teams
 manageTeams.heading = Manage teams ({0})
 manageTeams.admin = Integration Hub admin
-manageTeams.teams.caption = Teams
 manageTeams.teams.teamName = Team name
 manageTeams.teams.id = Id
 manageTeams.teams.created = Registered
+manageTeams.filter.title = Teams
+manageTeams.filter.placeholder = Search for team by name, Id or email
 
 api.deployment.success.title = Your API deployment request has been accepted.
 api.deployment.success = Your API deployment request has been accepted.
