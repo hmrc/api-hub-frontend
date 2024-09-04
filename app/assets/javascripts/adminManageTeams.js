@@ -2,7 +2,8 @@ import {buildPaginator} from './paginationController.js';
 import {buildTextFilter, dataAttribute} from "./textFilter.js";
 
 export function onPageShow() {
-    const paginator = buildPaginator(10),
+    const elTeamCount = document.getElementById('teamCount'),
+        paginator = buildPaginator(10),
         filter = buildTextFilter(
             document.querySelectorAll('#teamsTable .govuk-table__body .govuk-table__row'),
             document.getElementById('teamFilter'),
@@ -13,7 +14,10 @@ export function onPageShow() {
             ]
         );
 
-    filter.onChange(paginator.render);
+    filter.onChange(matchingEls => {
+        elTeamCount.textContent = matchingEls.length;
+        paginator.render(matchingEls);
+    });
 }
 
 if (typeof window !== 'undefined') {
