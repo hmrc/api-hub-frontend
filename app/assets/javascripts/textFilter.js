@@ -3,7 +3,7 @@ import {noop, normaliseText, setVisible} from "./utils.js";
 export function dataAttribute(attr) {
     function dataAttributeTester(transformFns) {
         function applyTransformsAndTest(initValue, fnTest) {
-            return transformFns.reduce((values, fnTransform) => values.flatMap(fnTransform), [initValue]).some(fnTest)
+            return transformFns.reduce((values, fnTransform) => values.flatMap(fnTransform), [initValue]).some(fnTest);
         }
 
         return {
@@ -16,14 +16,14 @@ export function dataAttribute(attr) {
             includesTheFilterText() {
                 return (filterText, el) => {
                     return applyTransformsAndTest(el.dataset[attr], value => value.includes(filterText));
-                }
+                };
             },
             startsWithTheFilterText() {
                 return (filterText, el) => {
                     return applyTransformsAndTest(el.dataset[attr], value => value.startsWith(filterText));
-                }
+                };
             },
-        }
+        };
     }
 
     return dataAttributeTester([]);
@@ -31,8 +31,6 @@ export function dataAttribute(attr) {
 
 export function buildTextFilter(itemEls, elFilterInput, valueFns) {
     let onFiltersChangedHandler = noop;
-
-    elFilterInput.addEventListener('input', applyFilter);
 
     const itemModels =  [...itemEls].map(el => {
         return {el, hiddenByFilter: false};
@@ -52,6 +50,8 @@ export function buildTextFilter(itemEls, elFilterInput, valueFns) {
 
         onFiltersChangedHandler(matchingElements);
     }
+
+    elFilterInput.addEventListener('input', applyFilter);
 
     return {
         onChange(handler) {

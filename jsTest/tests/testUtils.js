@@ -61,7 +61,9 @@ export const paginationHelper = {
     getVisiblePanelData(selector, ...props) {
         return Array.from(document.querySelectorAll(selector))
             .filter(isVisible)
+            /* jshint -W119 */
             .map(el => props.reduce((acc, prop) => ({...acc, [prop]: el.dataset[prop]}), {id: parseInt(el.dataset.id)}));
+            /* jshint +W119 */
     },
     getVisiblePanelIndexes(selector) {
         return this.getVisiblePanelData(selector, 'index').map(({index}) => parseInt(index));

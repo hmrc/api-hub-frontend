@@ -6,12 +6,12 @@ describe('textFilter', () => {
     let document, elFilter, elItems;
 
     beforeEach(() => {
-        const dom = (new JSDOM(`
+        const dom = new JSDOM(`
             <!DOCTYPE html>
             <div id="items"></div>
             <input id="filter" type="text">
             ${paginationContainerHtml}
-        `));
+        `);
         document = dom.window.document;
         globalThis.document = document;
         globalThis.Event = dom.window.Event;
@@ -42,7 +42,7 @@ describe('textFilter', () => {
                 ['Apple', false]
             ].forEach(([filterText, expected]) => {
                 expect(dataAttribute('name').includesTheFilterText()(filterText, el)).toBe(expected);
-            })
+            });
         });
         it("startsWithTheFilterText matches values correctly ", () => {
             const el = buildItemElement({name: 'apple'});
@@ -54,7 +54,7 @@ describe('textFilter', () => {
                 ['Apple', false]
             ].forEach(([filterText, expected]) => {
                 expect(dataAttribute('name').startsWithTheFilterText()(filterText, el)).toBe(expected);
-            })
+            });
         });
         it("whenNormalised transforms values correctly ", () => {
             [
@@ -66,7 +66,7 @@ describe('textFilter', () => {
             ].forEach(([attributeValue, expected]) => {
                 const el = buildItemElement({name: attributeValue});
                 expect(dataAttribute('name').whenNormalised().includesTheFilterText()('apple', el)).toBe(expected);
-            })
+            });
         });
         it("whenSplitBy transforms values correctly ", () => {
             [
@@ -77,7 +77,7 @@ describe('textFilter', () => {
             ].forEach(([filterText, attributeValue, expected]) => {
                 const el = buildItemElement({name: attributeValue});
                 expect(dataAttribute('name').whenSplitBy(',').startsWithTheFilterText()(filterText, el)).toBe(expected);
-            })
+            });
         });
     });
 
@@ -107,8 +107,8 @@ describe('textFilter', () => {
             it(`filtering by '${filterText}' sets item visibility to [${expected}]`, () => {
                 enterFilterText(filterText);
                 expect(itemElements.map(isVisible)).toEqual(expected);
-            })
+            });
         });
 
     });
-})
+});

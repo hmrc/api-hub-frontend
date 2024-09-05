@@ -6,36 +6,36 @@ describe('myApis', () => {
     let document;
 
     beforeEach(() => {
-        const dom = (new JSDOM(`
+        const dom = new JSDOM(`
             <!DOCTYPE html>
             <input id="nameFilter">
             <div id="myApisPanels"></div>
             <div id="searchResultsSize"></div>
             <div id="noSearchResults"></div>
             ${paginationContainerHtml}
-        `));
+        `);
         document = dom.window.document;
         globalThis.document = document;
         globalThis.Event = dom.window.Event;
     });
 
-    function buildApiPanelsByCount(count) {
-        const panels = [],
-            names = [...Array(count)].map((_, i) => `api number ${i + 1}`);
-        let i= 0;
-        while (i < count) {
-            const name = names[i];
-            panels.push(name)
-            i++;
-        }
-        buildApiPanels(...panels);
-    }
     function buildApiPanels(...panels) {
         document.getElementById('myApisPanels').innerHTML = panels.map((panel, i) => {
             return `<div class="hip-api" 
                 data-id="${i}"
                 data-apiname="${panel}" data-index="${i}"></div>`;
         }).join('');
+    }
+    function buildApiPanelsByCount(count) {
+        const panels = [],
+            names = [...Array(count)].map((_, i) => `api number ${i + 1}`);
+        let i= 0;
+        while (i < count) {
+            const name = names[i];
+            panels.push(name);
+            i++;
+        }
+        buildApiPanels(...panels);
     }
     function enterMyApiNameFilterText(value) {
         document.getElementById('nameFilter').value = value;

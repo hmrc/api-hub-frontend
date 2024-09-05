@@ -1,8 +1,6 @@
 import {buildPaginationView} from './paginationView.js';
 import {setVisible} from "./utils.js";
 
-export const HIDDEN_BY_PAGINATION = 'hiddenByPagination';
-
 function defaultItemVisibilityHandler(itemsVisibility) {
     itemsVisibility.forEach(([item, isVisible]) => {
         setVisible(item, isVisible);
@@ -12,6 +10,19 @@ function defaultItemVisibilityHandler(itemsVisibility) {
 export function buildPaginator(itemsPerPage, itemVisibilityHandler = defaultItemVisibilityHandler) {
     const view = buildPaginationView(),
         model = {};
+
+    function applyPagination() {
+        const onLastPage = model.currentPage === model.totalPages,
+            visibleItemsCount = onLastPage ? model.items.length - itemsPerPage * (model.totalPages - 1) : itemsPerPage,
+            totalItemsCount = model.items.length;
+
+        view.render(model.currentPage, model.totalPages, visibleItemsCount, totalItemsCount);
+
+        const startIndex = (model.currentPage - 1) * itemsPerPage,
+            endIndex = startIndex + itemsPerPage;
+
+        itemVisibilityHandler(model.items.map((item, index) => [item, index >= startIndex && index < endIndex]));
+    }
 
     view.onNextLinkClick(() => {
         if (model.currentPage < model.totalPages) {
@@ -33,19 +44,6 @@ export function buildPaginator(itemsPerPage, itemVisibilityHandler = defaultItem
             applyPagination();
         }
     });
-
-    function applyPagination() {
-        const onLastPage = model.currentPage === model.totalPages,
-            visibleItemsCount = onLastPage ? model.items.length - itemsPerPage * (model.totalPages - 1) : itemsPerPage,
-            totalItemsCount = model.items.length;
-
-        view.render(model.currentPage, model.totalPages, visibleItemsCount, totalItemsCount);
-
-        const startIndex = (model.currentPage - 1) * itemsPerPage,
-            endIndex = startIndex + itemsPerPage;
-
-        itemVisibilityHandler(model.items.map((item, index) => [item, index >= startIndex && index < endIndex]));
-    }
 
     return {
         render(items) {

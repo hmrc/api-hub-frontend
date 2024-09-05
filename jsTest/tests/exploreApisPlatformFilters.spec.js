@@ -6,7 +6,7 @@ describe('exploreApisPlatformFilters', () => {
     let document, platformFilters, apis;
 
     beforeEach(() => {
-        const dom = (new JSDOM(`
+        const dom = new JSDOM(`
             <!DOCTYPE html>
             <input id="filterPlatformSelfServe" type="checkbox" checked="checked">
             <input id="filterPlatformNonSelfServe" type="checkbox">
@@ -24,7 +24,7 @@ describe('exploreApisPlatformFilters', () => {
                     <input class="platformFilter" type="checkbox" value="cma">
                 </div>
             </details>
-        `));
+        `);
         document = dom.window.document;
         globalThis.document = document;
 
@@ -58,7 +58,7 @@ describe('exploreApisPlatformFilters', () => {
         it("removes checkboxes for platforms not in use by any APIs, and for self-serve APIs",  () => {
             expect(getNonSelfServeCheckboxValues()).toEqual(['hip', 'api_platform', 'sdes', 'cma']);
 
-            const apis = buildApisWithPlatforms('sdes', 'sdes', 'cma', 'hip')
+            const apis = buildApisWithPlatforms('sdes', 'sdes', 'cma', 'hip');
             platformFilters.initialise(apis);
 
             expect(getNonSelfServeCheckboxValues()).toEqual(['sdes', 'cma']);
@@ -77,7 +77,7 @@ describe('exploreApisPlatformFilters', () => {
 
             expect(changeCount).toBe(0);
 
-            const apis = buildApisWithPlatforms('sdes', 'sdes', 'cma', 'hip')
+            const apis = buildApisWithPlatforms('sdes', 'sdes', 'cma', 'hip');
             platformFilters.initialise(apis);
 
             selfServeApiCheckbox().click();
@@ -125,7 +125,7 @@ describe('exploreApisPlatformFilters', () => {
     describe('syncWithApis', () => {
         let apis;
         beforeEach(() => {
-            apis = buildApisWithPlatforms('sdes', 'sdes', 'hip')
+            apis = buildApisWithPlatforms('sdes', 'sdes', 'hip');
         });
 
         it("when new APIs are added, hidden checkboxes are shown",  () => {

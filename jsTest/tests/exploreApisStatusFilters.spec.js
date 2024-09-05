@@ -5,8 +5,12 @@ import {isVisible} from "./testUtils.js";
 describe('exploreApisStatusFilters', () => {
     let document, statusFilters, apis;
 
+    function buildApis(...statuses) {
+        return statuses.map(o => ({data: {apiStatus: o}}));
+    }
+
     beforeEach(() => {
-        const dom = (new JSDOM(`
+        const dom = new JSDOM(`
             <!DOCTYPE html>
             <div id="statusFilters">
                 <div><input class="statusFilter" type="checkbox" value="ALPHA"></div>
@@ -16,7 +20,7 @@ describe('exploreApisStatusFilters', () => {
             </div>
             <div id="statusFilterCount"></div>
             <details id="viewStatusFilters"><summary></summary></details>            
-        `));
+        `);
         document = dom.window.document;
         globalThis.document = document;
 
@@ -24,10 +28,6 @@ describe('exploreApisStatusFilters', () => {
 
         apis = buildApis('ALPHA', 'BETA', 'LIVE', 'DEPRECATED');
     });
-
-    function buildApis(...statuses) {
-        return statuses.map(o => ({data: {apiStatus: o}}));
-    }
 
     function statusCheckbox(status) {
         return document.querySelector(`.statusFilter[value="${status}"]`);

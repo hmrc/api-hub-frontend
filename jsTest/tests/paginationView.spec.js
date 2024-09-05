@@ -3,10 +3,10 @@ import {paginationHelper, paginationContainerHtml, isVisible} from "./testUtils.
 import {JSDOM} from 'jsdom';
 
 describe('paginationView', () => {
-    let elContainer, paginationView, document;
+    let paginationView, document;
 
     beforeEach(() => {
-        const dom = (new JSDOM(`<!DOCTYPE html><div id="panels"></div>${paginationContainerHtml}`));
+        const dom = new JSDOM(`<!DOCTYPE html><div id="panels"></div>${paginationContainerHtml}`);
         document = dom.window.document;
         globalThis.document = document;
         paginationView = buildPaginationView();
@@ -82,4 +82,4 @@ describe('paginationView', () => {
             expect(paginationHelper.getCurrentPageLinkNumber()).toBe(2);
         });
     });
-})
+});

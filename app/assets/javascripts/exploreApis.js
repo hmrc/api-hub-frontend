@@ -4,7 +4,7 @@ import {buildStatusFilters} from "./exploreApisStatusFilters.js";
 import {buildHodsFilters} from "./exploreApisHodsFilters.js";
 import {buildPlatformFilters} from "./exploreApisPlatformFilters.js";
 import {buildModel} from "./exploreApisModel.js";
-import {setVisible, addToSortedMethodToArray, normaliseText, isVisible} from "./utils.js";
+import {setVisible, addToSortedMethodToArray, normaliseText} from "./utils.js";
 import {buildSearch} from "./exploreApisSearch.js";
 import {buildSearchResultPanel, buildFilterResultPanel} from "./exploreApisResultPanels.js";
 
@@ -61,6 +61,7 @@ export function onPageShow() {
             get searchTerm() {
                 return searchBox.searchTerm;
             },
+            /* jshint -W078 */
             set displayResults(visible) {
                 setVisible(elApiResults, visible);
                 setVisible(elApiResultsSize, visible);
@@ -68,8 +69,11 @@ export function onPageShow() {
             set enableFilters(enabled) {
                 document.querySelectorAll('input[type=checkbox]').forEach(checkbox => checkbox.disabled = !enabled);
             }
+            /* jshint +W078 */
         };
     })();
+
+    const model = buildModel(view.apiDetailPanels);
 
     function updateHiddenByPaginationValues(itemsVisibility) {
         itemsVisibility.forEach(([el, visibleOnCurrentPage]) => {
@@ -79,8 +83,7 @@ export function onPageShow() {
         view.setApiPanelVisibility(model.apis);
     }
 
-    const paginator = buildPaginator(15, updateHiddenByPaginationValues)
-    const model = buildModel(view.apiDetailPanels);
+    const paginator = buildPaginator(15, updateHiddenByPaginationValues);
 
     function buildFilterFunctions() {
         return filters.map(filter=> filter.buildFilterFunction());
@@ -170,7 +173,7 @@ export function onPageShow() {
                 model.apis.forEach(apiDetail => apiDetail.hiddenBySearch = true);
                 model.currentSearchText = null;
                 view.showSearchResultsPanelError();
-                console.error(e)
+                console.error(e);
             })
             .finally(() => {
                 if (clearFilters) {

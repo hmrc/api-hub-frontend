@@ -3,7 +3,7 @@ export function addIntersectionMethodToSet() {
     if (! Set.prototype.intersection) {
         Set.prototype.intersection = function(that) {
             return new Set([...that].filter(x => this.has(x)));
-        }
+        };
     }
 }
 
@@ -11,7 +11,7 @@ export function addToSortedMethodToArray() {
     if (!Array.prototype.toSorted) {
         Array.prototype.toSorted = function(compareFn) {
             return [...this].sort(compareFn);
-        }
+        };
     }
 }
 
