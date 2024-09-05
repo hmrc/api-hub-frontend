@@ -99,7 +99,7 @@
             @if(user.permissions.canSupport) {
                 <h3 class="govuk-heading-s">@messages("myApis.update.team.selectNew")</h3>
 
-                <select id="owningTeam" name="owningTeam">
+                <select id="owningTeamSelection" name="owningTeam">
                     <option value="">Select an owning team</option>
                     @for(team <- teams){
                       @if(!owningTeam.exists(_.id == team.id)){
