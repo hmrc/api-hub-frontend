@@ -27,4 +27,4 @@ describe('utils', () => {
             expect(pluralise("loss", 2, "es")).toBe("losses");
         });
     });
-})
+});
