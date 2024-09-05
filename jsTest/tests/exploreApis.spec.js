@@ -6,7 +6,7 @@ describe('exploreApis', () => {
     let document, fetch;
 
     beforeEach(() => {
-        const dom = (new JSDOM(`
+        const dom = new JSDOM(`
             <!DOCTYPE html>
             <input id="filterPlatformSelfServe" type="checkbox">
             <input id="filterPlatformNonSelfServe" type="checkbox">
@@ -89,7 +89,7 @@ describe('exploreApis', () => {
                 <div id="apiList"></div>
             </div>
             ${paginationContainerHtml}
-        `));
+        `);
         document = dom.window.document;
         globalThis.document = document;
         globalThis.Event = dom.window.Event;
@@ -102,6 +102,18 @@ describe('exploreApis', () => {
     }
     function setSearchError(reason) {
         fetch = globalThis.fetch = jasmine.createSpy('fetch').and.returnValue(Promise.reject(reason));
+    }
+
+    function buildApiPanels(...panels) {
+        document.getElementById('apiList').innerHTML = panels.map((panel, i) => {
+            return `<div class="api-panel" 
+                data-apistatus="${panel.apistatus}" 
+                data-domain="${panel.domain || ''}" 
+                data-subdomain="${panel.subdomain || ''}" 
+                data-id="${i}" 
+                data-hods="${panel.hods || ''}" 
+                data-platform="${panel.platform || ''}"></div>`;
+        }).join('');
     }
 
     function buildApiPanelsByCount(count) {
@@ -129,21 +141,10 @@ describe('exploreApis', () => {
                 [domain, subdomain] = domainValues[i % domainValues.length],
                 hods = hodsValues[i % hodsValues.length],
                 platform = platformValues[i % platformValues.length];
-            panels.push({apistatus, domain, subdomain, hods, platform})
+            panels.push({apistatus, domain, subdomain, hods, platform});
             i++;
         }
         buildApiPanels(...panels);
-    }
-    function buildApiPanels(...panels) {
-        document.getElementById('apiList').innerHTML = panels.map((panel, i) => {
-            return `<div class="api-panel" 
-                data-apistatus="${panel.apistatus}" 
-                data-domain="${panel.domain || ''}" 
-                data-subdomain="${panel.subdomain || ''}" 
-                data-id="${i}" 
-                data-hods="${panel.hods || ''}" 
-                data-platform="${panel.platform || ''}"></div>`;
-        }).join('');
     }
 
     function getAttributeValuesForAllVisiblePanelsAsArray(attribute) {
@@ -211,6 +212,9 @@ describe('exploreApis', () => {
     function filterResultsPanel() {
         return document.getElementById('filterResultsPanel');
     }
+    function resultsError() {
+        return document.getElementById('resultsError');
+    }
     async function runSearch(searchTerm, expectError = false) {
         searchBox().value = searchTerm;
         document.getElementById('search_button').click();
@@ -239,9 +243,6 @@ describe('exploreApis', () => {
     }
     function resultsSuccess() {
         return document.getElementById('resultsSuccess');
-    }
-    function resultsError() {
-        return document.getElementById('resultsError');
     }
     function clearSearchLink() {
         return document.getElementById('clearSearch');
@@ -613,7 +614,7 @@ describe('exploreApis', () => {
         });
         it("the search box is emptied", () => {
             expect(searchBox().value).toBe('');
-        })
+        });
         it("the api results return to the default sort order", () => {
             expect(getAttributeValuesForAllVisiblePanelsAsArray('id')).toEqual(arrayFromTo(0, 14).map(i => i.toString()));
         });

@@ -6,13 +6,13 @@ describe('adminAccessRequests', () => {
     let document;
 
     beforeEach(() => {
-        const dom = (new JSDOM(`
+        const dom = new JSDOM(`
             <!DOCTYPE html>
             <div id="accessRequestList">
                 <div class="hip-access-request-panel"></div>
             </div>
             ${paginationContainerHtml}
-        `));
+        `);
         document = dom.window.document;
         globalThis.document = document;
         globalThis.Event = dom.window.Event;

@@ -5,7 +5,7 @@ describe('apiDeployment', () => {
     let document;
 
     beforeEach(() => {
-        const dom = (new JSDOM(`
+        const dom = new JSDOM(`
             <!DOCTYPE html>
             <select id="domain">
                 <option hidden></option>
@@ -22,7 +22,7 @@ describe('apiDeployment', () => {
                 <option data-domain="3" value="3.2"></option>
                 <option data-domain="3" value="3.3"></option>                
             </select>
-        `));
+        `);
         document = dom.window.document;
         globalThis.document = document;
         globalThis.Event = dom.window.Event;

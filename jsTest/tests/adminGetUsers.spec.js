@@ -6,10 +6,10 @@ describe('adminManageApps', () => {
     let document, clipboardContents;
 
     beforeEach(() => {
-        const dom = (new JSDOM(`
+        const dom = new JSDOM(`
             <!DOCTYPE html>
             <div id="copyButton" data-emails="${emails}"></div>
-        `));
+        `);
         document = dom.window.document;
         globalThis.document = document;
         Object.defineProperty(globalThis, 'navigator', {

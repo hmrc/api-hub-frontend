@@ -8,7 +8,7 @@ describe('localiseUtcDateTimeValues', () => {
     let document;
 
     beforeEach(() => {
-        const dom = (new JSDOM('<!DOCTYPE html><div id="dates"></div>'));
+        const dom = new JSDOM('<!DOCTYPE html><div id="dates"></div>');
         document = dom.window.document;
         globalThis.document = document;
     });
@@ -37,7 +37,7 @@ describe('localiseUtcDateTimeValues', () => {
                 locally and in the build pipeline */
                 expect(document.querySelector(`.${className}`).textContent.replaceAll(/\s/g, ' ')).toBe(expectedDateTime);
             });
-        })
+        });
     });
 
     it("date formatter does not alter invalid date values, and logs a warning",  () => {

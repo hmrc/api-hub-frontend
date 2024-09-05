@@ -9,14 +9,15 @@
   },
   "scripts": {
     "test": "jasmine --config=jsTest/jasmine.json --reporter=jasmine-console-reporter",
-    "jshint": "jshint --verbose app/assets/javascripts/*.js"
+    "jshint": "jshint --verbose app/assets/javascripts/*.js jsTest/tests/*.js"
   },
   "license": "Apache-2.0",
   "type": "module",
   "jshintConfig": {
-    "esversion": 6,
+    "esversion": 8,
     "browser": true,
-    "globals": {"console":  true, "accessibleAutocomplete":  true},
+    "jasmine": true,
+    "globals": {"console":  true, "accessibleAutocomplete":  true, "globalThis":  true},
     "curly": true,
     "eqeqeq": true,
     "futurehostile": true,

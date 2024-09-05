@@ -5,8 +5,12 @@ import {isVisible} from "./testUtils.js";
 describe('exploreApisHodsFilters', () => {
     let document, hodsFilters, apis;
 
+    function buildApis(...hods) {
+        return hods.map(o => ({data: {hods: new Set(o.split(',').filter(f=>f))}}));
+    }
+
     beforeEach(() => {
-        const dom = (new JSDOM(`
+        const dom = new JSDOM(`
             <!DOCTYPE html>
             <div id="hodFilterCount"></div>
             <details id="viewHodFilters"><summary>View</summary></details>
@@ -16,7 +20,7 @@ describe('exploreApisHodsFilters', () => {
                 <div><input class="hodFilter" type="checkbox" value="h3"></div>
                 <div><input class="hodFilter" type="checkbox" value="h4"></div>
             </div>
-        `));
+        `);
         document = dom.window.document;
         globalThis.document = document;
 
@@ -26,10 +30,6 @@ describe('exploreApisHodsFilters', () => {
 
     function hodCheckbox(hod) {
         return document.querySelector(`.hodFilter[value="${hod}"]`);
-    }
-
-    function buildApis(...hods) {
-        return hods.map(o => ({data: {hods: new Set(o.split(',').filter(f=>f))}}));
     }
 
     describe("initialise", () => {

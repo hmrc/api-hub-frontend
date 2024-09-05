@@ -1,12 +1,12 @@
 import {JSDOM} from 'jsdom';
 import {onPageShow} from '../../app/assets/javascripts/adminManageTeams.js';
-import {paginationHelper, paginationContainerHtml, arrayFromTo, isVisible} from "./testUtils.js";
+import {paginationHelper, paginationContainerHtml, arrayFromTo} from "./testUtils.js";
 
 describe('adminManageTeams', () => {
     let document;
 
     beforeEach(() => {
-        const dom = (new JSDOM(`
+        const dom = new JSDOM(`
             <!DOCTYPE html>
             <div id="teamsTable">
                 <div class="govuk-table__body"></div>                
@@ -14,7 +14,7 @@ describe('adminManageTeams', () => {
             <input id="teamFilter" type="text">
             <div id="teamCount"></div>
             ${paginationContainerHtml}
-        `));
+        `);
         document = dom.window.document;
         globalThis.document = document;
         globalThis.Event = dom.window.Event;

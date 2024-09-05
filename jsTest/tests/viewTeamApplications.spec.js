@@ -6,7 +6,7 @@ describe('viewTeamApplications', () => {
     let document;
 
     beforeEach(() => {
-        const dom = (new JSDOM(`
+        const dom = new JSDOM(`
             <!DOCTYPE html>
             <div id="appDetailPanels">
                 <div class="hip-app"></div>
@@ -15,7 +15,7 @@ describe('viewTeamApplications', () => {
             <div id="noResultsPanel"></div>
             <div id="appCount"></div>
             ${paginationContainerHtml}
-        `));
+        `);
         document = dom.window.document;
         globalThis.document = document;
         globalThis.Event = dom.window.Event;
@@ -27,7 +27,11 @@ describe('viewTeamApplications', () => {
                 (_, i) => `<div class="hip-app" data-index="${i+1+dataIndex}" data-app-name="${prefix}App ${i+1+dataIndex}" data-app-id="${prefix}AppId${i+1+dataIndex}">${prefix}App ${i+1+dataIndex}</div>`
             ).join('');
         const htmlElement = document.getElementById('appDetailPanels');
-        dataIndex == 0 ? htmlElement.innerHTML = content : htmlElement.insertAdjacentHTML('beforeend', content);
+        if (dataIndex === 0) {
+            htmlElement.innerHTML = content;
+        } else {
+            htmlElement.insertAdjacentHTML('beforeend', content);
+        }
     }
 
     function enterAppFilterText(value) {

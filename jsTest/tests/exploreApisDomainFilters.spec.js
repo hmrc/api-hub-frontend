@@ -6,7 +6,7 @@ describe('exploreApisDomainFilters', () => {
     let document, domainFilters, apis;
 
     beforeEach(() => {
-        const dom = (new JSDOM(`
+        const dom = new JSDOM(`
             <!DOCTYPE html>
             <div id="domainFilterCount"></div>
             <details id="viewDomainFilters"><summary>View</summary></details>
@@ -36,7 +36,7 @@ describe('exploreApisDomainFilters', () => {
                     <div><input class="subDomainFilter" type="checkbox" value="d4s3" data-domain="d4"></div>
                 </div>
             </div>
-        `));
+        `);
         document = dom.window.document;
         globalThis.document = document;
 

@@ -1,5 +1,4 @@
 import {JSDOM} from 'jsdom';
-import {buildStatusFilters} from "../../app/assets/javascripts/exploreApisStatusFilters.js";
 import {buildFilterResultPanel, buildSearchResultPanel} from "../../app/assets/javascripts/exploreApisResultPanels.js";
 import {isVisible} from "./testUtils.js";
 
@@ -7,7 +6,7 @@ describe('exploreApisResultPanels', () => {
     let panel, document;
     describe('buildSearchResultPanel', () => {
         beforeEach(() => {
-            const dom = (new JSDOM(`
+            const dom = new JSDOM(`
             <!DOCTYPE html>
             <div id="searchResultsPanel" class="govuk-!-display-none">
                 <p id="resultsSuccess">
@@ -18,7 +17,7 @@ describe('exploreApisResultPanels', () => {
                 </p>
                 <p id="resultsError"></p>
                 <a id="clearSearch"></a>
-            </div>`));
+            </div>`);
             document = dom.window.document;
             globalThis.document = document;
             panel = buildSearchResultPanel();
@@ -30,15 +29,15 @@ describe('exploreApisResultPanels', () => {
         function resultsSuccess() {
             return document.getElementById('resultsSuccess');
         }
+        function searchResultsShowing() {
+            return document.getElementById('searchResultsShowing');
+        }
         function panelContent() {
             let visibleContent = resultsSuccess().textContent;
             if (!isVisible(searchResultsShowing())) {
                 visibleContent = visibleContent.replace("Showing", "");
             }
             return visibleContent.replace(/\s+/g, ' ').trim();
-        }
-        function searchResultsShowing() {
-            return document.getElementById('searchResultsShowing');
         }
         function resultsError() {
             return document.getElementById('resultsError');
@@ -102,7 +101,7 @@ describe('exploreApisResultPanels', () => {
 
     describe('buildFilterResultPanel', () => {
         beforeEach(() => {
-            const dom = (new JSDOM(`
+            const dom = new JSDOM(`
             <!DOCTYPE html>
                 <div id="filterResultsPanel" class="govuk-!-display-none">
                     <span class="call-out-type govuk-!-font-weight-regular">
@@ -113,7 +112,7 @@ describe('exploreApisResultPanels', () => {
                     <span id="filterResultsMultipleApis">APIs are</span>
                     being hidden by your filters.
                     <a id="clearFilters"></a>
-                </div>`));
+                </div>`);
             document = dom.window.document;
             globalThis.document = document;
             panel = buildFilterResultPanel();

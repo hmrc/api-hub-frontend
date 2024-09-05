@@ -1,12 +1,12 @@
 import {buildPaginator} from '../../app/assets/javascripts/paginationController.js';
 import {JSDOM} from 'jsdom';
-import {paginationHelper, paginationContainerHtml, isVisible, arrayFromTo} from "./testUtils.js";
+import {paginationHelper, paginationContainerHtml, arrayFromTo} from "./testUtils.js";
 
 describe('paginationController', () => {
     let paginator, document;
 
     beforeEach(() => {
-        const dom = (new JSDOM(`<!DOCTYPE html><div id="panels"></div>${paginationContainerHtml}`));
+        const dom = new JSDOM(`<!DOCTYPE html><div id="panels"></div>${paginationContainerHtml}`);
         document = dom.window.document;
         globalThis.document = document;
         paginator = buildPaginator(10);
@@ -142,4 +142,4 @@ describe('paginationController', () => {
             expect(paginationHelper.getCurrentPageNumber()).toBe(1);
         });
     });
-})
+});
