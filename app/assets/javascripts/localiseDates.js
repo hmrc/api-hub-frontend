@@ -21,11 +21,13 @@ export function localiseUtcDateTimeValues(locale = BROWSER_DEFAULT_LOCALE, timeZ
                 isValidDate = !isNaN(date.valueOf());
             if (isValidDate) {
                 const [dateFormatOptions, timeFormatOptions] = options;
+                /* jshint +W119 */
                 el.textContent = date.toLocaleDateString(locale, {...dateFormatOptions, timeZone});
                 if (timeFormatOptions) {
                     const formattedTime = date.toLocaleTimeString(locale, {...timeFormatOptions, timeZone});
                     el.textContent += ` at ${formattedTime}`;
                 }
+                /* jshint +W119 */
             } else {
                 console.warn(`Expected a valid date/time string but found "${rawDateText}"`);
             }

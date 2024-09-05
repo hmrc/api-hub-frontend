@@ -7,6 +7,6 @@ document.addEventListener('DOMContentLoaded', function() {
             defaultValue: '',
             selectElement: elOwningTeamSelect,
             showAllValues: true
-        })
+        });
     }
 });

@@ -36,7 +36,7 @@ export function buildSearchResultPanel() {
         onClear(handler) {
             onClearSearchHandler = handler;
         }
-    }
+    };
 }
 
 export function buildFilterResultPanel() {

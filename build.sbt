@@ -7,6 +7,7 @@ import scala.sys.process._
 
 lazy val appName: String = "api-hub-frontend"
 lazy val jsTest = taskKey[Unit]("jsTest")
+lazy val jsHint = taskKey[Unit]("jsHint")
 
 ThisBuild / majorVersion := 0
 ThisBuild / scalaVersion := "3.4.2"
@@ -71,7 +72,13 @@ lazy val root = (project in file("."))
       if (exitCode != 0) {
         throw new MessageOnlyException("npm install and test failed")
       }
-    }
+    },
+    jsHint := {
+      val exitCode = ("npm run jshint").!
+      if (exitCode != 0) {
+        throw new MessageOnlyException("jsHint checks failed")
+      }
+    },
   )
   .settings(scalacOptions := scalacOptions.value.diff(Seq("-Wunused:all")))
 

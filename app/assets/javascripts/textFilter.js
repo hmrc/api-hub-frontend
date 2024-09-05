@@ -3,7 +3,7 @@ import {noop, normaliseText, setVisible} from "./utils.js";
 export function dataAttribute(attr) {
     function dataAttributeTester(transformFns) {
         function applyTransformsAndTest(initValue, fnTest) {
-            return transformFns.reduce((values, fnTransform) => values.flatMap(fnTransform), [initValue]).some(fnTest)
+            return transformFns.reduce((values, fnTransform) => values.flatMap(fnTransform), [initValue]).some(fnTest);
         }
 
         return {
@@ -16,14 +16,14 @@ export function dataAttribute(attr) {
             includesTheFilterText() {
                 return (filterText, el) => {
                     return applyTransformsAndTest(el.dataset[attr], value => value.includes(filterText));
-                }
+                };
             },
             startsWithTheFilterText() {
                 return (filterText, el) => {
                     return applyTransformsAndTest(el.dataset[attr], value => value.startsWith(filterText));
-                }
+                };
             },
-        }
+        };
     }
 
     return dataAttributeTester([]);

@@ -45,7 +45,7 @@ export function buildDomainFilters() {
         subdomainFilterEls.length = 0;
         document.querySelectorAll('input.subDomainFilter').forEach(elSubDomainCheckbox => {
             const subDomain = elSubDomainCheckbox.value,
-                domain = elSubDomainCheckbox.dataset['domain'],
+                domain = elSubDomainCheckbox.dataset.domain,
                 subDomainInUse = apiDomains.some(api => api.domain === domain && api.subdomain === subDomain);
 
             setVisible(elSubDomainCheckbox.parentElement, subDomainInUse);
@@ -73,7 +73,7 @@ export function buildDomainFilters() {
         domainFilterEls.filter(el => el.checked).forEach(el => {
             const domain = el.value;
             selections[domain] = subdomainFilterEls
-                .filter(el => el.dataset['domain'] === domain && el.checked)
+                .filter(el => el.dataset.domain === domain && el.checked)
                 .map(el => el.value);
         });
         return selections;
@@ -86,7 +86,7 @@ export function buildDomainFilters() {
                 elDomainCheckbox.addEventListener('change', () => {
                     const isDomainSelected = elDomainCheckbox.checked;
                     subdomainFilterEls
-                        .filter(elSubdomainCheckbox => elSubdomainCheckbox.dataset['domain'] === domain)
+                        .filter(elSubdomainCheckbox => elSubdomainCheckbox.dataset.domain === domain)
                         .forEach(elSubdomainCheckbox => {
                             elSubdomainCheckbox.checked = isDomainSelected;
                         });
