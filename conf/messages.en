@@ -154,6 +154,8 @@ applicationDetails.teamMembers.emailAddress = Email address
 applicationDetails.teamMembers = Team members
 applicationDetails.pending.heading = Production request for APIs is pending approval
 applicationDetails.pending.message = When a decision is made for your production request for APIs you will be notified via email.
+applicationDetails.no.prod.access.heading = APIs not requested in production
+applicationDetails.no.prod.access.message = This application uses APIs for which production access has not been requested. When you are ready to integrate with production, then production access for these APIs can be requested from the {0}.
 
 applicationApis.title = Application APIs
 applicationApis.heading = Manage application APIs
