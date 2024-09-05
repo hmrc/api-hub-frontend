@@ -32,8 +32,6 @@ export function dataAttribute(attr) {
 export function buildTextFilter(itemEls, elFilterInput, valueFns) {
     let onFiltersChangedHandler = noop;
 
-    elFilterInput.addEventListener('input', applyFilter);
-
     const itemModels =  [...itemEls].map(el => {
         return {el, hiddenByFilter: false};
     });
@@ -52,6 +50,8 @@ export function buildTextFilter(itemEls, elFilterInput, valueFns) {
 
         onFiltersChangedHandler(matchingElements);
     }
+
+    elFilterInput.addEventListener('input', applyFilter);
 
     return {
         onChange(handler) {

@@ -4,7 +4,7 @@ import {buildStatusFilters} from "./exploreApisStatusFilters.js";
 import {buildHodsFilters} from "./exploreApisHodsFilters.js";
 import {buildPlatformFilters} from "./exploreApisPlatformFilters.js";
 import {buildModel} from "./exploreApisModel.js";
-import {setVisible, addToSortedMethodToArray, normaliseText, isVisible} from "./utils.js";
+import {setVisible, addToSortedMethodToArray, normaliseText} from "./utils.js";
 import {buildSearch} from "./exploreApisSearch.js";
 import {buildSearchResultPanel, buildFilterResultPanel} from "./exploreApisResultPanels.js";
 
@@ -73,6 +73,8 @@ export function onPageShow() {
         };
     })();
 
+    const model = buildModel(view.apiDetailPanels);
+
     function updateHiddenByPaginationValues(itemsVisibility) {
         itemsVisibility.forEach(([el, visibleOnCurrentPage]) => {
             const api = model.getApiForElement(el);
@@ -82,7 +84,6 @@ export function onPageShow() {
     }
 
     const paginator = buildPaginator(15, updateHiddenByPaginationValues);
-    const model = buildModel(view.apiDetailPanels);
 
     function buildFilterFunctions() {
         return filters.map(filter=> filter.buildFilterFunction());

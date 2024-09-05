@@ -1,4 +1,4 @@
-import {addIntersectionMethodToSet, isVisible, noop, removeElement, setVisible} from "./utils.js";
+import {addIntersectionMethodToSet, noop, setVisible} from "./utils.js";
 
 addIntersectionMethodToSet();
 

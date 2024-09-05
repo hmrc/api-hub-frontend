@@ -74,7 +74,7 @@ lazy val root = (project in file("."))
       }
     },
     jsHint := {
-      val exitCode = ("npm run jshint").!
+      val exitCode = ("npm ci" #&& "npm run jshint").!
       if (exitCode != 0) {
         throw new MessageOnlyException("jsHint checks failed")
       }
@@ -96,5 +96,6 @@ lazy val testSettings: Seq[Def.Setting[?]] = Seq(
 
 test := {
   jsTest.value
+  jsHint.value
   (test in Test).value
 }

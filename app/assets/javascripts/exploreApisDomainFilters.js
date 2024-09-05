@@ -1,4 +1,4 @@
-import {noop, removeElement, setVisible} from "./utils.js";
+import {noop, setVisible} from "./utils.js";
 
 export function buildDomainFilters() {
     const domainFilterEls = [],

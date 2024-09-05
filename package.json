@@ -14,6 +14,23 @@
   "license": "Apache-2.0",
   "type": "module",
   "jshintConfig": {
-    "esversion": 6
+    "esversion": 6,
+    "browser": true,
+    "globals": {"console":  true, "accessibleAutocomplete":  true},
+    "curly": true,
+    "eqeqeq": true,
+    "futurehostile": true,
+    "latedef": true,
+    "leanswitch": true,
+    "noarg": true,
+    "nocomma": true,
+    "nonbsp": true,
+    "nonew": true,
+    "noreturnawait": true,
+    "singleGroups": true,
+    "strict": "implied",
+    "undef": true,
+    "unused": true,
+    "varstmt": true
   }
 }

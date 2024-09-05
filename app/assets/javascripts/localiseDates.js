@@ -21,7 +21,7 @@ export function localiseUtcDateTimeValues(locale = BROWSER_DEFAULT_LOCALE, timeZ
                 isValidDate = !isNaN(date.valueOf());
             if (isValidDate) {
                 const [dateFormatOptions, timeFormatOptions] = options;
-                /* jshint +W119 */
+                /* jshint -W119 */
                 el.textContent = date.toLocaleDateString(locale, {...dateFormatOptions, timeZone});
                 if (timeFormatOptions) {
                     const formattedTime = date.toLocaleTimeString(locale, {...timeFormatOptions, timeZone});

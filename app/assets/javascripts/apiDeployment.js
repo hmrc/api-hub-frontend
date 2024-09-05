@@ -5,7 +5,7 @@ export function onLoad(){
         const elDomain = document.getElementById('domain');
         let onChangeHandler = noop;
 
-        elDomain.addEventListener('input', event => {
+        elDomain.addEventListener('input', () => {
             onChangeHandler();
         });
 
