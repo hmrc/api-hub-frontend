@@ -18,7 +18,9 @@ package models.application
 
 import play.api.libs.json.{Format, Json}
 
-case class Api(id: String, endpoints: Seq[SelectedEndpoint] = Seq.empty)
+case class Api(id: String, endpoints: Seq[SelectedEndpoint] = Seq.empty) {
+  def title: String = "API name unknown"
+}
 
 object Api {
 

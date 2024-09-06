@@ -96,21 +96,21 @@ class RequestProductionAccessEndJourneyController @Inject()(
   }
 
   private def buildAccessRequest(application: Application, supportingInformation: String, requestedBy: String)(implicit request: DataRequest[AnyContent]): Future[Either[Result, AccessRequestRequest]] = {
-    applicationApiBuilder.build(application).map {
-      case Right(applicationApis) =>
+    applicationApiBuilder.build(application).map(
+      applicationApis =>
         val accessRequestApis = applicationApis.filter(_.endpoints.exists(_.primaryAccess == Inaccessible)).map(applicationApi => {
           val accessRequestEndpoints = applicationApi.endpoints.filter(_.primaryAccess == Inaccessible).map(endpoint => AccessRequestEndpoint(endpoint.httpMethod, endpoint.path, endpoint.scopes))
           AccessRequestApi(
-            applicationApi.apiDetail.id,
-            applicationApi.apiDetail.title,
+            applicationApi.apiId,
+            applicationApi.apiTitle,
             accessRequestEndpoints)
         })
         Right(AccessRequestRequest(application.id, supportingInformation, requestedBy, accessRequestApis))
-      case Left(result) => Left(result)
-    }
+    )
   }
 
   private def badGateway(t: Throwable)(implicit request: Request[?]): Result = {
     errorResultBuilder.internalServerError(Messages("addAnApiComplete.failed"), t)
   }
+
 }

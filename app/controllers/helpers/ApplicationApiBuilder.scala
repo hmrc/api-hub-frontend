@@ -19,86 +19,63 @@ package controllers.helpers
 import com.google.inject.Inject
 import models.accessrequest.{AccessRequest, Pending}
 import models.api.ApiDetail
-import models.application._
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc.{Request, Result}
+import models.application.*
+import play.api.mvc.Request
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider
-import viewmodels.application._
+import viewmodels.application.*
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class ApplicationApiBuilder @Inject()(
-  apiHubService: ApiHubService,
-  errorResultBuilder: ErrorResultBuilder,
-  override val messagesApi: MessagesApi
-)(implicit ec: ExecutionContext) extends FrontendHeaderCarrierProvider with I18nSupport {
+  apiHubService: ApiHubService
+)(implicit ec: ExecutionContext) extends FrontendHeaderCarrierProvider {
 
-  def build(application: Application)(implicit request: Request[?]): Future[Either[Result, Seq[ApplicationApi]]] = {
+  def build(application: Application)(implicit request: Request[?]): Future[Seq[ApplicationApi]] = {
     apiHubService.getAccessRequests(Some(application.id), Some(Pending)).flatMap (
       pendingAccessRequests =>
-        fetchApiDetails(application).map {
-          case Right(apiDetails) => Right(build(application, apiDetails, pendingAccessRequests))
-          case Left(result) => Left(result)
-        }
+        fetchApiDetails(application).map(apis => build(application, apis, pendingAccessRequests))
     )
   }
 
-  private def build(application: Application, apiDetails: Seq[ApiDetail], pendingAccessRequests: Seq[AccessRequest]): Seq[ApplicationApi] = {
-    application.apis.flatMap(
-      api =>
-        apiDetails.find(_.id == api.id).map {
-          apiDetail =>
-            val endpoints = api.endpoints.flatMap {
-              endpoint =>
-                apiDetail.endpoints
-                  .find(_.path == endpoint.path)
-                  .flatMap(_.methods.find(_.httpMethod == endpoint.httpMethod))
-                  .map(
-                    endpointMethod =>
-                      ApplicationEndpoint(
-                        endpoint.httpMethod,
-                        endpoint.path,
-                        endpointMethod.scopes,
-                        ApplicationEndpointAccess(application, hasPendingAccessRequest(apiDetail.id, pendingAccessRequests), endpointMethod, Primary),
-                        ApplicationEndpointAccess(application, hasPendingAccessRequest(apiDetail.id, pendingAccessRequests), endpointMethod, Secondary)
-                      )
+  private def build(application: Application, apis: Seq[(Api, Option[ApiDetail])], pendingAccessRequests: Seq[AccessRequest]): Seq[ApplicationApi] = {
+    apis.map {
+      case (api, Some(apiDetail)) =>
+        val endpoints = api.endpoints.flatMap {
+          endpoint =>
+            apiDetail.endpoints
+              .find(_.path == endpoint.path)
+              .flatMap(_.methods.find(_.httpMethod == endpoint.httpMethod))
+              .map(
+                endpointMethod =>
+                  ApplicationEndpoint(
+                    endpoint.httpMethod,
+                    endpoint.path,
+                    endpointMethod.summary,
+                    endpointMethod.description,
+                    endpointMethod.scopes,
+                    ApplicationEndpointAccess(application, hasPendingAccessRequest(apiDetail.id, pendingAccessRequests), endpointMethod, Primary),
+                    ApplicationEndpointAccess(application, hasPendingAccessRequest(apiDetail.id, pendingAccessRequests), endpointMethod, Secondary)
                   )
-            }
-            ApplicationApi(apiDetail, endpoints, hasPendingAccessRequest(apiDetail.id, pendingAccessRequests))
+              )
         }
-    )
+        ApplicationApi(apiDetail, endpoints, hasPendingAccessRequest(apiDetail.id, pendingAccessRequests))
+      case (api, None) =>
+        ApplicationApi(api, hasPendingAccessRequest(api.id, pendingAccessRequests))
+    }
   }
 
   private def hasPendingAccessRequest(apiId: String, pendingAccessRequests: Seq[AccessRequest]): Boolean = {
     pendingAccessRequests.exists(_.apiId == apiId)
   }
 
-  private def fetchApiDetails(application: Application)(implicit request: Request[?]): Future[Either[Result, Seq[ApiDetail]]] = {
+  private def fetchApiDetails(application: Application)(implicit request: Request[?]): Future[Seq[(Api, Option[ApiDetail])]] = {
     Future
       .sequence(application.apis.map(fetchApiDetail(_)))
-      .map(
-        apiDetails =>
-          apiDetails.foldLeft[Either[Result, Seq[ApiDetail]]](Right(Seq.empty))(
-            (results, apiDetail) =>
-              (results, apiDetail) match {
-                case (Left(result), _) => Left(result)
-                case (_, Left(result)) => Left(result)
-                case (Right(apiDetails), Right(apiDetail)) => Right(apiDetails :+ apiDetail)
-              }
-          )
-      )
   }
 
-  private def fetchApiDetail(api: Api)(implicit request: Request[?]): Future[Either[Result, ApiDetail]] = {
-    apiHubService.getApiDetail(api.id).map(
-      _.toRight(
-        errorResultBuilder.notFound(
-          Messages("site.apiNotFound.heading"),
-          Messages("site.apiNotFound.message", api.id)
-        )
-      )
-    )
+  private def fetchApiDetail(api: Api)(implicit request: Request[?]): Future[(Api, Option[ApiDetail])] = {
+    apiHubService.getApiDetail(api.id).map(apiDetail => (api, apiDetail))
   }
 
 }

@@ -138,7 +138,7 @@
                     <details class="hip-details hip-expander">
                         <summary class="hip-details__summary">
                             <span class="hip-details__summary-text govuk-heading-s govuk-!-margin-bottom-0">
-                            @applicationApi.apiDetail.title
+                            @applicationApi.apiTitle
                             </span>
                             <span class="hip-details__summary-info govuk-body-s">
                             @Html(messages("applicationApis.apis.endpointsAdded",
@@ -175,17 +175,17 @@
                                 @if(!applicationApi.hasPendingAccessRequest) {
                                     @govukButton(
                                         Button(
-                                            href = Some(routes.AddAnApiStartController.addEndpoints(application.id, applicationApi.apiDetail.id).url),
+                                            href = Some(routes.AddAnApiStartController.addEndpoints(application.id, applicationApi.apiId).url),
                                             content = Text(messages("applicationApis.addEndpoints")),
                                             classes = "govuk-button--secondary"
                                         )
-                                        .withAttribute("data-add-endpoints-api-id", applicationApi.apiDetail.id)
+                                        .withAttribute("data-add-endpoints-api-id", applicationApi.apiId)
                                     )
                                 }
-                                <a class="govuk-link govuk-link--no-visited-state" href="@routes.ApiDetailsController.onPageLoad(applicationApi.apiDetail.id)" data-api-specification-api-id="@applicationApi.apiDetail.id">
+                                <a class="govuk-link govuk-link--no-visited-state" href="@routes.ApiDetailsController.onPageLoad(applicationApi.apiId)" data-api-specification-api-id="@applicationApi.apiId">
                                     @messages("applicationApis.apis.viewSpecification")
                                 </a>
-                                <a class="govuk-link govuk-link--no-visited-state" href="@controllers.application.routes.RemoveApiController.onPageLoad(application.id, applicationApi.apiDetail.id)" data-remove-api-api-id="@applicationApi.apiDetail.id">
+                                <a class="govuk-link govuk-link--no-visited-state" href="@controllers.application.routes.RemoveApiController.onPageLoad(application.id, applicationApi.apiId)" data-remove-api-api-id="@applicationApi.apiId">
                                     @messages("applicationApis.removeApi")
                                 </a>
                             </div>

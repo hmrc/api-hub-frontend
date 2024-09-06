@@ -35,3 +35,4 @@ bin
 /.bsp/
 /node_modules
 /jsTest/local
+.jvmopts

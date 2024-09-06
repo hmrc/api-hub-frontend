@@ -137,7 +137,7 @@
                             rows = applicationApis.map(
                                 applicationApi=>
                                     Seq(
-                                        TableRow(content = applicationApi.apiDetail.title, attributes = Map("data-api-id" -> applicationApi.apiDetail.id)),
+                                        TableRow(content = applicationApi.apiTitle, attributes = Map("data-api-id" -> applicationApi.apiId)),
                                         TableRow(content = HtmlContent(messages("applicationDetails.apis.endpointsAvailable", boldNumber(applicationApi.availableSecondaryEndpoints), boldNumber(applicationApi.totalEndpoints)))),
                                         TableRow(content = HtmlContent(messages("applicationDetails.apis.endpointsAvailable", boldNumber(applicationApi.availablePrimaryEndpoints), boldNumber(applicationApi.totalEndpoints))))
                                     )

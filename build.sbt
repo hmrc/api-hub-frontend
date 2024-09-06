@@ -11,6 +11,7 @@ lazy val jsHint = taskKey[Unit]("jsHint")
 
 ThisBuild / majorVersion := 0
 ThisBuild / scalaVersion := "3.4.2"
+Compile / javaOptions += "-Xmx2G"
 
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala, SbtDistributablesPlugin)
