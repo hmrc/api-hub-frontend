@@ -54,7 +54,7 @@ class AddAnApiCompleteController @Inject()(
             call => Future.successful(Redirect(call)),
             addAnApiRequest => {
               val selectedEndpoints = AvailableEndpoints.selectedEndpoints(apiDetail, addAnApiRequest.application, request.userAnswers).flatten(_._2).toSeq
-              apiHubService.addApi(addAnApiRequest.application.id, addAnApiRequest.apiId, selectedEndpoints)
+              apiHubService.addApi(addAnApiRequest.application.id, addAnApiRequest.apiId, addAnApiRequest.apiTitle, selectedEndpoints)
             } flatMap {
               case Some(_) =>
                 addAnApiSessionRepository.clear(request.user.userId).map(_ =>
@@ -75,7 +75,7 @@ class AddAnApiCompleteController @Inject()(
       application <- validateSelectedApplication(userAnswers)
       endpoints <- validateSelectedEndpoints(userAnswers, context)
       _ <- validatePolicyConditions(userAnswers, context)
-    } yield AddAnApiRequest(application, apiDetail.id, endpoints)
+    } yield AddAnApiRequest(application, apiDetail.id, apiDetail.title, endpoints)
   }
 
   private def validateApiId(userAnswers: UserAnswers): Either[Call, ApiDetail] = {
@@ -121,6 +121,6 @@ class AddAnApiCompleteController @Inject()(
 
 object AddAnApiCompleteController {
 
-  case class AddAnApiRequest(application: Application, apiId: String, scopes: Set[String])
+  case class AddAnApiRequest(application: Application, apiId: String, apiTitle: String, scopes: Set[String])
 
 }

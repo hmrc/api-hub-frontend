@@ -64,10 +64,10 @@ class ApiHubService @Inject()(
     applicationsConnector.deleteApplication(id, userEmail)
   }
 
-  def addApi(applicationId: String, apiId: String, availableEndpoints: Seq[AvailableEndpoint])(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+  def addApi(applicationId: String, apiId: String, apiTitle: String, availableEndpoints: Seq[AvailableEndpoint])(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
     val scopes = availableEndpoints.flatMap(ae => ae.endpointMethod.scopes)
     val endpoints = availableEndpoints.map(ae => AddApiRequestEndpoint(ae.endpointMethod.httpMethod, ae.path))
-    applicationsConnector.addApi(applicationId, AddApiRequest(apiId, endpoints, scopes))
+    applicationsConnector.addApi(applicationId, AddApiRequest(apiId, apiTitle, endpoints, scopes))
   }
 
   def removeApi(applicationId: String, apiId: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {

@@ -629,7 +629,7 @@ class ApplicationsConnectorSpec
   "ApplicationsConnector.addApi" - {
     "must place the correct request" in {
       val applicationId = "test-id"
-      val newApi = AddApiRequest("test-api-id", Seq(AddApiRequestEndpoint("GET", "test-path")), Seq("test-scope"))
+      val newApi = AddApiRequest("test-api-id", "test-api-title", Seq(AddApiRequestEndpoint("GET", "test-path")), Seq("test-scope"))
 
       stubFor(
         put(urlEqualTo(s"/api-hub-applications/applications/$applicationId/apis"))
@@ -650,7 +650,7 @@ class ApplicationsConnectorSpec
 
     "must return None when the application cannot be found" in {
       val applicationId = "test-id"
-      val newApi = AddApiRequest("test-api-id", Seq(AddApiRequestEndpoint("GET", "test-path")), Seq("test-scope"))
+      val newApi = AddApiRequest("test-api-id", "test-api-title", Seq(AddApiRequestEndpoint("GET", "test-path")), Seq("test-scope"))
 
       stubFor(
         put(urlEqualTo(s"/api-hub-applications/applications/$applicationId/apis"))

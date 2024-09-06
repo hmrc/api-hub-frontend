@@ -140,44 +140,6 @@ class AddAnApiSelectEndpointsControllerSpec extends SpecBase with MockitoSugar w
       }
     }
 
-    "must add further endpoints to an existing answer (add endpoints journey)" in {
-      val apiDetail = sampleApiDetail()
-        .copy(
-          endpoints = Seq(
-            Endpoint("/test-path-1", Seq(EndpointMethod("GET", None, None, Seq("test-scope-1")))),
-            Endpoint("/test-path-2", Seq(EndpointMethod("GET", None, None, Seq("test-scope-2")))),
-            Endpoint("/test-path-3", Seq(EndpointMethod("GET", None, None, Seq("test-scope-3"))))
-          )
-        )
-
-      val application = FakeApplication
-        .addApi(
-          Api(apiDetail.id, Seq(SelectedEndpoint("GET", "/test-path-2")))
-        )
-
-      val fixture = buildFixture(Some(buildUserAnswers(apiDetail, application)))
-
-      when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
-        .thenReturn(Future.successful(Some(apiDetail)))
-
-      when(fixture.addAnApiSessionRepository.set(any())).thenReturn(Future.successful(true))
-
-      running(fixture.application) {
-        val request =
-          FakeRequest(POST, addAnApiSelectEndpointsRoute)
-            .withFormUrlEncodedBody(("value[0]", Set("test-scope-1").toString()))
-
-        val result = route(fixture.application, request).value
-
-        status(result) mustEqual SEE_OTHER
-
-        val expected = buildUserAnswers(apiDetail, application)
-          .set(AddAnApiSelectEndpointsPage, Set(Set("test-scope-1"), Set("test-scope-2"))).toOption.value
-
-        verify(fixture.addAnApiSessionRepository).set(eqTo(expected))
-      }
-    }
-
     "must return a Bad Request and errors when invalid data is submitted" in {
       val fixture = buildFixture(Some(buildUserAnswers(apiDetail)))
 

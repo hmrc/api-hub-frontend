@@ -34,12 +34,6 @@
     }
 }
 
-@readonly(endpoints: Seq[AvailableEndpoint]) = {
-    @if(endpoints.exists(_.added)) {
-        disabled
-    }
-}
-
 @layout(pageTitle = title(form, messages("addAnApiSelectEndpoints.title")), user = user) {
 
     @formHelper(action = routes.AddAnApiSelectEndpointsController.onSubmit(mode, context), Symbol("autoComplete") -> "off") {
@@ -69,7 +63,7 @@
                     @AvailableEndpoints(apiDetail, application).toSeq.zipWithIndex.map {case (value, index) =>
                     <div class="custom-checkbox-holder">
                         <div class="govuk-checkboxes__item govuk-!-margin-bottom-5">
-                            <input class="govuk-checkboxes__input" id="value_@index" name="value[@index]" type="checkbox" value="@(value._1.toString)" @checked(value._1) @readonly(value._2)>
+                            <input class="govuk-checkboxes__input" id="value_@index" name="value[@index]" type="checkbox" value="@(value._1.toString)" @checked(value._1)>
                             <label class="govuk-label govuk-checkboxes__label" for="value_@index">
                                 @if(value._2.size == 1) {
                                     @messages("addAnApiSelectEndpoints.selectEndpoint")

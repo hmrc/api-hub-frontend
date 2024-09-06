@@ -71,7 +71,7 @@ class AddAnApiSelectEndpointsController @Inject()(
         case (Some(apiDetail), Some(application)) =>
           val form = formProvider.apply(apiDetail, application)
 
-          form.bindFromRequest(formDataWithExistingEndpoints(request, apiDetail, application)).fold(
+          form.bindFromRequest(request.body.asFormUrlEncoded.getOrElse(Map.empty)).fold(
             formWithErrors =>
               Future.successful(BadRequest(view(formWithErrors, mode, context, Some(request.user), apiDetail, application))),
             selectedScopes =>
@@ -82,23 +82,6 @@ class AddAnApiSelectEndpointsController @Inject()(
           )
         case _ => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
       }
-  }
-
-  private def formDataWithExistingEndpoints(request: DataRequest[AnyContent], apiDetail: ApiDetail, application: Application): Map[String, Seq[String]] = {
-
-    // We are disabling the checkboxes for endpoints that have already been
-    // added. Disabled inputs are not submitted with the other form data so we
-    // lose the data associated with them when this is posted back to us.
-    // So we need to add the already-added endpoints into the form data.
-
-    request.request.body.asFormUrlEncoded.getOrElse(Map.empty) ++
-      AvailableEndpoints(apiDetail, application)
-        .toSeq
-        .zipWithIndex
-        .filter(_._1._2.exists(_.added))
-        .map(data => s"value[${data._2}]" -> Seq(data._1._1.toString()))
-        .toMap
-
   }
 
 }
