@@ -741,6 +741,13 @@ header {
     }
 }
 
+.govuk-summary-list {
+    &.no-table-layout {
+        table-layout: unset;
+    }
+}
+
+
 .autocomplete__wrapper svg {
     // added this to fix a bug in accessible-autocomplete component where drop-down arrow was not being displayed when showAllValues is set to true
     z-index: 1;

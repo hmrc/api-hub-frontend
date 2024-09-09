@@ -20,14 +20,14 @@ import base.SpecBase
 import controllers.actions.{FakeApplication, FakeUser}
 import models.api.{ApiDetail, Endpoint, EndpointMethod, Live, Maintainer}
 import models.{AddAnApi, ApiPolicyConditionsDeclaration, AvailableEndpoint, CheckMode, UserAnswers}
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.{AddAnApiApiPage, AddAnApiContextPage, AddAnApiSelectApplicationPage, AddAnApiSelectEndpointsPage, ApiPolicyConditionsDeclarationPage}
 import play.api.Application
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.AddAnApiSessionRepository
 import services.ApiHubService
 import uk.gov.hmrc.http.UpstreamErrorResponse
@@ -43,10 +43,11 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation with M
   private val selectedScopes = Set(Set("test-scope-1", "test-scope-2"))
   private val acceptedPolicyConditions: Set[ApiPolicyConditionsDeclaration] = Set(ApiPolicyConditionsDeclaration.Accept)
   private val apiId = "test-api-id"
+  private val apiTitle = "test-api-title"
   private val expectedScopes = Set("test-scope-1", "test-scope-2")
   private val apiDetail = ApiDetail(apiId,
     "publisher ref",
-    "API title",
+    apiTitle,
     "",
     "",
     Seq(Endpoint("/foo/bar", Seq(EndpointMethod("GET", None, None, expectedScopes.toSeq)))),
@@ -74,14 +75,15 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation with M
 
       when(fixture.apiHubService.addApi(eqTo(FakeApplication.id),
         eqTo(apiId),
+        eqTo(apiTitle),
         eqTo(
-          Seq(
-            AvailableEndpoint(
-              "/foo/bar",
-              EndpointMethod("GET", None, None, expectedScopes.toSeq),
-              false
+            Seq(
+              AvailableEndpoint(
+                "/foo/bar",
+                EndpointMethod("GET", None, None, expectedScopes.toSeq),
+                false
+              )
             )
-          )
         )
       )(any()))
         .thenReturn(Future.successful(Some(())))
@@ -102,7 +104,7 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation with M
 
       when(fixture.apiHubService.getApiDetail(eqTo(apiId))(any())).thenReturn(Future.successful(Some(apiDetail)))
 
-      when(fixture.apiHubService.addApi(any(), any(), any())(any()))
+      when(fixture.apiHubService.addApi(any(), any(), any(), any())(any()))
         .thenReturn(Future.successful(Some(())))
 
       when(fixture.addAnApiSessionRepository.clear(any())).thenReturn(Future.successful(true))
@@ -122,7 +124,7 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation with M
 
       when(fixture.apiHubService.getApiDetail(eqTo(apiId))(any())).thenReturn(Future.successful(Some(apiDetail)))
 
-      when(fixture.apiHubService.addApi(eqTo(FakeApplication.id), eqTo(apiId), any())(any()))
+      when(fixture.apiHubService.addApi(eqTo(FakeApplication.id), eqTo(apiId), any(), any())(any()))
         .thenReturn(Future.successful(None))
 
       running(fixture.application) {
@@ -219,7 +221,7 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation with M
 
       when(fixture.apiHubService.getApiDetail(eqTo(apiId))(any())).thenReturn(Future.successful(Some(apiDetail)))
 
-      when(fixture.apiHubService.addApi(any(), any(), any())(any()))
+      when(fixture.apiHubService.addApi(any(), any(), any(), any())(any()))
         .thenReturn(Future.failed(UpstreamErrorResponse.apply("test-message", BAD_GATEWAY)))
 
       running(fixture.application) {

@@ -367,17 +367,18 @@ class ApiHubServiceSpec
 
       val applicationId = "applicationId"
       val apiId = "apiId"
+      val apiTitle = "apiTitle"
       val verb = "GET"
       val path = "/foo/bar"
       val scopes = Seq("test-scope-1", "test-scope-2")
       val availableEndpoints = Seq(AvailableEndpoint(path, EndpointMethod(verb, None, None, scopes), false))
 
-      val apiRequest = AddApiRequest(apiId, Seq(AddApiRequestEndpoint(verb, path)), scopes)
+      val apiRequest = AddApiRequest(apiId, apiTitle, Seq(AddApiRequestEndpoint(verb, path)), scopes)
 
       val expected = Some(())
       when(fixture.applicationsConnector.addApi(eqTo(applicationId), eqTo(apiRequest))(any())).thenReturn(Future.successful(expected))
 
-      fixture.service.addApi(applicationId, apiId, availableEndpoints)(HeaderCarrier()) map {
+      fixture.service.addApi(applicationId, apiId, apiTitle, availableEndpoints)(HeaderCarrier()) map {
         actual =>
           actual mustBe expected
       }
