@@ -104,8 +104,8 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
 
           val application = FakeApplication.copy(
             apis = Seq(
-              Api(api1.id, Seq.empty),
-              Api(api2.id, Seq.empty)
+              Api(api1.id, api1.title, Seq.empty),
+              Api(api2.id, api2.title, Seq.empty)
             )
           )
 

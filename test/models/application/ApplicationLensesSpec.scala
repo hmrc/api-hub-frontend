@@ -446,7 +446,7 @@ object ApplicationLensesSpec {
       .map(_ => randomEndpoint())
 
   private def randomApi(): Api =
-    Api(randomString(), randomEndpoints())
+    Api(randomString(), randomString(), randomEndpoints())
 
   private def randomApis(): Seq[Api] =
     (0 to Random.nextInt(5))

@@ -47,9 +47,9 @@ class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
     "must correctly stitch together data" in {
       val fixture = buildFixture()
       val application = FakeApplication
-        .addApi(Api(apiId1, Seq(SelectedEndpoint("GET", "/test1/1"), SelectedEndpoint("POST", "/test1/1"), SelectedEndpoint("GET", "/test1/2"))))
-        .addApi(Api(apiId2, Seq(SelectedEndpoint("GET", "/test2/1"))))
-        .addApi(Api(apiId3, Seq(SelectedEndpoint("GET", "/test3/1"))))
+        .addApi(Api(apiId1, apiTitle1, Seq(SelectedEndpoint("GET", "/test1/1"), SelectedEndpoint("POST", "/test1/1"), SelectedEndpoint("GET", "/test1/2"))))
+        .addApi(Api(apiId2, apiTitle2, Seq(SelectedEndpoint("GET", "/test2/1"))))
+        .addApi(Api(apiId3, apiTitle3, Seq(SelectedEndpoint("GET", "/test3/1"))))
         .setPrimaryScopes(scopes("all:test-scope-1", "get:test-scope-1-1", "get:test-scope-1-2"))
         .setSecondaryScopes(scopes("all:test-scope-1", "get:test-scope-1-1", "post:test-scope-1-1", "get:test-scope-1-2", "get:test-scope-3-1"))
 
@@ -71,23 +71,23 @@ class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
           ApplicationApi(
             apiDetail1,
             Seq(
-              ApplicationEndpoint("GET", "/test1/1", Seq("all:test-scope-1", "get:test-scope-1-1"), Accessible, Accessible),
-              ApplicationEndpoint("POST", "/test1/1", Seq("all:test-scope-1", "post:test-scope-1-1"), Inaccessible, Accessible),
-              ApplicationEndpoint("GET", "/test1/2", Seq("all:test-scope-1", "get:test-scope-1-2"), Accessible, Accessible)
+              ApplicationEndpoint("GET", "/test1/1", None, None, Seq("all:test-scope-1", "get:test-scope-1-1"), Accessible, Accessible),
+              ApplicationEndpoint("POST", "/test1/1", None, None, Seq("all:test-scope-1", "post:test-scope-1-1"), Inaccessible, Accessible),
+              ApplicationEndpoint("GET", "/test1/2", None, None, Seq("all:test-scope-1", "get:test-scope-1-2"), Accessible, Accessible)
             ),
             false
           ),
           ApplicationApi(
             apiDetail2,
             Seq(
-              ApplicationEndpoint("GET", "/test2/1", Seq("get:test-scope-2-1"), Inaccessible, Inaccessible)
+              ApplicationEndpoint("GET", "/test2/1", None, None, Seq("get:test-scope-2-1"), Inaccessible, Inaccessible)
             ),
             false
           ),
           ApplicationApi(
             apiDetail3,
             Seq(
-              ApplicationEndpoint("GET", "/test3/1", Seq("get:test-scope-3-1"), Requested, Accessible)
+              ApplicationEndpoint("GET", "/test3/1", None, None, Seq("get:test-scope-3-1"), Requested, Accessible)
             ),
             true
           )
@@ -116,7 +116,7 @@ class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
     "must return a 404 Not Found result when an API detail cannot be found" in {
       val fixture = buildFixture()
       val apiId = "test-id"
-      val application = FakeApplication.addApi(Api(apiId, Seq.empty))
+      val application = FakeApplication.addApi(Api(apiId, "test-title", Seq.empty))
 
       when(fixture.apiHubService.getAccessRequests(eqTo(Some(FakeApplication.id)), eqTo(Some(Pending)))(any()))
         .thenReturn(Future.successful(Seq.empty))
@@ -170,6 +170,10 @@ object ApplicationApiBuilderSpec {
   private val apiId1 = "test-id-1"
   private val apiId2 = "test-id-2"
   private val apiId3 = "test-id-3"
+
+  private val apiTitle1 = "test-title-1"
+  private val apiTitle2 = "test-title-2"
+  private val apiTitle3 = "test-title-3"
 
   private val apiDetail1 =
     ApiDetail(

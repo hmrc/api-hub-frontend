@@ -61,7 +61,7 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
           val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
 
           val applicationApis = Seq(
-            ApplicationApi(anApiDetail, Seq(ApplicationEndpoint("GET", "/test", Seq("test-scope"), Inaccessible, Accessible)), false)
+            ApplicationApi(anApiDetail, Seq(ApplicationEndpoint("GET", "/test", Some("A summary"), Some("A description"), Seq("test-scope"), Inaccessible, Accessible)), false)
           )
 
           when(fixture.apiHubService.getApiDetail(any())(any())).thenReturn(Future.successful(Some(anApiDetail)))
@@ -88,7 +88,7 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
       val fixture = buildFixture(userAnswers = Some(userAnswers))
 
       val applicationApis = Seq(
-        ApplicationApi(anApiDetail, Seq(ApplicationEndpoint("GET", "/test", Seq("test-scope"), Inaccessible, Accessible)), false)
+        ApplicationApi(anApiDetail, Seq(ApplicationEndpoint("GET", "/test", Some("A summary"), Some("A description"), Seq("test-scope"), Inaccessible, Accessible)), false)
       )
 
       when(fixture.apiHubService.getApiDetail(any())(any())).thenReturn(Future.successful(Some(anApiDetail)))
@@ -153,7 +153,7 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
     val apiDetail = anApiDetail
 
     val application = FakeApplication
-      .addApi(Api(apiDetail.id, Seq(SelectedEndpoint("GET", "/test"))))
+      .addApi(Api(apiDetail.id, apiDetail.title, Seq(SelectedEndpoint("GET", "/test"))))
       .setSecondaryScopes(Seq(Scope("test-scope")))
 
     application

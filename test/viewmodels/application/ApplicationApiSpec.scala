@@ -116,6 +116,8 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
           ApplicationEndpoint(
             httpMethod = "GET",
             path = "/test",
+            summary = Some("test-summary"),
+            description = Some("test-description"),
             scopes = Seq.empty,
             primaryAccess = Accessible,
             secondaryAccess = Accessible
@@ -123,6 +125,8 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
           ApplicationEndpoint(
             httpMethod = "GET",
             path = "/test",
+            summary = Some("test-summary"),
+            description = Some("test-description"),
             scopes = Seq.empty,
             primaryAccess = Accessible,
             secondaryAccess = Inaccessible
@@ -130,6 +134,8 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
           ApplicationEndpoint(
             httpMethod = "GET",
             path = "/test",
+            summary = Some("test-summary"),
+            description = Some("test-description"),
             scopes = Seq.empty,
             primaryAccess = Inaccessible,
             secondaryAccess = Accessible
@@ -137,6 +143,8 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
           ApplicationEndpoint(
             httpMethod = "GET",
             path = "/test",
+            summary = Some("test-summary"),
+            description = Some("test-description"),
             scopes = Seq.empty,
             primaryAccess = Requested,
             secondaryAccess = Accessible

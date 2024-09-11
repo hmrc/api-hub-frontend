@@ -269,7 +269,7 @@ object RemoveApiControllerSpec {
 
   val form: Form[?] = new YesNoFormProvider()("removeApiConfirmation.error")
   val apiDetail: ApiDetail = FakeApiDetail
-  val application: Application = FakeApplication.addApi(Api(apiDetail.id, Seq.empty))
+  val application: Application = FakeApplication.addApi(Api(apiDetail.id, apiDetail.title, Seq.empty))
   val applicationWithoutApis: Application = FakeApplication
 
 }

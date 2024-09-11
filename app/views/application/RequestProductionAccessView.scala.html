@@ -17,7 +17,6 @@
 @import models.application._
 @import models.user.UserModel
 @import viewmodels.application._
-@import models.api.ApiDetail
 
 @this(
         layout: templates.Layout,
@@ -48,25 +47,21 @@
     <strong>@endpoint.path</strong>
 }
 
-@endpointSummary(endpoint: ApplicationEndpoint, apiDetail: ApiDetail) = {
-    <p class="govuk-body-s govuk-!-margin-top-4">@descriptionOf(apiDetail, endpoint)</p>
+@endpointSummary(endpoint: ApplicationEndpoint) = {
+    <p class="govuk-body-s govuk-!-margin-top-4">@descriptionOf(endpoint)</p>
 }
 
-@endpointDetails(endpoint: ApplicationEndpoint, apiDetail: ApiDetail) = {
+@endpointDetails(endpoint: ApplicationEndpoint) = {
     <div class="nhs-body govuk-!-margin-bottom-2">
         @endpointName(endpoint)
-        @endpointSummary(endpoint, apiDetail)
+        @endpointSummary(endpoint)
     </div>
 }
 
-@descriptionOf(apiDetail: ApiDetail, applicationEndpoint: ApplicationEndpoint) = @{
-    apiDetail.endpoints.filter(endpoint => endpoint.path.equals(applicationEndpoint.path))
-            .flatMap(endpoint => endpoint.methods)
-            .filter(endpointMethod => endpointMethod.httpMethod.equals(applicationEndpoint.httpMethod))
-            .headOption
-            .map(endpointMethod => endpointMethod.summary.getOrElse(endpointMethod.description))
-            .getOrElse("")
-
+@descriptionOf(applicationEndpoint: ApplicationEndpoint) = @{
+    applicationEndpoint
+        .summary
+        .getOrElse(applicationEndpoint.description.getOrElse(""))
 }
 
 @layout(pageTitle = titleNoForm(messages("requestProductionAccess.title")), user = user, fullWidth = true) {
@@ -92,7 +87,7 @@
                 <div>
                     <p class="govuk-body">
                         @messages("requestProductionAccess.apiName")
-                    <strong>@applicationApi.apiDetail.title</strong>
+                    <strong>@applicationApi.apiTitle</strong>
                     </p>
                 </div>
 
@@ -104,7 +99,7 @@
                     </summary>
 
                     <div class="govuk-details__text">
-                        @applicationApi.endpoints.map(endpoint => endpointDetails(endpoint, applicationApi.apiDetail))
+                        @applicationApi.endpoints.map(endpoint => endpointDetails(endpoint))
                         <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
                         <p class="govuk-body">@messages("requestProductionAccess.scopes")</p>
                         <div>
@@ -124,7 +119,7 @@
                     <summary class="hip-details__summary">
                         <span class="hip-details__summary-text govuk-heading-s govuk-!-margin-bottom-0">
                             @{
-                                applicationApi.apiDetail.title
+                                applicationApi.apiTitle
                             } usage policy
                         </span>
                         <span class="hip-details__summary-info govuk-body-s"></span>

@@ -59,6 +59,8 @@ class ApplicationApiBuilder @Inject()(
                       ApplicationEndpoint(
                         endpoint.httpMethod,
                         endpoint.path,
+                        endpointMethod.summary,
+                        endpointMethod.description,
                         endpointMethod.scopes,
                         ApplicationEndpointAccess(application, hasPendingAccessRequest(apiDetail.id, pendingAccessRequests), endpointMethod, Primary),
                         ApplicationEndpointAccess(application, hasPendingAccessRequest(apiDetail.id, pendingAccessRequests), endpointMethod, Secondary)

@@ -120,10 +120,11 @@ class ApiHubServiceSpec
   }
   "getApplicationsUsingApi" - {
     val apiId = "myApiId"
+    val apiTitle = "myApiTitle"
 
     "must call the applications connector and return a sequence of applications" in {
-      val application1 = Application("id-1", "test-app-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1"))).addApi(Api(apiId))
-      val application2 = Application("id-2", "test-app-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2"))).addApi(Api(apiId))
+      val application1 = Application("id-1", "test-app-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1"))).addApi(Api(apiId, apiTitle))
+      val application2 = Application("id-2", "test-app-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2"))).addApi(Api(apiId, apiTitle))
       val expected = Seq(application1, application2)
 
       val fixture = buildFixture()
@@ -138,8 +139,8 @@ class ApiHubServiceSpec
     }
 
     "must call the applications connector and return a sequence of applications including deleted when requested" in {
-      val application1 = Application("id-1", "test-app-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1"))).addApi(Api(apiId))
-      val application2 = Application("id-2", "test-app-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2"))).addApi(Api(apiId))
+      val application1 = Application("id-1", "test-app-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1"))).addApi(Api(apiId, apiTitle))
+      val application2 = Application("id-2", "test-app-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2"))).addApi(Api(apiId, apiTitle))
         .delete(Deleted(LocalDateTime.now(), "test-deleted-by"))
       val expected = Seq(application1, application2)
 

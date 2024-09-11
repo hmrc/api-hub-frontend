@@ -85,11 +85,11 @@ class ApplicationApisControllerSpec extends SpecBase with MockitoSugar with Test
       )
 
       val application = FakeApplication
-        .addApi(Api(apiDetail.id, Seq(SelectedEndpoint("GET", "/test"))))
+        .addApi(Api(apiDetail.id, apiDetail.title, Seq(SelectedEndpoint("GET", "/test"))))
         .setSecondaryScopes(Seq(Scope("test-scope")))
 
       val applicationApis = Seq(
-        ApplicationApi(apiDetail, Seq(ApplicationEndpoint("GET", "/test", Seq("test-scope"), Inaccessible, Accessible)), false)
+        ApplicationApi(apiDetail, Seq(ApplicationEndpoint("GET", "/test", None, None, Seq("test-scope"), Inaccessible, Accessible)), false)
       )
 
       when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(true), eqTo(false))(any()))

@@ -101,9 +101,10 @@ class RequestProductionAccessEndJourneyController @Inject()(
         val accessRequestApis = applicationApis.filter(_.endpoints.exists(_.primaryAccess == Inaccessible)).map(applicationApi => {
           val accessRequestEndpoints = applicationApi.endpoints.filter(_.primaryAccess == Inaccessible).map(endpoint => AccessRequestEndpoint(endpoint.httpMethod, endpoint.path, endpoint.scopes))
           AccessRequestApi(
-            applicationApi.apiDetail.id,
-            applicationApi.apiDetail.title,
-            accessRequestEndpoints)
+            applicationApi.apiId,
+            applicationApi.apiTitle,
+            accessRequestEndpoints
+          )
         })
         Right(AccessRequestRequest(application.id, supportingInformation, requestedBy, accessRequestApis))
       case Left(result) => Left(result)

@@ -80,7 +80,7 @@ class AddAnApiStartControllerSpec extends SpecBase with MockitoSugar with HtmlVa
         )
       val application = FakeApplication
         .addApi(
-          Api(apiDetail.id, Seq(SelectedEndpoint("GET", "/test-path-1")))
+          Api(apiDetail.id, apiDetail.title, Seq(SelectedEndpoint("GET", "/test-path-1")))
         )
 
       when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))

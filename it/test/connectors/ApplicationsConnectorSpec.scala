@@ -157,10 +157,11 @@ class ApplicationsConnectorSpec
 
   "ApplicationsConnector.getApplicationsUsingApi" - {
     val apiId = "myApiId"
+    val apiTitle = "myApiTitle"
 
     "must place the correct request and return the array of applications" in {
-      val application1 = Application("id-1", "test-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1"))).addApi(Api(apiId))
-      val application2 = Application("id-2", "test-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2"))).addApi(Api(apiId))
+      val application1 = Application("id-1", "test-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1"))).addApi(Api(apiId, apiTitle))
+      val application2 = Application("id-2", "test-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2"))).addApi(Api(apiId, apiTitle))
       val expected = Seq(application1, application2)
 
       stubFor(
@@ -180,8 +181,8 @@ class ApplicationsConnectorSpec
     }
 
     "must place the correct request and return the applications including deleted ones when requested" in {
-      val application1 = Application("id-1", "test-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1"))).addApi(Api(apiId))
-      val application2 = Application("id-2", "test-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2"))).addApi(Api(apiId))
+      val application1 = Application("id-1", "test-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1"))).addApi(Api(apiId, apiTitle))
+      val application2 = Application("id-2", "test-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2"))).addApi(Api(apiId, apiTitle))
         .delete(Deleted(LocalDateTime.now(), "test-deleted-by"))
       val expected = Seq(application1, application2)
 
@@ -1528,7 +1529,7 @@ object ApplicationsConnectorSpec extends HttpClientV2Support {
 
     def successfulApplicationGetter(enrich: Boolean, includeDeleted: Boolean): Unit = {
       s"must place the correct request and return the application when enrich = $enrich" in {
-        val api = Api("api_id", Seq(SelectedEndpoint("GET", "/foo/bar")))
+        val api = Api("api_id", "api_title", Seq(SelectedEndpoint("GET", "/foo/bar")))
         val applicationWithApis = Application(
           "id-1",
           "test-name-1",
