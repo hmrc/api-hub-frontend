@@ -540,6 +540,17 @@ $active-link-color: govuk-colour("dark-blue");
     width: 1%;
 }
 
+table.govuk-table {
+    &.scrollable {
+        display: block;
+        overflow: auto;
+        // nice to have a wider table on wider screens
+        @media only screen and (min-width: 1700px) {
+            width: 150%;
+        }
+    }
+}
+
 .gem-c-search__submit {
     background-color: $search-button-background;
     color: $search-button-text;
