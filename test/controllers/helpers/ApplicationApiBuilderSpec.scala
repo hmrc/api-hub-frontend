@@ -93,7 +93,7 @@ class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
           )
         )
 
-        actual mustBe Right(expected)
+        actual mustBe expected
       }
     }
 
@@ -109,17 +109,19 @@ class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
 
         val actual = fixture.applicationApiBuilder.build(application).futureValue
 
-        actual mustBe Right(Seq.empty)
+        actual mustBe Seq.empty
       }
     }
 
     "must return a 404 Not Found result when an API detail cannot be found" in {
       val fixture = buildFixture()
       val apiId = "test-id"
-      val application = FakeApplication.addApi(Api(apiId, "test-title", Seq.empty))
+      val api = Api(apiId, "test-title", Seq.empty)
+      val application = FakeApplication.addApi(api)
 
       when(fixture.apiHubService.getAccessRequests(eqTo(Some(FakeApplication.id)), eqTo(Some(Pending)))(any()))
         .thenReturn(Future.successful(Seq.empty))
+
       when(fixture.apiHubService.getApiDetail(any())(any()))
         .thenReturn(Future.successful(None))
 
@@ -128,17 +130,10 @@ class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
         implicit val msgs: Messages = messages(fixture.application)
 
         val actual = fixture.applicationApiBuilder.build(application).futureValue
-        val view = fixture.application.injector.instanceOf[ErrorTemplate]
 
-        val expected = NotFound(
-          view(
-            "Page not found - 404",
-            "API not found",
-            s"Cannot find an API with Id $apiId."
-          )
-        )
+        val expected = Seq(ApplicationApi(api, false))
 
-        actual mustBe Left(expected)
+        actual mustBe expected
       }
     }
   }

@@ -36,11 +36,9 @@ class ApplicationApisController @Inject()(
 
   def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id, enrich = true)).async {
     implicit request =>
-      applicationApiBuilder.build(request.application).map {
-        case Right(applicationApis) => Ok(view(request.application, applicationApis, Some(request.identifierRequest.user)))
-        case Left(result) => result
-      }
-
+      applicationApiBuilder.build(request.application).map(
+        applicationApis => Ok(view(request.application, applicationApis, Some(request.identifierRequest.user)))
+      )
   }
 
 }

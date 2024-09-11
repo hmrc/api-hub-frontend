@@ -43,7 +43,7 @@ class RequestProductionAccessController @Inject()(
                                                    getData: AccessRequestDataRetrievalAction,
                                                    requireData: DataRequiredAction)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form = formProvider()
+  private val form = formProvider()
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request => {
@@ -60,26 +60,22 @@ class RequestProductionAccessController @Inject()(
     }
   }
 
-
   private def showPage(form: Form[?], status: Int)(implicit request: DataRequest[AnyContent]) = {
     request.userAnswers.get(AccessRequestApplicationIdPage) match {
       case Some(application) =>
-        applicationApiBuilder.build(application)
-          .map {
-            case Right(applicationApis) =>
-              val filteredApis = applicationApis.filter(_.endpoints.exists(_.primaryAccess == Inaccessible))
-                .map(applicationApi => {
-                  val filteredEndpoints = applicationApi.endpoints.filter(_.primaryAccess == Inaccessible)
-                  val prunedApi = applicationApi.copy(endpoints = filteredEndpoints)
-                  prunedApi
-                })
+        applicationApiBuilder.build(application).map(
+          applicationApis =>
+            val filteredApis = applicationApis.filter(_.endpoints.exists(_.primaryAccess == Inaccessible))
+              .map(applicationApi => {
+                val filteredEndpoints = applicationApi.endpoints.filter(_.primaryAccess == Inaccessible)
+                val prunedApi = applicationApi.copy(endpoints = filteredEndpoints)
+                prunedApi
+              })
 
-              Status(status)(requestProductionAccessView(
-                form,
-                application, filteredApis, Some(request.user)))
-            case Left(result) => result
-          }
-
+            Status(status)(requestProductionAccessView(
+              form,
+              application, filteredApis, Some(request.user)))
+        )
       case _ => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
     }
   }
@@ -93,7 +89,8 @@ class RequestProductionAccessController @Inject()(
             updatedAnswers <- Future.fromTry(request.userAnswers.set(RequestProductionAccessPage, value))
             _ <- sessionRepository.set(updatedAnswers)
           } yield Redirect(controllers.application.routes.ProvideSupportingInformationController.onPageLoad())
-        })
-
+        }
+      )
   }
+
 }

@@ -180,13 +180,37 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
       }
     }
 
-    "must return the correct view when the application APIs are missing" in {
+    "must return the correct view when the APIs are missing" in {
       val fixture = buildFixture()
       val apiId = "test-id"
+      val apiTitle = "test-title"
+
+//      val endpointMethod = EndpointMethod("GET", Some("test-summary"), Some("test-description"), Seq("test-scope"))
+//
+//      val apiDetail = ApiDetail(
+//        id = "test-id",
+//        publisherReference = "test-pub-ref",
+//        title = "test-title",
+//        description = "test-description",
+//        version = "test-version",
+//        endpoints = Seq(Endpoint(path = "/test", methods = Seq(endpointMethod))),
+//        shortDescription = None,
+//        openApiSpecification = "test-oas-spec",
+//        apiStatus = Live,
+//        reviewedDate = Instant.now(),
+//        platform = "HIP",
+//        maintainer = Maintainer("name", "#slack", List.empty)
+//      )
+
+      val api = Api(apiId, apiTitle, Seq(SelectedEndpoint("GET", "/test")))
 
       val application = FakeApplication
-        .addApi(Api(apiId, "test-title", Seq(SelectedEndpoint("GET", "/test"))))
+        .addApi(api)
         .setSecondaryScopes(Seq(Scope("test-scope")))
+
+      val applicationApis = Seq(
+        ApplicationApi(api, false)
+      )
 
       when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(true), eqTo(false))(any()))
         .thenReturn(Future.successful(Some(application)))
@@ -203,7 +227,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustBe view(application, None, Some(FakeUser))(request, messages(fixture.playApplication)).toString
+        contentAsString(result) mustBe view(application, Some(applicationApis), Some(FakeUser))(request, messages(fixture.playApplication)).toString
         contentAsString(result) must validateAsHtml
       }
     }

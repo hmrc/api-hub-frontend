@@ -37,32 +37,32 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class RequestProductionAccessEndJourneyController @Inject()(
-    override val controllerComponents: MessagesControllerComponents,
-    sessionRepository: AccessRequestSessionRepository,
-    identify: IdentifierAction,
-    getData: AccessRequestDataRetrievalAction,
-    requireData: DataRequiredAction,
-    requestProductionAccessSuccessView: RequestProductionAccessSuccessView,
-    apiHubService: ApiHubService,
-    applicationApiBuilder: ApplicationApiBuilder,
-    errorResultBuilder: ErrorResultBuilder)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+  override val controllerComponents: MessagesControllerComponents,
+  sessionRepository: AccessRequestSessionRepository,
+  identify: IdentifierAction,
+  getData: AccessRequestDataRetrievalAction,
+  requireData: DataRequiredAction,
+  requestProductionAccessSuccessView: RequestProductionAccessSuccessView,
+  apiHubService: ApiHubService,
+  applicationApiBuilder: ApplicationApiBuilder,
+  errorResultBuilder: ErrorResultBuilder
+)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def submitRequest(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       validate(request).fold(
         call => Future.successful(Redirect(call)),
         validated =>
-          buildAccessRequest(validated._1, validated._2, validated._3)(request).flatMap {
-            case Right(accessRequest) =>
+          buildAccessRequest(validated._1, validated._2, validated._3)(request).flatMap(
+            accessRequest =>
               apiHubService.requestProductionAccess(accessRequest)
                 .flatMap(_ => sessionRepository.clear(request.user.userId))
                 .flatMap(_ => Future.successful(Ok(requestProductionAccessSuccessView(validated._1, Some(request.user), accessRequest.apis))))
                 .recoverWith {
                   case e: UpstreamErrorResponse if e.statusCode == BAD_GATEWAY => Future.successful(badGateway(e))
                 }
-            case Left(result) =>
-              Future.successful(result)
-          })
+          )
+      )
   }
 
   private def validate(implicit request: DataRequest[AnyContent]): Either[Call, (Application, String, String)] = {
@@ -71,7 +71,6 @@ class RequestProductionAccessEndJourneyController @Inject()(
       _ <- validateConditions(request.userAnswers)
       supportingInformation <- validateSupportingInformation(request.userAnswers)
     } yield (application, supportingInformation, request.user.email)
-
   }
 
   private def validateApplication(userAnswers: UserAnswers): Either[Call, Application] = {
@@ -95,9 +94,9 @@ class RequestProductionAccessEndJourneyController @Inject()(
     }
   }
 
-  private def buildAccessRequest(application: Application, supportingInformation: String, requestedBy: String)(implicit request: DataRequest[AnyContent]): Future[Either[Result, AccessRequestRequest]] = {
-    applicationApiBuilder.build(application).map {
-      case Right(applicationApis) =>
+  private def buildAccessRequest(application: Application, supportingInformation: String, requestedBy: String)(implicit request: DataRequest[AnyContent]): Future[AccessRequestRequest] = {
+    applicationApiBuilder.build(application).map(
+      applicationApis =>
         val accessRequestApis = applicationApis.filter(_.endpoints.exists(_.primaryAccess == Inaccessible)).map(applicationApi => {
           val accessRequestEndpoints = applicationApi.endpoints.filter(_.primaryAccess == Inaccessible).map(endpoint => AccessRequestEndpoint(endpoint.httpMethod, endpoint.path, endpoint.scopes))
           AccessRequestApi(
@@ -106,12 +105,12 @@ class RequestProductionAccessEndJourneyController @Inject()(
             accessRequestEndpoints
           )
         })
-        Right(AccessRequestRequest(application.id, supportingInformation, requestedBy, accessRequestApis))
-      case Left(result) => Left(result)
-    }
+        AccessRequestRequest(application.id, supportingInformation, requestedBy, accessRequestApis)
+    )
   }
 
   private def badGateway(t: Throwable)(implicit request: Request[?]): Result = {
     errorResultBuilder.internalServerError(Messages("addAnApiComplete.failed"), t)
   }
+
 }
