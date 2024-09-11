@@ -233,7 +233,7 @@ class MarkdownUtilsSpec extends AnyFreeSpec with Matchers {
       "tables" - {
         val tableHtml =
           """
-            |<table class="govuk-table">
+            |<table class="govuk-table scrollable">
             |<thead class="govuk-table__head">
             |<tr class="govuk-table__row">
             |<th class="govuk-table__header">foo</th>

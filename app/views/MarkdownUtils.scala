@@ -62,7 +62,7 @@ object MarkdownUtils {
           case _: BulletList => attributes.put("class", "govuk-list govuk-list--bullet")
           case _: OrderedList => attributes.put("class", "govuk-list govuk-list--number")
           case _: Paragraph => attributes.put("class", "govuk-body")
-          case _: TableBlock => attributes.put("class", "govuk-table")
+          case _: TableBlock => attributes.put("class", "govuk-table scrollable")
           case _: TableHead => attributes.put("class", "govuk-table__head")
           case _: TableBody => attributes.put("class", "govuk-table__body")
           case cell: TableCell if cell.isHeader => attributes.put("class", "govuk-table__header")
