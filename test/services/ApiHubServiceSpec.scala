@@ -705,8 +705,38 @@ class ApiHubServiceSpec
     }
   }
 
+  "updateApplicationTeam" - {
+    "must make the correct update request to the applications connector and return successfully" in {
+      val fixture = buildFixture()
+      val teamId = "test-team-id"
+      val applicationId = "test-app-id"
+
+      when(fixture.applicationsConnector.updateApplicationTeam(eqTo(applicationId), eqTo(teamId))(any())).thenReturn(Future.successful(Some(())))
+
+      fixture.service.updateApplicationTeam(applicationId, teamId)(HeaderCarrier()).map {
+        result =>
+          verify(fixture.applicationsConnector).updateApplicationTeam(eqTo(applicationId), eqTo(teamId))(any())
+          result mustBe Some(())
+      }
+    }
+
+    "must make the correct delete request to the applications connector and return successfully" in {
+      val fixture = buildFixture()
+      val teamId = "unassigned"
+      val applicationId = "test-app-id"
+
+      when(fixture.applicationsConnector.removeApplicationTeam(eqTo(applicationId))(any())).thenReturn(Future.successful(Some(())))
+
+      fixture.service.updateApplicationTeam(applicationId, teamId)(HeaderCarrier()).map {
+        result =>
+          verify(fixture.applicationsConnector).removeApplicationTeam(eqTo(applicationId))(any())
+          result mustBe Some(())
+      }
+    }
+  }
+
   "updateApiTeam" - {
-    "must make the correct request to the integration catalogue connector and return successfully" in {
+    "must make the correct update request to the applications connector and return successfully" in {
       val fixture = buildFixture()
       val teamId = "test-team-id"
       val apiId = "test-api-id"
@@ -719,8 +749,22 @@ class ApiHubServiceSpec
           result mustBe Some(())
       }
     }
-  }
 
+    "must make the correct delete request to the applications connector and return successfully" in {
+      val fixture = buildFixture()
+      val teamId = "unassigned"
+      val apiId = "test-api-id"
+
+      when(fixture.applicationsConnector.removeApiTeam(eqTo(apiId))(any())).thenReturn(Future.successful(Some(())))
+
+      fixture.service.updateApiTeam(apiId, teamId)(HeaderCarrier()).map {
+        result =>
+          verify(fixture.applicationsConnector).removeApiTeam(eqTo(apiId))(any())
+          result mustBe Some(())
+      }
+    }
+  }
+  
   "getPlatformContact" - {
 
     "must make the correct request to the integration catalogue connector and return successfully" in {

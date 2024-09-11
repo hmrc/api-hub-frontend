@@ -180,11 +180,15 @@ class ApiHubService @Inject()(
   }
 
   def updateApiTeam(apiId: String, teamId: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
-    applicationsConnector.updateApiTeam(apiId, teamId)
+    teamId match
+      case "unassigned" => applicationsConnector.removeApiTeam(apiId)
+      case _ => applicationsConnector.updateApiTeam(apiId, teamId)
   }
 
-  def changeOwningTeam(applicationId: String, teamId: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
-    applicationsConnector.changeOwningTeam(applicationId, teamId)
+  def updateApplicationTeam(applicationId: String, teamId: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    teamId match
+      case "unassigned" => applicationsConnector.removeApplicationTeam(applicationId)
+      case _ => applicationsConnector.updateApplicationTeam(applicationId, teamId)
   }
 
   def getPlatformContact(forPlatform: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[PlatformContact]] = {

@@ -141,7 +141,7 @@ class UpdateApplicationTeamControllerSpec
                 val fixture = buildFixture(user)
                 when(fixture.applicationAuthActionProvider.apply(any, eqTo(false), eqTo(true))(any)).thenReturn(successfulApplicationAuthAction(FakeApplication))
                 when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(allTeams))
-                when(fixture.apiHubService.changeOwningTeam(any, any)(any)).thenReturn(Future.successful(Some(())))
+                when(fixture.apiHubService.updateApplicationTeam(any, any)(any)).thenReturn(Future.successful(Some(())))
 
                 running(fixture.playApplication) {
                     val request = FakeRequest(controllers.application.routes.UpdateApplicationTeamController.onSubmit(FakeApplication.id))
@@ -153,7 +153,7 @@ class UpdateApplicationTeamControllerSpec
                     contentAsString(result) mustBe view(FakeApplication, user)(request, messages(fixture.playApplication)).toString()
                     contentAsString(result) must validateAsHtml
 
-                    verify(fixture.apiHubService).changeOwningTeam(eqTo(FakeApplication.id), eqTo(teamId))(any)
+                    verify(fixture.apiHubService).updateApplicationTeam(eqTo(FakeApplication.id), eqTo(teamId))(any)
                 }
             }
         }
@@ -163,7 +163,7 @@ class UpdateApplicationTeamControllerSpec
                 val fixture = buildFixture(user)
                 when(fixture.applicationAuthActionProvider.apply(any, eqTo(false), eqTo(true))(any)).thenReturn(successfulApplicationAuthAction(FakeApplication))
                 when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(allTeams))
-                when(fixture.apiHubService.changeOwningTeam(any, any)(any)).thenReturn(Future.successful(Some(())))
+                when(fixture.apiHubService.updateApplicationTeam(any, any)(any)).thenReturn(Future.successful(Some(())))
 
                 running(fixture.playApplication) {
                     val request = FakeRequest(controllers.application.routes.UpdateApplicationTeamController.onSubmit(FakeApplication.id))
@@ -175,7 +175,7 @@ class UpdateApplicationTeamControllerSpec
                     contentAsString(result) mustBe view(form.bind(Map("owningTeam" -> "")), FakeApplication, None, allTeams, user)(request, messages(fixture.playApplication)).toString()
                     contentAsString(result) must validateAsHtml
 
-                    verify(fixture.apiHubService, never).changeOwningTeam(eqTo(FakeApplication.id), any)(any)
+                    verify(fixture.apiHubService, never).updateApplicationTeam(eqTo(FakeApplication.id), any)(any)
                 }
             }
         }
@@ -186,7 +186,7 @@ class UpdateApplicationTeamControllerSpec
 
                 when(fixture.applicationAuthActionProvider.apply(any, eqTo(false), eqTo(true))(any)).thenReturn(successfulApplicationAuthAction(FakeApplication))
                 when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(allTeams))
-                when(fixture.apiHubService.changeOwningTeam(any, any)(any)).thenReturn(Future.successful(None))
+                when(fixture.apiHubService.updateApplicationTeam(any, any)(any)).thenReturn(Future.successful(None))
 
                 running(fixture.playApplication) {
                     val request = FakeRequest(controllers.application.routes.UpdateApplicationTeamController.onSubmit(FakeApplication.id))
