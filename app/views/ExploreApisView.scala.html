@@ -273,6 +273,23 @@
                 @searchBox(messages("exploreApis.search.title"), Some(messages("exploreApis.search.hint")), "search")
             </form>
 
+            <details class="govuk-details">
+                <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">
+                      @messages("exploreApis.search.howto.hint")
+                    </span>
+                </summary>
+                <div class="govuk-details__text">
+                    <p class="govuk-heading-s">@messages("exploreApis.search.howto.heading1")</p>
+                    <p class="govuk-body ">@Html(messages("exploreApis.search.howto.content1"))</p>
+                    <code class="code--header"><strong class="bold-xsmall">@messages("exploreApis.search.howto.example1")</strong></code>
+
+                    <p class="govuk-heading-s govuk-!-margin-top-4">@messages("exploreApis.search.howto.heading2")</p>
+                    <p class="govuk-body ">@messages("exploreApis.search.howto.content2")</p>
+                    <code class="code--header"><strong class="bold-xsmall">@messages("exploreApis.search.howto.example2")</strong></code>
+                </div>
+            </details>
+
             <div id="apiResults" class="govuk-!-display-none">
                 <div id="searchResultsPanel" class="call-out-panel call-out-panel__small govuk-!-display-none">
                     <p id="resultsSuccess" class="govuk-body information--general-tag govuk-!-margin-bottom-1">
