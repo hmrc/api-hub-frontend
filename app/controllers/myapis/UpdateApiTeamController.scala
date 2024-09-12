@@ -62,8 +62,8 @@ class UpdateApiTeamController @Inject()(
         formWithErrors => {
           showView(BAD_REQUEST, formWithErrors)
         },
-        teamId =>
-          apiHubService.updateApiTeam(apiId, teamId) map   {
+        maybeTeamId =>
+          apiHubService.updateApiTeam(apiId, maybeTeamId) map   {
             case Some(()) => Ok(successView(request.apiDetails, request.identifierRequest.user))
             case None => somethingNotFound()
           }

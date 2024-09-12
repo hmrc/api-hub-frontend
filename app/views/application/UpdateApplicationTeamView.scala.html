@@ -63,6 +63,7 @@
 
                 <select id="owningTeamSelection" name="owningTeam">
                     <option value="">Select an owning team</option>
+                    <option value="unassigned">Unassigned</option>
                     @for(team <- teams){
                       @if(!owningTeam.exists(_.id == team.id)){
                         <option value="@team.id">@team.name</option>

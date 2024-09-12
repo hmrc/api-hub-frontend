@@ -706,7 +706,7 @@ class ApplicationsConnectorSpec
     }
   }
 
-  "ApplicationsConnector.changeOwningTeam" - {
+  "ApplicationsConnector.updateApplicationTeam" - {
     "must place the correct request" in {
       val applicationId = "test-id"
       val teamId = "test-api-id"
@@ -720,7 +720,7 @@ class ApplicationsConnectorSpec
           )
       )
 
-      buildConnector(this).changeOwningTeam(applicationId, teamId)(HeaderCarrier()).map(
+      buildConnector(this).updateApplicationTeam(applicationId, teamId)(HeaderCarrier()).map(
         result =>
           result mustBe Some(())
       )
@@ -731,14 +731,45 @@ class ApplicationsConnectorSpec
       val teamId = "test-api-id"
 
       stubFor(
-        delete(urlEqualTo(s"/api-hub-applications/applications/$applicationId/teams/$teamId"))
+        put(urlEqualTo(s"/api-hub-applications/applications/$applicationId/teams/$teamId"))
           .willReturn(
             aResponse()
               .withStatus(NOT_FOUND)
           )
       )
 
-      buildConnector(this).changeOwningTeam(applicationId, teamId)(HeaderCarrier()).map(
+      buildConnector(this).updateApplicationTeam(applicationId, teamId)(HeaderCarrier()).map(
+        result =>
+          result mustBe None
+      )
+    }
+  }
+
+  "ApplicationsConnector.removeApplicationTeam" - {
+    "must place the correct request" in {
+      val applicationId = "test-id"
+      val teamId = "test-api-id"
+
+      stubFor(
+        delete(urlEqualTo(s"/api-hub-applications/applications/$applicationId/teams"))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withStatus(NO_CONTENT)
+          )
+      )
+
+      buildConnector(this).removeApplicationTeam(applicationId)(HeaderCarrier()).map(
+        result =>
+          result mustBe Some(())
+      )
+    }
+
+    "must return none when the application cannot be found" in {
+      val applicationId = "test-id"
+      val teamId = "test-api-id"
+
+      buildConnector(this).removeApplicationTeam(applicationId)(HeaderCarrier()).map(
         result =>
           result mustBe None
       )
@@ -1469,6 +1500,56 @@ class ApplicationsConnectorSpec
 
       recoverToSucceededIf[UpstreamErrorResponse] {
         buildConnector(this).updateApiTeam(apiDetails.id, teamId)(HeaderCarrier())
+      }
+    }
+  }
+
+  "removeApiTeam" - {
+    val teamId = "team1"
+    val apiDetails = sampleApiDetail()
+
+    "must place the correct request and return an ApiDetail" in {
+      stubFor(
+        delete(urlEqualTo(s"/api-hub-applications/apis/${apiDetails.id}/teams"))
+          .withHeader("Authorization", equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withStatus(NO_CONTENT)
+          )
+      )
+
+      buildConnector(this).removeApiTeam(apiDetails.id)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe Some(())
+      }
+    }
+
+    "must handle 404 response from Applications" in {
+      stubFor(
+        delete(urlEqualTo(s"/api-hub-applications/apis/${apiDetails.id}/teams"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+          )
+      )
+
+      buildConnector(this).removeApiTeam(apiDetails.id)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe None
+      }
+    }
+
+    "must fail with an exception when applications returns a failure response" in {
+      stubFor(
+        delete(urlEqualTo(s"/api-hub-applications/apis/${apiDetails.id}/teams"))
+          .willReturn(
+            aResponse()
+              .withStatus(INTERNAL_SERVER_ERROR)
+          )
+      )
+
+      recoverToSucceededIf[UpstreamErrorResponse] {
+        buildConnector(this).removeApiTeam(apiDetails.id)(HeaderCarrier())
       }
     }
   }

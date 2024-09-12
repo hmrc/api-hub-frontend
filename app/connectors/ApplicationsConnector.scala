@@ -142,9 +142,21 @@ class ApplicationsConnector @Inject()(
       }
   }
 
-  def changeOwningTeam(applicationId: String, teamId: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+  def updateApplicationTeam(applicationId: String, teamId: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
     httpClient
       .put(url"$applicationsBaseUrl/api-hub-applications/applications/$applicationId/teams/$teamId")
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Either[UpstreamErrorResponse, Unit]]
+      .flatMap {
+        case Right(_) => Future.successful(Some(()))
+        case Left(e) if e.statusCode == 404 => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
+  }
+
+  def removeApplicationTeam(applicationId: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    httpClient
+      .delete(url"$applicationsBaseUrl/api-hub-applications/applications/$applicationId/teams")
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Either[UpstreamErrorResponse, Unit]]
       .flatMap {
@@ -490,6 +502,18 @@ class ApplicationsConnector @Inject()(
 
   def updateApiTeam(apiId: String, teamId: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
     httpClient.put(url"$applicationsBaseUrl/api-hub-applications/apis/$apiId/teams/$teamId")
+      .setHeader((ACCEPT, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Either[UpstreamErrorResponse, Unit]]
+      .flatMap {
+        case Right(_) => Future.successful(Some(()))
+        case Left(e) if e.statusCode == NOT_FOUND => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
+  }
+
+  def removeApiTeam(apiId: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    httpClient.delete(url"$applicationsBaseUrl/api-hub-applications/apis/$apiId/teams")
       .setHeader((ACCEPT, JSON))
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Either[UpstreamErrorResponse, Unit]]
