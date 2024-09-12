@@ -153,7 +153,7 @@ class UpdateApplicationTeamControllerSpec
                     contentAsString(result) mustBe view(FakeApplication, user)(request, messages(fixture.playApplication)).toString()
                     contentAsString(result) must validateAsHtml
 
-                    verify(fixture.apiHubService).updateApplicationTeam(eqTo(FakeApplication.id), eqTo(teamId))(any)
+                    verify(fixture.apiHubService).updateApplicationTeam(eqTo(FakeApplication.id), eqTo(Some(teamId)))(any)
                 }
             }
         }

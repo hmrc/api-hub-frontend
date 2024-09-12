@@ -179,16 +179,16 @@ class ApiHubService @Inject()(
     applicationsConnector.getUserContactDetails()
   }
 
-  def updateApiTeam(apiId: String, teamId: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
-    teamId match
-      case "unassigned" => applicationsConnector.removeApiTeam(apiId)
-      case _ => applicationsConnector.updateApiTeam(apiId, teamId)
+  def updateApiTeam(apiId: String, maybeTeamId: Option[String])(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    maybeTeamId match
+      case Some(teamId) => applicationsConnector.updateApiTeam(apiId, teamId)
+      case None => applicationsConnector.removeApiTeam(apiId)
   }
 
-  def updateApplicationTeam(applicationId: String, teamId: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
-    teamId match
-      case "unassigned" => applicationsConnector.removeApplicationTeam(applicationId)
-      case _ => applicationsConnector.updateApplicationTeam(applicationId, teamId)
+  def updateApplicationTeam(applicationId: String, maybeTeamId: Option[String])(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    maybeTeamId match
+      case Some(team) => applicationsConnector.updateApplicationTeam(applicationId, team)
+      case None => applicationsConnector.removeApplicationTeam(applicationId)
   }
 
   def getPlatformContact(forPlatform: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[PlatformContact]] = {

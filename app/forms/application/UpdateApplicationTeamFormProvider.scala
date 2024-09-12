@@ -23,8 +23,22 @@ import javax.inject.Inject
 
 class UpdateApplicationTeamFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[String] =
+  def apply(): Form[Option[String]] =
     Form(
       "owningTeam" -> text("application.update.team.error.required")
+        .transform(mapToTeamId, mapToInput)
     )
+
+  private def mapToTeamId(input: String): Option[String] = {
+    if (input.trim.toLowerCase.equals("unassigned")) {
+      None
+    }
+    else {
+      Some(input)
+    }
+  }
+
+  private def mapToInput(maybeTeamId: Option[String]): String = {
+    maybeTeamId.getOrElse("unassigned")
+  }
 }
