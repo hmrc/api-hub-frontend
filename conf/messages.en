@@ -331,6 +331,13 @@ exploreApis.search.title = Search for an API
 exploreApis.search.hint = The search will include API name, description, ref, ID. Click the Search icon to search. Deprecated APIs will be included in your search results.
 exploreApis.search.clear = Clear search
 exploreApis.search.error = An error occurred when performing your search
+exploreApis.search.howto.hint = Find out how to use advanced searching methods
+exploreApis.search.howto.heading1 = Search for an Exact Phrase
+exploreApis.search.howto.content1 = You can search for exact phrases within an API by wrapping them in double-quotes. If the search includes a phrase and individual terms, the search will only match results that include the phrase.<br><br>For example:
+exploreApis.search.howto.example1 = "personal tax"
+exploreApis.search.howto.heading2 = Exclude a Term
+exploreApis.search.howto.content2 = To exclude a word from your search results, you can prepend a "-" character. For example, to find all APIs containing "personal" but not "tax", use the following:
+exploreApis.search.howto.example2 = personal -tax
 
 support.link.text = Get Support
 support.title = Get Support
