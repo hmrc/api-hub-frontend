@@ -27,7 +27,7 @@
     applicationDetailsTable: ApplicationDetailsTable
 )
 
-@(application: Application, maybeApplicationApis: Seq[ApplicationApi], user: Option[UserModel])(implicit request: Request[?], messages: Messages)
+@(application: Application, applicationApis: Seq[ApplicationApi], user: Option[UserModel])(implicit request: Request[?], messages: Messages)
 
 @exploreApisLink(messageId: String) = {
     <a id="addExploreApisLink" href="@{routes.ExploreApisController.onPageLoad().url}" class="govuk-link govuk-link--no-visited-state">
@@ -94,22 +94,22 @@
             <div class="govuk-grid-row govuk-!-margin-bottom-0">
                 <div class="govuk-grid-column-one-half">
                     <h2 class="govuk-heading-m govuk-!-margin-bottom-4 govuk-!-margin-top-2">
-                        @if(maybeApplicationApis.isEmpty) {
+                        @if(applicationApis.isEmpty) {
                             @messages("applicationDetails.apis.heading.noApis")
                         } else {
-                            @messages("applicationDetails.apis.heading", maybeApplicationApis.size)
+                            @messages("applicationDetails.apis.heading", applicationApis.size)
                         }
                     </h2>
                 </div>
             </div>
 
 
-            @if(maybeApplicationApis.isEmpty) {
+            @if(applicationApis.isEmpty) {
                 <p id="noApisMessage" class="govuk-body">
                     @Html(messages("applicationDetails.apis.noApis", exploreApisLink("applicationDetails.apis.exploreApis")))
                 </p>
             } else {
-                @if(maybeApplicationApis.exists(_.isMissing)) {
+                @if(applicationApis.exists(_.isMissing)) {
                     <div class="call-out-panel call-out-panel__small govuk-!-margin-top-2">
                         <p class="govuk-body information-tag">
                             <i class="fa-solid fa-circle-exclamation"></i>
@@ -123,7 +123,7 @@
                         </p>
 
                         <ul class="govuk-list govuk-list--bullet">
-                            @for(apiApplication <- maybeApplicationApis.filter(_.isMissing)) {
+                            @for(apiApplication <- applicationApis.filter(_.isMissing)) {
                                 <li>
                                     @apiApplication.apiTitle
                                 </li>
@@ -136,7 +136,7 @@
                     </div>
                 }
 
-                @if(maybeApplicationApis.exists(_.hasPendingAccessRequest)) {
+                @if(applicationApis.exists(_.hasPendingAccessRequest)) {
                     <div class="call-out-panel call-out-panel__small govuk-!-margin-top-2">
                         <p class="govuk-body information-tag">
                             <i class="fa-solid fa-circle-exclamation warning-colour"></i>
@@ -150,7 +150,7 @@
                     </div>
                 }
 
-                @if(maybeApplicationApis.exists(_.needsProductionAccessRequest)) {
+                @if(applicationApis.exists(_.needsProductionAccessRequest)) {
                     <div class="call-out-panel call-out-panel__small govuk-!-margin-top-2">
                         <p class="govuk-body information-tag">
                             <i class="fa-solid fa-circle-exclamation"></i>
@@ -174,7 +174,7 @@
                                 HeadCell(messages("applicationDetails.apis.prodEnv"))
                             )
                         ),
-                        rows = maybeApplicationApis.map(
+                        rows = applicationApis.map(
                             applicationApi=>
                                 Seq(
                                     TableRow(content = HtmlContent(apiName(applicationApi)), attributes = Map("data-api-id" -> applicationApi.apiId)),

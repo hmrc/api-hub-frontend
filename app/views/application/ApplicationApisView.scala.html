@@ -95,15 +95,14 @@
             </div>
             <div class="govuk-grid-column-one-half govuk-!-text-align-right">
                 @if(applicationApis.exists(_.needsProductionAccessRequest)) {
-                @govukButton(
-                Button(
-                href =
-                Some(controllers.application.routes.RequestProductionAccessStartController.onPageLoad(application.id).url),
-                content = Text(messages("applicationApis.requestProductionAccess")),
-                id = Some("requestProductionAccessButton"),
-                classes = "govuk-!-margin-bottom-2"
-                )
-                )
+                    @govukButton(
+                        Button(
+                            href = Some(controllers.application.routes.RequestProductionAccessStartController.onPageLoad(application.id).url),
+                            content = Text(messages("applicationApis.requestProductionAccess")),
+                            id = Some("requestProductionAccessButton"),
+                            classes = "govuk-!-margin-bottom-2"
+                        )
+                    )
                 }
             </div>
         }
@@ -135,63 +134,84 @@
 
                 <div class="hip-app-apis">
                 @for(applicationApi <- applicationApis) {
-                    <details class="hip-details hip-expander">
-                        <summary class="hip-details__summary">
-                            <span class="hip-details__summary-text govuk-heading-s govuk-!-margin-bottom-0">
-                            @applicationApi.apiTitle
-                            </span>
-                            <span class="hip-details__summary-info govuk-body-s">
-                            @Html(messages("applicationApis.apis.endpointsAdded",
-                                <span class="govuk-!-font-weight-bold">{applicationApi.selectedEndpoints}</span>,
-                                <span class="govuk-!-font-weight-bold">{applicationApi.totalEndpoints}</span>
-                            ))
-                            </span>
-                        </summary>
+                    @if(applicationApi.isMissing) {
+                        <details class="hip-details hip-expander">
+                            <summary class="hip-details__summary">
+                                <span class="hip-details__summary-text govuk-heading-s govuk-!-margin-bottom-0">
+                                    @applicationApi.apiTitle
+                                </span>
+                            </summary>
 
-                        <div class="hip-details__text">
-                            @govukTable(
-                                Table(
-                                    caption = None,
-                                    head = Some(
-                                        Seq(
-                                            HeadCell(messages("applicationApis.apis.headings.endpoint")),
-                                            HeadCell(messages("applicationApis.apis.headings.test")),
-                                            HeadCell(messages("applicationApis.apis.headings.prod"))
-                                        )
-                                    ),
-                                    rows = applicationApi.endpoints.map(
-                                        endpoint =>
-                                            Seq(
-                                                TableRow(content = HtmlContent(endpointNameAndScopes(endpoint))),
-                                                TableRow(content = HtmlContent(endpointAccess(endpoint.secondaryAccess))),
-                                                TableRow(content = HtmlContent(endpointAccess(endpoint.primaryAccess)))
-                                            )
-                                    ),
-                                    firstCellIsHeader = true
-                                )
-                            )
-
-                            <div class="govuk-button-group">
-                                @if(!applicationApi.hasPendingAccessRequest) {
-                                    @govukButton(
-                                        Button(
-                                            href = Some(routes.AddAnApiStartController.addEndpoints(application.id, applicationApi.apiId).url),
-                                            content = Text(messages("applicationApis.addEndpoints")),
-                                            classes = "govuk-button--secondary"
-                                        )
-                                        .withAttribute("data-add-endpoints-api-id", applicationApi.apiId)
-                                    )
-                                }
-                                <a class="govuk-link govuk-link--no-visited-state" href="@routes.ApiDetailsController.onPageLoad(applicationApi.apiId)" data-api-specification-api-id="@applicationApi.apiId">
-                                    @messages("applicationApis.apis.viewSpecification")
-                                </a>
-                                <a class="govuk-link govuk-link--no-visited-state" href="@controllers.application.routes.RemoveApiController.onPageLoad(application.id, applicationApi.apiId)" data-remove-api-api-id="@applicationApi.apiId">
-                                    @messages("applicationApis.removeApi")
-                                </a>
+                            <div class="hip-details__text">
+                                <p class="govuk-body">
+                                    @messages("applicationApis.apiMissing")
+                                </p>
+                                <p class="govuk-body">
+                                    <a class="govuk-link govuk-link--no-visited-state" href="@controllers.application.routes.RemoveApiController.onPageLoad(application.id, applicationApi.apiId)" data-remove-api-api-id="@applicationApi.apiId">
+                                        @messages("applicationApis.removeApi")
+                                    </a>
+                                </p>
                             </div>
-                        </div>
+                        </details>
+                    } else {
+                        <details class="hip-details hip-expander">
+                            <summary class="hip-details__summary">
+                                <span class="hip-details__summary-text govuk-heading-s govuk-!-margin-bottom-0">
+                                    @applicationApi.apiTitle
+                                </span>
+                                <span class="hip-details__summary-info govuk-body-s">
+                                @Html(messages("applicationApis.apis.endpointsAdded",
+                                    <span class="govuk-!-font-weight-bold">{applicationApi.selectedEndpoints}</span>,
+                                    <span class="govuk-!-font-weight-bold">{applicationApi.totalEndpoints}</span>
+                                ))
+                                </span>
+                            </summary>
 
-                    </details>
+                            <div class="hip-details__text">
+                                @govukTable(
+                                    Table(
+                                        caption = None,
+                                        head = Some(
+                                            Seq(
+                                                HeadCell(messages("applicationApis.apis.headings.endpoint")),
+                                                HeadCell(messages("applicationApis.apis.headings.test")),
+                                                HeadCell(messages("applicationApis.apis.headings.prod"))
+                                            )
+                                        ),
+                                        rows = applicationApi.endpoints.map(
+                                            endpoint =>
+                                                Seq(
+                                                    TableRow(content = HtmlContent(endpointNameAndScopes(endpoint))),
+                                                    TableRow(content = HtmlContent(endpointAccess(endpoint.secondaryAccess))),
+                                                    TableRow(content = HtmlContent(endpointAccess(endpoint.primaryAccess)))
+                                                )
+                                        ),
+                                        firstCellIsHeader = true
+                                    )
+                                )
+
+                                <div class="govuk-button-group">
+                                    @if(!applicationApi.hasPendingAccessRequest) {
+                                        @govukButton(
+                                            Button(
+                                                href = Some(routes.AddAnApiStartController.addEndpoints(application.id, applicationApi.apiId).url),
+                                                content = Text(messages("applicationApis.addEndpoints")),
+                                                classes = "govuk-button--secondary"
+                                            )
+                                            .withAttribute("data-add-endpoints-api-id", applicationApi.apiId)
+                                        )
+                                    }
+                                    <a class="govuk-link govuk-link--no-visited-state" href="@routes.ApiDetailsController.onPageLoad(applicationApi.apiId)" data-api-specification-api-id="@applicationApi.apiId">
+                                        @messages("applicationApis.apis.viewSpecification")
+                                    </a>
+                                    <a class="govuk-link govuk-link--no-visited-state" href="@controllers.application.routes.RemoveApiController.onPageLoad(application.id, applicationApi.apiId)" data-remove-api-api-id="@applicationApi.apiId">
+                                        @messages("applicationApis.removeApi")
+                                    </a>
+                                </div>
+                            </div>
+
+                        </details>
+                    }
                 }
                 </div>
             }

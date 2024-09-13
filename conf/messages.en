@@ -177,6 +177,7 @@ applicationApis.requestProductionAccess = Request production access
 applicationApis.pending.heading = Production request for APIs is pending approval
 applicationApis.pending.message = When a decision is made for your production request for APIs you will be notified via email.
 applicationApis.addEndpoints = Manage endpoints
+applicationApis.apiMissing = This API is no longer available, it is recommended you remove this API from your application.
 applicationApis.removeApi = Remove from application
 
 environmentAndCredentials.title = Environments and Credentials
