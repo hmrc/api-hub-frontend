@@ -135,7 +135,11 @@ applicationDetails.apis.heading = Application APIs ({0})
 applicationDetails.apis.exploreApis = add APIs
 applicationDetails.apis.noApis = You have no APIs added, {0} to your application.
 applicationDetails.apis.endpointsAvailable = {0} of {1} endpoints available
-applicationDetails.apis.error = One of the APIs associated with this application no longer exists
+
+applicationDetails.apis.missing.heading = An API used by this application no longer exists
+applicationDetails.apis.missing.unavailable = The following API is no longer available:
+applicationDetails.apis.missing.remove = To remove this API from your application please visit the {0}.
+
 applicationDetails.apis.problem = Application APIs are not available.
 applicationDetails.apis.tryAgain = Please try again later.
 applicationDetails.apis.manageOrAddMore = Manage your {0} or {1} to your application.

@@ -41,7 +41,7 @@ class ApplicationDetailsController @Inject()(
         applicationApis =>
           Ok(view(
             request.application.withSortedTeam(),
-            Some(applicationApis),
+            applicationApis,
             Some(request.identifierRequest.user)
           ))
       )
