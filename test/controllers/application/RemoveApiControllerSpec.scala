@@ -20,17 +20,17 @@ import base.SpecBase
 import controllers.actions.{FakeApiDetail, FakeApplication, FakeApprover, FakeUser}
 import forms.YesNoFormProvider
 import models.api.ApiDetail
+import models.application.ApplicationLenses.*
 import models.application.{Api, Application}
-import models.application.ApplicationLenses._
 import models.user.UserModel
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
-import org.mockito.Mockito.{verify, when}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.Application as PlayApplication
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import play.api.{Application => PlayApplication}
+import play.api.test.Helpers.*
 import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
 import views.html.ErrorTemplate
@@ -40,7 +40,7 @@ import scala.concurrent.Future
 
 class RemoveApiControllerSpec extends SpecBase with MockitoSugar with HtmlValidation with TestHelpers {
 
-  import RemoveApiControllerSpec._
+  import RemoveApiControllerSpec.*
 
   "onPageLoad" - {
     "must display the correct confirmation view for a given application and API for a team member or supporter" in {
@@ -60,9 +60,29 @@ class RemoveApiControllerSpec extends SpecBase with MockitoSugar with HtmlValida
             val view = fixture.playApplication.injector.instanceOf[RemoveApiConfirmationView]
 
             status(result) mustBe OK
-            contentAsString(result) mustBe view(application, apiDetail, form, user)(request, messages(fixture.playApplication)).toString()
+            contentAsString(result) mustBe view(application, apiDetail.id, apiDetail.title,  form, user)(request, messages(fixture.playApplication)).toString()
             contentAsString(result) must validateAsHtml
           }
+      }
+    }
+
+    "must display the correct confirmation view when the API does not exist but has been added to the application" in {
+      val fixture = buildFixture(FakeUser)
+
+      when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false), eqTo(false))(any))
+        .thenReturn(Future.successful(Some(application)))
+
+      when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any))
+        .thenReturn(Future.successful(None))
+
+      running(fixture.playApplication) {
+        val request = FakeRequest(controllers.application.routes.RemoveApiController.onPageLoad(application.id, apiDetail.id))
+        val result = route(fixture.playApplication, request).value
+        val view = fixture.playApplication.injector.instanceOf[RemoveApiConfirmationView]
+
+        status(result) mustBe OK
+        contentAsString(result) mustBe view(application, api.id, api.title, form, FakeUser)(request, messages(fixture.playApplication)).toString()
+        contentAsString(result) must validateAsHtml
       }
     }
 
@@ -108,17 +128,17 @@ class RemoveApiControllerSpec extends SpecBase with MockitoSugar with HtmlValida
       }
     }
 
-    "must return a 404 Not Found with suitable message when the API does not exist" in {
+    "must return a 404 Not Found with suitable message when the API does not exist and has not been added" in {
       val fixture = buildFixture(FakeUser)
 
-      when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false), eqTo(false))(any))
-        .thenReturn(Future.successful(Some(application)))
+      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false), eqTo(false))(any))
+        .thenReturn(Future.successful(Some(FakeApplication)))
 
       when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any))
         .thenReturn(Future.successful(None))
 
       running(fixture.playApplication) {
-        val request = FakeRequest(controllers.application.routes.RemoveApiController.onPageLoad(application.id, apiDetail.id))
+        val request = FakeRequest(controllers.application.routes.RemoveApiController.onPageLoad(FakeApplication.id, apiDetail.id))
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[ErrorTemplate]
 
@@ -181,7 +201,7 @@ class RemoveApiControllerSpec extends SpecBase with MockitoSugar with HtmlValida
         val formWithErrors = form.bind(Map("value" -> ""))
 
         status(result) mustBe BAD_REQUEST
-        contentAsString(result) mustBe view(application, apiDetail, formWithErrors, FakeUser)(request, messages(fixture.playApplication)).toString()
+        contentAsString(result) mustBe view(application, apiDetail.id, apiDetail.title, formWithErrors, FakeUser)(request, messages(fixture.playApplication)).toString()
         contentAsString(result) must validateAsHtml
       }
     }
@@ -269,7 +289,8 @@ object RemoveApiControllerSpec {
 
   val form: Form[?] = new YesNoFormProvider()("removeApiConfirmation.error")
   val apiDetail: ApiDetail = FakeApiDetail
-  val application: Application = FakeApplication.addApi(Api(apiDetail.id, apiDetail.title, Seq.empty))
+  val api: Api = Api(apiDetail.id, apiDetail.title, Seq.empty)
+  val application: Application = FakeApplication.addApi(api)
   val applicationWithoutApis: Application = FakeApplication
 
 }
