@@ -85,14 +85,15 @@ class AddAnApiSelectApplicationController @Inject()(
       case Some(apiDetail) =>
         apiHubService.getApplications(Some(request.user.email), false).map {
           applications =>
+            val sortedApplications = applications.sortBy(_.name.toLowerCase)
             status(
               view(
                 form,
                 mode,
                 Some(request.user),
                 apiDetail,
-                applicationsWithAccess(apiDetail, applications),
-                applicationsWithoutAccess(apiDetail, applications)
+                applicationsWithAccess(apiDetail, sortedApplications),
+                applicationsWithoutAccess(apiDetail, sortedApplications)
               )
             )
         }
