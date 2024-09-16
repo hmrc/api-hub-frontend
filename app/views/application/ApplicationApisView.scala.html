@@ -135,7 +135,7 @@
                 <div class="hip-app-apis">
                 @for(applicationApi <- applicationApis) {
                     @if(applicationApi.isMissing) {
-                        <details class="hip-details hip-expander">
+                        <details class="hip-details hip-expander hip-expander__error">
                             <summary class="hip-details__summary">
                                 <span class="hip-details__summary-text govuk-heading-s govuk-!-margin-bottom-0">
                                     @applicationApi.apiTitle

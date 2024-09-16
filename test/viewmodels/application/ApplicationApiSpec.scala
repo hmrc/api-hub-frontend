@@ -19,7 +19,7 @@ package viewmodels.application
 import controllers.actions.FakeApplication
 import models.api.{ApiDetail, Endpoint, EndpointMethod, Live, Maintainer}
 import models.application.ApplicationLenses.ApplicationLensOps
-import models.application.{Primary, Scope, Secondary}
+import models.application.{Api, Primary, Scope, Secondary, SelectedEndpoint}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
@@ -80,9 +80,27 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
     }
   }
 
+  "ApplicationEndpoint" - {
+    "must construct the correct endpoint for a missing API" in {
+      val selectedEndpoint = SelectedEndpoint(httpMethod = "test-method", path = "test-path")
+      val actual = ApplicationEndpoint.forMissingApi(selectedEndpoint)
+      val expected = ApplicationEndpoint(
+        httpMethod = selectedEndpoint.httpMethod,
+        path = selectedEndpoint.path,
+        summary = None,
+        description = None,
+        scopes = Seq.empty,
+        primaryAccess = Unknown,
+        secondaryAccess = Unknown
+      )
+
+      actual mustBe expected
+    }
+  }
+
   "ApplicationApi" - {
     "must produce the correct summary values" in {
-      forAll {(hasPendingAccessRequest: Boolean) =>
+      forAll { (hasPendingAccessRequest: Boolean) =>
         val apiDetail = ApiDetail(
           id = "test-id",
           publisherReference = "test-pub-ref",
@@ -159,6 +177,30 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
         applicationApi.availableSecondaryEndpoints mustBe 3
         applicationApi.needsProductionAccessRequest mustBe !hasPendingAccessRequest
       }
+    }
+
+    "must construct the correct object for a missing API" in {
+      val api = Api(
+        id = "test-id",
+        title = "test-title",
+        endpoints = Seq(
+          SelectedEndpoint(httpMethod = "test-method-1", path = "test-path-1"),
+          SelectedEndpoint(httpMethod = "test-method-2", path = "test-path-2")
+        )
+      )
+
+      val actual = ApplicationApi(api, true)
+
+      val expected = ApplicationApi(
+        apiId = api.id,
+        apiTitle = api.title,
+        totalEndpoints = 0,
+        endpoints = api.endpoints.map(ApplicationEndpoint.forMissingApi),
+        hasPendingAccessRequest = true,
+        isMissing = true
+      )
+
+      actual mustBe expected
     }
   }
 

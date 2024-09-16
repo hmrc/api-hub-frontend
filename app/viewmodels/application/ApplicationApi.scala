@@ -17,7 +17,7 @@
 package viewmodels.application
 
 import models.api.{ApiDetail, EndpointMethod}
-import models.application.{Api, Application, EnvironmentName, Primary, Secondary}
+import models.application.{Api, Application, EnvironmentName, Primary, Secondary, SelectedEndpoint}
 import models.application.ApplicationLenses.ApplicationLensOps
 
 sealed trait ApplicationEndpointAccess {
@@ -33,6 +33,10 @@ case object Inaccessible extends ApplicationEndpointAccess {
 }
 
 case object Requested extends ApplicationEndpointAccess {
+  override val isAccessible: Boolean = false
+}
+
+case object Unknown extends ApplicationEndpointAccess {
   override val isAccessible: Boolean = false
 }
 
@@ -74,6 +78,22 @@ case class ApplicationEndpoint(
   secondaryAccess: ApplicationEndpointAccess
 )
 
+object ApplicationEndpoint {
+
+  def forMissingApi(selectedEndpoint: SelectedEndpoint): ApplicationEndpoint = {
+    ApplicationEndpoint(
+      httpMethod = selectedEndpoint.httpMethod,
+      path = selectedEndpoint.path,
+      summary = None,
+      description = None,
+      scopes = Seq.empty,
+      primaryAccess = Unknown,
+      secondaryAccess = Unknown
+    )
+  }
+
+}
+
 case class ApplicationApi(
   apiId: String,
   apiTitle: String,
@@ -108,7 +128,7 @@ object ApplicationApi {
       apiId = api.id,
       apiTitle = api.title,
       totalEndpoints = 0,
-      endpoints = Seq.empty,
+      endpoints = api.endpoints.map(ApplicationEndpoint.forMissingApi),
       hasPendingAccessRequest = hasPendingAccessRequest,
       isMissing = true
     )

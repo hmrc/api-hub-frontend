@@ -113,7 +113,9 @@ class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
     "must return a 'missing' ApplicationApi when API detail cannot be found" in {
       val fixture = buildFixture()
 
-      val missingApi = Api("test-missing-id", "test-missing-title", Seq.empty)
+      val endpoint1 = SelectedEndpoint("GET", "/test1")
+      val endpoint2 = SelectedEndpoint("POST", "/test2")
+      val missingApi = Api("test-missing-id", "test-missing-title", Seq(endpoint1, endpoint2))
 
       val application = FakeApplication
         .addApi(missingApi)
