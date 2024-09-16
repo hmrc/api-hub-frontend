@@ -41,8 +41,10 @@
                 @messages("dashboard.heading")
             </h1>
         </div>
+    </div>
+    <div class="govuk-grid-row govuk-!-text-align">
         <div class="govuk-grid-column-full">
-            <div class="call-out-panel dashboard-cards">
+            <div class="call-out-panel dashboard-cards govuk-!-margin-top-0">
             @if(applications.isEmpty) {
                 <div class="hip-flex-container">
                     <h2 class="govuk-heading-m call-out-header">@messages("dashboard.applications.title.none")</h2>
