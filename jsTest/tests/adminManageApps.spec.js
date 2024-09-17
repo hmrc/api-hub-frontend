@@ -24,7 +24,13 @@ describe('adminManageApps', () => {
     function buildAppPanels(count, prefix = '', dataIndex = 0) {
         const content = Array.from(
                 {length: count},
-                (_, i) => `<div class="hip-application" data-index="${i+1+dataIndex}" data-app-name="${prefix}App ${i+1+dataIndex}" data-app-id="${prefix}AppId${i+1+dataIndex}">${prefix}App ${i+1+dataIndex}</div>`
+                (_, i) => `<div class="hip-application" 
+                    data-index="${i+1+dataIndex}" 
+                    data-app-name="${prefix}App ${i+1+dataIndex}" 
+                    data-app-id="${prefix}AppId${i+1+dataIndex}"
+                    data-client-ids="${prefix}ClientId${2*i+dataIndex},${prefix}ClientId${2*i+dataIndex+1}">
+                        ${prefix}App ${i+1+dataIndex}
+                </div>`
             ).join('');
         const htmlElement = document.getElementById('appDetailPanels');
         if (dataIndex === 0) {
@@ -82,6 +88,20 @@ describe('adminManageApps', () => {
            [...Array(20).keys()].map(i => `${prefixSearch}AppId${i+1}`)
         );
         expect(paginationHelper.paginationIsAvailable()).toBeTrue();
+    });
+
+    it("when the user enters some filter text then only the apps that match the clientid filter are shown",  () => {
+        buildAppPanels(100, '');
+
+        onPageShow();
+        enterAppFilterText(`ClientId10`);
+
+        console.log('============', paginationHelper.getVisiblePanelData('.hip-application', 'clientIds'));
+
+        expect(paginationHelper.getVisiblePanelData('.hip-application', 'clientIds').map(o => o.clientIds)).toEqual(
+            ['ClientId10,ClientId11', 'ClientId100,ClientId101', 'ClientId102,ClientId103', 'ClientId104,ClientId105', 'ClientId106,ClientId107', 'ClientId108,ClientId109']
+        );
+        expect(paginationHelper.paginationIsAvailable()).toBeFalse();
     });
 
 });

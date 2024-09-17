@@ -18,19 +18,20 @@ package controllers.admin
 
 import base.SpecBase
 import controllers.routes
-import models.application.{Application, Creator, TeamMember}
+import models.application.{Application, Creator, Environment, Environments, TeamMember, Credential}
 import models.user.UserModel
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import play.api.{Application => PlayApplication}
+import play.api.test.Helpers.*
+import play.api.Application as PlayApplication
 import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
 import views.html.admin.ManageApplicationsView
 
+import java.time.LocalDateTime
 import scala.concurrent.Future
 
 class ManageApplicationsControllerSpec
@@ -45,8 +46,16 @@ class ManageApplicationsControllerSpec
         val fixture = buildFixture(user)
         val testEmail = "test-email"
         val creatorEmail = "creator-email-2"
+        val primaryClientId1 = "client-id-1"
+        val primaryClientId2 = "client-id-2"
+        val secondaryClientId1 = "client-id-3"
+        val secondaryClientId2 = "client-id-4"
+        val environmentsWithCredentials = Environments(
+          buildEnvironmentWithClientIds(Seq(primaryClientId1, primaryClientId2)),
+          buildEnvironmentWithClientIds(Seq(secondaryClientId1, secondaryClientId2))
+        )
         val applications = Seq(
-          Application("id-1", "app-name-2", Creator(creatorEmail), Seq.empty).copy(teamMembers = Seq(TeamMember(testEmail))),
+          Application("id-1", "app-name-2", Creator(creatorEmail), Seq.empty).copy(teamMembers = Seq(TeamMember(testEmail))).copy(environments = environmentsWithCredentials),
           Application("id-2", "app-name-1", Creator(creatorEmail), Seq.empty).copy(teamMembers = Seq(TeamMember(testEmail)))
         )
 
@@ -64,6 +73,7 @@ class ManageApplicationsControllerSpec
           contentAsString(result) mustBe view(applications.sortBy(_.name.toLowerCase), user)(request, messages(fixture.playApplication)).toString()
           contentAsString(result) must validateAsHtml
           contentAsString(result) must include(s"""Manage applications (<span id="appCount">${applications.size}</span>)""")
+          contentAsString(result) must include(s"data-client-ids=\"$primaryClientId1,$primaryClientId2,$secondaryClientId1,$secondaryClientId2\"")
         }
       }
     }
@@ -94,6 +104,10 @@ class ManageApplicationsControllerSpec
       ).build()
 
     Fixture(playApplication, apiHubService)
+  }
+  
+  private def buildEnvironmentWithClientIds(clientIds: Seq[String]): Environment = {
+    Environment(Seq.empty, clientIds.map(id => Credential(id, LocalDateTime.now(), None, None)))
   }
 
 }

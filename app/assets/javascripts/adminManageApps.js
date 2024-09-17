@@ -11,7 +11,8 @@ export function onPageShow() {
             document.getElementById('appFilter'),
             [
                 dataAttribute('appName').whenNormalised().includesTheFilterText(),
-                dataAttribute('appId').whenNormalised().includesTheFilterText()
+                dataAttribute('appId').whenNormalised().includesTheFilterText(),
+                dataAttribute('clientIds').whenSplitBy(',').whenNormalised().includesTheFilterText(),
             ]
         );
 
