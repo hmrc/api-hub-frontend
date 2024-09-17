@@ -61,7 +61,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
             val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
 
             status(result) mustEqual OK
-            contentAsString(result) mustBe view(FakeApplication, Some(Seq.empty), Some(user))(request, messages(fixture.playApplication)).toString
+            contentAsString(result) mustBe view(FakeApplication, Seq.empty, Some(user))(request, messages(fixture.playApplication)).toString
             contentAsString(result) must validateAsHtml
           }
       }
@@ -88,7 +88,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustBe view(application, Some(Seq.empty), Some(FakeUser))(request, messages(fixture.playApplication)).toString
+        contentAsString(result) mustBe view(application, Seq.empty, Some(FakeUser))(request, messages(fixture.playApplication)).toString
         contentAsString(result) must validateAsHtml
       }
     }
@@ -130,7 +130,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
 
         status(result) mustBe OK
-        contentAsString(result) mustBe view(expected, Some(Seq.empty), Some(FakeUser))(request, messages(fixture.playApplication)).toString
+        contentAsString(result) mustBe view(expected, Seq.empty, Some(FakeUser))(request, messages(fixture.playApplication)).toString
       }
     }
 
@@ -153,11 +153,11 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
       )
 
       val application = FakeApplication
-        .addApi(Api(apiDetail.id, Seq(SelectedEndpoint("GET", "/test"))))
+        .addApi(Api(apiDetail.id, apiDetail.title, Seq(SelectedEndpoint("GET", "/test"))))
         .setSecondaryScopes(Seq(Scope("test-scope")))
 
       val applicationApis = Seq(
-        ApplicationApi(apiDetail, Seq(ApplicationEndpoint("GET", "/test", Seq("test-scope"), Inaccessible, Accessible)), false)
+        ApplicationApi(apiDetail, Seq(ApplicationEndpoint("GET", "/test", None, None, Seq("test-scope"), Inaccessible, Accessible)), false)
       )
 
       when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(true), eqTo(false))(any()))
@@ -175,18 +175,25 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustBe view(application, Some(applicationApis), Some(FakeUser))(request, messages(fixture.playApplication)).toString
+        contentAsString(result) mustBe view(application, applicationApis, Some(FakeUser))(request, messages(fixture.playApplication)).toString
         contentAsString(result) must validateAsHtml
       }
     }
 
-    "must return the correct view when the application APIs are missing" in {
+    "must return the correct view when the APIs are missing" in {
       val fixture = buildFixture()
       val apiId = "test-id"
+      val apiTitle = "test-title"
+
+      val api = Api(apiId, apiTitle, Seq(SelectedEndpoint("GET", "/test")))
 
       val application = FakeApplication
-        .addApi(Api(apiId, Seq(SelectedEndpoint("GET", "/test"))))
+        .addApi(api)
         .setSecondaryScopes(Seq(Scope("test-scope")))
+
+      val applicationApis = Seq(
+        ApplicationApi(api, false)
+      )
 
       when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(true), eqTo(false))(any()))
         .thenReturn(Future.successful(Some(application)))
@@ -203,7 +210,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustBe view(application, None, Some(FakeUser))(request, messages(fixture.playApplication)).toString
+        contentAsString(result) mustBe view(application, applicationApis, Some(FakeUser))(request, messages(fixture.playApplication)).toString
         contentAsString(result) must validateAsHtml
       }
     }

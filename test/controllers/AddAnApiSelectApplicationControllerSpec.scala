@@ -354,7 +354,7 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
   private def buildApplicationWithAccess(apiDetail: ApiDetail): Application = {
     FakeApplication
       .copy(id = "test-application-id-1", name = "test-application-name-1")
-      .addApi(Api(apiDetail.id, Seq.empty))
+      .addApi(Api(apiDetail.id, apiDetail.title, Seq.empty))
   }
 
   private def buildApplicationWithoutAccess(): Application = {

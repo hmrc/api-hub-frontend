@@ -334,7 +334,7 @@ class AvailableEndpointsSpec extends AnyFreeSpec with Matchers with TableDrivenP
     )
 
     val application = FakeApplication.addApi(
-      Api(apiDetail.id, Seq(SelectedEndpoint("GET", "/test-path-1")))
+      Api(apiDetail.id, apiDetail.title, Seq(SelectedEndpoint("GET", "/test-path-1")))
     )
 
     "must set the added attribute correctly when the endpoint has been added to the application" in {

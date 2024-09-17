@@ -118,7 +118,7 @@ class RequestProductionAccessStartControllerSpec extends SpecBase with MockitoSu
       maintainer = Maintainer("name", "#slack", List.empty)
     )
     val application = FakeApplication
-      .addApi(Api(apiDetail.id, Seq(SelectedEndpoint("GET", "/test"))))
+      .addApi(Api(apiDetail.id, apiDetail.title, Seq(SelectedEndpoint("GET", "/test"))))
       .setSecondaryScopes(Seq(Scope("test-scope")))
 
     application

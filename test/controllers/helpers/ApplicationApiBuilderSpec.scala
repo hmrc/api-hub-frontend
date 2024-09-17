@@ -19,37 +19,34 @@ package controllers.helpers
 import base.SpecBase
 import controllers.actions.FakeApplication
 import models.accessrequest.{AccessRequest, Pending}
-import models.api.{ApiDetail, Endpoint, EndpointMethod, Live, Maintainer}
-import models.application.{Api, Scope, SelectedEndpoint}
+import models.api.*
 import models.application.ApplicationLenses.ApplicationLensOps
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import models.application.{Api, Scope, SelectedEndpoint}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
+import play.api.Application as PlayApplication
 import play.api.inject.bind
 import play.api.mvc.Request
-import play.api.mvc.Results.NotFound
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import play.api.{Application => PlayApplication}
+import play.api.test.Helpers.*
 import services.ApiHubService
-import viewmodels.application.{Accessible, ApplicationApi, ApplicationEndpoint, Inaccessible, Requested}
-import views.html.ErrorTemplate
+import viewmodels.application.*
 
 import java.time.{Instant, LocalDateTime}
 import scala.concurrent.Future
 
 class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
 
-  import ApplicationApiBuilderSpec._
+  import ApplicationApiBuilderSpec.*
 
   "ApplicationApiBuilder" - {
     "must correctly stitch together data" in {
       val fixture = buildFixture()
       val application = FakeApplication
-        .addApi(Api(apiId1, Seq(SelectedEndpoint("GET", "/test1/1"), SelectedEndpoint("POST", "/test1/1"), SelectedEndpoint("GET", "/test1/2"))))
-        .addApi(Api(apiId2, Seq(SelectedEndpoint("GET", "/test2/1"))))
-        .addApi(Api(apiId3, Seq(SelectedEndpoint("GET", "/test3/1"))))
+        .addApi(Api(apiId1, apiTitle1, Seq(SelectedEndpoint("GET", "/test1/1"), SelectedEndpoint("POST", "/test1/1"), SelectedEndpoint("GET", "/test1/2"))))
+        .addApi(Api(apiId2, apiTitle2, Seq(SelectedEndpoint("GET", "/test2/1"))))
+        .addApi(Api(apiId3, apiTitle3, Seq(SelectedEndpoint("GET", "/test3/1"))))
         .setPrimaryScopes(scopes("all:test-scope-1", "get:test-scope-1-1", "get:test-scope-1-2"))
         .setSecondaryScopes(scopes("all:test-scope-1", "get:test-scope-1-1", "post:test-scope-1-1", "get:test-scope-1-2", "get:test-scope-3-1"))
 
@@ -71,29 +68,29 @@ class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
           ApplicationApi(
             apiDetail1,
             Seq(
-              ApplicationEndpoint("GET", "/test1/1", Seq("all:test-scope-1", "get:test-scope-1-1"), Accessible, Accessible),
-              ApplicationEndpoint("POST", "/test1/1", Seq("all:test-scope-1", "post:test-scope-1-1"), Inaccessible, Accessible),
-              ApplicationEndpoint("GET", "/test1/2", Seq("all:test-scope-1", "get:test-scope-1-2"), Accessible, Accessible)
+              ApplicationEndpoint("GET", "/test1/1", None, None, Seq("all:test-scope-1", "get:test-scope-1-1"), Accessible, Accessible),
+              ApplicationEndpoint("POST", "/test1/1", None, None, Seq("all:test-scope-1", "post:test-scope-1-1"), Inaccessible, Accessible),
+              ApplicationEndpoint("GET", "/test1/2", None, None, Seq("all:test-scope-1", "get:test-scope-1-2"), Accessible, Accessible)
             ),
             false
           ),
           ApplicationApi(
             apiDetail2,
             Seq(
-              ApplicationEndpoint("GET", "/test2/1", Seq("get:test-scope-2-1"), Inaccessible, Inaccessible)
+              ApplicationEndpoint("GET", "/test2/1", None, None, Seq("get:test-scope-2-1"), Inaccessible, Inaccessible)
             ),
             false
           ),
           ApplicationApi(
             apiDetail3,
             Seq(
-              ApplicationEndpoint("GET", "/test3/1", Seq("get:test-scope-3-1"), Requested, Accessible)
+              ApplicationEndpoint("GET", "/test3/1", None, None, Seq("get:test-scope-3-1"), Requested, Accessible)
             ),
             true
           )
         )
 
-        actual mustBe Right(expected)
+        actual mustBe expected
       }
     }
 
@@ -109,36 +106,46 @@ class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
 
         val actual = fixture.applicationApiBuilder.build(application).futureValue
 
-        actual mustBe Right(Seq.empty)
+        actual mustBe Seq.empty
       }
     }
 
-    "must return a 404 Not Found result when an API detail cannot be found" in {
+    "must return a 'missing' ApplicationApi when API detail cannot be found" in {
       val fixture = buildFixture()
-      val apiId = "test-id"
-      val application = FakeApplication.addApi(Api(apiId, Seq.empty))
+
+      val endpoint1 = SelectedEndpoint("GET", "/test1")
+      val endpoint2 = SelectedEndpoint("POST", "/test2")
+      val missingApi = Api("test-missing-id", "test-missing-title", Seq(endpoint1, endpoint2))
+
+      val application = FakeApplication
+        .addApi(missingApi)
+        .addApi(Api(apiId2, apiTitle2, Seq(SelectedEndpoint("GET", "/test2/1"))))
 
       when(fixture.apiHubService.getAccessRequests(eqTo(Some(FakeApplication.id)), eqTo(Some(Pending)))(any()))
         .thenReturn(Future.successful(Seq.empty))
-      when(fixture.apiHubService.getApiDetail(any())(any()))
+
+      when(fixture.apiHubService.getApiDetail(eqTo(missingApi.id))(any()))
         .thenReturn(Future.successful(None))
+      when(fixture.apiHubService.getApiDetail(eqTo(apiId2))(any()))
+        .thenReturn(Future.successful(Some(apiDetail2)))
 
       running(fixture.application) {
         implicit val request: Request[?] = FakeRequest()
-        implicit val msgs: Messages = messages(fixture.application)
 
         val actual = fixture.applicationApiBuilder.build(application).futureValue
-        val view = fixture.application.injector.instanceOf[ErrorTemplate]
 
-        val expected = NotFound(
-          view(
-            "Page not found - 404",
-            "API not found",
-            s"Cannot find an API with Id $apiId."
+        val expected = Seq(
+          ApplicationApi(missingApi, false),
+          ApplicationApi(
+            apiDetail2,
+            Seq(
+              ApplicationEndpoint("GET", "/test2/1", None, None, Seq("get:test-scope-2-1"), Inaccessible, Inaccessible)
+            ),
+            false
           )
         )
 
-        actual mustBe Left(expected)
+        actual mustBe expected
       }
     }
   }
@@ -170,6 +177,10 @@ object ApplicationApiBuilderSpec {
   private val apiId1 = "test-id-1"
   private val apiId2 = "test-id-2"
   private val apiId3 = "test-id-3"
+
+  private val apiTitle1 = "test-title-1"
+  private val apiTitle2 = "test-title-2"
+  private val apiTitle3 = "test-title-3"
 
   private val apiDetail1 =
     ApiDetail(

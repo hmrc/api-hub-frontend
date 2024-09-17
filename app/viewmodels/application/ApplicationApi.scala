@@ -17,7 +17,7 @@
 package viewmodels.application
 
 import models.api.{ApiDetail, EndpointMethod}
-import models.application.{Application, EnvironmentName, Primary, Secondary}
+import models.application.{Api, Application, EnvironmentName, Primary, Secondary, SelectedEndpoint}
 import models.application.ApplicationLenses.ApplicationLensOps
 
 sealed trait ApplicationEndpointAccess {
@@ -33,6 +33,10 @@ case object Inaccessible extends ApplicationEndpointAccess {
 }
 
 case object Requested extends ApplicationEndpointAccess {
+  override val isAccessible: Boolean = false
+}
+
+case object Unknown extends ApplicationEndpointAccess {
   override val isAccessible: Boolean = false
 }
 
@@ -67,17 +71,67 @@ object ApplicationEndpointAccess {
 case class ApplicationEndpoint(
   httpMethod: String,
   path: String,
+  summary: Option[String],
+  description: Option[String],
   scopes: Seq[String],
   primaryAccess: ApplicationEndpointAccess,
   secondaryAccess: ApplicationEndpointAccess
 )
 
-case class ApplicationApi(apiDetail: ApiDetail, endpoints: Seq[ApplicationEndpoint], hasPendingAccessRequest: Boolean) {
+object ApplicationEndpoint {
+
+  def forMissingApi(selectedEndpoint: SelectedEndpoint): ApplicationEndpoint = {
+    ApplicationEndpoint(
+      httpMethod = selectedEndpoint.httpMethod,
+      path = selectedEndpoint.path,
+      summary = None,
+      description = None,
+      scopes = Seq.empty,
+      primaryAccess = Unknown,
+      secondaryAccess = Unknown
+    )
+  }
+
+}
+
+case class ApplicationApi(
+  apiId: String,
+  apiTitle: String,
+  totalEndpoints: Int,
+  endpoints: Seq[ApplicationEndpoint],
+  hasPendingAccessRequest: Boolean,
+  isMissing: Boolean
+) {
 
   def selectedEndpoints: Int = endpoints.size
-  def totalEndpoints: Int = apiDetail.endpoints.flatMap(_.methods).size
   def availablePrimaryEndpoints: Int = endpoints.count(_.primaryAccess.isAccessible)
   def availableSecondaryEndpoints: Int = endpoints.count(_.secondaryAccess.isAccessible)
-  def needsProductionAccessRequest: Boolean = !hasPendingAccessRequest && (endpoints.exists(_.primaryAccess == Inaccessible))
+  def needsProductionAccessRequest: Boolean = !hasPendingAccessRequest && endpoints.exists(_.primaryAccess == Inaccessible)
+
+}
+
+object ApplicationApi {
+
+  def apply(apiDetail: ApiDetail, endpoints: Seq[ApplicationEndpoint], hasPendingAccessRequest: Boolean): ApplicationApi = {
+    ApplicationApi(
+      apiId = apiDetail.id,
+      apiTitle = apiDetail.title,
+      totalEndpoints = apiDetail.endpoints.flatMap(_.methods).size,
+      endpoints = endpoints,
+      hasPendingAccessRequest = hasPendingAccessRequest,
+      isMissing = false
+    )
+  }
+
+  def apply(api: Api, hasPendingAccessRequest: Boolean): ApplicationApi = {
+    ApplicationApi(
+      apiId = api.id,
+      apiTitle = api.title,
+      totalEndpoints = 0,
+      endpoints = api.endpoints.map(ApplicationEndpoint.forMissingApi),
+      hasPendingAccessRequest = hasPendingAccessRequest,
+      isMissing = true
+    )
+  }
 
 }

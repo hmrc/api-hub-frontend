@@ -71,11 +71,16 @@ class RemoveApiController @Inject()(
   private def showConfirmationView(status: Status, apiId: String, form: Form[?])(implicit request: ApplicationRequest[?]): Future[Result] = {
     apiHubService.getApiDetail(apiId).map {
       case Some(apiDetail) if request.application.hasApi(apiDetail.id) =>
-        status(confirmationView(request.application, apiDetail, form, request.identifierRequest.user))
+        status(confirmationView(request.application, apiDetail.id, apiDetail.title, form, request.identifierRequest.user))
       case Some(apiDetail) =>
         errorResultBuilder.apiNotFoundInApplication(apiDetail, request.application)
       case None =>
-        errorResultBuilder.apiNotFound(apiId)
+        request.application.apis.find(_.id.equals(apiId))
+          .map(
+            api =>
+              status(confirmationView(request.application, api.id, api.title, form, request.identifierRequest.user))
+          )
+          .getOrElse(errorResultBuilder.apiNotFound(apiId))
     }
   }
 

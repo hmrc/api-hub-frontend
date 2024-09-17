@@ -178,7 +178,7 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
     val apiDetail = anApiDetail
 
     val application = FakeApplication
-      .addApi(Api(apiDetail.id, Seq(SelectedEndpoint("GET", "/test"), SelectedEndpoint("POST", "/anothertest"))))
+      .addApi(Api(apiDetail.id, apiDetail.title, Seq(SelectedEndpoint("GET", "/test"), SelectedEndpoint("POST", "/anothertest"))))
       .setSecondaryScopes(Seq(Scope("test-scope")))
     application
   }

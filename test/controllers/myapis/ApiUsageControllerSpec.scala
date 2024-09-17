@@ -50,8 +50,8 @@ class ApiUsageControllerSpec
     val teamId = "teamId"
     val apiDetail = sampleApiDetail().copy(teamId = Some(teamId))
     val apps = Seq(
-      Application("id-1", "test-app-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1"))).addApi(Api("apiId")),
-      Application("id-2", "test-app-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2"))).addApi(Api("apiId"))
+      Application("id-1", "test-app-name-1", Creator("test-creator-email-1"), Seq(TeamMember("test-creator-email-1"))).addApi(Api("apiId", "apiTitle")),
+      Application("id-2", "test-app-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2"))).addApi(Api("apiId", "apiTitle"))
         .delete(Deleted(LocalDateTime.now(), "deletingUser"))
     )
     val owningTeam = Team(teamId, "teamName", LocalDateTime.now(), List.empty)
