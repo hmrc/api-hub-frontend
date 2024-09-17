@@ -52,3 +52,5 @@ GET         /update-team/:applicationId                                 controll
 POST        /update-team/:applicationId                                 controllers.application.UpdateApplicationTeamController.onSubmit(applicationId: String)
 
 GET         /access-requests/:applicationId                             controllers.application.ApplicationAccessRequestsController.onPageLoad(applicationId: String)
+
+GET         /curl/:applicationId                                        controllers.application.CurlCommandController.buildCurlCommand(applicationId: String, world: models.ApiWorld)
