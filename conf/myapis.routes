@@ -16,3 +16,4 @@ GET     /usage/:apiId                                       controllers.myapis.A
 GET     /update-team/:apiId                                 controllers.myapis.UpdateApiTeamController.onPageLoad(apiId: String)
 POST    /update-team/:apiId                                 controllers.myapis.UpdateApiTeamController.onSubmit(apiId: String)
 
+GET     /produce/start                                      controllers.myapis.produce.ProduceApiStartController.startProduceApi()
