@@ -14,8 +14,7 @@
  * limitations under the License.
  *@
 
-@import viewmodels.InputWidth._
-@import viewmodels.LabelSize.Large
+@import views.html.helper.CSPNonce
 
 @this(
     layout: templates.Layout,
@@ -27,7 +26,12 @@
 
 @(form: Form[?], mode: Mode)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = title(form, messages("produceApiEnterOas.title"))) {
+@scripts() = {
+    <script src='@routes.Assets.versioned("javascripts/oaseditor/ace.js")' @{CSPNonce.attr}></script>
+    <script src='@routes.Assets.versioned("javascripts/enterOas.js")' type="module" @{CSPNonce.attr}></script>
+}
+
+@layout(pageTitle = title(form, messages("produceApiEnterOas.title")), fullWidth = true, customScriptsBlock = Some(scripts())) {
 
     @formHelper(action = controllers.myapis.produce.routes.ProduceApiEnterOasController.onSubmit(mode)) {
 
@@ -35,13 +39,14 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
+        <h1 class="govuk-heading-l">@messages("produceApiEnterOas.heading")</h1>
+
+        <p class="govuk-hint">@messages("produceApiEnterOas.hint")</p>
+
+        <div id="aceEditorContainer" class="hip-ace-editor govuk-!-margin-bottom-5">+</div>
+
         @govukInput(
-            InputViewModel(
-                field = form("value"),
-                label = LabelViewModel(messages("produceApiEnterOas.heading")).asPageHeading(Large)
-            )
-            .withHint(Hint(content = messages("produceApiEnterOas.hint")))
-            .withWidth(Full)
+            Input(inputType="hidden", name="value", id="oasMirrorValue", value=form("value").value)
         )
 
         @govukButton(
