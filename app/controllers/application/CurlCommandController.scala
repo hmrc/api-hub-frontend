@@ -32,6 +32,13 @@ import io.swagger.v3.parser.OpenAPIV3Parser
 import io.swagger.v3.parser.core.models.ParseOptions
 import io.swagger.v3.oas.models.{Operation, PathItem, Paths}
 import io.swagger.v3.oas.models.servers.Server
+import io.swagger.v3.oas.models.parameters.Parameter
+import io.swagger.v3.oas.models.media.Schema
+import io.swagger.oas.inflector.examples.models.Example
+import io.swagger.oas.inflector.examples.ExampleBuilder
+import com.fasterxml.jackson.databind.module.SimpleModule
+import io.swagger.oas.inflector.processors.JsonNodeExampleSerializer
+
 import scala.jdk.CollectionConverters.*
 import models.{ApiWorld, CORPORATE, MDTP}
 import sttp.model.Uri.UriContext
@@ -70,11 +77,27 @@ class CurlCommandController @Inject()(
     options.setResolve(false)
     val result = new OpenAPIV3Parser().readContents(apiDetail.openApiSpecification, null, options)
     val openApiDoc = result.getOpenAPI
+    val schemas = openApiDoc.getComponents.getSchemas
     val paths = openApiDoc.getPaths
     val allServers = openApiDoc.getServers.asScala
     val server = getServerForApiWorld(apiWorld, Option(allServers.toList))
 
-    getCurlCommandsForPaths(paths).map(command => command.copy(server = server.map(_.getUrl).getOrElse("")))
+    getCurlCommandsForPaths(paths)
+      .map(command => command.copy(server = server.map(_.getUrl).getOrElse("")))
+      .map(command => {
+        val schemaMap = schemas.asScala.toMap
+        val maybeRequestBody = Option(command.operation.getRequestBody)
+        val maybeSchemaName = maybeRequestBody
+          .flatMap(requestBody => Option(requestBody.getContent)
+            .map(content => content.get("application/json"))
+            .map(_.getSchema.get$ref.split("/").last)
+          )
+        getExampleRequestBodyJson(schemaMap, maybeSchemaName) match {
+          case Some(requestBody) => command.copy(requestBody = Some(requestBody))
+          case None => command
+        }
+      })
+
   }
 
   private def getServerForApiWorld(apiWorld: ApiWorld, maybeServers: Option[List[Server]]): Option[Server] = {
@@ -86,6 +109,16 @@ class CurlCommandController @Inject()(
       }
       case None => None
     }
+  }
+
+  private def getExampleRequestBodyJson(schemas: Map[String, Schema[?]], schemaName: Option[String]): Option[String] = {
+    schemas.get(schemaName.getOrElse("")).map(schema => {
+      val example = ExampleBuilder.fromSchema(schema, schemas.asJava);
+      val simpleModule = SimpleModule().addSerializer(JsonNodeExampleSerializer());
+      io.swagger.util.Json.mapper().registerModule(simpleModule);
+      val x = Json.parse(io.swagger.util.Json.pretty(example))
+      x.toString()
+    })
   }
 
   private def getCurlCommandsForPaths(paths: Paths): Seq[CurlCommand] = {
@@ -109,36 +142,37 @@ class CurlCommandController @Inject()(
       .toSeq
   }
 
+  private def filterParameters(operation: Operation, in: String): Map[String,String] = {
+    Option(operation.getParameters).map(_.asScala).getOrElse(Seq.empty)
+      .filter(_.getIn == in)
+      .map(param => param.getName -> param.getSchema.getType.toUpperCase)
+      .toMap
+  }
+
   private def getCurlCommandForOperation(method: String, path: String, pathItem: PathItem, operation: Operation): CurlCommand = {
-    val queryParams = Option(operation.getParameters).map(_.asScala).getOrElse(Seq.empty)
-      .filter(_.getIn == "query")
-      .map(param => param.getName -> param.getSchema.getType.toUpperCase)
-      .toMap
-    val pathParams = Option(operation.getParameters).map(_.asScala).getOrElse(Seq.empty)
-      .filter(_.getIn == "path")
-      .map(param => param.getName -> param.getSchema.getType.toUpperCase)
-      .toMap
-    val headerParams = Option(operation.getParameters).map(_.asScala).getOrElse(Seq.empty)
-      .filter(_.getIn == "header")
-      .map(param => param.getName -> param.getSchema.getType.toUpperCase)
-      .toMap
-    CurlCommand(method = method, path = path, queryParams = queryParams, pathParams = pathParams, headers = headerParams)
+    val queryParams = filterParameters(operation, "query")
+    val pathParams = filterParameters(operation, "path")
+    val headerParams = filterParameters(operation, "header")
+
+    CurlCommand(method = method, path = path, queryParams = queryParams, pathParams = pathParams, headers = headerParams, operation = operation)
   }
 
 }
 
 case class CurlCommand(
-                        method: String = "GET",
+                        method: String,
                         server: String = "",
-                        path: String = "/",
+                        path: String,
+                        operation: Operation,
                         queryParams: Map[String, String] = Map.empty,
                         pathParams: Map[String, String] = Map.empty,
-                        headers: Map[String, String] = Map.empty) {
+                        headers: Map[String, String] = Map.empty,
+                        requestBody: Option[String] = None) {
   override def toString: String = {
     val hostAndPath = server + addPathParameters
     val url = uri"$hostAndPath?$queryParams"
     val headers = getHeadersString
-    s"curl -X '${method}' $headers '$url'"
+    s"curl -X '${method}' $headers '$url' ${requestBody.map(json => s"--data '$json'").getOrElse("")}"
   }
 
   private def getHeadersString: String = {
