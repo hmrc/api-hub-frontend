@@ -20,6 +20,7 @@ import com.google.inject.Inject
 import controllers.actions.{ApplicationAuthActionProvider, IdentifierAction}
 import controllers.helpers.ApplicationApiBuilder
 import models.application.ApplicationLenses.*
+import models.application.Application
 import play.api.i18n.I18nSupport
 import play.api.libs.json.Json
 import play.api.mvc.*
@@ -42,6 +43,7 @@ import io.swagger.oas.inflector.processors.JsonNodeExampleSerializer
 import scala.jdk.CollectionConverters.*
 import models.{ApiWorld, CORPORATE, MDTP}
 import sttp.model.Uri.UriContext
+import viewmodels.application.ApplicationEndpoint
 
 class CurlCommandController @Inject()(
   val controllerComponents: MessagesControllerComponents,
@@ -55,49 +57,73 @@ class CurlCommandController @Inject()(
     implicit request =>
       applicationApiBuilder.build(request.application).map {
         case Right(applicationApis) => {
-          val authHeaderValue = request.application.getSecondaryMasterCredential.map(credential => s"${credential.clientId}:${credential.clientSecret.getOrElse("")}")
-            .map(value => java.util.Base64.getEncoder.encodeToString(value.getBytes))
-            .getOrElse("")
-
-          val commands = applicationApis
-            .flatMap(api => parseApiOasSpec(api.apiDetail, apiWorld))
-            .map(command => command.copy(headers = command.headers +
-              ("Authorization" -> s"Basic $authHeaderValue") +
-              ("Content-Type" -> "application/json")
-            ))
+          val commands = applicationApis.flatMap(appApi => appApi.endpoints.map(endpoint => buildCurlCommandForEndpoint(request.application, endpoint, appApi.apiDetail, apiWorld)))
           Ok(Json.toJson(commands.map(_.toString)))
         }
         case Left(_) => Ok(Json.toJson(""))
       }
   }
 
-  private def parseApiOasSpec(apiDetail: ApiDetail, apiWorld: ApiWorld): Seq[CurlCommand] = {
+  private def buildCurlCommandForEndpoint(application: Application, endpoint: ApplicationEndpoint, apiDetail: ApiDetail, apiWorld: ApiWorld): CurlCommand = {
     val options: ParseOptions = new ParseOptions()
-
     options.setResolve(false)
-    val result = new OpenAPIV3Parser().readContents(apiDetail.openApiSpecification, null, options)
-    val openApiDoc = result.getOpenAPI
+    val parseResult = new OpenAPIV3Parser().readContents(apiDetail.openApiSpecification, null, options)
+    val openApiDoc = parseResult.getOpenAPI
     val schemas = openApiDoc.getComponents.getSchemas
     val paths = openApiDoc.getPaths
     val allServers = openApiDoc.getServers.asScala
     val server = getServerForApiWorld(apiWorld, Option(allServers.toList))
 
-    getCurlCommandsForPaths(paths)
-      .map(command => command.copy(server = server.map(_.getUrl).getOrElse("")))
-      .map(command => {
-        val schemaMap = schemas.asScala.toMap
-        val maybeRequestBody = Option(command.operation.getRequestBody)
-        val maybeSchemaName = maybeRequestBody
-          .flatMap(requestBody => Option(requestBody.getContent)
-            .map(content => content.get("application/json"))
-            .map(_.getSchema.get$ref.split("/").last)
-          )
-        getExampleRequestBodyJson(schemaMap, maybeSchemaName) match {
-          case Some(requestBody) => command.copy(requestBody = Some(requestBody))
-          case None => command
-        }
-      })
+    val operation = getOperationForEndpoint(endpoint, paths)
 
+    val queryParams = filterParameters(operation, "query")
+    val pathParams = filterParameters(operation, "path")
+    val headerParams = filterParameters(operation, "header") +
+        ("Authorization" -> s"Basic ${getAuthHeaderForApplication(application)}") +
+        ("Content-Type" -> "application/json")
+
+    val exampleRequestBody = getExampleRequestBody(schemas.asScala.toMap, operation)
+
+    CurlCommand(
+      method = endpoint.httpMethod,
+      server = server.map(_.getUrl).getOrElse(""),
+      path = endpoint.path,
+      queryParams = queryParams,
+      pathParams = pathParams,
+      headers = headerParams,
+      requestBody = exampleRequestBody
+    )
+  }
+
+  private def getAuthHeaderForApplication(application: Application): String = {
+    application.getSecondaryMasterCredential.map(credential => s"${credential.clientId}:${credential.clientSecret.getOrElse("")}")
+      .map(value => java.util.Base64.getEncoder.encodeToString(value.getBytes))
+      .getOrElse("")
+  }
+
+  private def getOperationForEndpoint(endpoint: ApplicationEndpoint, paths: Paths): Operation = {
+    val pathItem = paths.get(endpoint.path)
+    Map(
+      "GET" -> pathItem.getGet,
+      "POST" -> pathItem.getPost,
+      "PUT" -> pathItem.getPut,
+      "DELETE" -> pathItem.getDelete,
+      "OPTIONS" -> pathItem.getOptions,
+      "HEAD" -> pathItem.getHead,
+      "PATCH" -> pathItem.getPatch,
+      "TRACE" -> pathItem.getTrace
+    ).get(endpoint.httpMethod).get
+  }
+  
+  private def getExampleRequestBody(schemas: Map[String, Schema[?]], operation: Operation): Option[String] = {
+    val schemaMap = schemas
+    val maybeRequestBody = Option(operation.getRequestBody)
+    val maybeSchemaName = maybeRequestBody
+      .flatMap(requestBody => Option(requestBody.getContent)
+        .map(content => content.get("application/json"))
+        .map(_.getSchema.get$ref.split("/").last)
+      )
+    getExampleRequestBodyJson(schemaMap, maybeSchemaName)
   }
 
   private def getServerForApiWorld(apiWorld: ApiWorld, maybeServers: Option[List[Server]]): Option[Server] = {
@@ -121,40 +147,11 @@ class CurlCommandController @Inject()(
     })
   }
 
-  private def getCurlCommandsForPaths(paths: Paths): Seq[CurlCommand] = {
-    val x = paths.keySet().asScala.toSeq
-    x.flatMap(path => getCurlCommandsForPath(path, paths.get(path)))
-  }
-
-  private def getCurlCommandsForPath(path: String, pathItem: PathItem): Seq[CurlCommand] = {
-    Map(
-      "GET" -> pathItem.getGet,
-      "POST" -> pathItem.getPost,
-      "PUT" -> pathItem.getPut,
-      "DELETE" -> pathItem.getDelete,
-      "OPTIONS" -> pathItem.getOptions,
-      "HEAD" -> pathItem.getHead,
-      "PATCH" -> pathItem.getPatch,
-      "TRACE" -> pathItem.getTrace
-    )
-      .filter { case (_, operation) => operation != null }
-      .map { case (method, operation) => getCurlCommandForOperation(method, path, pathItem, operation) }
-      .toSeq
-  }
-
   private def filterParameters(operation: Operation, in: String): Map[String,String] = {
     Option(operation.getParameters).map(_.asScala).getOrElse(Seq.empty)
       .filter(_.getIn == in)
       .map(param => param.getName -> param.getSchema.getType.toUpperCase)
       .toMap
-  }
-
-  private def getCurlCommandForOperation(method: String, path: String, pathItem: PathItem, operation: Operation): CurlCommand = {
-    val queryParams = filterParameters(operation, "query")
-    val pathParams = filterParameters(operation, "path")
-    val headerParams = filterParameters(operation, "header")
-
-    CurlCommand(method = method, path = path, queryParams = queryParams, pathParams = pathParams, headers = headerParams, operation = operation)
   }
 
 }
@@ -163,13 +160,12 @@ case class CurlCommand(
                         method: String,
                         server: String = "",
                         path: String,
-                        operation: Operation,
                         queryParams: Map[String, String] = Map.empty,
                         pathParams: Map[String, String] = Map.empty,
                         headers: Map[String, String] = Map.empty,
                         requestBody: Option[String] = None) {
   override def toString: String = {
-    val hostAndPath = server + addPathParameters
+    val hostAndPath = (server + getPathWithParameters).replace("//", "/")
     val url = uri"$hostAndPath?$queryParams"
     val headers = getHeadersString
     s"curl -X '${method}' $headers '$url' ${requestBody.map(json => s"--data '$json'").getOrElse("")}"
@@ -179,7 +175,7 @@ case class CurlCommand(
     headers.map { case (key, value) => s"-H '$key: $value'" }.mkString(" ")
   }
 
-  private def addPathParameters: String = {
+  private def getPathWithParameters: String = {
     var newPath = path
     pathParams.foreach { case (key, value) =>
       newPath = newPath.replace(s"{$key}", value)
