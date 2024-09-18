@@ -21,7 +21,13 @@ object AppDependencies {
       ExclusionRule("com.fasterxml.jackson.core", "jackson-core"),
       ExclusionRule("com.fasterxml.jackson.core", "jackson-annotations"),
       ExclusionRule("com.fasterxml.jackson.datatype", "jackson-datatype-jsr310")
-    )
+    ),
+    "io.swagger" % "swagger-inflector" % "2.0.12" excludeAll(
+      ExclusionRule("com.fasterxml.jackson.core", "jackson-databind"),
+      ExclusionRule("com.fasterxml.jackson.core", "jackson-core"),
+      ExclusionRule("com.fasterxml.jackson.core", "jackson-annotations"),
+      ExclusionRule("com.fasterxml.jackson.datatype", "jackson-datatype-jsr310")
+    ),
   )
 
   val test = Seq(
