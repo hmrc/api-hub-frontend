@@ -16,10 +16,15 @@
 
 package controllers.myapis.produce
 
+import config.FrontendAppConfig
 import controllers.actions.*
-import play.api.i18n.{I18nSupport, MessagesApi}
+import models.NormalMode
+import navigation.Navigator
+import pages.myapis.produce.ProduceApiBeforeYouStartPage
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.RelatedContentLink
 import views.html.myapis.produce.ProduceApiBeforeYouStartView
 
 import javax.inject.Inject
@@ -30,12 +35,35 @@ class ProduceApiBeforeYouStartController @Inject()(
   getData: ProduceApiDataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  view: ProduceApiBeforeYouStartView
+  view: ProduceApiBeforeYouStartView,
+  navigator: Navigator,
+  config: FrontendAppConfig
 ) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
-      Ok(view())
+      val nextPageUrl = navigator.nextPage(ProduceApiBeforeYouStartPage, NormalMode, request.userAnswers).url
+      Ok(view(nextPageUrl, buildRelatedContentLinks(), request.user))
+  }
+
+  private def buildRelatedContentLinks()(implicit messages: Messages): Seq[RelatedContentLink] = {
+    Seq(
+      RelatedContentLink.apiHubGuideLink(
+        config,
+        messages("produceApiBeforeYouStart.relatedContent.generatingProductionCredentials"),
+        "documentation/how-do-I-consume-apis.html#managing-your-applications"
+      ),
+      RelatedContentLink.apiHubGuideLink(
+        config,
+        messages("produceApiBeforeYouStart.relatedContent.producingApis"),
+        "documentation/how-do-i-produce.apis.html#how-do-i-produce-apis"
+      ),
+      RelatedContentLink.apiHubGuideLink(
+        config,
+        messages("produceApiBeforeYouStart.relatedContent.consumingApis"),
+        "documentation/how-do-I-consume-apis.html#how-do-i-consume-apis"
+      )
+    )
   }
 
 }

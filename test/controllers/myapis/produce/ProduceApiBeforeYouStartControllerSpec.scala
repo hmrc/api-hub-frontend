@@ -17,28 +17,68 @@
 package controllers.myapis.produce
 
 import base.SpecBase
-import controllers.myapis.produce.routes
+import controllers.actions.FakeUser
+import navigation.{FakeNavigator, Navigator}
+import play.api.Application
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import utils.HtmlValidation
+import viewmodels.RelatedContentLink
 import views.html.myapis.produce.ProduceApiBeforeYouStartView
 
-class ProduceApiBeforeYouStartControllerSpec extends SpecBase {
+class ProduceApiBeforeYouStartControllerSpec extends SpecBase with HtmlValidation {
+
+  import ProduceApiBeforeYouStartControllerSpec.*
+
+  private val nextPage = controllers.routes.IndexController.onPageLoad
 
   "ProduceApiBeforeYouStart Controller" - {
     "must return OK and the correct view for a GET" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val fixture = buildFixture()
 
-      running(application) {
-        val request = FakeRequest(GET, routes.ProduceApiBeforeYouStartController.onPageLoad().url)
-
-        val result = route(application, request).value
-
-        val view = application.injector.instanceOf[ProduceApiBeforeYouStartView]
+      running(fixture.application) {
+        val request = FakeRequest(controllers.myapis.produce.routes.ProduceApiBeforeYouStartController.onPageLoad())
+        val result = route(fixture.application, request).value
+        val view = fixture.application.injector.instanceOf[ProduceApiBeforeYouStartView]
+        val nextPageUrl = nextPage.url
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        contentAsString(result) mustBe view(nextPageUrl, relatedContentLinks, FakeUser)(request, messages(fixture.application)).toString
+        contentAsString(result) must validateAsHtml
       }
     }
   }
+
+  private case class Fixture(application: Application)
+
+  private def buildFixture(): Fixture = {
+    val application = applicationBuilder(Some(emptyUserAnswers))
+      .overrides(
+        bind[Navigator].toInstance(new FakeNavigator(nextPage))
+      )
+      .build()
+
+    Fixture(application)
+  }
+
+}
+
+object ProduceApiBeforeYouStartControllerSpec {
+
+  private val relatedContentLinks: Seq[RelatedContentLink] = Seq(
+    RelatedContentLink(
+      "Generating production credentials",
+      "http://localhost:8490/guides/integration-hub-guide/documentation/how-do-I-consume-apis.html#managing-your-applications"
+    ),
+    RelatedContentLink(
+      "Producing APIs",
+      "http://localhost:8490/guides/integration-hub-guide/documentation/how-do-i-produce.apis.html#how-do-i-produce-apis"
+    ),
+    RelatedContentLink(
+      "Consuming APIs",
+      "http://localhost:8490/guides/integration-hub-guide/documentation/how-do-I-consume-apis.html#how-do-i-consume-apis"
+    )
+  )
 
 }

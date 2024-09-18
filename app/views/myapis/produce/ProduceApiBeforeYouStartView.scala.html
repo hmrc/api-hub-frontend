@@ -14,14 +14,52 @@
  * limitations under the License.
  *@
 
+@import models.user.UserModel
+@import viewmodels.RelatedContentLink
+@import views.html.components.RelatedContent
+
 @this(
-        layout: templates.Layout,
-        govukButton: GovukButton
+    layout: templates.Layout,
+    govukButton: GovukButton,
+    relatedContent: RelatedContent
 )
 
-@()(implicit request: Request[?], messages: Messages)
+@(nextPageUrl: String, relatedContentLinks: Seq[RelatedContentLink], user: UserModel)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("produceApiBeforeYouStart.title"))) {
+@layout(pageTitle = titleNoForm(messages("produceApiBeforeYouStart.title")), user = Some(user), fullWidth = true) {
 
-    <h1 class="govuk-heading-xl">@messages("produceApiBeforeYouStart.heading")</h1>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-l">@messages("produceApiBeforeYouStart.heading")</h1>
+
+            <h2 class="govuk-heading-m">@messages("produceApiBeforeYouStart.beforeYouStart.heading")</h2>
+
+            <p class="govuk-body">@messages("produceApiBeforeYouStart.beforeYouStart.content")</p>
+
+            <h2 class="govuk-heading-m">@messages("produceApiBeforeYouStart.creationProcess.heading")</h2>
+
+            <p class="govuk-body">@messages("produceApiBeforeYouStart.creationProcess.content")</p>
+
+            <ol class="govuk-list govuk-list--number">
+                <li>@messages("produceApiBeforeYouStart.creationProcess.list.1")</li>
+                <li>@messages("produceApiBeforeYouStart.creationProcess.list.2")</li>
+                <li>@messages("produceApiBeforeYouStart.creationProcess.list.3")</li>
+                <li>@messages("produceApiBeforeYouStart.creationProcess.list.4")</li>
+            </ol>
+
+            @govukButton(
+                Button(
+                    id = Some("getStartedButton"),
+                    href = Some(nextPageUrl),
+                    content = Text(messages("produceApiBeforeYouStart.getStarted"))
+                )
+            )
+
+        </div>
+
+        <div class="govuk-grid-column-one-third ">
+            @relatedContent(relatedContentLinks)
+        </div>
+    </div>
+
 }
