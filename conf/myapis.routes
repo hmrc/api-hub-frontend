@@ -17,3 +17,9 @@ GET     /update-team/:apiId                                 controllers.myapis.U
 POST    /update-team/:apiId                                 controllers.myapis.UpdateApiTeamController.onSubmit(apiId: String)
 
 GET     /produce/start                                      controllers.myapis.produce.ProduceApiStartController.startProduceApi()
+
+GET     /produce/enter-oas                                  controllers.myapis.produce.ProduceApiEnterOasController.onPageLoad(mode: Mode = NormalMode)
+POST    /produce/enter-oas                                  controllers.myapis.produce.ProduceApiEnterOasController.onSubmit(mode: Mode = NormalMode)
+
+GET     /produce/change-enter-oas                           controllers.myapis.produce.ProduceApiEnterOasController.onPageLoad(mode: Mode = CheckMode)
+POST    /produce/change-enter-oas                           controllers.myapis.produce.ProduceApiEnterOasController.onSubmit(mode: Mode = CheckMode)

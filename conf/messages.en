@@ -753,3 +753,9 @@ applicationHistory.title = Application history
 applicationHistory.requests = Here are all the API Production access requests that have been made for this application:
 applicationHistory.noRequests = No production access requests have been made for this application.
 applicationHistory.secondaryTitle = Production access request history
+
+produceApiEnterOas.title = produceApiEnterOas
+produceApiEnterOas.heading = produceApiEnterOas
+produceApiEnterOas.checkYourAnswersLabel = produceApiEnterOas
+produceApiEnterOas.error.required = Enter produceApiEnterOas
+produceApiEnterOas.change.hidden = ProduceApiEnterOas

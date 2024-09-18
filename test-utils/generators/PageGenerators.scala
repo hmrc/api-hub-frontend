@@ -17,10 +17,14 @@
 package generators
 
 import org.scalacheck.Arbitrary
-import pages._
+import pages.*
 import pages.application.register.RegisterApplicationTeamPage
+import pages.myapis.produce.ProduceApiEnterOasPage
 
 trait PageGenerators {
+
+  implicit lazy val arbitraryProduceApiEnterOasPage: Arbitrary[ProduceApiEnterOasPage.type] =
+    Arbitrary(ProduceApiEnterOasPage)
 
   implicit lazy val arbitraryRegisterApplicationTeamPage: Arbitrary[RegisterApplicationTeamPage.type] =
     Arbitrary(RegisterApplicationTeamPage)
