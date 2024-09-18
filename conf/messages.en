@@ -761,3 +761,6 @@ produceApiEnterOas.hint = We''ve pre-populated the editor below with the specifi
 produceApiEnterOas.checkYourAnswersLabel = OpenAPI Specification
 produceApiEnterOas.error.required = Enter a valid OpenAPI Specification for your API
 produceApiEnterOas.change.hidden = OpenAPI Specification
+
+produceApiBeforeYouStart.title = produceApiBeforeYouStart
+produceApiBeforeYouStart.heading = produceApiBeforeYouStart

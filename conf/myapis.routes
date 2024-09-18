@@ -23,3 +23,5 @@ POST    /produce/enter-oas                                  controllers.myapis.p
 
 GET     /produce/change-enter-oas                           controllers.myapis.produce.ProduceApiEnterOasController.onPageLoad(mode: Mode = CheckMode)
 POST    /produce/change-enter-oas                           controllers.myapis.produce.ProduceApiEnterOasController.onSubmit(mode: Mode = CheckMode)
+
+GET     /produce/before-you-start                           controllers.myapis.produce.ProduceApiBeforeYouStartController.onPageLoad()
