@@ -2,6 +2,7 @@ service.name = The Integration Hub
 
 site.back = Back
 site.remove = Remove
+site.submit = Submit
 site.change = Change
 site.no = No
 site.yes = Yes
@@ -760,3 +761,5 @@ produceApiEnterOas.hint = We''ve pre-populated the editor below with the specifi
 produceApiEnterOas.checkYourAnswersLabel = OpenAPI Specification
 produceApiEnterOas.error.required = Enter a valid OpenAPI Specification for your API
 produceApiEnterOas.change.hidden = OpenAPI Specification
+
+feedback.button = Feedback
