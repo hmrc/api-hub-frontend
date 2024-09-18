@@ -165,7 +165,7 @@ case class CurlCommand(
                         headers: Map[String, String] = Map.empty,
                         requestBody: Option[String] = None) {
   override def toString: String = {
-    val hostAndPath = (server + getPathWithParameters).replace("//", "/")
+    val hostAndPath = server.replaceAll("/$", "") + getPathWithParameters
     val url = uri"$hostAndPath?$queryParams"
     val headers = getHeadersString
     s"curl -X '${method}' $headers '$url' ${requestBody.map(json => s"--data '$json'").getOrElse("")}"
