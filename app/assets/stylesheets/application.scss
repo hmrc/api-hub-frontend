@@ -452,6 +452,7 @@ $active-link-color: govuk-colour("dark-blue");
     display: inline-block;
     background-color: $code-background;
     line-height: 1.1em;
+    word-break: break-word;
 }
 
 .environment-block-header {
