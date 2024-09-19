@@ -702,7 +702,7 @@ myApis.produce.howtocreate.upload.hint = If you already have an OpenAPI Specific
 myApis.produce.howtocreate.editor.hint = If you do not have an OpenAPI Specification yet and want to create it in our graphical OAS editor
 myApis.produce.howtocreate.cya.label = produceApiHowToCreate
 myApis.produce.howtocreate.error.required = Select produceApiHowToCreate
-myApis.produce.howtocreate.change.hidden = ProduceApiHowToCreate
+myApis.produce.howtocreate.change.hidden = How do you want to create an API?
 
 applicationDetailsTable.applicationName = Name
 applicationDetailsTable.owningTeam = Owning team
