@@ -21,6 +21,7 @@
 @import uk.gov.hmrc.hmrcfrontend.views.config.StandardAlphaBanner
 @import views.html.helper.CSPNonce
 @import views.html.util.FooterWithItems
+@import views.ViewUtils
 
 @this(
     appConfig: FrontendAppConfig,
@@ -94,19 +95,10 @@
 
 }
 
-
-@feedbackTarget = @{
-    if (user.exists(_.userType != StrideUser)) {
-        "_blank"
-    } else {
-        "_self"
-    }
-}
-
 @content = {
     <a class="hip-feedback-button govuk-link govuk-link--inverse govuk-link--no-underline"
        href=@appConfig.feedbackLink
-       target=@feedbackTarget
+       target=@ViewUtils.linkTarget(request)
     >
         @messages("feedback.button")
     </a>
