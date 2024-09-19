@@ -1,0 +1,127 @@
+@*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.api.{Domain, Hod}
+@import models.user.UserModel
+@import viewmodels.admin.{AdminNavItems, AdminSideNavPages}
+
+@this(
+    layout: templates.Layout,
+    govukTabs : GovukTabs,
+    govukTable : GovukTable
+)
+
+@(domains: Seq[Domain], hods: Seq[Hod], user: UserModel)(implicit request: Request[?], messages: Messages)
+
+@subDomainsHtml(domain: Domain) = {
+    <ul class="govuk-list govuk-list-bullet">
+        @for(subDomain <- domain.subDomains) {
+            <li>@subDomain.code: @subDomain.description</li>
+        }
+    </ul>
+}
+
+@domainsHtml() = {
+
+    <h2 class="govuk-heading-m">@messages("configuration.domains.heading")</h2>
+
+    @govukTable(Table(
+        rows = domains.map(
+            domain =>
+                Seq(
+                    TableRow(
+                        content = Text(domain.code)
+                    ),
+                    TableRow(
+                        content = Text(domain.description)
+                    ),
+                    TableRow(
+                        content = HtmlContent(subDomainsHtml(domain))
+                    )
+                )
+        ),
+        head = Some(Seq(
+            HeadCell(
+                content = messages("configuration.domains.code")
+            ),
+            HeadCell(
+                content = messages("configuration.domains.description")
+            ),
+            HeadCell(
+                content = messages("configuration.domains.subDomains")
+            )
+        ))
+    ))
+
+}
+
+@hodsHtml() = {
+
+    <h2 class="govuk-heading-m">@messages("configuration.hods.heading")</h2>
+
+    @govukTable(Table(
+        rows = hods.map(
+            hod =>
+                Seq(
+                    TableRow(
+                        content = Text(hod.code)
+                    ),
+                    TableRow(
+                        content = Text(hod.description)
+                    )
+                )
+        ),
+        head = Some(Seq(
+            HeadCell(
+                content = messages("configuration.hods.abbreviation")
+            ),
+            HeadCell(
+                content = messages("configuration.hods.fullName")
+            )
+        ))
+    ))
+
+}
+
+@layout(pageTitle = titleNoForm(messages("configuration.title")), user = Some(user), fullWidth = true) {
+
+    @views.html.templates.SideNav(messages("manageApplications.admin"), AdminNavItems(user, AdminSideNavPages.ConfigurationPage)) {
+
+        <h1 class="govuk-heading-l">@messages("configuration.title")</h1>
+
+        @govukTabs(Tabs(
+            items = Seq(
+              TabItem(
+                id = Some("domainsTab"),
+                label = messages("configuration.domains.heading"),
+                panel = TabPanel(
+                  content = HtmlContent(domainsHtml())
+                )
+              ),
+              TabItem(
+                id = Some("hodsTab"),
+                label = messages("configuration.hods.heading"),
+                panel = TabPanel(
+                  content = HtmlContent(hodsHtml())
+                )
+              )
+            )
+          )
+        )
+
+    }
+
+}
