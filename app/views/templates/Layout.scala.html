@@ -104,14 +104,12 @@
 }
 
 @content = {
-    @if(pageTitle != messages("feedback.title")){
-        <a class="feedback-button govuk-link govuk-link--inverse govuk-link--no-underline"
-           href=@controllers.routes.FeedbackController.onPageLoad().url
-           target=@feedbackTarget
-        >
-            @messages("feedback.button")
-        </a>
-    }
+    <a class="hip-feedback-button govuk-link govuk-link--inverse govuk-link--no-underline"
+       href=@appConfig.feedbackLink
+       target=@feedbackTarget
+    >
+        @messages("feedback.button")
+    </a>
 
     @contentBlock
 

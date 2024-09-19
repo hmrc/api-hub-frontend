@@ -797,29 +797,15 @@ header {
     width: 100%;
 }
 
-.feedback-button {
+.hip-feedback-button {
     position: fixed;
     top: 50%;
-    right: -30px;
+    right: -2rem;
     transform: translateY(-50%) rotate(-90deg);
     background-color: $mid-blue;
     color: $off-white !important;
-    padding: 15px;
-    font-size: 16px;
+    padding: 1rem;
+    font-size: 1rem;
     font-weight: bold;
     border: none;
-}
-
-.govuk-radios--inline {
-    &[data-before]:before {
-        content: attr(data-before);
-        font-family: $font-family;
-        align-self: center;
-        padding-right: 30px;
-    }
-    &[data-after]:after {
-        content: attr(data-after);
-        font-family: $font-family;
-        align-self: center;
-    }
 }

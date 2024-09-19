@@ -2,7 +2,6 @@ service.name = The Integration Hub
 
 site.back = Back
 site.remove = Remove
-site.submit = Submit
 site.change = Change
 site.no = No
 site.yes = Yes
