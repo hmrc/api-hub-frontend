@@ -19,19 +19,19 @@ package controllers.application
 import base.SpecBase
 import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
 import generators.ApiDetailGenerators
-import models.UserAnswers
-import models.api.{ApiDetail, Endpoint, EndpointMethod, Live, Maintainer}
+import models.api.*
+import models.application.*
 import models.application.ApplicationLenses.ApplicationLensOps
-import models.application._
 import models.user.UserModel
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import models.{NormalMode, UserAnswers}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.AccessRequestApplicationIdPage
+import play.api.Application as PlayApplication
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import play.api.{Application => PlayApplication}
+import play.api.test.Helpers.*
 import repositories.AccessRequestSessionRepository
 import services.ApiHubService
 import utils.HtmlValidation
@@ -81,7 +81,7 @@ class RequestProductionAccessStartControllerSpec extends SpecBase with MockitoSu
         val result = route(fixture.application, request).value
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.RequestProductionAccessController.onPageLoad().url)
+        redirectLocation(result) mustBe Some(routes.RequestProductionAccessSelectApisController.onPageLoad(NormalMode).url)
       }
     }
 

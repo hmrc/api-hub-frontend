@@ -16,8 +16,9 @@
 
 package controllers.application
 
+import config.FrontendAppConfig
 import controllers.actions.{ApplicationAuthActionProvider, IdentifierAction}
-import models.UserAnswers
+import models.{NormalMode, UserAnswers}
 import pages.AccessRequestApplicationIdPage
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -33,17 +34,20 @@ class RequestProductionAccessStartController @Inject()(
     identify: IdentifierAction,
     accessRequestSessionRepository: AccessRequestSessionRepository,
     clock: Clock,
-    applicationAuth: ApplicationAuthActionProvider)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+    applicationAuth: ApplicationAuthActionProvider,
+    appConfig: FrontendAppConfig,
+)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id, enrich = true)).async {
     implicit request =>
       for {
         userAnswers <- Future.fromTry(UserAnswers(
-            id = request.identifierRequest.user.userId,
-            lastUpdated = clock.instant()
-          ).set(AccessRequestApplicationIdPage, request.application))
+          id = request.identifierRequest.user.userId,
+          lastUpdated = clock.instant()
+        ).set(AccessRequestApplicationIdPage, request.application))
         _ <- accessRequestSessionRepository.set(userAnswers)
-      } yield Redirect(controllers.application.routes.RequestProductionAccessController.onPageLoad())
+
+      } yield Redirect(controllers.application.routes.RequestProductionAccessSelectApisController.onPageLoad(NormalMode))
   }
 
 }
