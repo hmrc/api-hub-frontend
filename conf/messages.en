@@ -753,3 +753,10 @@ applicationHistory.title = Application history
 applicationHistory.requests = Here are all the API Production access requests that have been made for this application:
 applicationHistory.noRequests = No production access requests have been made for this application.
 applicationHistory.secondaryTitle = Production access request history
+
+produceApiEnterOas.title = Enter your OpenAPI Specification
+produceApiEnterOas.heading = Enter your OpenAPI Specification
+produceApiEnterOas.hint = We''ve pre-populated the editor below with the specification of an example API, you can edit it to match your own API. Note the various best practices included in the example such as a clear overall description of the API, descriptions for each endpoint, lists of error response messages, and the response that is to be expected from a successful request.
+produceApiEnterOas.checkYourAnswersLabel = OpenAPI Specification
+produceApiEnterOas.error.required = Enter a valid OpenAPI Specification for your API
+produceApiEnterOas.change.hidden = OpenAPI Specification
