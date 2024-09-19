@@ -98,9 +98,9 @@
 @content = {
     <a class="hip-feedback-button govuk-link govuk-link--inverse govuk-link--no-underline"
        href=@appConfig.feedbackLink
-       target=@ViewUtils.linkTarget(request)
+       target="_blank"
     >
-        @messages("feedback.button")
+        @messages("site.feedback")
     </a>
 
     @contentBlock

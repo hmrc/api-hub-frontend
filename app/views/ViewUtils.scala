@@ -19,15 +19,12 @@ package views
 import models.accessrequest.*
 import play.api.data.Form
 import play.api.i18n.Messages
-import play.api.mvc.RequestHeader
 import play.twirl.api.Html
 
 import java.time.format.DateTimeFormatter
 import java.time.{Instant, LocalDateTime, ZoneOffset}
 
 object ViewUtils {
-
-  private val userAgentValuesStrideBrowsers = Seq("edge", "trident", "msie")
 
   def title(form: Form[?], title: String, section: Option[String] = None)(implicit messages: Messages): String =
     titleNoForm(
@@ -58,16 +55,5 @@ object ViewUtils {
       case Cancelled => Html(s"<strong class='govuk-tag govuk-tag--grey'>${status.toString}</strong>")
     }
   }
-
-  def linkTarget(request: RequestHeader): String =
-    val isRunningOfStrideBrowser = request.headers.get("user-agent").exists(ua =>
-      userAgentValuesStrideBrowsers.exists(sb =>
-        ua.toLowerCase().contains(sb)
-      )
-    )
-    if (isRunningOfStrideBrowser)
-      "_self"
-    else
-      "_blank"
 
 }
