@@ -98,7 +98,7 @@ class NavigatorSpec extends SpecBase with TryValues {
         }
       }
 
-      "during the Produce and API journey" - {
+      "during the Produce an API journey" - {
         "must start with the Before you Start page" in {
           navigator.nextPage(ProduceApiStartPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiBeforeYouStartController.onPageLoad()
         }

@@ -821,29 +821,16 @@ header {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-weight: 700;
-  font-size: 16px;
   font-size: 1rem;
   line-height: 1.25;
   margin-top: 15px;
   margin-bottom: 10px;
 }
 
-@media print {
-  .gem-c-related-navigation__main-heading {
-    font-family: sans-serif;
-  }
-}
 @media (min-width: 40.0625em) {
   .gem-c-related-navigation__main-heading {
-    font-size: 19px;
     font-size: 1.1875rem;
     line-height: 1.3157894737;
-  }
-}
-@media print {
-  .gem-c-related-navigation__main-heading {
-    font-size: 14pt;
-    line-height: 1.15;
   }
 }
 
