@@ -16,11 +16,12 @@
 
 @import components.FullWidthMainContent
 @import config.FrontendAppConfig
-@import models.user.UserModel
+@import models.user.{StrideUser, UserModel}
 @import templates.ApiHubHeader
 @import uk.gov.hmrc.hmrcfrontend.views.config.StandardAlphaBanner
 @import views.html.helper.CSPNonce
 @import views.html.util.FooterWithItems
+@import views.ViewUtils
 
 @this(
     appConfig: FrontendAppConfig,
@@ -95,6 +96,13 @@
 }
 
 @content = {
+    <a class="hip-feedback-button govuk-link govuk-link--inverse govuk-link--no-underline"
+       href=@appConfig.feedbackLink
+       target="_blank"
+    >
+        @messages("site.feedback")
+    </a>
+
     @contentBlock
 
     <div class="govuk-!-margin-top-8">

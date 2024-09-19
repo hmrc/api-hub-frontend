@@ -33,6 +33,7 @@ site.deleted = Deleted
 site.live = Live
 site.total = Total
 site.noEmail = The current user does not have an email address
+site.feedback = Feedback
 
 date.day = Day
 date.month = Month
@@ -762,3 +763,27 @@ applicationHistory.title = Application history
 applicationHistory.requests = Here are all the API Production access requests that have been made for this application:
 applicationHistory.noRequests = No production access requests have been made for this application.
 applicationHistory.secondaryTitle = Production access request history
+
+produceApiEnterOas.title = Enter your OpenAPI Specification
+produceApiEnterOas.heading = Enter your OpenAPI Specification
+produceApiEnterOas.hint = We''ve pre-populated the editor below with the specification of an example API, you can edit it to match your own API. Note the various best practices included in the example such as a clear overall description of the API, descriptions for each endpoint, lists of error response messages, and the response that is to be expected from a successful request.
+produceApiEnterOas.checkYourAnswersLabel = OpenAPI Specification
+produceApiEnterOas.error.required = Enter a valid OpenAPI Specification for your API
+produceApiEnterOas.change.hidden = OpenAPI Specification
+
+produceApiBeforeYouStart.title = Produce an API
+produceApiBeforeYouStart.heading = Produce an API
+produceApiBeforeYouStart.beforeYouStart.heading = Before you start
+produceApiBeforeYouStart.beforeYouStart.content = If you plan to deploy an API you will need your OAS file, however if you want to test a hello world API you will not need anything.
+produceApiBeforeYouStart.creationProcess.heading = API Creation Process
+produceApiBeforeYouStart.creationProcess.content = The API creation process is as follows
+produceApiBeforeYouStart.creationProcess.list.1 = Provide your OAS File
+produceApiBeforeYouStart.creationProcess.list.2 = Choose an API name
+produceApiBeforeYouStart.creationProcess.list.3 = Wait for deployment to complete
+produceApiBeforeYouStart.creationProcess.list.4 = Test the API using credentials and the provided endpoint
+produceApiBeforeYouStart.getStarted = Get started
+produceApiBeforeYouStart.relatedContent.generatingProductionCredentials = Generating production credentials
+produceApiBeforeYouStart.relatedContent.producingApis = Producing APIs
+produceApiBeforeYouStart.relatedContent.consumingApis = Consuming APIs
+
+relatedContent.header = Related content

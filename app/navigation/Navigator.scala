@@ -20,9 +20,10 @@ import javax.inject.{Inject, Singleton}
 import play.api.mvc.Call
 import controllers.routes
 import models.AddEndpoints
-import pages._
-import models._
+import pages.*
+import models.*
 import pages.application.register.{RegisterApplicationNamePage, RegisterApplicationStartPage, RegisterApplicationTeamPage}
+import pages.myapis.produce.ProduceApiStartPage
 
 @Singleton
 class Navigator @Inject()() {
@@ -39,6 +40,7 @@ class Navigator @Inject()() {
     case RegisterApplicationStartPage => _ => controllers.application.register.routes.RegisterApplicationNameController.onPageLoad(NormalMode)
     case RegisterApplicationNamePage => _ => controllers.application.register.routes.RegisterApplicationTeamController.onPageLoad(NormalMode)
     case RegisterApplicationTeamPage => _ => controllers.application.register.routes.RegisterApplicationCheckYourAnswersController.onPageLoad()
+    case ProduceApiStartPage => _ => controllers.myapis.produce.routes.ProduceApiBeforeYouStartController.onPageLoad()
     case _ => _ => routes.IndexController.onPageLoad
   }
 

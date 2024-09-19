@@ -86,6 +86,19 @@ export const paginationHelper = {
     clickPrevious() {
         this.previousLink().click();
     }
-
-
 };
+
+export function buildFakeAceEditor()  {
+    const editor = jasmine.createSpyObj({
+        setOption: null,
+        setTheme: null,
+    });
+    let currentValue = '';
+    editor.session = jasmine.createSpyObj({setMode: null});
+    editor.setValue = value => currentValue = value;
+    editor.getValue = () => currentValue;
+    const fakeAce = {
+        edit: () => editor,
+    };
+    return fakeAce;
+}

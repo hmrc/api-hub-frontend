@@ -18,6 +18,14 @@ POST    /update-team/:apiId                                 controllers.myapis.U
 
 GET     /produce/start                                      controllers.myapis.produce.ProduceApiStartController.startProduceApi()
 
+GET     /produce/enter-oas                                  controllers.myapis.produce.ProduceApiEnterOasController.onPageLoad(mode: Mode = NormalMode)
+POST    /produce/enter-oas                                  controllers.myapis.produce.ProduceApiEnterOasController.onSubmit(mode: Mode = NormalMode)
+
+GET     /produce/change-enter-oas                           controllers.myapis.produce.ProduceApiEnterOasController.onPageLoad(mode: Mode = CheckMode)
+POST    /produce/change-enter-oas                           controllers.myapis.produce.ProduceApiEnterOasController.onSubmit(mode: Mode = CheckMode)
+
+GET     /produce/before-you-start                           controllers.myapis.produce.ProduceApiBeforeYouStartController.onPageLoad()
+
 GET     /produce/how-to-create                              controllers.myapis.produce.ProduceApiHowToCreateController.onPageLoad(mode: Mode = NormalMode)
 POST    /produce/how-to-create                              controllers.myapis.produce.ProduceApiHowToCreateController.onSubmit(mode: Mode = NormalMode)
 GET     /produce/change-how-to-create                       controllers.myapis.produce.ProduceApiHowToCreateController.onPageLoad(mode: Mode = CheckMode)

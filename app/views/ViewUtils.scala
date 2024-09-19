@@ -16,13 +16,13 @@
 
 package views
 
-import models.accessrequest._
+import models.accessrequest.*
 import play.api.data.Form
 import play.api.i18n.Messages
 import play.twirl.api.Html
 
-import java.time.{Instant, LocalDateTime, ZoneOffset}
 import java.time.format.DateTimeFormatter
+import java.time.{Instant, LocalDateTime, ZoneOffset}
 
 object ViewUtils {
 
