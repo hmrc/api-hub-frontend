@@ -30,7 +30,7 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import views.html.ProduceApiEnterOasView
+import views.html.myapis.produce.ProduceApiEnterOasView
 
 import scala.concurrent.Future
 
@@ -41,7 +41,7 @@ class ProduceApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
   val formProvider = new ProduceApiEnterOasFormProvider()
   val form = formProvider()
 
-  lazy val produceApiEnterOasRoute = routes.ProduceApiEnterOasController.onPageLoad(NormalMode).url
+  lazy val produceApiEnterOasRoute = controllers.myapis.produce.routes.ProduceApiEnterOasController.onPageLoad(NormalMode).url
 
   "ProduceApiEnterOas Controller" - {
 
