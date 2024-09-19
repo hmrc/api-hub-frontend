@@ -43,6 +43,8 @@ $secondary-success-color: govuk-colour("white");
 $secondary-success-background: govuk-colour("dark-grey");
 $active-link-color: govuk-colour("dark-blue");
 
+$font-family: "GDS Transport", arial, sans-serif;
+
 .js-visible {
     display: none !important;
 }
@@ -205,7 +207,7 @@ $active-link-color: govuk-colour("dark-blue");
 }
 
 .api-panel {
-    font-family: "GDS Transport", arial, sans-serif;
+    font-family: $font-family;
     min-height: 45px;
     background-color: $panel-background;
     border: solid 1px $api-panel-border-color;
@@ -240,7 +242,7 @@ $active-link-color: govuk-colour("dark-blue");
     }
 
     .call-out-type {
-        font-family: "GDS Transport", arial, sans-serif;
+        font-family: $font-family;
         margin-bottom: 20px;
         font-weight: 700;
         font-size: 1.1rem !important;
@@ -288,7 +290,7 @@ $active-link-color: govuk-colour("dark-blue");
 }
 
 .call-out-panel {
-    font-family: "GDS Transport", arial, sans-serif;
+    font-family: $font-family;
     min-height: 45px;
     background-color: $panel-background;
     border: solid 1px $call-out-panel-border-color;
@@ -329,7 +331,7 @@ $active-link-color: govuk-colour("dark-blue");
     }
 
     .call-out-type {
-        font-family: "GDS Transport", arial, sans-serif;
+        font-family: $font-family;
         margin-bottom: 20px;
         margin-left: 14px;
         font-weight: 700;
@@ -405,7 +407,7 @@ $active-link-color: govuk-colour("dark-blue");
     text-decoration: none;
     display: block;
     background-color: transparent;
-    font-family: "GDS Transport", arial, sans-serif;
+    font-family: $font-family;
     font-weight: 400;
     text-transform: none;
     font-size: 16px;
@@ -517,7 +519,7 @@ $active-link-color: govuk-colour("dark-blue");
 }
 
 .gem-c-search__input[type=search] {
-    font-family: "GDS Transport", arial, sans-serif;
+    font-family: $font-family;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-weight: 400;
@@ -793,4 +795,17 @@ header {
 .hip-ace-editor {
     height: 600px;
     width: 100%;
+}
+
+.hip-feedback-button {
+    position: fixed;
+    top: 50%;
+    right: -2rem;
+    transform: translateY(-50%) rotate(-90deg);
+    background-color: $mid-blue;
+    color: $off-white !important;
+    padding: 1rem;
+    font-size: 1rem;
+    font-weight: bold;
+    border: none;
 }

@@ -33,6 +33,7 @@ site.deleted = Deleted
 site.live = Live
 site.total = Total
 site.noEmail = The current user does not have an email address
+site.feedback = Feedback
 
 date.day = Day
 date.month = Month

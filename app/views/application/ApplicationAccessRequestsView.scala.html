@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import models.accessrequest._
+@import models.accessrequest.*
 @import models.user.UserModel
 @import views.html.components.AccessRequestPanel
 @import viewmodels.application.ApplicationNavItems
@@ -29,7 +29,7 @@
     applicationDetailsTable: ApplicationDetailsTable
 )
 
-@(application: Application, accessRequests: Seq[AccessRequest], user: UserModel)(implicit request: Request[_], messages: Messages)
+@(application: Application, accessRequests: Seq[AccessRequest], user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @layout(
     pageTitle = titleNoForm(messages("applicationHistory.title")),
