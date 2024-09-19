@@ -18,10 +18,11 @@ package navigation
 
 import base.SpecBase
 import controllers.routes
-import pages._
-import models._
+import pages.*
+import models.*
 import org.scalatest.TryValues
 import pages.application.register.{RegisterApplicationNamePage, RegisterApplicationStartPage, RegisterApplicationTeamPage}
+import pages.myapis.produce.ProduceApiStartPage
 
 class NavigatorSpec extends SpecBase with TryValues {
 
@@ -94,6 +95,12 @@ class NavigatorSpec extends SpecBase with TryValues {
         }
         "must go from the Application Team page to the Check Your Answers page" in {
           navigator.nextPage(RegisterApplicationTeamPage, NormalMode, emptyUserAnswers) mustBe controllers.application.register.routes.RegisterApplicationCheckYourAnswersController.onPageLoad()
+        }
+      }
+
+      "during the Produce an API journey" - {
+        "must start with the Before you Start page" in {
+          navigator.nextPage(ProduceApiStartPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiBeforeYouStartController.onPageLoad()
         }
       }
     }

@@ -809,3 +809,38 @@ header {
     font-weight: bold;
     border: none;
 }
+
+.gem-c-related-navigation {
+  color: #0b0c0c;
+  border-top: 2px solid #1d70b8;
+  margin-bottom: 60px;
+}
+
+.gem-c-related-navigation__main-heading {
+  font-family: "GDS Transport", arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.25;
+  margin-top: 15px;
+  margin-bottom: 10px;
+}
+
+@media (min-width: 40.0625em) {
+  .gem-c-related-navigation__main-heading {
+    font-size: 1.1875rem;
+    line-height: 1.3157894737;
+  }
+}
+
+.gem-c-related-navigation__link-list {
+  padding: 0;
+  list-style: none;
+  margin-bottom: 1.25em;
+}
+
+.gem-c-related-navigation__link {
+  margin-bottom: 0.8em;
+  font-size: 1rem;
+}

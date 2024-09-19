@@ -761,3 +761,20 @@ produceApiEnterOas.hint = We''ve pre-populated the editor below with the specifi
 produceApiEnterOas.checkYourAnswersLabel = OpenAPI Specification
 produceApiEnterOas.error.required = Enter a valid OpenAPI Specification for your API
 produceApiEnterOas.change.hidden = OpenAPI Specification
+
+produceApiBeforeYouStart.title = Produce an API
+produceApiBeforeYouStart.heading = Produce an API
+produceApiBeforeYouStart.beforeYouStart.heading = Before you start
+produceApiBeforeYouStart.beforeYouStart.content = If you plan to deploy an API you will need your OAS file, however if you want to test a hello world API you will not need anything.
+produceApiBeforeYouStart.creationProcess.heading = API Creation Process
+produceApiBeforeYouStart.creationProcess.content = The API creation process is as follows
+produceApiBeforeYouStart.creationProcess.list.1 = Provide your OAS File
+produceApiBeforeYouStart.creationProcess.list.2 = Choose an API name
+produceApiBeforeYouStart.creationProcess.list.3 = Wait for deployment to complete
+produceApiBeforeYouStart.creationProcess.list.4 = Test the API using credentials and the provided endpoint
+produceApiBeforeYouStart.getStarted = Get started
+produceApiBeforeYouStart.relatedContent.generatingProductionCredentials = Generating production credentials
+produceApiBeforeYouStart.relatedContent.producingApis = Producing APIs
+produceApiBeforeYouStart.relatedContent.consumingApis = Consuming APIs
+
+relatedContent.header = Related content
