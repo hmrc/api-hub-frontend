@@ -21,11 +21,20 @@ import models.application.TeamMember
 import models.team.Team
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
-import pages._
+import pages.*
 import pages.application.register.RegisterApplicationTeamPage
+import pages.myapis.produce.ProduceApiHowToCreatePage
 import play.api.libs.json.{JsValue, Json}
 
 trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators with TeamGenerator {
+
+  implicit lazy val arbitraryProduceApiHowToCreateUserAnswersEntry: Arbitrary[(ProduceApiHowToCreatePage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[ProduceApiHowToCreatePage.type]
+        value <- arbitrary[ProduceApiHowToCreate].map(Json.toJson(_))
+      } yield (page, value)
+    }
 
   implicit lazy val arbitraryRegisterApplicationTeamUserAnswersEntry: Arbitrary[(RegisterApplicationTeamPage.type, JsValue)] =
     Arbitrary {

@@ -17,3 +17,8 @@ GET     /update-team/:apiId                                 controllers.myapis.U
 POST    /update-team/:apiId                                 controllers.myapis.UpdateApiTeamController.onSubmit(apiId: String)
 
 GET     /produce/start                                      controllers.myapis.produce.ProduceApiStartController.startProduceApi()
+
+GET     /produce/how-to-create                              controllers.myapis.produce.ProduceApiHowToCreateController.onPageLoad(mode: Mode = NormalMode)
+POST    /produce/how-to-create                              controllers.myapis.produce.ProduceApiHowToCreateController.onSubmit(mode: Mode = NormalMode)
+GET     /produce/change-how-to-create                       controllers.myapis.produce.ProduceApiHowToCreateController.onPageLoad(mode: Mode = CheckMode)
+POST    /produce/change-how-to-create                       controllers.myapis.produce.ProduceApiHowToCreateController.onSubmit(mode: Mode = CheckMode)

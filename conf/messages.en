@@ -693,6 +693,15 @@ myApis.update.team.success.subHeading = What you can do now
 myApis.update.team.success.text = Return to {0}
 myApis.update.team.something.not.found.heading = Unable to update owning team for this API.
 myApis.update.team.something.not.found.message = The API or team cannot be found.
+myApis.produce.howtocreate.title = How do you want to create an API?
+myApis.produce.howtocreate.heading = How do you want to create an API?
+myApis.produce.howtocreate.upload = Upload an OpenAPI Specification file
+myApis.produce.howtocreate.editor = Use a Visual OpenAPI Specification Editor
+myApis.produce.howtocreate.upload.hint = If you already have an OpenAPI Specification file you can upload this file to begin creating your API
+myApis.produce.howtocreate.editor.hint = If you do not have an OpenAPI Specification yet and want to create it in our graphical OAS editor
+myApis.produce.howtocreate.cya.label = produceApiHowToCreate
+myApis.produce.howtocreate.error.required = Select produceApiHowToCreate
+myApis.produce.howtocreate.change.hidden = ProduceApiHowToCreate
 
 applicationDetailsTable.applicationName = Name
 applicationDetailsTable.owningTeam = Owning team
