@@ -23,7 +23,7 @@ import navigation.Navigator
 import pages.myapis.produce.ProduceApiEnterOasPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.SessionRepository
+import repositories.ProduceApiSessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.myapis.produce.ProduceApiEnterOasView
 
@@ -32,7 +32,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ProduceApiEnterOasController @Inject()(
                                         override val messagesApi: MessagesApi,
-                                        sessionRepository: SessionRepository,
+                                        sessionRepository: ProduceApiSessionRepository,
                                         navigator: Navigator,
                                         identify: IdentifierAction,
                                         getData: ProduceApiDataRetrievalAction,

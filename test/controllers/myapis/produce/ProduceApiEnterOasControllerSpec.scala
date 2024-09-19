@@ -29,7 +29,7 @@ import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import repositories.SessionRepository
+import repositories.ProduceApiSessionRepository
 import views.html.myapis.produce.ProduceApiEnterOasView
 
 import scala.concurrent.Future
@@ -81,7 +81,7 @@ class ProduceApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to the next page when valid data is submitted" in {
 
-      val mockSessionRepository = mock[SessionRepository]
+      val mockSessionRepository = mock[ProduceApiSessionRepository]
 
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
@@ -89,7 +89,7 @@ class ProduceApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[ProduceApiSessionRepository].toInstance(mockSessionRepository)
           )
           .build()
 
