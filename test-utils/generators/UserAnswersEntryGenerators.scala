@@ -16,9 +16,10 @@
 
 package generators
 
-import models.ApiPolicyConditionsDeclaration
+import models.{ApiPolicyConditionsDeclaration}
 import models.application.TeamMember
 import models.team.Team
+import models.myapis.produce.ProduceApiHowToCreate
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import pages.*

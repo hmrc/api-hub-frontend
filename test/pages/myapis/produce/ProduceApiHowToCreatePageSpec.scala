@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
-package pages.myapis.produce
+package pages
 
 import models.myapis.produce.ProduceApiHowToCreate
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import pages.behaviours.PageBehaviours
+import pages.myapis.produce.ProduceApiHowToCreatePage
 
-case object ProduceApiHowToCreatePage extends QuestionPage[ProduceApiHowToCreate] {
+class ProduceApiHowToCreateSpec extends PageBehaviours {
 
-  override def path: JsPath = JsPath \ toString
+  "ProduceApiHowToCreatePage" - {
 
-  override def toString: String = "produceApiHowToCreate"
+    beRetrievable[ProduceApiHowToCreate](ProduceApiHowToCreatePage)
+
+    beSettable[ProduceApiHowToCreate](ProduceApiHowToCreatePage)
+
+    beRemovable[ProduceApiHowToCreate](ProduceApiHowToCreatePage)
+  }
 }

@@ -17,7 +17,7 @@
 package forms.myapis.produce
 
 import forms.mappings.Mappings
-import models.ProduceApiHowToCreate
+import models.myapis.produce.ProduceApiHowToCreate
 import play.api.data.Form
 
 import javax.inject.Inject
