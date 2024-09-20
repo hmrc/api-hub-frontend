@@ -21,10 +21,11 @@ import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
 import models.AvailableEndpoint
 import models.accessrequest.{AccessRequest, AccessRequestRequest, AccessRequestStatus}
 import models.api.{ApiDeploymentStatuses, ApiDetail, PlatformContact}
-import models.application._
+import models.application.*
 import models.deployment.DeploymentDetails
 import models.exception.ApplicationsException
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
+import models.stats.ApisInProductionStatistic
 import models.team.{NewTeam, Team}
 import models.user.UserContactDetails
 import play.api.Logging
@@ -195,6 +196,10 @@ class ApiHubService @Inject()(
     integrationCatalogueConnector.getPlatformContacts() flatMap {
       platformContacts => Future.successful(platformContacts.find(_.platformType == forPlatform))
     }
+  }
+
+  def apisInProduction()(implicit hc: HeaderCarrier): Future[ApisInProductionStatistic] = {
+    applicationsConnector.apisInProduction()
   }
 
 }

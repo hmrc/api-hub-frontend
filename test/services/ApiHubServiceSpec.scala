@@ -26,6 +26,7 @@ import models.application.ApplicationLenses.*
 import models.application.*
 import models.deployment.DeploymentDetails
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
+import models.stats.ApisInProductionStatistic
 import models.team.{NewTeam, Team}
 import models.user.UserContactDetails
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -778,6 +779,20 @@ class ApiHubServiceSpec
         result =>
           verify(fixture.integrationCatalogueConnector).getPlatformContacts()(any())
           result mustBe Some(PlatformContact("A_PLATFORM", ContactInfo("a name", "an email"), false))
+      }
+    }
+  }
+
+  "apisInProduction" - {
+    "must make the correct request to the applications connector and return the statistic" in {
+      val fixture = buildFixture()
+      val expected = ApisInProductionStatistic(10, 2)
+
+      when(fixture.applicationsConnector.apisInProduction()(any)).thenReturn(Future.successful(expected))
+
+      fixture.service.apisInProduction()(HeaderCarrier()).map {
+        result =>
+          result mustBe expected
       }
     }
   }
