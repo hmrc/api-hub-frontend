@@ -40,17 +40,12 @@ class CurlCommandController @Inject()(
   def buildCurlCommand(id: String, apiWorld: ApiWorld): Action[AnyContent] = (identify andThen isSupport andThen applicationAuth(id, enrich = true)).async {
     implicit request => {
       Future.sequence(request.application.apis.map(api => apiHubService.getApiDetail(api.id))).map(_.flatten).map(apiDetails =>
-        val curlCommandResults = for {
-          apiDetail <- apiDetails
-          endpoint <- apiDetail.endpoints
-          method <- endpoint.methods
-        } yield curlCommandService.buildCurlCommandForEndpoint(request.application, apiDetail, endpoint.path, method.httpMethod, apiWorld)
-
-        val curlCommands = curlCommandResults.collect { case Right(curlCommand) => curlCommand }
+        val curlCommandResults = apiDetails.map(apiDetail => curlCommandService.buildCurlCommandsForApi(request.application, apiDetail, apiWorld))
+        val curlCommands = curlCommandResults.collect { case Right(curlCommand) => curlCommand }.flatten
         val errors = curlCommandResults.collect { case Left(error) => error }
 
         (curlCommands, errors) match {
-          case (Nil, Nil) => Ok(Json.arr()) // The application has no APIs
+          case (Nil, Nil) => Ok(Json.arr()) // The application has no APIs 
           case (Nil, _) => InternalServerError(Json.toJson(errors.toSet.toSeq.mkString(","))) // No curl commands were built
           case _ => Ok(Json.toJson(curlCommands.map(_.toString))) // Some curl commands were successfully built
         }

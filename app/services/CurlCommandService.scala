@@ -30,26 +30,35 @@ import models.api.ApiDetail
 import models.application.Application
 import models.application.ApplicationLenses.*
 import models.{ApiWorld, CORPORATE, CurlCommand, MDTP}
+import play.api.Logging
 import play.api.libs.json.Json
 
 import java.util.Base64.getEncoder
 import scala.jdk.CollectionConverters.*
 
 @Singleton
-class CurlCommandService {
+class CurlCommandService extends Logging {
 
-  def buildCurlCommandForEndpoint(application: Application, apiDetail: ApiDetail, path: String, method: String, apiWorld: ApiWorld): Either[String, CurlCommand] = {
-    for {
-      openApiDoc <- OpenApiDoc.parse(apiDetail.openApiSpecification)
-      operation <- openApiDoc.getOperation(method, path)
-    } yield CurlCommand(
-      method = method,
-      server = openApiDoc.getServerForApiWorld(apiWorld),
-      path = path,
-      queryParams = operation.queryParams,
-      pathParams = operation.pathParams,
-      headers = operation.headerParams ++ getCommonHeaders(application),
-      requestBody = operation.exampleRequestBody
+  def buildCurlCommandsForApi(application: Application, apiDetail: ApiDetail, apiWorld: ApiWorld): Either[String, Seq[CurlCommand]] = {
+    OpenApiDoc.parse(apiDetail.openApiSpecification).map(openApiDoc =>
+      val operationResults = for {
+        endpoint <- apiDetail.endpoints
+        method <- endpoint.methods
+      } yield openApiDoc.getOperation(method.httpMethod, endpoint.path)
+
+      operationResults.collect({ case Left(errorMessage) => logger.warn(errorMessage) })
+
+      operationResults.collect({ case Right(operation) => operation }).map(operation =>
+        CurlCommand(
+          method = operation.method,
+          server = openApiDoc.getServerForApiWorld(apiWorld),
+          path = operation.path,
+          queryParams = operation.queryParams,
+          pathParams = operation.pathParams,
+          headers = operation.headerParams ++ getCommonHeaders(application),
+          requestBody = operation.exampleRequestBody
+        )
+      )
     )
   }
 
@@ -85,7 +94,7 @@ class OpenApiDoc(openApi: OpenAPI) {
     for {
       pathItem <- paths.get(path).toRight(s"No path matching '$path' was found in the OAS document")
       operation <- getOperationForMethod(method, pathItem).toRight(s"No $method operation found for the path '$path' in the OAS document'")
-    } yield OpenApiOperation(operation)
+    } yield OpenApiOperation(operation, method, path)
   }
 
   private def getOperationForMethod(method: String, pathItem: PathItem): Option[Operation] = {
@@ -101,7 +110,7 @@ class OpenApiDoc(openApi: OpenAPI) {
     })
   }
 
-  class OpenApiOperation(operation: Operation) {
+  case class OpenApiOperation(operation: Operation, method: String, path: String) {
     val queryParams = filterParameters(operation, "query")
     val pathParams = filterParameters(operation, "path", true)
     val headerParams = filterParameters(operation, "header")
@@ -125,7 +134,7 @@ class OpenApiDoc(openApi: OpenAPI) {
   }
 }
 
-object OpenApiDoc {
+object OpenApiDoc extends Logging {
   private val simpleModule = SimpleModule().addSerializer(JsonNodeExampleSerializer());
   io.swagger.util.Json.mapper().registerModule(simpleModule);
 
@@ -133,9 +142,12 @@ object OpenApiDoc {
     val options: ParseOptions = new ParseOptions()
     options.setResolve(false)
 
-    val parseResult = new OpenAPIV3Parser().readContents("asdasda", null, options)
+    val parseResult = new OpenAPIV3Parser().readContents(openApiSpecification, null, options)
     parseResult.getOpenAPI match {
-      case null => Left(("Unable to parse the OAS document" + parseResult.getMessages.asScala).mkString(", "))
+      case null => {
+        logger.warn(("Unable to parse the OAS document" :: List(parseResult.getMessages)).mkString(", "))
+        Left("Unable to parse the OAS document")
+      }
       case openApi => Right(OpenApiDoc(openApi))
     }
   }
