@@ -22,6 +22,7 @@ import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.TryValues
 import pages.*
 import pages.application.register.RegisterApplicationTeamPage
+import pages.myapis.produce.ProduceApiHowToCreatePage
 import pages.myapis.produce.ProduceApiEnterOasPage
 import play.api.libs.json.{JsValue, Json}
 
@@ -30,6 +31,7 @@ trait UserAnswersGenerator extends TryValues {
 
   val generators: Seq[Gen[(QuestionPage[?], JsValue)]] =
     arbitrary[(ProduceApiEnterOasPage.type, JsValue)] ::
+    arbitrary[(ProduceApiHowToCreatePage.type, JsValue)] ::
     arbitrary[(RegisterApplicationTeamPage.type, JsValue)] ::
     arbitrary[(CreateTeamNamePage.type, JsValue)] ::
     arbitrary[(ApiPolicyConditionsDeclarationPage.type, JsValue)] ::
