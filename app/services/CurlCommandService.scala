@@ -38,7 +38,7 @@ import scala.jdk.CollectionConverters.*
 @Singleton
 class CurlCommandService {
 
-  def buildCurlCommandForEndpoint(application: Application, apiDetail: ApiDetail, path: String, method: String, apiWorld: ApiWorld): Option[CurlCommand] = {
+  def buildCurlCommandForEndpoint(application: Application, apiDetail: ApiDetail, path: String, method: String, apiWorld: ApiWorld): Either[String, CurlCommand] = {
     for {
       openApiDoc <- OpenApiDoc.parse(apiDetail.openApiSpecification)
       operation <- openApiDoc.getOperation(method, path)
@@ -80,12 +80,12 @@ class OpenApiDoc(openApi: OpenAPI) {
     }
   }
 
-  def getOperation(method: String, path: String): Option[OpenApiOperation] = {
+  def getOperation(method: String, path: String): Either[String, OpenApiOperation] = {
     val paths = openApi.getPaths.asScala
     for {
-      pathItem <- paths.get(path)
-      operation <- getOperationForMethod(method, pathItem)
-    } yield new OpenApiOperation(operation)
+      pathItem <- paths.get(path).toRight(s"No path matching '$path' was found in the OAS document")
+      operation <- getOperationForMethod(method, pathItem).toRight(s"No $method operation found for the path '$path' in the OAS document'")
+    } yield OpenApiOperation(operation)
   }
 
   private def getOperationForMethod(method: String, pathItem: PathItem): Option[Operation] = {
@@ -129,11 +129,14 @@ object OpenApiDoc {
   private val simpleModule = SimpleModule().addSerializer(JsonNodeExampleSerializer());
   io.swagger.util.Json.mapper().registerModule(simpleModule);
 
-  def parse(openApiSpecification: String): Option[OpenApiDoc] = {
+  def parse(openApiSpecification: String): Either[String, OpenApiDoc] = {
     val options: ParseOptions = new ParseOptions()
     options.setResolve(false)
 
-    val parseResult = new OpenAPIV3Parser().readContents(openApiSpecification, null, options)
-    Option(parseResult.getOpenAPI).map(new OpenApiDoc(_))
+    val parseResult = new OpenAPIV3Parser().readContents("asdasda", null, options)
+    parseResult.getOpenAPI match {
+      case null => Left(("Unable to parse the OAS document" + parseResult.getMessages.asScala).mkString(", "))
+      case openApi => Right(OpenApiDoc(openApi))
+    }
   }
 }
