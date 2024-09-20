@@ -778,3 +778,12 @@ produceApiBeforeYouStart.relatedContent.producingApis = Producing APIs
 produceApiBeforeYouStart.relatedContent.consumingApis = Consuming APIs
 
 relatedContent.header = Related content
+
+configuration.title = API configuration
+configuration.domains.heading = Domains data
+configuration.domains.code = Code
+configuration.domains.description = Description
+configuration.domains.subDomains = Sub-domains
+configuration.hods.heading = HoDs data
+configuration.hods.abbreviation = Abbreviation
+configuration.hods.fullName = Full name
