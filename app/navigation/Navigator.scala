@@ -22,8 +22,9 @@ import controllers.routes
 import models.AddEndpoints
 import pages.*
 import models.*
+import models.myapis.produce.ProduceApiHowToCreate.{Editor, Upload}
 import pages.application.register.{RegisterApplicationNamePage, RegisterApplicationStartPage, RegisterApplicationTeamPage}
-import pages.myapis.produce.ProduceApiStartPage
+import pages.myapis.produce.{ProduceApiBeforeYouStartPage, ProduceApiHowToCreatePage, ProduceApiStartPage}
 
 @Singleton
 class Navigator @Inject()() {
@@ -41,6 +42,8 @@ class Navigator @Inject()() {
     case RegisterApplicationNamePage => _ => controllers.application.register.routes.RegisterApplicationTeamController.onPageLoad(NormalMode)
     case RegisterApplicationTeamPage => _ => controllers.application.register.routes.RegisterApplicationCheckYourAnswersController.onPageLoad()
     case ProduceApiStartPage => _ => controllers.myapis.produce.routes.ProduceApiBeforeYouStartController.onPageLoad()
+    case ProduceApiBeforeYouStartPage => _ => controllers.myapis.produce.routes.ProduceApiHowToCreateController.onPageLoad(NormalMode)
+    case ProduceApiHowToCreatePage => produceApiHowToCreateNextPage(NormalMode)
     case _ => _ => routes.IndexController.onPageLoad
   }
 
@@ -92,4 +95,11 @@ class Navigator @Inject()() {
     }
   }
 
+  private def produceApiHowToCreateNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
+    (mode, userAnswers.get(ProduceApiHowToCreatePage)) match {
+      case (_, Some(Editor)) => controllers.myapis.produce.routes.ProduceApiEnterOasController.onPageLoad(mode)
+      case (_, Some(Upload)) => routes.JourneyRecoveryController.onPageLoad()
+      case _ => routes.JourneyRecoveryController.onPageLoad()
+    }
+  }
 }
