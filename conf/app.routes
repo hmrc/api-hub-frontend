@@ -69,13 +69,13 @@ POST        /apis/add-endpoints/select-endpoints                               c
 GET         /apis/add-endpoints/change-select-endpoints                        controllers.AddAnApiSelectEndpointsController.onPageLoad(mode: Mode = CheckMode, context: AddAnApiContext = AddEndpoints)
 POST        /apis/add-endpoints/change-select-endpoints                        controllers.AddAnApiSelectEndpointsController.onSubmit(mode: Mode = CheckMode, context: AddAnApiContext = AddEndpoints)
 
-GET         /apis/add-an-api/success/:applicationId/:apiId                      controllers.AddAnApiSuccessController.onPageLoad(applicationId: String, apiId: String)
+GET         /apis/add-an-api/success/:applicationId/:apiId                     controllers.AddAnApiSuccessController.onPageLoad(applicationId: String, apiId: String)
 
-GET         /apis/add-an-api/check-your-answers                                 controllers.AddAnApiCheckYourAnswersController.onPageLoad(context: AddAnApiContext = AddAnApi)
-GET         /apis/add-endpoints/check-your-answers                              controllers.AddAnApiCheckYourAnswersController.onPageLoad(context: AddAnApiContext = AddEndpoints)
+GET         /apis/add-an-api/check-your-answers                                controllers.AddAnApiCheckYourAnswersController.onPageLoad(context: AddAnApiContext = AddAnApi)
+GET         /apis/add-endpoints/check-your-answers                             controllers.AddAnApiCheckYourAnswersController.onPageLoad(context: AddAnApiContext = AddEndpoints)
 
-POST        /apis/add-an-api/add-api                                            controllers.AddAnApiCompleteController.addApi(context: AddAnApiContext = AddAnApi)
-POST        /apis/add-endpoints/add-endpoints                                   controllers.AddAnApiCompleteController.addApi(context: AddAnApiContext = AddEndpoints)
+POST        /apis/add-an-api/add-api                                           controllers.AddAnApiCompleteController.addApi(context: AddAnApiContext = AddAnApi)
+POST        /apis/add-endpoints/add-endpoints                                  controllers.AddAnApiCompleteController.addApi(context: AddAnApiContext = AddEndpoints)
 
-GET         /apis/view-specification/:apiId                                     controllers.OasRedocController.onPageLoad(apiId: String)
-GET         /apis/oas/:apiId                                                    controllers.OasRedocController.getOas(apiId: String)
+GET         /apis/view-specification/:apiId                                    controllers.OasRedocController.onPageLoad(apiId: String)
+GET         /apis/oas/:apiId                                                   controllers.OasRedocController.getOas(apiId: String)

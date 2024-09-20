@@ -12,6 +12,10 @@ POST        /add-development-credential/:id                             controll
 GET         /request-production-access/:id/start                        controllers.application.RequestProductionAccessStartController.onPageLoad(id: String)
 GET         /request-production-access                                  controllers.application.RequestProductionAccessController.onPageLoad()
 POST        /request-production-access                                  controllers.application.RequestProductionAccessController.onSubmit()
+GET         /request-production-access/select-apis                      controllers.application.RequestProductionAccessSelectApisController.onPageLoad(mode: Mode = NormalMode)
+POST        /request-production-access/select-apis                      controllers.application.RequestProductionAccessSelectApisController.onSubmit(mode: Mode = NormalMode)
+GET         /request-production-access/change-select-apis               controllers.application.RequestProductionAccessSelectApisController.onPageLoad(mode: Mode = CheckMode)
+POST        /request-production-access/change-select-apis               controllers.application.RequestProductionAccessSelectApisController.onSubmit(mode: Mode = CheckMode)
 
 GET         /provide-supporting-information                             controllers.application.ProvideSupportingInformationController.onPageLoad()
 POST        /provide-supporting-information                             controllers.application.ProvideSupportingInformationController.onSubmit()

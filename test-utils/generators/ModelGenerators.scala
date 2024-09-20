@@ -18,11 +18,17 @@ package generators
 
 import models.application.TeamMember
 import models.ApiPolicyConditionsDeclaration
+import models.myapis.produce.ProduceApiHowToCreate
 import org.scalacheck.{Arbitrary, Gen}
 import viewmodels.admin.Decision
 import viewmodels.admin.Decision.{Approve, Reject}
 
 trait ModelGenerators {
+
+  implicit lazy val arbitraryProduceApiHowToCreate: Arbitrary[ProduceApiHowToCreate] =
+    Arbitrary {
+      Gen.oneOf(ProduceApiHowToCreate.values.toSeq)
+    }
 
   implicit lazy val arbitraryApiPolicyConditionsDeclaration: Arbitrary[ApiPolicyConditionsDeclaration] =
     Arbitrary {

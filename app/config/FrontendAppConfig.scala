@@ -64,4 +64,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
 
   val feedbackLink: String = configuration.get[String]("feedback-link")
 
+  val featureProductionAccessRequestSelectApi = configuration.getOptional[Boolean]("features.production-access-request-select-api")
+    .getOrElse(false)
+
 }

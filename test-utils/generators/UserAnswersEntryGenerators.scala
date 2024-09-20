@@ -16,23 +16,42 @@
 
 package generators
 
-import models.ApiPolicyConditionsDeclaration
+import models.{ApiPolicyConditionsDeclaration}
 import models.application.TeamMember
 import models.team.Team
+import models.myapis.produce.ProduceApiHowToCreate
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import pages.*
+import pages.application.accessrequest.RequestProductionAccessSelectApisPage
 import pages.application.register.RegisterApplicationTeamPage
+import pages.myapis.produce.ProduceApiHowToCreatePage
 import pages.myapis.produce.ProduceApiEnterOasPage
 import play.api.libs.json.{JsValue, Json}
 
 trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators with TeamGenerator {
+
+  implicit lazy val arbitraryRequestProductionAccessSelectApisUserAnswersEntry: Arbitrary[(RequestProductionAccessSelectApisPage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[RequestProductionAccessSelectApisPage.type]
+        value <- arbitrary[String].map(Json.toJson(_))
+      } yield (page, value)
+    }
 
   implicit lazy val arbitraryProduceApiEnterOasUserAnswersEntry: Arbitrary[(ProduceApiEnterOasPage.type, JsValue)] =
     Arbitrary {
       for {
         page  <- arbitrary[ProduceApiEnterOasPage.type]
         value <- arbitrary[String].suchThat(_.nonEmpty).map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitraryProduceApiHowToCreateUserAnswersEntry: Arbitrary[(ProduceApiHowToCreatePage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[ProduceApiHowToCreatePage.type]
+        value <- arbitrary[ProduceApiHowToCreate].map(Json.toJson(_))
       } yield (page, value)
     }
 
