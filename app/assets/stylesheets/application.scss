@@ -875,3 +875,36 @@ header {
         }
     }
 }
+
+.hip-stat-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.hip-stat-item {
+  background-color: #fbfbfb;
+  border: 1px solid #ebebeb;
+  border-radius: 5px;
+  padding: 1rem;
+  min-width: 120px;
+  text-align: center;
+}
+
+.hip-stat-title {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 0.5rem;
+}
+
+.hip-stat-number {
+  display: block;
+  font-size: 24px;
+  font-weight: bold;
+  color: #0b0c0c;
+}
+
+.stats-button {
+  font-size: 1rem !important;
+  margin-top: 1rem !important;
+}
