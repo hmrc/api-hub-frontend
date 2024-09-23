@@ -35,7 +35,7 @@ case class CurlCommand(
       .addParams(queryParams)
       .toString
     val headers = getHeadersString
-    s"curl -X '${method}' $headers '$url' ${requestBody.map(json => s"--data '$json'").getOrElse("")}"
+    s"curl -X '${method}' $headers '$url' ${requestBody.map(json => s"--data '$json'").getOrElse("")}".replaceAll("\\s+", " ").trim
   }
 
   private val pathParamRegex = "\\{([^\\}]*)\\}".r

@@ -16,7 +16,6 @@
 
 package models
 
-import play.api.mvc.JavascriptLiteral
 import play.api.mvc.QueryStringBindable
 
 sealed trait ApiWorld
