@@ -16,19 +16,20 @@
 
 package connectors
 
-import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.typesafe.config.ConfigFactory
 import config.FrontendAppConfig
 import connectors.ApplicationsConnectorSpec.ApplicationGetterBehaviours
 import models.UserEmail
-import models.accessrequest._
+import models.accessrequest.*
 import models.api.ApiDeploymentStatuses
 import models.api.ApiDetailLensesSpec.sampleApiDetail
-import models.application._
-import models.application.ApplicationLenses._
+import models.application.*
+import models.application.ApplicationLenses.*
 import models.deployment.{DeploymentDetails, DeploymentsRequest, Error, FailuresResponse, InvalidOasResponse, RedeploymentRequest, SuccessfulDeploymentsResponse}
 import models.exception.{ApplicationCredentialLimitException, TeamNameNotUniqueException}
 import models.requests.{AddApiRequest, AddApiRequestEndpoint, ChangeTeamNameRequest, TeamMemberRequest}
+import models.stats.ApisInProductionStatistic
 import models.team.{NewTeam, Team}
 import models.user.{LdapUser, UserContactDetails, UserModel}
 import org.scalatest.{EitherValues, OptionValues}
@@ -37,7 +38,7 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.Configuration
 import play.api.http.ContentTypes
-import play.api.http.Status._
+import play.api.http.Status.*
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.test.Helpers.{ACCEPT, AUTHORIZATION, CONTENT_TYPE}
@@ -1551,6 +1552,27 @@ class ApplicationsConnectorSpec
 
       recoverToSucceededIf[UpstreamErrorResponse] {
         buildConnector(this).removeApiTeam(apiDetails.id)(HeaderCarrier())
+      }
+    }
+  }
+
+  "apisInProduction" - {
+    "must place the correct request and return an ApisInProductionStatistic" in {
+      val statistic = ApisInProductionStatistic(10, 2)
+
+      stubFor(
+        get(urlEqualTo("/api-hub-applications/stats/apis-in-production"))
+          .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withBody(Json.toJson(statistic).toString())
+          )
+      )
+
+      buildConnector(this).apisInProduction()(HeaderCarrier()).map {
+        result =>
+          result mustBe statistic
       }
     }
   }

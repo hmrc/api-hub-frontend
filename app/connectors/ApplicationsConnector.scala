@@ -21,19 +21,20 @@ import config.FrontendAppConfig
 import models.UserEmail
 import models.accessrequest.{AccessRequest, AccessRequestDecisionRequest, AccessRequestRequest, AccessRequestStatus}
 import models.api.ApiDeploymentStatuses
-import models.application._
-import models.deployment._
+import models.application.*
+import models.deployment.*
 import models.exception.{ApplicationCredentialLimitException, ApplicationsException, TeamNameNotUniqueException}
 import models.requests.{AddApiRequest, ChangeTeamNameRequest, TeamMemberRequest}
+import models.stats.ApisInProductionStatistic
 import models.team.{NewTeam, Team}
 import models.user.UserContactDetails
 import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION, CONTENT_TYPE}
 import play.api.http.MimeTypes.JSON
-import play.api.http.Status._
+import play.api.http.Status.*
 import play.api.libs.json.{JsResultException, Json}
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpErrorFunctions, HttpResponse, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
@@ -522,6 +523,13 @@ class ApplicationsConnector @Inject()(
         case Left(e) if e.statusCode == NOT_FOUND => Future.successful(None)
         case Left(e) => Future.failed(e)
       }
+  }
+
+  def apisInProduction()(implicit hc: HeaderCarrier): Future[ApisInProductionStatistic] = {
+    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/stats/apis-in-production")
+      .setHeader(ACCEPT -> JSON)
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[ApisInProductionStatistic]
   }
 
   private def handleSuccessfulDeploymentsResponse(response: HttpResponse): Future[SuccessfulDeploymentsResponse] = {

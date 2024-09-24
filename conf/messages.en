@@ -803,3 +803,10 @@ requestProductionAccessSelectApis.pendingRequests.heading = The following APIs a
 requestProductionAccessSelectApis.checkYourAnswersLabel = Selected APIs
 requestProductionAccessSelectApis.error.required = Please select at least one API
 requestProductionAccessSelectApis.change.hidden = APIs
+
+statistics.title = Integration Hub stats
+statistics.heading = Integration Hub stats
+statistics.menuTitle = Hub stats
+statistics.fetchStat = Fetch stat
+statistics.apisInProductionStatistic.totalApis = Total APIs
+statistics.apisInProductionStatistic.totalInProduction = APIs in Production

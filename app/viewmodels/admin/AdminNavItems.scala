@@ -29,6 +29,7 @@ object AdminSideNavPages {
   case object ManageApisPage extends SideNavPage
   case object TeamMigrationPage extends SideNavPage
   case object ConfigurationPage extends SideNavPage
+  case object StatisticsPage extends SideNavPage
 
 }
 
@@ -81,6 +82,12 @@ object AdminNavItems {
           title = messages("configuration.title"),
           link = controllers.admin.routes.ConfigurationController.onPageLoad(),
           isCurrentPage = currentPage == ConfigurationPage
+        ),
+        SideNavItem(
+          page = StatisticsPage,
+          title = messages("statistics.menuTitle"),
+          link = controllers.admin.routes.StatisticsController.onPageLoad(),
+          isCurrentPage = currentPage == StatisticsPage
         ),
         accessRequestsNavItem
       )

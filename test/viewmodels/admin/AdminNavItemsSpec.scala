@@ -23,7 +23,7 @@ import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages
 import play.api.test.Helpers.running
 import viewmodels.SideNavItem
-import viewmodels.admin.AdminSideNavPages.{AccessRequestsPage, ConfigurationPage, GetUsersPage, ManageApisPage, ManageApplicationsPage, ManageTeamsPage, TeamMigrationPage}
+import viewmodels.admin.AdminSideNavPages.{AccessRequestsPage, ConfigurationPage, GetUsersPage, ManageApisPage, ManageApplicationsPage, ManageTeamsPage, StatisticsPage, TeamMigrationPage}
 
 class AdminNavItemsSpec extends SpecBase with Matchers with TableDrivenPropertyChecks {
 
@@ -43,6 +43,7 @@ class AdminNavItemsSpec extends SpecBase with Matchers with TableDrivenPropertyC
           teamMigrationNavItem(),
           getUsersNavItem(),
           configurationNavItem(),
+          statisticsNavItem(),
           accessRequestsNavItem()
         )
 
@@ -150,6 +151,15 @@ object AdminNavItemsSpec {
       page = ConfigurationPage,
       title = "API configuration",
       link = controllers.admin.routes.ConfigurationController.onPageLoad(),
+      isCurrentPage = false
+    )
+  }
+
+  private def statisticsNavItem(): SideNavItem = {
+    SideNavItem(
+      page = StatisticsPage,
+      title = "Hub stats",
+      link = controllers.admin.routes.StatisticsController.onPageLoad(),
       isCurrentPage = false
     )
   }
