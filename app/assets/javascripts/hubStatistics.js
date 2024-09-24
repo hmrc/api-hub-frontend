@@ -36,7 +36,7 @@ function buildStatDisplay(el) {
 
 export function onDomLoaded() {
     const totalApisStat = buildStatDisplay(document.getElementById('statTotalApis')),
-        prodApisStat = buildStatDisplay(document.getElementById('statProdApis'))
+        prodApisStat = buildStatDisplay(document.getElementById('statProdApis'));
 
     function onFetchClick() {
         totalApisStat.loading();
