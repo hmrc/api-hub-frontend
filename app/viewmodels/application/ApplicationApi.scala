@@ -16,31 +16,33 @@
 
 package viewmodels.application
 
+import models.{Enumerable, WithName}
 import models.api.{ApiDetail, EndpointMethod}
 import models.application.{Api, Application, EnvironmentName, Primary, Secondary, SelectedEndpoint}
 import models.application.ApplicationLenses.ApplicationLensOps
+import play.api.libs.json.{Format, Json, Writes}
 
 sealed trait ApplicationEndpointAccess {
   def isAccessible: Boolean
 }
 
-case object Accessible extends ApplicationEndpointAccess {
+case object Accessible extends WithName("accessible") with ApplicationEndpointAccess {
   override val isAccessible: Boolean = true
 }
 
-case object Inaccessible extends ApplicationEndpointAccess {
+case object Inaccessible extends WithName("inaccessible") with ApplicationEndpointAccess {
   override val isAccessible: Boolean = false
 }
 
-case object Requested extends ApplicationEndpointAccess {
+case object Requested extends WithName("requested") with ApplicationEndpointAccess {
   override val isAccessible: Boolean = false
 }
 
-case object Unknown extends ApplicationEndpointAccess {
+case object Unknown extends WithName("unknown") with ApplicationEndpointAccess {
   override val isAccessible: Boolean = false
 }
 
-object ApplicationEndpointAccess {
+object ApplicationEndpointAccess extends Enumerable.Implicits{
 
   def apply(
     application: Application,
@@ -65,6 +67,16 @@ object ApplicationEndpointAccess {
     }
 
   }
+
+  val values: Seq[ApplicationEndpointAccess] = Seq(
+    Accessible,
+    Inaccessible,
+    Requested,
+    Unknown
+  )
+
+  implicit val enumerable: Enumerable[ApplicationEndpointAccess] =
+    Enumerable(values.map(v => v.toString -> v)*)
 
 }
 
@@ -91,6 +103,8 @@ object ApplicationEndpoint {
       secondaryAccess = Unknown
     )
   }
+
+  implicit val formatApplicationEndpoint: Format[ApplicationEndpoint] = Json.format[ApplicationEndpoint]
 
 }
 
@@ -133,5 +147,7 @@ object ApplicationApi {
       isMissing = true
     )
   }
+
+  implicit val formatApplicationApi: Format[ApplicationApi] = Json.format[ApplicationApi]
 
 }

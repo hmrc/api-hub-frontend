@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package pages
+package pages.application.accessrequest
 
+import models.application.Application
+import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object ProvideSupportingInformationPage extends QuestionPage[String] {
+case object RequestProductionAccessApplicationPage extends QuestionPage[Application] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "provideSupportingInformation"
+  override def toString: String = "requestProductionAccessApplication"
+
 }

@@ -18,7 +18,7 @@ package controllers.application
 
 import controllers.actions._
 import forms.ProvideSupportingInformationFormProvider
-import pages.ProvideSupportingInformationPage
+import pages.application.accessrequest.ProvideSupportingInformationPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

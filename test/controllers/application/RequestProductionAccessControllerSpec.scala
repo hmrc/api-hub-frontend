@@ -21,25 +21,24 @@ import controllers.actions.{FakeApplication, FakeUser}
 import controllers.routes
 import forms.RequestProductionAccessDeclarationFormProvider
 import models.accessrequest.Pending
-import models.api.{ApiDetail, Endpoint, EndpointMethod, Live, Maintainer}
+import models.api.*
+import models.application.*
 import models.application.ApplicationLenses.ApplicationLensOps
-import models.application._
 import models.user.UserModel
 import models.{RequestProductionAccessDeclaration, UserAnswers}
-import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{AccessRequestApplicationIdPage, RequestProductionAccessPage}
+import pages.application.accessrequest.{RequestProductionAccessApisPage, RequestProductionAccessApplicationPage, RequestProductionAccessPage}
+import play.api.Application as PlayApplication
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{running, _}
-import play.api.{Application => PlayApplication}
+import play.api.test.Helpers.*
 import repositories.AccessRequestSessionRepository
 import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
-import viewmodels.application.{Accessible, ApplicationApi, ApplicationEndpoint, Inaccessible}
+import viewmodels.application.*
 import views.html.application.RequestProductionAccessView
 
 import java.time.{Clock, Instant, ZoneId}
@@ -63,8 +62,6 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
           val applicationApis = Seq(
             ApplicationApi(anApiDetail, Seq(ApplicationEndpoint("GET", "/test", Some("A summary"), Some("A description"), Seq("test-scope"), Inaccessible, Accessible)), false)
           )
-
-          when(fixture.apiHubService.getApiDetail(any())(any())).thenReturn(Future.successful(Some(anApiDetail)))
 
           when(fixture.apiHubService.getAccessRequests(eqTo(Some(FakeApplication.id)), eqTo(Some(Pending)))(any()))
             .thenReturn(Future.successful(Seq.empty))
@@ -90,8 +87,6 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
       val applicationApis = Seq(
         ApplicationApi(anApiDetail, Seq(ApplicationEndpoint("GET", "/test", Some("A summary"), Some("A description"), Seq("test-scope"), Inaccessible, Accessible)), false)
       )
-
-      when(fixture.apiHubService.getApiDetail(any())(any())).thenReturn(Future.successful(Some(anApiDetail)))
 
       when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(true), eqTo(false))(any()))
         .thenReturn(Future.successful(Some(application)))
@@ -142,7 +137,7 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
             val captor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
             verify(fixture.accessRequestSessionRepository).set(captor.capture())
             val userAnswers: UserAnswers = captor.getValue
-            userAnswers.get(RequestProductionAccessPage) mustEqual Some(Set(RequestProductionAccessDeclaration.Accept))
+            userAnswers.get(RequestProductionAccessPage).value mustBe Set(RequestProductionAccessDeclaration.Accept)
             redirectLocation(result) mustBe Some(controllers.application.routes.ProvideSupportingInformationController.onPageLoad().url)
           }
       }
@@ -176,6 +171,30 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
     )
   }
 
+  private def applicationApi(application: Application) =
+    ApplicationApi(
+      apiId = anApiDetail.id,
+      apiTitle = anApiDetail.title,
+      totalEndpoints = anApiDetail.endpoints.size,
+      endpoints = anApiDetail.endpoints.flatMap(
+        endpoint =>
+          endpoint.methods.map(
+            method =>
+              ApplicationEndpoint(
+                httpMethod = method.httpMethod,
+                path = endpoint.path,
+                summary = method.summary,
+                description = method.description,
+                scopes = method.scopes,
+                primaryAccess = ApplicationEndpointAccess(application, false, method, Primary),
+                secondaryAccess = Inaccessible
+              )
+          )
+      ),
+      hasPendingAccessRequest = false,
+      isMissing = false
+    )
+
   private case class Fixture(
                               application: PlayApplication,
                               apiHubService: ApiHubService,
@@ -201,6 +220,8 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
 
   private def buildUserAnswers(application: Application): UserAnswers = {
     UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
-      .set(AccessRequestApplicationIdPage, application).toOption.value
+      .set(RequestProductionAccessApplicationPage, application).toOption.value
+      .set(RequestProductionAccessApisPage, Seq(applicationApi(application))).toOption.value
   }
+
 }

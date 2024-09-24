@@ -18,14 +18,13 @@ package controllers.application
 
 import com.google.inject.Inject
 import controllers.actions.{AccessRequestDataRetrievalAction, DataRequiredAction, IdentifierAction}
-import controllers.helpers.ApplicationApiBuilder
 import controllers.routes
 import forms.RequestProductionAccessDeclarationFormProvider
 import models.requests.DataRequest
-import pages.{AccessRequestApplicationIdPage, RequestProductionAccessPage}
+import pages.application.accessrequest.{RequestProductionAccessApisPage, RequestProductionAccessApplicationPage, RequestProductionAccessPage}
 import play.api.data.Form
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.AccessRequestSessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.application.Inaccessible
@@ -37,7 +36,6 @@ class RequestProductionAccessController @Inject()(
                                                    val controllerComponents: MessagesControllerComponents,
                                                    identify: IdentifierAction,
                                                    requestProductionAccessView: RequestProductionAccessView,
-                                                   applicationApiBuilder: ApplicationApiBuilder,
                                                    formProvider: RequestProductionAccessDeclarationFormProvider,
                                                    sessionRepository: AccessRequestSessionRepository,
                                                    getData: AccessRequestDataRetrievalAction,
@@ -45,9 +43,9 @@ class RequestProductionAccessController @Inject()(
 
   private val form = formProvider()
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request => {
-      request.userAnswers.get(AccessRequestApplicationIdPage) match {
+      request.userAnswers.get(RequestProductionAccessApplicationPage) match {
         case Some(_) =>
           val previousAnswers = request.userAnswers.get(RequestProductionAccessPage)
           previousAnswers match {
@@ -55,16 +53,16 @@ class RequestProductionAccessController @Inject()(
             case Some(value) => showPage(form.fill(value), OK)
           }
 
-        case None => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+        case None => Redirect(routes.JourneyRecoveryController.onPageLoad())
       }
     }
   }
 
-  private def showPage(form: Form[?], status: Int)(implicit request: DataRequest[AnyContent]) = {
-    request.userAnswers.get(AccessRequestApplicationIdPage) match {
+  private def showPage(form: Form[?], status: Int)(implicit request: DataRequest[AnyContent]): Result = {
+    request.userAnswers.get(RequestProductionAccessApplicationPage) match {
       case Some(application) =>
-        applicationApiBuilder.build(application).map(
-          applicationApis =>
+        request.userAnswers.get(RequestProductionAccessApisPage) match {
+          case Some(applicationApis) =>
             val filteredApis = applicationApis.filter(_.endpoints.exists(_.primaryAccess == Inaccessible))
               .map(applicationApi => {
                 val filteredEndpoints = applicationApi.endpoints.filter(_.primaryAccess == Inaccessible)
@@ -75,15 +73,16 @@ class RequestProductionAccessController @Inject()(
             Status(status)(requestProductionAccessView(
               form,
               application, filteredApis, Some(request.user)))
-        )
-      case _ => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+          case _ => Redirect(routes.JourneyRecoveryController.onPageLoad())
+        }
+      case _ => Redirect(routes.JourneyRecoveryController.onPageLoad())
     }
   }
 
   def onSubmit: Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       form.bindFromRequest().fold(
-        formWithErrors => showPage(formWithErrors, BAD_REQUEST),
+        formWithErrors => Future.successful(showPage(formWithErrors, BAD_REQUEST)),
         value => {
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(RequestProductionAccessPage, value))

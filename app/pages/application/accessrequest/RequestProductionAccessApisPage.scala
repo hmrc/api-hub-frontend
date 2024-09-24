@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package pages
+package pages.application.accessrequest
 
-import models.RequestProductionAccessDeclaration
+import pages.QuestionPage
 import play.api.libs.json.JsPath
+import viewmodels.application.ApplicationApi
 
-case object RequestProductionAccessPage extends QuestionPage[Set[RequestProductionAccessDeclaration]] {
+case object RequestProductionAccessApisPage extends QuestionPage[Seq[ApplicationApi]] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "requestProductionAccess"
+  override def toString: String = "requestProductionAccessApis"
+
 }

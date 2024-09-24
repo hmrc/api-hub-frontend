@@ -28,11 +28,11 @@ import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{AccessRequestApplicationIdPage, ProvideSupportingInformationPage}
+import pages.application.accessrequest.{RequestProductionAccessApplicationPage, ProvideSupportingInformationPage}
 import play.api.data.FormError
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{status, _}
+import play.api.test.Helpers.*
 import play.api.{Application => PlayApplication}
 import repositories.AccessRequestSessionRepository
 import services.ApiHubService
@@ -196,6 +196,6 @@ class ProvideSupportingInformationControllerSpec extends SpecBase with MockitoSu
 
   private def buildUserAnswers(application: Application): UserAnswers = {
     UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
-      .set(AccessRequestApplicationIdPage, application).toOption.value
+      .set(RequestProductionAccessApplicationPage, application).toOption.value
   }
 }

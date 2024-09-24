@@ -18,19 +18,19 @@ package controllers.application
 
 import com.google.inject.{Inject, Singleton}
 import controllers.actions.{AccessRequestDataRetrievalAction, DataRequiredAction, IdentifierAction}
-import controllers.helpers.{ApplicationApiBuilder, ErrorResultBuilder}
+import controllers.helpers.ErrorResultBuilder
 import models.UserAnswers
 import models.accessrequest.{AccessRequestApi, AccessRequestEndpoint, AccessRequestRequest}
 import models.application.Application
 import models.requests.DataRequest
-import pages.{AccessRequestApplicationIdPage, ProvideSupportingInformationPage, RequestProductionAccessPage}
+import pages.application.accessrequest.{ProvideSupportingInformationPage, RequestProductionAccessApisPage, RequestProductionAccessApplicationPage, RequestProductionAccessPage}
 import play.api.i18n.{I18nSupport, Messages}
-import play.api.mvc._
+import play.api.mvc.*
 import repositories.AccessRequestSessionRepository
 import services.ApiHubService
 import uk.gov.hmrc.http.UpstreamErrorResponse
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.application.Inaccessible
+import viewmodels.application.{ApplicationApi, Inaccessible}
 import views.html.application.RequestProductionAccessSuccessView
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -44,7 +44,6 @@ class RequestProductionAccessEndJourneyController @Inject()(
   requireData: DataRequiredAction,
   requestProductionAccessSuccessView: RequestProductionAccessSuccessView,
   apiHubService: ApiHubService,
-  applicationApiBuilder: ApplicationApiBuilder,
   errorResultBuilder: ErrorResultBuilder
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
@@ -53,29 +52,36 @@ class RequestProductionAccessEndJourneyController @Inject()(
       validate(request).fold(
         call => Future.successful(Redirect(call)),
         validated =>
-          buildAccessRequest(validated._1, validated._2, validated._3)(request).flatMap(
-            accessRequest =>
-              apiHubService.requestProductionAccess(accessRequest)
-                .flatMap(_ => sessionRepository.clear(request.user.userId))
-                .flatMap(_ => Future.successful(Ok(requestProductionAccessSuccessView(validated._1, Some(request.user), accessRequest.apis))))
-                .recoverWith {
-                  case e: UpstreamErrorResponse if e.statusCode == BAD_GATEWAY => Future.successful(badGateway(e))
-                }
-          )
+          val accessRequest = buildAccessRequest(validated._1, validated._2, validated._3, validated._4)(request)
+
+          apiHubService.requestProductionAccess(accessRequest)
+            .flatMap(_ => sessionRepository.clear(request.user.userId))
+            .flatMap(_ => Future.successful(Ok(requestProductionAccessSuccessView(validated._1, Some(request.user), accessRequest.apis))))
+            .recoverWith {
+              case e: UpstreamErrorResponse if e.statusCode == BAD_GATEWAY => Future.successful(badGateway(e))
+            }
       )
   }
 
-  private def validate(implicit request: DataRequest[AnyContent]): Either[Call, (Application, String, String)] = {
+  private def validate(implicit request: DataRequest[AnyContent]): Either[Call, (Application, Seq[ApplicationApi], String, String)] = {
     for {
       application <- validateApplication(request.userAnswers)
+      applicationApis <- validateApis(request.userAnswers)
       _ <- validateConditions(request.userAnswers)
       supportingInformation <- validateSupportingInformation(request.userAnswers)
-    } yield (application, supportingInformation, request.user.email)
+    } yield (application, applicationApis, supportingInformation, request.user.email)
   }
 
   private def validateApplication(userAnswers: UserAnswers): Either[Call, Application] = {
-    userAnswers.get(AccessRequestApplicationIdPage) match {
+    userAnswers.get(RequestProductionAccessApplicationPage) match {
       case Some(application) => Right(application)
+      case None => Left(controllers.routes.JourneyRecoveryController.onPageLoad())
+    }
+  }
+
+  private def validateApis(userAnswers: UserAnswers): Either[Call, Seq[ApplicationApi]] = {
+    userAnswers.get(RequestProductionAccessApisPage) match {
+      case Some(applicationApis) => Right(applicationApis)
       case None => Left(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
   }
@@ -94,19 +100,19 @@ class RequestProductionAccessEndJourneyController @Inject()(
     }
   }
 
-  private def buildAccessRequest(application: Application, supportingInformation: String, requestedBy: String)(implicit request: DataRequest[AnyContent]): Future[AccessRequestRequest] = {
-    applicationApiBuilder.build(application).map(
-      applicationApis =>
-        val accessRequestApis = applicationApis.filter(_.endpoints.exists(_.primaryAccess == Inaccessible)).map(applicationApi => {
-          val accessRequestEndpoints = applicationApi.endpoints.filter(_.primaryAccess == Inaccessible).map(endpoint => AccessRequestEndpoint(endpoint.httpMethod, endpoint.path, endpoint.scopes))
-          AccessRequestApi(
-            applicationApi.apiId,
-            applicationApi.apiTitle,
-            accessRequestEndpoints
-          )
-        })
-        AccessRequestRequest(application.id, supportingInformation, requestedBy, accessRequestApis)
+  private def buildAccessRequest(application: Application, applicationApis: Seq[ApplicationApi], supportingInformation: String, requestedBy: String)(implicit request: DataRequest[AnyContent]): AccessRequestRequest = {
+    val accessRequestApis = applicationApis.filter(_.endpoints.exists(_.primaryAccess == Inaccessible)).map(
+      applicationApi => {
+        val accessRequestEndpoints = applicationApi.endpoints.filter(_.primaryAccess == Inaccessible).map(endpoint => AccessRequestEndpoint(endpoint.httpMethod, endpoint.path, endpoint.scopes))
+
+        AccessRequestApi(
+          applicationApi.apiId,
+          applicationApi.apiTitle,
+          accessRequestEndpoints
+        )
+      }
     )
+    AccessRequestRequest(application.id, supportingInformation, requestedBy, accessRequestApis)
   }
 
   private def badGateway(t: Throwable)(implicit request: Request[?]): Result = {
