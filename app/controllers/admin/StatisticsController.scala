@@ -19,21 +19,33 @@ package controllers.admin
 import com.google.inject.{Inject, Singleton}
 import controllers.actions.{AuthorisedSupportAction, IdentifierAction}
 import play.api.i18n.I18nSupport
+import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.admin.StatisticsView
+
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class StatisticsController @Inject()(
   override val controllerComponents: MessagesControllerComponents,
+  apiHubService: ApiHubService,
   identify: IdentifierAction,
   isSupport: AuthorisedSupportAction,
   view: StatisticsView
-) extends FrontendBaseController with I18nSupport {
+)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = (identify andThen isSupport) {
     implicit request =>
       Ok(view(request.user))
+  }
+  
+  def apisInProduction(): Action[AnyContent] = (identify andThen isSupport).async {
+    implicit request =>
+      apiHubService.apisInProduction().map { apis =>
+        Ok(Json.toJson(apis))
+      }
   }
 
 }

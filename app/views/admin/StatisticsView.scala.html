@@ -16,6 +16,7 @@
 
 @import models.user.UserModel
 @import viewmodels.admin.{AdminNavItems, AdminSideNavPages}
+@import views.html.helper.CSPNonce
 
 @this(
     layout: templates.Layout,
@@ -24,22 +25,35 @@
 
 @(user: UserModel)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("statistics.title")), user = Some(user)) {
+@scripts() = {
+    <script src='@routes.Assets.versioned("javascripts/hubStatistics.js")' type="module" @{CSPNonce.attr}></script>
+}
+
+@layout(pageTitle = titleNoForm(messages("statistics.title")), user = Some(user), customScriptsBlock = Some(scripts())) {
 
     @views.html.templates.SideNav(messages("manageApplications.admin"), AdminNavItems(user, AdminSideNavPages.StatisticsPage)) {
 
         <h1 class="govuk-heading-l">@messages("statistics.heading")</h1>
 
         <div class="hip-stat-container govuk-!-margin-bottom-6">
-            <div class="hip-stat-item">
+            <div id="statTotalApis" class="hip-stat-item">
                 <span class="hip-stat-title">@messages("statistics.apisInProductionStatistic.totalApis")</span>
-                <span id="totalApis" class="hip-stat-number"></span>
-                <span class="hip-stat-title">@messages("statistics.apisInProductionStatistic.totalInProduction")</span>
-                <span id="totalInProduction" class="hip-stat-number"></span>
+                <span class="hip-stat-number"></span>
 
                 @govukButton(
                     Button(
-                        id = Some("fetchApisInProductionStatisticButton"),
+                        content = Text(messages("statistics.fetchStat")),
+                        classes = "stats-button"
+                    )
+                )
+            </div>
+
+            <div id="statProdApis" class="hip-stat-item">
+                <span class="hip-stat-title">@messages("statistics.apisInProductionStatistic.totalInProduction")</span>
+                <span class="hip-stat-number"></span>
+
+                @govukButton(
+                    Button(
                         content = Text(messages("statistics.fetchStat")),
                         classes = "stats-button"
                     )

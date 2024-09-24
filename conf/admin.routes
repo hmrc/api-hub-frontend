@@ -9,3 +9,4 @@ GET         /team-migration                                                     
 GET         /deleted-application/:id                                                controllers.admin.DeletedApplicationDetailsController.onPageLoad(id)
 GET         /configuration                                                          controllers.admin.ConfigurationController.onPageLoad()
 GET         /statistics                                                             controllers.admin.StatisticsController.onPageLoad()
+GET         /statistics/apis-in-production                                          controllers.admin.StatisticsController.apisInProduction()

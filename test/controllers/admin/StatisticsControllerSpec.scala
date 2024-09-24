@@ -18,12 +18,19 @@ package controllers.admin
 
 import base.SpecBase
 import models.user.UserModel
+import org.mockito.ArgumentMatchers.any
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.Application
+import play.api.inject.bind
+import play.api.{Application, Application as PlayApplication}
+import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
 import views.html.admin.StatisticsView
+import org.mockito.Mockito.when
+import scala.concurrent.Future
+import models.stats.ApisInProductionStatistic
 
 class StatisticsControllerSpec
   extends SpecBase
@@ -32,44 +39,82 @@ class StatisticsControllerSpec
     with HtmlValidation {
 
   "StatisticsController" - {
-    "must return Ok and the correct view for a support user" in {
-      forAll(usersWhoCanSupport) { (user: UserModel) =>
-        val fixture = buildFixture(user)
+    "onPageLoad" - {
+      "must return Ok and the correct view for a support user" in {
+        forAll(usersWhoCanSupport) { (user: UserModel) =>
+          val fixture = buildFixture(user)
+  
+          running(fixture.application) {
+            val request = FakeRequest(controllers.admin.routes.StatisticsController.onPageLoad())
+            val result = route(fixture.application, request).value
+            val view = fixture.application.injector.instanceOf[StatisticsView]
+  
+            status(result) mustBe OK
+            contentAsString(result) mustBe view(user)(request, messages(fixture.application)).toString
+            contentAsString(result) must validateAsHtml
+          }
+        }
+      }
+  
+      "must return Unauthorized for a non-support user" in {
+        forAll(usersWhoCannotSupport) { (user: UserModel) =>
+          val fixture = buildFixture(user)
 
-        running(fixture.application) {
-          val request = FakeRequest(controllers.admin.routes.StatisticsController.onPageLoad())
-          val result = route(fixture.application, request).value
-          val view = fixture.application.injector.instanceOf[StatisticsView]
+          running(fixture.application) {
+            val request = FakeRequest(controllers.admin.routes.StatisticsController.onPageLoad())
+            val result = route(fixture.application, request).value
 
-          status(result) mustBe OK
-          contentAsString(result) mustBe view(user)(request, messages(fixture.application)).toString
-          contentAsString(result) must validateAsHtml
+            status(result) mustBe SEE_OTHER
+            redirectLocation(result) mustBe Some(controllers.routes.UnauthorisedController.onPageLoad.url)
+          }
         }
       }
     }
+    
+    "apisInProduction" - {
+      "must return Ok and the JSON for a support user" in {
+        forAll(usersWhoCanSupport) { (user: UserModel) =>
+          val fixture = buildFixture(user)
+          val stats = ApisInProductionStatistic(10, 5)
+          when(fixture.apiHubService.apisInProduction()(any)).thenReturn(Future.successful(stats))
 
-    "must return Unauthorized for a non-support user" in {
-      forAll(usersWhoCannotSupport) { (user: UserModel) =>
-        val fixture = buildFixture(user)
+          running(fixture.application) {
+            val request = FakeRequest(controllers.admin.routes.StatisticsController.apisInProduction())
+            val result = route(fixture.application, request).value
 
-        running(fixture.application) {
-          val request = FakeRequest(controllers.admin.routes.StatisticsController.onPageLoad())
-          val result = route(fixture.application, request).value
-
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(controllers.routes.UnauthorisedController.onPageLoad.url)
+            status(result) mustBe OK
+            contentAsJson(result) mustBe Json.toJson(stats)
+          }
         }
       }
+
+      "must return Unauthorized for a non-support user" in {
+        forAll(usersWhoCannotSupport) { (user: UserModel) =>
+          val fixture = buildFixture(user)
+
+          running(fixture.application) {
+            val request = FakeRequest(controllers.admin.routes.StatisticsController.apisInProduction())
+            val result = route(fixture.application, request).value
+
+            status(result) mustBe SEE_OTHER
+            redirectLocation(result) mustBe Some(controllers.routes.UnauthorisedController.onPageLoad.url)
+          }
+        }
+      }      
     }
   }
 
-  private case class Fixture(application: Application)
+  private case class Fixture(application: PlayApplication, apiHubService: ApiHubService)
 
-  private def buildFixture(user: UserModel): Fixture = {
-    val application = applicationBuilder(user = user)
-      .build()
+  private def buildFixture(userModel: UserModel): Fixture = {
+    val apiHubService = mock[ApiHubService]
 
-    Fixture(application)
+    val playApplication = applicationBuilder(userAnswers = Some(emptyUserAnswers), user = userModel)
+      .overrides(
+        bind[ApiHubService].toInstance(apiHubService)
+      ).build()
+
+    Fixture(playApplication, apiHubService)
   }
 
 }
