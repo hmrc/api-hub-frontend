@@ -2,7 +2,7 @@ import {JSDOM} from 'jsdom';
 import {onPageShow} from '../../app/assets/javascripts/adminAccessRequests.js';
 import {paginationHelper, paginationContainerHtml, arrayFromTo} from "./testUtils.js";
 
-fdescribe('adminAccessRequests', () => {
+describe('adminAccessRequests', () => {
     let document;
 
     beforeEach(() => {
