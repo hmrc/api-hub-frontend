@@ -21,7 +21,7 @@
 
 @(accessRequest: AccessRequest, showReviewLink: Boolean)(implicit request: RequestHeader, messages: Messages)
 
-<div class="api-panel hip-access-request-panel">
+<div class="api-panel hip-access-request-panel" data-status="@accessRequest.status">
     <p class="call-out-type hip-access-request-name-status">
         @ViewUtils.formatAccessRequestStatus(accessRequest.status)
         @accessRequest.apiName

@@ -44,30 +44,30 @@
     @views.html.templates.SideNav(messages("accessRequests.admin"), AdminNavItems(user, AdminSideNavPages.AccessRequestsPage)) {
 
         <h1 class="govuk-heading-m govuk-!-margin-bottom-7">
-            @messages("accessRequests.heading", accessRequests.size)
+            @Html(messages("accessRequests.heading", <span id="requestCount">{accessRequests.size}</span>))
         </h1>
 
         <div class="horizontal-filter-panel__item">
             <div class="govuk-form-group">
-                <fieldset class="govuk-fieldset" aria-describedby="filter-hint">
+                <fieldset id="filterByStatusCheckboxes" class="govuk-fieldset" aria-describedby="filter-hint">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                         <h2 class="govuk-fieldset__heading">Filter by Status</h2>
                     </legend>
                     <div class="govuk-checkboxes govuk-checkboxes--small checkboxes-inline">
                         <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input" checked="" id="status-pending" name="status" type="checkbox" value="pending">
+                            <input class="govuk-checkboxes__input" checked id="status-pending" name="status" type="checkbox" value="@Pending">
                             <label class="govuk-label govuk-checkboxes__label" for="status-pending">Pending</label>
                         </div>
                         <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input" id="status-approved" name="status" type="checkbox" value="approved">
+                            <input class="govuk-checkboxes__input" id="status-approved" name="status" type="checkbox" value="@Approved">
                             <label class="govuk-label govuk-checkboxes__label" for="status-approved">Approved </label>
                         </div>
                         <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input" id="status-rejected" name="status" type="checkbox" value="rejected">
+                            <input class="govuk-checkboxes__input" id="status-rejected" name="status" type="checkbox" value="@Rejected">
                             <label class="govuk-label govuk-checkboxes__label" for="status-rejected">Rejected</label>
                         </div>
                         <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input" id="status-cancelled" name="status" type="checkbox" value="cancelled">
+                            <input class="govuk-checkboxes__input" id="status-cancelled" name="status" type="checkbox" value="@Cancelled">
                             <label class="govuk-label govuk-checkboxes__label" for="status-cancelled">Cancelled</label>
                         </div>
                     </div>
