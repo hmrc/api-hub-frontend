@@ -47,6 +47,36 @@
             @messages("accessRequests.heading", accessRequests.size)
         </h1>
 
+        <div class="horizontal-filter-panel__item">
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset" aria-describedby="filter-hint">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                        <h2 class="govuk-fieldset__heading">Filter by Status</h2>
+                    </legend>
+                    <div class="govuk-checkboxes govuk-checkboxes--small checkboxes-inline">
+                        <div class="govuk-checkboxes__item">
+                            <input class="govuk-checkboxes__input" checked="" id="status-pending" name="status" type="checkbox" value="pending">
+                            <label class="govuk-label govuk-checkboxes__label" for="status-pending">Pending</label>
+                        </div>
+                        <div class="govuk-checkboxes__item">
+                            <input class="govuk-checkboxes__input" id="status-approved" name="status" type="checkbox" value="approved">
+                            <label class="govuk-label govuk-checkboxes__label" for="status-approved">Approved </label>
+                        </div>
+                        <div class="govuk-checkboxes__item">
+                            <input class="govuk-checkboxes__input" id="status-rejected" name="status" type="checkbox" value="rejected">
+                            <label class="govuk-label govuk-checkboxes__label" for="status-rejected">Rejected</label>
+                        </div>
+                        <div class="govuk-checkboxes__item">
+                            <input class="govuk-checkboxes__input" id="status-cancelled" name="status" type="checkbox" value="cancelled">
+                            <label class="govuk-label govuk-checkboxes__label" for="status-cancelled">Cancelled</label>
+                        </div>
+                    </div>
+                </fieldset>
+                <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible govuk-!-margin-top-0">
+            </div>
+
+        </div>
+
         <div id="accessRequestList">
         @for(accessRequest <- accessRequests) {
             @accessRequestPanel(accessRequest, showReviewLink = true)
