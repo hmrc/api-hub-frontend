@@ -20,7 +20,8 @@ import config.FrontendAppConfig
 import controllers.actions.{ApplicationAuthActionProvider, IdentifierAction}
 import controllers.helpers.ApplicationApiBuilder
 import models.{NormalMode, UserAnswers}
-import pages.application.accessrequest.{RequestProductionAccessApplicationPage, RequestProductionAccessApisPage}
+import navigation.Navigator
+import pages.application.accessrequest.{RequestProductionAccessApisPage, RequestProductionAccessApplicationPage, RequestProductionAccessStartPage}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.AccessRequestSessionRepository
@@ -37,7 +38,8 @@ class RequestProductionAccessStartController @Inject()(
     clock: Clock,
     applicationAuth: ApplicationAuthActionProvider,
     appConfig: FrontendAppConfig,
-    applicationApiBuilder: ApplicationApiBuilder
+    applicationApiBuilder: ApplicationApiBuilder,
+    navigator: Navigator
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id, enrich = true)).async {
@@ -53,7 +55,7 @@ class RequestProductionAccessStartController @Inject()(
             .flatMap(_.set(RequestProductionAccessApisPage, applicationApis))
         )
         _ <- accessRequestSessionRepository.set(userAnswers)
-      } yield Redirect(controllers.application.routes.RequestProductionAccessSelectApisController.onPageLoad(NormalMode))
+      } yield Redirect(navigator.nextPage(RequestProductionAccessStartPage, NormalMode, userAnswers))
   }
 
 }

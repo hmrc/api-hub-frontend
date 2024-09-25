@@ -16,135 +16,72 @@
 
 @import models.application._
 @import models.user.UserModel
-@import viewmodels.application._
+@import viewmodels.application.ApplicationApi
 
 @this(
-        layout: templates.Layout,
-        govukTable: GovukTable,
-        govukButton: GovukButton,
-        govukCheckboxes: GovukCheckboxes,
-        govukErrorSummary: GovukErrorSummary,
-        formHelper: FormWithCSRF,
-        policyView: PolicyView
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukSummaryList: GovukSummaryList,
+    policyView: PolicyView,
+    govukCheckboxes: GovukCheckboxes,
+    govukButton: GovukButton
 )
 
-@(form: Form[?], application: Application, applicationApis: Seq[ApplicationApi], user: Option[UserModel])(implicit request: Request[?], messages: Messages)
+@(form: Form[?], summaries: Seq[SummaryListRow], selectedApis: Seq[ApplicationApi], user: Option[UserModel])(implicit request: Request[?], messages: Messages)
 
-@endpointScopes(scopes: Set[String]) = {
-    <ul class="govuk-list govuk-list-inline scopes-list">
-    @for(scope <- scopes) {
-        <li>
-            <strong class="hip-tag--scope">@scope</strong>
-        </li>
-    }
-    </ul>
-}
-
-@endpointName(endpoint: ApplicationEndpoint) = {
-    <strong class="govuk-tag govuk-tag--blue">@{
-        endpoint.httpMethod
-    }</strong>
-    <strong>@endpoint.path</strong>
-}
-
-@endpointSummary(endpoint: ApplicationEndpoint) = {
-    <p class="govuk-body-s govuk-!-margin-top-4">@descriptionOf(endpoint)</p>
-}
-
-@endpointDetails(endpoint: ApplicationEndpoint) = {
-    <div class="nhs-body govuk-!-margin-bottom-2">
-        @endpointName(endpoint)
-        @endpointSummary(endpoint)
-    </div>
-}
-
-@descriptionOf(applicationEndpoint: ApplicationEndpoint) = @{
-    applicationEndpoint
-        .summary
-        .getOrElse(applicationEndpoint.description.getOrElse(""))
-}
-
-@layout(pageTitle = titleNoForm(messages("requestProductionAccess.title")), user = user, fullWidth = true) {
+@layout(pageTitle = titleNoForm(messages("requestProductionAccess.title")), user = user) {
 
     @formHelper(action = controllers.application.routes.RequestProductionAccessController.onSubmit(), Symbol("autoComplete") -> "off") {
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
         }
-        <h1 class="govuk-heading-l">@messages("requestProductionAccess.title")</h1>
 
-        <p class="govuk-body">@messages("requestProductionAccess.heading")</p>
+        <h1 class="govuk-heading-l">@messages("requestProductionAccess.heading")</h1>
 
-        <div class="custom-checkbox-holder govuk-!-margin-top-0">
+        <h2 class="govuk-heading-m">@messages("requestProductionAccess.details")</h2>
 
-            @for(applicationApi <- applicationApis) {
+        @govukSummaryList(
+            SummaryList(
+                rows = summaries
+            )
+        )
 
-                @{
-                    if(applicationApi != applicationApis.head) {
-                                <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible"/>
-                    }
-                }
+        <h2 class="govuk-heading-m govuk-!-margin-top-9">@messages("requestProductionAccess.instruction")</h2>
 
-                <div>
-                    <p class="govuk-body">
-                        @messages("requestProductionAccess.apiName")
-                    <strong>@applicationApi.apiTitle</strong>
-                    </p>
-                </div>
-
-                <details class="govuk-details">
-                    <summary class="govuk-details__summary">
-                        <span class="govuk-details__summary-text">
-                        @messages("requestProductionAccess.viewDetails")
-                        </span>
-                    </summary>
-
-                    <div class="govuk-details__text">
-                        @applicationApi.endpoints.map(endpoint => endpointDetails(endpoint))
-                        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-                        <p class="govuk-body">@messages("requestProductionAccess.scopes")</p>
-                        <div>
-                            @endpointScopes(applicationApi.endpoints.flatMap(endpoint => endpoint.scopes).toSet)
-                        </div>
-                    </div>
-
-                </details>
-
-            }
-        </div>
-        <p class="govuk-body govuk-!-margin-top-4">@messages("requestProductionAccess.instruction")</p>
-        <div>
-            <div class="hip-request-apis">
-            @for(applicationApi <- applicationApis) {
+        <div class="hip-request-apis">
+            @for(applicationApi <- selectedApis) {
                 <details class="hip-details hip-expander">
                     <summary class="hip-details__summary">
                         <span class="hip-details__summary-text govuk-heading-s govuk-!-margin-bottom-0">
-                            @{
-                                applicationApi.apiTitle
-                            } usage policy
+                            @applicationApi.apiTitle
                         </span>
-                        <span class="hip-details__summary-info govuk-body-s"></span>
                     </summary>
-                    <div class="hip-details__terms">
+                    <div class="hip-details__text"> <!-- hip-details__terms -->
                         @policyView()
                     </div>
                 </details>
             }
-            </div>
-
-            <br>
-                @govukCheckboxes(
-                    CheckboxesViewModel(
-                        form = form,
-                        name = "accept",
-                        legend = Legend(""),
-                        items = RequestProductionAccessDeclaration.checkboxItems
-                    )
-                )
-
-                @govukButton(
-                    ButtonViewModel(messages("requestProductionAccess.button.accept")).withId("continueButton")
-                )
         </div>
+
+        @govukCheckboxes(
+            CheckboxesViewModel(
+                form = form,
+                name = "accept",
+                legend = Legend(""),
+                items = RequestProductionAccessDeclaration.checkboxItems
+            ).withClasses("govuk-!-margin-top-7 govuk-!-margin-bottom-5")
+        )
+
+        <h2 class="govuk-heading-m">@messages("requestProductionAccess.complete.heading")</h2>
+        <p class="govuk-body">@messages("requestProductionAccess.complete.p1")</p>
+        <p class="govuk-body">@messages("requestProductionAccess.complete.p2")</p>
+
+        @govukButton(
+            ButtonViewModel(messages("requestProductionAccess.button.accept"))
+                .withId("continueButton")
+                .withCssClass("govuk-!-margin-top-5")
+        )
     }
 
 }

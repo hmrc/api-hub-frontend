@@ -16,15 +16,16 @@
 
 package navigation
 
-import javax.inject.{Inject, Singleton}
-import play.api.mvc.Call
 import controllers.routes
-import models.AddEndpoints
-import pages.*
 import models.*
 import models.myapis.produce.ProduceApiHowToCreate.{Editor, Upload}
+import pages.*
+import pages.application.accessrequest.{ProvideSupportingInformationPage, RequestProductionAccessSelectApisPage, RequestProductionAccessStartPage}
 import pages.application.register.{RegisterApplicationNamePage, RegisterApplicationStartPage, RegisterApplicationTeamPage}
 import pages.myapis.produce.{ProduceApiBeforeYouStartPage, ProduceApiHowToCreatePage, ProduceApiStartPage}
+import play.api.mvc.Call
+
+import javax.inject.{Inject, Singleton}
 
 @Singleton
 class Navigator @Inject()() {
@@ -41,6 +42,9 @@ class Navigator @Inject()() {
     case RegisterApplicationStartPage => _ => controllers.application.register.routes.RegisterApplicationNameController.onPageLoad(NormalMode)
     case RegisterApplicationNamePage => _ => controllers.application.register.routes.RegisterApplicationTeamController.onPageLoad(NormalMode)
     case RegisterApplicationTeamPage => _ => controllers.application.register.routes.RegisterApplicationCheckYourAnswersController.onPageLoad()
+    case RequestProductionAccessStartPage => _ => controllers.application.routes.RequestProductionAccessSelectApisController.onPageLoad(NormalMode)
+    case RequestProductionAccessSelectApisPage => _ => controllers.application.routes.ProvideSupportingInformationController.onPageLoad(NormalMode)
+    case ProvideSupportingInformationPage => _ => controllers.application.routes.RequestProductionAccessController.onPageLoad()
     case ProduceApiStartPage => _ => controllers.myapis.produce.routes.ProduceApiBeforeYouStartController.onPageLoad()
     case ProduceApiBeforeYouStartPage => _ => controllers.myapis.produce.routes.ProduceApiHowToCreateController.onPageLoad(NormalMode)
     case ProduceApiHowToCreatePage => produceApiHowToCreateNextPage(NormalMode)
@@ -54,6 +58,8 @@ class Navigator @Inject()() {
     case CreateTeamNamePage => _ => controllers.team.routes.CreateTeamCheckYourAnswersController.onPageLoad()
     case RegisterApplicationNamePage => _ => controllers.application.register.routes.RegisterApplicationCheckYourAnswersController.onPageLoad()
     case RegisterApplicationTeamPage => _ => controllers.application.register.routes.RegisterApplicationCheckYourAnswersController.onPageLoad()
+    case RequestProductionAccessSelectApisPage => _ => controllers.application.routes.ProvideSupportingInformationController.onPageLoad(CheckMode)
+    case ProvideSupportingInformationPage => _ => controllers.application.routes.RequestProductionAccessController.onPageLoad()
     case _ => _ => routes.IndexController.onPageLoad
   }
 

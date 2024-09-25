@@ -19,19 +19,19 @@ package controllers.application
 import base.SpecBase
 import controllers.actions.{FakeApplication, FakeUser}
 import models.accessrequest.{AccessRequestApi, AccessRequestEndpoint, AccessRequestRequest, Pending}
-import models.api.{ApiDetail, Endpoint, EndpointMethod, Live, Maintainer}
-import models.application.ApplicationLenses.ApplicationLensOps
+import models.api.*
 import models.application.*
+import models.application.ApplicationLenses.ApplicationLensOps
 import models.user.UserModel
-import models.{RequestProductionAccessDeclaration, UserAnswers}
+import models.{CheckMode, RequestProductionAccessDeclaration, UserAnswers}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.application.accessrequest.{ProvideSupportingInformationPage, RequestProductionAccessApisPage, RequestProductionAccessApplicationPage, RequestProductionAccessPage}
+import play.api.Application as PlayApplication
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import play.api.Application as PlayApplication
 import repositories.AccessRequestSessionRepository
 import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
@@ -171,7 +171,7 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
             val result = route(fixture.application, request).value
 
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result) mustBe Some(controllers.application.routes.ProvideSupportingInformationController.onPageLoad().url)
+            redirectLocation(result) mustBe Some(controllers.application.routes.ProvideSupportingInformationController.onPageLoad(CheckMode).url)
           }
       }
     }

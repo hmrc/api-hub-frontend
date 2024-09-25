@@ -18,7 +18,6 @@ package controllers.application
 
 import base.SpecBase
 import controllers.actions.{FakeApplication, FakeUser}
-import controllers.routes
 import forms.RequestProductionAccessDeclarationFormProvider
 import models.accessrequest.Pending
 import models.api.*
@@ -26,12 +25,13 @@ import models.application.*
 import models.application.ApplicationLenses.ApplicationLensOps
 import models.user.UserModel
 import models.{RequestProductionAccessDeclaration, UserAnswers}
-import org.mockito.ArgumentCaptor
+import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.application.accessrequest.{RequestProductionAccessApisPage, RequestProductionAccessApplicationPage, RequestProductionAccessPage}
+import pages.application.accessrequest.*
 import play.api.Application as PlayApplication
+import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -39,6 +39,7 @@ import repositories.AccessRequestSessionRepository
 import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
 import viewmodels.application.*
+import viewmodels.checkAnswers.application.accessrequest.{ProvideSupportingInformationSummary, RequestProductionAccessApplicationSummary, RequestProductionAccessSelectApisSummary}
 import views.html.application.RequestProductionAccessView
 
 import java.time.{Clock, Instant, ZoneId}
@@ -48,6 +49,8 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
 
   private val form = new RequestProductionAccessDeclarationFormProvider()()
   private val clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
+  private val supportingInformation = "test-supporting-information"
+  private val onwardRoute = controllers.routes.IndexController.onPageLoad
 
   "RequestProductionAccessController" - {
     "must return OK and the correct view for a GET for a team member or supporter" in {
@@ -59,9 +62,7 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
 
           val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
 
-          val applicationApis = Seq(
-            ApplicationApi(anApiDetail, Seq(ApplicationEndpoint("GET", "/test", Some("A summary"), Some("A description"), Seq("test-scope"), Inaccessible, Accessible)), false)
-          )
+          val applicationApis = Seq(applicationApi(application))
 
           when(fixture.apiHubService.getAccessRequests(eqTo(Some(FakeApplication.id)), eqTo(Some(Pending)))(any()))
             .thenReturn(Future.successful(Seq.empty))
@@ -72,7 +73,7 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
             val view = fixture.application.injector.instanceOf[RequestProductionAccessView]
 
             status(result) mustEqual OK
-            contentAsString(result) mustBe view(form, FakeApplication, applicationApis, Some(user))(request, messages(fixture.application)).toString
+            contentAsString(result) mustBe view(form, buildSummaries(userAnswers)(messages(fixture.application)), applicationApis, Some(user))(request, messages(fixture.application)).toString
             contentAsString(result) must validateAsHtml
           }
       }
@@ -100,20 +101,8 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
         val view = fixture.application.injector.instanceOf[RequestProductionAccessView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustBe view(form, application, applicationApis, Some(FakeUser))(request, messages(fixture.application)).toString
+        contentAsString(result) mustBe view(form, buildSummaries(userAnswers)(messages(fixture.application)), applicationApis, Some(FakeUser))(request, messages(fixture.application)).toString
         contentAsString(result) must validateAsHtml
-      }
-    }
-
-    "must redirect to recovery page for a GET when there is no application in the session repository" in {
-      val fixture = buildFixture()
-
-      running(fixture.application) {
-        val request = FakeRequest(GET, controllers.application.routes.RequestProductionAccessController.onPageLoad().url)
-        val result = route(fixture.application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.JourneyRecoveryController.onPageLoad().url)
       }
     }
 
@@ -128,17 +117,16 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
 
           when(fixture.apiHubService.getApiDetail(any())(any())).thenReturn(Future.successful(Some(anApiDetail)))
           when(fixture.accessRequestSessionRepository.set(any())).thenReturn(Future.successful(true))
+
           running(fixture.application) {
             val request = FakeRequest(POST, controllers.application.routes.RequestProductionAccessController.onSubmit().url).withFormUrlEncodedBody(("accept[0]", "accept"))
             val result = route(fixture.application, request).value
 
             status(result) mustEqual SEE_OTHER
+            redirectLocation(result) mustBe Some(onwardRoute.url)
 
-            val captor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
-            verify(fixture.accessRequestSessionRepository).set(captor.capture())
-            val userAnswers: UserAnswers = captor.getValue
-            userAnswers.get(RequestProductionAccessPage).value mustBe Set(RequestProductionAccessDeclaration.Accept)
-            redirectLocation(result) mustBe Some(controllers.application.routes.ProvideSupportingInformationController.onPageLoad().url)
+            val expected = userAnswers.set(RequestProductionAccessPage, Set(RequestProductionAccessDeclaration.Accept)).toOption.value
+            verify(fixture.accessRequestSessionRepository).set(eqTo(expected))
           }
       }
     }
@@ -210,7 +198,8 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
       .overrides(
         bind[ApiHubService].toInstance(apiHubService),
         bind[AccessRequestSessionRepository].toInstance(accessRequestSessionRepository),
-        bind[Clock].toInstance(clock)
+        bind[Clock].toInstance(clock),
+        bind[Navigator].toInstance(FakeNavigator(onwardRoute))
       )
       .build()
 
@@ -222,6 +211,16 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
     UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
       .set(RequestProductionAccessApplicationPage, application).toOption.value
       .set(RequestProductionAccessApisPage, Seq(applicationApi(application))).toOption.value
+      .set(RequestProductionAccessSelectApisPage, Set(applicationApi(application).apiId)).toOption.value
+      .set(ProvideSupportingInformationPage, supportingInformation).toOption.value
+  }
+
+  private def buildSummaries(userAnswers: UserAnswers)(implicit messages: Messages) = {
+    Seq(
+      RequestProductionAccessApplicationSummary.row(userAnswers),
+      RequestProductionAccessSelectApisSummary.row(userAnswers),
+      ProvideSupportingInformationSummary.row(userAnswers)
+    )
   }
 
 }

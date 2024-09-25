@@ -19,7 +19,7 @@ package controllers.application
 import com.google.inject.{Inject, Singleton}
 import controllers.actions.{AccessRequestDataRetrievalAction, DataRequiredAction, IdentifierAction}
 import controllers.helpers.ErrorResultBuilder
-import models.UserAnswers
+import models.{CheckMode, UserAnswers}
 import models.accessrequest.{AccessRequestApi, AccessRequestEndpoint, AccessRequestRequest}
 import models.application.Application
 import models.requests.DataRequest
@@ -96,7 +96,7 @@ class RequestProductionAccessEndJourneyController @Inject()(
   private def validateSupportingInformation(userAnswers: UserAnswers): Either[Call, String] = {
     userAnswers.get(ProvideSupportingInformationPage) match {
       case Some(information) => Right(information)
-      case None => Left(controllers.application.routes.ProvideSupportingInformationController.onPageLoad())
+      case None => Left(controllers.application.routes.ProvideSupportingInformationController.onPageLoad(CheckMode))
     }
   }
 

@@ -18,65 +18,54 @@ package controllers.application
 
 import com.google.inject.Inject
 import controllers.actions.{AccessRequestDataRetrievalAction, DataRequiredAction, IdentifierAction}
-import controllers.routes
 import forms.RequestProductionAccessDeclarationFormProvider
 import models.requests.DataRequest
-import pages.application.accessrequest.{RequestProductionAccessApisPage, RequestProductionAccessApplicationPage, RequestProductionAccessPage}
+import models.{NormalMode, UserAnswers}
+import navigation.Navigator
+import pages.application.accessrequest.*
 import play.api.data.Form
-import play.api.i18n.I18nSupport
+import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.AccessRequestSessionRepository
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.application.Inaccessible
+import viewmodels.checkAnswers.application.accessrequest.{ProvideSupportingInformationSummary, RequestProductionAccessApplicationSummary, RequestProductionAccessSelectApisSummary}
 import views.html.application.RequestProductionAccessView
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class RequestProductionAccessController @Inject()(
-                                                   val controllerComponents: MessagesControllerComponents,
-                                                   identify: IdentifierAction,
-                                                   requestProductionAccessView: RequestProductionAccessView,
-                                                   formProvider: RequestProductionAccessDeclarationFormProvider,
-                                                   sessionRepository: AccessRequestSessionRepository,
-                                                   getData: AccessRequestDataRetrievalAction,
-                                                   requireData: DataRequiredAction)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+  val controllerComponents: MessagesControllerComponents,
+  identify: IdentifierAction,
+  requestProductionAccessView: RequestProductionAccessView,
+  formProvider: RequestProductionAccessDeclarationFormProvider,
+  sessionRepository: AccessRequestSessionRepository,
+  getData: AccessRequestDataRetrievalAction,
+  requireData: DataRequiredAction,
+  navigator: Navigator
+)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request => {
-      request.userAnswers.get(RequestProductionAccessApplicationPage) match {
-        case Some(_) =>
-          val previousAnswers = request.userAnswers.get(RequestProductionAccessPage)
-          previousAnswers match {
-            case None => showPage(form, OK)
-            case Some(value) => showPage(form.fill(value), OK)
-          }
-
-        case None => Redirect(routes.JourneyRecoveryController.onPageLoad())
+    implicit request =>
+      val filledForm =  request.userAnswers.get(RequestProductionAccessPage) match {
+        case Some(value) => form.fill(value)
+        case None => form
       }
-    }
+
+      showPage(filledForm, OK)
   }
 
-  private def showPage(form: Form[?], status: Int)(implicit request: DataRequest[AnyContent]): Result = {
-    request.userAnswers.get(RequestProductionAccessApplicationPage) match {
-      case Some(application) =>
-        request.userAnswers.get(RequestProductionAccessApisPage) match {
-          case Some(applicationApis) =>
-            val filteredApis = applicationApis.filter(_.endpoints.exists(_.primaryAccess == Inaccessible))
-              .map(applicationApi => {
-                val filteredEndpoints = applicationApi.endpoints.filter(_.primaryAccess == Inaccessible)
-                val prunedApi = applicationApi.copy(endpoints = filteredEndpoints)
-                prunedApi
-              })
-
-            Status(status)(requestProductionAccessView(
-              form,
-              application, filteredApis, Some(request.user)))
-          case _ => Redirect(routes.JourneyRecoveryController.onPageLoad())
-        }
-      case _ => Redirect(routes.JourneyRecoveryController.onPageLoad())
-    }
+  private def showPage(form: Form[?], status: Int)(implicit request: DataRequest[?]): Result = {
+    Status(status)(
+      requestProductionAccessView(
+        form,
+        buildSummaries(request.userAnswers),
+        RequestProductionAccessSelectApisSummary.buildSelectedApis(request.userAnswers),
+        Some(request.user)
+      )
+    )
   }
 
   def onSubmit: Action[AnyContent] = (identify andThen getData andThen requireData).async {
@@ -87,9 +76,17 @@ class RequestProductionAccessController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(RequestProductionAccessPage, value))
             _ <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(controllers.application.routes.ProvideSupportingInformationController.onPageLoad())
+          } yield Redirect(navigator.nextPage(RequestProductionAccessPage, NormalMode, request.userAnswers).url)
         }
       )
+  }
+
+  private def buildSummaries(userAnswers: UserAnswers)(implicit messages: Messages): Seq[SummaryListRow] = {
+    Seq(
+      RequestProductionAccessApplicationSummary.row(userAnswers),
+      RequestProductionAccessSelectApisSummary.row(userAnswers),
+      ProvideSupportingInformationSummary.row(userAnswers)
+    )
   }
 
 }

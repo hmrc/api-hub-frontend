@@ -16,8 +16,10 @@
 
 package controllers.application
 
-import controllers.actions._
+import controllers.actions.*
 import forms.ProvideSupportingInformationFormProvider
+import models.Mode
+import navigation.Navigator
 import pages.application.accessrequest.ProvideSupportingInformationPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -30,38 +32,42 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class ProvideSupportingInformationController @Inject()(
-                                        override val messagesApi: MessagesApi,
-                                        sessionRepository: AccessRequestSessionRepository,
-                                        identify: IdentifierAction,
-                                        getData: AccessRequestDataRetrievalAction,
-                                        requireData: DataRequiredAction,
-                                        formProvider: ProvideSupportingInformationFormProvider,
-                                        val controllerComponents: MessagesControllerComponents,
-                                        provideSupportingInformationView: ProvideSupportingInformationView
-                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+  override val messagesApi: MessagesApi,
+  sessionRepository: AccessRequestSessionRepository,
+  identify: IdentifierAction,
+  getData: AccessRequestDataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: ProvideSupportingInformationFormProvider,
+  val controllerComponents: MessagesControllerComponents,
+  provideSupportingInformationView: ProvideSupportingInformationView,
+  navigator: Navigator
+)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form: Form[String] = formProvider()
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
-        request.userAnswers.get(ProvideSupportingInformationPage) match {
-          case None => Ok(provideSupportingInformationView(form, Some(request.user)))
-          case Some(value) => Ok(provideSupportingInformationView(form.fill(value), Some(request.user)))
-        }
+      val filledForm = request.userAnswers.get(ProvideSupportingInformationPage) match {
+        case None => form
+        case Some(value) => form.fill(value)
+      }
+
+      Ok(provideSupportingInformationView(filledForm, mode, Some(request.user)))
   }
 
-  def onSubmit: Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(provideSupportingInformationView(formWithErrors, Some(request.user)))),
+          Future.successful(BadRequest(provideSupportingInformationView(formWithErrors, mode, Some(request.user)))),
 
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(ProvideSupportingInformationPage, value))
             _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(controllers.application.routes.RequestProductionAccessEndJourneyController.submitRequest())
+          } yield Redirect(navigator.nextPage(ProvideSupportingInformationPage, mode, request.userAnswers).url)
       )
   }
+
 }

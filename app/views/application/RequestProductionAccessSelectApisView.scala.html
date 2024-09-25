@@ -42,7 +42,7 @@
         </p>
 }
 
-@layout(pageTitle = title(form, messages("requestProductionAccessSelectApis.title")), fullWidth = true) {
+@layout(pageTitle = title(form, messages("requestProductionAccessSelectApis.title"))) {
 
     @formHelper(action = controllers.application.routes.RequestProductionAccessSelectApisController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
@@ -50,7 +50,7 @@
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
         }
 
-        <h1 class="govuk-heading-xl">
+        <h1 class="govuk-heading-l">
             @messages("requestProductionAccessSelectApis.heading")
         </h1>
 
