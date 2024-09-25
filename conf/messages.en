@@ -413,6 +413,7 @@ requestProductionAccess.complete.p1 = Once the API has been added to your applic
 requestProductionAccess.complete.p2 = To use these APIs in production you will need to request production access.
 requestProductionAccess.button.accept = Continue
 requestProductionAccess.error.required = You must confirm that you have read and meet the requirements outlined in the usage policies.
+requestProductionAccess.declaration.accept = I confirm that I have read and meet the requirements outlined in the usage policies.
 
 accessRequests.title = API requests
 accessRequests.heading = API production access requests ({0})
