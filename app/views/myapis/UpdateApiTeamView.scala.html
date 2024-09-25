@@ -21,18 +21,19 @@
 @import views.html.components.IconsLink
 @import views.ViewUtils
 @import views.html.helper.CSPNonce
+@import models.api.ApiDeploymentStatuses
 
 @this(
-    layout: templates.Layout,
-    formHelper: FormWithCSRF,
-    govukSummaryList: GovukSummaryList,
-    govukSelect: GovukSelect,
-    govukErrorSummary: GovukErrorSummary,
-    govukButton: GovukButton,
-    iconsLink: IconsLink,
+layout: templates.Layout,
+formHelper: FormWithCSRF,
+govukSummaryList: GovukSummaryList,
+govukSelect: GovukSelect,
+govukErrorSummary: GovukErrorSummary,
+govukButton: GovukButton,
+iconsLink: IconsLink,
 )
 
-@(form: Form[?], apiDetail: ApiDetail, owningTeam: Option[Team], teams: Seq[Team], user: UserModel)(implicit request: Request[?], messages: Messages)
+@(form: Form[?], apiDetail: ApiDetail, owningTeam: Option[Team], teams: Seq[Team], userModel: UserModel, maybeDeploymentStatuses: Option[ApiDeploymentStatuses])(implicit request: Request[?], messages: Messages)
 
 @scripts() = {
     @iconsLink()
@@ -44,8 +45,8 @@
     <a href="@routes.GetSupportController.onPageLoad" class="govuk-link">@messages("myApis.update.team.nonSupport.text3")</a>
 }
 
-@layout(pageTitle = titleNoForm(messages("myApis.update.team.title")), user = Some(user), fullWidth = true, customScriptsBlock = Some(scripts())) {
-    @views.html.templates.SideNav(apiDetail.title, MyApisNavItems(apiDetail.id, user, MyApisNavPages.ChangeOwningTeamPage)) {
+@layout(pageTitle = titleNoForm(messages("myApis.update.team.title")), user = Some(userModel), fullWidth = true, customScriptsBlock = Some(scripts())) {
+    @views.html.templates.SideNav(apiDetail.title, MyApisNavItems(apiDetail.id, userModel, MyApisNavPages.ChangeOwningTeamPage, maybeDeploymentStatuses)) {
         @formHelper(action = controllers.myapis.routes.UpdateApiTeamController.onSubmit(apiDetail.id), Symbol("autoComplete") -> "off") {
             @if(form.errors.nonEmpty) {
                 @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
@@ -96,7 +97,7 @@
 
             <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
 
-            @if(user.permissions.canSupport) {
+            @if(userModel.permissions.canSupport) {
                 <h3 class="govuk-heading-s">@messages("myApis.update.team.selectNew")</h3>
 
                 <select id="owningTeamSelection" name="owningTeam">

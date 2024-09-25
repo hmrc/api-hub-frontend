@@ -16,6 +16,7 @@
 
 package viewmodels.myapis
 
+import models.api.ApiDeploymentStatuses
 import models.user.UserModel
 import play.api.i18n.Messages
 import viewmodels.{SideNavItem, SideNavPage}
@@ -34,20 +35,24 @@ object MyApisNavItems {
 
   import MyApisNavPages._
 
-  def apply(apiId: String, user: UserModel, currentPage: SideNavPage)(implicit messages: Messages): Seq[SideNavItem] = {
+  def apply(apiId: String, user: UserModel, currentPage: SideNavPage, maybeApiDeploymentStatuses: Option[ApiDeploymentStatuses])(implicit messages: Messages): Seq[SideNavItem] = {
     Seq(
       SideNavItem(
         page = ProducerApiDetailsPage,
         title = messages("myApis.details.title"),
         link = controllers.myapis.routes.MyApiDetailsController.onPageLoad(apiId),
         isCurrentPage = currentPage == ProducerApiDetailsPage
-      ),
-      SideNavItem(
-        page = UpdateApiPage,
-        title = messages("myApis.update.title"),
-        link = controllers.myapis.routes.SimpleApiRedeploymentController.onPageLoad(apiId),
-        isCurrentPage = currentPage == UpdateApiPage
-      ),
+      )) ++ (
+        if (maybeApiDeploymentStatuses.isDefined && maybeApiDeploymentStatuses.get.isDeployed) {
+          Some(SideNavItem(
+            page = UpdateApiPage,
+            title = messages("myApis.update.title"),
+            link = controllers.myapis.routes.SimpleApiRedeploymentController.onPageLoad(apiId),
+            isCurrentPage = currentPage == UpdateApiPage
+          ))
+        } else {
+          None
+        }) ++ Seq (
       SideNavItem(
         page = ChangeOwningTeamPage,
         title = messages("myApis.update.team.title"),

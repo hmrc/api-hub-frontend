@@ -20,17 +20,18 @@ import base.SpecBase
 import controllers.actions.{FakeSupporter, FakeUser}
 import controllers.routes
 import generators.ApiDetailGenerators
-import models.application.ApplicationLenses._
+import models.api.ApiDeploymentStatuses
+import models.application.ApplicationLenses.*
 import models.application.{Api, Application, Creator, Deleted, TeamMember}
 import models.team.Team
 import models.user.UserModel
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import play.api.{Application => PlayApplication}
+import play.api.test.Helpers.*
+import play.api.Application as PlayApplication
 import services.ApiHubService
 import utils.HtmlValidation
 import views.html.ErrorTemplate
@@ -64,12 +65,14 @@ class ApiUsageControllerSpec
       when(fixture.apiHubService.findTeamById(eqTo(teamId))(any)).thenReturn(Future.successful(Some(owningTeam)))
       when(fixture.apiHubService.getApplicationsUsingApi(eqTo(apiDetail.id), eqTo(true))(any))
         .thenReturn(Future.successful(apps))
-
+      val statuses = ApiDeploymentStatuses(Some("prod"), Some("qa"))
+      when(fixture.apiHubService.getApiDeploymentStatuses(any)(any)).thenReturn(Future.successful(Some(statuses)))
+      
       val request = FakeRequest(GET, controllers.myapis.routes.ApiUsageController.onPageLoad(apiDetail.id).url)
       val result = route(fixture.application, request).value
 
       status(result) mustBe OK
-      contentAsString(result) mustBe view(apiDetail, Some(owningTeam), apps, FakeSupporter)(request, messages(fixture.application)).toString()
+      contentAsString(result) mustBe view(apiDetail, Some(owningTeam), apps, FakeSupporter, Some(statuses))(request, messages(fixture.application)).toString()
       contentAsString(result) must validateAsHtml
     }
   }
