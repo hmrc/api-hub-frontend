@@ -22,6 +22,7 @@ import pages.*
 import models.*
 import models.myapis.produce.ProduceApiHowToCreate.Editor
 import org.scalatest.TryValues
+import pages.application.accessrequest.{ProvideSupportingInformationPage, RequestProductionAccessSelectApisPage, RequestProductionAccessStartPage}
 import pages.application.register.{RegisterApplicationNamePage, RegisterApplicationStartPage, RegisterApplicationTeamPage}
 import pages.myapis.produce.{ProduceApiBeforeYouStartPage, ProduceApiHowToCreatePage, ProduceApiStartPage}
 
@@ -99,6 +100,18 @@ class NavigatorSpec extends SpecBase with TryValues {
         }
       }
 
+      "during the Request Production Access journey" - {
+        "must start with the Select APIs page" in {
+          navigator.nextPage(RequestProductionAccessStartPage, NormalMode, emptyUserAnswers) mustBe controllers.application.accessrequest.routes.RequestProductionAccessSelectApisController.onPageLoad(NormalMode)
+        }
+        "must go from the Select APIs page to the Provide supporting information page" in {
+          navigator.nextPage(RequestProductionAccessSelectApisPage, NormalMode, emptyUserAnswers) mustBe controllers.application.accessrequest.routes.ProvideSupportingInformationController.onPageLoad(NormalMode)
+        }
+        "must go from the Provide supporting information page to the Check your answers page" in {
+          navigator.nextPage(ProvideSupportingInformationPage, NormalMode, emptyUserAnswers) mustBe controllers.application.accessrequest.routes.RequestProductionAccessController.onPageLoad()
+        }
+      }
+
       "during the Produce an API journey" - {
         "must start with the Before you Start page" in {
           navigator.nextPage(ProduceApiStartPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiBeforeYouStartController.onPageLoad()
@@ -157,6 +170,14 @@ class NavigatorSpec extends SpecBase with TryValues {
         }
       }
 
+      "during the Request Production Access journey" - {
+        "must go from the Select APIs page to the Provide supporting information page" in {
+          navigator.nextPage(RequestProductionAccessSelectApisPage, CheckMode, emptyUserAnswers) mustBe controllers.application.accessrequest.routes.ProvideSupportingInformationController.onPageLoad(CheckMode)
+        }
+        "must go from the Provide supporting information page to the Check your answers page" in {
+          navigator.nextPage(ProvideSupportingInformationPage, CheckMode, emptyUserAnswers) mustBe controllers.application.accessrequest.routes.RequestProductionAccessController.onPageLoad()
+        }
+      }
     }
   }
 

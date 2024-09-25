@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package controllers.application
+package controllers.application.accessrequest
 
 import controllers.actions.*
-import forms.ProvideSupportingInformationFormProvider
+import forms.application.accessrequest.ProvideSupportingInformationFormProvider
 import models.Mode
 import navigation.Navigator
 import pages.application.accessrequest.ProvideSupportingInformationPage
@@ -26,7 +26,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.AccessRequestSessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.application.ProvideSupportingInformationView
+import views.html.application.accessrequest.ProvideSupportingInformationView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}

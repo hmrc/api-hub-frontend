@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.application
+package controllers.application.accessrequest
 
 import base.SpecBase
 import controllers.actions.{FakeApplication, FakeUser}
@@ -36,7 +36,7 @@ import repositories.AccessRequestSessionRepository
 import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
 import viewmodels.application.{ApplicationApi, ApplicationEndpoint, ApplicationEndpointAccess, Inaccessible}
-import views.html.application.RequestProductionAccessSuccessView
+import views.html.application.accessrequest.RequestProductionAccessSuccessView
 
 import java.time.{Clock, Instant, ZoneId}
 import scala.concurrent.Future
@@ -71,7 +71,7 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
           when(fixture.accessRequestSessionRepository.clear(user.userId)).thenReturn(Future.successful(true))
 
           running(fixture.application) {
-            val request = FakeRequest(GET, controllers.application.routes.RequestProductionAccessEndJourneyController.submitRequest().url)
+            val request = FakeRequest(GET, controllers.application.accessrequest.routes.RequestProductionAccessEndJourneyController.submitRequest().url)
             val result = route(fixture.application, request).value
 
             val view = fixture.application.injector.instanceOf[RequestProductionAccessSuccessView]
@@ -104,7 +104,7 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
           when(fixture.accessRequestSessionRepository.clear(user.userId)).thenReturn(Future.successful(true))
 
           running(fixture.application) {
-            val request = FakeRequest(GET, controllers.application.routes.RequestProductionAccessEndJourneyController.submitRequest().url)
+            val request = FakeRequest(GET, controllers.application.accessrequest.routes.RequestProductionAccessEndJourneyController.submitRequest().url)
             val result = route(fixture.application, request).value
 
             val view = fixture.application.injector.instanceOf[RequestProductionAccessSuccessView]
@@ -125,7 +125,7 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
           val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
 
           running(fixture.application) {
-            val request = FakeRequest(GET, controllers.application.routes.RequestProductionAccessEndJourneyController.submitRequest().url)
+            val request = FakeRequest(GET, controllers.application.accessrequest.routes.RequestProductionAccessEndJourneyController.submitRequest().url)
             val result = route(fixture.application, request).value
 
             status(result) mustEqual SEE_OTHER
@@ -145,11 +145,11 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
           val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
 
           running(fixture.application) {
-            val request = FakeRequest(GET, controllers.application.routes.RequestProductionAccessEndJourneyController.submitRequest().url)
+            val request = FakeRequest(GET, controllers.application.accessrequest.routes.RequestProductionAccessEndJourneyController.submitRequest().url)
             val result = route(fixture.application, request).value
 
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result) mustBe Some(controllers.application.routes.RequestProductionAccessController.onPageLoad().url)
+            redirectLocation(result) mustBe Some(controllers.application.accessrequest.routes.RequestProductionAccessController.onPageLoad().url)
           }
       }
     }
@@ -167,11 +167,11 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
           val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
 
           running(fixture.application) {
-            val request = FakeRequest(GET, controllers.application.routes.RequestProductionAccessEndJourneyController.submitRequest().url)
+            val request = FakeRequest(GET, controllers.application.accessrequest.routes.RequestProductionAccessEndJourneyController.submitRequest().url)
             val result = route(fixture.application, request).value
 
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result) mustBe Some(controllers.application.routes.ProvideSupportingInformationController.onPageLoad(CheckMode).url)
+            redirectLocation(result) mustBe Some(controllers.application.accessrequest.routes.ProvideSupportingInformationController.onPageLoad(CheckMode).url)
           }
       }
     }

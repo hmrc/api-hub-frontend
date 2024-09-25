@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package forms
+package forms.application.accessrequest
 
-import forms.application.RequestProductionAccessSelectApisFormProvider
+import forms.application.accessrequest.RequestProductionAccessSelectApisFormProvider
 import forms.behaviours.CheckboxFieldBehaviours
 import play.api.data.FormError
 import viewmodels.application.ApplicationApi

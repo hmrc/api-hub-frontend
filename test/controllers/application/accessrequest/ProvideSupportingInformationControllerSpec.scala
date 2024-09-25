@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package controllers.application
+package controllers.application.accessrequest
 
 import base.SpecBase
 import controllers.actions.{FakeApplication, FakeUser}
-import forms.ProvideSupportingInformationFormProvider
+import forms.application.accessrequest.ProvideSupportingInformationFormProvider
 import models.{NormalMode, UserAnswers}
 import models.api.{ApiDetail, Endpoint, EndpointMethod, Live, Maintainer}
 import models.application.ApplicationLenses.ApplicationLensOps
@@ -38,7 +38,7 @@ import play.api.Application as PlayApplication
 import repositories.AccessRequestSessionRepository
 import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
-import views.html.application.ProvideSupportingInformationView
+import views.html.application.accessrequest.ProvideSupportingInformationView
 
 import java.time.{Clock, Instant, ZoneId}
 import scala.concurrent.Future
@@ -61,7 +61,7 @@ class ProvideSupportingInformationControllerSpec extends SpecBase with MockitoSu
             .thenReturn(Future.successful(Some(application)))
 
           running(fixture.application) {
-            val request = FakeRequest(GET, controllers.application.routes.ProvideSupportingInformationController.onPageLoad(NormalMode).url)
+            val request = FakeRequest(GET, controllers.application.accessrequest.routes.ProvideSupportingInformationController.onPageLoad(NormalMode).url)
             val result = route(fixture.application, request).value
             val view = fixture.application.injector.instanceOf[ProvideSupportingInformationView]
 
@@ -83,7 +83,7 @@ class ProvideSupportingInformationControllerSpec extends SpecBase with MockitoSu
             .thenReturn(Future.successful(Some(application)))
 
           running(fixture.application) {
-            val request = FakeRequest(GET, controllers.application.routes.ProvideSupportingInformationController.onPageLoad(NormalMode).url)
+            val request = FakeRequest(GET, controllers.application.accessrequest.routes.ProvideSupportingInformationController.onPageLoad(NormalMode).url)
             val result = route(fixture.application, request).value
             val view = fixture.application.injector.instanceOf[ProvideSupportingInformationView]
 
@@ -106,7 +106,7 @@ class ProvideSupportingInformationControllerSpec extends SpecBase with MockitoSu
             .thenReturn(Future.successful(Some(application)))
 
           running(fixture.application) {
-            val request = FakeRequest(POST, controllers.application.routes.ProvideSupportingInformationController.onPageLoad(NormalMode).url)
+            val request = FakeRequest(POST, controllers.application.accessrequest.routes.ProvideSupportingInformationController.onPageLoad(NormalMode).url)
 
             val formWithError = form.withError(FormError("value", "Enter information to support your request"))
             val result = route(fixture.application, request).value
@@ -131,7 +131,7 @@ class ProvideSupportingInformationControllerSpec extends SpecBase with MockitoSu
 
           when(fixture.accessRequestSessionRepository.set(any())).thenReturn(Future.successful(true))
           running(fixture.application) {
-            val request = FakeRequest(POST, controllers.application.routes.ProvideSupportingInformationController.onSubmit(NormalMode).url).withFormUrlEncodedBody(("value", "blah"))
+            val request = FakeRequest(POST, controllers.application.accessrequest.routes.ProvideSupportingInformationController.onSubmit(NormalMode).url).withFormUrlEncodedBody(("value", "blah"))
             val result = route(fixture.application, request).value
 
             status(result) mustEqual SEE_OTHER

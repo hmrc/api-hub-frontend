@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package controllers.application
+package controllers.application.accessrequest
 
 import base.SpecBase
-import forms.application.RequestProductionAccessSelectApisFormProvider
+import forms.application.accessrequest.RequestProductionAccessSelectApisFormProvider
 import models.NormalMode
 import models.application.*
 import navigation.{FakeNavigator, Navigator}
@@ -31,7 +31,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.AccessRequestSessionRepository
 import viewmodels.application.{Accessible, ApplicationApi, ApplicationEndpoint, Inaccessible}
-import views.html.application.RequestProductionAccessSelectApisView
+import views.html.application.accessrequest.RequestProductionAccessSelectApisView
 
 import scala.concurrent.Future
 
@@ -39,7 +39,7 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
 
   private def onwardRoute = Call("GET", "/foo")
 
-  private lazy val requestProductionAccessSelectApisRoute = controllers.application.routes.RequestProductionAccessSelectApisController.onPageLoad(NormalMode).url
+  private lazy val requestProductionAccessSelectApisRoute = controllers.application.accessrequest.routes.RequestProductionAccessSelectApisController.onPageLoad(NormalMode).url
 
   private val testApplication = Application("id-1", "test", Creator("creator-email"), Seq(TeamMember("test-email")))
 

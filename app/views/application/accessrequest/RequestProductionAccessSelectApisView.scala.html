@@ -44,7 +44,7 @@
 
 @layout(pageTitle = title(form, messages("requestProductionAccessSelectApis.title"))) {
 
-    @formHelper(action = controllers.application.routes.RequestProductionAccessSelectApisController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.application.accessrequest.routes.RequestProductionAccessSelectApisController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))

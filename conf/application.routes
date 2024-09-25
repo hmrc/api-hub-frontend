@@ -9,20 +9,21 @@ GET         /add-credential-checklist/:id                               controll
 POST        /add-credential-success/:id                                 controllers.application.AddCredentialController.addProductionCredential(id: String)
 POST        /add-development-credential/:id                             controllers.application.AddCredentialController.addDevelopmentCredential(id: String)
 
-GET         /request-production-access/:id/start                        controllers.application.RequestProductionAccessStartController.onPageLoad(id: String)
-GET         /request-production-access/check-your-answers               controllers.application.RequestProductionAccessController.onPageLoad()
-POST        /request-production-access/check-your-answers               controllers.application.RequestProductionAccessController.onSubmit()
-GET         /request-production-access/select-apis                      controllers.application.RequestProductionAccessSelectApisController.onPageLoad(mode: Mode = NormalMode)
-POST        /request-production-access/select-apis                      controllers.application.RequestProductionAccessSelectApisController.onSubmit(mode: Mode = NormalMode)
-GET         /request-production-access/change-select-apis               controllers.application.RequestProductionAccessSelectApisController.onPageLoad(mode: Mode = CheckMode)
-POST        /request-production-access/change-select-apis               controllers.application.RequestProductionAccessSelectApisController.onSubmit(mode: Mode = CheckMode)
+GET         /request-production-access/:id/start                        controllers.application.accessrequest.RequestProductionAccessStartController.onPageLoad(id: String)
+GET         /request-production-access/check-your-answers               controllers.application.accessrequest.RequestProductionAccessController.onPageLoad()
+POST        /request-production-access/check-your-answers               controllers.application.accessrequest.RequestProductionAccessController.onSubmit()
 
-GET         /request-production-access/supporting-information           controllers.application.ProvideSupportingInformationController.onPageLoad(mode: Mode = NormalMode)
-POST        /request-production-access/supporting-information           controllers.application.ProvideSupportingInformationController.onSubmit(mode: Mode = NormalMode)
-GET         /request-production-access/change-supporting-information    controllers.application.ProvideSupportingInformationController.onPageLoad(mode: Mode = CheckMode)
-POST        /request-production-access/change-supporting-information    controllers.application.ProvideSupportingInformationController.onSubmit(mode: Mode = CheckMode)
+GET         /request-production-access/select-apis                      controllers.application.accessrequest.RequestProductionAccessSelectApisController.onPageLoad(mode: Mode = NormalMode)
+POST        /request-production-access/select-apis                      controllers.application.accessrequest.RequestProductionAccessSelectApisController.onSubmit(mode: Mode = NormalMode)
+GET         /request-production-access/change-select-apis               controllers.application.accessrequest.RequestProductionAccessSelectApisController.onPageLoad(mode: Mode = CheckMode)
+POST        /request-production-access/change-select-apis               controllers.application.accessrequest.RequestProductionAccessSelectApisController.onSubmit(mode: Mode = CheckMode)
 
-GET         /request-production-access/success                          controllers.application.RequestProductionAccessEndJourneyController.submitRequest()
+GET         /request-production-access/supporting-information           controllers.application.accessrequest.ProvideSupportingInformationController.onPageLoad(mode: Mode = NormalMode)
+POST        /request-production-access/supporting-information           controllers.application.accessrequest.ProvideSupportingInformationController.onSubmit(mode: Mode = NormalMode)
+GET         /request-production-access/change-supporting-information    controllers.application.accessrequest.ProvideSupportingInformationController.onPageLoad(mode: Mode = CheckMode)
+POST        /request-production-access/change-supporting-information    controllers.application.accessrequest.ProvideSupportingInformationController.onSubmit(mode: Mode = CheckMode)
+
+GET         /request-production-access/success                          controllers.application.accessrequest.RequestProductionAccessEndJourneyController.submitRequest()
 
 GET         /delete-primary-credential/:id/:clientId                    controllers.application.EnvironmentAndCredentialsController.deletePrimaryCredential(id: String ,clientId: String)
 GET         /delete-secondary-credential/:id/:clientId                  controllers.application.EnvironmentAndCredentialsController.deleteSecondaryCredential(id: String ,clientId: String)

@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.application.accessrequest
 
-import controllers.application.routes
+import controllers.application.accessrequest.routes
 import models.{CheckMode, UserAnswers}
 import pages.application.accessrequest.{RequestProductionAccessApisPage, RequestProductionAccessSelectApisPage}
 import play.api.i18n.Messages
@@ -34,8 +34,10 @@ object RequestProductionAccessSelectApisSummary  {
       key     = "requestProductionAccessSelectApis.checkYourAnswersLabel",
       value   = selectedApisValue(userAnswers),
       actions = Seq(
-        ActionItemViewModel("site.change", routes.RequestProductionAccessSelectApisController.onPageLoad(CheckMode).url)
-          .withVisuallyHiddenText(messages("requestProductionAccessSelectApis.change.hidden"))
+        ActionItemViewModel(
+          "site.change",
+          routes.RequestProductionAccessSelectApisController.onPageLoad(CheckMode).url
+        ).withVisuallyHiddenText(messages("requestProductionAccessSelectApis.change.hidden"))
       )
     )
   }

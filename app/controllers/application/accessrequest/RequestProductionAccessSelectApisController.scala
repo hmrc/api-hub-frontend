@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package controllers.application
+package controllers.application.accessrequest
 
 import controllers.actions.*
 import controllers.routes
-import forms.application.RequestProductionAccessSelectApisFormProvider
+import forms.application.accessrequest.RequestProductionAccessSelectApisFormProvider
 import models.Mode
 import models.requests.DataRequest
 import navigation.Navigator
@@ -29,7 +29,7 @@ import repositories.AccessRequestSessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.application.ApplicationApi
-import views.html.application.RequestProductionAccessSelectApisView
+import views.html.application.accessrequest.RequestProductionAccessSelectApisView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}

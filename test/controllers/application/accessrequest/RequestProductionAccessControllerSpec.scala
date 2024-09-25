@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package controllers.application
+package controllers.application.accessrequest
 
 import base.SpecBase
 import controllers.actions.{FakeApplication, FakeUser}
-import forms.RequestProductionAccessDeclarationFormProvider
+import forms.application.accessrequest.RequestProductionAccessDeclarationFormProvider
 import models.accessrequest.Pending
 import models.api.*
 import models.application.*
@@ -40,7 +40,7 @@ import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
 import viewmodels.application.*
 import viewmodels.checkAnswers.application.accessrequest.{ProvideSupportingInformationSummary, RequestProductionAccessApplicationSummary, RequestProductionAccessSelectApisSummary}
-import views.html.application.RequestProductionAccessView
+import views.html.application.accessrequest.RequestProductionAccessView
 
 import java.time.{Clock, Instant, ZoneId}
 import scala.concurrent.Future
@@ -68,7 +68,7 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
             .thenReturn(Future.successful(Seq.empty))
 
           running(fixture.application) {
-            val request = FakeRequest(GET, controllers.application.routes.RequestProductionAccessController.onPageLoad().url)
+            val request = FakeRequest(GET, controllers.application.accessrequest.routes.RequestProductionAccessController.onPageLoad().url)
             val result = route(fixture.application, request).value
             val view = fixture.application.injector.instanceOf[RequestProductionAccessView]
 
@@ -96,7 +96,7 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
         .thenReturn(Future.successful(Seq.empty))
 
       running(fixture.application) {
-        val request = FakeRequest(GET, controllers.application.routes.RequestProductionAccessController.onPageLoad().url)
+        val request = FakeRequest(GET, controllers.application.accessrequest.routes.RequestProductionAccessController.onPageLoad().url)
         val result = route(fixture.application, request).value
         val view = fixture.application.injector.instanceOf[RequestProductionAccessView]
 
@@ -119,7 +119,7 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
           when(fixture.accessRequestSessionRepository.set(any())).thenReturn(Future.successful(true))
 
           running(fixture.application) {
-            val request = FakeRequest(POST, controllers.application.routes.RequestProductionAccessController.onSubmit().url).withFormUrlEncodedBody(("accept[0]", "accept"))
+            val request = FakeRequest(POST, controllers.application.accessrequest.routes.RequestProductionAccessController.onSubmit().url).withFormUrlEncodedBody(("accept[0]", "accept"))
             val result = route(fixture.application, request).value
 
             status(result) mustEqual SEE_OTHER

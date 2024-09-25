@@ -34,7 +34,7 @@ object ProvideSupportingInformationSummary {
       actions = Seq(
         ActionItemViewModel(
           "site.change",
-          controllers.application.routes.ProvideSupportingInformationController.onPageLoad(CheckMode).url
+          controllers.application.accessrequest.routes.ProvideSupportingInformationController.onPageLoad(CheckMode).url
         ).withVisuallyHiddenText(messages("provideSupportingInformation.change.hidden"))
       )
     )

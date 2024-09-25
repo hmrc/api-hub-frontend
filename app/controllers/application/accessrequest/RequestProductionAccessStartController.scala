@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.application
+package controllers.application.accessrequest
 
 import config.FrontendAppConfig
 import controllers.actions.{ApplicationAuthActionProvider, IdentifierAction}

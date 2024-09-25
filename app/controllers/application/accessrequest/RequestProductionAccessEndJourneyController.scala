@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.application
+package controllers.application.accessrequest
 
 import com.google.inject.{Inject, Singleton}
 import controllers.actions.{AccessRequestDataRetrievalAction, DataRequiredAction, IdentifierAction}
@@ -31,7 +31,7 @@ import services.ApiHubService
 import uk.gov.hmrc.http.UpstreamErrorResponse
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.application.{ApplicationApi, Inaccessible}
-import views.html.application.RequestProductionAccessSuccessView
+import views.html.application.accessrequest.RequestProductionAccessSuccessView
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -89,14 +89,14 @@ class RequestProductionAccessEndJourneyController @Inject()(
   private def validateConditions(userAnswers: UserAnswers): Either[Call, Unit] = {
     userAnswers.get(RequestProductionAccessPage) match {
       case Some(_) => Right(())
-      case None => Left(controllers.application.routes.RequestProductionAccessController.onPageLoad())
+      case None => Left(controllers.application.accessrequest.routes.RequestProductionAccessController.onPageLoad())
     }
   }
 
   private def validateSupportingInformation(userAnswers: UserAnswers): Either[Call, String] = {
     userAnswers.get(ProvideSupportingInformationPage) match {
       case Some(information) => Right(information)
-      case None => Left(controllers.application.routes.ProvideSupportingInformationController.onPageLoad(CheckMode))
+      case None => Left(controllers.application.accessrequest.routes.ProvideSupportingInformationController.onPageLoad(CheckMode))
     }
   }
 

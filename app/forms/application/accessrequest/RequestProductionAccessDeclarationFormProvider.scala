@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package forms
+package forms.application.accessrequest
 
 import forms.mappings.Mappings
 import models.RequestProductionAccessDeclaration

@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package controllers.application
+package controllers.application.accessrequest
 
 import com.google.inject.Inject
 import controllers.actions.{AccessRequestDataRetrievalAction, DataRequiredAction, IdentifierAction}
-import forms.RequestProductionAccessDeclarationFormProvider
+import forms.application.accessrequest.RequestProductionAccessDeclarationFormProvider
 import models.requests.DataRequest
 import models.{NormalMode, UserAnswers}
 import navigation.Navigator
@@ -30,7 +30,7 @@ import repositories.AccessRequestSessionRepository
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.application.accessrequest.{ProvideSupportingInformationSummary, RequestProductionAccessApplicationSummary, RequestProductionAccessSelectApisSummary}
-import views.html.application.RequestProductionAccessView
+import views.html.application.accessrequest.RequestProductionAccessView
 
 import scala.concurrent.{ExecutionContext, Future}
 
