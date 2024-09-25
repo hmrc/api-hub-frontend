@@ -29,7 +29,7 @@
     <script src='@routes.Assets.versioned("javascripts/hubStatistics.js")' type="module" @{CSPNonce.attr}></script>
 }
 
-@layout(pageTitle = titleNoForm(messages("statistics.title")), user = Some(user), customScriptsBlock = Some(scripts())) {
+@layout(pageTitle = titleNoForm(messages("statistics.title")), fullWidth = true, user = Some(user), customScriptsBlock = Some(scripts())) {
 
     @views.html.templates.SideNav(messages("manageApplications.admin"), AdminNavItems(user, AdminSideNavPages.StatisticsPage)) {
 
