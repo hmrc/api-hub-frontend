@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.actions.{FakeApiDetail, FakeApplication}
 import io.swagger.v3.oas.models.servers.Server
 import models.api.{Endpoint, EndpointMethod}
-import models.application.{Credential, Environment, Environments}
+import models.application.{Credential, Environment, Environments, SelectedEndpoint, Api}
 import models.{CORPORATE, CurlCommand, MDTP}
 import org.scalatestplus.mockito.MockitoSugar
 
@@ -41,7 +41,7 @@ class CurlCommandServiceSpec extends SpecBase with MockitoSugar {
 
     "must return the correct curl command for a minimal valid oas file" in {
       val service = new CurlCommandService()
-      val application = FakeApplication
+      val application = FakeApplication.copy(apis = Seq(Api("id", "title", Seq(SelectedEndpoint("GET", "/get_it")))))
       val minimalValidOas =
         """
           |openapi: 3.0.3
@@ -71,10 +71,6 @@ class CurlCommandServiceSpec extends SpecBase with MockitoSugar {
     "must return the correct curl commands if the oas file can be parsed" in {
       val service = new CurlCommandService()
       val credential = Credential("client-id", LocalDateTime.now, Some("client-secret"), None)
-      val application = FakeApplication.copy(environments = Environments(
-        primary = Environment(Seq.empty, Seq.empty),
-        secondary = Environment(Seq.empty, Seq(credential))
-      ))
       val validOas =
         """
           |---
@@ -109,6 +105,11 @@ class CurlCommandServiceSpec extends SpecBase with MockitoSugar {
           |      responses:
           |        "200":
           |          description: successful operation
+          |    delete:
+          |      description: request that shouldn't generate a curl command
+          |      responses:
+          |        "200":
+          |          description: successful operation
           |  /thing:
           |    delete:
           |      description: request with header parameter
@@ -119,6 +120,12 @@ class CurlCommandServiceSpec extends SpecBase with MockitoSugar {
           |        required: true
           |        schema:
           |          type: string
+          |      responses:
+          |        "200":
+          |          description: successful operation
+          |  /another:
+          |    get:
+          |      description: another request that shouldn't generate a curl command
           |      responses:
           |        "200":
           |          description: successful operation
@@ -151,9 +158,23 @@ class CurlCommandServiceSpec extends SpecBase with MockitoSugar {
           |""".stripMargin
       val apiDetail = FakeApiDetail.copy(openApiSpecification = validOas).copy(endpoints = Seq(
         Endpoint("/findByColour", Seq(EndpointMethod("GET", None, None, Seq.empty))),
-        Endpoint("/thing/{id}", Seq(EndpointMethod("GET", None, None, Seq.empty))),
+        Endpoint("/thing/{id}", Seq(EndpointMethod("GET", None, None, Seq.empty), EndpointMethod("DELETE", None, None, Seq.empty))),
         Endpoint("/thing", Seq(EndpointMethod("DELETE", None, None, Seq.empty))),
+        Endpoint("/another", Seq(EndpointMethod("GET", None, None, Seq.empty))),
       ))
+
+      val application = FakeApplication
+        .copy(environments = Environments(
+          primary = Environment(Seq.empty, Seq.empty),
+          secondary = Environment(Seq.empty, Seq(credential))
+        ))
+        .copy(apis = Seq(
+          Api(apiDetail.id, apiDetail.title, Seq(
+            SelectedEndpoint("GET", "/findByColour"),
+            SelectedEndpoint("GET", "/thing/{id}"),
+            SelectedEndpoint("DELETE", "/thing")
+          ))
+        ))
 
       val result = service.buildCurlCommandsForApi(application, apiDetail, MDTP)
       val commonHeaders = Map("Content-Type" -> "application/json", "Authorization" -> "Basic Y2xpZW50LWlkOmNsaWVudC1zZWNyZXQ=")

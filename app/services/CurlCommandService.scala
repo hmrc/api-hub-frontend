@@ -32,9 +32,9 @@ class CurlCommandService extends Logging {
   def buildCurlCommandsForApi(application: Application, apiDetail: ApiDetail, apiWorld: ApiWorld): Either[String, Seq[CurlCommand]] = {
     OpenApiDoc.parse(apiDetail.openApiSpecification).map(openApiDoc =>
       val operationResults = for {
-        endpoint <- apiDetail.endpoints
-        method <- endpoint.methods
-      } yield openApiDoc.getOperation(method.httpMethod, endpoint.path)
+        api <- application.apis
+        selectedEndpoint <- api.endpoints
+      } yield openApiDoc.getOperation(selectedEndpoint.httpMethod, selectedEndpoint.path)
 
       operationResults.collect({ case Left(errorMessage) => logger.warn(errorMessage) })
 
