@@ -24,6 +24,7 @@
 @import models.team.Team
 @import views.html.helper.CSPNonce
 @import views.html.components.Paginator
+@import models.api.ApiDeploymentStatuses
 
 @this(
         layout: templates.Layout,
@@ -36,7 +37,7 @@
         paginator: Paginator
 )
 
-@(apiDetail: ApiDetail, owningTeam: Option[Team], applications: Seq[Application], user: UserModel)(implicit request: Request[?], messages: Messages)
+@(apiDetail: ApiDetail, owningTeam: Option[Team], applications: Seq[Application],  userModel: UserModel, maybeDeploymentStatuses: Option[ApiDeploymentStatuses])(implicit request: Request[?], messages: Messages)
 
 @applicationLink(application: Application) = {
     <a href="@controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id)" class="govuk-link">@application.name</a>
@@ -57,11 +58,11 @@
 @layout(
     pageTitle    = titleNoForm(messages("myApis.usage.title", apiDetail.title)),
     showBackLink = true,
-    user = Some(user),
+    user = Some(userModel),
     fullWidth = true,
     customScriptsBlock = Some(scripts())
 ) {
-    @views.html.templates.SideNav(apiDetail.title, MyApisNavItems(apiDetail.id, user, MyApisNavPages.ApiUsagePage)) {
+    @views.html.templates.SideNav(apiDetail.title, MyApisNavItems(apiDetail.id, userModel, MyApisNavPages.ApiUsagePage, maybeDeploymentStatuses)) {
         <h1 class="govuk-heading-l">
         @messages("myApis.usage.title")
         </h1>

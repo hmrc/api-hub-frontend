@@ -40,8 +40,9 @@ class ApiUsageController @Inject()(
   def onPageLoad(apiId: String): Action[AnyContent] = (identify andThen isSupport andThen apiAuth(apiId)) async {
     implicit request => for {
       applications <- apiHubService.getApplicationsUsingApi(apiId, true)
+      deploymentStatuses <- apiHubService.getApiDeploymentStatuses(request.apiDetails.publisherReference)
       owningTeam <- request.apiDetails.teamId.fold(Future.successful(Option.empty[Team]))(apiHubService.findTeamById)
-    } yield  Ok(view(request.apiDetails, owningTeam, applications, request.identifierRequest.user))
+    } yield  Ok(view(request.apiDetails, owningTeam, applications, request.identifierRequest.user, deploymentStatuses))
   }
 
 }
