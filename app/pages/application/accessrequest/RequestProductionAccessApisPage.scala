@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,16 @@
  * limitations under the License.
  */
 
-package forms
+package pages.application.accessrequest
 
-import forms.mappings.Mappings
-import models.RequestProductionAccessDeclaration
-import play.api.data.Form
-import play.api.data.Forms.set
+import pages.QuestionPage
+import play.api.libs.json.JsPath
+import viewmodels.application.ApplicationApi
 
-import javax.inject.Inject
+case object RequestProductionAccessApisPage extends QuestionPage[Seq[ApplicationApi]] {
 
-class RequestProductionAccessDeclarationFormProvider @Inject() extends Mappings {
+  override def path: JsPath = JsPath \ toString
 
-  def apply(): Form[Set[RequestProductionAccessDeclaration]] =
-    Form(
-      "accept" -> set(enumerable[RequestProductionAccessDeclaration]("requestProductionAccess.error.required"))
-        .verifying(nonEmptySet("requestProductionAccess.error.required"))
-    )
+  override def toString: String = "requestProductionAccessApis"
+
 }

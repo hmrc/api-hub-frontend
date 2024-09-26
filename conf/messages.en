@@ -404,14 +404,16 @@ addAnApiSuccess.advice.body2 = View your application: {0}
 addAnApiComplete.failed = You should check this application''s details before trying again as it is possible that this action was partially successful.
 
 requestProductionAccess.title = Request production access for APIs
-requestProductionAccess.heading = You will be requesting access for the following APIs
+requestProductionAccess.heading = Check your answers before continuing
+requestProductionAccess.details = Details
+requestProductionAccess.application.name = Application name
 requestProductionAccess.instruction = Review and accept the policies for each API you plan to use in production.
-requestProductionAccess.declaration.accept = I confirm that I have read and meet the requirements outlined in the usage policies.
-requestProductionAccess.apiName = API name:
-requestProductionAccess.viewDetails = View details
-requestProductionAccess.scopes = These end points use the following scopes:
+requestProductionAccess.complete.heading = Complete your production access request
+requestProductionAccess.complete.p1 = Once the API has been added to your application you will be able to use it in non-production environments.
+requestProductionAccess.complete.p2 = To use these APIs in production you will need to request production access.
 requestProductionAccess.button.accept = Continue
 requestProductionAccess.error.required = You must confirm that you have read and meet the requirements outlined in the usage policies.
+requestProductionAccess.declaration.accept = I confirm that I have read and meet the requirements outlined in the usage policies.
 
 accessRequests.title = API requests
 accessRequests.heading = API production access requests ({0})
@@ -467,6 +469,8 @@ provideSupportingInformation.title = Provide supporting information
 provideSupportingInformation.hint = Provide any additional information you think will support your request. For example a link to any technical information about your service, or details of discussions with the producing team.
 provideSupportingInformation.continue = Continue
 provideSupportingInformation.error.required = Enter information to support your request
+provideSupportingInformation.checkYourAnswersLabel = Supporting information
+provideSupportingInformation.change.hidden = Provide supporting information
 
 requestProductionAccessSuccess.title = Request Production Access Success
 requestProductionAccessSuccess.heading = Request for production access has been submitted

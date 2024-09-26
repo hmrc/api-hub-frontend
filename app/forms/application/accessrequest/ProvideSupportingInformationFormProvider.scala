@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package pages
+package forms.application.accessrequest
 
-import models.application.Application
-import play.api.libs.json.JsPath
+import forms.mappings.Mappings
+import play.api.data.Form
 
-case object AccessRequestApplicationIdPage extends QuestionPage[Application] {
+import javax.inject.Inject
 
-  override def path: JsPath = JsPath \ toString
+class ProvideSupportingInformationFormProvider @Inject() extends Mappings {
 
-  override def toString: String = "application"
-
+  def apply(): Form[String] =
+    Form(
+      "value" -> text("provideSupportingInformation.error.required")
+    )
 }

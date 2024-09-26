@@ -14,25 +14,22 @@
  * limitations under the License.
  */
 
-package controllers.application
+package controllers.application.accessrequest
 
 import controllers.actions.*
-import controllers.helpers.{ApplicationApiBuilder, ErrorResultBuilder}
 import controllers.routes
-import forms.application.RequestProductionAccessSelectApisFormProvider
+import forms.application.accessrequest.RequestProductionAccessSelectApisFormProvider
+import models.Mode
 import models.requests.DataRequest
-import models.{Mode, NormalMode}
 import navigation.Navigator
-import pages.AccessRequestApplicationIdPage
-import pages.application.accessrequest.RequestProductionAccessSelectApisPage
+import pages.application.accessrequest.{RequestProductionAccessApisPage, RequestProductionAccessSelectApisPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.AccessRequestSessionRepository
-import services.ApiHubService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.application.ApplicationApi
-import views.html.application.RequestProductionAccessSelectApisView
+import views.html.application.accessrequest.RequestProductionAccessSelectApisView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -46,12 +43,8 @@ class RequestProductionAccessSelectApisController @Inject()(
                                         requireData: DataRequiredAction,
                                         formProvider: RequestProductionAccessSelectApisFormProvider,
                                         val controllerComponents: MessagesControllerComponents,
-                                        view: RequestProductionAccessSelectApisView,
-                                        applicationApiBuilder: ApplicationApiBuilder,
-                                        apiHubService: ApiHubService,
-                                        errorResultBuilder: ErrorResultBuilder,
+                                        view: RequestProductionAccessSelectApisView
                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport:
-
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
@@ -100,8 +93,8 @@ class RequestProductionAccessSelectApisController @Inject()(
                                          applicationApisPendingRequests: Seq[ApplicationApi]
                                        ) => Future[Result]
                                      )(implicit hc: HeaderCarrier, request: DataRequest[?]): Future[Result] =
-    request.userAnswers.get(AccessRequestApplicationIdPage) match {
-      case Some(application) =>
-        applicationApiBuilder.build(application).flatMap(apis => result.tupled(partitionApplicationApis(apis)))
+    request.userAnswers.get(RequestProductionAccessApisPage) match {
+      case Some(apis) =>
+        result.tupled(partitionApplicationApis(apis))
       case _ => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
     }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package forms.application
+package forms.application.accessrequest
 
 import forms.mappings.Mappings
 import models.{AvailableEndpoints, Enumerable}

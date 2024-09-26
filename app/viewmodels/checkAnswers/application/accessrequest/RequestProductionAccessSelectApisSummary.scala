@@ -16,38 +16,55 @@
 
 package viewmodels.checkAnswers.application.accessrequest
 
-import controllers.application.routes
+import controllers.application.accessrequest.routes
 import models.{CheckMode, UserAnswers}
-import pages.application.accessrequest.RequestProductionAccessSelectApisPage
+import pages.application.accessrequest.{RequestProductionAccessApisPage, RequestProductionAccessSelectApisPage}
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.Aliases.Value
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import viewmodels.application.ApplicationApi
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
 object RequestProductionAccessSelectApisSummary  {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(RequestProductionAccessSelectApisPage).map {
-      answers =>
+  def row(userAnswers: UserAnswers)(implicit messages: Messages): SummaryListRow = {
+    SummaryListRowViewModel(
+      key     = "requestProductionAccessSelectApis.checkYourAnswersLabel",
+      value   = selectedApisValue(userAnswers),
+      actions = Seq(
+        ActionItemViewModel(
+          "site.change",
+          routes.RequestProductionAccessSelectApisController.onPageLoad(CheckMode).url
+        ).withVisuallyHiddenText(messages("requestProductionAccessSelectApis.change.hidden"))
+      )
+    )
+  }
 
-        val value = ValueViewModel(
-          HtmlContent(
-            answers.map {
-              answer => HtmlFormat.escape(messages(s"requestProductionAccessSelectApis.$answer")).toString
-            }
-            .mkString(",<br>")
-          )
-        )
+  def buildSelectedApis(userAnswers: UserAnswers)(implicit messages: Messages): Seq[ApplicationApi] = {
+    applicationApis(userAnswers)
+      .filter(api => selectedApis(userAnswers).exists(_.equals(api.apiId)))
+  }
 
-        SummaryListRowViewModel(
-          key     = "requestProductionAccessSelectApis.checkYourAnswersLabel",
-          value   = value,
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.RequestProductionAccessSelectApisController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("requestProductionAccessSelectApis.change.hidden"))
-          )
-        )
-    }
+  private def selectedApisValue(userAnswers: UserAnswers)(implicit messages: Messages) = {
+    val listItems = buildSelectedApis(userAnswers)
+      .map(api => s"<li>${api.apiTitle}</li>")
+      .mkString
+
+    Value(HtmlContent(s"<ul class='govuk-list govuk-list--bullet'>$listItems</ul>"))
+  }
+
+  private def applicationApis(userAnswers: UserAnswers): Seq[ApplicationApi] = {
+    userAnswers
+      .get(RequestProductionAccessApisPage)
+      .getOrElse(Seq.empty)
+  }
+
+  private def selectedApis(userAnswers: UserAnswers): Set[String] = {
+    userAnswers
+      .get(RequestProductionAccessSelectApisPage)
+      .getOrElse(Set.empty)
+  }
+
 }

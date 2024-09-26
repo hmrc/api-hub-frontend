@@ -14,26 +14,24 @@
  * limitations under the License.
  */
 
-package controllers.application
+package controllers.application.accessrequest
 
 import base.SpecBase
-import controllers.helpers.ApplicationApiBuilder
-import forms.application.RequestProductionAccessSelectApisFormProvider
+import forms.application.accessrequest.RequestProductionAccessSelectApisFormProvider
 import models.NormalMode
 import models.application.*
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.AccessRequestApplicationIdPage
-import pages.application.accessrequest.RequestProductionAccessSelectApisPage
+import pages.application.accessrequest.{RequestProductionAccessApisPage, RequestProductionAccessApplicationPage, RequestProductionAccessSelectApisPage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.AccessRequestSessionRepository
 import viewmodels.application.{Accessible, ApplicationApi, ApplicationEndpoint, Inaccessible}
-import views.html.application.RequestProductionAccessSelectApisView
+import views.html.application.accessrequest.RequestProductionAccessSelectApisView
 
 import scala.concurrent.Future
 
@@ -41,7 +39,7 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
 
   private def onwardRoute = Call("GET", "/foo")
 
-  private lazy val requestProductionAccessSelectApisRoute = controllers.application.routes.RequestProductionAccessSelectApisController.onPageLoad(NormalMode).url
+  private lazy val requestProductionAccessSelectApisRoute = controllers.application.accessrequest.routes.RequestProductionAccessSelectApisController.onPageLoad(NormalMode).url
 
   private val testApplication = Application("id-1", "test", Creator("creator-email"), Seq(TeamMember("test-email")))
 
@@ -106,9 +104,12 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
     applicationApiPendingRequest,
   )
 
-  private val userAnswersWithApplication = Some(emptyUserAnswers.set(
-    AccessRequestApplicationIdPage, testApplication
-  ).get)
+  private val userAnswersWithApplicationAndApis = Some(
+    emptyUserAnswers
+      .set(RequestProductionAccessApplicationPage, testApplication)
+      .flatMap(_.set(RequestProductionAccessApisPage, applicationApis))
+      .get
+  )
 
   val formProvider = new RequestProductionAccessSelectApisFormProvider()
   private val form = formProvider(applicationApis.toSet)
@@ -117,15 +118,7 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
 
     "must return OK and the correct view for a GET" in {
 
-      val applicationApiBuilder = mock[ApplicationApiBuilder]
-
-      when(applicationApiBuilder.build(any)(any))
-        .thenReturn(Future.successful(applicationApis))
-
-      val application = applicationBuilder(userAnswers = userAnswersWithApplication)
-        .overrides(
-          bind[ApplicationApiBuilder].toInstance(applicationApiBuilder)
-        )
+      val application = applicationBuilder(userAnswers = userAnswersWithApplicationAndApis)
         .build()
 
       running(application) {
@@ -142,19 +135,11 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
-      val applicationApiBuilder = mock[ApplicationApiBuilder]
-
-      when(applicationApiBuilder.build(any)(any))
-        .thenReturn(Future.successful(applicationApis))
-
-      val userAnswers = userAnswersWithApplication.map(
+      val userAnswers = userAnswersWithApplicationAndApis.map(
         _.set(RequestProductionAccessSelectApisPage, Set(applicationApi.apiId)).success.value
       )
 
       val application = applicationBuilder(userAnswers = userAnswers)
-        .overrides(
-          bind[ApplicationApiBuilder].toInstance(applicationApiBuilder)
-        )
         .build()
 
       running(application) {
@@ -170,21 +155,15 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
     }
 
     "must redirect to the next page when valid data is submitted" in {
-      val applicationApiBuilder = mock[ApplicationApiBuilder]
-
-      when(applicationApiBuilder.build(any)(any))
-        .thenReturn(Future.successful(applicationApis))
-
       val mockSessionRepository = mock[AccessRequestSessionRepository]
 
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
       val application =
-        applicationBuilder(userAnswers = userAnswersWithApplication)
+        applicationBuilder(userAnswers = userAnswersWithApplicationAndApis)
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[AccessRequestSessionRepository].toInstance(mockSessionRepository),
-            bind[ApplicationApiBuilder].toInstance(applicationApiBuilder)
           )
           .build()
 
@@ -201,15 +180,7 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
-      val applicationApiBuilder = mock[ApplicationApiBuilder]
-
-      when(applicationApiBuilder.build(any)(any))
-        .thenReturn(Future.successful(applicationApis))
-
-      val application = applicationBuilder(userAnswers = userAnswersWithApplication)
-        .overrides(
-          bind[ApplicationApiBuilder].toInstance(applicationApiBuilder)
-        )
+      val application = applicationBuilder(userAnswers = userAnswersWithApplicationAndApis)
         .build()
 
       running(application) {

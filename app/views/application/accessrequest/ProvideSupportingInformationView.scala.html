@@ -26,11 +26,11 @@
         govukTextarea: GovukTextarea
 )
 
-@(form: Form[?], user: Option[UserModel])(implicit request: Request[?], messages: Messages)
+@(form: Form[?], mode: Mode, user: Option[UserModel])(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = title(form, messages("provideSupportingInformation.title")), user = user) {
 
-    @formHelper(action = controllers.application.routes.ProvideSupportingInformationController.onSubmit()) {
+    @formHelper(action = controllers.application.accessrequest.routes.ProvideSupportingInformationController.onSubmit(mode)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

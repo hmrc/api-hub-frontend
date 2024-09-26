@@ -14,30 +14,31 @@
  * limitations under the License.
  */
 
-package controllers.application
+package controllers.application.accessrequest
 
 import base.SpecBase
 import controllers.actions.{FakeApplication, FakeUser}
-import forms.ProvideSupportingInformationFormProvider
-import models.UserAnswers
+import forms.application.accessrequest.ProvideSupportingInformationFormProvider
+import models.{NormalMode, UserAnswers}
 import models.api.{ApiDetail, Endpoint, EndpointMethod, Live, Maintainer}
 import models.application.ApplicationLenses.ApplicationLensOps
-import models.application._
+import models.application.*
 import models.user.UserModel
+import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{AccessRequestApplicationIdPage, ProvideSupportingInformationPage}
+import pages.application.accessrequest.{ProvideSupportingInformationPage, RequestProductionAccessApplicationPage}
 import play.api.data.FormError
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{status, _}
-import play.api.{Application => PlayApplication}
+import play.api.test.Helpers.*
+import play.api.Application as PlayApplication
 import repositories.AccessRequestSessionRepository
 import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
-import views.html.application.ProvideSupportingInformationView
+import views.html.application.accessrequest.ProvideSupportingInformationView
 
 import java.time.{Clock, Instant, ZoneId}
 import scala.concurrent.Future
@@ -46,6 +47,7 @@ class ProvideSupportingInformationControllerSpec extends SpecBase with MockitoSu
 
   private val form = new ProvideSupportingInformationFormProvider()()
   private val clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
+  private val onwardRoute = controllers.routes.IndexController.onPageLoad
 
   "ProvideSupportingInformationController" - {
     "must return OK and the correct view for a GET for a team member or supporter" in {
@@ -59,12 +61,12 @@ class ProvideSupportingInformationControllerSpec extends SpecBase with MockitoSu
             .thenReturn(Future.successful(Some(application)))
 
           running(fixture.application) {
-            val request = FakeRequest(GET, controllers.application.routes.ProvideSupportingInformationController.onPageLoad().url)
+            val request = FakeRequest(GET, controllers.application.accessrequest.routes.ProvideSupportingInformationController.onPageLoad(NormalMode).url)
             val result = route(fixture.application, request).value
             val view = fixture.application.injector.instanceOf[ProvideSupportingInformationView]
 
             status(result) mustEqual OK
-            contentAsString(result) mustBe view(form, Some(user))(request, messages(fixture.application)).toString
+            contentAsString(result) mustBe view(form, NormalMode, Some(user))(request, messages(fixture.application)).toString
             contentAsString(result) must validateAsHtml
           }
       }
@@ -81,14 +83,14 @@ class ProvideSupportingInformationControllerSpec extends SpecBase with MockitoSu
             .thenReturn(Future.successful(Some(application)))
 
           running(fixture.application) {
-            val request = FakeRequest(GET, controllers.application.routes.ProvideSupportingInformationController.onPageLoad().url)
+            val request = FakeRequest(GET, controllers.application.accessrequest.routes.ProvideSupportingInformationController.onPageLoad(NormalMode).url)
             val result = route(fixture.application, request).value
             val view = fixture.application.injector.instanceOf[ProvideSupportingInformationView]
 
             status(result) mustEqual OK
-            contentAsString(result) mustBe view(form.fill("blah"), Some(user))(request, messages(fixture.application)).toString
+            contentAsString(result) mustBe view(form.fill("blah"), NormalMode, Some(user))(request, messages(fixture.application)).toString
             contentAsString(result) must validateAsHtml
-            contentAsString(result).contains("blah") mustBe(true)
+            contentAsString(result).contains("blah") mustBe true
           }
       }
     }
@@ -104,7 +106,7 @@ class ProvideSupportingInformationControllerSpec extends SpecBase with MockitoSu
             .thenReturn(Future.successful(Some(application)))
 
           running(fixture.application) {
-            val request = FakeRequest(POST, controllers.application.routes.ProvideSupportingInformationController.onPageLoad().url)
+            val request = FakeRequest(POST, controllers.application.accessrequest.routes.ProvideSupportingInformationController.onPageLoad(NormalMode).url)
 
             val formWithError = form.withError(FormError("value", "Enter information to support your request"))
             val result = route(fixture.application, request).value
@@ -112,7 +114,7 @@ class ProvideSupportingInformationControllerSpec extends SpecBase with MockitoSu
             val view = fixture.application.injector.instanceOf[ProvideSupportingInformationView]
 
             status(result) mustEqual BAD_REQUEST
-            contentAsString(result) mustBe view(formWithError, Some(user))(request, messages(fixture.application)).toString
+            contentAsString(result) mustBe view(formWithError, NormalMode, Some(user))(request, messages(fixture.application)).toString
             contentAsString(result) must validateAsHtml
           }
       }
@@ -129,16 +131,15 @@ class ProvideSupportingInformationControllerSpec extends SpecBase with MockitoSu
 
           when(fixture.accessRequestSessionRepository.set(any())).thenReturn(Future.successful(true))
           running(fixture.application) {
-            val request = FakeRequest(POST, controllers.application.routes.ProvideSupportingInformationController.onSubmit().url).withFormUrlEncodedBody(("value", "blah"))
+            val request = FakeRequest(POST, controllers.application.accessrequest.routes.ProvideSupportingInformationController.onSubmit(NormalMode).url).withFormUrlEncodedBody(("value", "blah"))
             val result = route(fixture.application, request).value
 
             status(result) mustEqual SEE_OTHER
             val captor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
             verify(fixture.accessRequestSessionRepository).set(captor.capture())
             val userAnswers: UserAnswers = captor.getValue
-            userAnswers.get(ProvideSupportingInformationPage) mustEqual Some("blah")
-            // TODO in HIP 870:
-            // redirectLocation(result) mustBe Some(controllers.application.routes.Whatever.onPageLoad().url)
+            userAnswers.get(ProvideSupportingInformationPage).value mustBe "blah"
+            redirectLocation(result) mustBe Some(onwardRoute.url)
           }
       }
     }
@@ -186,7 +187,8 @@ class ProvideSupportingInformationControllerSpec extends SpecBase with MockitoSu
       .overrides(
         bind[ApiHubService].toInstance(apiHubService),
         bind[AccessRequestSessionRepository].toInstance(accessRequestSessionRepository),
-        bind[Clock].toInstance(clock)
+        bind[Clock].toInstance(clock),
+        bind[Navigator].toInstance(FakeNavigator(onwardRoute))
       )
       .build()
 
@@ -196,6 +198,7 @@ class ProvideSupportingInformationControllerSpec extends SpecBase with MockitoSu
 
   private def buildUserAnswers(application: Application): UserAnswers = {
     UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
-      .set(AccessRequestApplicationIdPage, application).toOption.value
+      .set(RequestProductionAccessApplicationPage, application).toOption.value
   }
+
 }
