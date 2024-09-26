@@ -909,3 +909,12 @@ header {
   font-size: 1rem !important;
   margin-top: 1rem !important;
 }
+
+.hip-checkboxes-inline {
+    display: flex;
+    flex-wrap: wrap;
+}
+.hip-checkboxes-inline .govuk-checkboxes__item {
+    margin-right: 20px;
+    margin-bottom: 10px;
+}
