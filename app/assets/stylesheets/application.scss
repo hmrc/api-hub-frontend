@@ -47,14 +47,6 @@ body, input {
     font-family: $govuk-font-family ! important;
 }
 
-.js-visible {
-    display: none !important;
-}
-
-.js-enabled .js-visible {
-    display: inline-block !important;
-}
-
 .hip-signin-container {
     padding-top: 80px !important;
     padding-bottom: 140px !important;
@@ -214,7 +206,6 @@ body, input {
         margin-top: 16px;
         font-size: 1rem !important;
         margin-bottom: 4px;
-        color: #000;
     }
 
     .call-out-type {
@@ -579,8 +570,8 @@ table.govuk-table {
 }
 
 .api-scopes-list-inline {
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 0;
 
     li {
         display: inline;
@@ -597,7 +588,7 @@ table.govuk-table {
 
 .hip-app-apis, .hip-request-apis {
     .hip-details {
-        border: 1px solid #d8dde0;
+        border: 1px solid $hip-card-border;
         border-bottom-width: 4px;
         margin-bottom: 16px;
 
@@ -608,11 +599,11 @@ table.govuk-table {
         .hip-details__summary {
             margin-top: 4px;
             padding: 20px 24px 24px;
-            color: #005eb8;
+            color: $mid-blue;
             cursor: pointer;
         }
         .hip-details__summary-text {
-            color: #005eb8;
+            color: $mid-blue;
             cursor: pointer;
             display: inline-block;
             text-decoration: underline;
@@ -723,7 +714,6 @@ header {
     }
 }
 
-
 .autocomplete__wrapper svg {
     // added this to fix a bug in accessible-autocomplete component where drop-down arrow was not being displayed when showAllValues is set to true
     z-index: 1;
@@ -751,7 +741,7 @@ header {
 }
 
 .hip-expander__error {
-    border-color: #d4351c !important;
+    border-color: $error-color !important;
 }
 
 .hip-ace-editor {
@@ -773,8 +763,8 @@ header {
 }
 
 .gem-c-related-navigation {
-  color: #0b0c0c;
-  border-top: 2px solid #1d70b8;
+  color: govuk-colour("black");
+  border-top: 2px solid govuk-colour("blue");
   margin-bottom: 60px;
 }
 
@@ -808,8 +798,7 @@ header {
 
 .hip-warning-text {
     display: inline-block;
-    padding: 20px;
-    padding-right: 40px;
+    padding: 20px 40px 20px 20px;
     border: 1px solid $light-mid-grey;
     border-radius: 5px;
     background-color: $off-white;
@@ -825,8 +814,7 @@ header {
     .hip-warning-list {
         li {
             margin-top: 5px;
-            padding: 10px;
-            padding-left: 20px;
+            padding: 10px 10px 10px 20px;
             font-size: 1rem;
             background-color: $light-mid-grey;
             border-color: $govuk-border-colour;
@@ -838,31 +826,31 @@ header {
 }
 
 .hip-stat-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
 
-.hip-stat-item {
-  background-color: #fbfbfb;
-  border: 1px solid #ebebeb;
-  border-radius: 5px;
-  padding: 1rem;
-  min-width: 120px;
-  text-align: center;
-}
+    .hip-stat-item {
+        background-color: $off-white;
+        border: 1px solid $light-mid-grey;
+        border-radius: 5px;
+        padding: 1rem;
+        min-width: 120px;
+        text-align: center;
 
-.hip-stat-title {
-  display: block;
-  font-size: 14px;
-  margin-bottom: 0.5rem;
-}
+        .hip-stat-title {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 0.5rem;
+        }
 
-.hip-stat-number {
-  display: block;
-  font-size: 24px;
-  font-weight: bold;
-  color: #0b0c0c;
+        .hip-stat-number {
+            display: block;
+            font-size: 24px;
+            font-weight: bold;
+            color: $input-text-border;
+        }
+    }
 }
 
 .stats-button {
@@ -873,8 +861,9 @@ header {
 .hip-checkboxes-inline {
     display: flex;
     flex-wrap: wrap;
-}
-.hip-checkboxes-inline .govuk-checkboxes__item {
-    margin-right: 20px;
-    margin-bottom: 10px;
+
+    .govuk-checkboxes__item {
+        margin-right: 20px;
+        margin-bottom: 10px;
+    }
 }
