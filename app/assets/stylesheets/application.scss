@@ -13,8 +13,8 @@ $hip-card-border: govuk-colour("mid-grey");
 $hip-card-border-dark: govuk-colour("dark-grey");
 $hip-card-background: govuk-colour("light-grey");
 $hip-inner-card-background: govuk-colour("white");
-$hipp-card-background: $off-white;
-$hipp-card-border: $light-mid-grey;
+$hip-signin-card-background: $off-white;
+$hip-signin-card-border: $light-mid-grey;
 $panel-background: $off-white;
 $filter-separator-color: $light-mid-grey;
 $api-panel-border-color: $light-mid-grey;
@@ -43,7 +43,9 @@ $secondary-success-color: govuk-colour("white");
 $secondary-success-background: govuk-colour("dark-grey");
 $active-link-color: govuk-colour("dark-blue");
 
-$font-family: "GDS Transport", arial, sans-serif;
+body, input {
+    font-family: $govuk-font-family ! important;
+}
 
 .js-visible {
     display: none !important;
@@ -53,38 +55,24 @@ $font-family: "GDS Transport", arial, sans-serif;
     display: inline-block !important;
 }
 
-.custom-bottom-padding {
-    padding-bottom: 140px !important;
+.hip-signin-container {
     padding-top: 80px !important;
-}
-
-.custom-flex-container {
+    padding-bottom: 140px !important;
     display: flex;
     justify-content: space-between;
     padding-left: 7%;
     padding-right: 7%;
     flex-wrap: wrap;
-}
 
-.hip-card-container .hip-card-container-top {
-    padding: 30px;
-    border-bottom: solid 1px $hip-card-border;
-}
-
-.hipp-card {
-    background-color: $hipp-card-background;
-    border: solid 1px $hipp-card-border;
-    padding: 24px;
-    width: 30%;
-    min-width: 300px;
-    height: 380px;
-    margin-top: 16px;
-}
-
-.hip-card-header {
-    margin-top: 20px;
-    margin-left: 30px;
-    margin-bottom: 0;
+    .hip-signin-card {
+        background-color: $hip-signin-card-background;
+        border: solid 1px $hip-signin-card-border;
+        padding: 24px;
+        width: 30%;
+        min-width: 300px;
+        height: 380px;
+        margin-top: 16px;
+    }
 }
 
 .hip-inner-card {
@@ -130,11 +118,6 @@ $font-family: "GDS Transport", arial, sans-serif;
     .hip-deleted-tag-container {
         flex: 0 0 80px;
     }
-}
-
-.hip-card-header strong {
-    font-weight: 700;
-    font-size: 1rem !important;
 }
 
 .hip-inner-card-title {
@@ -200,14 +183,7 @@ $font-family: "GDS Transport", arial, sans-serif;
     }
 }
 
-.custom-width-notification {
-    max-width: 100% !important;
-    font-weight: normal !important;
-    font-size: 1.2rem !important;
-}
-
 .api-panel {
-    font-family: $font-family;
     min-height: 45px;
     background-color: $panel-background;
     border: solid 1px $api-panel-border-color;
@@ -242,7 +218,6 @@ $font-family: "GDS Transport", arial, sans-serif;
     }
 
     .call-out-type {
-        font-family: $font-family;
         margin-bottom: 20px;
         font-weight: 700;
         font-size: 1.1rem !important;
@@ -290,7 +265,6 @@ $font-family: "GDS Transport", arial, sans-serif;
 }
 
 .call-out-panel {
-    font-family: $font-family;
     min-height: 45px;
     background-color: $panel-background;
     border: solid 1px $call-out-panel-border-color;
@@ -331,7 +305,6 @@ $font-family: "GDS Transport", arial, sans-serif;
     }
 
     .call-out-type {
-        font-family: $font-family;
         margin-bottom: 20px;
         margin-left: 14px;
         font-weight: 700;
@@ -397,7 +370,6 @@ $font-family: "GDS Transport", arial, sans-serif;
     list-style: none;
     font-size: 19px;
     line-height: 1.31579;
-    font-family: "nta", Arial, sans-serif;
     font-weight: 400;
     text-transform: none;
 }
@@ -407,7 +379,6 @@ $font-family: "GDS Transport", arial, sans-serif;
     text-decoration: none;
     display: block;
     background-color: transparent;
-    font-family: $font-family;
     font-weight: 400;
     text-transform: none;
     font-size: 16px;
@@ -477,14 +448,6 @@ $font-family: "GDS Transport", arial, sans-serif;
     color: $ready-color;
 }
 
-.customised-table {
-    margin-bottom: 20px !important;
-
-    tr:last-child td, tr:last-child th {
-        border-width: 0;
-    }
-}
-
 .hip-color-override {
     border-bottom: solid 1px $filter-separator-color;
 }
@@ -519,7 +482,6 @@ $font-family: "GDS Transport", arial, sans-serif;
 }
 
 .gem-c-search__input[type=search] {
-    font-family: $font-family;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-weight: 400;
@@ -817,7 +779,6 @@ header {
 }
 
 .gem-c-related-navigation__main-heading {
-  font-family: "GDS Transport", arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-weight: 700;
@@ -880,7 +841,6 @@ header {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
-  font-family: $font-family;
 }
 
 .hip-stat-item {
