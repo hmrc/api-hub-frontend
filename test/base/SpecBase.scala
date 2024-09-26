@@ -58,6 +58,7 @@ trait SpecBase
         bind[AddAnApiDataRetrievalAction].toInstance(new FakeAddAnApiDataRetrievalAction(userAnswers)),
         bind[CreateTeamDataRetrievalAction].toInstance(new FakeCreateTeamDataRetrievalAction(userAnswers)),
         bind[ProduceApiDataRetrievalAction].toInstance(new FakeProduceApiDataRetrievalAction(userAnswers)),
+        bind[CancelAccessRequestDataRetrievalAction].toInstance(new FakeCancelAccessRequestDataRetrievalAction(userAnswers)),
         bind[Domains].toInstance(FakeDomains),
         bind[Hods].toInstance(FakeHods),
         bind[Platforms].toInstance(FakePlatforms)
