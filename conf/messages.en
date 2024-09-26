@@ -420,6 +420,11 @@ accessRequests.headings.requestedBy = Requested by
 accessRequests.headings.supportingInformation = Supporting information
 accessRequests.headings.rejectedReason = Rejected reason
 accessRequests.headings.reviewRequest = Review request
+accessRequests.filterByStatus = Filter by status
+accessRequests.status.pending = Pending
+accessRequests.status.approved = Approved
+accessRequests.status.rejected = Rejected
+accessRequests.status.cancelled = Cancelled
 
 accessRequest.title = Production API request
 accessRequest.heading = Production API request

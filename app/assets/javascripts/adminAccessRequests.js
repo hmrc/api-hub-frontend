@@ -13,7 +13,11 @@ export function onPageShow() {
         }));
 
     function onFilterUpdate() {
-        const selectedStatuses = new Set(filterByStatusCheckboxEls.filter(checkbox => checkbox.checked).map(checkbox => checkbox.value));
+        const selectedStatuses = new Set(filterByStatusCheckboxEls
+            .filter(checkbox => checkbox.checked)
+            .map(checkbox => checkbox.value)
+        );
+
         requestsModel.forEach(accessRequest => {
             accessRequest.hiddenByFilters = selectedStatuses.size > 0 && !selectedStatuses.has(accessRequest.status);
             setVisible(accessRequest.el, !accessRequest.hiddenByFilters);
