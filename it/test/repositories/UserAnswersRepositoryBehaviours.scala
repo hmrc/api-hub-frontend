@@ -36,7 +36,6 @@ import java.time.{Clock, Instant, ZoneId}
 import java.time.temporal.ChronoUnit
 import java.util.Base64
 
-//noinspection ScalaStyle
 trait UserAnswersRepositoryBehaviours
   extends AnyFreeSpec
     with Matchers
@@ -90,7 +89,7 @@ trait UserAnswersRepositoryBehaviours
           insert(userAnswers).futureValue
 
           val result         = repository.get(userAnswers.id).futureValue
-          val expectedResult = userAnswers copy (lastUpdated = instant)
+          val expectedResult = userAnswers.copy(lastUpdated = instant)
 
           result.value mustEqual expectedResult
         }
@@ -134,7 +133,7 @@ trait UserAnswersRepositoryBehaviours
 
           val result = repository.keepAlive(userAnswers.id).futureValue
 
-          val expectedUpdatedAnswers = userAnswers copy (lastUpdated = instant)
+          val expectedUpdatedAnswers = userAnswers.copy(lastUpdated = instant)
 
           result mustEqual true
           val updatedAnswers = find(Filters.equal("userId", userAnswers.id)).futureValue.headOption.value
@@ -166,7 +165,7 @@ trait UserAnswersRepositoryBehaviours
 
   val mockAppConfig: FrontendAppConfig = {
     val appConfig = mock[FrontendAppConfig]
-    when(appConfig.cacheTtl) thenReturn 1
+    when(appConfig.cacheTtl).thenReturn(1)
     appConfig
   }
 
