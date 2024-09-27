@@ -18,16 +18,18 @@ package controllers.application.accessrequest
 
 import base.SpecBase
 import controllers.actions.{FakeApplication, FakeUser}
-import models.accessrequest.{AccessRequestApi, AccessRequestEndpoint, AccessRequestRequest, Pending}
-import models.api.*
+import controllers.application.accessrequest.RequestProductionAccessEndJourneyController.Data
+import models.accessrequest.{AccessRequestApi, AccessRequestEndpoint, AccessRequestRequest}
 import models.application.*
 import models.application.ApplicationLenses.ApplicationLensOps
 import models.user.UserModel
 import models.{CheckMode, RequestProductionAccessDeclaration, UserAnswers}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
+import org.scalatest.OptionValues
 import org.scalatestplus.mockito.MockitoSugar
-import pages.application.accessrequest.{ProvideSupportingInformationPage, RequestProductionAccessApisPage, RequestProductionAccessApplicationPage, RequestProductionAccessPage}
+import pages.QuestionPage
+import pages.application.accessrequest.*
 import play.api.Application as PlayApplication
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -35,7 +37,7 @@ import play.api.test.Helpers.*
 import repositories.AccessRequestSessionRepository
 import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
-import viewmodels.application.{ApplicationApi, ApplicationEndpoint, ApplicationEndpointAccess, Inaccessible}
+import viewmodels.application.*
 import views.html.application.accessrequest.RequestProductionAccessSuccessView
 
 import java.time.{Clock, Instant, ZoneId}
@@ -43,9 +45,7 @@ import scala.concurrent.Future
 
 class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with MockitoSugar with TestHelpers with HtmlValidation {
 
-  val acceptRequestProductionAccessConditions: Set[RequestProductionAccessDeclaration] = Set(RequestProductionAccessDeclaration.Accept)
-
-  private val clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
+  import RequestProductionAccessEndJourneyControllerSpec.*
 
   "RequestProductionAccessEndJourneyController" - {
     "must return OK and the correct view for a GET for a team member or supporter and make the request and clear user answers " in {
@@ -53,22 +53,12 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
       forAll(teamMemberAndSupporterTable) {
         (user: UserModel) =>
           val application = anApplication
-          val userAnswers = buildUserAnswers(application)
+          val userAnswers = buildUserAnswers()
           val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
-          val apiDetail = anApiDetail
+          val accessRequestRequest = data.toRequest(user.email)
 
-          // 2 endpoints for the API, because the application currently holds neither scope
-          val accessRequestApis = Seq(
-            AccessRequestApi(apiDetail.id, apiDetail.title, Seq(AccessRequestEndpoint("GET", "/test", Seq("test-scope")),
-            AccessRequestEndpoint("POST", "/anothertest", Seq("another-test-scope"))))
-          )
-          val expectedAccessRequest: AccessRequestRequest = AccessRequestRequest(application.id, "blah", user.email, accessRequestApis)
-
-          when(fixture.apiHubService.getAccessRequests(eqTo(Some(application.id)), eqTo(Some(Pending)))(any()))
-            .thenReturn(Future.successful(Seq.empty))
-          when(fixture.apiHubService.getApiDetail(any())(any())).thenReturn(Future.successful(Some(anApiDetail)))
-          when(fixture.apiHubService.requestProductionAccess(eqTo(expectedAccessRequest))(any())).thenReturn(Future.successful(()))
-          when(fixture.accessRequestSessionRepository.clear(user.userId)).thenReturn(Future.successful(true))
+          when(fixture.apiHubService.requestProductionAccess(any())(any())).thenReturn(Future.successful(()))
+          when(fixture.accessRequestSessionRepository.clear(any())).thenReturn(Future.successful(true))
 
           running(fixture.application) {
             val request = FakeRequest(GET, controllers.application.accessrequest.routes.RequestProductionAccessEndJourneyController.submitRequest().url)
@@ -76,42 +66,9 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
 
             val view = fixture.application.injector.instanceOf[RequestProductionAccessSuccessView]
             status(result) mustEqual OK
-            contentAsString(result) mustBe view(application, Some(user), accessRequestApis)(request, messages(fixture.application)).toString
+            contentAsString(result) mustBe view(application, Some(user), accessRequestRequest.apis)(request, messages(fixture.application)).toString
             contentAsString(result) must validateAsHtml
-            verify(fixture.apiHubService).requestProductionAccess(eqTo(expectedAccessRequest))(any())
-            verify(fixture.accessRequestSessionRepository).clear(eqTo(user.userId))
-          }
-      }
-    }
-
-    "will not request access for API endpoints whose scope is already held by the application " in {
-      forAll(teamMemberAndSupporterTable) {
-        (user: UserModel) =>
-          val application = anApplication.setPrimaryScopes(Seq(Scope("test-scope"))) //decorate application with primary scope test-scope
-          val userAnswers = buildUserAnswers(application)
-          val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
-          val apiDetail = anApiDetail
-
-          // Only one endpoint, because we already hold test-scope
-          val accessRequestApis = Seq(
-            AccessRequestApi(apiDetail.id, apiDetail.title, Seq(AccessRequestEndpoint("POST", "/anothertest", Seq("another-test-scope"))))
-          )
-          val expectedAccessRequest: AccessRequestRequest = AccessRequestRequest(application.id, "blah", user.email, accessRequestApis)
-
-          when(fixture.apiHubService.getAccessRequests(eqTo(Some(application.id)), eqTo(Some(Pending)))(any()))
-            .thenReturn(Future.successful(Seq.empty))
-          when(fixture.apiHubService.requestProductionAccess(eqTo(expectedAccessRequest))(any())).thenReturn(Future.successful(()))
-          when(fixture.accessRequestSessionRepository.clear(user.userId)).thenReturn(Future.successful(true))
-
-          running(fixture.application) {
-            val request = FakeRequest(GET, controllers.application.accessrequest.routes.RequestProductionAccessEndJourneyController.submitRequest().url)
-            val result = route(fixture.application, request).value
-
-            val view = fixture.application.injector.instanceOf[RequestProductionAccessSuccessView]
-            status(result) mustEqual OK
-            contentAsString(result) mustBe view(application, Some(user), accessRequestApis)(request, messages(fixture.application)).toString
-            contentAsString(result) must validateAsHtml
-            verify(fixture.apiHubService).requestProductionAccess(eqTo(expectedAccessRequest))(any())
+            verify(fixture.apiHubService).requestProductionAccess(eqTo(accessRequestRequest))(any())
             verify(fixture.accessRequestSessionRepository).clear(eqTo(user.userId))
           }
       }
@@ -120,8 +77,23 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
     "must redirect to journey recovery when no application in user answers" in {
       forAll(teamMemberAndSupporterTable) {
         (user: UserModel) =>
+          val userAnswers = buildUserAnswers(without = Seq(RequestProductionAccessApplicationPage))
+          val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
 
-          val userAnswers = UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
+          running(fixture.application) {
+            val request = FakeRequest(GET, controllers.application.accessrequest.routes.RequestProductionAccessEndJourneyController.submitRequest().url)
+            val result = route(fixture.application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result) mustBe Some(controllers.routes.JourneyRecoveryController.onPageLoad().url)
+          }
+      }
+    }
+
+    "must redirect to journey recovery when no Application APIs in user answers" in {
+      forAll(teamMemberAndSupporterTable) {
+        (user: UserModel) =>
+          val userAnswers = buildUserAnswers(without = Seq(RequestProductionAccessApisPage))
           val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
 
           running(fixture.application) {
@@ -137,11 +109,7 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
     "must redirect to request production access page when no accept conditions in user answers" in {
       forAll(teamMemberAndSupporterTable) {
         (user: UserModel) =>
-
-          val application = anApplication
-          val userAnswers = UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
-            .set(RequestProductionAccessApplicationPage, application).toOption.value
-            .set(RequestProductionAccessApisPage, Seq(applicationApi(application))).toOption.value
+          val userAnswers = buildUserAnswers(without = Seq(RequestProductionAccessPage))
           val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
 
           running(fixture.application) {
@@ -157,12 +125,7 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
     "must redirect to provide supporting information page when no supporting information" in {
       forAll(teamMemberAndSupporterTable) {
         (user: UserModel) =>
-
-          val application = anApplication
-          val userAnswers = UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
-            .set(RequestProductionAccessApplicationPage, application).toOption.value
-            .set(RequestProductionAccessApisPage, Seq(applicationApi(application))).toOption.value
-            .set(RequestProductionAccessPage, acceptRequestProductionAccessConditions).toOption.value
+          val userAnswers = buildUserAnswers(without = Seq(ProvideSupportingInformationPage))
 
           val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
 
@@ -175,61 +138,97 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
           }
       }
     }
+
+    "must redirect to Select APIs page when no answer exists" in {
+      forAll(teamMemberAndSupporterTable) {
+        (user: UserModel) =>
+          val userAnswers = buildUserAnswers(without = Seq(RequestProductionAccessSelectApisPage))
+
+          val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
+
+          running(fixture.application) {
+            val request = FakeRequest(GET, controllers.application.accessrequest.routes.RequestProductionAccessEndJourneyController.submitRequest().url)
+            val result = route(fixture.application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result) mustBe Some(controllers.application.accessrequest.routes.RequestProductionAccessSelectApisController.onPageLoad(CheckMode).url)
+          }
+      }
+    }
   }
 
-  private val anApiDetail =
-    ApiDetail(
-      id = "test-id",
-      publisherReference = "test-pub-ref",
-      title = "test-title",
-      description = "test-description",
-      version = "test-version",
-      endpoints = Seq(
-        Endpoint(path = "/test", methods = Seq(EndpointMethod("GET", Some("A summary"), Some("A description"), Seq("test-scope")))),
-        Endpoint(path = "/anothertest", methods = Seq(EndpointMethod("POST", Some("A summary"), Some("A description"), Seq("another-test-scope"))))),
-      shortDescription = None,
-      openApiSpecification = "test-oas-spec",
-      apiStatus = Live,
-      reviewedDate = Instant.now(),
-      platform = "HIP",
-      maintainer = Maintainer("name", "#slack", List.empty)
-    )
+  "RequestProductionAccessEndJourneyController.Data.toRequest" - {
+    "must build a request for selected APIs only" in {
+      val selectedApplicationApi = buildApplicationApi(1, Seq(Inaccessible))
+      val nonSelectedApplicationApi = buildApplicationApi(2, Seq(Inaccessible))
 
-  private val anApplication =
-    FakeApplication
-      .addApi(Api(anApiDetail.id, anApiDetail.title, Seq(SelectedEndpoint("GET", "/test"), SelectedEndpoint("POST", "/anothertest"))))
-      .setSecondaryScopes(Seq(Scope("test-scope")))
+      val data = Data(
+        application = anApplication,
+        applicationApis = Seq(selectedApplicationApi, nonSelectedApplicationApi),
+        selectedApis = Set(selectedApplicationApi.apiId),
+        supportingInformation = supportingInformation
+      )
 
-  private def applicationApi(application: Application) =
-    ApplicationApi(
-      apiId = anApiDetail.id,
-      apiTitle = anApiDetail.title,
-      totalEndpoints = anApiDetail.endpoints.size,
-      endpoints = anApiDetail.endpoints.flatMap(
-        endpoint =>
-          endpoint.methods.map(
-            method =>
-              ApplicationEndpoint(
-                httpMethod = method.httpMethod,
-                path = endpoint.path,
-                summary = method.summary,
-                description = method.description,
-                scopes = method.scopes,
-                primaryAccess = ApplicationEndpointAccess(application, false, method, Primary),
-                secondaryAccess = Inaccessible
-              )
+      val expected = AccessRequestRequest(
+        applicationId = anApplication.id,
+        supportingInformation = supportingInformation,
+        requestedBy = FakeUser.email,
+        apis = Seq(
+          AccessRequestApi(
+            apiId = selectedApplicationApi.apiId,
+            apiName = selectedApplicationApi.apiTitle,
+            endpoints = selectedApplicationApi.endpoints.map(
+              endpoint =>
+                AccessRequestEndpoint(
+                  httpMethod = endpoint.httpMethod,
+                  path = endpoint.path,
+                  scopes = endpoint.scopes
+                )
+            )
           )
-      ),
-      hasPendingAccessRequest = false,
-      isMissing = false
-    )
+        )
+      )
 
-  private case class Fixture(
-                              application: PlayApplication,
-                              apiHubService: ApiHubService,
-                              accessRequestSessionRepository: AccessRequestSessionRepository,
-                              requestProductionAccessController: RequestProductionAccessController
-                            )
+      val actual = data.toRequest(FakeUser.email)
+
+      actual mustBe expected
+    }
+
+    "must only include endpoints that are inaccessible in production" in {
+      val selectedApplicationApi = buildApplicationApi(1, Seq(Inaccessible, Accessible))
+
+      val data = Data(
+        application = anApplication,
+        applicationApis = Seq(selectedApplicationApi),
+        selectedApis = Set(selectedApplicationApi.apiId),
+        supportingInformation = supportingInformation
+      )
+
+      val expected = AccessRequestRequest(
+        applicationId = anApplication.id,
+        supportingInformation = supportingInformation,
+        requestedBy = FakeUser.email,
+        apis = Seq(
+          AccessRequestApi(
+            apiId = selectedApplicationApi.apiId,
+            apiName = selectedApplicationApi.apiTitle,
+            endpoints = selectedApplicationApi.endpoints.filter(!_.primaryAccess.isAccessible).map(
+              endpoint =>
+                AccessRequestEndpoint(
+                  httpMethod = endpoint.httpMethod,
+                  path = endpoint.path,
+                  scopes = endpoint.scopes
+                )
+            )
+          )
+        )
+      )
+
+      val actual = data.toRequest(FakeUser.email)
+
+      actual mustBe expected
+    }
+  }
 
   private def buildFixture(userModel: UserModel, userAnswers: Option[UserAnswers]): Fixture = {
     val apiHubService = mock[ApiHubService]
@@ -247,12 +246,65 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
     Fixture(playApplication, apiHubService, accessRequestSessionRepository, controller)
   }
 
-  private def buildUserAnswers(application: Application): UserAnswers = {
-    UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
-      .set(RequestProductionAccessApplicationPage, application).toOption.value
-      .set(RequestProductionAccessApisPage, Seq(applicationApi(application))).toOption.value
-      .set(RequestProductionAccessPage, acceptRequestProductionAccessConditions).toOption.value
-      .set(ProvideSupportingInformationPage, "blah").toOption.value
+}
+
+object RequestProductionAccessEndJourneyControllerSpec extends OptionValues{
+
+  private val acceptRequestProductionAccessConditions: Set[RequestProductionAccessDeclaration] = Set(RequestProductionAccessDeclaration.Accept)
+  private val clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
+  private val supportingInformation = "test-supporting-information"
+  private val applicationApi = buildApplicationApi(1, Seq(Inaccessible))
+
+  private val anApplication =
+    FakeApplication
+      .addApi(Api(applicationApi.apiId, applicationApi.apiTitle, Seq(SelectedEndpoint("GET", "/test"), SelectedEndpoint("POST", "/anothertest"))))
+      .setSecondaryScopes(Seq(Scope("test-scope")))
+
+  private def buildApplicationApi(apiId: Int, endpointAccesses: Seq[ApplicationEndpointAccess]): ApplicationApi = {
+    ApplicationApi(
+      apiId = s"test-api-id-$apiId",
+      apiTitle = s"test-api-title-$apiId",
+      totalEndpoints = endpointAccesses.size,
+      endpoints = endpointAccesses.map(
+        endpointAccess =>
+          ApplicationEndpoint(
+            httpMethod = "GET",
+            path = s"/test/$apiId/$endpointAccess",
+            summary = None,
+            description = None,
+            scopes = Seq(s"test-scope-$apiId-$endpointAccess"),
+            primaryAccess = endpointAccess,
+            secondaryAccess = Accessible
+          )
+      ),
+      hasPendingAccessRequest = false,
+      isMissing = false
+    )
   }
+
+  private val data: Data = Data(
+    application = anApplication,
+    applicationApis = Seq(applicationApi),
+    selectedApis = Set(applicationApi.apiId),
+    supportingInformation = supportingInformation
+  )
+
+  private def buildUserAnswers(without: Seq[QuestionPage[?]] = Seq.empty): UserAnswers = {
+    val fullUserAnswers = UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
+      .set(RequestProductionAccessApplicationPage, data.application).toOption.value
+      .set(RequestProductionAccessApisPage, data.applicationApis).toOption.value
+      .set(RequestProductionAccessSelectApisPage, data.selectedApis).toOption.value
+      .set(ProvideSupportingInformationPage, data.supportingInformation).toOption.value
+      .set(RequestProductionAccessPage, acceptRequestProductionAccessConditions).toOption.value
+
+    without.foldRight(fullUserAnswers)((page, userAnswers) => userAnswers.remove(page).toOption.value)
+  }
+
+  private case class Fixture(
+    application: PlayApplication,
+    apiHubService: ApiHubService,
+    accessRequestSessionRepository: AccessRequestSessionRepository,
+    requestProductionAccessController: RequestProductionAccessController
+  )
 
 }

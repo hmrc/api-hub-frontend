@@ -23,7 +23,7 @@ import models.{CheckMode, UserAnswers}
 import models.accessrequest.{AccessRequestApi, AccessRequestEndpoint, AccessRequestRequest}
 import models.application.Application
 import models.requests.DataRequest
-import pages.application.accessrequest.{ProvideSupportingInformationPage, RequestProductionAccessApisPage, RequestProductionAccessApplicationPage, RequestProductionAccessPage}
+import pages.application.accessrequest.{ProvideSupportingInformationPage, RequestProductionAccessApisPage, RequestProductionAccessApplicationPage, RequestProductionAccessPage, RequestProductionAccessSelectApisPage}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.*
 import repositories.AccessRequestSessionRepository
@@ -47,29 +47,32 @@ class RequestProductionAccessEndJourneyController @Inject()(
   errorResultBuilder: ErrorResultBuilder
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
+  import RequestProductionAccessEndJourneyController.*
+
   def submitRequest(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       validate(request).fold(
         call => Future.successful(Redirect(call)),
-        validated =>
-          val accessRequest = buildAccessRequest(validated._1, validated._2, validated._3, validated._4)(request)
+        data =>
+          val accessRequest = data.toRequest(request.user.email)
 
           apiHubService.requestProductionAccess(accessRequest)
             .flatMap(_ => sessionRepository.clear(request.user.userId))
-            .flatMap(_ => Future.successful(Ok(requestProductionAccessSuccessView(validated._1, Some(request.user), accessRequest.apis))))
+            .flatMap(_ => Future.successful(Ok(requestProductionAccessSuccessView(data.application, Some(request.user), accessRequest.apis))))
             .recoverWith {
               case e: UpstreamErrorResponse if e.statusCode == BAD_GATEWAY => Future.successful(badGateway(e))
             }
       )
   }
 
-  private def validate(implicit request: DataRequest[AnyContent]): Either[Call, (Application, Seq[ApplicationApi], String, String)] = {
+  private def validate(request: DataRequest[?]): Either[Call, Data] = {
     for {
       application <- validateApplication(request.userAnswers)
       applicationApis <- validateApis(request.userAnswers)
-      _ <- validateConditions(request.userAnswers)
+      selectedApis <- validateSelectedApis(request.userAnswers)
       supportingInformation <- validateSupportingInformation(request.userAnswers)
-    } yield (application, applicationApis, supportingInformation, request.user.email)
+      _ <- validateDeclaration(request.userAnswers)
+    } yield Data(application, applicationApis, selectedApis, supportingInformation)
   }
 
   private def validateApplication(userAnswers: UserAnswers): Either[Call, Application] = {
@@ -86,10 +89,10 @@ class RequestProductionAccessEndJourneyController @Inject()(
     }
   }
 
-  private def validateConditions(userAnswers: UserAnswers): Either[Call, Unit] = {
-    userAnswers.get(RequestProductionAccessPage) match {
-      case Some(_) => Right(())
-      case None => Left(controllers.application.accessrequest.routes.RequestProductionAccessController.onPageLoad())
+  private def validateSelectedApis(userAnswers: UserAnswers): Either[Call, Set[String]] = {
+    userAnswers.get(RequestProductionAccessSelectApisPage) match {
+      case Some(selectedApis) => Right(selectedApis)
+      case None => Left(controllers.application.accessrequest.routes.RequestProductionAccessSelectApisController.onPageLoad(CheckMode))
     }
   }
 
@@ -100,23 +103,56 @@ class RequestProductionAccessEndJourneyController @Inject()(
     }
   }
 
-  private def buildAccessRequest(application: Application, applicationApis: Seq[ApplicationApi], supportingInformation: String, requestedBy: String)(implicit request: DataRequest[AnyContent]): AccessRequestRequest = {
-    val accessRequestApis = applicationApis.filter(_.endpoints.exists(_.primaryAccess == Inaccessible)).map(
-      applicationApi => {
-        val accessRequestEndpoints = applicationApi.endpoints.filter(_.primaryAccess == Inaccessible).map(endpoint => AccessRequestEndpoint(endpoint.httpMethod, endpoint.path, endpoint.scopes))
-
-        AccessRequestApi(
-          applicationApi.apiId,
-          applicationApi.apiTitle,
-          accessRequestEndpoints
-        )
-      }
-    )
-    AccessRequestRequest(application.id, supportingInformation, requestedBy, accessRequestApis)
+  private def validateDeclaration(userAnswers: UserAnswers): Either[Call, Unit] = {
+    userAnswers.get(RequestProductionAccessPage) match {
+      case Some(_) => Right(())
+      case None => Left(controllers.application.accessrequest.routes.RequestProductionAccessController.onPageLoad())
+    }
   }
 
   private def badGateway(t: Throwable)(implicit request: Request[?]): Result = {
     errorResultBuilder.internalServerError(Messages("addAnApiComplete.failed"), t)
+  }
+
+}
+
+object RequestProductionAccessEndJourneyController {
+
+  case class Data(
+    application: Application,
+    applicationApis: Seq[ApplicationApi],
+    selectedApis: Set[String],
+    supportingInformation: String
+  ) {
+
+    def toRequest(requestedBy: String): AccessRequestRequest = {
+
+      AccessRequestRequest(
+        applicationId = application.id,
+        supportingInformation = supportingInformation,
+        requestedBy = requestedBy,
+        apis = applicationApis
+          .filter(
+            applicationApi => selectedApis.exists(_.equals(applicationApi.apiId))
+          )
+          .map(
+            applicationApi => AccessRequestApi(
+              apiId = applicationApi.apiId,
+              apiName = applicationApi.apiTitle,
+              endpoints = applicationApi.endpoints
+                .filter(_.primaryAccess.equals(Inaccessible))
+                .map(
+                  endpoint => AccessRequestEndpoint(
+                    httpMethod = endpoint.httpMethod,
+                    path = endpoint.path,
+                    scopes = endpoint.scopes
+                  )
+                )
+            )
+          )
+      )
+    }
+
   }
 
 }

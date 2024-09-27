@@ -20,7 +20,7 @@ import controllers.routes
 import models.*
 import models.myapis.produce.ProduceApiHowToCreate.{Editor, Upload}
 import pages.*
-import pages.application.accessrequest.{ProvideSupportingInformationPage, RequestProductionAccessSelectApisPage, RequestProductionAccessStartPage}
+import pages.application.accessrequest.{ProvideSupportingInformationPage, RequestProductionAccessPage, RequestProductionAccessSelectApisPage, RequestProductionAccessStartPage}
 import pages.application.register.{RegisterApplicationNamePage, RegisterApplicationStartPage, RegisterApplicationTeamPage}
 import pages.myapis.produce.{ProduceApiBeforeYouStartPage, ProduceApiHowToCreatePage, ProduceApiStartPage}
 import play.api.mvc.Call
@@ -45,6 +45,7 @@ class Navigator @Inject()() {
     case RequestProductionAccessStartPage => _ => controllers.application.accessrequest.routes.RequestProductionAccessSelectApisController.onPageLoad(NormalMode)
     case RequestProductionAccessSelectApisPage => _ => controllers.application.accessrequest.routes.ProvideSupportingInformationController.onPageLoad(NormalMode)
     case ProvideSupportingInformationPage => _ => controllers.application.accessrequest.routes.RequestProductionAccessController.onPageLoad()
+    case RequestProductionAccessPage => _ => controllers.application.accessrequest.routes.RequestProductionAccessEndJourneyController.submitRequest()
     case ProduceApiStartPage => _ => controllers.myapis.produce.routes.ProduceApiBeforeYouStartController.onPageLoad()
     case ProduceApiBeforeYouStartPage => _ => controllers.myapis.produce.routes.ProduceApiHowToCreateController.onPageLoad(NormalMode)
     case ProduceApiHowToCreatePage => produceApiHowToCreateNextPage(NormalMode)

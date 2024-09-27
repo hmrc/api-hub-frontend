@@ -22,7 +22,7 @@ import pages.*
 import models.*
 import models.myapis.produce.ProduceApiHowToCreate.Editor
 import org.scalatest.TryValues
-import pages.application.accessrequest.{ProvideSupportingInformationPage, RequestProductionAccessSelectApisPage, RequestProductionAccessStartPage}
+import pages.application.accessrequest.{ProvideSupportingInformationPage, RequestProductionAccessPage, RequestProductionAccessSelectApisPage, RequestProductionAccessStartPage}
 import pages.application.register.{RegisterApplicationNamePage, RegisterApplicationStartPage, RegisterApplicationTeamPage}
 import pages.myapis.produce.{ProduceApiBeforeYouStartPage, ProduceApiHowToCreatePage, ProduceApiStartPage}
 
@@ -109,6 +109,9 @@ class NavigatorSpec extends SpecBase with TryValues {
         }
         "must go from the Provide supporting information page to the Check your answers page" in {
           navigator.nextPage(ProvideSupportingInformationPage, NormalMode, emptyUserAnswers) mustBe controllers.application.accessrequest.routes.RequestProductionAccessController.onPageLoad()
+        }
+        "must go from the Check your answers page to the end journey controller" in {
+          navigator.nextPage(RequestProductionAccessPage, NormalMode, emptyUserAnswers) mustBe controllers.application.accessrequest.routes.RequestProductionAccessEndJourneyController.submitRequest()
         }
       }
 
