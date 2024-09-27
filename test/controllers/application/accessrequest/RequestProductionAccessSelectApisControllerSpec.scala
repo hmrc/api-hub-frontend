@@ -17,6 +17,7 @@
 package controllers.application.accessrequest
 
 import base.SpecBase
+import controllers.actions.FakeUser
 import forms.application.accessrequest.RequestProductionAccessSelectApisFormProvider
 import models.NormalMode
 import models.application.*
@@ -130,7 +131,7 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
 
         status(result) mustEqual OK
 
-        contentAsString(result) mustEqual view(form, NormalMode, Seq(applicationApiEndpointNotAccessible), Seq(applicationApiPendingRequest))(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, Seq(applicationApiEndpointNotAccessible), Seq(applicationApiPendingRequest), FakeUser)(request, messages(application)).toString
       }
     }
 
@@ -150,7 +151,7 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(Set(applicationApiEndpointNotAccessible.apiId)), NormalMode, Seq(applicationApiEndpointNotAccessible), Seq(applicationApiPendingRequest))(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(Set(applicationApiEndpointNotAccessible.apiId)), NormalMode, Seq(applicationApiEndpointNotAccessible), Seq(applicationApiPendingRequest), FakeUser)(request, messages(application)).toString
       }
     }
 
@@ -195,7 +196,7 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode,  Seq(applicationApiEndpointNotAccessible), Seq(applicationApiPendingRequest))(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode,  Seq(applicationApiEndpointNotAccessible), Seq(applicationApiPendingRequest), FakeUser)(request, messages(application)).toString
       }
     }
 

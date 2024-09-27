@@ -15,6 +15,7 @@
  *@
 
 @import models.Confirmation
+@import models.user.UserModel
 
 @this(
     layout: templates.Layout,
@@ -25,9 +26,9 @@
     govukButton: GovukButton
 )
 
-@(applicationId: String, form: Form[?], summaryList: SummaryList)(implicit request: Request[?], messages: Messages)
+@(applicationId: String, form: Form[?], summaryList: SummaryList, user: UserModel)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = title(form, messages("deleteApplicationConfirmation.title"))) {
+@layout(pageTitle = title(form, messages("deleteApplicationConfirmation.title")), user = Some(user)) {
 
     <h1 class="govuk-heading-l">
         @messages("deleteApplicationConfirmation.heading")

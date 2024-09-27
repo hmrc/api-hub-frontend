@@ -60,7 +60,7 @@ class DeleteApplicationConfirmationControllerSpec extends SpecBase with MockitoS
         val view = fixture.application.injector.instanceOf[DeleteApplicationConfirmationView]
 
         status(result) mustBe OK
-        contentAsString(result) mustBe view(FakeApplication.id, form, buildSummaryList(FakeApplication)).toString()
+        contentAsString(result) mustBe view(FakeApplication.id, form, buildSummaryList(FakeApplication), FakeUser).toString()
         contentAsString(result) must validateAsHtml
       }
     }
@@ -108,7 +108,7 @@ class DeleteApplicationConfirmationControllerSpec extends SpecBase with MockitoS
         val formWithErrors = form.bind(Map.empty[String, String])
 
         status(result) mustBe BAD_REQUEST
-        contentAsString(result) mustBe view(FakeApplication.id, formWithErrors, buildSummaryList(FakeApplication)).toString()
+        contentAsString(result) mustBe view(FakeApplication.id, formWithErrors, buildSummaryList(FakeApplication), FakeUser).toString()
         contentAsString(result) must validateAsHtml
       }
     }

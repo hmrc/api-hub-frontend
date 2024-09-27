@@ -51,7 +51,7 @@ class RequestProductionAccessSelectApisController @Inject()(
       viewWithApiApplications(
         mode,
         (applicationApis: Seq[ApplicationApi], applicationApisPendingRequest: Seq[ApplicationApi]) =>
-          Future.successful(Ok(view(preparedForm(applicationApis), mode, applicationApis, applicationApisPendingRequest)))
+          Future.successful(Ok(view(preparedForm(applicationApis), mode, applicationApis, applicationApisPendingRequest, request.user)))
       )
   }
 
@@ -63,7 +63,7 @@ class RequestProductionAccessSelectApisController @Inject()(
         (applicationApis: Seq[ApplicationApi], applicationApisPendingRequest: Seq[ApplicationApi]) =>
           formProvider(applicationApis.toSet).bindFromRequest().fold(
             formWithErrors =>
-                  Future.successful(BadRequest(view(formWithErrors, mode, applicationApis, applicationApisPendingRequest))),
+                  Future.successful(BadRequest(view(formWithErrors, mode, applicationApis, applicationApisPendingRequest, request.user))),
 
             selectedApiIds =>
               for {

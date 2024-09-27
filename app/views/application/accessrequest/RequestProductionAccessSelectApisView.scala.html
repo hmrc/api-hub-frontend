@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import models.user.UserModel
 @import viewmodels.application.ApplicationApi
 
 @this(
@@ -25,7 +26,7 @@
     govukWarningText: GovukWarningText
 )
 
-@(form: Form[?], mode: Mode, applicationApis: Seq[ApplicationApi], applicationApisPendingRequest: Seq[ApplicationApi])(implicit request: Request[?], messages: Messages)
+@(form: Form[?], mode: Mode, applicationApis: Seq[ApplicationApi], applicationApisPendingRequest: Seq[ApplicationApi], user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @pendingRequestsContent() = {
         <p class="govuk-body">
@@ -42,7 +43,7 @@
         </p>
 }
 
-@layout(pageTitle = title(form, messages("requestProductionAccessSelectApis.title"))) {
+@layout(pageTitle = title(form, messages("requestProductionAccessSelectApis.title")), user = Some(user)) {
 
     @formHelper(action = controllers.application.accessrequest.routes.RequestProductionAccessSelectApisController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
