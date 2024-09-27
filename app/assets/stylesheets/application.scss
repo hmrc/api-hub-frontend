@@ -59,16 +59,16 @@ body, input {
     .hip-signin-card {
         background-color: $hip-signin-card-background;
         border: solid 1px $hip-signin-card-border;
-        padding: 24px;
+        padding: govuk-spacing(5);
         width: 30%;
         min-width: 300px;
         height: 380px;
-        margin-top: 16px;
+        margin-top: govuk-spacing(3);
     }
 }
 
 .hip-inner-card {
-    padding: 10px 20px;
+    padding: govuk-spacing(2) govuk-spacing(4);
     background-color: $hip-inner-card-background;
     border-bottom: solid 2px $hip-card-border;
     border-radius: 4px;
@@ -76,7 +76,7 @@ body, input {
     border-left: solid 1px $hip-card-border;
     border-right: solid 1px $hip-card-border;
     margin-top: 0;
-    margin-bottom: 12px;
+    margin-bottom: govuk-spacing(2);
     display: flex;
     flex-wrap: wrap;
 
@@ -101,12 +101,6 @@ body, input {
         text-align: right;
     }
 
-    .body {
-        padding-top: 8px;
-        padding-bottom: 4px;
-        clear: both;
-    }
-
     .hip-deleted-tag-container {
         flex: 0 0 80px;
     }
@@ -124,7 +118,7 @@ body, input {
 .view-all-link {
     font-size: 1rem;
     display: block;
-    margin-top: 12px;
+    margin-top: govuk-spacing(2);
 }
 
 .flex {
@@ -145,22 +139,22 @@ body, input {
     text-align: center;
 }
 
-.custom-second-nav {
-    margin: 0;
-    padding: 0;
-    float: right;
+.hip-nav-header-links {
+    .custom-second-nav {
+        margin: 0;
+        padding: 0;
+        float: right;
 
-    li {
-        display: inline;
+        li {
+            display: inline;
 
-        a.govuk-link {
-            margin-right: 30px;
+            a.govuk-link {
+                margin-right: govuk-spacing(6);
+            }
         }
     }
-}
 
-.hip-nav-header-links {
-    height: 20px;
+    height: govuk-spacing(4);
 
     .custom-back-link {
         margin-top: 0 !important;
@@ -176,40 +170,23 @@ body, input {
 }
 
 .api-panel {
-    min-height: 45px;
+    min-height: govuk-spacing(9);
     background-color: $panel-background;
     border: solid 1px $api-panel-border-color;
     border-radius: 5px;
-    padding: 12px 24px;
-    margin-top: 20px;
-    margin-bottom: 16px;
+    padding: govuk-spacing(3) govuk-spacing(5);
+    margin-top: govuk-spacing(4);
+    margin-bottom: govuk-spacing(3);
     font-size: 0.8rem;
 
-    .call-out-body {
-        margin-top: 8px;
-        padding-left: 27px;
-        margin-bottom: 8px;
-    }
-
-    .call-out-list-item {
-        background-color: $call-out-list-item-background;
-        padding: 8px 20px;
-        width: 80%;
-    }
-
-    .call-out-data-attribute {
-        float: right;
-        font-size: 1.05rem;
-    }
-
     .additional-message {
-        margin-top: 16px;
+        margin-top: govuk-spacing(3);
         font-size: 1rem !important;
-        margin-bottom: 4px;
+        margin-bottom: govuk-spacing(1);
     }
 
     .call-out-type {
-        margin-bottom: 20px;
+        margin-bottom: govuk-spacing(4);
         font-weight: 700;
         font-size: 1.1rem !important;
     }
@@ -230,7 +207,7 @@ body, input {
 
     .hip-inline-list li {
         display: inline-block !important;
-        margin-right: 12px;
+        margin-right: govuk-spacing(2);
     }
 
     .hip-inline-list li .govuk-tag {
@@ -246,7 +223,7 @@ body, input {
 }
 
 .api-panel--small {
-    padding-top: 16px !important;
+    padding-top: govuk-spacing(3) !important;
     p {
         font-size: 1rem;
     }
@@ -256,48 +233,42 @@ body, input {
 }
 
 .call-out-panel {
-    min-height: 45px;
+    min-height: govuk-spacing(9);
     background-color: $panel-background;
     border: solid 1px $call-out-panel-border-color;
     border-radius: 5px;
-    padding: 20px;
-    margin-top: 20px;
-    margin-bottom: 40px;
+    padding: govuk-spacing(4);
+    margin-top: govuk-spacing(4);
+    margin-bottom: govuk-spacing(8);
     font-size: 0.8rem;
-
-    .call-out-body {
-        margin-top: 8px;
-        padding-left: 27px;
-        margin-bottom: 8px;
-    }
 
     .call-out-list-item {
         background-color: $call-out-list-item-background;
-        padding: 8px 20px;
+        padding: govuk-spacing(2) govuk-spacing(4);
         width: 80%;
     }
 
     ul:not(.govuk-pagination__list) {
-        margin-left: 37px;
-        margin-top: 16px;
+        margin-left: govuk-spacing(7);
+        margin-top: govuk-spacing(3);
         font-size: 1rem;
-        margin-bottom: 12px;
+        margin-bottom: govuk-spacing(2);
     }
 
     nav.govuk-pagination {
-        margin-bottom: 10px;
+        margin-bottom: govuk-spacing(2);
     }
 
     .additional-message {
-        margin-left: 37px;
-        margin-top: 16px;
+        margin-left: govuk-spacing(7);
+        margin-top: govuk-spacing(3);
         font-size: 1rem !important;
-        margin-bottom: 4px;
+        margin-bottom: govuk-spacing(1);
     }
 
     .call-out-type {
-        margin-bottom: 20px;
-        margin-left: 14px;
+        margin-bottom: govuk-spacing(4);
+        margin-left: govuk-spacing(3);
         font-weight: 700;
         font-size: 1rem !important;
     }
@@ -326,10 +297,10 @@ body, input {
 }
 
 .call-out-panel__small {
-    min-height: 20px !important;
-    padding: 10px !important;
+    min-height: govuk-spacing(4) !important;
+    padding: govuk-spacing(2) !important;
     margin-top: 0 !important;
-    margin-bottom: 20px !important;
+    margin-bottom: govuk-spacing(4) !important;
 }
 
 .scopes-list {
@@ -337,8 +308,8 @@ body, input {
 }
 
 .custom-checkbox-holder {
-    margin-top: 30px;
-    padding: 30px 30px 10px 30px;
+    margin-top: govuk-spacing(6);
+    padding: govuk-spacing(6) govuk-spacing(6) govuk-spacing(2) govuk-spacing(6);
     background-color: $hip-card-background;
 }
 
@@ -353,7 +324,7 @@ body, input {
     border: none;
     padding: 0;
     list-style-type: none;
-    margin: 16px 0 0 0;
+    margin: govuk-spacing(3) 0 0 0;
 }
 
 .side-nav__list {
@@ -366,7 +337,7 @@ body, input {
 }
 
 .side-nav__link {
-    padding: 12px 30px 8px 15px;
+    padding: govuk-spacing(3) govuk-spacing(6) govuk-spacing(2) govuk-spacing(3);
     text-decoration: none;
     display: block;
     background-color: transparent;
@@ -410,7 +381,7 @@ body, input {
 .code--header {
     border: 1px solid $code-border;
     border-radius: 4px;
-    padding: 2px 4px;
+    padding: govuk-spacing(1);
     font-size: 16px;
     font-weight: normal;
     display: inline-block;
@@ -443,12 +414,12 @@ body, input {
     border-bottom: solid 1px $filter-separator-color;
 }
 
-.filters-container {
+.hip-filters-container {
     border-right: solid 1px $filter-separator-color;
     min-height: 400px;
 }
 
-.filterSelectionCount, #resetFilters {
+.hip-filter-selection-count, #resetFilters {
     font-size: 16px;
 }
 
@@ -456,9 +427,9 @@ body, input {
     max-width: fit-content;
 }
 
-.stickySideMenu {
+.hip-sticky-side-menu {
     position: sticky;
-    top: 10px;
+    top: govuk-spacing(2);
 }
 
 .gem-c-search__item-wrapper {
@@ -480,8 +451,8 @@ body, input {
     line-height: 1.4736842105;
     margin: 0;
     width: 100%;
-    height: 2.5em;
-    padding: 0.375em;
+    height: govuk-spacing(7);
+    padding: govuk-spacing(1);
     border: 2px solid $input-text-border;
     background: $input-text-background;
     border-radius: 0;
@@ -517,8 +488,8 @@ table.govuk-table {
     outline-offset: 0;
     position: relative;
     padding: 0;
-    width: 40px;
-    height: 40px;
+    width: govuk-spacing(7);
+    height: govuk-spacing(7);
     text-indent: -5000px;
     overflow: hidden;
 
@@ -526,10 +497,10 @@ table.govuk-table {
         display: block;
         pointer-events: none;
         position: absolute;
-        height: 20px;
-        width: 20px;
-        top: 10px;
-        left: 10px;
+        height: govuk-spacing(4);
+        width: govuk-spacing(4);
+        top: govuk-spacing(2);
+        left: govuk-spacing(2);
     }
 }
 
@@ -540,7 +511,7 @@ table.govuk-table {
 .apiStatusContainer {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: govuk-spacing(3);
 
     strong {
         width: max-content;
@@ -561,8 +532,8 @@ table.govuk-table {
 }
 
 .govuk-details.hip-details--get-support {
-    margin-left: 38px;
-    margin-top: 20px;
+    margin-left: govuk-spacing(7);
+    margin-top: govuk-spacing(4);
 
     .govuk-details__summary-text {
         color: $support-info-details-color;
@@ -578,7 +549,7 @@ table.govuk-table {
     }
 
     li .govuk-tag--grey {
-        margin-top: 8px;
+        margin-top: govuk-spacing(1);
     }
 
     .scope {
@@ -589,16 +560,16 @@ table.govuk-table {
 .hip-app-apis, .hip-request-apis {
     .hip-details {
         border: 1px solid $hip-card-border;
-        border-bottom-width: 4px;
-        margin-bottom: 16px;
+        border-bottom-width: govuk-spacing(1);
+        margin-bottom: govuk-spacing(3);
 
         ::marker {
             font-size: 1.1875rem;
             line-height: 1.47368;
         }
         .hip-details__summary {
-            margin-top: 4px;
-            padding: 20px 24px 24px;
+            margin-top: govuk-spacing(1);
+            padding: govuk-spacing(4) govuk-spacing(5) govuk-spacing(5);
             color: $mid-blue;
             cursor: pointer;
         }
@@ -609,20 +580,20 @@ table.govuk-table {
             text-decoration: underline;
         }
         .hip-details__text {
-            margin-top: 8px;
-            padding: 16px 16px 16px 20px;
+            margin-top: govuk-spacing(2);
+            padding: govuk-spacing(3) govuk-spacing(3) govuk-spacing(3) govuk-spacing(4);
         }
         .hip-details__terms {
-            padding: 0 16px 16px 16px;
+            padding: 0 govuk-spacing(3) govuk-spacing(3) govuk-spacing(3);
         }
         .hip-details__summary-info {
             float: right;
-            margin-top: 6px;
+            margin-top: govuk-spacing(1);
         }
 
         @media (min-width: 40.0625em) {
             .hip-expander .hip-details__text {
-                padding: 0 24px 24px;
+                padding: 0 govuk-spacing(5) govuk-spacing(5);
             }
         }
     }
@@ -736,7 +707,7 @@ header {
     .hip-access-request-name-status {
         display: flex;
         align-items: flex-start;
-        gap: 5px;
+        gap: govuk-spacing(1);
     }
 }
 
@@ -752,11 +723,11 @@ header {
 .hip-feedback-button {
     position: fixed;
     top: 50%;
-    right: -2rem;
+    right: govuk-spacing(-6);
     transform: translateY(-50%) rotate(-90deg);
     background-color: $mid-blue;
     color: $off-white !important;
-    padding: 1rem;
+    padding: govuk-spacing(3);
     font-size: 1rem;
     font-weight: bold;
     border: none;
@@ -765,7 +736,7 @@ header {
 .gem-c-related-navigation {
   color: govuk-colour("black");
   border-top: 2px solid govuk-colour("blue");
-  margin-bottom: 60px;
+  margin-bottom: govuk-spacing(9);
 }
 
 .gem-c-related-navigation__main-heading {
@@ -774,8 +745,8 @@ header {
   font-weight: 700;
   font-size: 1rem;
   line-height: 1.25;
-  margin-top: 15px;
-  margin-bottom: 10px;
+  margin-top: govuk-spacing(3);
+  margin-bottom: govuk-spacing(2);
 }
 
 @media (min-width: 40.0625em) {
@@ -788,33 +759,34 @@ header {
 .gem-c-related-navigation__link-list {
   padding: 0;
   list-style: none;
-  margin-bottom: 1.25em;
+  margin-bottom: govuk-spacing(4);
 }
 
 .gem-c-related-navigation__link {
-  margin-bottom: 0.8em;
+  margin-bottom: govuk-spacing(3);
   font-size: 1rem;
 }
 
 .hip-warning-text {
     display: inline-block;
-    padding: 20px 40px 20px 20px;
+    padding: govuk-spacing(4) govuk-spacing(7) govuk-spacing(4) govuk-spacing(4);
     border: 1px solid $light-mid-grey;
     border-radius: 5px;
     background-color: $off-white;
 
     .govuk-warning-text__icon {
-        margin-left: 15px;
+        margin-left: govuk-spacing(3);
     }
 
     .govuk-warning-text__text {
-        padding-left: 40px;
+        padding-left: govuk-spacing(5);
     }
 
     .hip-warning-list {
+        padding-left: govuk-spacing(5);
         li {
-            margin-top: 5px;
-            padding: 10px 10px 10px 20px;
+            margin-top: govuk-spacing(1);
+            padding: govuk-spacing(2) govuk-spacing(2) govuk-spacing(2) govuk-spacing(4);
             font-size: 1rem;
             background-color: $light-mid-grey;
             border-color: $govuk-border-colour;
@@ -834,14 +806,14 @@ header {
         background-color: $off-white;
         border: 1px solid $light-mid-grey;
         border-radius: 5px;
-        padding: 1rem;
+        padding: govuk-spacing(3);
         min-width: 120px;
         text-align: center;
 
         .hip-stat-title {
             display: block;
             font-size: 14px;
-            margin-bottom: 0.5rem;
+            margin-bottom: govuk-spacing(2);
         }
 
         .hip-stat-number {
@@ -850,20 +822,21 @@ header {
             font-weight: bold;
             color: $input-text-border;
         }
+
+        .hip-stats-button {
+            font-size: 1rem !important;
+            margin: govuk-spacing(3) !important;
+        }
     }
 }
 
-.stats-button {
-  font-size: 1rem !important;
-  margin-top: 1rem !important;
-}
 
 .hip-checkboxes-inline {
     display: flex;
     flex-wrap: wrap;
 
     .govuk-checkboxes__item {
-        margin-right: 20px;
-        margin-bottom: 10px;
+        margin-right: govuk-spacing(4);
+        margin-bottom: govuk-spacing(2);
     }
 }
