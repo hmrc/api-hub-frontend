@@ -47,6 +47,12 @@ trait TestHelpers extends TableDrivenPropertyChecks {
     FakeSupporter
   )
 
+  val nonTeamMembersOrSupport: TableFor1[UserModel] = Table(
+    "User",
+    FakePrivilegedUser,
+    FakeApprover
+  )
+
   val privilegedTeamMemberAndSupporterTable: TableFor1[UserModel] = Table(
     "User",
     FakeUser.copy(permissions = FakeUser.permissions.copy(isPrivileged = true)),

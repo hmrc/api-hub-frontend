@@ -58,3 +58,5 @@ POST        /update-team/:applicationId                                 controll
 GET         /access-requests/:applicationId                             controllers.application.ApplicationAccessRequestsController.onPageLoad(applicationId: String)
 
 GET         /curl/:applicationId                                        controllers.application.CurlCommandController.buildCurlCommand(applicationId: String, world: models.ApiWorld)
+
+GET         /cancel-access-request/start/:id                            controllers.application.cancelaccessrequest.CancelAccessRequestStartController.startJourney(id: String)
