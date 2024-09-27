@@ -43,6 +43,8 @@ $secondary-success-color: govuk-colour("white");
 $secondary-success-background: govuk-colour("dark-grey");
 $active-link-color: govuk-colour("dark-blue");
 
+$border-radius-size: 4px;
+
 body, input {
     font-family: $govuk-font-family ! important;
 }
@@ -71,7 +73,7 @@ body, input {
     padding: govuk-spacing(2) govuk-spacing(4);
     background-color: $hip-inner-card-background;
     border-bottom: solid 2px $hip-card-border;
-    border-radius: 4px;
+    border-radius: $border-radius-size;
     border-top: solid 1px $hip-card-border;
     border-left: solid 1px $hip-card-border;
     border-right: solid 1px $hip-card-border;
@@ -87,17 +89,15 @@ body, input {
     }
 
     strong {
-        font-size: 14px;
+        @include govuk-font($size: 16, $weight: bold);
     }
 
     .left {
-        width: 65%;
-        float: left;
+        flex-grow: 2;
     }
 
     .right {
-        width: 30%;
-        float: right;
+        flex-grow: 1;
         text-align: right;
     }
 
@@ -116,7 +116,7 @@ body, input {
 }
 
 .view-all-link {
-    font-size: 1rem;
+    @include govuk-font($size: 16);
     display: block;
     margin-top: govuk-spacing(2);
 }
@@ -173,27 +173,21 @@ body, input {
     min-height: govuk-spacing(9);
     background-color: $panel-background;
     border: solid 1px $api-panel-border-color;
-    border-radius: 5px;
+    border-radius: $border-radius-size;
     padding: govuk-spacing(3) govuk-spacing(5);
     margin-top: govuk-spacing(4);
     margin-bottom: govuk-spacing(3);
-    font-size: 0.8rem;
+    @include govuk-font($size: 16);
 
     .additional-message {
-        margin-top: govuk-spacing(3);
-        font-size: 1rem !important;
-        margin-bottom: govuk-spacing(1);
+        margin-top: govuk-spacing(2);
+        margin-bottom: govuk-spacing(2);
+        @include govuk-font($size: 16);
     }
 
     .call-out-type {
         margin-bottom: govuk-spacing(4);
-        font-weight: 700;
-        font-size: 1.1rem !important;
-    }
-
-    .information-tag {
-        font-size: 1.2rem;
-        margin-bottom: 0;
+        @include govuk-font($size: 16, $weight: bold);
     }
 
     .information {
@@ -211,7 +205,7 @@ body, input {
     }
 
     .hip-inline-list li .govuk-tag {
-        font-size: 14px;
+        @include govuk-font($size: 14);
         max-width: none;
     }
 
@@ -224,11 +218,8 @@ body, input {
 
 .api-panel--small {
     padding-top: govuk-spacing(3) !important;
-    p {
-        font-size: 1rem;
-    }
-    a {
-        font-size: 1rem !important;
+    p.govuk-body, a.govuk-link {
+        @include govuk-font($size: 16);
     }
 }
 
@@ -236,11 +227,10 @@ body, input {
     min-height: govuk-spacing(9);
     background-color: $panel-background;
     border: solid 1px $call-out-panel-border-color;
-    border-radius: 5px;
+    border-radius: $border-radius-size;
     padding: govuk-spacing(4);
     margin-top: govuk-spacing(4);
     margin-bottom: govuk-spacing(8);
-    font-size: 0.8rem;
 
     .call-out-list-item {
         background-color: $call-out-list-item-background;
@@ -249,9 +239,9 @@ body, input {
     }
 
     ul:not(.govuk-pagination__list) {
+        @include govuk-font($size: 16);
         margin-left: govuk-spacing(7);
         margin-top: govuk-spacing(3);
-        font-size: 1rem;
         margin-bottom: govuk-spacing(2);
     }
 
@@ -262,15 +252,16 @@ body, input {
     .additional-message {
         margin-left: govuk-spacing(7);
         margin-top: govuk-spacing(3);
-        font-size: 1rem !important;
         margin-bottom: govuk-spacing(1);
+        &.govuk-body {
+            @include govuk-font($size: 16);
+        }
     }
 
-    .call-out-type {
+    span.call-out-type {
         margin-bottom: govuk-spacing(4);
         margin-left: govuk-spacing(3);
-        font-weight: 700;
-        font-size: 1rem !important;
+        @include govuk-font($size: 16, $weight: bold);
     }
 
     .information-tag {
@@ -380,7 +371,7 @@ body, input {
 
 .code--header {
     border: 1px solid $code-border;
-    border-radius: 4px;
+    border-radius: $border-radius-size;
     padding: govuk-spacing(1);
     font-size: 16px;
     font-weight: normal;
@@ -771,7 +762,7 @@ header {
     display: inline-block;
     padding: govuk-spacing(4) govuk-spacing(7) govuk-spacing(4) govuk-spacing(4);
     border: 1px solid $light-mid-grey;
-    border-radius: 5px;
+    border-radius: $border-radius-size;
     background-color: $off-white;
 
     .govuk-warning-text__icon {
@@ -805,7 +796,7 @@ header {
     .hip-stat-item {
         background-color: $off-white;
         border: 1px solid $light-mid-grey;
-        border-radius: 5px;
+        border-radius: $border-radius-size;
         padding: govuk-spacing(3);
         min-width: 120px;
         text-align: center;
