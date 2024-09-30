@@ -48,14 +48,14 @@ class DeleteApplicationConfirmationController @Inject()(
 
   def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id)) {
     implicit request =>
-      Ok(confirmView(id, form, applicationSummaryList(request.application)))
+      Ok(confirmView(id, form, applicationSummaryList(request.application), request.identifierRequest.user))
   }
 
   def onSubmit(id: String): Action[AnyContent] = (identify andThen applicationAuth(id)).async {
     implicit request =>
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(confirmView(id, formWithErrors, applicationSummaryList(request.application)))),
+          Future.successful(BadRequest(confirmView(id, formWithErrors, applicationSummaryList(request.application), request.identifierRequest.user))),
         _ =>
           apiHubService.deleteApplication(id, Some(request.identifierRequest.user.email)).map {
             case Some(_) => Ok(successView(request.identifierRequest.user))
