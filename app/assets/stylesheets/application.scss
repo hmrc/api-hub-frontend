@@ -265,7 +265,6 @@ body, input {
     }
 
     .information-tag {
-        font-size: 1.2rem;
         margin-bottom: 0;
     }
 
@@ -294,10 +293,6 @@ body, input {
     margin-bottom: govuk-spacing(4) !important;
 }
 
-.scopes-list {
-    font-size: 16px;
-}
-
 .custom-checkbox-holder {
     margin-top: govuk-spacing(6);
     padding: govuk-spacing(6) govuk-spacing(6) govuk-spacing(2) govuk-spacing(6);
@@ -318,24 +313,11 @@ body, input {
     margin: govuk-spacing(3) 0 0 0;
 }
 
-.side-nav__list {
-    position: relative;
-    list-style: none;
-    font-size: 19px;
-    line-height: 1.31579;
-    font-weight: 400;
-    text-transform: none;
-}
-
 .side-nav__link {
     padding: govuk-spacing(3) govuk-spacing(6) govuk-spacing(2) govuk-spacing(3);
     text-decoration: none;
     display: block;
-    background-color: transparent;
-    font-weight: 400;
-    text-transform: none;
-    font-size: 16px;
-    line-height: 1.25;
+    @include govuk-font($size: 16);
     color: $search-button-background;
 
     &:hover {
@@ -348,8 +330,6 @@ body, input {
         outline: 3px solid transparent;
         box-shadow: 0 -2px $focus-color, 0 4px $focus-border-color;
         text-decoration: none;
-        -webkit-box-decoration-break: clone;
-        box-decoration-break: clone;
     }
 }
 
@@ -373,11 +353,10 @@ body, input {
     border: 1px solid $code-border;
     border-radius: $border-radius-size;
     padding: govuk-spacing(1);
-    font-size: 16px;
-    font-weight: normal;
+    @include govuk-font-size($size: 16);
+    line-height: 1.1em;
     display: inline-block;
     background-color: $code-background;
-    line-height: 1.1em;
     word-break: break-word;
 }
 
@@ -410,8 +389,8 @@ body, input {
     min-height: 400px;
 }
 
-.hip-filter-selection-count, #resetFilters {
-    font-size: 16px;
+.hip-filter-selection-count {
+    @include govuk-font($size: 16);
 }
 
 .hip-no-stretch {
@@ -437,9 +416,7 @@ body, input {
 .gem-c-search__input[type=search] {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    font-weight: 400;
-    font-size: 1rem;
-    line-height: 1.4736842105;
+    @include govuk-font($size: 16);
     margin: 0;
     width: 100%;
     height: govuk-spacing(7);
@@ -555,8 +532,7 @@ table.govuk-table {
         margin-bottom: govuk-spacing(3);
 
         ::marker {
-            font-size: 1.1875rem;
-            line-height: 1.47368;
+            @include govuk-font($size: 19);
         }
         .hip-details__summary {
             margin-top: govuk-spacing(1);
@@ -605,7 +581,7 @@ nav.hip-pagination--centered {
 .hip-tag  {
     @extend .govuk-tag;
     @extend .govuk-tag--grey;
-    font-size: 1rem;
+    @include govuk-font($size: 16);
     white-space: nowrap;
     max-width: none;
     height: fit-content;
@@ -639,7 +615,7 @@ nav.hip-pagination--centered {
 
 .hip-platform-filters {
     .govuk-tag, .govuk-hint {
-        font-size: 1rem;
+        @include govuk-font($size: 16);
     }
     summary {
         display: none;
@@ -680,11 +656,13 @@ header {
     // added this to fix a bug in accessible-autocomplete component where drop-down arrow was not being displayed when showAllValues is set to true
     z-index: 1;
 }
+
 .autocomplete__option {
     @include govuk-font($size: 19);
 }
+
 #deepSearch .govuk-hint {
-    font-size: 1rem;
+    @include govuk-font($size: 16);
 }
 
 .hip-api-info__summary, .hip-api-info__description {
@@ -719,43 +697,29 @@ header {
     background-color: $mid-blue;
     color: $off-white !important;
     padding: govuk-spacing(3);
-    font-size: 1rem;
-    font-weight: bold;
+    @include govuk-font($size: 16, $weight: bold);
     border: none;
 }
 
-.gem-c-related-navigation {
-  color: govuk-colour("black");
-  border-top: 2px solid govuk-colour("blue");
-  margin-bottom: govuk-spacing(9);
-}
+.hip-related-content {
+    color: govuk-colour("black");
+    border-top: 2px solid govuk-colour("blue");
+    margin-bottom: govuk-spacing(9);
 
-.gem-c-related-navigation__main-heading {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-weight: 700;
-  font-size: 1rem;
-  line-height: 1.25;
-  margin-top: govuk-spacing(3);
-  margin-bottom: govuk-spacing(2);
-}
+    h2 {
+        margin-top: govuk-spacing(3);
+        margin-bottom: govuk-spacing(2);
+    }
 
-@media (min-width: 40.0625em) {
-  .gem-c-related-navigation__main-heading {
-    font-size: 1.1875rem;
-    line-height: 1.3157894737;
-  }
-}
+    ul {
+        padding: 0;
+        list-style: none;
+        margin-bottom: govuk-spacing(4);
+    }
 
-.gem-c-related-navigation__link-list {
-  padding: 0;
-  list-style: none;
-  margin-bottom: govuk-spacing(4);
-}
-
-.gem-c-related-navigation__link {
-  margin-bottom: govuk-spacing(3);
-  font-size: 1rem;
+    li {
+        margin-bottom: govuk-spacing(3);
+    }
 }
 
 .hip-warning-text {
@@ -778,10 +742,9 @@ header {
         li {
             margin-top: govuk-spacing(1);
             padding: govuk-spacing(2) govuk-spacing(2) govuk-spacing(2) govuk-spacing(4);
-            font-size: 1rem;
+            @include govuk-font($size: 16);
             background-color: $light-mid-grey;
             border-color: $govuk-border-colour;
-            font-weight: lighter;
             list-style: none;
             border-radius: 2px;
         }
@@ -803,20 +766,19 @@ header {
 
         .hip-stat-title {
             display: block;
-            font-size: 14px;
+            @include govuk-font($size: 14);
             margin-bottom: govuk-spacing(2);
         }
 
         .hip-stat-number {
             display: block;
-            font-size: 24px;
-            font-weight: bold;
+            @include govuk-font($size: 24, $weight: bold);
             color: $input-text-border;
         }
 
-        .hip-stats-button {
-            font-size: 1rem !important;
-            margin: govuk-spacing(3) !important;
+        .govuk-button.hip-stats-button {
+            @include govuk-font($size: 16);
+            margin: govuk-spacing(3);
         }
     }
 }
