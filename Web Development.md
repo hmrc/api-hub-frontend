@@ -1,9 +1,10 @@
 # Web Development guidance for the Integration Hub
 
 ## CSS
-When copying CSS rules from the prototype bear in mind that the CSS you see in the browser is the output of the 
-prototype's CSS preprocessor, not [the original source code](https://github.com/hmrc/integration-hub-prototype/blob/main/app/assets/sass/application.scss) written by the prototype's developers. As such the in-browser CSS may not exemplify best practices and it may be possible to write the rules in a more maintainable way when including 
-them in the application.scss file. 
+When copying CSS rules from the prototype bear in mind that what you see in the browser is the output of the 
+prototype's CSS preprocessor, not [the original source code](https://github.com/hmrc/integration-hub-prototype/blob/main/app/assets/sass/application.scss) written by the prototype's developers. 
+As such the in-browser CSS may not exemplify best practices, and it may be possible to write the rules in a more maintainable way when including 
+them in the `application.scss` file. 
 
 Some guidelines when adding new CSS rules:
 
@@ -45,7 +46,7 @@ Example:
 ### Colours
 When specifying a colour use one of the variables defined at the top of the application.scss file. 
 
-For example rather than
+For example, rather than:
 ```scss
 color: #003078;
 ```
@@ -59,7 +60,7 @@ To find out the hex code for a given colour see the [_colours-palette.scss](http
 ### Spacing
 When specifying padding or margins use the `govuk-spacing()` function.
 
-For example rather than
+For example, rather than:
 ```scss
 margin-top: 30px;
 ```
@@ -69,3 +70,22 @@ margin-top: govuk-spacing(6);
 ```
 
 To find out what spacing value corresponds to a given pixel value, see the [_spacing.scss](https://github.com/alphagov/govuk-frontend/blob/main/packages/govuk-frontend/src/govuk/settings/_spacing.scss#L11) file or look at the [design system guidance](https://design-system.service.gov.uk/styles/spacing/#static-spacing) page.
+
+### Fonts
+When specifying the size, weight, line-height or typeface of text use the `govuk-font()` or `govuk-font-size()` mixins.
+
+For example, rather than:
+```scss
+strong {
+    font-size: 16px;
+    font-weight: bold;
+}
+```
+use
+```scss
+strong {
+    @include govuk-font($size: 16, $weight: bold);
+}
+```
+
+See the [design system guidance](https://design-system.service.gov.uk/styles/type-scale/) page for more details.
