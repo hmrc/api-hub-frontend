@@ -20,9 +20,9 @@ import com.google.inject.{Inject, Singleton}
 import config.{Domains, Hods}
 import connectors.ApplicationsConnector
 import controllers.actions.{ApiAuthActionProvider, IdentifierAction}
-import controllers.myapis.SimpleApiDeploymentController.{transformFromPrefixesToRemove, transformToPrefixesToRemove}
+import controllers.myapis.SimpleApiDeploymentController.{transformFromEgressMappings, transformFromPrefixesToRemove, transformToEgressMappings, transformToPrefixesToRemove}
 import forms.mappings.Mappings
-import models.deployment.{InvalidOasResponse, RedeploymentRequest, SuccessfulDeploymentsResponse}
+import models.deployment.{EgressMapping, InvalidOasResponse, RedeploymentRequest, SuccessfulDeploymentsResponse}
 import models.requests.ApiRequest
 import play.api.data.{Form, Forms}
 import play.api.data.Forms.{mapping, optional}
@@ -65,7 +65,7 @@ class SimpleApiRedeploymentController @Inject()(
               subDomain = deploymentDetails.subDomain,
               hods = deploymentDetails.hods,
               prefixesToRemove = deploymentDetails.prefixesToRemove,
-              egressPrefix = deploymentDetails.egressPrefix
+              egressMappings = deploymentDetails.egressMappings
             )
           )
 
@@ -110,7 +110,7 @@ object SimpleApiRedeploymentController {
           "subdomain" -> text("Enter a subdomain"),
           "hods" -> Forms.seq(text()),
           "prefixesToRemove" -> optional(text()).transform[Seq[String]](transformToPrefixesToRemove, transformFromPrefixesToRemove),
-          "egressPrefix" -> optional(text())
+          "egressMappings" -> optional(text()).transform[Option[Seq[EgressMapping]]](transformToEgressMappings, transformFromEgressMappings)
         )(RedeploymentRequest.apply)(o => Some(Tuple.fromProductTyped(o)))
       )
 

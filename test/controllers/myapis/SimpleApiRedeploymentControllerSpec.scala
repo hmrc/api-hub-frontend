@@ -19,11 +19,12 @@ package controllers.myapis
 import base.SpecBase
 import connectors.ApplicationsConnector
 import controllers.actions.{ApiAuthActionProvider, FakeApiAuthActions, FakeApiDetail, FakeUser}
+import controllers.myapis.SimpleApiDeploymentControllerSpec.{egressMappingEgressPrefix1, egressMappingEgressPrefix2, egressMappingPrefix1, egressMappingPrefix2}
 import controllers.myapis.SimpleApiRedeploymentController.RedeploymentRequestFormProvider
 import fakes.{FakeDomains, FakeHods}
-import models.deployment._
+import models.deployment.*
 import models.user.UserModel
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.OptionValues
 import org.scalatest.matchers.must.Matchers
@@ -32,8 +33,8 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import play.api.{Application => PlayApplication}
+import play.api.test.Helpers.*
+import play.api.Application as PlayApplication
 import services.ApiHubService
 import utils.HtmlValidation
 import views.html.myapis.{DeploymentFailureView, DeploymentSuccessView, SimpleApiRedeploymentView}
@@ -81,7 +82,7 @@ class SimpleApiRedeploymentControllerSpec
         domain = redeploymentRequest.domain,
         subDomain = redeploymentRequest.subDomain,
         hods = redeploymentRequest.hods,
-        egressPrefix = redeploymentRequest.egressPrefix,
+        egressMappings = redeploymentRequest.egressMappings,
         prefixesToRemove = redeploymentRequest.prefixesToRemove
       )
 
@@ -222,6 +223,10 @@ object SimpleApiRedeploymentControllerSpec extends OptionValues {
   val prefix1 = "test-prefix-1"
   val prefix2 = "test-prefix-2"
   val prefix3 = "test-prefix-3"
+  val egressMappingPrefix1 = "test-egress-mapping-prefix-1"
+  val egressMappingEgressPrefix1 = "test-egress-mapping-egress-prefix-1"
+  val egressMappingPrefix2 = "test-egress-mapping-prefix-2"
+  val egressMappingEgressPrefix2 = "test-egress-mapping-egress-prefix-2"
 
   private val redeploymentRequest = RedeploymentRequest(
     description = "test-description",
@@ -231,7 +236,10 @@ object SimpleApiRedeploymentControllerSpec extends OptionValues {
     subDomain = "1.1",
     hods = Seq(hod1, hod2),
     prefixesToRemove = Seq(prefix1, prefix2, prefix3),
-    egressPrefix = Some("test-egress-prefix")
+    egressMappings = Some(Seq(
+      EgressMapping(egressMappingPrefix1, egressMappingEgressPrefix1),
+      EgressMapping(egressMappingPrefix2, egressMappingEgressPrefix2)
+    ))
   )
 
   private val validForm = Seq(
@@ -243,7 +251,7 @@ object SimpleApiRedeploymentControllerSpec extends OptionValues {
     "hods[]" -> hod1,
     "hods[]" -> hod2,
     "prefixesToRemove" -> s"$prefix1 \n $prefix2  \r\n$prefix3",    // Deliberate mix of UNIX and Windows newlines with surplus whitespace
-    "egressPrefix" -> redeploymentRequest.egressPrefix.get
+    "egressMappings" -> s"  $egressMappingPrefix1,$egressMappingEgressPrefix1 \n $egressMappingPrefix2,$egressMappingEgressPrefix2 \r\n  "
   )
 
   private def invalidForm(missingField: String): Seq[(String, String)] =

@@ -21,11 +21,11 @@ import config.{Domains, Hods}
 import connectors.ApplicationsConnector
 import controllers.actions.IdentifierAction
 import forms.mappings.Mappings
-import models.deployment.{DeploymentsRequest, InvalidOasResponse, SuccessfulDeploymentsResponse}
+import models.deployment.{DeploymentsRequest, EgressMapping, InvalidOasResponse, SuccessfulDeploymentsResponse}
 import models.requests.IdentifierRequest
 import play.api.Logging
 import play.api.data.Forms.{mapping, optional}
-import play.api.data._
+import play.api.data.*
 import play.api.i18n.I18nSupport
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -102,7 +102,7 @@ object SimpleApiDeploymentController {
         "subdomain" -> text("Enter a subdomain"),
         "hods" -> Forms.seq(text()),
         "prefixesToRemove" -> optional(text()).transform[Seq[String]](transformToPrefixesToRemove, transformFromPrefixesToRemove),
-        "egressPrefix" -> optional(text())
+        "egressMappings" -> optional(text()).transform[Option[Seq[EgressMapping]]](transformToEgressMappings, transformFromEgressMappings),
         )(DeploymentsRequest.apply)(o => Some(Tuple.fromProductTyped(o)))
       )
 
@@ -119,6 +119,20 @@ object SimpleApiDeploymentController {
     else {
       None
     }
+  }
+
+  def transformToEgressMappings(text: Option[String]): Option[Seq[EgressMapping]] = {
+    Seq.from(text.getOrElse("").split("""\R""")).map(_.trim).filter(_.nonEmpty) match {
+      case Nil => None
+      case mappings => Some(mappings.map { mapping =>
+        val Array(prefix, egressPrefix) = mapping.split(",", 2).map(_.trim)
+        EgressMapping(prefix, egressPrefix)
+      })
+    }
+  }
+
+  def transformFromEgressMappings(mappings: Option[Seq[EgressMapping]]): Option[String] = {
+    mappings.map(_.map(mapping => s"${mapping.prefix},${mapping.egressPrefix}").mkString(System.lineSeparator()))
   }
 
 }

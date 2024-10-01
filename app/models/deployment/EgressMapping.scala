@@ -18,18 +18,13 @@ package models.deployment
 
 import play.api.libs.json.{Format, Json}
 
-case class DeploymentDetails (
-  description: String,
-  status: String,
-  domain: String,
-  subDomain: String,
-  hods: Seq[String],
-  egressMappings: Option[Seq[EgressMapping]],
-  prefixesToRemove: Seq[String]
+case class EgressMapping(
+    prefix: String,
+    egressPrefix: String
 )
 
-object DeploymentDetails {
+object EgressMapping {
 
-  implicit val formatDeploymentDetails: Format[DeploymentDetails] = Json.format[DeploymentDetails]
+  implicit val formatEgressMapping: Format[EgressMapping] = Json.format[EgressMapping]
 
 }

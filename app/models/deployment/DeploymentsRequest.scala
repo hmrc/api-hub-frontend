@@ -31,7 +31,7 @@ case class DeploymentsRequest(
   subDomain: String,
   hods: Seq[String],
   prefixesToRemove: Seq[String],
-  egressPrefix: Option[String]
+  egressMappings: Option[Seq[EgressMapping]]
 )
 
 object DeploymentsRequest {
