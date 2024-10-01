@@ -32,11 +32,11 @@ Example:
         background-color: $off-white;
 
         .hip-stat-title {
-            font-size: 14px;
+            @include govuk-font($size: 14);
         }
 
         .hip-stat-number {
-            font-size: 24px;
+            @include govuk-font($size: 24, $weight: bold);
         }
     }
 }

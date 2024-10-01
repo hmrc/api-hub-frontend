@@ -783,7 +783,6 @@ header {
     }
 }
 
-
 .hip-checkboxes-inline {
     display: flex;
     flex-wrap: wrap;
@@ -791,5 +790,13 @@ header {
     .govuk-checkboxes__item {
         margin-right: govuk-spacing(4);
         margin-bottom: govuk-spacing(2);
+    }
+}
+
+#viewSearchHint {
+    margin-top: govuk-spacing(-1);
+    margin-bottom: govuk-spacing(2);
+    summary {
+        @include govuk-font($size: 16);
     }
 }
