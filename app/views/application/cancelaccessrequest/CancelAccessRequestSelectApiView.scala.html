@@ -28,7 +28,7 @@
 
 @(accessRequests: Seq[AccessRequest], form: Form[?], mode: Mode, user: UserModel)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = title(form, messages("cancelAccessRequestSelectApi.title"))) {
+@layout(pageTitle = title(form, messages("cancelAccessRequestSelectApi.title")), user = Some(user), fullWidth = true) {
 
     @formHelper(action = routes.CancelAccessRequestSelectApiController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
@@ -41,12 +41,20 @@
                 form   = form,
                 name   = "value",
                 legend = LegendViewModel(messages("cancelAccessRequestSelectApi.heading")).asPageHeading(),
-                items  = Seq.empty
-            )
+                items  = accessRequests.zipWithIndex.map {
+                    case (accessRequest, index) =>
+                        CheckboxItemViewModel(
+                            content = Text(accessRequest.apiName),
+                            fieldId = "value",
+                            index = index,
+                            value = accessRequest.id
+                        )
+                }
+            ).withClasses("govuk-!-margin-top-6 govuk-!-margin-bottom-6")
         )
 
         @govukButton(
-            ButtonViewModel(messages("site.continue"))
+            ButtonViewModel(messages("site.continue")).withId("continueButton")
         )
     }
 
