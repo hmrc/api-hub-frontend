@@ -23,6 +23,7 @@ import models.*
 import models.myapis.produce.ProduceApiHowToCreate.Editor
 import org.scalatest.TryValues
 import pages.application.accessrequest.{ProvideSupportingInformationPage, RequestProductionAccessPage, RequestProductionAccessSelectApisPage, RequestProductionAccessStartPage}
+import pages.application.cancelaccessrequest.CancelAccessRequestStartPage
 import pages.application.register.{RegisterApplicationNamePage, RegisterApplicationStartPage, RegisterApplicationTeamPage}
 import pages.myapis.produce.{ProduceApiBeforeYouStartPage, ProduceApiHowToCreatePage, ProduceApiStartPage}
 
@@ -124,6 +125,12 @@ class NavigatorSpec extends SpecBase with TryValues {
         }
         "must go from the How To Create page to the Produce Api Enter OAS page" in {
           navigator.nextPage(ProduceApiHowToCreatePage, NormalMode, emptyUserAnswers.set(ProduceApiHowToCreatePage, Editor).get) mustBe controllers.myapis.produce.routes.ProduceApiEnterOasController.onPageLoad(NormalMode)
+        }
+      }
+
+      "during the Cancel access request journey" - {
+        "must start with the Select APIs page" in {
+          navigator.nextPage(CancelAccessRequestStartPage, NormalMode, emptyUserAnswers) mustBe controllers.application.cancelaccessrequest.routes.CancelAccessRequestSelectApiController.onPageLoad(NormalMode)
         }
       }
     }
