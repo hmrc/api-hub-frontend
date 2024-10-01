@@ -49,7 +49,7 @@
                 <div class="hip-flex-container">
                     <h2 class="govuk-heading-m call-out-header">@messages("dashboard.applications.title.none")</h2>
                 </div>
-                <div class="hip-card-container-top">
+                <div>
                     <p class="govuk-body">@messages("dashboard.applications.none")</p>
                     @formHelper(action = controllers.application.register.routes.RegisterApplicationStartController.startRegisterApplication()) {
                         @govukButton(
@@ -71,7 +71,7 @@
                     }
                 </div>
 
-                <div class="hip-card-container-top">
+                <div>
                 @applications.map( application =>
                     <div class="hip-inner-card flex">
                         <h3 class="govuk-heading-s align-left hip-inner-card-title">
@@ -95,7 +95,7 @@
                 <div class="hip-flex-container">
                     <h2 class="govuk-heading-m call-out-header">@messages("dashboard.teams.title.none")</h2>
                 </div>
-                <div class="hip-card-container-top">
+                <div>
                     <p class="govuk-body">@messages("dashboard.teams.none")</p>
                     @formHelper(action = controllers.team.routes.CreateTeamStartController.startCreateTeam()) {
                         @govukButton(
@@ -117,7 +117,7 @@
                     }
                 </div>
 
-                <div class="hip-card-container-top">
+                <div>
                 @teams.map( team =>
                     <div class="hip-inner-card flex">
                         <h3 class="govuk-heading-s align-left hip-inner-card-title">

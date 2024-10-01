@@ -20,11 +20,11 @@
 
 @(relatedContentLinks: Seq[RelatedContentLink])(implicit request: RequestHeader, messages: Messages)
 
-    <div class="gem-c-related-navigation">
-        <h2 class="gem-c-related-navigation__main-heading">@messages("relatedContent.header")</h2>
+    <div class="hip-related-content">
+        <h2 class="govuk-heading-s">@messages("relatedContent.header")</h2>
 
         <nav role="navigation">
-            <ul class="gem-c-related-navigation__link-list">
+            <ul>
                 @for(link <- relatedContentLinks){
                     <li class="gem-c-related-navigation__link">
                         <a href="@link.url" class="govuk-link govuk-link--no-visited-state">@link.description</a>

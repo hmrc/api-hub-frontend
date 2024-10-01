@@ -13,8 +13,8 @@ $hip-card-border: govuk-colour("mid-grey");
 $hip-card-border-dark: govuk-colour("dark-grey");
 $hip-card-background: govuk-colour("light-grey");
 $hip-inner-card-background: govuk-colour("white");
-$hipp-card-background: $off-white;
-$hipp-card-border: $light-mid-grey;
+$hip-signin-card-background: $off-white;
+$hip-signin-card-border: $light-mid-grey;
 $panel-background: $off-white;
 $filter-separator-color: $light-mid-grey;
 $api-panel-border-color: $light-mid-grey;
@@ -43,60 +43,42 @@ $secondary-success-color: govuk-colour("white");
 $secondary-success-background: govuk-colour("dark-grey");
 $active-link-color: govuk-colour("dark-blue");
 
-$font-family: "GDS Transport", arial, sans-serif;
+$border-radius-size: 4px;
 
-.js-visible {
-    display: none !important;
+body, input {
+    font-family: $govuk-font-family ! important;
 }
 
-.js-enabled .js-visible {
-    display: inline-block !important;
-}
-
-.custom-bottom-padding {
-    padding-bottom: 140px !important;
+.hip-signin-container {
     padding-top: 80px !important;
-}
-
-.custom-flex-container {
+    padding-bottom: 140px !important;
     display: flex;
     justify-content: space-between;
     padding-left: 7%;
     padding-right: 7%;
     flex-wrap: wrap;
-}
 
-.hip-card-container .hip-card-container-top {
-    padding: 30px;
-    border-bottom: solid 1px $hip-card-border;
-}
-
-.hipp-card {
-    background-color: $hipp-card-background;
-    border: solid 1px $hipp-card-border;
-    padding: 24px;
-    width: 30%;
-    min-width: 300px;
-    height: 380px;
-    margin-top: 16px;
-}
-
-.hip-card-header {
-    margin-top: 20px;
-    margin-left: 30px;
-    margin-bottom: 0;
+    .hip-signin-card {
+        background-color: $hip-signin-card-background;
+        border: solid 1px $hip-signin-card-border;
+        padding: govuk-spacing(5);
+        width: 30%;
+        min-width: 300px;
+        height: 380px;
+        margin-top: govuk-spacing(3);
+    }
 }
 
 .hip-inner-card {
-    padding: 10px 20px;
+    padding: govuk-spacing(2) govuk-spacing(4);
     background-color: $hip-inner-card-background;
     border-bottom: solid 2px $hip-card-border;
-    border-radius: 4px;
+    border-radius: $border-radius-size;
     border-top: solid 1px $hip-card-border;
     border-left: solid 1px $hip-card-border;
     border-right: solid 1px $hip-card-border;
     margin-top: 0;
-    margin-bottom: 12px;
+    margin-bottom: govuk-spacing(2);
     display: flex;
     flex-wrap: wrap;
 
@@ -107,34 +89,21 @@ $font-family: "GDS Transport", arial, sans-serif;
     }
 
     strong {
-        font-size: 14px;
+        @include govuk-font($size: 16, $weight: bold);
     }
 
     .left {
-        width: 65%;
-        float: left;
+        flex-grow: 2;
     }
 
     .right {
-        width: 30%;
-        float: right;
+        flex-grow: 1;
         text-align: right;
-    }
-
-    .body {
-        padding-top: 8px;
-        padding-bottom: 4px;
-        clear: both;
     }
 
     .hip-deleted-tag-container {
         flex: 0 0 80px;
     }
-}
-
-.hip-card-header strong {
-    font-weight: 700;
-    font-size: 1rem !important;
 }
 
 .hip-inner-card-title {
@@ -147,9 +116,9 @@ $font-family: "GDS Transport", arial, sans-serif;
 }
 
 .view-all-link {
-    font-size: 1rem;
+    @include govuk-font($size: 16);
     display: block;
-    margin-top: 12px;
+    margin-top: govuk-spacing(2);
 }
 
 .flex {
@@ -170,22 +139,22 @@ $font-family: "GDS Transport", arial, sans-serif;
     text-align: center;
 }
 
-.custom-second-nav {
-    margin: 0;
-    padding: 0;
-    float: right;
+.hip-nav-header-links {
+    .custom-second-nav {
+        margin: 0;
+        padding: 0;
+        float: right;
 
-    li {
-        display: inline;
+        li {
+            display: inline;
 
-        a.govuk-link {
-            margin-right: 30px;
+            a.govuk-link {
+                margin-right: govuk-spacing(6);
+            }
         }
     }
-}
 
-.hip-nav-header-links {
-    height: 20px;
+    height: govuk-spacing(4);
 
     .custom-back-link {
         margin-top: 0 !important;
@@ -200,57 +169,25 @@ $font-family: "GDS Transport", arial, sans-serif;
     }
 }
 
-.custom-width-notification {
-    max-width: 100% !important;
-    font-weight: normal !important;
-    font-size: 1.2rem !important;
-}
-
 .api-panel {
-    font-family: $font-family;
-    min-height: 45px;
+    min-height: govuk-spacing(9);
     background-color: $panel-background;
     border: solid 1px $api-panel-border-color;
-    border-radius: 5px;
-    padding: 12px 24px;
-    margin-top: 20px;
-    margin-bottom: 16px;
-    font-size: 0.8rem;
-
-    .call-out-body {
-        margin-top: 8px;
-        padding-left: 27px;
-        margin-bottom: 8px;
-    }
-
-    .call-out-list-item {
-        background-color: $call-out-list-item-background;
-        padding: 8px 20px;
-        width: 80%;
-    }
-
-    .call-out-data-attribute {
-        float: right;
-        font-size: 1.05rem;
-    }
+    border-radius: $border-radius-size;
+    padding: govuk-spacing(3) govuk-spacing(5);
+    margin-top: govuk-spacing(4);
+    margin-bottom: govuk-spacing(3);
+    @include govuk-font($size: 16);
 
     .additional-message {
-        margin-top: 16px;
-        font-size: 1rem !important;
-        margin-bottom: 4px;
-        color: #000;
+        margin-top: govuk-spacing(2);
+        margin-bottom: govuk-spacing(2);
+        @include govuk-font($size: 16);
     }
 
     .call-out-type {
-        font-family: $font-family;
-        margin-bottom: 20px;
-        font-weight: 700;
-        font-size: 1.1rem !important;
-    }
-
-    .information-tag {
-        font-size: 1.2rem;
-        margin-bottom: 0;
+        margin-bottom: govuk-spacing(4);
+        @include govuk-font($size: 16, $weight: bold);
     }
 
     .information {
@@ -264,11 +201,11 @@ $font-family: "GDS Transport", arial, sans-serif;
 
     .hip-inline-list li {
         display: inline-block !important;
-        margin-right: 12px;
+        margin-right: govuk-spacing(2);
     }
 
     .hip-inline-list li .govuk-tag {
-        font-size: 14px;
+        @include govuk-font($size: 14);
         max-width: none;
     }
 
@@ -280,66 +217,54 @@ $font-family: "GDS Transport", arial, sans-serif;
 }
 
 .api-panel--small {
-    padding-top: 16px !important;
-    p {
-        font-size: 1rem;
-    }
-    a {
-        font-size: 1rem !important;
+    padding-top: govuk-spacing(3) !important;
+    p.govuk-body, a.govuk-link {
+        @include govuk-font($size: 16);
     }
 }
 
 .call-out-panel {
-    font-family: $font-family;
-    min-height: 45px;
+    min-height: govuk-spacing(9);
     background-color: $panel-background;
     border: solid 1px $call-out-panel-border-color;
-    border-radius: 5px;
-    padding: 20px;
-    margin-top: 20px;
-    margin-bottom: 40px;
-    font-size: 0.8rem;
-
-    .call-out-body {
-        margin-top: 8px;
-        padding-left: 27px;
-        margin-bottom: 8px;
-    }
+    border-radius: $border-radius-size;
+    padding: govuk-spacing(4);
+    margin-top: govuk-spacing(4);
+    margin-bottom: govuk-spacing(8);
 
     .call-out-list-item {
         background-color: $call-out-list-item-background;
-        padding: 8px 20px;
+        padding: govuk-spacing(2) govuk-spacing(4);
         width: 80%;
     }
 
     ul:not(.govuk-pagination__list) {
-        margin-left: 37px;
-        margin-top: 16px;
-        font-size: 1rem;
-        margin-bottom: 12px;
+        @include govuk-font($size: 16);
+        margin-left: govuk-spacing(7);
+        margin-top: govuk-spacing(3);
+        margin-bottom: govuk-spacing(2);
     }
 
     nav.govuk-pagination {
-        margin-bottom: 10px;
+        margin-bottom: govuk-spacing(2);
     }
 
     .additional-message {
-        margin-left: 37px;
-        margin-top: 16px;
-        font-size: 1rem !important;
-        margin-bottom: 4px;
+        margin-left: govuk-spacing(7);
+        margin-top: govuk-spacing(3);
+        margin-bottom: govuk-spacing(1);
+        &.govuk-body {
+            @include govuk-font($size: 16);
+        }
     }
 
-    .call-out-type {
-        font-family: $font-family;
-        margin-bottom: 20px;
-        margin-left: 14px;
-        font-weight: 700;
-        font-size: 1rem !important;
+    span.call-out-type {
+        margin-bottom: govuk-spacing(4);
+        margin-left: govuk-spacing(3);
+        @include govuk-font($size: 16, $weight: bold);
     }
 
     .information-tag {
-        font-size: 1.2rem;
         margin-bottom: 0;
     }
 
@@ -362,19 +287,15 @@ $font-family: "GDS Transport", arial, sans-serif;
 }
 
 .call-out-panel__small {
-    min-height: 20px !important;
-    padding: 10px !important;
+    min-height: govuk-spacing(4) !important;
+    padding: govuk-spacing(2) !important;
     margin-top: 0 !important;
-    margin-bottom: 20px !important;
-}
-
-.scopes-list {
-    font-size: 16px;
+    margin-bottom: govuk-spacing(4) !important;
 }
 
 .custom-checkbox-holder {
-    margin-top: 30px;
-    padding: 30px 30px 10px 30px;
+    margin-top: govuk-spacing(6);
+    padding: govuk-spacing(6) govuk-spacing(6) govuk-spacing(2) govuk-spacing(6);
     background-color: $hip-card-background;
 }
 
@@ -389,29 +310,14 @@ $font-family: "GDS Transport", arial, sans-serif;
     border: none;
     padding: 0;
     list-style-type: none;
-    margin: 16px 0 0 0;
-}
-
-.side-nav__list {
-    position: relative;
-    list-style: none;
-    font-size: 19px;
-    line-height: 1.31579;
-    font-family: "nta", Arial, sans-serif;
-    font-weight: 400;
-    text-transform: none;
+    margin: govuk-spacing(3) 0 0 0;
 }
 
 .side-nav__link {
-    padding: 12px 30px 8px 15px;
+    padding: govuk-spacing(3) govuk-spacing(6) govuk-spacing(2) govuk-spacing(3);
     text-decoration: none;
     display: block;
-    background-color: transparent;
-    font-family: $font-family;
-    font-weight: 400;
-    text-transform: none;
-    font-size: 16px;
-    line-height: 1.25;
+    @include govuk-font($size: 16);
     color: $search-button-background;
 
     &:hover {
@@ -424,8 +330,6 @@ $font-family: "GDS Transport", arial, sans-serif;
         outline: 3px solid transparent;
         box-shadow: 0 -2px $focus-color, 0 4px $focus-border-color;
         text-decoration: none;
-        -webkit-box-decoration-break: clone;
-        box-decoration-break: clone;
     }
 }
 
@@ -447,13 +351,12 @@ $font-family: "GDS Transport", arial, sans-serif;
 
 .code--header {
     border: 1px solid $code-border;
-    border-radius: 4px;
-    padding: 2px 4px;
-    font-size: 16px;
-    font-weight: normal;
+    border-radius: $border-radius-size;
+    padding: govuk-spacing(1);
+    @include govuk-font-size($size: 16);
+    line-height: 1.1em;
     display: inline-block;
     background-color: $code-background;
-    line-height: 1.1em;
     word-break: break-word;
 }
 
@@ -477,34 +380,26 @@ $font-family: "GDS Transport", arial, sans-serif;
     color: $ready-color;
 }
 
-.customised-table {
-    margin-bottom: 20px !important;
-
-    tr:last-child td, tr:last-child th {
-        border-width: 0;
-    }
-}
-
 .hip-color-override {
     border-bottom: solid 1px $filter-separator-color;
 }
 
-.filters-container {
+.hip-filters-container {
     border-right: solid 1px $filter-separator-color;
     min-height: 400px;
 }
 
-.filterSelectionCount, #resetFilters {
-    font-size: 16px;
+.hip-filter-selection-count {
+    @include govuk-font($size: 16);
 }
 
 .hip-no-stretch {
     max-width: fit-content;
 }
 
-.stickySideMenu {
+.hip-sticky-side-menu {
     position: sticky;
-    top: 10px;
+    top: govuk-spacing(2);
 }
 
 .gem-c-search__item-wrapper {
@@ -519,16 +414,13 @@ $font-family: "GDS Transport", arial, sans-serif;
 }
 
 .gem-c-search__input[type=search] {
-    font-family: $font-family;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    font-weight: 400;
-    font-size: 1rem;
-    line-height: 1.4736842105;
+    @include govuk-font($size: 16);
     margin: 0;
     width: 100%;
-    height: 2.5em;
-    padding: 0.375em;
+    height: govuk-spacing(7);
+    padding: govuk-spacing(1);
     border: 2px solid $input-text-border;
     background: $input-text-background;
     border-radius: 0;
@@ -564,8 +456,8 @@ table.govuk-table {
     outline-offset: 0;
     position: relative;
     padding: 0;
-    width: 40px;
-    height: 40px;
+    width: govuk-spacing(7);
+    height: govuk-spacing(7);
     text-indent: -5000px;
     overflow: hidden;
 
@@ -573,10 +465,10 @@ table.govuk-table {
         display: block;
         pointer-events: none;
         position: absolute;
-        height: 20px;
-        width: 20px;
-        top: 10px;
-        left: 10px;
+        height: govuk-spacing(4);
+        width: govuk-spacing(4);
+        top: govuk-spacing(2);
+        left: govuk-spacing(2);
     }
 }
 
@@ -587,7 +479,7 @@ table.govuk-table {
 .apiStatusContainer {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: govuk-spacing(3);
 
     strong {
         width: max-content;
@@ -608,8 +500,8 @@ table.govuk-table {
 }
 
 .govuk-details.hip-details--get-support {
-    margin-left: 38px;
-    margin-top: 20px;
+    margin-left: govuk-spacing(7);
+    margin-top: govuk-spacing(4);
 
     .govuk-details__summary-text {
         color: $support-info-details-color;
@@ -617,15 +509,15 @@ table.govuk-table {
 }
 
 .api-scopes-list-inline {
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 0;
 
     li {
         display: inline;
     }
 
     li .govuk-tag--grey {
-        margin-top: 8px;
+        margin-top: govuk-spacing(1);
     }
 
     .scope {
@@ -635,41 +527,40 @@ table.govuk-table {
 
 .hip-app-apis, .hip-request-apis {
     .hip-details {
-        border: 1px solid #d8dde0;
-        border-bottom-width: 4px;
-        margin-bottom: 16px;
+        border: 1px solid $hip-card-border;
+        border-bottom-width: govuk-spacing(1);
+        margin-bottom: govuk-spacing(3);
 
         ::marker {
-            font-size: 1.1875rem;
-            line-height: 1.47368;
+            @include govuk-font($size: 19);
         }
         .hip-details__summary {
-            margin-top: 4px;
-            padding: 20px 24px 24px;
-            color: #005eb8;
+            margin-top: govuk-spacing(1);
+            padding: govuk-spacing(4) govuk-spacing(5) govuk-spacing(5);
+            color: $mid-blue;
             cursor: pointer;
         }
         .hip-details__summary-text {
-            color: #005eb8;
+            color: $mid-blue;
             cursor: pointer;
             display: inline-block;
             text-decoration: underline;
         }
         .hip-details__text {
-            margin-top: 8px;
-            padding: 16px 16px 16px 20px;
+            margin-top: govuk-spacing(2);
+            padding: govuk-spacing(3) govuk-spacing(3) govuk-spacing(3) govuk-spacing(4);
         }
         .hip-details__terms {
-            padding: 0 16px 16px 16px;
+            padding: 0 govuk-spacing(3) govuk-spacing(3) govuk-spacing(3);
         }
         .hip-details__summary-info {
             float: right;
-            margin-top: 6px;
+            margin-top: govuk-spacing(1);
         }
 
         @media (min-width: 40.0625em) {
             .hip-expander .hip-details__text {
-                padding: 0 24px 24px;
+                padding: 0 govuk-spacing(5) govuk-spacing(5);
             }
         }
     }
@@ -690,7 +581,7 @@ nav.hip-pagination--centered {
 .hip-tag  {
     @extend .govuk-tag;
     @extend .govuk-tag--grey;
-    font-size: 1rem;
+    @include govuk-font($size: 16);
     white-space: nowrap;
     max-width: none;
     height: fit-content;
@@ -724,7 +615,7 @@ nav.hip-pagination--centered {
 
 .hip-platform-filters {
     .govuk-tag, .govuk-hint {
-        font-size: 1rem;
+        @include govuk-font($size: 16);
     }
     summary {
         display: none;
@@ -761,16 +652,17 @@ header {
     }
 }
 
-
 .autocomplete__wrapper svg {
     // added this to fix a bug in accessible-autocomplete component where drop-down arrow was not being displayed when showAllValues is set to true
     z-index: 1;
 }
+
 .autocomplete__option {
     @include govuk-font($size: 19);
 }
+
 #deepSearch .govuk-hint {
-    font-size: 1rem;
+    @include govuk-font($size: 16);
 }
 
 .hip-api-info__summary, .hip-api-info__description {
@@ -784,12 +676,12 @@ header {
     .hip-access-request-name-status {
         display: flex;
         align-items: flex-start;
-        gap: 5px;
+        gap: govuk-spacing(1);
     }
 }
 
 .hip-expander__error {
-    border-color: #d4351c !important;
+    border-color: $error-color !important;
 }
 
 .hip-ace-editor {
@@ -800,76 +692,59 @@ header {
 .hip-feedback-button {
     position: fixed;
     top: 50%;
-    right: -2rem;
+    right: govuk-spacing(-6);
     transform: translateY(-50%) rotate(-90deg);
     background-color: $mid-blue;
     color: $off-white !important;
-    padding: 1rem;
-    font-size: 1rem;
-    font-weight: bold;
+    padding: govuk-spacing(3);
+    @include govuk-font($size: 16, $weight: bold);
     border: none;
 }
 
-.gem-c-related-navigation {
-  color: #0b0c0c;
-  border-top: 2px solid #1d70b8;
-  margin-bottom: 60px;
-}
+.hip-related-content {
+    color: govuk-colour("black");
+    border-top: 2px solid govuk-colour("blue");
+    margin-bottom: govuk-spacing(9);
 
-.gem-c-related-navigation__main-heading {
-  font-family: "GDS Transport", arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-weight: 700;
-  font-size: 1rem;
-  line-height: 1.25;
-  margin-top: 15px;
-  margin-bottom: 10px;
-}
+    h2 {
+        margin-top: govuk-spacing(3);
+        margin-bottom: govuk-spacing(2);
+    }
 
-@media (min-width: 40.0625em) {
-  .gem-c-related-navigation__main-heading {
-    font-size: 1.1875rem;
-    line-height: 1.3157894737;
-  }
-}
+    ul {
+        padding: 0;
+        list-style: none;
+        margin-bottom: govuk-spacing(4);
+    }
 
-.gem-c-related-navigation__link-list {
-  padding: 0;
-  list-style: none;
-  margin-bottom: 1.25em;
-}
-
-.gem-c-related-navigation__link {
-  margin-bottom: 0.8em;
-  font-size: 1rem;
+    li {
+        margin-bottom: govuk-spacing(3);
+    }
 }
 
 .hip-warning-text {
     display: inline-block;
-    padding: 20px;
-    padding-right: 40px;
+    padding: govuk-spacing(4) govuk-spacing(7) govuk-spacing(4) govuk-spacing(4);
     border: 1px solid $light-mid-grey;
-    border-radius: 5px;
+    border-radius: $border-radius-size;
     background-color: $off-white;
 
     .govuk-warning-text__icon {
-        margin-left: 15px;
+        margin-left: govuk-spacing(3);
     }
 
     .govuk-warning-text__text {
-        padding-left: 40px;
+        padding-left: govuk-spacing(5);
     }
 
     .hip-warning-list {
+        padding-left: govuk-spacing(5);
         li {
-            margin-top: 5px;
-            padding: 10px;
-            padding-left: 20px;
-            font-size: 1rem;
+            margin-top: govuk-spacing(1);
+            padding: govuk-spacing(2) govuk-spacing(2) govuk-spacing(2) govuk-spacing(4);
+            @include govuk-font($size: 16);
             background-color: $light-mid-grey;
             border-color: $govuk-border-colour;
-            font-weight: lighter;
             list-style: none;
             border-radius: 2px;
         }
@@ -877,44 +752,51 @@ header {
 }
 
 .hip-stat-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  font-family: $font-family;
-}
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
 
-.hip-stat-item {
-  background-color: #fbfbfb;
-  border: 1px solid #ebebeb;
-  border-radius: 5px;
-  padding: 1rem;
-  min-width: 120px;
-  text-align: center;
-}
+    .hip-stat-item {
+        background-color: $off-white;
+        border: 1px solid $light-mid-grey;
+        border-radius: $border-radius-size;
+        padding: govuk-spacing(3);
+        min-width: 120px;
+        text-align: center;
 
-.hip-stat-title {
-  display: block;
-  font-size: 14px;
-  margin-bottom: 0.5rem;
-}
+        .hip-stat-title {
+            display: block;
+            @include govuk-font($size: 14);
+            margin-bottom: govuk-spacing(2);
+        }
 
-.hip-stat-number {
-  display: block;
-  font-size: 24px;
-  font-weight: bold;
-  color: #0b0c0c;
-}
+        .hip-stat-number {
+            display: block;
+            @include govuk-font($size: 24, $weight: bold);
+            color: $input-text-border;
+        }
 
-.stats-button {
-  font-size: 1rem !important;
-  margin-top: 1rem !important;
+        .govuk-button.hip-stats-button {
+            @include govuk-font($size: 16);
+            margin: govuk-spacing(3);
+        }
+    }
 }
 
 .hip-checkboxes-inline {
     display: flex;
     flex-wrap: wrap;
+
+    .govuk-checkboxes__item {
+        margin-right: govuk-spacing(4);
+        margin-bottom: govuk-spacing(2);
+    }
 }
-.hip-checkboxes-inline .govuk-checkboxes__item {
-    margin-right: 20px;
-    margin-bottom: 10px;
+
+#viewSearchHint {
+    margin-top: govuk-spacing(-1);
+    margin-bottom: govuk-spacing(2);
+    summary {
+        @include govuk-font($size: 16);
+    }
 }

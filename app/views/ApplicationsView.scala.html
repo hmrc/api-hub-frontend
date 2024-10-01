@@ -45,9 +45,9 @@
         @messages("applications.heading")
     </h1>
 
-    <div id="appDetailPanels" class="hip-card-container-top">
+    <div id="appDetailPanels">
     @applications.map( application =>
-        <div class="hip-card-container-top hip-application">
+        <div class="hip-application">
             <div class="hip-inner-card flex">
                 <h3 class="govuk-heading-s align-left hip-inner-card-title">
                     <a class="govuk-link govuk-link--no-visited-state" href={controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url} data-application-id={application.id}>{application.name}</a>

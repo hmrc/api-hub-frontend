@@ -180,7 +180,7 @@
     <h2 class="govuk-heading-l">@messages("exploreApis.title")</h2>
     <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible hip-color-override">
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-one-third filters-container">
+        <div class="govuk-grid-column-one-third hip-filters-container">
             <div class="govuk-form-group">
                 <h2 class="govuk-heading-s govuk-!-margin-bottom-1">
                     @messages("exploreApis.filter.heading")
@@ -233,7 +233,7 @@
                         summary = Text(messages("exploreApis.filter.byDomain.view")),
                         content = HtmlContent(domainsAndSubDomains())
                     ))
-                    <div class="govuk-body filterSelectionCount">
+                    <div class="govuk-body hip-filter-selection-count">
                         <strong id="domainFilterCount">0</strong> @messages("exploreApis.filter.selected")
                     </div>
                     <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible hip-color-override govuk-!-margin-top-1">
@@ -251,7 +251,7 @@
                         summary = Text(messages("exploreApis.filter.byHods.view")),
                         content = HtmlContent(hodsFilters())
                     ))
-                    <div class="govuk-body filterSelectionCount">
+                    <div class="govuk-body hip-filter-selection-count">
                         <strong id="hodFilterCount">0</strong> @messages("exploreApis.filter.selected")
                     </div>
                     <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible hip-color-override govuk-!-margin-top-1">
@@ -269,7 +269,7 @@
                         summary = Text(messages("exploreApis.filter.byStatus.view")),
                         content = HtmlContent(statusFilters())
                     ))
-                    <div class="govuk-body filterSelectionCount">
+                    <div class="govuk-body hip-filter-selection-count">
                         <strong id="statusFilterCount">0</strong> @messages("exploreApis.filter.selected")
                     </div>
                 </fieldset>
@@ -285,7 +285,6 @@
 
             @govukDetails(Details(
                 id = Some("viewSearchHint"),
-                classes = "govuk-!-margin-bottom-1",
                 summary = Text(messages("exploreApis.search.howto.hint")),
                 content = HtmlContent(searchHintContent())
             ))

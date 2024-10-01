@@ -54,6 +54,9 @@ The MongoDb version should be 4.2 or 4.4 and is constrained by the wider platfor
 - Database: api-hub-frontend
 - Collection: user-answers
 
+### JavaScript and CSS
+Some guidance regarding use of JavaScript and S/CSS can be found in the [Web Development guidance](Web%20Development.md) document.
+
 ## Using the service
 
 ### Running the application

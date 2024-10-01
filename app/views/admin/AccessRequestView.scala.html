@@ -176,7 +176,8 @@
 @layout(
     pageTitle = titleNoForm(messages("accessRequest.title")),
     user = Some(user),
-    activeLink = Some("apiHubAdmin")
+    activeLink = Some("apiHubAdmin"),
+    fullWidth = true
 ) {
     @if(canApprove()) {
         @formHelper(action = controllers.admin.routes.AccessRequestController.onSubmit(accessRequest.id), Symbol("autoComplete") -> "off") {
