@@ -65,3 +65,8 @@ GET         /cancel-access-request/select-api                           controll
 POST        /cancel-access-request/select-api                           controllers.application.cancelaccessrequest.CancelAccessRequestSelectApiController.onSubmit(mode: Mode = NormalMode)
 GET         /cancel-access-request/change-select-api                    controllers.application.cancelaccessrequest.CancelAccessRequestSelectApiController.onPageLoad(mode: Mode = CheckMode)
 POST        /cancel-access-request/change-select-api                    controllers.application.cancelaccessrequest.CancelAccessRequestSelectApiController.onSubmit(mode: Mode = CheckMode)
+
+GET         /cancel-access-request/confirm                              controllers.application.cancelaccessrequest.CancelAccessRequestConfirmController.onPageLoad(mode: Mode = NormalMode)
+POST        /cancel-access-request/confirm                              controllers.application.cancelaccessrequest.CancelAccessRequestConfirmController.onSubmit(mode: Mode = NormalMode)
+GET         /cancel-access-request/change-confirm                       controllers.application.cancelaccessrequest.CancelAccessRequestConfirmController.onPageLoad(mode: Mode = CheckMode)
+POST        /cancel-access-request/change-confirm                       controllers.application.cancelaccessrequest.CancelAccessRequestConfirmController.onSubmit(mode: Mode = CheckMode)

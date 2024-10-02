@@ -19,12 +19,15 @@ package generators
 import org.scalacheck.Arbitrary
 import pages.*
 import pages.application.accessrequest.RequestProductionAccessSelectApisPage
-import pages.application.cancelaccessrequest.CancelAccessRequestSelectApiPage
+import pages.application.cancelaccessrequest.{CancelAccessRequestConfirmPage, CancelAccessRequestSelectApiPage}
 import pages.application.register.RegisterApplicationTeamPage
 import pages.myapis.produce.ProduceApiEnterOasPage
 import pages.myapis.produce.ProduceApiHowToCreatePage
 
 trait PageGenerators {
+
+  implicit lazy val arbitraryCancelAccessRequestConfirmPage: Arbitrary[CancelAccessRequestConfirmPage.type] =
+    Arbitrary(CancelAccessRequestConfirmPage)
 
   implicit lazy val arbitraryCancelAccessRequestSelectApiPage: Arbitrary[CancelAccessRequestSelectApiPage.type] =
     Arbitrary(CancelAccessRequestSelectApiPage)
