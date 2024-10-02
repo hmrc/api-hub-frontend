@@ -24,7 +24,7 @@ import models.accessrequest.*
 import models.api.{ApiDeploymentStatuses, ContactInfo, EndpointMethod, PlatformContact}
 import models.application.ApplicationLenses.*
 import models.application.*
-import models.deployment.DeploymentDetails
+import models.deployment.{DeploymentDetails, EgressMapping}
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
 import models.stats.ApisInProductionStatistic
 import models.team.{NewTeam, Team}
@@ -256,7 +256,7 @@ class ApiHubServiceSpec
         domain = "test-domain",
         subDomain = "test-dub-domain",
         hods = Seq("test-backend-1", "test-backend-2"),
-        egressPrefix = Some("test-egress-prefix"),
+        egressMappings = Some(Seq(EgressMapping("prefix", "egress-prefix"))),
         prefixesToRemove = Seq("test-prefix-1", "test-prefix-2")
       )
 

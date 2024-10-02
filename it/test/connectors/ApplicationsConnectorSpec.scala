@@ -26,7 +26,7 @@ import models.api.ApiDeploymentStatuses
 import models.api.ApiDetailLensesSpec.sampleApiDetail
 import models.application.*
 import models.application.ApplicationLenses.*
-import models.deployment.{DeploymentDetails, DeploymentsRequest, Error, FailuresResponse, InvalidOasResponse, RedeploymentRequest, SuccessfulDeploymentsResponse}
+import models.deployment.{DeploymentDetails, DeploymentsRequest, EgressMapping, Error, FailuresResponse, InvalidOasResponse, RedeploymentRequest, SuccessfulDeploymentsResponse}
 import models.exception.{ApplicationCredentialLimitException, TeamNameNotUniqueException}
 import models.requests.{AddApiRequest, AddApiRequestEndpoint, ChangeTeamNameRequest, TeamMemberRequest}
 import models.stats.ApisInProductionStatistic
@@ -822,7 +822,8 @@ class ApplicationsConnectorSpec
   "ApplicationsConnector.generateDeployment" - {
     "must place the correct request and return the response" in {
       val request = DeploymentsRequest("test-lob", "test-name", "test-description", "test-egress", "test-team-id",
-        "test-oas", false, "ALPHA", "domain", "subdomain", Seq("hod1", "hod2"), Seq("test-prefix-1", "test-prefix-2"), Some("test-egress-prefix"))
+        "test-oas", false, "ALPHA", "domain", "subdomain", Seq("hod1", "hod2"), Seq("test-prefix-1", "test-prefix-2"), 
+        Some(Seq(EgressMapping("prefix", "egress-prefix"))))
       val response = SuccessfulDeploymentsResponse("test-id", "1.0.0", 102, "test-url")
 
       stubFor(
@@ -845,7 +846,8 @@ class ApplicationsConnectorSpec
 
     "must handle a 400 bad Request response with invalid OAS payload" in {
       val request = DeploymentsRequest("test-lob", "test-name", "test-description", "test-egress", "test-team-id",
-        "test-oas", true, "BETA", "domain", "subdomain", Seq("hod1", "hod2"), Seq("test-prefix-1", "test-prefix-2"), Some("test-egress-prefix"))
+        "test-oas", true, "BETA", "domain", "subdomain", Seq("hod1", "hod2"), Seq("test-prefix-1", "test-prefix-2"),
+        Some(Seq(EgressMapping("prefix", "egress-prefix"))))
 
       stubFor(
         post(urlEqualTo("/api-hub-applications/deployments"))
@@ -875,7 +877,7 @@ class ApplicationsConnectorSpec
         subDomain = "test-subdomain",
         hods = Seq("test-hod"),
         prefixesToRemove = Seq("test-prefix-1", "test-prefix-2"),
-        egressPrefix = Some("test-egress-prefix")
+        egressMappings = Some(Seq(EgressMapping("prefix", "egress-prefix")))
       )
 
       val response = SuccessfulDeploymentsResponse("test-id", "1.0.0", 102, "test-url")
@@ -909,7 +911,7 @@ class ApplicationsConnectorSpec
         subDomain = "test-subdomain",
         hods = Seq("test-hod"),
         prefixesToRemove = Seq("test-prefix-1", "test-prefix-2"),
-        egressPrefix = Some("test-egress-prefix")
+        egressMappings = Some(Seq(EgressMapping("prefix", "egress-prefix")))
       )
 
       stubFor(
@@ -938,7 +940,7 @@ class ApplicationsConnectorSpec
         subDomain = "test-subdomain",
         hods = Seq("test-hod"),
         prefixesToRemove = Seq("test-prefix-1", "test-prefix-2"),
-        egressPrefix = Some("test-egress-prefix")
+        egressMappings = Some(Seq(EgressMapping("prefix", "egress-prefix")))
       )
 
       stubFor(
@@ -1082,7 +1084,7 @@ class ApplicationsConnectorSpec
         domain = "test-domain",
         subDomain = "test-dub-domain",
         hods = Seq("test-backend-1", "test-backend-2"),
-        egressPrefix = Some("test-egress-prefix"),
+        egressMappings = Some(Seq(EgressMapping("prefix", "egress-prefix"))),
         prefixesToRemove = Seq("test-prefix-1", "test-prefix-2")
       )
 

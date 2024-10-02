@@ -21,11 +21,11 @@ import config.{Domains, Hods}
 import connectors.ApplicationsConnector
 import controllers.actions.IdentifierAction
 import forms.mappings.Mappings
-import models.deployment.{DeploymentsRequest, InvalidOasResponse, SuccessfulDeploymentsResponse}
+import models.deployment.{DeploymentsRequest, EgressMapping, InvalidOasResponse, SuccessfulDeploymentsResponse}
 import models.requests.IdentifierRequest
 import play.api.Logging
 import play.api.data.Forms.{mapping, optional}
-import play.api.data._
+import play.api.data.*
 import play.api.i18n.I18nSupport
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -101,15 +101,18 @@ object SimpleApiDeploymentController {
         "domain" -> text("Enter a domain"),
         "subdomain" -> text("Enter a subdomain"),
         "hods" -> Forms.seq(text()),
-        "prefixesToRemove" -> optional(text()).transform[Seq[String]](transformToPrefixesToRemove, transformFromPrefixesToRemove),
-        "egressPrefix" -> optional(text())
+        "prefixesToRemove" -> optional(text())
+          .transform[Seq[String]](transformToPrefixesToRemove, transformFromPrefixesToRemove),
+        "egressMappings" -> optional(text())
+          .verifying("Each Egress Prefix Mapping must contain exactly one comma", optionalTextToSeq andThen allContainExactlyOneComma)
+          .transform[Option[Seq[EgressMapping]]](transformToEgressMappings, transformFromEgressMappings)
         )(DeploymentsRequest.apply)(o => Some(Tuple.fromProductTyped(o)))
       )
 
   }
 
   def transformToPrefixesToRemove(text: Option[String]): Seq[String] = {
-    Seq.from(text.getOrElse("").split("""\R""")).map(_.trim).filter(_.nonEmpty)
+    optionalTextToSeq(text)
   }
 
   def transformFromPrefixesToRemove(prefixes: Seq[String]): Option[String] = {
@@ -119,6 +122,28 @@ object SimpleApiDeploymentController {
     else {
       None
     }
+  }
+
+  def transformToEgressMappings(text: Option[String]): Option[Seq[EgressMapping]] = {
+    optionalTextToSeq(text) match {
+      case Nil => None
+      case mappings => Some(mappings.map { mapping =>
+        val Array(prefix, egressPrefix) = mapping.split(",", 2).map(_.trim)
+        EgressMapping(prefix, egressPrefix)
+      })
+    }
+  }
+
+  def transformFromEgressMappings(mappings: Option[Seq[EgressMapping]]): Option[String] = {
+    mappings.map(_.map(mapping => s"${mapping.prefix},${mapping.egressPrefix}").mkString(System.lineSeparator()))
+  }
+  
+  def optionalTextToSeq(text: Option[String]): Seq[String] = {
+    Seq.from(text.getOrElse("").split("""\R""")).map(_.trim).filter(_.nonEmpty)
+  }
+  
+  def allContainExactlyOneComma(strings: Seq[String]): Boolean = {
+    strings.forall(_.count(_ == ',') == 1)
   }
 
 }

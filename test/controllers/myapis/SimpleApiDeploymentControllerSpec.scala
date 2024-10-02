@@ -22,17 +22,17 @@ import controllers.actions.FakeUser
 import controllers.myapis.SimpleApiDeploymentController.DeploymentsRequestFormProvider
 import fakes.{FakeDomains, FakeHods}
 import models.application.TeamMember
-import models.deployment.{DeploymentsRequest, Error, FailuresResponse, InvalidOasResponse, SuccessfulDeploymentsResponse}
+import models.deployment.{DeploymentsRequest, EgressMapping, Error, FailuresResponse, InvalidOasResponse, SuccessfulDeploymentsResponse}
 import models.team.Team
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import play.api.{Application => PlayApplication}
+import play.api.test.Helpers.*
+import play.api.Application as PlayApplication
 import services.ApiHubService
 import utils.HtmlValidation
 import views.html.myapis.{DeploymentFailureView, DeploymentSuccessView, SimpleApiDeploymentView}
@@ -185,6 +185,44 @@ class SimpleApiDeploymentControllerSpec
         }
       }
     }
+
+    "must validate egress prefix mappings correctly" in {
+      val fixture = buildFixture()
+
+      val prefixMappings = Table(
+        ("value", "is valid"),
+        ("", true),
+        ("/prefix,/replacement", true),
+        ("/prefix1,/replacement1\n/prefix2,/replacement2", true),
+        ("/prefix/replacement", false),
+        ("/prefix,/replacement,", false),
+        ("/prefix1,/replacement1\n/prefix2,,/replacement2", false),
+        ("/prefix1,/replacement1\n/prefix2/replacement2", false),
+      )
+
+      when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(teams))
+      when(fixture.applicationsConnector.generateDeployment(any)(any)).thenReturn(Future.successful(SuccessfulDeploymentsResponse(
+        id = "test-id",
+        version = "test-version",
+        mergeRequestIid = 101,
+        uri = "test-uri"
+      )))
+
+      running(fixture.playApplication) {
+        forAll(prefixMappings) { (egressPrefixMappings, isValid) =>
+          val form: Seq[(String,String)] = validForm.filterNot(_._1.equals("egressMappings")) :+ "egressMappings" -> egressPrefixMappings
+          val request = FakeRequest(controllers.myapis.routes.SimpleApiDeploymentController.onSubmit())
+            .withFormUrlEncodedBody(form *)
+          val result = route(fixture.playApplication, request).value
+
+          if (isValid) {
+            status(result) mustBe OK
+          } else {
+            status(result) mustBe BAD_REQUEST
+          }
+        }
+      }
+    }
   }
 
   private case class Fixture(
@@ -216,6 +254,10 @@ object SimpleApiDeploymentControllerSpec {
   val prefix1 = "test-prefix-1"
   val prefix2 = "test-prefix-2"
   val prefix3 = "test-prefix-3"
+  val egressMappingPrefix1 = "test-egress-mapping-prefix-1"
+  val egressMappingEgressPrefix1 = "test-egress-mapping-egress-prefix-1"
+  val egressMappingPrefix2 = "test-egress-mapping-prefix-2"
+  val egressMappingEgressPrefix2 = "test-egress-mapping-egress-prefix-2"
 
   val deploymentsRequest: DeploymentsRequest = DeploymentsRequest(
     lineOfBusiness = "test-line-of-business",
@@ -230,7 +272,10 @@ object SimpleApiDeploymentControllerSpec {
     subDomain = "test-sub-domain",
     hods = Seq(hod1, hod2),
     prefixesToRemove = Seq(prefix1, prefix2, prefix3),
-    egressPrefix = Some("test-egress-prefix")
+    egressMappings = Some(Seq(
+      EgressMapping(egressMappingPrefix1, egressMappingEgressPrefix1),
+      EgressMapping(egressMappingPrefix2, egressMappingEgressPrefix2)
+    ))
   )
 
   val validForm: Seq[(String, String)] = Seq(
@@ -247,7 +292,7 @@ object SimpleApiDeploymentControllerSpec {
     "hods[]" -> hod1,
     "hods[]" -> hod2,
     "prefixesToRemove" -> s"$prefix1 \n $prefix2  \r\n$prefix3",    // Deliberate mix of UNIX and Windows newlines with surplus whitespace
-    "egressPrefix" -> deploymentsRequest.egressPrefix.get
+    "egressMappings" -> s"  $egressMappingPrefix1,$egressMappingEgressPrefix1 \n $egressMappingPrefix2,$egressMappingEgressPrefix2 \r\n  "
   )
 
   def invalidForm(missingField: String): Seq[(String, String)] =
