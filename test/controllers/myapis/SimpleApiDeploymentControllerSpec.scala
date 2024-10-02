@@ -185,6 +185,44 @@ class SimpleApiDeploymentControllerSpec
         }
       }
     }
+
+    "must validate egress prefix mappings correctly" in {
+      val fixture = buildFixture()
+
+      val prefixMappings = Table(
+        ("value", "is valid"),
+        ("", true),
+        ("/prefix,/replacement", true),
+        ("/prefix1,/replacement1\n/prefix2,/replacement2", true),
+        ("/prefix/replacement", false),
+        ("/prefix,/replacement,", false),
+        ("/prefix1,/replacement1\n/prefix2,,/replacement2", false),
+        ("/prefix1,/replacement1\n/prefix2/replacement2", false),
+      )
+
+      when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(teams))
+      when(fixture.applicationsConnector.generateDeployment(any)(any)).thenReturn(Future.successful(SuccessfulDeploymentsResponse(
+        id = "test-id",
+        version = "test-version",
+        mergeRequestIid = 101,
+        uri = "test-uri"
+      )))
+
+      running(fixture.playApplication) {
+        forAll(prefixMappings) { (egressPrefixMappings, isValid) =>
+          val form: Seq[(String,String)] = validForm.filterNot(_._1.equals("egressMappings")) :+ "egressMappings" -> egressPrefixMappings
+          val request = FakeRequest(controllers.myapis.routes.SimpleApiDeploymentController.onSubmit())
+            .withFormUrlEncodedBody(form *)
+          val result = route(fixture.playApplication, request).value
+
+          if (isValid) {
+            status(result) mustBe OK
+          } else {
+            status(result) mustBe BAD_REQUEST
+          }
+        }
+      }
+    }
   }
 
   private case class Fixture(

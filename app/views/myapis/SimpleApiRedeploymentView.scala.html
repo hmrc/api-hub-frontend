@@ -69,14 +69,6 @@
             .withWidth(Full)
         )
 
-        @govukInput(
-            InputViewModel(
-                field = form("egressPrefix"),
-                label = LabelViewModel("Egress prefix")
-            )
-            .withWidth(Full)
-        )
-
         @govukSelect(
             SelectViewModel(
                 field = form("status"),
@@ -141,6 +133,13 @@
                 field = form("prefixesToRemove"),
                 label = LabelViewModel("Prefixes to remove")
             ).withHint(HintViewModel(messages("This is a line-separated list of prefixes to remove")))
+        )
+
+        @govukTextarea(
+            TextareaViewModel(
+                field = form("egressMappings"),
+                label = LabelViewModel("Egress Prefix Mappings")
+            ).withHint(HintViewModel(messages("One mapping per line, in the format /old-prefix,/new-prefix")))
         )
 
         @govukTextarea(

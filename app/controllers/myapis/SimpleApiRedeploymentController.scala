@@ -20,7 +20,7 @@ import com.google.inject.{Inject, Singleton}
 import config.{Domains, Hods}
 import connectors.ApplicationsConnector
 import controllers.actions.{ApiAuthActionProvider, IdentifierAction}
-import controllers.myapis.SimpleApiDeploymentController.{transformFromEgressMappings, transformFromPrefixesToRemove, transformToEgressMappings, transformToPrefixesToRemove}
+import controllers.myapis.SimpleApiDeploymentController.{optionalTextToSeq, allContainExactlyOneComma, transformFromEgressMappings, transformFromPrefixesToRemove, transformToEgressMappings, transformToPrefixesToRemove}
 import forms.mappings.Mappings
 import models.deployment.{EgressMapping, InvalidOasResponse, RedeploymentRequest, SuccessfulDeploymentsResponse}
 import models.requests.ApiRequest
@@ -109,8 +109,12 @@ object SimpleApiRedeploymentController {
           "domain" -> text("Enter a domain"),
           "subdomain" -> text("Enter a subdomain"),
           "hods" -> Forms.seq(text()),
-          "prefixesToRemove" -> optional(text()).transform[Seq[String]](transformToPrefixesToRemove, transformFromPrefixesToRemove),
-          "egressMappings" -> optional(text()).transform[Option[Seq[EgressMapping]]](transformToEgressMappings, transformFromEgressMappings)
+          "prefixesToRemove" -> optional(text())
+            .transform[Seq[String]](transformToPrefixesToRemove, transformFromPrefixesToRemove),
+          "egressMappings" -> optional(text())
+            .verifying("Each Egress Prefix Mapping must contain exactly one comma", optionalTextToSeq andThen allContainExactlyOneComma)
+            .transform[Option[Seq[EgressMapping]]](transformToEgressMappings, transformFromEgressMappings)
+
         )(RedeploymentRequest.apply)(o => Some(Tuple.fromProductTyped(o)))
       )
 

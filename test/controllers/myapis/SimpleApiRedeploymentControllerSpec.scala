@@ -19,7 +19,6 @@ package controllers.myapis
 import base.SpecBase
 import connectors.ApplicationsConnector
 import controllers.actions.{ApiAuthActionProvider, FakeApiAuthActions, FakeApiDetail, FakeUser}
-import controllers.myapis.SimpleApiDeploymentControllerSpec.{egressMappingEgressPrefix1, egressMappingEgressPrefix2, egressMappingPrefix1, egressMappingPrefix2}
 import controllers.myapis.SimpleApiRedeploymentController.RedeploymentRequestFormProvider
 import fakes.{FakeDomains, FakeHods}
 import models.deployment.*
@@ -185,6 +184,45 @@ class SimpleApiRedeploymentControllerSpec
           status(result) mustBe BAD_REQUEST
           contentAsString(result) mustBe view(boundForm, FakeApiDetail, FakeDomains, FakeHods, FakeUser)(request, messages(fixture.playApplication)).toString()
           contentAsString(result) must validateAsHtml
+        }
+      }
+    }
+
+    "must validate egress prefix mappings correctly" in {
+      val fixture = buildFixture()
+
+      val prefixMappings = Table(
+        ("value", "is valid"),
+        ("", true),
+        ("/prefix,/replacement", true),
+        ("/prefix1,/replacement1\n/prefix2,/replacement2", true),
+        ("/prefix/replacement", false),
+        ("/prefix,/replacement,", false),
+        ("/prefix1,/replacement1\n/prefix2,,/replacement2", false),
+        ("/prefix1,/replacement1\n/prefix2/replacement2", false),
+      )
+
+      when(fixture.applicationsConnector.updateDeployment(any, any)(any)).thenReturn(Future.successful(Some(SuccessfulDeploymentsResponse(
+        id = "test-id",
+        version = "test-version",
+        mergeRequestIid = 101,
+        uri = "test-uri"
+      ))))
+      when(fixture.apiAuthActionProvider.apply(any)(any)).thenReturn(successfulApiAuthAction(FakeApiDetail))
+
+
+      running(fixture.playApplication) {
+        forAll(prefixMappings) { (egressPrefixMappings, isValid) =>
+          val form: Seq[(String,String)] = validForm.filterNot(_._1.equals("egressMappings")) :+ "egressMappings" -> egressPrefixMappings
+          val request = FakeRequest(controllers.myapis.routes.SimpleApiRedeploymentController.onSubmit(FakeApiDetail.id))
+            .withFormUrlEncodedBody(form *)
+          val result = route(fixture.playApplication, request).value
+
+          if (isValid) {
+            status(result) mustBe OK
+          } else {
+            status(result) mustBe BAD_REQUEST
+          }
         }
       }
     }

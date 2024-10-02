@@ -101,15 +101,18 @@ object SimpleApiDeploymentController {
         "domain" -> text("Enter a domain"),
         "subdomain" -> text("Enter a subdomain"),
         "hods" -> Forms.seq(text()),
-        "prefixesToRemove" -> optional(text()).transform[Seq[String]](transformToPrefixesToRemove, transformFromPrefixesToRemove),
-        "egressMappings" -> optional(text()).transform[Option[Seq[EgressMapping]]](transformToEgressMappings, transformFromEgressMappings),
+        "prefixesToRemove" -> optional(text())
+          .transform[Seq[String]](transformToPrefixesToRemove, transformFromPrefixesToRemove),
+        "egressMappings" -> optional(text())
+          .verifying("Each Egress Prefix Mapping must contain exactly one comma", optionalTextToSeq andThen allContainExactlyOneComma)
+          .transform[Option[Seq[EgressMapping]]](transformToEgressMappings, transformFromEgressMappings)
         )(DeploymentsRequest.apply)(o => Some(Tuple.fromProductTyped(o)))
       )
 
   }
 
   def transformToPrefixesToRemove(text: Option[String]): Seq[String] = {
-    Seq.from(text.getOrElse("").split("""\R""")).map(_.trim).filter(_.nonEmpty)
+    optionalTextToSeq(text)
   }
 
   def transformFromPrefixesToRemove(prefixes: Seq[String]): Option[String] = {
@@ -122,7 +125,7 @@ object SimpleApiDeploymentController {
   }
 
   def transformToEgressMappings(text: Option[String]): Option[Seq[EgressMapping]] = {
-    Seq.from(text.getOrElse("").split("""\R""")).map(_.trim).filter(_.nonEmpty) match {
+    optionalTextToSeq(text) match {
       case Nil => None
       case mappings => Some(mappings.map { mapping =>
         val Array(prefix, egressPrefix) = mapping.split(",", 2).map(_.trim)
@@ -133,6 +136,14 @@ object SimpleApiDeploymentController {
 
   def transformFromEgressMappings(mappings: Option[Seq[EgressMapping]]): Option[String] = {
     mappings.map(_.map(mapping => s"${mapping.prefix},${mapping.egressPrefix}").mkString(System.lineSeparator()))
+  }
+  
+  def optionalTextToSeq(text: Option[String]): Seq[String] = {
+    Seq.from(text.getOrElse("").split("""\R""")).map(_.trim).filter(_.nonEmpty)
+  }
+  
+  def allContainExactlyOneComma(strings: Seq[String]): Boolean = {
+    strings.forall(_.count(_ == ',') == 1)
   }
 
 }
