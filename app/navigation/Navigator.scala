@@ -21,6 +21,7 @@ import models.*
 import models.myapis.produce.ProduceApiHowToCreate.{Editor, Upload}
 import pages.*
 import pages.application.accessrequest.{ProvideSupportingInformationPage, RequestProductionAccessPage, RequestProductionAccessSelectApisPage, RequestProductionAccessStartPage}
+import pages.application.cancelaccessrequest.CancelAccessRequestStartPage
 import pages.application.register.{RegisterApplicationNamePage, RegisterApplicationStartPage, RegisterApplicationTeamPage}
 import pages.myapis.produce.{ProduceApiBeforeYouStartPage, ProduceApiHowToCreatePage, ProduceApiStartPage}
 import play.api.mvc.Call
@@ -49,6 +50,7 @@ class Navigator @Inject()() {
     case ProduceApiStartPage => _ => controllers.myapis.produce.routes.ProduceApiBeforeYouStartController.onPageLoad()
     case ProduceApiBeforeYouStartPage => _ => controllers.myapis.produce.routes.ProduceApiHowToCreateController.onPageLoad(NormalMode)
     case ProduceApiHowToCreatePage => produceApiHowToCreateNextPage(NormalMode)
+    case CancelAccessRequestStartPage => _ => controllers.application.cancelaccessrequest.routes.CancelAccessRequestSelectApiController.onPageLoad(NormalMode)
     case _ => _ => routes.IndexController.onPageLoad
   }
 
