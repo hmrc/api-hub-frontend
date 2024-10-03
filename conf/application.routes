@@ -25,6 +25,8 @@ POST        /request-production-access/change-supporting-information    controll
 
 GET         /request-production-access/success                          controllers.application.accessrequest.RequestProductionAccessEndJourneyController.submitRequest()
 
+GET         /access-request/:accessRequestId                            controllers.application.AccessRequestController.onPageLoad(accessRequestId: String)
+
 GET         /delete-primary-credential/:id/:clientId                    controllers.application.EnvironmentAndCredentialsController.deletePrimaryCredential(id: String ,clientId: String)
 GET         /delete-secondary-credential/:id/:clientId                  controllers.application.EnvironmentAndCredentialsController.deleteSecondaryCredential(id: String ,clientId: String)
 

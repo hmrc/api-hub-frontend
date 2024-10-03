@@ -68,41 +68,95 @@ trait AccessRequestGenerator {
     Gen.listOf(Gen.resize(size/ resizeFactor, genAccessRequestEndpoint))
   }
 
-  private def genAccessRequestDecision: Gen[AccessRequestDecision] = {
+  private def genApproved: Gen[AccessRequestDecision] = {
     for {
       decided <- genLocalDateTime
       decidedBy <- sensiblySizedAlphaNumStr
-      rejectedReason <- Gen.option(sensiblySizedAlphaNumStr)
     } yield AccessRequestDecision(
       decided = decided,
       decidedBy = decidedBy,
-      rejectedReason = rejectedReason
+      rejectedReason = None
     )
   }
 
-  private def genAccessRequest: Gen[AccessRequest] = Gen.sized {size =>
+  private def genRejected: Gen[AccessRequestDecision] = {
+    for {
+      approved <- genApproved
+      rejectedReason <- sensiblySizedAlphaNumStr
+    } yield {
+      approved.copy(rejectedReason = Some(rejectedReason))
+    }
+  }
+
+  private def genAccessRequestDecision: Gen[AccessRequestDecision] = {
+    Gen.oneOf(genApproved, genRejected)
+  }
+
+  private def genAccessRequestCancelled: Gen[AccessRequestCancelled] = {
+    for {
+      cancelled <- genLocalDateTime
+      cancelledBy <- sensiblySizedAlphaNumStr
+    } yield AccessRequestCancelled(cancelled, cancelledBy)
+  }
+
+  private def genPendingAccessRequest: Gen[AccessRequest] = Gen.sized { size =>
     for {
       id <- Gen.uuid
       applicationId <- sensiblySizedAlphaNumStr
       apiId <- Gen.uuid
       apiName <- sensiblySizedAlphaNumStr
-      status <- genAccessRequestStatus
       endpoints <- Gen.resize(newSize(size), genAccessRequestEndpoints)
       supportingInformation <- sensiblySizedAlphaNumStr
       requested <- genLocalDateTime
       requestedBy <- sensiblySizedAlphaNumStr
-      decision <- Gen.option(genAccessRequestDecision)
     } yield AccessRequest(
       id = id.toString,
       applicationId = applicationId,
       apiId = apiId.toString,
       apiName = apiName,
-      status = status,
+      status = Pending,
       endpoints = endpoints,
       supportingInformation = supportingInformation,
       requested = requested,
       requestedBy = requestedBy,
-      decision = decision
+      decision = None,
+      cancelled = None
+    )
+  }
+
+  private def genApprovedAccessRequest: Gen[AccessRequest] = Gen.sized { size =>
+    for {
+      pendingAccessRequest <- genPendingAccessRequest
+      decision <- genApproved
+    } yield {
+      pendingAccessRequest.copy(status = Approved, decision = Some(decision))
+    }
+  }
+
+  private def genRejectedAccessRequest: Gen[AccessRequest] = Gen.sized { size =>
+    for {
+      pendingAccessRequest <- genPendingAccessRequest
+      decision <- genRejected
+    } yield {
+      pendingAccessRequest.copy(status = Rejected, decision = Some(decision))
+    }
+  }
+
+  private def genCancelledAccessRequest: Gen[AccessRequest] = Gen.sized { size =>
+    for {
+      pendingAccessRequest <- genPendingAccessRequest
+      cancelled <- genAccessRequestCancelled
+    } yield {
+      pendingAccessRequest.copy(status = Cancelled, cancelled = Some(cancelled))
+    }
+  }
+
+  private def genAccessRequest: Gen[AccessRequest] = Gen.sized {size =>
+    Gen.oneOf(
+      genPendingAccessRequest,
+      genApprovedAccessRequest,
+      genRejectedAccessRequest,
+      genCancelledAccessRequest
     )
   }
 
@@ -119,6 +173,18 @@ trait AccessRequestGenerator {
 
   def sampleAccessRequests(): Seq[AccessRequest] =
     genAccessRequests.pureApply(parameters, Seed.random())
+
+  def samplePendingAccessRequest(): AccessRequest =
+    genPendingAccessRequest.pureApply(parameters, Seed.random())
+
+  def sampleApprovedAccessRequest(): AccessRequest =
+    genApprovedAccessRequest.pureApply(parameters, Seed.random())
+
+  def sampleRejectedAccessRequest(): AccessRequest =
+    genRejectedAccessRequest.pureApply(parameters, Seed.random())
+
+  def sampleCancelledAccessRequest(): AccessRequest =
+    genCancelledAccessRequest.pureApply(parameters, Seed.random())
 
   private def genAccessRequestApi: Gen[AccessRequestApi] = Gen.sized {size =>
     for {
