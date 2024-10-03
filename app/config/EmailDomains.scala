@@ -37,6 +37,6 @@ trait EmailDomains {
 @Singleton
 class EmailDomainsImpl @Inject()(configuration: Configuration) extends EmailDomains {
   override val emailDomains: Set[String] =
-    (configuration.get[Seq[String]]("digital") ++ configuration.get[Seq[String]]("stride")).map(normalise(_)).toSet
+    (configuration.get[Seq[String]]("emailDomains.digital") ++ configuration.get[Seq[String]]("emailDomains.stride")).map(normalise(_)).toSet
 
 }

@@ -16,6 +16,7 @@
 
 package forms
 
+import fakes.FakeEmailDomains
 import forms.behaviours.StringFieldBehaviours
 import models.application.TeamMember
 import org.scalacheck.Gen
@@ -25,7 +26,7 @@ class AddTeamMemberDetailsFormProviderSpec extends StringFieldBehaviours {
 
   val invalidKey = "addTeamMemberDetails.email.invalid"
 
-  val form = new AddTeamMemberDetailsFormProvider()()
+  val form = new AddTeamMemberDetailsFormProvider(FakeEmailDomains)()
 
   ".email" - {
 
