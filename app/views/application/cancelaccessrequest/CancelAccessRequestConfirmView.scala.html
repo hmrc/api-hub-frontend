@@ -32,6 +32,10 @@ govukButton: GovukButton
 
         <h1 class="govuk-heading-l">@messages("cancelAccessRequestConfirm.heading")</h1>
 
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form))
+        }
+
         <h2 class="govuk-body">
         @messages("cancelAccessRequestConfirm.message.1")
         </h2>
@@ -47,10 +51,6 @@ govukButton: GovukButton
         <ul class="govuk-list govuk-list--bullet">
             @requestsToCancel.map(request => <li>{request.apiName}</li>)
         </ul>
-
-        @if(form.errors.nonEmpty) {
-            @govukErrorSummary(ErrorSummaryViewModel(form))
-        }
 
         @govukRadios(
             RadiosViewModel.yesNo(
