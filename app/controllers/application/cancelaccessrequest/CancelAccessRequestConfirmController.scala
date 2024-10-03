@@ -46,15 +46,19 @@ class CancelAccessRequestConfirmController @Inject()(
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
-
-      val preparedForm = request.userAnswers.get(CancelAccessRequestConfirmPage) match {
-        case None => form
-        case Some(value) => form.fill(value)
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) async {
+    implicit request => {
+      (request.userAnswers.get(CancelAccessRequestPendingPage), request.userAnswers.get(CancelAccessRequestSelectApiPage)) match {
+        case (_, None) => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        case (None, _) => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        case (Some(accessRequests), Some(apiIds)) =>
+          val preparedForm = request.userAnswers.get(CancelAccessRequestConfirmPage) match {
+            case None => form
+            case Some(value) => form.fill(value)
+          }
+          Future.successful(Ok(view(preparedForm, mode, getCancellableRequests(request))))
       }
-
-      Ok(view(preparedForm, mode, getCancellableRequests(request)))
+    }
   }
 
   private def getCancellableRequests(request: DataRequest[AnyContent]) = {
@@ -66,17 +70,22 @@ class CancelAccessRequestConfirmController @Inject()(
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+      implicit request => {
+        (request.userAnswers.get(CancelAccessRequestPendingPage), request.userAnswers.get(CancelAccessRequestSelectApiPage)) match {
+          case (_, None) => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+          case (None, _) => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+          case (Some(accessRequests), Some(apiIds)) =>
+            form.bindFromRequest().fold(
+              formWithErrors =>
+                Future.successful(BadRequest(view(formWithErrors, mode, accessRequests))),
 
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode, getCancellableRequests(request)))),
-
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(CancelAccessRequestConfirmPage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(CancelAccessRequestConfirmPage, mode, updatedAnswers))
-      )
+              value =>
+                for {
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(CancelAccessRequestConfirmPage, value))
+                  _ <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(navigator.nextPage(CancelAccessRequestConfirmPage, mode, updatedAnswers))
+            )
+        }
+      }
   }
 }
