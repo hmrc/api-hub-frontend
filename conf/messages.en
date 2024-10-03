@@ -825,3 +825,12 @@ cancelAccessRequestSelectApi.heading = Which APIs do you want to cancel producti
 cancelAccessRequestSelectApi.checkYourAnswersLabel = API
 cancelAccessRequestSelectApi.error.required = Select at least one API
 cancelAccessRequestSelectApi.change.hidden = CancelAccessRequestSelectApi
+
+cancelAccessRequestConfirm.title = Confirm API production access request cancellations
+cancelAccessRequestConfirm.heading = Confirm API production access request cancellations
+cancelAccessRequestConfirm.message.1 = Cancelling these production access requests will withdraw your requests to use the selected APIs in production.
+cancelAccessRequestConfirm.message.2 = If you need to use the APIs in production you will need to raise new production access requests.
+cancelAccessRequestConfirm.message.3 = The following production access requests will be cancelled:
+cancelAccessRequestConfirm.checkYourAnswersLabel = Do you want to continue with the cancellation of these production access requests?
+cancelAccessRequestConfirm.error.required = Select yes if you wish to cancel the access request
+cancelAccessRequestConfirm.change.hidden = CancelAccessRequestConfirm

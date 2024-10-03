@@ -16,7 +16,7 @@
 
 package generators
 
-import models.{ApiPolicyConditionsDeclaration}
+import models.ApiPolicyConditionsDeclaration
 import models.application.TeamMember
 import models.team.Team
 import models.myapis.produce.ProduceApiHowToCreate
@@ -24,12 +24,21 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import pages.*
 import pages.application.accessrequest.RequestProductionAccessSelectApisPage
+import pages.application.cancelaccessrequest.CancelAccessRequestConfirmPage
 import pages.application.register.RegisterApplicationTeamPage
 import pages.myapis.produce.ProduceApiHowToCreatePage
 import pages.myapis.produce.ProduceApiEnterOasPage
 import play.api.libs.json.{JsValue, Json}
 
 trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators with TeamGenerator {
+
+  implicit lazy val arbitraryCancelAccessRequestConfirmUserAnswersEntry: Arbitrary[(CancelAccessRequestConfirmPage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[CancelAccessRequestConfirmPage.type]
+        value <- arbitrary[Boolean].map(Json.toJson(_))
+      } yield (page, value)
+    }
 
   implicit lazy val arbitraryRequestProductionAccessSelectApisUserAnswersEntry: Arbitrary[(RequestProductionAccessSelectApisPage.type, JsValue)] =
     Arbitrary {

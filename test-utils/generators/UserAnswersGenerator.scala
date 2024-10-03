@@ -22,6 +22,7 @@ import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.TryValues
 import pages.*
 import pages.application.accessrequest.RequestProductionAccessSelectApisPage
+import pages.application.cancelaccessrequest.CancelAccessRequestConfirmPage
 import pages.application.register.RegisterApplicationTeamPage
 import pages.myapis.produce.ProduceApiHowToCreatePage
 import pages.myapis.produce.ProduceApiEnterOasPage
@@ -31,6 +32,7 @@ trait UserAnswersGenerator extends TryValues {
   self: Generators =>
 
   val generators: Seq[Gen[(QuestionPage[?], JsValue)]] =
+    arbitrary[(CancelAccessRequestConfirmPage.type, JsValue)] ::
     arbitrary[(RequestProductionAccessSelectApisPage.type, JsValue)] ::
     arbitrary[(ProduceApiEnterOasPage.type, JsValue)] ::
     arbitrary[(ProduceApiHowToCreatePage.type, JsValue)] ::
