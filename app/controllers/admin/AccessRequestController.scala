@@ -23,11 +23,11 @@ import forms.admin.ApprovalDecisionFormProvider
 import models.requests.IdentifierRequest
 import play.api.data.{Form, FormError}
 import play.api.i18n.{I18nSupport, Messages}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
+import play.api.mvc.*
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.admin.Decision.{Approve, Reject}
-import viewmodels.admin.{AccessRequestEndpointGroups, ApprovalDecision}
+import viewmodels.admin.{AccessRequestViewModel, ApprovalDecision}
 import views.html.admin.{AccessRequestApprovedSuccessView, AccessRequestRejectedSuccessView, AccessRequestView}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -71,7 +71,9 @@ class AccessRequestController @Inject()(
     apiHubService.getAccessRequest(id).flatMap {
       case Some(accessRequest) =>
         apiHubService.getApplication(accessRequest.applicationId, enrich = false, includeDeleted = true).map {
-          case Some(application) => Status(status)(view(accessRequest, application, AccessRequestEndpointGroups.group(accessRequest), form, request.user))
+          case Some(application) =>
+            val model = AccessRequestViewModel.adminViewModel(application, accessRequest, request.user)
+            Status(status)(view(model, form, request.user))
           case _ => applicationNotFound(accessRequest.applicationId)
         }
       case None => Future.successful(accessRequestNotFound(id))

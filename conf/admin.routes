@@ -7,6 +7,7 @@ GET         /apis                                                               
 GET         /users                                                                  controllers.admin.GetUsersController.onPageLoad()
 GET         /team-migration                                                         controllers.admin.TeamMigrationController.onPageLoad()
 GET         /deleted-application/:id                                                controllers.admin.DeletedApplicationDetailsController.onPageLoad(id)
+GET         /deleted-application/access-request/:accessRequestId                    controllers.admin.DeletedApplicationAccessRequestController.onPageLoad(accessRequestId: String)
 GET         /configuration                                                          controllers.admin.ConfigurationController.onPageLoad()
 GET         /statistics                                                             controllers.admin.StatisticsController.onPageLoad()
 GET         /statistics/apis-in-production                                          controllers.admin.StatisticsController.apisInProduction()

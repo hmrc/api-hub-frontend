@@ -93,7 +93,6 @@ object ApplicationNavItems {
     )
     .filter(dontShowManageTeamForMigratedApps(application))
     .filter(onlyShowViewAsJsonForSupportUsers(userModel))
-    .filter(onlyShowAppHistoryForSupportUsers(userModel))
   }
 
   private def dontShowManageTeamForMigratedApps(application: Application)(navItem: SideNavItem): Boolean = {
@@ -102,10 +101,6 @@ object ApplicationNavItems {
 
   private def onlyShowViewAsJsonForSupportUsers(userModel: Option[UserModel])(navItem: SideNavItem): Boolean = {
     !navItem.page.equals(ViewAsJsonApplicationPage) || userModel.exists(_.permissions.canSupport)
-  }
-
-  private def onlyShowAppHistoryForSupportUsers(userModel: Option[UserModel])(navItem: SideNavItem): Boolean = {
-    !navItem.page.equals(ApplicationHistoryPage) || userModel.exists(_.permissions.canSupport)
   }
 
 }

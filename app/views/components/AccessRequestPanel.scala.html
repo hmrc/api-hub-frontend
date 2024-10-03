@@ -14,36 +14,36 @@
  * limitations under the License.
  *@
 
-@import models.accessrequest.AccessRequest
+@import viewmodels.components.AccessRequestPanelViewModel
 @import views.ViewUtils
 
 @this()
 
-@(accessRequest: AccessRequest, showReviewLink: Boolean)(implicit request: RequestHeader, messages: Messages)
+@(model: AccessRequestPanelViewModel)(implicit request: RequestHeader, messages: Messages)
 
-<div class="api-panel hip-access-request-panel" data-status="@accessRequest.status">
+<div class="api-panel hip-access-request-panel" data-status="@model.accessRequest.status">
     <p class="call-out-type hip-access-request-name-status">
-        @ViewUtils.formatAccessRequestStatus(accessRequest.status)
-        @accessRequest.apiName
+        @ViewUtils.formatAccessRequestStatus(model.accessRequest.status)
+        @model.accessRequest.apiName
     </p>
 
     <p class="govuk-body additional-message utcDateTime">
-    @ViewUtils.formatLocalDateTimeContainingUtc(accessRequest.requested)
+        @ViewUtils.formatLocalDateTimeContainingUtc(model.accessRequest.requested)
     </p>
 
     <p class="govuk-body additional-message">
         <strong>@messages("accessRequests.headings.requestedBy"):</strong>
-        @accessRequest.requestedBy
+        @model.accessRequest.requestedBy
     </p>
 
     <div class="text-overflow-ellipses">
         <p class="govuk-body additional-message">
             <strong>@messages("accessRequests.headings.supportingInformation"):</strong>
-            @accessRequest.supportingInformation
+            @model.accessRequest.supportingInformation
         </p>
     </div>
 
-    @for(rejectedReason <- accessRequest.decision.flatMap(_.rejectedReason)) {
+    @for(rejectedReason <- model.accessRequest.decision.flatMap(_.rejectedReason)) {
         <div class="text-overflow-ellipses">
             <p class="govuk-body additional-message">
                 <strong>@messages("accessRequests.headings.rejectedReason"):</strong>
@@ -52,11 +52,9 @@
         </div>
     }
 
-    @if(showReviewLink) {
-        <p class="govuk-body-s govuk-!-margin-top-3 govuk-!-margin-bottom-2">
-            <a href="@controllers.admin.routes.AccessRequestController.onPageLoad(accessRequest.id).url" class="govuk-link govuk-link--no-visited-state">
-            @messages("accessRequests.headings.reviewRequest")
-            </a>
-        </p>
-    }
+    <p class="govuk-body-s govuk-!-margin-top-3 govuk-!-margin-bottom-2">
+        <a href="@model.viewCall.url" class="govuk-link govuk-link--no-visited-state">
+            @model.viewMessage
+        </a>
+    </p>
 </div>

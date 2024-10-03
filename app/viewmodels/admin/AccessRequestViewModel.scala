@@ -20,6 +20,8 @@ import models.accessrequest.{AccessRequest, AccessRequestCancelled, AccessReques
 import models.application.{Application, Deleted}
 import models.application.ApplicationLenses.*
 import models.user.UserModel
+import play.api.i18n.Messages
+import play.api.mvc.Call
 
 import java.time.LocalDateTime
 
@@ -61,23 +63,29 @@ case class AccessRequestViewModel(
   applicationDeleted: Option[Deleted],
   teamName: Option[String],
   canDecide: Boolean,
-  canCancel: Boolean
+  canCancel: Boolean,
+  returnCall: Call,
+  returnMessage: String
 )
 
 object AccessRequestViewModel {
 
   private enum ViewType:
-    case Consumer, Admin
+    case Consumer, Admin, DeletedApplication
 
-  def consumerViewModel(application: Application, accessRequest: AccessRequest, user: UserModel): AccessRequestViewModel = {
+  def consumerViewModel(application: Application, accessRequest: AccessRequest, user: UserModel)(implicit messages: Messages): AccessRequestViewModel = {
     apply(application, accessRequest, user, ViewType.Consumer)
   }
 
-  def adminViewModel(application: Application, accessRequest: AccessRequest, user: UserModel): AccessRequestViewModel = {
+  def adminViewModel(application: Application, accessRequest: AccessRequest, user: UserModel)(implicit messages: Messages): AccessRequestViewModel = {
     apply(application, accessRequest, user, ViewType.Admin)
   }
 
-  private def apply(application: Application, accessRequest: AccessRequest, user: UserModel, viewType: ViewType): AccessRequestViewModel = {
+  def deletedApplicationViewModel(application: Application, accessRequest: AccessRequest, user: UserModel)(implicit messages: Messages): AccessRequestViewModel = {
+    apply(application, accessRequest, user, ViewType.DeletedApplication)
+  }
+
+  private def apply(application: Application, accessRequest: AccessRequest, user: UserModel, viewType: ViewType)(implicit messages: Messages): AccessRequestViewModel = {
     AccessRequestViewModel(
       accessRequestId = accessRequest.id,
       apiId = accessRequest.apiId,
@@ -94,18 +102,19 @@ object AccessRequestViewModel {
       applicationDeleted = application.deleted,
       teamName = application.teamName,
       canDecide = canDecide(accessRequest, user, viewType),
-      canCancel = canCancel(application, accessRequest, user, viewType)
+      canCancel = canCancel(application, accessRequest, user, viewType),
+      returnCall = returnCall(application, viewType),
+      returnMessage = returnMessage(viewType)
     )
   }
 
   private def buildDecision(accessRequest: AccessRequest, viewType: ViewType): Option[AccessRequestDecisionViewModel] = {
     accessRequest.decision.map(
       decision =>
-        if (viewType == ViewType.Consumer) {
-          AccessRequestDecisionViewModel.consumerViewModel(decision)
-        }
-        else {
-          AccessRequestDecisionViewModel.adminViewModel(decision)
+        viewType match {
+          case ViewType.Consumer => AccessRequestDecisionViewModel.consumerViewModel(decision)
+          case ViewType.Admin => AccessRequestDecisionViewModel.adminViewModel(decision)
+          case ViewType.DeletedApplication => AccessRequestDecisionViewModel.adminViewModel(decision)
         }
     )
   }
@@ -120,6 +129,25 @@ object AccessRequestViewModel {
     viewType == ViewType.Consumer
       && accessRequest.status == Pending
       && application.isAccessible(user)
+  }
+
+  private def returnCall(application: Application, viewType: ViewType): Call = {
+    viewType match {
+      case ViewType.Consumer =>
+        controllers.application.routes.ApplicationAccessRequestsController.onPageLoad(application.id)
+      case ViewType.Admin =>
+        controllers.admin.routes.AccessRequestsController.onPageLoad()
+      case ViewType.DeletedApplication =>
+        controllers.admin.routes.DeletedApplicationDetailsController.onPageLoad(application.id)
+    }
+  }
+
+  private def returnMessage(viewType: ViewType)(implicit messages: Messages): String = {
+    viewType match {
+      case ViewType.Consumer => Messages("accessRequest.link.backForConsumer")
+      case ViewType.Admin => Messages("accessRequest.link.backForAdmin")
+      case ViewType.DeletedApplication => Messages("accessRequest.link.backForDeletedApplication")
+    }
   }
 
 }

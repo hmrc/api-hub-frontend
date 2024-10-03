@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package controllers.application
+package controllers.admin
 
 import cats.data.EitherT
 import com.google.inject.{Inject, Singleton}
-import controllers.actions.IdentifierAction
+import controllers.actions.{AuthorisedApproverOrSupportAction, IdentifierAction}
 import controllers.helpers.{ErrorResultBuilder, Fetching}
 import forms.admin.ApprovalDecisionFormProvider
 import models.accessrequest.AccessRequest
 import models.application.Application
 import models.requests.IdentifierRequest
 import play.api.i18n.I18nSupport
-import play.api.mvc.*
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.admin.AccessRequestViewModel
@@ -34,27 +34,28 @@ import views.html.admin.AccessRequestView
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class AccessRequestController @Inject()(
+class DeletedApplicationAccessRequestController @Inject()(
   override val controllerComponents: MessagesControllerComponents,
   identify: IdentifierAction,
+  isApproverOrSupport: AuthorisedApproverOrSupportAction,
   override val apiHubService: ApiHubService,
   override val errorResultBuilder: ErrorResultBuilder,
   formProvider: ApprovalDecisionFormProvider,
-  view: AccessRequestView
+  view: AccessRequestView,
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Fetching {
 
   private val form = formProvider()
 
-  def onPageLoad(accessRequestId: String): Action[AnyContent] = identify.async {
+  def onPageLoad(accessRequestId: String): Action[AnyContent] = (identify andThen isApproverOrSupport).async {
     implicit request =>
       (for {
         accessRequest <- EitherT(fetchAccessRequestOrNotFound(accessRequestId))
-        application <- EitherT(fetchApplicationOrNotFound(accessRequest.applicationId))
+        application <- EitherT(fetchApplicationOrNotFound(accessRequest.applicationId, includeDeleted = true))
       } yield buildView(accessRequest, application)).merge
   }
 
   private def buildView(accessRequest: AccessRequest, application: Application)(implicit request: IdentifierRequest[?]): Result = {
-    val model = AccessRequestViewModel.consumerViewModel(application, accessRequest, request.user)
+    val model = AccessRequestViewModel.deletedApplicationViewModel(application, accessRequest, request.user)
     Ok(view(model, form, request.user))
   }
 

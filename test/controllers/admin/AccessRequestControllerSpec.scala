@@ -22,19 +22,19 @@ import controllers.routes
 import forms.admin.ApprovalDecisionFormProvider
 import generators.AccessRequestGenerator
 import models.user.UserModel
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.Application as PlayApplication
 import play.api.data.FormError
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded}
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import play.api.{Application => PlayApplication}
+import play.api.test.Helpers.*
 import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
-import viewmodels.admin.AccessRequestEndpointGroups
+import viewmodels.admin.AccessRequestViewModel
 import viewmodels.admin.Decision.{Approve, Reject}
 import views.html.ErrorTemplate
 import views.html.admin.{AccessRequestApprovedSuccessView, AccessRequestRejectedSuccessView, AccessRequestView}
@@ -61,9 +61,10 @@ class AccessRequestControllerSpec
           implicit val msgs: Messages = messages(fixture.playApplication)
           val result = route(fixture.playApplication, request).value
           val view = fixture.playApplication.injector.instanceOf[AccessRequestView]
+          val model = AccessRequestViewModel.adminViewModel(FakeApplication, accessRequest, user)
 
           status(result) mustBe OK
-          contentAsString(result) mustBe view(accessRequest, FakeApplication, AccessRequestEndpointGroups.group(accessRequest), form, user).toString()
+          contentAsString(result) mustBe view(model, form, user).toString()
           contentAsString(result) must validateAsHtml
 
           verify(fixture.apiHubService).getAccessRequest(eqTo(accessRequest.id))(any())
@@ -195,10 +196,11 @@ class AccessRequestControllerSpec
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[AccessRequestView]
         val formWithErrors = form.bind(Map("decision" -> ""))
+        val model = AccessRequestViewModel.adminViewModel(FakeApplication, accessRequest, FakeApprover)
 
         status(result) mustBe BAD_REQUEST
         contentAsString(result) mustBe
-          view(accessRequest, FakeApplication, AccessRequestEndpointGroups.group(accessRequest), formWithErrors, FakeApprover).toString()
+          view(model, formWithErrors, FakeApprover).toString()
         contentAsString(result) must validateAsHtml
       }
     }
@@ -219,10 +221,11 @@ class AccessRequestControllerSpec
         val view = fixture.playApplication.injector.instanceOf[AccessRequestView]
         val formWithErrors = form.bind(Map("decision" -> Reject.toString, "rejectedReason" -> ""))
           .withError(FormError("rejectedReason", "accessRequest.rejectedReason.required"))
-
+        val model = AccessRequestViewModel.adminViewModel(FakeApplication, accessRequest, FakeApprover)
+        
         status(result) mustBe BAD_REQUEST
         contentAsString(result) mustBe
-          view(accessRequest, FakeApplication, AccessRequestEndpointGroups.group(accessRequest), formWithErrors, FakeApprover).toString()
+          view(model, formWithErrors, FakeApprover).toString()
         contentAsString(result) must validateAsHtml
       }
     }

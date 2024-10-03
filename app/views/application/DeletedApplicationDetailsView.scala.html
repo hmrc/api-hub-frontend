@@ -19,6 +19,7 @@
 @import views.ViewUtils
 @import views.html.components.IconsLink
 @import viewmodels.application.DeletedApplicationNavItems
+@import viewmodels.components.AccessRequestPanelViewModel
 @import models.accessrequest.AccessRequest
 @import views.html.components.AccessRequestPanel
 
@@ -99,7 +100,7 @@
         <h2 class="govuk-heading-m">@messages("applicationDetails.application.history")</h2>
 
         @for(accessRequest <- accessRequests) {
-            @accessRequestPanel(accessRequest, showReviewLink = false)
+            @accessRequestPanel(AccessRequestPanelViewModel.deletedApplicationViewModel(accessRequest))
         }
     }
 

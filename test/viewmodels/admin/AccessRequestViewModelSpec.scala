@@ -1,6 +1,22 @@
+/*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package viewmodels.admin
 
-import controllers.actions.FakeUser
+import controllers.actions.{FakeApprover, FakeUser}
 import models.application.ApplicationLenses.*
 import generators.{AccessRequestGenerator, ApplicationGenerator}
 import models.accessrequest.{Approved, Cancelled, Pending, Rejected}
@@ -8,9 +24,17 @@ import models.user.UserModel
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
+import play.api.i18n.Messages
+import play.api.test.Helpers
 import utils.TestHelpers
 
 class AccessRequestViewModelSpec extends AnyFreeSpec with Matchers with ApplicationGenerator with AccessRequestGenerator with OptionValues with TestHelpers {
+
+  private implicit val messages: Messages = Helpers.stubMessages()
+  private def consumerReturnCall(applicationId: String) = controllers.application.routes.ApplicationAccessRequestsController.onPageLoad(applicationId)
+  private val consumerReturnMessage = "accessRequest.link.backForConsumer"
+  private val adminReturnCall = controllers.admin.routes.AccessRequestsController.onPageLoad()
+  private val adminReturnMessage = "accessRequest.link.backForAdmin"
 
   "consumerViewModel" - {
     "must correctly construct a Pending model when the user is a team member" in {
@@ -36,7 +60,9 @@ class AccessRequestViewModelSpec extends AnyFreeSpec with Matchers with Applicat
           applicationDeleted = application.deleted,
           teamName = application.teamName,
           canDecide = false,
-          canCancel = true
+          canCancel = true,
+          returnCall = consumerReturnCall(application.id),
+          returnMessage = consumerReturnMessage
         )
 
         actual mustBe expected
@@ -66,7 +92,9 @@ class AccessRequestViewModelSpec extends AnyFreeSpec with Matchers with Applicat
           applicationDeleted = application.deleted,
           teamName = application.teamName,
           canDecide = false,
-          canCancel = false
+          canCancel = false,
+          returnCall = consumerReturnCall(application.id),
+          returnMessage = consumerReturnMessage
         )
 
         actual mustBe expected
@@ -102,7 +130,9 @@ class AccessRequestViewModelSpec extends AnyFreeSpec with Matchers with Applicat
           applicationDeleted = application.deleted,
           teamName = application.teamName,
           canDecide = false,
-          canCancel = false
+          canCancel = false,
+          returnCall = consumerReturnCall(application.id),
+          returnMessage = consumerReturnMessage
         )
 
         actual mustBe expected
@@ -138,7 +168,9 @@ class AccessRequestViewModelSpec extends AnyFreeSpec with Matchers with Applicat
           applicationDeleted = application.deleted,
           teamName = application.teamName,
           canDecide = false,
-          canCancel = false
+          canCancel = false,
+          returnCall = consumerReturnCall(application.id),
+          returnMessage = consumerReturnMessage
         )
 
         actual mustBe expected
@@ -168,7 +200,9 @@ class AccessRequestViewModelSpec extends AnyFreeSpec with Matchers with Applicat
           applicationDeleted = application.deleted,
           teamName = application.teamName,
           canDecide = false,
-          canCancel = false
+          canCancel = false,
+          returnCall = consumerReturnCall(application.id),
+          returnMessage = consumerReturnMessage
         )
 
         actual mustBe expected
@@ -200,7 +234,9 @@ class AccessRequestViewModelSpec extends AnyFreeSpec with Matchers with Applicat
           applicationDeleted = application.deleted,
           teamName = application.teamName,
           canDecide = true,
-          canCancel = false
+          canCancel = false,
+          returnCall = adminReturnCall,
+          returnMessage = adminReturnMessage
         )
 
         actual mustBe expected
@@ -230,7 +266,9 @@ class AccessRequestViewModelSpec extends AnyFreeSpec with Matchers with Applicat
           applicationDeleted = application.deleted,
           teamName = application.teamName,
           canDecide = false,
-          canCancel = false
+          canCancel = false,
+          returnCall = adminReturnCall,
+          returnMessage = adminReturnMessage
         )
 
         actual mustBe expected
@@ -266,7 +304,9 @@ class AccessRequestViewModelSpec extends AnyFreeSpec with Matchers with Applicat
           applicationDeleted = application.deleted,
           teamName = application.teamName,
           canDecide = false,
-          canCancel = false
+          canCancel = false,
+          returnCall = adminReturnCall,
+          returnMessage = adminReturnMessage
         )
 
         actual mustBe expected
@@ -302,7 +342,9 @@ class AccessRequestViewModelSpec extends AnyFreeSpec with Matchers with Applicat
           applicationDeleted = application.deleted,
           teamName = application.teamName,
           canDecide = false,
-          canCancel = false
+          canCancel = false,
+          returnCall = adminReturnCall,
+          returnMessage = adminReturnMessage
         )
 
         actual mustBe expected
@@ -332,11 +374,25 @@ class AccessRequestViewModelSpec extends AnyFreeSpec with Matchers with Applicat
           applicationDeleted = application.deleted,
           teamName = application.teamName,
           canDecide = false,
-          canCancel = false
+          canCancel = false,
+          returnCall = adminReturnCall,
+          returnMessage = adminReturnMessage
         )
 
         actual mustBe expected
       }
+    }
+  }
+
+  "deletedApplicationViewModel" - {
+    "must return to the deleted application page" in {
+      val application = sampleApplication()
+      val accessRequest = sampleCancelledAccessRequest()
+
+      val actual = AccessRequestViewModel.deletedApplicationViewModel(application, accessRequest, FakeApprover)
+
+      actual.returnCall mustBe controllers.admin.routes.DeletedApplicationDetailsController.onPageLoad(application.id)
+      actual.returnMessage mustBe "accessRequest.link.backForDeletedApplication"
     }
   }
 
