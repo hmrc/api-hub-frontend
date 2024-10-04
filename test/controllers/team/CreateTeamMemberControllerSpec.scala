@@ -18,6 +18,7 @@ package controllers.team
 
 import base.SpecBase
 import controllers.actions.FakeUser
+import fakes.FakeEmailDomains
 import forms.AddTeamMemberDetailsFormProvider
 import models.UserAnswers
 import models.application.TeamMember
@@ -31,7 +32,7 @@ import pages.CreateTeamMembersPage
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.CreateTeamSessionRepository
 import views.html.AddTeamMemberDetailsView
 
@@ -41,7 +42,7 @@ class CreateTeamMemberControllerSpec extends SpecBase with MockitoSugar {
 
   private def onwardRoute = Call("GET", "/foo")
 
-  private val formProvider = new AddTeamMemberDetailsFormProvider()
+  private val formProvider = new AddTeamMemberDetailsFormProvider(FakeEmailDomains)
   private val form = formProvider()
 
   private lazy val createTeamMemberRoute = controllers.team.routes.CreateTeamMemberController.onPageLoad().url

@@ -35,8 +35,6 @@
             <div class="hip-signin-card">
                 <p class="govuk-body govuk-!-font-weight-bold">@messages("signIn.ldap.heading")</p>
 
-                <p class="govuk-body">@Html(messages("signIn.ldap.instructions", <span class="govuk-!-font-weight-bold">@digital.hmrc.gov.uk</span>))</p>
-
                 <p class="govuk-body-s">@messages("signIn.ldap.guidance")</p>
 
                 <p class="govuk-body">
@@ -50,9 +48,7 @@
             <div class="hip-signin-card">
                 <p class="govuk-body govuk-!-font-weight-bold">@messages("signIn.stride.heading")</p>
 
-                <p class="govuk-body">@Html(messages("signIn.stride.instructions", <span class="govuk-!-font-weight-bold">@hmrc.gov.uk</span>))</p>
-
-                <p class="govuk-body-s">@messages("signIn.stride.guidance")</p>
+                <p class="govuk-body-s">@Html(messages("signIn.stride.guidance", newTabLink(apiHubGuideUrl + "/documentation/what-access-do-i-need.html#what-access-do-i-need", messages("signIn.stride.helpLink"))))</p>
 
                 <p class="govuk-body">
                     @govukButton(
@@ -62,10 +58,6 @@
                     )
                 </p>
 
-                <p class="govuk-body-s">
-                    @messages("signIn.stride.help")
-                    @newTabLink(apiHubGuideUrl + "/documentation/what-access-do-i-need.html#what-access-do-i-need", messages("signIn.stride.helpLink"))
-                </p>
             </div>
         </div>
     </div>

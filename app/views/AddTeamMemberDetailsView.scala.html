@@ -43,7 +43,8 @@
                 label = LabelViewModel(messages("addTeamMemberDetails.email.label")).withCssClass("govuk-label--m")
             )
             .withWidth(Full)
-            .withHint(HintViewModel(messages("addTeamMemberDetails.email.hint")))
+            .withHint(HintViewModel(HtmlContent(
+                messages("addTeamMemberDetails.email.hint", <span class="govuk-!-font-weight-bold">@digital.hmrc.gov.uk</span>, <span class="govuk-!-font-weight-bold">@hmrc.gov.uk</span>))))
         )
 
         @govukButton(

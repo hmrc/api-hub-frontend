@@ -16,7 +16,7 @@
 
 package forms
 
-import forms.AddTeamMemberDetailsFormProvider.hmrcEmailConstraint
+import config.EmailDomains
 import forms.mappings.Mappings
 import models.application.TeamMember
 import play.api.data.Form
@@ -26,7 +26,7 @@ import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
 
 import javax.inject.Inject
 
-class AddTeamMemberDetailsFormProvider @Inject() extends Mappings {
+class AddTeamMemberDetailsFormProvider @Inject()(emailDomains: EmailDomains) extends Mappings {
 
   def apply(): Form[TeamMember] =
     Form(
@@ -36,24 +36,21 @@ class AddTeamMemberDetailsFormProvider @Inject() extends Mappings {
             firstError(
               nonEmpty,
               emailAddress(errorMessage = "addTeamMemberDetails.email.invalid"),
-              hmrcEmailConstraint
+              emailConstraint
             )
           )
       )(email => TeamMember(email.trim.toLowerCase))(o => Some(o.email))
     )
 
-}
-
-object AddTeamMemberDetailsFormProvider {
-
-  val hmrcEmailConstraint: Constraint[String] = Constraint("hmrcEmailConstraint")({
+  private val emailConstraint = Constraint[String]("hmrcEmailConstraint")({
     email =>
-      if (email.trim.toLowerCase.endsWith("@hmrc.gov.uk") || email.trim.toLowerCase.endsWith("@digital.hmrc.gov.uk")) {
+      if (emailDomains.emailAddressHasValidDomain(email)) {
         Valid
       }
       else {
         Invalid(Seq(ValidationError("addTeamMemberDetails.email.invalid")))
       }
   })
-
 }
+
+

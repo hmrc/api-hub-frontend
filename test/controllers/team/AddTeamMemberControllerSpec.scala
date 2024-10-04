@@ -18,12 +18,13 @@ package controllers.team
 
 import base.SpecBase
 import controllers.actions.{FakeUser, FakeUserNotTeamMember}
+import fakes.FakeEmailDomains
 import forms.AddTeamMemberDetailsFormProvider
 import models.application.TeamMember
 import models.team.Team
-import models.team.TeamLenses._
+import models.team.TeamLenses.*
 import models.user.UserModel
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.OptionValues
@@ -31,8 +32,8 @@ import play.api.data.FormError
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import play.api.{Application => PlayApplication}
+import play.api.test.Helpers.*
+import play.api.Application as PlayApplication
 import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
 import views.html.AddTeamMemberDetailsView
@@ -196,7 +197,7 @@ class AddTeamMemberControllerSpec
 
 object AddTeamMemberControllerSpec extends OptionValues {
 
-  private val formProvider = new AddTeamMemberDetailsFormProvider()
+  private val formProvider = new AddTeamMemberDetailsFormProvider(FakeEmailDomains)
   private val form = formProvider()
 
   private val teamId = "test-team-id"

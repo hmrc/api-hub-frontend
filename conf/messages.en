@@ -259,19 +259,16 @@ addTeamMemberDetails.email.invalid = Please enter a valid email address
 addTeamMemberDetails.email.duplicateInApplication = This email address has already been added to this application
 addTeamMemberDetails.email.duplicateInTeam = This email address has already been added to this team
 addTeamMemberDetails.email.label = Enter your team member''s email address
-addTeamMemberDetails.email.hint = Email address should be valid and either a @digital.hmrc.gov.uk or a @hmrc.gov.uk address
+addTeamMemberDetails.email.hint = Email address should be valid for use on the Integration Hub, for example a {0} or a {1} address
 addTeamMemberDetails.change.hidden = Add team member details
 addTeamMemberDetails.notFound = Cannot find this team member.
 
 signIn.title = Sign-in
-signIn.ldap.heading = Sign in via LDAP
-signIn.ldap.instructions = Use your {0} email to sign in.
-signIn.ldap.guidance = Digital users will be taken to a sign in screen and be asked to enter their email and password to access the Integration Hub.
-signIn.stride.heading = Sign in via STRIDE
-signIn.stride.instructions = Use your {0} email to sign in.
-signIn.stride.guidance = If you are on a corporate device you will automatically be signed in and taken to The Integration Hub.
-signIn.stride.help = To sign in via STRIDE you will need the "The API Hub user" role assigned in the Service Request System.
-signIn.stride.helpLink = Find out how to self-serve the role
+signIn.ldap.heading = Sign in via Digital LDAP
+signIn.ldap.guidance = Digital/MDTP users will be taken to a sign in screen and be asked to enter their Digital/MDTP username and password to access the Integration Hub.
+signIn.stride.heading = Sign in via STRIDE/CORPORATE
+signIn.stride.guidance = You will need the "API Hub Prod user" role assigned in the Service Request System. Find out how to {0}.
+signIn.stride.helpLink = self-serve the role
 
 testConnectivity.heading = Test Connectivity
 testConnectivity.title = Test Connectivity

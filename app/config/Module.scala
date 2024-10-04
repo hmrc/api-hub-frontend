@@ -46,7 +46,8 @@ class Module extends play.api.inject.Module {
       bindz[Encrypter & Decrypter].toProvider[CryptoProvider],
       bindz[Domains].to(classOf[DomainsImpl]).eagerly(),
       bindz[Hods].to(classOf[HodsImpl]).eagerly(),
-      bindz[Platforms].to(classOf[PlatformsImpl]).eagerly()
+      bindz[Platforms].to(classOf[PlatformsImpl]).eagerly(),
+      bindz[EmailDomains].to(classOf[EmailDomainsImpl]).eagerly()
     )
 
     val authTokenInitialiserBindings: Seq[Binding[?]] = if (configuration.get[Boolean]("create-internal-auth-token-on-start")) {
