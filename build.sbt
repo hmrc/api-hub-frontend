@@ -10,7 +10,7 @@ lazy val jsTest = taskKey[Unit]("jsTest")
 lazy val jsHint = taskKey[Unit]("jsHint")
 
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := "3.4.2"
+ThisBuild / scalaVersion := "3.5.0"
 Compile / javaOptions += "-Xmx2G"
 
 lazy val root = (project in file("."))
@@ -49,7 +49,7 @@ lazy val root = (project in file("."))
     ScoverageKeys.coverageHighlighting := true,
     scalacOptions ++= Seq(
       "-feature",
-      "-Wconf:cat=deprecation:ws,cat=feature:ws,cat=optimizer:ws,src=target/.*:s"
+      "-Wconf:msg=deprecation:w,msg=feature:w,msg=optimizer:w,src=target/.*:s"
     ),
     libraryDependencies ++= AppDependencies(),
     retrieveManaged := true,
@@ -82,6 +82,7 @@ lazy val root = (project in file("."))
     },
   )
   .settings(scalacOptions := scalacOptions.value.diff(Seq("-Wunused:all")))
+  .settings(scalacOptions += "-Wconf:msg=Flag.*repeatedly:s")
 
 lazy val it = (project in file("it"))
   .enablePlugins(PlayScala)
@@ -89,6 +90,7 @@ lazy val it = (project in file("it"))
   .settings(DefaultBuildSettings.itSettings())
   .settings(libraryDependencies ++= AppDependencies.it)
   .settings(scalacOptions := scalacOptions.value.diff(Seq("-Wunused:all")))
+  .settings(scalacOptions += "-Wconf:msg=Flag.*repeatedly:s")
 
 lazy val testSettings: Seq[Def.Setting[?]] = Seq(
   fork := true,
