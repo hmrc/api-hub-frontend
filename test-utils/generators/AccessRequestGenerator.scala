@@ -171,6 +171,10 @@ trait AccessRequestGenerator {
   def sampleAccessRequest(): AccessRequest =
     genAccessRequest.pureApply(parameters, Seed.random())
 
+  def sampleAccessRequest(applicationId: String): AccessRequest =
+    genAccessRequest.pureApply(parameters, Seed.random())
+      .copy(applicationId = applicationId)
+
   def sampleAccessRequests(): Seq[AccessRequest] =
     genAccessRequests.pureApply(parameters, Seed.random())
 

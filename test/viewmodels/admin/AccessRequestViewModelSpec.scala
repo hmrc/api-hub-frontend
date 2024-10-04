@@ -16,10 +16,10 @@
 
 package viewmodels.admin
 
-import controllers.actions.{FakeApprover, FakeUser}
-import models.application.ApplicationLenses.*
+import controllers.actions.FakeUser
 import generators.{AccessRequestGenerator, ApplicationGenerator}
-import models.accessrequest.{Approved, Cancelled, Pending, Rejected}
+import models.accessrequest.Pending
+import models.application.ApplicationLenses.*
 import models.user.UserModel
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
@@ -30,11 +30,7 @@ import utils.TestHelpers
 
 class AccessRequestViewModelSpec extends AnyFreeSpec with Matchers with ApplicationGenerator with AccessRequestGenerator with OptionValues with TestHelpers {
 
-  private implicit val messages: Messages = Helpers.stubMessages()
-  private def consumerReturnCall(applicationId: String) = controllers.application.routes.ApplicationAccessRequestsController.onPageLoad(applicationId)
-  private val consumerReturnMessage = "accessRequest.link.backForConsumer"
-  private val adminReturnCall = controllers.admin.routes.AccessRequestsController.onPageLoad()
-  private val adminReturnMessage = "accessRequest.link.backForAdmin"
+  import AccessRequestViewModelSpec.*
 
   "consumerViewModel" - {
     "must correctly construct a Pending model when the user is a team member" in {
@@ -69,317 +65,210 @@ class AccessRequestViewModelSpec extends AnyFreeSpec with Matchers with Applicat
       }
     }
 
-    "must correctly construct a Pending model when the user is not a team member" in {
+    "must not allow non team members to cancel a pending access request" in {
       forAll(nonTeamMembersOrSupport) { (user: UserModel) =>
         val application = sampleApplication().removeTeamMember(user)
         val accessRequest = samplePendingAccessRequest()
 
         val actual = AccessRequestViewModel.consumerViewModel(application, accessRequest, user)
 
-        val expected = AccessRequestViewModel(
-          accessRequestId = accessRequest.id,
-          apiId = accessRequest.apiId,
-          apiName = accessRequest.apiName,
-          requested = accessRequest.requested,
-          requestedBy = accessRequest.requestedBy,
-          status = Pending,
-          supportingInformation = accessRequest.supportingInformation,
-          endpointGroups = AccessRequestEndpointGroups.group(accessRequest),
-          decision = None,
-          cancelled = None,
-          applicationId = application.id,
-          applicationName = application.name,
-          applicationDeleted = application.deleted,
-          teamName = application.teamName,
-          canDecide = false,
-          canCancel = false,
-          returnCall = consumerReturnCall(application.id),
-          returnMessage = consumerReturnMessage
-        )
-
-        actual mustBe expected
+        actual.canCancel mustBe false
       }
     }
 
-    "must correctly construct an Approved model" in {
+    "must not allow any user to approve/reject a pending access request" in {
+      forAll(allUsers) { (user: UserModel) =>
+        val application = sampleApplication().addTeamMember(FakeUser.email)
+        val accessRequest = samplePendingAccessRequest()
+
+        val actual = AccessRequestViewModel.consumerViewModel(application, accessRequest, user)
+
+        actual.canDecide mustBe false
+      }
+    }
+
+    "must not allow any user to approve/reject/cancel an approved access request" in {
       forAll(allUsers) { (user: UserModel) =>
         val application = sampleApplication().addTeamMember(FakeUser.email)
         val accessRequest = sampleApprovedAccessRequest()
 
         val actual = AccessRequestViewModel.consumerViewModel(application, accessRequest, user)
 
-        val expected = AccessRequestViewModel(
-          accessRequestId = accessRequest.id,
-          apiId = accessRequest.apiId,
-          apiName = accessRequest.apiName,
-          requested = accessRequest.requested,
-          requestedBy = accessRequest.requestedBy,
-          status = Approved,
-          supportingInformation = accessRequest.supportingInformation,
-          endpointGroups = AccessRequestEndpointGroups.group(accessRequest),
-          decision = Some(
-            AccessRequestDecisionViewModel(
-              accessRequest.decision.value.decided,
-              None,
-              None
-            )
-          ),
-          cancelled = None,
-          applicationId = application.id,
-          applicationName = application.name,
-          applicationDeleted = application.deleted,
-          teamName = application.teamName,
-          canDecide = false,
-          canCancel = false,
-          returnCall = consumerReturnCall(application.id),
-          returnMessage = consumerReturnMessage
-        )
-
-        actual mustBe expected
+        actual.canDecide mustBe false
+        actual.canCancel mustBe false
       }
     }
 
-    "must correctly construct a Rejected model" in {
+    "must correctly construct the approved decision model for a non-admin, hiding approved by" in {
+      forAll(usersWhoCannotViewApprovals) { (user: UserModel) =>
+        val application = sampleApplication().addTeamMember(FakeUser.email)
+        val accessRequest = sampleApprovedAccessRequest()
+
+        val actual = AccessRequestViewModel.consumerViewModel(application, accessRequest, user)
+
+        val expected = AccessRequestDecisionViewModel(
+          decided = accessRequest.decision.value.decided,
+          decidedBy = None,
+          rejectedReason = None
+        )
+
+        actual.decision.value mustBe expected
+      }
+    }
+
+    "must correctly construct the approved decision attributes for an admin, showing approved by" in {
+      forAll(usersWhoCanViewApprovals) { (user: UserModel) =>
+        val application = sampleApplication().addTeamMember(FakeUser.email)
+        val accessRequest = sampleApprovedAccessRequest()
+
+        val actual = AccessRequestViewModel.consumerViewModel(application, accessRequest, user)
+
+        val expected = AccessRequestDecisionViewModel(
+          decided = accessRequest.decision.value.decided,
+          decidedBy = Some(accessRequest.decision.value.decidedBy),
+          rejectedReason = None
+        )
+
+        actual.decision.value mustBe expected
+      }
+    }
+
+    "must not allow any user to approve/reject/cancel a rejected access request" in {
       forAll(allUsers) { (user: UserModel) =>
         val application = sampleApplication().addTeamMember(FakeUser.email)
         val accessRequest = sampleRejectedAccessRequest()
 
         val actual = AccessRequestViewModel.consumerViewModel(application, accessRequest, user)
 
-        val expected = AccessRequestViewModel(
-          accessRequestId = accessRequest.id,
-          apiId = accessRequest.apiId,
-          apiName = accessRequest.apiName,
-          requested = accessRequest.requested,
-          requestedBy = accessRequest.requestedBy,
-          status = Rejected,
-          supportingInformation = accessRequest.supportingInformation,
-          endpointGroups = AccessRequestEndpointGroups.group(accessRequest),
-          decision = Some(
-            AccessRequestDecisionViewModel(
-              accessRequest.decision.value.decided,
-              None,
-              accessRequest.decision.value.rejectedReason
-            )
-          ),
-          cancelled = None,
-          applicationId = application.id,
-          applicationName = application.name,
-          applicationDeleted = application.deleted,
-          teamName = application.teamName,
-          canDecide = false,
-          canCancel = false,
-          returnCall = consumerReturnCall(application.id),
-          returnMessage = consumerReturnMessage
-        )
-
-        actual mustBe expected
+        actual.canDecide mustBe false
+        actual.canCancel mustBe false
       }
     }
 
-    "must correctly construct a Cancelled model" in {
+    "must correctly construct the rejected decision attributes for a user, hiding approved by" in {
+      forAll(usersWhoCannotViewApprovals) { (user: UserModel) =>
+        val application = sampleApplication().addTeamMember(FakeUser.email)
+        val accessRequest = sampleRejectedAccessRequest()
+
+        val actual = AccessRequestViewModel.consumerViewModel(application, accessRequest, user)
+
+        val expected = AccessRequestDecisionViewModel(
+          decided = accessRequest.decision.value.decided,
+          decidedBy = None,
+          rejectedReason = accessRequest.decision.value.rejectedReason
+        )
+
+        actual.decision.value mustBe expected
+      }
+    }
+
+    "must correctly construct the rejected decision attributes for an admin, showing approved by" in {
+      forAll(usersWhoCanViewApprovals) { (user: UserModel) =>
+        val application = sampleApplication().addTeamMember(FakeUser.email)
+        val accessRequest = sampleRejectedAccessRequest()
+
+        val actual = AccessRequestViewModel.consumerViewModel(application, accessRequest, user)
+
+        val expected = AccessRequestDecisionViewModel(
+          decided = accessRequest.decision.value.decided,
+          decidedBy = Some(accessRequest.decision.value.decidedBy),
+          rejectedReason = accessRequest.decision.value.rejectedReason
+        )
+
+        actual.decision.value mustBe expected
+      }
+    }
+
+    "must not allow any user to approve/reject/cancel a cancelled access request" in {
       forAll(allUsers) { (user: UserModel) =>
         val application = sampleApplication().addTeamMember(FakeUser.email)
         val accessRequest = sampleCancelledAccessRequest()
 
         val actual = AccessRequestViewModel.consumerViewModel(application, accessRequest, user)
 
-        val expected = AccessRequestViewModel(
-          accessRequestId = accessRequest.id,
-          apiId = accessRequest.apiId,
-          apiName = accessRequest.apiName,
-          requested = accessRequest.requested,
-          requestedBy = accessRequest.requestedBy,
-          status = Cancelled,
-          supportingInformation = accessRequest.supportingInformation,
-          endpointGroups = AccessRequestEndpointGroups.group(accessRequest),
-          decision = None,
-          cancelled = accessRequest.cancelled,
-          applicationId = application.id,
-          applicationName = application.name,
-          applicationDeleted = application.deleted,
-          teamName = application.teamName,
-          canDecide = false,
-          canCancel = false,
-          returnCall = consumerReturnCall(application.id),
-          returnMessage = consumerReturnMessage
-        )
-
-        actual mustBe expected
+        actual.canCancel mustBe false
+        actual.canDecide mustBe false
       }
     }
   }
 
   "adminViewModel" - {
-    "must correctly construct a Pending model when the user is an approver" in {
-      forAll(usersWhoCanApprove) {(user: UserModel) =>
-        val application = sampleApplication().addTeamMember(FakeUser)
+    "must return to the admin view" in {
+      val application = sampleApplication()
+      val accessRequest = sampleAccessRequest()
+
+      val actual = AccessRequestViewModel.adminViewModel(application, accessRequest, FakeUser)
+
+      actual.returnCall mustBe adminReturnCall
+      actual.returnMessage mustBe adminReturnMessage
+    }
+
+    "must allow an approver to approve/reject a pending access request" in {
+      forAll(usersWhoCanApprove) { (user: UserModel) =>
+        val application = sampleApplication().addTeamMember(FakeUser.email)
         val accessRequest = samplePendingAccessRequest()
 
         val actual = AccessRequestViewModel.adminViewModel(application, accessRequest, user)
 
-        val expected = AccessRequestViewModel(
-          accessRequestId = accessRequest.id,
-          apiId = accessRequest.apiId,
-          apiName = accessRequest.apiName,
-          requested = accessRequest.requested,
-          requestedBy = accessRequest.requestedBy,
-          status = Pending,
-          supportingInformation = accessRequest.supportingInformation,
-          endpointGroups = AccessRequestEndpointGroups.group(accessRequest),
-          decision = None,
-          cancelled = None,
-          applicationId = application.id,
-          applicationName = application.name,
-          applicationDeleted = application.deleted,
-          teamName = application.teamName,
-          canDecide = true,
-          canCancel = false,
-          returnCall = adminReturnCall,
-          returnMessage = adminReturnMessage
-        )
-
-        actual mustBe expected
+        actual.canDecide mustBe true
       }
     }
 
-    "must correctly construct a Pending model when the user is not an approver" in {
-      forAll(usersWhoCannotApprove) {(user: UserModel) =>
-        val application = sampleApplication().addTeamMember(FakeUser)
+    "must not allow a non-approver to approve/reject a pending access request" in {
+      forAll(usersWhoCannotApprove) { (user: UserModel) =>
+        val application = sampleApplication().addTeamMember(FakeUser.email)
         val accessRequest = samplePendingAccessRequest()
 
         val actual = AccessRequestViewModel.adminViewModel(application, accessRequest, user)
 
-        val expected = AccessRequestViewModel(
-          accessRequestId = accessRequest.id,
-          apiId = accessRequest.apiId,
-          apiName = accessRequest.apiName,
-          requested = accessRequest.requested,
-          requestedBy = accessRequest.requestedBy,
-          status = Pending,
-          supportingInformation = accessRequest.supportingInformation,
-          endpointGroups = AccessRequestEndpointGroups.group(accessRequest),
-          decision = None,
-          cancelled = None,
-          applicationId = application.id,
-          applicationName = application.name,
-          applicationDeleted = application.deleted,
-          teamName = application.teamName,
-          canDecide = false,
-          canCancel = false,
-          returnCall = adminReturnCall,
-          returnMessage = adminReturnMessage
-        )
-
-        actual mustBe expected
+        actual.canDecide mustBe false
       }
     }
 
-    "must correctly construct an Approved model" in {
+    "must not allow any user to cancel a pending access request" in {
+      forAll(allUsers) { (user: UserModel) =>
+        val application = sampleApplication().addTeamMember(FakeUser.email)
+        val accessRequest = samplePendingAccessRequest()
+
+        val actual = AccessRequestViewModel.adminViewModel(application, accessRequest, user)
+
+        actual.canCancel mustBe false
+      }
+    }
+
+    "must not allow any user to approve/reject/cancel an approved access request" in {
       forAll(allUsers) { (user: UserModel) =>
         val application = sampleApplication().addTeamMember(FakeUser.email)
         val accessRequest = sampleApprovedAccessRequest()
 
         val actual = AccessRequestViewModel.adminViewModel(application, accessRequest, user)
 
-        val expected = AccessRequestViewModel(
-          accessRequestId = accessRequest.id,
-          apiId = accessRequest.apiId,
-          apiName = accessRequest.apiName,
-          requested = accessRequest.requested,
-          requestedBy = accessRequest.requestedBy,
-          status = Approved,
-          supportingInformation = accessRequest.supportingInformation,
-          endpointGroups = AccessRequestEndpointGroups.group(accessRequest),
-          decision = Some(
-            AccessRequestDecisionViewModel(
-              accessRequest.decision.value.decided,
-              Some(accessRequest.decision.value.decidedBy),
-              None
-            )
-          ),
-          cancelled = None,
-          applicationId = application.id,
-          applicationName = application.name,
-          applicationDeleted = application.deleted,
-          teamName = application.teamName,
-          canDecide = false,
-          canCancel = false,
-          returnCall = adminReturnCall,
-          returnMessage = adminReturnMessage
-        )
-
-        actual mustBe expected
+        actual.canDecide mustBe false
+        actual.canCancel mustBe false
       }
     }
 
-    "must correctly construct a Rejected model" in {
+    "must not allow any user to approve/reject/cancel a rejected access request" in {
       forAll(allUsers) { (user: UserModel) =>
         val application = sampleApplication().addTeamMember(FakeUser.email)
         val accessRequest = sampleRejectedAccessRequest()
 
         val actual = AccessRequestViewModel.adminViewModel(application, accessRequest, user)
 
-        val expected = AccessRequestViewModel(
-          accessRequestId = accessRequest.id,
-          apiId = accessRequest.apiId,
-          apiName = accessRequest.apiName,
-          requested = accessRequest.requested,
-          requestedBy = accessRequest.requestedBy,
-          status = Rejected,
-          supportingInformation = accessRequest.supportingInformation,
-          endpointGroups = AccessRequestEndpointGroups.group(accessRequest),
-          decision = Some(
-            AccessRequestDecisionViewModel(
-              accessRequest.decision.value.decided,
-              Some(accessRequest.decision.value.decidedBy),
-              accessRequest.decision.value.rejectedReason
-            )
-          ),
-          cancelled = None,
-          applicationId = application.id,
-          applicationName = application.name,
-          applicationDeleted = application.deleted,
-          teamName = application.teamName,
-          canDecide = false,
-          canCancel = false,
-          returnCall = adminReturnCall,
-          returnMessage = adminReturnMessage
-        )
-
-        actual mustBe expected
+        actual.canDecide mustBe false
+        actual.canCancel mustBe false
       }
     }
 
-    "must correctly construct a Cancelled model" in {
+    "must not allow any user to approve/reject/cancel a cancelled access request" in {
       forAll(allUsers) { (user: UserModel) =>
         val application = sampleApplication().addTeamMember(FakeUser.email)
         val accessRequest = sampleCancelledAccessRequest()
 
         val actual = AccessRequestViewModel.adminViewModel(application, accessRequest, user)
 
-        val expected = AccessRequestViewModel(
-          accessRequestId = accessRequest.id,
-          apiId = accessRequest.apiId,
-          apiName = accessRequest.apiName,
-          requested = accessRequest.requested,
-          requestedBy = accessRequest.requestedBy,
-          status = Cancelled,
-          supportingInformation = accessRequest.supportingInformation,
-          endpointGroups = AccessRequestEndpointGroups.group(accessRequest),
-          decision = None,
-          cancelled = accessRequest.cancelled,
-          applicationId = application.id,
-          applicationName = application.name,
-          applicationDeleted = application.deleted,
-          teamName = application.teamName,
-          canDecide = false,
-          canCancel = false,
-          returnCall = adminReturnCall,
-          returnMessage = adminReturnMessage
-        )
-
-        actual mustBe expected
+        actual.canDecide mustBe false
+        actual.canCancel mustBe false
       }
     }
   }
@@ -387,13 +276,76 @@ class AccessRequestViewModelSpec extends AnyFreeSpec with Matchers with Applicat
   "deletedApplicationViewModel" - {
     "must return to the deleted application page" in {
       val application = sampleApplication()
-      val accessRequest = sampleCancelledAccessRequest()
+      val accessRequest = sampleAccessRequest()
 
-      val actual = AccessRequestViewModel.deletedApplicationViewModel(application, accessRequest, FakeApprover)
+      val actual = AccessRequestViewModel.deletedApplicationViewModel(application, accessRequest, FakeUser)
 
-      actual.returnCall mustBe controllers.admin.routes.DeletedApplicationDetailsController.onPageLoad(application.id)
-      actual.returnMessage mustBe "accessRequest.link.backForDeletedApplication"
+      actual.returnCall mustBe deletedApplicationCall(application.id)
+      actual.returnMessage mustBe deletedApplicationMessage
+    }
+
+    "must not allow any user to approve/reject/cancel a pending access request" in {
+      forAll(allUsers) { (user: UserModel) =>
+        val application = sampleApplication().addTeamMember(FakeUser.email)
+        val accessRequest = samplePendingAccessRequest()
+
+        val actual = AccessRequestViewModel.deletedApplicationViewModel(application, accessRequest, user)
+
+        actual.canDecide mustBe false
+        actual.canCancel mustBe false
+      }
+    }
+
+    "must not allow any user to approve/reject/cancel an approved access request" in {
+      forAll(allUsers) { (user: UserModel) =>
+        val application = sampleApplication().addTeamMember(FakeUser.email)
+        val accessRequest = sampleApprovedAccessRequest()
+
+        val actual = AccessRequestViewModel.deletedApplicationViewModel(application, accessRequest, user)
+
+        actual.canDecide mustBe false
+        actual.canCancel mustBe false
+      }
+    }
+
+    "must not allow any user to approve/reject/cancel a rejected access request" in {
+      forAll(allUsers) { (user: UserModel) =>
+        val application = sampleApplication().addTeamMember(FakeUser.email)
+        val accessRequest = sampleRejectedAccessRequest()
+
+        val actual = AccessRequestViewModel.deletedApplicationViewModel(application, accessRequest, user)
+
+        actual.canDecide mustBe false
+        actual.canCancel mustBe false
+      }
+    }
+
+    "must not allow any user to approve/reject/cancel a cancelled access request" in {
+      forAll(allUsers) { (user: UserModel) =>
+        val application = sampleApplication().addTeamMember(FakeUser.email)
+        val accessRequest = sampleCancelledAccessRequest()
+
+        val actual = AccessRequestViewModel.deletedApplicationViewModel(application, accessRequest, user)
+
+        actual.canDecide mustBe false
+        actual.canCancel mustBe false
+      }
     }
   }
+
+}
+
+object AccessRequestViewModelSpec {
+
+  private implicit val messages: Messages = Helpers.stubMessages()
+
+  private def consumerReturnCall(applicationId: String) = controllers.application.routes.ApplicationAccessRequestsController.onPageLoad(applicationId)
+  private val consumerReturnMessage = "accessRequest.link.backForConsumer"
+
+  private val adminReturnCall = controllers.admin.routes.AccessRequestsController.onPageLoad()
+  private val adminReturnMessage = "accessRequest.link.backForAdmin"
+
+  private def deletedApplicationCall(applicationId: String) = controllers.admin.routes.DeletedApplicationDetailsController.onPageLoad(applicationId)
+  private val deletedApplicationMessage = "accessRequest.link.backForDeletedApplication"
 
 }

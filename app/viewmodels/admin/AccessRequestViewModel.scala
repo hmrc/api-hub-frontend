@@ -95,7 +95,7 @@ object AccessRequestViewModel {
       status = accessRequest.status,
       supportingInformation = accessRequest.supportingInformation,
       endpointGroups = AccessRequestEndpointGroups.group(accessRequest),
-      decision = buildDecision(accessRequest, viewType),
+      decision = buildDecision(accessRequest, user),
       cancelled = accessRequest.cancelled,
       applicationId = application.id,
       applicationName = application.name,
@@ -108,13 +108,14 @@ object AccessRequestViewModel {
     )
   }
 
-  private def buildDecision(accessRequest: AccessRequest, viewType: ViewType): Option[AccessRequestDecisionViewModel] = {
+  private def buildDecision(accessRequest: AccessRequest, user: UserModel): Option[AccessRequestDecisionViewModel] = {
     accessRequest.decision.map(
       decision =>
-        viewType match {
-          case ViewType.Consumer => AccessRequestDecisionViewModel.consumerViewModel(decision)
-          case ViewType.Admin => AccessRequestDecisionViewModel.adminViewModel(decision)
-          case ViewType.DeletedApplication => AccessRequestDecisionViewModel.adminViewModel(decision)
+        if (user.permissions.canApprove || user.permissions.canSupport) {
+          AccessRequestDecisionViewModel.adminViewModel(decision)
+        }
+        else {
+          AccessRequestDecisionViewModel.consumerViewModel(decision)
         }
     )
   }

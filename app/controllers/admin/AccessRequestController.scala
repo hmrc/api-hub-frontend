@@ -16,13 +16,14 @@
 
 package controllers.admin
 
+import cats.data.EitherT
 import com.google.inject.{Inject, Singleton}
 import controllers.actions.{AuthorisedApproverAction, AuthorisedApproverOrSupportAction, IdentifierAction}
-import controllers.helpers.ErrorResultBuilder
+import controllers.helpers.{ErrorResultBuilder, Fetching}
 import forms.admin.ApprovalDecisionFormProvider
 import models.requests.IdentifierRequest
 import play.api.data.{Form, FormError}
-import play.api.i18n.{I18nSupport, Messages}
+import play.api.i18n.I18nSupport
 import play.api.mvc.*
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -38,13 +39,13 @@ class AccessRequestController @Inject()(
   identify: IdentifierAction,
   isApproverOrSupport: AuthorisedApproverOrSupportAction,
   isApprover: AuthorisedApproverAction,
-  apiHubService: ApiHubService,
-  errorResultBuilder: ErrorResultBuilder,
+  override val apiHubService: ApiHubService,
+  override val errorResultBuilder: ErrorResultBuilder,
   formProvider: ApprovalDecisionFormProvider,
   view: AccessRequestView,
   approvedSuccessView: AccessRequestApprovedSuccessView,
   rejectedSuccessView: AccessRequestRejectedSuccessView
-)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Fetching {
 
   private val form = formProvider()
 
@@ -68,44 +69,27 @@ class AccessRequestController @Inject()(
   }
 
   private def buildView(id: String, status: Int, form: Form[ApprovalDecision])(implicit request: IdentifierRequest[AnyContent]): Future[Result] = {
-    apiHubService.getAccessRequest(id).flatMap {
-      case Some(accessRequest) =>
-        apiHubService.getApplication(accessRequest.applicationId, enrich = false, includeDeleted = true).map {
-          case Some(application) =>
-            val model = AccessRequestViewModel.adminViewModel(application, accessRequest, request.user)
-            Status(status)(view(model, form, request.user))
-          case _ => applicationNotFound(accessRequest.applicationId)
-        }
-      case None => Future.successful(accessRequestNotFound(id))
-    }
+    (for{
+      accessRequest <- EitherT(fetchAccessRequestOrNotFound(id))
+      application <- EitherT(fetchApplicationOrNotFound(accessRequest.applicationId, includeDeleted = true))
+    } yield {
+      val model = AccessRequestViewModel.adminViewModel(application, accessRequest, request.user)
+      Status(status)(view(model, form, request.user))
+    }).merge
   }
 
   private def approve(id: String)(implicit request: IdentifierRequest[AnyContent]): Future[Result] = {
     apiHubService.approveAccessRequest(id, request.user.email).map {
       case Some(_) => Ok(approvedSuccessView(request.user))
-      case _ => accessRequestNotFound(id)
+      case _ => errorResultBuilder.accessRequestNotFound(id)
     }
   }
 
   private def reject(id: String, rejectedReason: String)(implicit request: IdentifierRequest[AnyContent]): Future[Result] = {
     apiHubService.rejectAccessRequest(id, request.user.email, rejectedReason.trim).map {
       case Some(_) => Ok(rejectedSuccessView(request.user))
-      case _ => accessRequestNotFound(id)
+      case _ => errorResultBuilder.accessRequestNotFound(id)
     }
-  }
-
-  private def accessRequestNotFound(accessRequestId: String)(implicit request: Request[?]): Result = {
-    errorResultBuilder.notFound(
-      heading = Messages("site.accessRequestNotFound.heading"),
-      message = Messages("site.accessRequestNotFound.message", accessRequestId)
-    )
-  }
-
-  private def applicationNotFound(applicationId: String)(implicit request: Request[?]): Result = {
-    errorResultBuilder.notFound(
-      heading = Messages("site.applicationNotFoundHeading"),
-      message = Messages("site.applicationNotFoundMessage", applicationId)
-    )
   }
 
 }
