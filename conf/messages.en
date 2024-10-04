@@ -268,7 +268,7 @@ signIn.ldap.heading = Sign in via Digital LDAP
 signIn.ldap.guidance = Digital/MDTP users will be taken to a sign in screen and be asked to enter their Digital/MDTP username and password to access the Integration Hub.
 signIn.stride.heading = Sign in via STRIDE/CORPORATE
 signIn.stride.guidance = You will need the "API Hub Prod user" role assigned in the Service Request System. Find out how to {0}.
-signIn.stride.helpLink = self-serve the role (opens in new tab)
+signIn.stride.helpLink = self-serve the role
 
 testConnectivity.heading = Test Connectivity
 testConnectivity.title = Test Connectivity
