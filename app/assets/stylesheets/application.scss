@@ -646,6 +646,34 @@ header {
     }
 }
 
+.hip-summary-list--wide-values {
+    .govuk-summary-list__row {
+        display: flex;
+        flex-direction: row;
+        gap: govuk-spacing(3);
+    }
+    .govuk-summary-list__key {
+        flex: 0 0 15%;
+    }
+    .govuk-summary-list__value {
+        flex: 1 1 75%;
+        li {
+            display: flex;
+            align-items: center;
+        }
+        code {
+            margin-top: 0 ! important;
+        }
+    }
+    .govuk-summary-list__actions {
+        flex: 0 1 10%;
+    }
+    .govuk-list--bullet {
+        list-style-type: none;
+        padding-left: 0;
+    }
+}
+
 .govuk-summary-list {
     &.no-table-layout {
         table-layout: unset;
