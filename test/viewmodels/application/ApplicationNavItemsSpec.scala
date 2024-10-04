@@ -17,16 +17,16 @@
 package viewmodels.application
 
 import base.SpecBase
-import controllers.actions.{FakeApplication, FakeSupporter, FakeUser}
-import models.application.ApplicationLenses._
+import controllers.actions.{FakeApplication, FakeSupporter}
+import models.application.ApplicationLenses.*
 import models.user.UserModel
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import utils.TestHelpers
 import viewmodels.SideNavItem
-import viewmodels.application.ApplicationSideNavPages._
+import viewmodels.application.ApplicationSideNavPages.*
 
 class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers with TableDrivenPropertyChecks {
 
@@ -142,21 +142,6 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
 
           val actual = ApplicationNavItems(Some(user), FakeApplication.setTeamId("test-team-id"), DetailsPage)
             .filter(_.page.equals(ViewAsJsonApplicationPage))
-
-          actual mustBe empty
-        }
-      }
-    }
-
-    "must not display the Application history item for non-support users" in {
-      forAll(usersWhoCannotSupport) { (user: UserModel) =>
-        val playApplication = applicationBuilder(None).build()
-
-        running(playApplication) {
-          implicit val implicitMessages: Messages = messages(playApplication)
-
-          val actual = ApplicationNavItems(Some(FakeUser), FakeApplication.setTeamId("test-team-id"), DetailsPage)
-            .filter(_.page.equals(ApplicationHistoryPage))
 
           actual mustBe empty
         }

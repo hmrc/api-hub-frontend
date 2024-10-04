@@ -184,9 +184,18 @@ object ApplicationLenses {
         applicationTeamMembers.get(application) :+ TeamMember(email)
       )
 
+    def addTeamMember(user: UserModel): Application =
+      addTeamMember(user.email)
+
     def setTeamMembers(teamMembers: Seq[TeamMember]): Application = {
       applicationTeamMembers.set(application, teamMembers)
     }
+
+    def removeTeamMember(user: UserModel): Application =
+      applicationTeamMembers.set(
+        application,
+        applicationTeamMembers.get(application).filterNot(_.email.toLowerCase.equals(user.email.toLowerCase))
+      )
 
     def withSortedTeam(): Application =
       applicationTeamMembers.set(

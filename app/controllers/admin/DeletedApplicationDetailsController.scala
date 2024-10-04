@@ -22,7 +22,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc._
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.application.DeletedApplicationDetailsView
+import views.html.admin.DeletedApplicationDetailsView
 
 import scala.concurrent.ExecutionContext
 

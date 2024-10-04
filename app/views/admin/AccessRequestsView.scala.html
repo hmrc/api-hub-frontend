@@ -17,6 +17,7 @@
 @import models.accessrequest._
 @import models.user.UserModel
 @import viewmodels.admin.{AdminNavItems, AdminSideNavPages}
+@import viewmodels.components.AccessRequestPanelViewModel
 @import views.html.components.AccessRequestPanel
 @import views.html.helper.CSPNonce
 @import views.html.components.Paginator
@@ -74,7 +75,7 @@
 
         <div id="accessRequestList">
         @for(accessRequest <- accessRequests) {
-            @accessRequestPanel(accessRequest, showReviewLink = true)
+            @accessRequestPanel(AccessRequestPanelViewModel.adminViewModel(accessRequest))
         }
         </div>
 

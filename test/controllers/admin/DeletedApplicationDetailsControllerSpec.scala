@@ -32,7 +32,7 @@ import play.api.{Application => PlayApplication}
 import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
 import views.html.ErrorTemplate
-import views.html.application.DeletedApplicationDetailsView
+import views.html.admin.DeletedApplicationDetailsView
 
 import java.time.LocalDateTime
 import scala.concurrent.Future

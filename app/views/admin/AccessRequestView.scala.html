@@ -1,5 +1,5 @@
 @*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,14 @@
  * limitations under the License.
  *@
 
-@import models.application.Application
-@import models.accessrequest._
 @import models.user.UserModel
-@import viewmodels.admin.AccessRequestEndpointGroup
+@import viewmodels.admin.AccessRequestViewModel
 @import viewmodels.admin.Decision.{Approve, Reject}
 @import views.ViewUtils
 
 @this(
     layout: templates.Layout,
+    govukSummaryList : GovukSummaryList,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukButton : GovukButton,
@@ -30,147 +29,137 @@
     govukTextarea : GovukTextarea
 )
 
-@(accessRequest: AccessRequest, application: Application, endpointGroups: Seq[AccessRequestEndpointGroup], form: Form[?], user: UserModel)(implicit request: Request[?], messages: Messages)
-
-@canApprove() = @{
-    accessRequest.status == Pending && user.permissions.canApprove
-}
+@(model: AccessRequestViewModel, form: Form[?], user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @accessRequestDetail() = {
-    <h1 class="govuk-heading-l govuk-!-margin-bottom-7">
-        @messages("accessRequest.heading")
-    </h1>
 
     <h2 class="govuk-heading-m">
         @messages("accessRequest.applicationDetails")
     </h2>
 
-    <dl class="govuk-summary-list">
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">
-                @messages("accessRequest.headings.applicationName")
-            </dt>
-            <dd class="govuk-summary-list__value">
-                @application.name
-                @for(deleted <- application.deleted){
-                    <strong
-                        class="govuk-body govuk-!-margin-left-2 govuk-tag govuk-tag--grey"
-                        title="@{s"Deleted by ${deleted.deletedBy} at ${deleted.deleted}"}"
-                    >
-                            @{messages("site.deleted").toUpperCase}
-                    </strong>
-                }
-            </dd>
-        </div>
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">
-                @messages("accessRequest.headings.status")
-            </dt>
-            <dd class="govuk-summary-list__value">
-                @ViewUtils.formatAccessRequestStatus(accessRequest.status)
-            </dd>
-        </div>
+    @govukSummaryList(
+        SummaryList(
+            rows = Seq(
+                Some(SummaryListRow(
+                    key = Key(messages("accessRequest.headings.applicationName")),
+                    value = Value(HtmlContent(applicationNameValue()))
+                )),
+                Some(SummaryListRow(
+                    key = Key(messages("accessRequest.headings.applicationId")),
+                    value = Value(Text(model.applicationId))
+                )),
+                Some(SummaryListRow(
+                    key = Key(messages("accessRequest.headings.apiName")),
+                    value = Value(Text(model.apiName))
+                )),
+                Some(SummaryListRow(
+                    key = Key(messages("accessRequest.headings.status")),
+                    value = Value(HtmlContent(ViewUtils.formatAccessRequestStatus(model.status)))
+                )),
+                Some(SummaryListRow(
+                    key = Key(messages("accessRequest.headings.requestedOn")),
+                    value = Value(Text(ViewUtils.formatLocalDateTimeContainingUtc(model.requested)))
+                )),
+                Some(SummaryListRow(
+                    key = Key(messages("accessRequest.headings.requestedBy")),
+                    value = Value(Text(model.requestedBy))
+                )),
+                model.teamName.map(teamName =>
+                    SummaryListRow(
+                        key = Key(messages("accessRequest.headings.requestingTeam")),
+                        value = Value(Text(teamName))
+                    )
+                ),
+                model.decision.map(decision =>
+                    SummaryListRow(
+                        key = Key(messages("accessRequest.headings.decided")),
+                        value = Value(Text(ViewUtils.formatLocalDateTimeContainingUtc(decision.decided)))
+                    )
+                ),
+                model.decision.flatMap(decision =>
+                    decision.decidedBy.map(decidedBy =>
+                        SummaryListRow(
+                            key = Key(messages("accessRequest.headings.decidedBy")),
+                            value = Value(Text(decidedBy))
+                        )
+                    )
+                ),
+                model.decision.flatMap(decision =>
+                    decision.rejectedReason.map(rejectedReason =>
+                        SummaryListRow(
+                            key = Key(messages("accessRequest.headings.rejectedReason")),
+                            value = Value(Text(rejectedReason))
+                        )
+                    )
+                ),
+                model.cancelled.map(cancelled =>
+                    SummaryListRow(
+                        key = Key(messages("accessRequest.headings.cancelled")),
+                        value = Value(Text(ViewUtils.formatLocalDateTimeContainingUtc(cancelled.cancelled)))
+                    )
+                ),
+                model.cancelled.map(cancelled =>
+                    SummaryListRow(
+                        key = Key(messages("accessRequest.headings.cancelledBy")),
+                        value = Value(Text(cancelled.cancelledBy))
+                    )
+                ),
+                Some(SummaryListRow(
+                    key = Key(messages("accessRequest.headings.endpoints")),
+                    value = Value(HtmlContent(endpointGroupsValue()))
+                )),
+                Some(SummaryListRow(
+                    key = Key(messages("accessRequest.headings.supportingInformation")),
+                    value = Value(Text(model.supportingInformation))
+                ))
+            ).flatten
+        )
+    )
 
-        @for(decision <- accessRequest.decision) {
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                    @messages("accessRequest.headings.decided")
-                </dt>
-                <dd class="govuk-summary-list__value utcDateLong">
-                    @ViewUtils.formatLocalDateTimeContainingUtc(decision.decided)
-                </dd>
-            </div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                    @messages("accessRequest.headings.decidedBy")
-                </dt>
-                <dd class="govuk-summary-list__value">
-                    @decision.decidedBy
-                </dd>
-            </div>
+}
 
-            @for(rejectedReason <- decision.rejectedReason) {
-                <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">
-                        @messages("accessRequest.headings.rejectedReason")
-                    </dt>
-                    <dd class="govuk-summary-list__value">
-                        @rejectedReason
-                    </dd>
-                </div>
+@applicationNameValue() = {
+    @model.applicationName
+    @for(deleted <- model.applicationDeleted){
+        <strong
+            class="govuk-body govuk-!-margin-left-2 govuk-tag govuk-tag--grey"
+            title='@{s"Deleted by ${deleted.deletedBy} at ${deleted.deleted}"}'
+        >
+            @{messages("site.deleted").toUpperCase}
+        </strong>
+    }
+}
+
+@endpointGroupsValue() = {
+    <ul class="govuk-list govuk-!-padding-left-4">
+        @for(endpointGroup <- model.endpointGroups) {
+            @if(endpointGroup.index > 0) {
+                <li>
+                    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+                </li>
             }
-        }
+            <li>
+                @for(endpoint <- endpointGroup.endpoints) {
+                    <p class="govuk-body govuk-!-margin-bottom-2 ">
+                        <strong class="govuk-tag govuk-tag--blue ">
+                            @endpoint.httpMethod
+                        </strong>
+                        <strong>@endpoint.path</strong>
+                    </p>
+                }
 
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">
-                @messages("accessRequest.headings.apiName")
-            </dt>
-            <dd class="govuk-summary-list__value">
-                @accessRequest.apiName
-            </dd>
-        </div>
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">
-                @messages("accessRequest.headings.applicationId")
-            </dt>
-            <dd class="govuk-summary-list__value">
-                @application.id
-            </dd>
-        </div>
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">
-                @messages("accessRequest.headings.requestedBy")
-            </dt>
-            <dd class="govuk-summary-list__value">
-                @accessRequest.requestedBy
-            </dd>
-        </div>
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">
-                @messages("accessRequest.headings.endpoints")
-            </dt>
-            <dd class="govuk-summary-list__value">
-                <ul class="govuk-list govuk-!-padding-left-4">
-                    @for(endpointGroup <- endpointGroups) {
-                        @if(endpointGroup.index > 0) {
-                            <li>
-                                <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-                            </li>
-                        }
+                <p class="govuk-body govuk-!-font-size-16 govuk-!-margin-top-3 govuk-!-margin-bottom-1">@messages("accessRequest.endpoints.scopes"):</p>
+
+                <ul class="govuk-list govuk-list-inline scopes-list">
+                    @for(scope <- endpointGroup.scopes) {
                         <li>
-                            @for(endpoint <- endpointGroup.endpoints) {
-                                <p class="govuk-body govuk-!-margin-bottom-2 ">
-                                    <strong class="govuk-tag govuk-tag--blue ">
-                                        @endpoint.httpMethod
-                                    </strong>
-                                    <strong>@endpoint.path</strong>
-                                </p>
-                            }
-
-                            <p class="govuk-body govuk-!-font-size-16 govuk-!-margin-top-3 govuk-!-margin-bottom-1">@messages("accessRequest.endpoints.scopes"):</p>
-
-                            <ul class="govuk-list govuk-list-inline scopes-list">
-                                @for(scope <- endpointGroup.scopes) {
-                                    <li>
-                                        <strong class="hip-tag--scope govuk-!-margin-bottom-2">@scope</strong>
-                                    </li>
-                                }
-                            </ul>
+                            <strong class="hip-tag--scope govuk-!-margin-bottom-2">@scope</strong>
                         </li>
                     }
                 </ul>
-            </dd>
-        </div>
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">
-                @messages("accessRequest.headings.supportingInformation")
-            </dt>
-            <dd class="govuk-summary-list__value">
-                @accessRequest.supportingInformation
-            </dd>
-        </div>
-    </dl>
-
+            </li>
+        }
+    </ul>
 }
 
 @layout(
@@ -179,8 +168,13 @@
     activeLink = Some("apiHubAdmin"),
     fullWidth = true
 ) {
-    @if(canApprove()) {
-        @formHelper(action = controllers.admin.routes.AccessRequestController.onSubmit(accessRequest.id), Symbol("autoComplete") -> "off") {
+
+    <h1 class="govuk-heading-l govuk-!-margin-bottom-7">
+        @messages("accessRequest.heading")
+    </h1>
+
+    @if(model.canDecide) {
+        @formHelper(action = controllers.admin.routes.AccessRequestController.onSubmit(model.accessRequestId), Symbol("autoComplete") -> "off") {
             @if(form.errors.nonEmpty) {
                 @govukErrorSummary(ErrorSummaryViewModel(form))
             }
@@ -220,23 +214,29 @@
             )
 
             <div class="govuk-button-group">
-                @govukButton(Button(
-                content = Text(messages("site.continue"))
-                ))
-                @govukButton(Button(
-                classes = "govuk-button--secondary",
-                content = Text(messages("site.cancel")),
-                href = Some(controllers.admin.routes.AccessRequestsController.onPageLoad().url)
-                ))
+                @govukButton(
+                    Button(
+                        content = Text(messages("site.continue"))
+                    ).withId("continueButton")
+                )
+                @govukButton(
+                    Button(
+                        classes = "govuk-button--secondary",
+                        content = Text(messages("site.cancel")),
+                        href = Some(controllers.admin.routes.AccessRequestsController.onPageLoad().url)
+                    ).withId("cancelButton")
+                )
             </div>
         }
     } else {
         @accessRequestDetail()
 
-        @govukButton(Button(
-            content = Text(messages("accessRequest.link.backToApprovalList")),
-            href = Some(controllers.admin.routes.AccessRequestsController.onPageLoad().url)
-        ))
+        @govukButton(
+            Button(
+                content = Text(model.returnMessage),
+                href = Some(model.returnCall.url)
+            ).withId("returnButton")
+        )
     }
 
 }

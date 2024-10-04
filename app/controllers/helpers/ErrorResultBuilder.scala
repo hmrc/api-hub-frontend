@@ -103,6 +103,13 @@ class ErrorResultBuilder @Inject()(
     apiNotFoundInApplication(apiDetail.title, application)
   }
 
+  def accessRequestNotFound(id: String)(implicit request: Request[?]): Result = {
+    notFound(
+      Messages("site.accessRequestNotFound.heading"),
+      Messages("site.accessRequestNotFound.message", id)
+    )
+  }
+
   def teamNotFound(teamId: String)(implicit request: Request[?]): Result = {
     notFound(
       Messages("site.teamNotFoundHeading"),

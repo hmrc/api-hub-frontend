@@ -18,6 +18,7 @@
 @import models.user.UserModel
 @import views.html.components.AccessRequestPanel
 @import viewmodels.application.ApplicationNavItems
+@import viewmodels.components.AccessRequestPanelViewModel
 @import models.application.Application
 @import views.html.components.ApplicationDetailsTable
 @import viewmodels.application.ApplicationSideNavPages
@@ -58,7 +59,7 @@
         </p>
 
         @for(accessRequest <- accessRequests) {
-            @accessRequestPanel(accessRequest, showReviewLink = false)
+            @accessRequestPanel(AccessRequestPanelViewModel.consumerViewModel(accessRequest))
         }
     }
 
