@@ -20,6 +20,7 @@ import com.google.inject.{Inject, Singleton}
 import controllers.actions.StrideAuthenticator.{API_HUB_APPROVER_ROLE, API_HUB_PRIVILEGED_USER_ROLE, API_HUB_SUPPORT_ROLE, API_HUB_USER_ROLE}
 import models.user.{Permissions, StrideUser, UserModel}
 import play.api.mvc.Request
+import services.MetricsService
 import uk.gov.hmrc.auth.core.AuthProvider.PrivilegedApplication
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.retrieve.~
@@ -31,7 +32,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class StrideAuthenticator @Inject()(
-  override val authConnector: AuthConnector
+  override val authConnector: AuthConnector,
+  metricsService: MetricsService
 )(implicit ec: ExecutionContext) extends Authenticator with AuthorisedFunctions with FrontendHeaderCarrierProvider {
 
   def authenticate()(implicit request: Request[?]): Future[UserAuthResult] = {
@@ -61,6 +63,7 @@ class StrideAuthenticator @Inject()(
             case (_, None) =>
               Future.failed(new UnauthorizedException("Unable to retrieve Stride provider Id"))
             case (_, Some(providerId)) =>
+              metricsService.strideMissingEmail()
               Future.successful(UserMissingEmail(buildUserId(providerId), StrideUser))
           }
       }.recover {
