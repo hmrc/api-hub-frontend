@@ -19,6 +19,8 @@
 @import viewmodels.admin.Decision.{Approve, Reject}
 @import views.ViewUtils
 
+@import java.time.LocalDateTime
+
 @this(
     layout: templates.Layout,
     govukSummaryList : GovukSummaryList,
@@ -58,7 +60,7 @@
                 )),
                 Some(SummaryListRow(
                     key = Key(messages("accessRequest.headings.requestedOn")),
-                    value = Value(Text(ViewUtils.formatLocalDateTimeContainingUtc(model.requested)))
+                    value = Value(HtmlContent(dateTimeValue(model.requested)))
                 )),
                 Some(SummaryListRow(
                     key = Key(messages("accessRequest.headings.requestedBy")),
@@ -73,7 +75,7 @@
                 model.decision.map(decision =>
                     SummaryListRow(
                         key = Key(messages("accessRequest.headings.decided")),
-                        value = Value(Text(ViewUtils.formatLocalDateTimeContainingUtc(decision.decided)))
+                        value = Value(HtmlContent(dateValue(decision.decided)))
                     )
                 ),
                 model.decision.flatMap(decision =>
@@ -95,7 +97,7 @@
                 model.cancelled.map(cancelled =>
                     SummaryListRow(
                         key = Key(messages("accessRequest.headings.cancelled")),
-                        value = Value(Text(ViewUtils.formatLocalDateTimeContainingUtc(cancelled.cancelled)))
+                        value = Value(HtmlContent(dateTimeValue(cancelled.cancelled)))
                     )
                 ),
                 model.cancelled.map(cancelled =>
@@ -160,6 +162,14 @@
             </li>
         }
     </ul>
+}
+
+@dateTimeValue(dateTime: LocalDateTime) = {
+    <span class="utcDateTime">@ViewUtils.formatLocalDateTimeContainingUtc(dateTime)</span>
+}
+
+@dateValue(dateTime: LocalDateTime) = {
+    <span class="utcDateLong">@ViewUtils.formatLocalDateTimeContainingUtc(dateTime)</span>
 }
 
 @layout(
