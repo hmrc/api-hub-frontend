@@ -23,7 +23,7 @@ import models.accessrequest.{AccessRequest, Pending}
 import models.application.*
 import models.application.ApplicationLenses.ApplicationLensOps
 import models.user.UserModel
-import models.{Mode, NormalMode, RequestProductionAccessDeclaration, UserAnswers}
+import models.{CheckMode, RequestProductionAccessDeclaration, UserAnswers}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.OptionValues
@@ -35,7 +35,7 @@ import play.api.Application as PlayApplication
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import repositories.{AccessRequestSessionRepository, CancelAccessRequestSessionRepository}
+import repositories.CancelAccessRequestSessionRepository
 import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
 import viewmodels.application.*
@@ -117,7 +117,7 @@ class CancelAccessRequestEndJourneyControllerSpec extends SpecBase with MockitoS
             val result = route(fixture.application, request).value
 
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result) mustBe Some(controllers.application.cancelaccessrequest.routes.CancelAccessRequestConfirmController.onPageLoad(NormalMode).url)
+            redirectLocation(result) mustBe Some(controllers.application.cancelaccessrequest.routes.CancelAccessRequestConfirmController.onPageLoad(CheckMode).url)
           }
       }
     }

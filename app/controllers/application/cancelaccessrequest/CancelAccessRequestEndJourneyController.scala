@@ -16,24 +16,21 @@
 
 package controllers.application.cancelaccessrequest
 
-import com.google.inject.{Inject, Singleton}
-import controllers.actions.{AccessRequestDataRetrievalAction, CancelAccessRequestDataRetrievalAction, DataRequiredAction, IdentifierAction}
+import com.google.inject.Inject
+import controllers.actions.{CancelAccessRequestDataRetrievalAction, DataRequiredAction, IdentifierAction}
 import controllers.helpers.ErrorResultBuilder
-import models.accessrequest.{AccessRequest, AccessRequestApi, AccessRequestEndpoint, AccessRequestRequest}
+import models.accessrequest.AccessRequest
 import models.application.Application
 import models.requests.DataRequest
 import models.user.UserModel
-import models.{CheckMode, NormalMode, UserAnswers}
-import pages.application.accessrequest.*
+import models.{CheckMode, UserAnswers}
 import pages.application.cancelaccessrequest.{CancelAccessRequestApplicationPage, CancelAccessRequestConfirmPage, CancelAccessRequestPendingPage, CancelAccessRequestSelectApiPage}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.*
-import repositories.{AccessRequestSessionRepository, CancelAccessRequestSessionRepository}
+import repositories.CancelAccessRequestSessionRepository
 import services.ApiHubService
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.application.{ApplicationApi, Inaccessible}
-import views.html.application.accessrequest.RequestProductionAccessSuccessView
 import views.html.application.cancelaccessrequest.CancelAccessRequestSuccessView
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -101,14 +98,14 @@ class CancelAccessRequestEndJourneyController @Inject()(
   private def validateApis(userAnswers: UserAnswers): Either[Call, Set[String]] = {
     userAnswers.get(CancelAccessRequestSelectApiPage) match {
       case Some(applicationApis) => Right(applicationApis)
-      case None => Left(controllers.routes.JourneyRecoveryController.onPageLoad())
+      case None => Left(controllers.application.cancelaccessrequest.routes.CancelAccessRequestSelectApiController.onPageLoad(CheckMode))
     }
   }
 
   private def validateDeclaration(userAnswers: UserAnswers): Either[Call, Unit] = {
     userAnswers.get(CancelAccessRequestConfirmPage) match {
       case Some(_) => Right(())
-      case None => Left(controllers.application.cancelaccessrequest.routes.CancelAccessRequestConfirmController.onPageLoad(NormalMode))
+      case None => Left(controllers.application.cancelaccessrequest.routes.CancelAccessRequestConfirmController.onPageLoad(CheckMode))
     }
   }
 
