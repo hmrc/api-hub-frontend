@@ -53,7 +53,6 @@ class CancelAccessRequestEndJourneyController @Inject()(
 
   def submitRequest(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-
       validate(request).fold(
         call => Future.successful(Redirect(call)),
         data => {
@@ -69,9 +68,7 @@ class CancelAccessRequestEndJourneyController @Inject()(
   }
 
   private def cancelAccessRequests(data: CancelAccessRequestEndJourneyController.Data, user: UserModel)(implicit hc:HeaderCarrier): Future[Seq[Option[Unit]]] = {
-
-    val eventualMaybeUnits1 = Future.sequence(getCancellableRequests(data).map(request => apiHubService.cancelAccessRequest(request.id, user.email)))
-    eventualMaybeUnits1
+    Future.sequence(getCancellableRequests(data).map(request => apiHubService.cancelAccessRequest(request.id, user.email)))
   }
 
   private def getCancellableRequests(data: CancelAccessRequestEndJourneyController.Data) = {
