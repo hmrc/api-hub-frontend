@@ -584,6 +584,47 @@ class ApplicationsConnectorSpec
     }
   }
 
+  "ApplicationsConnector.cancelAccessRequest" - {
+    "must place the correct request" in {
+      val id = "test-id"
+      val cancelRequest = AccessRequestCancelRequest(cancelledBy = "test-cancelled-by")
+
+      stubFor(
+        put(urlEqualTo(s"/api-hub-applications/access-requests/$id/cancel"))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .withHeader(CONTENT_TYPE, equalTo(ContentTypes.JSON))
+          .withRequestBody(equalToJson(Json.toJson(cancelRequest).toString()))
+          .willReturn(
+            aResponse()
+              .withStatus(NO_CONTENT)
+          )
+      )
+
+      buildConnector(this).cancelAccessRequest(id, cancelRequest.cancelledBy)(HeaderCarrier()).map(
+        result =>
+          result mustBe Some(())
+      )
+    }
+
+    "must return None when the access request does not exist" in {
+      val id = "test-id"
+      val cancelRequest = AccessRequestCancelRequest(cancelledBy = "test-cancelled-by")
+
+      stubFor(
+        put(urlEqualTo(s"/api-hub-applications/access-requests/$id/cancel"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+          )
+      )
+
+      buildConnector(this).cancelAccessRequest(id, cancelRequest.cancelledBy)(HeaderCarrier()).map(
+        result =>
+          result mustBe None
+      )
+    }
+  }
+  
   "ApplicationsConnector.rejectAccessRequest" - {
     "must place the correct request" in {
       val id = "test-id"

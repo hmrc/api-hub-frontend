@@ -513,6 +513,23 @@ class ApiHubServiceSpec
     }
   }
 
+  "cancelAccessRequest" - {
+    "must make the correct request to the applications connector and return the response" in {
+      val fixture = buildFixture()
+      val id = "test-id"
+      val cancelledBy = "test-cancelled-by"
+
+      when(fixture.applicationsConnector.cancelAccessRequest(any(), any())(any())).thenReturn(Future.successful(Some(())))
+
+      fixture.service.cancelAccessRequest(id, cancelledBy)(HeaderCarrier()).map {
+        result =>
+          verify(fixture.applicationsConnector).cancelAccessRequest(eqTo(id), eqTo(cancelledBy))(any())
+          result mustBe Some(())
+      }
+    }
+  }
+
+
   "rejectAccessRequest" - {
     "must make the correct request to the applications connector and return the response" in {
       val fixture = buildFixture()

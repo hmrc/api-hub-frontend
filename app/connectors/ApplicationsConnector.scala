@@ -19,7 +19,7 @@ package connectors
 import com.google.inject.{Inject, Singleton}
 import config.FrontendAppConfig
 import models.UserEmail
-import models.accessrequest.{AccessRequest, AccessRequestDecisionRequest, AccessRequestRequest, AccessRequestStatus}
+import models.accessrequest.{AccessRequest, AccessRequestCancelRequest, AccessRequestDecisionRequest, AccessRequestRequest, AccessRequestStatus}
 import models.api.ApiDeploymentStatuses
 import models.application.*
 import models.deployment.*
@@ -279,6 +279,21 @@ class ApplicationsConnector @Inject()(
       .setHeader((CONTENT_TYPE, JSON))
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .withBody(Json.toJson(decisionRequest))
+      .execute[Either[UpstreamErrorResponse, Unit]]
+      .flatMap {
+        case Right(()) => Future.successful(Some(()))
+        case Left(e) if e.statusCode == NOT_FOUND => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
+  }
+
+  def cancelAccessRequest(id: String, cancelledBy: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    val cancelRequest = AccessRequestCancelRequest(cancelledBy)
+
+    httpClient.put(url"$applicationsBaseUrl/api-hub-applications/access-requests/$id/cancel")
+      .setHeader((CONTENT_TYPE, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .withBody(Json.toJson(cancelRequest))
       .execute[Either[UpstreamErrorResponse, Unit]]
       .flatMap {
         case Right(()) => Future.successful(Some(()))
