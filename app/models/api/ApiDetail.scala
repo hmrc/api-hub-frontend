@@ -18,6 +18,7 @@ package models.api
 
 import models.{Enumerable, WithName}
 import play.api.libs.json._
+import utils.EnumFormat
 
 import java.time.{Instant, ZoneOffset}
 import java.time.format.DateTimeFormatter
@@ -38,6 +39,9 @@ object ApiStatus extends Enumerable.Implicits {
 
 }
 
+enum ApiType derives EnumFormat:
+  case SIMPLE, ADVANCED
+
 case class ApiDetail(
   id: String,
   publisherReference: String,
@@ -54,7 +58,8 @@ case class ApiDetail(
   hods: Seq[String] = List.empty,
   reviewedDate: Instant,
   platform: String,
-  maintainer: Maintainer
+  maintainer: Maintainer,
+  apiType: Option[ApiType] = None,
 ) {
   def isSelfServe: Boolean = platform == "HIP"
 }

@@ -69,6 +69,7 @@ trait ApiDetailGenerators {
       platform <- sensiblySizedAlphaNumStr
       maintainerName <- sensiblySizedAlphaNumStr
       maintainerSlack <- sensiblySizedAlphaNumStr
+      apiType <- Gen.oneOf(ApiType.values.toIndexedSeq)
     } yield ApiDetail(
       id.toString,
       publisherReference,
@@ -84,7 +85,8 @@ trait ApiDetailGenerators {
       hods = hods,
       reviewedDate = reviewedDate,
       platform = platform,
-      maintainer = Maintainer(maintainerName, s"#$maintainerSlack", List.empty)
+      maintainer = Maintainer(maintainerName, s"#$maintainerSlack", List.empty),
+      apiType = Some(apiType)
     )
   }
 
