@@ -18,7 +18,6 @@ package models.api
 
 import models.{Enumerable, WithName}
 import play.api.libs.json._
-import utils.EnumFormat
 
 import java.time.{Instant, ZoneOffset}
 import java.time.format.DateTimeFormatter
@@ -39,8 +38,18 @@ object ApiStatus extends Enumerable.Implicits {
 
 }
 
-enum ApiType derives EnumFormat:
-  case SIMPLE, ADVANCED
+sealed trait ApiType
+
+case object SIMPLE extends WithName("SIMPLE") with ApiType
+case object ADVANCED extends WithName("ADVANCED") with ApiType
+
+object ApiType extends Enumerable.Implicits {
+
+  val values: Seq[ApiType] = Seq(SIMPLE, ADVANCED)
+
+  implicit val enumerable: Enumerable[ApiType] =
+    Enumerable(values.map(value => value.toString -> value)*)
+}
 
 case class ApiDetail(
   id: String,
