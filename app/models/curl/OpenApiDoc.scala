@@ -39,7 +39,6 @@ class OpenApiDoc(openApi: OpenAPI) {
     apiWorld match {
       case MDTP => servers.find(s => Option(s.getDescription).contains("MDTP - QA"))
       case CORPORATE => servers.find(s => Option(s.getDescription).contains("Corporate - Test"))
-      case _ => None
     }
   }
 
