@@ -32,9 +32,9 @@ class MetricsService @Inject()(metricRegistry: MetricRegistry) {
 
 }
 
-private object MetricsService {
+object MetricsService {
 
-  private object MetricsKeys {
+  object MetricsKeys {
 
     object Authentication {
 
