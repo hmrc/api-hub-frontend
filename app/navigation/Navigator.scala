@@ -21,7 +21,7 @@ import models.*
 import models.myapis.produce.ProduceApiHowToCreate.{Editor, Upload}
 import pages.*
 import pages.application.accessrequest.{ProvideSupportingInformationPage, RequestProductionAccessPage, RequestProductionAccessSelectApisPage, RequestProductionAccessStartPage}
-import pages.application.cancelaccessrequest.CancelAccessRequestStartPage
+import pages.application.cancelaccessrequest.{CancelAccessRequestConfirmPage, CancelAccessRequestSelectApiPage, CancelAccessRequestStartPage}
 import pages.application.register.{RegisterApplicationNamePage, RegisterApplicationStartPage, RegisterApplicationTeamPage}
 import pages.myapis.produce.{ProduceApiBeforeYouStartPage, ProduceApiHowToCreatePage, ProduceApiStartPage}
 import play.api.mvc.Call
@@ -51,6 +51,8 @@ class Navigator @Inject()() {
     case ProduceApiBeforeYouStartPage => _ => controllers.myapis.produce.routes.ProduceApiHowToCreateController.onPageLoad(NormalMode)
     case ProduceApiHowToCreatePage => produceApiHowToCreateNextPage(NormalMode)
     case CancelAccessRequestStartPage => _ => controllers.application.cancelaccessrequest.routes.CancelAccessRequestSelectApiController.onPageLoad(NormalMode)
+    case CancelAccessRequestSelectApiPage => _ => controllers.application.cancelaccessrequest.routes.CancelAccessRequestConfirmController.onPageLoad(NormalMode)
+    case CancelAccessRequestConfirmPage => cancelAccessRequestConfirmNextPage(NormalMode)
     case _ => _ => routes.IndexController.onPageLoad
   }
 
@@ -100,6 +102,14 @@ class Navigator @Inject()() {
   private def apiPolicyConditionsDeclarationNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
     (mode, userAnswers.get(AddAnApiContextPage)) match {
       case (_, Some(context)) => routes.AddAnApiCheckYourAnswersController.onPageLoad(context)
+      case _ => routes.JourneyRecoveryController.onPageLoad()
+    }
+  }
+
+  private def cancelAccessRequestConfirmNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
+    (mode, userAnswers.get(CancelAccessRequestConfirmPage)) match {
+      case (_, Some(true)) => controllers.application.cancelaccessrequest.routes.CancelAccessRequestEndJourneyController.submitRequest()
+      case (_, Some(false)) => routes.IndexController.onPageLoad
       case _ => routes.JourneyRecoveryController.onPageLoad()
     }
   }

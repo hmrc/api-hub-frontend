@@ -49,7 +49,7 @@ class CancelAccessRequestEndJourneyController @Inject()(
   import CancelAccessRequestEndJourneyController.*
 
   def submitRequest(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+    implicit request => {
       validate(request).fold(
         call => Future.successful(Redirect(call)),
         data => {
@@ -62,6 +62,7 @@ class CancelAccessRequestEndJourneyController @Inject()(
             }
         }
       )
+    }
   }
 
   private def cancelAccessRequests(data: CancelAccessRequestEndJourneyController.Data, user: UserModel)(implicit hc:HeaderCarrier): Future[Seq[Option[Unit]]] = {

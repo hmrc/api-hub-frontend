@@ -29,8 +29,8 @@ class CancelAccessRequestSelectApiFormProvider @Inject() extends Mappings {
   def apply(accessRequests: Seq[AccessRequest]): Form[Set[String]] = {
     given enumerableAccessRequests: Enumerable[String] = (str: String) => {
       accessRequests
-        .find(_.id == str)
-        .map(_.id)
+        .find(_.apiId == str)
+        .map(_.apiId)
     }
 
     Form(
