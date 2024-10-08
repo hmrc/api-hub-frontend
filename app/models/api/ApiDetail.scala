@@ -38,6 +38,19 @@ object ApiStatus extends Enumerable.Implicits {
 
 }
 
+sealed trait ApiType
+
+case object SIMPLE extends WithName("SIMPLE") with ApiType
+case object ADVANCED extends WithName("ADVANCED") with ApiType
+
+object ApiType extends Enumerable.Implicits {
+
+  val values: Seq[ApiType] = Seq(SIMPLE, ADVANCED)
+
+  implicit val enumerable: Enumerable[ApiType] =
+    Enumerable(values.map(value => value.toString -> value)*)
+}
+
 case class ApiDetail(
   id: String,
   publisherReference: String,
@@ -54,7 +67,8 @@ case class ApiDetail(
   hods: Seq[String] = List.empty,
   reviewedDate: Instant,
   platform: String,
-  maintainer: Maintainer
+  maintainer: Maintainer,
+  apiType: Option[ApiType] = None,
 ) {
   def isSelfServe: Boolean = platform == "HIP"
 }
