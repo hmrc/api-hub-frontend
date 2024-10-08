@@ -164,6 +164,7 @@ object CancelAccessRequestEndJourneyControllerSpec extends OptionValues{
     "abc",
     LocalDateTime.now(clock),
     "me",
+    None,
     None)
 
 
