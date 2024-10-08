@@ -119,6 +119,10 @@ class ApiHubService @Inject()(
     applicationsConnector.approveAccessRequest(id, decidedBy)
   }
 
+  def cancelAccessRequest(id: String, cancelledBy: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    applicationsConnector.cancelAccessRequest(id, cancelledBy)
+  }
+
   def rejectAccessRequest(id: String, decidedBy: String, rejectedReason: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
     applicationsConnector.rejectAccessRequest(id, decidedBy, rejectedReason)
   }

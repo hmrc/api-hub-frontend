@@ -483,6 +483,13 @@ requestProductionAccessSuccess.h2 = What you can do now
 requestProductionAccessSuccess.text.line1 = View and manage your {0} application.
 requestProductionAccessSuccess.text.line2 = You will receive an email once a decision on access has been made.
 
+cancelAccessRequestSuccess.title = Production access requests cancelled
+cancelAccessRequestSuccess.heading = Production access requests cancelled
+cancelAccessRequestSuccess.applicationName = Application name
+cancelAccessRequestSuccess.apiName = Cancelled API production access requests
+cancelAccessRequestSuccess.h2 = What you can do now
+cancelAccessRequestSuccess.text.line1 = View and manage your {0} application.
+
 applicationDeletedSuccess.title = Application successfully deleted
 applicationDeletedSuccess.heading = Application successfully deleted
 applicationDeletedSuccess.advice.heading = What you can do now

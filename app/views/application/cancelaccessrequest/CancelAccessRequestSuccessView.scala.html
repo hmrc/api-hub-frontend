@@ -1,0 +1,86 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.application.Application
+@import models.user.UserModel
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import models.accessrequest.AccessRequest
+
+@this(
+    layout: templates.Layout,
+    govukPanel: GovukPanel,
+    govukSummaryList: GovukSummaryList
+)
+
+@(app:Application, user: Option[UserModel], accessRequests: Seq[AccessRequest])(implicit request: Request[?], messages: Messages)
+
+@applicationLink(application: Application) = {
+    <a href='@applicationLinkUrl(application)' class='govuk-link govuk-link--no-visited-state'>
+        @(application.name)
+    </a>
+}
+
+@applicationLinkUrl(application: Application) = @{
+    controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url
+}
+
+@apiListItem(accessRequest: AccessRequest) = {
+    <li>@accessRequest.apiName</li>
+}
+
+@apiList(apis: Seq[AccessRequest]) = {
+    <br>
+    <ul class="govuk-list govuk-list--bullet govuk-!-margin-top-0">
+    @{apis.map(accessRequest => apiListItem(accessRequest))}
+    </ul>
+}
+
+@layout(pageTitle = titleNoForm(messages("cancelAccessRequestSuccess.title")), user = user, showBackLink = false) {
+    @govukPanel(Panel(
+        title = Text(messages("cancelAccessRequestSuccess.heading")),
+        classes = "govuk-panel--warning",
+        attributes = Map("id" -> "successHeading")
+    ))
+
+    @govukSummaryList(SummaryList(
+        rows = Seq(
+            SummaryListRow(
+                key = Key(
+                    content = Text(messages("cancelAccessRequestSuccess.applicationName"))
+                ),
+                value = Value(
+                    content = HtmlContent(app.name)
+                ),
+            ),
+            SummaryListRow(
+                key = Key(
+                    content = Text(messages("cancelAccessRequestSuccess.apiName"))
+                ),
+                value = Value(
+                    content = HtmlContent(apiList(accessRequests))
+                )
+            ))))
+
+ <h2 class="govuk-heading-m">@messages("cancelAccessRequestSuccess.h2")</h2>
+ <p class="govuk-body">
+    @Html(
+        messages(
+            "cancelAccessRequestSuccess.text.line1",
+            applicationLink(app)
+        )
+    )
+ </p>
+}

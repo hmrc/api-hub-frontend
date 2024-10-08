@@ -72,3 +72,5 @@ GET         /cancel-access-request/confirm                              controll
 POST        /cancel-access-request/confirm                              controllers.application.cancelaccessrequest.CancelAccessRequestConfirmController.onSubmit(mode: Mode = NormalMode)
 GET         /cancel-access-request/change-confirm                       controllers.application.cancelaccessrequest.CancelAccessRequestConfirmController.onPageLoad(mode: Mode = CheckMode)
 POST        /cancel-access-request/change-confirm                       controllers.application.cancelaccessrequest.CancelAccessRequestConfirmController.onSubmit(mode: Mode = CheckMode)
+
+POST        /cancel-access-request/submit                               controllers.application.cancelaccessrequest.CancelAccessRequestEndJourneyController.submitRequest()
