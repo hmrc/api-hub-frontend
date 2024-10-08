@@ -149,8 +149,9 @@ object ApplicationLenses {
 
     def getCredentialsFor(environmentName: EnvironmentName): Seq[Credential] = {
       environmentName match {
-        case Primary => application.getPrimaryCredentials
-        case Secondary => application.getSecondaryCredentials
+        case Production => application.getPrimaryCredentials
+        case Test => application.getSecondaryCredentials
+        case _ => throw new IllegalArgumentException(s"Unsupported environment: $environmentName")  // TODO
       }
     }
 

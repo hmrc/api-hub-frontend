@@ -21,7 +21,7 @@ import controllers.actions.{FakeApplication, FakePrivilegedUser, FakeUser, FakeU
 import controllers.routes
 import forms.AddCredentialChecklistFormProvider
 import models.api.{ApiDetail, Live, Maintainer}
-import models.application.{Api, Application, Credential, Primary, Secondary}
+import models.application.{Api, Application, Credential, Production, Test}
 import models.exception.ApplicationCredentialLimitException
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
@@ -112,7 +112,7 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
           val fixture = buildFixture(user, Some(application))
           val credential = Credential("test-client-id", LocalDateTime.now(clock), Some("test-secret"), Some("test-fragment"))
 
-          when(fixture.apiHubService.addCredential(eqTo(application.id), eqTo(Primary))(any()))
+          when(fixture.apiHubService.addCredential(eqTo(application.id), eqTo(Production))(any()))
             .thenReturn(Future.successful(Right(Some(credential))))
 
           when(fixture.apiHubService.getApiDetail(eqTo(api1.id))(any()))
@@ -198,7 +198,7 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
 
       val credential = Credential("test-client-id", LocalDateTime.now(clock), Some("test-secret"), Some("test-fragment"))
 
-      when(fixture.apiHubService.addCredential(eqTo(FakeApplication.id), eqTo(Secondary))(any()))
+      when(fixture.apiHubService.addCredential(eqTo(FakeApplication.id), eqTo(Test))(any()))
         .thenReturn(Future.successful(Right(Some(credential))))
 
       running(fixture.playApplication) {

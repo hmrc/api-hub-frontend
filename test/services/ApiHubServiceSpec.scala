@@ -417,10 +417,10 @@ class ApiHubServiceSpec
       val fixture = buildFixture()
       val expected = Credential("test-client-id", LocalDateTime.now(), Some("test-secret"), Some("test-fragment"))
 
-      when(fixture.applicationsConnector.addCredential(eqTo(FakeApplication.id), eqTo(Primary))(any()))
+      when(fixture.applicationsConnector.addCredential(eqTo(FakeApplication.id), eqTo(Production))(any()))
         .thenReturn(Future.successful(Right(Some(expected))))
 
-      fixture.service.addCredential(FakeApplication.id, Primary)(HeaderCarrier()).map {
+      fixture.service.addCredential(FakeApplication.id, Production)(HeaderCarrier()).map {
         actual =>
           actual mustBe Right(Some(expected))
       }
@@ -435,11 +435,11 @@ class ApiHubServiceSpec
       when(fixture.applicationsConnector.deleteCredential(any(), any(), any())(any()))
         .thenReturn(Future.successful(Right(Some(()))))
 
-      fixture.service.deleteCredential(FakeApplication.id, Primary, clientId)(HeaderCarrier()).map {
+      fixture.service.deleteCredential(FakeApplication.id, Production, clientId)(HeaderCarrier()).map {
         actual =>
           verify(fixture.applicationsConnector).deleteCredential(
             eqTo(FakeApplication.id),
-            eqTo(Primary),
+            eqTo(Production),
             eqTo(clientId))(any()
           )
 

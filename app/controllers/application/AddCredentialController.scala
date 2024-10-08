@@ -19,7 +19,7 @@ package controllers.application
 import controllers.actions._
 import controllers.helpers.ErrorResultBuilder
 import forms.AddCredentialChecklistFormProvider
-import models.application.{Application, Credential, Primary, Secondary}
+import models.application.{Application, Credential, Production, Test}
 import models.exception.ApplicationCredentialLimitException
 import models.user.UserModel
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
@@ -59,7 +59,7 @@ class AddCredentialController @Inject()(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, applicationId))),
         _ =>
-          apiHubService.addCredential(request.application.id, Primary) flatMap {
+          apiHubService.addCredential(request.application.id, Production) flatMap {
             case Right(Some(credential)) =>
               fetchApiNames(request.application).map(
                 apiNames =>
@@ -74,7 +74,7 @@ class AddCredentialController @Inject()(
 
   def addDevelopmentCredential(applicationId: String): Action[AnyContent] = (identify andThen applicationAuth(applicationId)).async {
     implicit request =>
-      apiHubService.addCredential(request.application.id, Secondary) flatMap {
+      apiHubService.addCredential(request.application.id, Test) flatMap {
         case Right(Some(_)) =>
           Future.successful(SeeOther(controllers.application.routes.EnvironmentAndCredentialsController.onPageLoad(request.application.id).url))
         case Right(None) => applicationNotFound(request.application)
