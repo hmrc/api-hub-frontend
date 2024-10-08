@@ -56,7 +56,7 @@ class CancelAccessRequestEndJourneyController @Inject()(
           val accessRequests = getCancellableRequests(data)
           Future.sequence(getCancellableRequests(data).map(accessRequest => apiHubService.cancelAccessRequest(accessRequest.id, request.user.email)))
             .flatMap(_ => sessionRepository.clear(request.user.userId))
-            .flatMap(_ => Future.successful(Ok(cancelAccessRequestSuccessView(data.application, Some(request.user), accessRequests))))
+            .map(_ => Ok(cancelAccessRequestSuccessView(data.application, Some(request.user), accessRequests)))
             .recoverWith {
               case e: UpstreamErrorResponse if e.statusCode == BAD_GATEWAY => Future.successful(badGateway(e))
             }
