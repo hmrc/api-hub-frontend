@@ -21,11 +21,18 @@ import models.user.UserModel
 
 object ApplicationLenses {
 
-  val applicationEnvironments: Lens[Application, Environments] =
-    Lens[Application, Environments](
-      get = _.environments,
-      set = (application, environments) => application.copy(environments = environments)
+  // TODO: replace these hacks with something better
+  private def setProductionEnvironment(application: Application, environment: Environment): Application = {
+    application.copy(
+      environments = application.environments.copy(primary = environment)
     )
+  }
+
+  private def setTestEnvironment(application: Application, environment: Environment): Application = {
+    application.copy(
+      environments = application.environments.copy(secondary = environment)
+    )
+  }
 
   val environmentScopes: Lens[Environment, Seq[Scope]] =
     Lens[Environment, Seq[Scope]](
@@ -39,35 +46,29 @@ object ApplicationLenses {
       set = (environment, credentials) => environment.copy(credentials = credentials)
     )
 
-  val environmentPrimary: Lens[Environments, Environment] =
-    Lens[Environments, Environment](
-      get = _.primary,
-      set = (environments, primary) => environments.copy(primary = primary)
+  val applicationProduction: Lens[Application, Environment] =
+    Lens[Application, Environment](
+      get = _.newEnvironments.getOrElse(Production, Environment()),
+      set = (application, environment) => setProductionEnvironment(application, environment)
     )
 
-  val applicationPrimary: Lens[Application, Environment] =
-    Lens.compose(applicationEnvironments, environmentPrimary)
+  val applicationProductionScopes: Lens[Application, Seq[Scope]] =
+    Lens.compose(applicationProduction, environmentScopes)
 
-  val applicationPrimaryScopes: Lens[Application, Seq[Scope]] =
-    Lens.compose(applicationPrimary, environmentScopes)
+  val applicationProductionCredentials: Lens[Application, Seq[Credential]] =
+    Lens.compose(applicationProduction, environmentCredentials)
 
-  val applicationPrimaryCredentials: Lens[Application, Seq[Credential]] =
-    Lens.compose(applicationPrimary, environmentCredentials)
-
-  val environmentSecondary: Lens[Environments, Environment] =
-    Lens[Environments, Environment](
-      get = _.secondary,
-      set = (environments, secondary) => environments.copy(secondary = secondary)
+  val applicationTest: Lens[Application, Environment] =
+    Lens[Application, Environment](
+      get = _.newEnvironments.getOrElse(Test, Environment()),
+      set = (application, environment) => setTestEnvironment(application, environment)
     )
 
-  val applicationSecondary: Lens[Application, Environment] =
-    Lens.compose(applicationEnvironments, environmentSecondary)
+  val applicationTestScopes: Lens[Application, Seq[Scope]] =
+    Lens.compose(applicationTest, environmentScopes)
 
-  val applicationSecondaryScopes: Lens[Application, Seq[Scope]] =
-    Lens.compose(applicationSecondary, environmentScopes)
-
-  val applicationSecondaryCredentials: Lens[Application, Seq[Credential]] =
-    Lens.compose(applicationSecondary, environmentCredentials)
+  val applicationTestCredentials: Lens[Application, Seq[Credential]] =
+    Lens.compose(applicationTest, environmentCredentials)
 
   val applicationTeamMembers: Lens[Application, Seq[TeamMember]] =
     Lens[Application, Seq[TeamMember]](
@@ -89,68 +90,68 @@ object ApplicationLenses {
 
   implicit class ApplicationLensOps(application: Application) {
 
-    def getPrimaryScopes: Seq[Scope] =
-      applicationPrimaryScopes.get(application)
+    def getProductionScopes: Seq[Scope] =
+      applicationProductionScopes.get(application)
 
-    def setPrimaryScopes(scopes: Seq[Scope]): Application =
-      applicationPrimaryScopes.set(application, scopes)
+    def setProductionScopes(scopes: Seq[Scope]): Application =
+      applicationProductionScopes.set(application, scopes)
 
-    def addPrimaryScope(scope: Scope): Application =
-      applicationPrimaryScopes.set(
+    def addProductionScope(scope: Scope): Application =
+      applicationProductionScopes.set(
         application,
-        applicationPrimaryScopes.get(application) :+ scope
+        applicationProductionScopes.get(application) :+ scope
       )
 
-    def getPrimaryMasterCredential: Option[Credential] =
-      applicationPrimaryCredentials.get(application)
+    def getProductionMasterCredential: Option[Credential] =
+      applicationProductionCredentials.get(application)
         .sortWith((a, b) => a.created.isAfter(b.created))
         .headOption
 
-    def getPrimaryCredentials: Seq[Credential] =
-      applicationPrimaryCredentials.get(application)
+    def getProductionCredentials: Seq[Credential] =
+      applicationProductionCredentials.get(application)
 
-    def setPrimaryCredentials(credentials: Seq[Credential]): Application =
-      applicationPrimaryCredentials.set(application, credentials)
+    def setProductionCredentials(credentials: Seq[Credential]): Application =
+      applicationProductionCredentials.set(application, credentials)
 
-    def addPrimaryCredential(credential: Credential): Application =
-      applicationPrimaryCredentials.set(
+    def addProductionCredential(credential: Credential): Application =
+      applicationProductionCredentials.set(
         application,
-        applicationPrimaryCredentials.get(application) :+ credential
+        applicationProductionCredentials.get(application) :+ credential
       )
 
-    def getSecondaryScopes: Seq[Scope] =
-      applicationSecondaryScopes.get(application)
+    def getTestScopes: Seq[Scope] =
+      applicationTestScopes.get(application)
 
-    def setSecondaryScopes(scopes: Seq[Scope]): Application =
-      applicationSecondaryScopes.set(application, scopes)
+    def setTestScopes(scopes: Seq[Scope]): Application =
+      applicationTestScopes.set(application, scopes)
 
-    def addSecondaryScope(scope: Scope): Application =
-      applicationSecondaryScopes.set(
+    def addTestScope(scope: Scope): Application =
+      applicationTestScopes.set(
         application,
-        applicationSecondaryScopes.get(application) :+ scope
+        applicationTestScopes.get(application) :+ scope
       )
 
-    def getSecondaryMasterCredential: Option[Credential] =
-      applicationSecondaryCredentials.get(application)
+    def getTestMasterCredential: Option[Credential] =
+      applicationTestCredentials.get(application)
         .sortWith((a, b) => a.created.isAfter(b.created))
         .headOption
 
-    def getSecondaryCredentials: Seq[Credential] =
-      applicationSecondaryCredentials.get(application)
+    def getTestCredentials: Seq[Credential] =
+      applicationTestCredentials.get(application)
 
-    def setSecondaryCredentials(credentials: Seq[Credential]): Application =
-      applicationSecondaryCredentials.set(application, credentials)
+    def setTestCredentials(credentials: Seq[Credential]): Application =
+      applicationTestCredentials.set(application, credentials)
 
-    def addSecondaryCredential(credential: Credential): Application =
-      applicationSecondaryCredentials.set(
+    def addTestCredential(credential: Credential): Application =
+      applicationTestCredentials.set(
         application,
-        applicationSecondaryCredentials.get(application) :+ credential
+        applicationTestCredentials.get(application) :+ credential
       )
 
     def getCredentialsFor(environmentName: EnvironmentName): Seq[Credential] = {
       environmentName match {
-        case Production => application.getPrimaryCredentials
-        case Test => application.getSecondaryCredentials
+        case Production => application.getProductionCredentials
+        case Test => application.getTestCredentials
         case _ => throw new IllegalArgumentException(s"Unsupported environment: $environmentName")  // TODO
       }
     }
@@ -210,7 +211,7 @@ object ApplicationLenses {
 
     def getRequiredScopeNames: Set[String] = {
       application
-        .getSecondaryScopes
+        .getTestScopes
         .map(_.name)
         .toSet
     }

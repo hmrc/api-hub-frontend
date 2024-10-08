@@ -47,8 +47,8 @@ class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
         .addApi(Api(apiId1, apiTitle1, Seq(SelectedEndpoint("GET", "/test1/1"), SelectedEndpoint("POST", "/test1/1"), SelectedEndpoint("GET", "/test1/2"))))
         .addApi(Api(apiId2, apiTitle2, Seq(SelectedEndpoint("GET", "/test2/1"))))
         .addApi(Api(apiId3, apiTitle3, Seq(SelectedEndpoint("GET", "/test3/1"))))
-        .setPrimaryScopes(scopes("all:test-scope-1", "get:test-scope-1-1", "get:test-scope-1-2"))
-        .setSecondaryScopes(scopes("all:test-scope-1", "get:test-scope-1-1", "post:test-scope-1-1", "get:test-scope-1-2", "get:test-scope-3-1"))
+        .setProductionScopes(scopes("all:test-scope-1", "get:test-scope-1-1", "get:test-scope-1-2"))
+        .setTestScopes(scopes("all:test-scope-1", "get:test-scope-1-1", "post:test-scope-1-1", "get:test-scope-1-2", "get:test-scope-3-1"))
 
       when(fixture.apiHubService.getApiDetail(eqTo(apiId1))(any()))
         .thenReturn(Future.successful(Some(apiDetail1)))

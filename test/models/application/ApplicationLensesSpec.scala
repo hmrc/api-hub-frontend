@@ -27,22 +27,22 @@ import scala.util.Random
 
 class ApplicationLensesSpec extends LensBehaviours {
 
-  "applicationEnvironments" - {
-    "must get the correct Environments" in {
-      val expected = randomEnvironments()
-      val application = testApplication.copy(environments = expected)
-
-      val actual = applicationEnvironments.get(application)
-      actual mustBe expected
-    }
-
-    "must set the Environments correctly" in {
-      val expected = randomEnvironments()
-      val application = applicationEnvironments.set(testApplication, expected)
-
-      application.environments mustBe expected
-    }
-  }
+//  "applicationEnvironments" - {
+//    "must get the correct Environments" in {
+//      val expected = randomEnvironments()
+//      val application = testApplication.copy(environments = expected)
+//
+//      val actual = applicationEnvironments.get(application)
+//      actual mustBe expected
+//    }
+//
+//    "must set the Environments correctly" in {
+//      val expected = randomEnvironments()
+//      val application = applicationEnvironments.set(testApplication, expected)
+//
+//      application.environments mustBe expected
+//    }
+//  }
 
   "environmentScopes" - {
     "must get the correct Scopes" in {
@@ -80,19 +80,19 @@ class ApplicationLensesSpec extends LensBehaviours {
     }
   }
 
-  "environmentPrimary" - {
-    "must" - {
-      behave like environmentsToEnvironmentLens(
-        environmentPrimary,
-        _.primary
-      )
-    }
-  }
+//  "environmentPrimary" - {
+//    "must" - {
+//      behave like environmentsToEnvironmentLens(
+//        environmentProduction,
+//        _.primary
+//      )
+//    }
+//  }
 
   "applicationPrimary" - {
     "must" - {
       behave like applicationToEnvironmentLens(
-        applicationPrimary,
+        applicationProduction,
         _.primary
       )
     }
@@ -101,7 +101,7 @@ class ApplicationLensesSpec extends LensBehaviours {
   "applicationPrimaryScopes" - {
     "must" - {
       behave like applicationToScopesLens(
-        applicationPrimaryScopes,
+        applicationProductionScopes,
         _.primary
       )
     }
@@ -110,25 +110,25 @@ class ApplicationLensesSpec extends LensBehaviours {
   "applicationPrimaryCredentials" - {
     "must" - {
       behave like applicationToCredentialsLens(
-        applicationPrimaryCredentials,
+        applicationProductionCredentials,
         _.primary
       )
     }
   }
 
-  "environmentSecondary" - {
-    "must" - {
-      behave like environmentsToEnvironmentLens(
-        environmentSecondary,
-        _.secondary
-      )
-    }
-  }
+//  "environmentSecondary" - {
+//    "must" - {
+//      behave like environmentsToEnvironmentLens(
+//        environmentTest,
+//        _.secondary
+//      )
+//    }
+//  }
 
   "applicationSecondary" - {
     "must" - {
       behave like applicationToEnvironmentLens(
-        applicationSecondary,
+        applicationTest,
         _.secondary
       )
     }
@@ -137,7 +137,7 @@ class ApplicationLensesSpec extends LensBehaviours {
   "applicationSecondaryScopes" - {
     "must" - {
       behave like applicationToScopesLens(
-        applicationSecondaryScopes,
+        applicationTestScopes,
         _.secondary
       )
     }
@@ -146,7 +146,7 @@ class ApplicationLensesSpec extends LensBehaviours {
   "applicationSecondaryCredentials" - {
     "must" - {
       behave like applicationToCredentialsLens(
-        applicationSecondaryCredentials,
+        applicationTestCredentials,
         _.secondary
       )
     }
@@ -186,8 +186,8 @@ class ApplicationLensesSpec extends LensBehaviours {
     "getPrimaryScopes" - {
       "must" - {
         behave like applicationScopesGetterFunction(
-          applicationPrimaryScopes,
-          application => ApplicationLensOps(application).getPrimaryScopes
+          applicationProductionScopes,
+          application => ApplicationLensOps(application).getProductionScopes
         )
       }
     }
@@ -195,8 +195,8 @@ class ApplicationLensesSpec extends LensBehaviours {
     "setPrimaryScopes" - {
       "must" - {
         behave like applicationScopesSetterFunction(
-          applicationPrimaryScopes,
-          (application, scopes) => ApplicationLensOps(application).setPrimaryScopes(scopes)
+          applicationProductionScopes,
+          (application, scopes) => ApplicationLensOps(application).setProductionScopes(scopes)
         )
       }
     }
@@ -204,8 +204,8 @@ class ApplicationLensesSpec extends LensBehaviours {
     "addPrimaryScope" - {
       "must" - {
         behave like applicationAddScopeFunction(
-          applicationPrimaryScopes,
-          (application, scope) => ApplicationLensOps(application).addPrimaryScope(scope)
+          applicationProductionScopes,
+          (application, scope) => ApplicationLensOps(application).addProductionScope(scope)
         )
       }
     }
@@ -217,17 +217,17 @@ class ApplicationLensesSpec extends LensBehaviours {
         val credential2 = randomCredential().copy(created = LocalDateTime.now().minusDays(2))
 
         val application = testApplication
-          .setPrimaryCredentials(Seq(credential1, master, credential2))
+          .setProductionCredentials(Seq(credential1, master, credential2))
 
-        application.getPrimaryMasterCredential mustBe Some(master)
+        application.getProductionMasterCredential mustBe Some(master)
       }
     }
 
     "getPrimaryCredentials" - {
       "must" - {
         behave like applicationCredentialsGetterFunction(
-          applicationPrimaryCredentials,
-          application => ApplicationLensOps(application).getPrimaryCredentials
+          applicationProductionCredentials,
+          application => ApplicationLensOps(application).getProductionCredentials
         )
       }
     }
@@ -235,8 +235,8 @@ class ApplicationLensesSpec extends LensBehaviours {
     "setPrimaryCredentials" - {
       "must" - {
         behave like applicationCredentialsSetterFunction(
-          applicationPrimaryCredentials,
-          (application, credentials) => ApplicationLensOps(application).setPrimaryCredentials(credentials)
+          applicationProductionCredentials,
+          (application, credentials) => ApplicationLensOps(application).setProductionCredentials(credentials)
         )
       }
     }
@@ -244,8 +244,8 @@ class ApplicationLensesSpec extends LensBehaviours {
     "addPrimaryCredential" - {
       "must" - {
         behave like applicationAddCredentialFunction(
-          applicationPrimaryCredentials,
-          (application, credential) => ApplicationLensOps(application).addPrimaryCredential(credential)
+          applicationProductionCredentials,
+          (application, credential) => ApplicationLensOps(application).addProductionCredential(credential)
         )
       }
     }
@@ -253,8 +253,8 @@ class ApplicationLensesSpec extends LensBehaviours {
     "getSecondaryScopes" - {
       "must" - {
         behave like applicationScopesGetterFunction(
-          applicationSecondaryScopes,
-          application => ApplicationLensOps(application).getSecondaryScopes
+          applicationTestScopes,
+          application => ApplicationLensOps(application).getTestScopes
         )
       }
     }
@@ -262,8 +262,8 @@ class ApplicationLensesSpec extends LensBehaviours {
     "setSecondaryScopes" - {
       "must" - {
         behave like applicationScopesSetterFunction(
-          applicationSecondaryScopes,
-          (application, scopes) => ApplicationLensOps(application).setSecondaryScopes(scopes)
+          applicationTestScopes,
+          (application, scopes) => ApplicationLensOps(application).setTestScopes(scopes)
         )
       }
     }
@@ -271,8 +271,8 @@ class ApplicationLensesSpec extends LensBehaviours {
     "addSecondaryScope" - {
       "must" - {
         behave like applicationAddScopeFunction(
-          applicationSecondaryScopes,
-          (application, scope) => ApplicationLensOps(application).addSecondaryScope(scope)
+          applicationTestScopes,
+          (application, scope) => ApplicationLensOps(application).addTestScope(scope)
         )
       }
     }
@@ -284,17 +284,17 @@ class ApplicationLensesSpec extends LensBehaviours {
         val credential2 = randomCredential().copy(created = LocalDateTime.now().minusDays(2))
 
         val application = testApplication
-          .setSecondaryCredentials(Seq(credential1, master, credential2))
+          .setTestCredentials(Seq(credential1, master, credential2))
 
-        application.getSecondaryMasterCredential mustBe Some(master)
+        application.getTestMasterCredential mustBe Some(master)
       }
     }
 
     "getSecondaryCredentials" - {
       "must" - {
         behave like applicationCredentialsGetterFunction(
-          applicationSecondaryCredentials,
-          application => ApplicationLensOps(application).getSecondaryCredentials
+          applicationTestCredentials,
+          application => ApplicationLensOps(application).getTestCredentials
         )
       }
     }
@@ -302,8 +302,8 @@ class ApplicationLensesSpec extends LensBehaviours {
     "setSecondaryCredentials" - {
       "must" - {
         behave like applicationCredentialsSetterFunction(
-          applicationSecondaryCredentials,
-          (application, credentials) => ApplicationLensOps(application).setSecondaryCredentials(credentials)
+          applicationTestCredentials,
+          (application, credentials) => ApplicationLensOps(application).setTestCredentials(credentials)
         )
       }
     }
@@ -311,8 +311,8 @@ class ApplicationLensesSpec extends LensBehaviours {
     "addSecondaryCredential" - {
       "must" - {
         behave like applicationAddCredentialFunction(
-          applicationSecondaryCredentials,
-          (application, credential) => ApplicationLensOps(application).addSecondaryCredential(credential)
+          applicationTestCredentials,
+          (application, credential) => ApplicationLensOps(application).addTestCredential(credential)
         )
       }
     }
@@ -364,14 +364,14 @@ class ApplicationLensesSpec extends LensBehaviours {
           Scope("test-scope-2")
         )
 
-        val application = testApplication.setSecondaryScopes(scopes)
+        val application = testApplication.setTestScopes(scopes)
 
         val actual = application.getRequiredScopeNames
         actual must contain theSameElementsAs Set("test-scope-1", "test-scope-2")
       }
 
       "must return an empty set when there are no secondary scopes" in {
-        val application = testApplication.setSecondaryScopes(Seq.empty)
+        val application = testApplication.setTestScopes(Seq.empty)
 
         val actual = application.getRequiredScopeNames
         actual mustBe empty

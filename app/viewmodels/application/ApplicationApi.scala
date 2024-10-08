@@ -52,8 +52,8 @@ object ApplicationEndpointAccess extends Enumerable.Implicits{
   ): ApplicationEndpointAccess = {
 
     val scopes = environmentName match {
-      case Production => application.getPrimaryScopes
-      case Test => application.getSecondaryScopes
+      case Production => application.getProductionScopes
+      case Test => application.getTestScopes
       case _ => throw new IllegalArgumentException(s"Unsupported environment: $environmentName")  // TODO
     }
 

@@ -33,7 +33,13 @@ case class Application (
   issues: Seq[String] = Seq.empty,
   deleted: Option[Deleted] = None,
   teamName: Option[String] = None,
-)
+) {
+
+  def newEnvironments: Map[EnvironmentName, Environment] = {
+    environments.toNewEnvironments
+  }
+
+}
 
 object Application {
 
