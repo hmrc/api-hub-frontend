@@ -14,7 +14,6 @@ site.signIn = Sign in
 site.govuk = GOV.UK
 site.dashboard = Dashboard
 site.approvals = Integration Hub Admin
-site.copy = Copy
 site.applicationNotFoundHeading = Application not found
 site.applicationNotFoundMessage = Cannot find an application with Id {0}.
 site.apiNotFound.heading = API not found
@@ -238,8 +237,6 @@ applicationNav.page.applicationDetails = Application details
 applicationNav.page.applicationApis = Application APIs
 applicationNav.page.environmentsAndCredentials = Environments and credentials
 applicationNav.page.manageTeamMembers = Manage team members
-applicationNav.page.editApplicationName = Edit application name
-applicationNav.page.leaveApplication = Leave application
 applicationNav.page.deleteApplication = Delete application
 applicationNav.page.viewJson = View as JSON
 
@@ -263,13 +260,11 @@ fake-sign-in.resource.action = Action
 
 addTeamMemberDetails.title = Add a team member
 addTeamMemberDetails.heading = Add a team member
-addTeamMemberDetails.checkYourAnswersLabel = Add team member
 addTeamMemberDetails.email.invalid = Please enter a valid email address
 addTeamMemberDetails.email.duplicateInApplication = This email address has already been added to this application
 addTeamMemberDetails.email.duplicateInTeam = This email address has already been added to this team
 addTeamMemberDetails.email.label = Enter your team member''s email address
 addTeamMemberDetails.email.hint = Email address should be valid for use on the Integration Hub, for example a {0} or a {1} address
-addTeamMemberDetails.change.hidden = Add team member details
 addTeamMemberDetails.notFound = Cannot find this team member.
 
 signIn.title = Sign-in
@@ -321,8 +316,6 @@ apiDeployments.versionPrefix = Version
 apiDeployments.environment.primary = Production env
 apiDeployments.environment.secondary = Test env
 
-assignApplicationToTeam.title = Assign application to team
-
 exploreApis.title = Explore APIs
 exploreApis.searchResults.heading = API Results
 exploreApis.searchResults.empty = No APIs found.
@@ -372,7 +365,6 @@ helpdocs.link.text = Help Docs
 addAnApiApiId.checkYourAnswersLabel = API Name
 
 addAnApiSelectApplication.title = Select application
-addAnApiSelectApplication.heading = Select application
 addAnApiSelectApplication.error.required = Please select an application
 addAnApiSelectApplication.noApplications = To subscribe to an API, you must first register an application.
 addAnApiSelectApplication.registerApplication = Register an application
@@ -411,7 +403,6 @@ addAnApiCheckYourAnswers.guidance.p1 = Once the API has been added to your appli
 addAnApiCheckYourAnswers.guidance.p2 = To use this API in production you will need to request production access.
 
 addAnApiSuccess.title = API added successfully
-addAnApiSuccess.heading = API added successfully
 addAnApiSuccess.summary = {0} is now available within your application
 addAnApiSuccess.advice.heading = What you can do next
 addAnApiSuccess.advice.body1 = You can now use the API within your application, with the credentials that are available in the credentials section of your application.
@@ -511,7 +502,6 @@ cancelAccessRequestSuccess.h2 = What you can do now
 cancelAccessRequestSuccess.text.line1 = View and manage your {0} application.
 
 applicationDeletedSuccess.title = Application successfully deleted
-applicationDeletedSuccess.heading = Application successfully deleted
 applicationDeletedSuccess.advice.heading = What you can do now
 applicationDeletedSuccess.advice.returnTo = Return to the {0}
 applicationDeletedSuccess.advice.dashboard = dashboard
@@ -597,14 +587,12 @@ createTeamName.change.hidden = Give your team a name
 createTeamName.error.nameNotUnique = This team name is already in use. Please enter a different value.
 
 changeTeamName.title = Change your team name
-changeTeamName.link = Change team name
 
 createTeamMember.email.duplicate = This email address has already been added to this team
 
 createTeamManageMembers.title = Manage team members
 createTeamManageMembers.heading = Team members ({0})
 createTeamManageMembers.addTeamMember = Add another team member
-createTeamManageMembers.emailAddressColumnHeading = Email address
 
 manageTeam.title = Manage {0}
 manageTeam.removeTeamMember.title = Confirm team member removal
@@ -798,10 +786,11 @@ getUsers.admin = Integration Hub admin
 
 teamMigration.pageTitle = Global team migration
 teamMigration.title = Team migration
-teamMigration.nonMigrated.heading = Non-migrated applications
 teamMigration.migrated = Migrated
 teamMigration.nonMigrated = Non-migrated
 teamMigration.changeOwningTeam = Change owning team
+teamMigration.nonMigrated.grouped = Non-migrated applications grouped by team members
+teamMigration.nonMigrated.all = All non-migrated applications
 
 registerApplicationTeam.title = Select team
 registerApplicationTeam.heading = Select the team which will own the application
@@ -868,9 +857,7 @@ statistics.apisInProductionStatistic.totalInProduction = APIs in Production
 
 cancelAccessRequestSelectApi.title = Select APIs
 cancelAccessRequestSelectApi.heading = Which APIs do you want to cancel production access requests for?
-cancelAccessRequestSelectApi.checkYourAnswersLabel = API
 cancelAccessRequestSelectApi.error.required = Select at least one API
-cancelAccessRequestSelectApi.change.hidden = CancelAccessRequestSelectApi
 
 cancelAccessRequestConfirm.title = Confirm API production access request cancellations
 cancelAccessRequestConfirm.heading = Confirm API production access request cancellations

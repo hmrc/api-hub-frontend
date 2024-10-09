@@ -157,7 +157,7 @@
           )
         )
 
-        <h2 class="govuk-heading-m">@messages("Non-migrated applications grouped by team members")</h2>
+        <h2 class="govuk-heading-m">@messages("teamMigration.nonMigrated.grouped")</h2>
 
         @for(team <- teamApplications){
             <div>
@@ -173,7 +173,7 @@
             </div>
         }
 
-        <h2 class="govuk-heading-m">@messages("All non-migrated applications")</h2>
+        <h2 class="govuk-heading-m">@messages("teamMigration.nonMigrated.all")</h2>
 
         @for(application <- applications){
             @displayApplication(application)

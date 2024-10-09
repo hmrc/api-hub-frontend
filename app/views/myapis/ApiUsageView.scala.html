@@ -64,7 +64,7 @@
 ) {
     @views.html.templates.SideNav(apiDetail.title, MyApisNavItems(apiDetail.id, userModel, MyApisNavPages.ApiUsagePage, maybeDeploymentStatuses)) {
         <h1 class="govuk-heading-l">
-        @messages("myApis.usage.title")
+        @messages("myApis.usage.heading")
         </h1>
 
         @govukSummaryList(SummaryList(
