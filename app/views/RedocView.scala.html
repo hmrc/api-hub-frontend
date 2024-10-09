@@ -19,9 +19,7 @@
 @import views.html.helper.CSPNonce
 
 
-@this(
-layout: templates.Layout
-)
+@this(layout: templates.Layout)
 
 @(apiDetail: ApiDetail, user: Option[UserModel])(implicit request: Request[?], messages: Messages)
 
@@ -31,32 +29,18 @@ layout: templates.Layout
     }
 }
 
-@layout(pageTitle = titleNoForm(messages("apiDetails.title")), user = user, showBackLink = false, fullWidth = true, customStyles = Some(styles())) {
-    <div id="redoc"></div>
-
+@scripts() = {
     <script src='@controllers.routes.Assets.versioned("javascripts/redoc/redoc.standalone.js")' charset="UTF-8" @{CSPNonce.attr}> </script>
+    <script src='@routes.Assets.versioned("javascripts/redoc.js")' type="module" @{CSPNonce.attr}></script>
+}
 
-    @*
-    To fix this issue:
-    https://github.com/Redocly/redoc/issues/1108#issuecomment-585990742
-    *@
-    <script @{CSPNonce.attr}>
-        var options = {
-        hideHostname: false,
-        theme: {
-        spacing: {
-        sectionVertical: '35px',
-        },
-        typography: {
-        headings: {
-        lineHeight: "1.2em"
-        }
-        }
-        }
-        };
-
-        var oasUrl = "@routes.OasRedocController.getOas(apiDetail.id).url"
-
-        Redoc.init(oasUrl,options,document.getElementById("redoc"));
-    </script>
+@layout(
+    pageTitle = titleNoForm(messages("apiDetails.title")),
+    user = user,
+    showBackLink = false,
+    fullWidth = true,
+    customStyles = Some(styles()),
+    customScriptsBlock = Some(scripts())
+) {
+    <div id="redocContainer" data-oasurl="@routes.OasRedocController.getOas(apiDetail.id).url"></div>
 }

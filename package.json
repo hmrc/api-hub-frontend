@@ -17,7 +17,7 @@
     "esversion": 8,
     "browser": true,
     "jasmine": true,
-    "globals": {"console":  true, "accessibleAutocomplete":  true, "globalThis":  true, "ace":  true},
+    "globals": {"console":  true, "accessibleAutocomplete":  true, "globalThis":  true, "ace":  true, "Redoc": true},
     "curly": true,
     "eqeqeq": true,
     "futurehostile": true,
