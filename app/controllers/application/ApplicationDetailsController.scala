@@ -38,10 +38,11 @@ class ApplicationDetailsController @Inject()(
   def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id, enrich = true)).async {
     implicit request =>
       applicationApiBuilder.build(request.application).map(
-        applicationApis =>
+        applicationApisAndPendingCount =>
           Ok(view(
             request.application.withSortedTeam(),
-            applicationApis,
+            applicationApisAndPendingCount._1,
+            applicationApisAndPendingCount._2,
             Some(request.identifierRequest.user)
           ))
       )

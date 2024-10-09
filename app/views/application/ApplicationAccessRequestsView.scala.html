@@ -32,6 +32,10 @@
 
 @(application: Application, accessRequests: Seq[AccessRequest], user: UserModel)(implicit request: Request[?], messages: Messages)
 
+@pendingAccessRequestsCount = @{
+    accessRequests.count(_.status == Pending)
+}
+
 @layout(
     pageTitle = titleNoForm(messages("applicationHistory.title")),
     user = Some(user),
@@ -54,16 +58,17 @@
         @if(accessRequests.isEmpty) {
             @messages("applicationHistory.noRequests")
         } else {
-            @if(!accessRequests.filter(_.status == Pending).isEmpty) {
+            @if(pendingAccessRequestsCount > 0) {
                 <div class="call-out-panel call-out-panel__small govuk-!-margin-top-2">
                     <div class="govuk-body information-tag">
                         <i class="fa-solid fa-circle-exclamation warning-colour"></i>
                         <span class="call-out-type warning">
-                        @messages("applicationApis.pending.heading")
+                        @messages("applicationApis.pending.heading", pendingAccessRequestsCount)
                         </span>
                     </div>
-                    <div class="govuk-body additional-message">
-                        @messages("applicationApis.pending.message")
+                    <div class="govuk-body additional-message govuk-!-margin-left-3">
+                        @messages("applicationApis.pending.message.1", pendingAccessRequestsCount)
+                        @messages("applicationApis.pending.message.2", pendingAccessRequestsCount)
                         <br>
                         <br>
                         <a href="@controllers.application.cancelaccessrequest.routes.CancelAccessRequestStartController.startJourney(application.id)">Cancel production access requests</a>

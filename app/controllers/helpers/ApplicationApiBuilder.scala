@@ -31,11 +31,10 @@ class ApplicationApiBuilder @Inject()(
   apiHubService: ApiHubService
 )(implicit ec: ExecutionContext) extends FrontendHeaderCarrierProvider {
 
-  def build(application: Application)(implicit request: Request[?]): Future[Seq[ApplicationApi]] = {
+  def build(application: Application)(implicit request: Request[?]): Future[(Seq[ApplicationApi], Int)] = {
     apiHubService.getAccessRequests(Some(application.id), Some(Pending)).flatMap (
       pendingAccessRequests =>
-        fetchApiDetails(application).map(apis => build(application, apis, pendingAccessRequests))
-    )
+        fetchApiDetails(application).map(apis => (build(application, apis, pendingAccessRequests), pendingAccessRequests.size)))
   }
 
   private def build(application: Application, apis: Seq[(Api, Option[ApiDetail])], pendingAccessRequests: Seq[AccessRequest]): Seq[ApplicationApi] = {
