@@ -193,14 +193,14 @@ object CancelAccessRequestEndJourneyControllerSpec extends OptionValues{
   private val data: Data = Data(
     application = anApplication,
     accessRequests = Seq(anAccessRequest),
-    apis = Set(applicationApi.apiId)
+    selectedAccessRequests = Set(anAccessRequest.id)
   )
 
   private def buildUserAnswers(without: Seq[QuestionPage[?]] = Seq.empty): UserAnswers = {
     val fullUserAnswers = UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
       .set(CancelAccessRequestApplicationPage, data.application).toOption.value
       .set(CancelAccessRequestPendingPage, data.accessRequests).toOption.value
-      .set(CancelAccessRequestSelectApiPage, data.apis).toOption.value
+      .set(CancelAccessRequestSelectApiPage, data.selectedAccessRequests).toOption.value
       .set(CancelAccessRequestConfirmPage, true).toOption.value
 
     without.foldRight(fullUserAnswers)((page, userAnswers) => userAnswers.remove(page).toOption.value)
