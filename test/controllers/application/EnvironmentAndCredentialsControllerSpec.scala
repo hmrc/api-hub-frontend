@@ -17,20 +17,20 @@
 package controllers.application
 
 import base.SpecBase
-import config.FrontendAppConfig
+import config.{EnvironmentsImpl, FrontendAppConfig}
 import controllers.actions.{FakeApplication, FakePrivilegedUser, FakeUser, FakeUserNotTeamMember}
 import controllers.routes
 import models.application.{Production, Test}
-import models.application.ApplicationLenses._
+import models.application.ApplicationLenses.*
 import models.exception.ApplicationCredentialLimitException
 import models.user.UserModel
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import play.api.{Application => PlayApplication}
+import play.api.test.Helpers.*
+import play.api.Application as PlayApplication
 import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
 import views.html.ErrorTemplate
@@ -54,9 +54,10 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
             val result = route(fixture.playApplication, request).value
             val view = fixture.playApplication.injector.instanceOf[EnvironmentAndCredentialsView]
             val config = fixture.playApplication.injector.instanceOf[FrontendAppConfig]
+            val environments = new EnvironmentsImpl()
 
             status(result) mustEqual OK
-            contentAsString(result) mustBe view(FakeApplication, user, config.helpDocsPath)(request, messages(fixture.playApplication)).toString
+            contentAsString(result) mustBe view(FakeApplication, user, config.helpDocsPath, environments)(request, messages(fixture.playApplication)).toString
             contentAsString(result) must validateAsHtml
           }
       }

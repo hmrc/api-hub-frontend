@@ -17,14 +17,14 @@
 package controllers.application
 
 import com.google.inject.Inject
-import config.FrontendAppConfig
+import config.{Environments, FrontendAppConfig}
 import controllers.actions.{ApplicationAuthActionProvider, IdentifierAction}
 import controllers.helpers.ErrorResultBuilder
 import models.application.{EnvironmentName, Production, Test}
 import models.exception.ApplicationCredentialLimitException
 import models.user.Permissions
 import play.api.i18n.{I18nSupport, Messages}
-import play.api.mvc._
+import play.api.mvc.*
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.application.EnvironmentAndCredentialsView
@@ -38,12 +38,13 @@ class EnvironmentAndCredentialsController @Inject()(
   view: EnvironmentAndCredentialsView,
   apiHubService: ApiHubService,
   errorResultBuilder: ErrorResultBuilder,
-  config: FrontendAppConfig
+  config: FrontendAppConfig,
+  environments: Environments
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id, enrich = true)) {
     implicit request =>
-      Ok(view(request.application, request.identifierRequest.user, config.helpDocsPath))
+      Ok(view(request.application, request.identifierRequest.user, config.helpDocsPath, environments))
   }
 
   def deletePrimaryCredential(id: String, clientId: String): Action[AnyContent] = (identify andThen applicationAuth(id, enrich = true)).async {
