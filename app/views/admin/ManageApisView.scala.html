@@ -17,7 +17,7 @@
 @import models.user.UserModel
 @import viewmodels.admin.{AdminNavItems, AdminSideNavPages}
 @import views.html.helper.CSPNonce
-@import models.api.ApiDetail
+@import models.api.ApiDetailWithoutOAS
 @import views.html.components.SearchBox
 @import views.html.components.IconsLink
 @import views.html.components.Paginator
@@ -31,7 +31,7 @@
     paginator: Paginator
 )
 
-@(apis: Seq[ApiDetail], user: UserModel)(implicit request: Request[?], messages: Messages)
+@(apis: Seq[ApiDetailWithoutOAS], user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @scripts() = {
     @iconsLink()

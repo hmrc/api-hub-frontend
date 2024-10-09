@@ -97,13 +97,60 @@ trait ApiDetailGenerators {
       Gen.nonEmptyListOf(arbitraryApiDetail.arbitrary)
     }
 
+  private def genApiDetailWithoutOAS: Gen[ApiDetailWithoutOAS] = Gen.sized {size =>
+    for {
+      id <- Gen.uuid
+      title <- sensiblySizedAlphaNumStr
+      description <- sensiblySizedAlphaNumStr
+      publisherReference <- sensiblySizedAlphaNumStr
+      version <- sensiblySizedAlphaNumStr
+      endpoints <- Gen.listOfN(size / listSizeQuota, arbitraryEndpoint.arbitrary).suchThat(_.nonEmpty)
+      shortDescription <- sensiblySizedAlphaNumStr
+      apiStatus <- Gen.oneOf(ApiStatus.values)
+      domain <- Gen.oneOf(FakeDomains.domains)
+      subDomain <- Gen.oneOf(domain.subDomains)
+      hods <- Gen.listOfN(size/ listSizeQuota, sensiblySizedAlphaNumStr).suchThat(_.nonEmpty)
+      reviewedDate <- Gen.const(Instant.now().truncatedTo(ChronoUnit.SECONDS))
+      platform <- sensiblySizedAlphaNumStr
+      maintainerName <- sensiblySizedAlphaNumStr
+      maintainerSlack <- sensiblySizedAlphaNumStr
+      apiType <- Gen.oneOf(ApiType.values.toIndexedSeq)
+    } yield ApiDetailWithoutOAS(
+      id.toString,
+      publisherReference,
+      title,
+      description,
+      version,
+      endpoints,
+      Some(shortDescription),
+      apiStatus,
+      domain = Some(domain.code),
+      subDomain = Some(subDomain.code),
+      hods = hods,
+      reviewedDate = reviewedDate,
+      platform = platform,
+      maintainer = Maintainer(maintainerName, s"#$maintainerSlack", List.empty),
+      apiType = Some(apiType)
+    )
+  }
+
+  implicit lazy val arbitraryApiDetailWithoutOAS: Arbitrary[ApiDetailWithoutOAS] = Arbitrary(genApiDetailWithoutOAS)
+
+  implicit val arbitraryApiDetailsWithoutOAS: Arbitrary[Seq[ApiDetailWithoutOAS]] =
+    Arbitrary {
+      Gen.nonEmptyListOf(arbitraryApiDetailWithoutOAS.arbitrary)
+    }
+
   private val parameters = Gen.Parameters.default
 
   def sampleApiDetail(): ApiDetail =
     genApiDetail.pureApply(parameters, Seed.random())
 
+  def sampleApiDetailWithoutOAS(): ApiDetailWithoutOAS =
+    genApiDetailWithoutOAS.pureApply(parameters, Seed.random())
+
   def sampleApis() : IntegrationResponse =
-    IntegrationResponse(1, None, arbitraryApiDetails.arbitrary.pureApply(parameters, Seed.random()))
+    IntegrationResponse(1, None, arbitraryApiDetailsWithoutOAS.arbitrary.pureApply(parameters, Seed.random()))
 
   def sampleOas: String =
     """openapi: 3.0.3

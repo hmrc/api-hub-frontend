@@ -20,7 +20,7 @@ import base.OptionallyAuthenticatedSpecBase
 import controllers.actions.FakeUser
 import fakes.{FakeDomains, FakeHods, FakePlatforms}
 import generators.ApiDetailGenerators
-import models.api.{ApiDetail, Live, Maintainer}
+import models.api.{ApiDetail, ApiDetailWithoutOAS, Live, Maintainer}
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -53,7 +53,7 @@ class ExploreApisControllerSpec
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[ExploreApisView]
 
-        forAll { (apiDetail: ApiDetail) =>
+        forAll { (apiDetail: ApiDetailWithoutOAS) =>
           when(fixture.apiHubService.getApis(any())(any()))
             .thenReturn(Future.successful(Seq(apiDetail)))
 
@@ -73,7 +73,7 @@ class ExploreApisControllerSpec
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[ExploreApisView]
 
-        forAll { (apiDetail: ApiDetail) =>
+        forAll { (apiDetail: ApiDetailWithoutOAS) =>
           when(fixture.apiHubService.getApis(any())(any()))
             .thenReturn(Future.successful(Seq(apiDetail)))
 
@@ -95,10 +95,10 @@ class ExploreApisControllerSpec
 
         val platform = "HIP"
         val maintainer = Maintainer("name", "#slack", List.empty)
-        val zebras = ApiDetail("id1", "ref1", "zebras", "zebras api", "1.0.0", Seq.empty, None, "oas", Live, reviewedDate = Instant.now(), platform = platform, maintainer = maintainer)
-        val molluscs = ApiDetail("id2", "ref2", "MOLLUSCS", "molluscs api", "1.0.0", Seq.empty, None, "oas", Live, reviewedDate = Instant.now(), platform = platform, maintainer = maintainer)
-        val aardvarks = ApiDetail("id3", "ref3", "aardvarks", "aardvarks api", "1.0.0", Seq.empty, None, "oas", Live, reviewedDate = Instant.now(), platform = platform, maintainer = maintainer)
-        val pigeons = ApiDetail("id4", "ref4", "PIGEONS", "pigeons api", "1.0.0", Seq.empty, None, "oas", Live, reviewedDate = Instant.now(), platform = platform, maintainer = maintainer)
+        val zebras = ApiDetailWithoutOAS("id1", "ref1", "zebras", "zebras api", "1.0.0", Seq.empty, None, Live, reviewedDate = Instant.now(), platform = platform, maintainer = maintainer)
+        val molluscs = ApiDetailWithoutOAS("id2", "ref2", "MOLLUSCS", "molluscs api", "1.0.0", Seq.empty, None, Live, reviewedDate = Instant.now(), platform = platform, maintainer = maintainer)
+        val aardvarks = ApiDetailWithoutOAS("id3", "ref3", "aardvarks", "aardvarks api", "1.0.0", Seq.empty, None, Live, reviewedDate = Instant.now(), platform = platform, maintainer = maintainer)
+        val pigeons = ApiDetailWithoutOAS("id4", "ref4", "PIGEONS", "pigeons api", "1.0.0", Seq.empty, None, Live, reviewedDate = Instant.now(), platform = platform, maintainer = maintainer)
 
         when(fixture.apiHubService.getApis(any())(any()))
           .thenReturn(Future.successful(Seq(molluscs, zebras, aardvarks, pigeons)))

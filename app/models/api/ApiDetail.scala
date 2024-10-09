@@ -84,6 +84,37 @@ object ApiDetail {
   }
 }
 
+case class ApiDetailWithoutOAS(
+                                id: String,
+                                publisherReference: String,
+                                title: String,
+                                description: String,
+                                version: String,
+                                endpoints: Seq[Endpoint],
+                                shortDescription: Option[String],
+                                apiStatus: ApiStatus,
+                                teamId: Option[String] = None,
+                                domain: Option[String] = None,
+                                subDomain: Option[String] = None,
+                                hods: Seq[String] = List.empty,
+                                reviewedDate: Instant,
+                                platform: String,
+                                maintainer: Maintainer,
+                                apiType: Option[ApiType] = None,
+                              )
+
+object ApiDetailWithoutOAS {
+  implicit val formatApiDetailWithoutOAS: OFormat[ApiDetailWithoutOAS] = {
+    val instantDateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+    implicit val customInstantFormat: Format[Instant] = Format(
+      Reads(js => JsSuccess(instantDateFormatter.parse(js.as[String], Instant.from))),
+      Writes(d => JsString(instantDateFormatter.format(d.atOffset(ZoneOffset.UTC))))
+    )
+    Json.format[ApiDetailWithoutOAS]
+  }
+}
+
+
 case class Maintainer(name: String, slackChannel: String, contactInfo: List[ContactInformation] = List.empty)
 
 object Maintainer {

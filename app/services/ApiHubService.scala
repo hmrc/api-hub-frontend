@@ -20,7 +20,7 @@ import com.google.inject.{Inject, Singleton}
 import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
 import models.AvailableEndpoint
 import models.accessrequest.{AccessRequest, AccessRequestRequest, AccessRequestStatus}
-import models.api.{ApiDeploymentStatuses, ApiDetail, PlatformContact}
+import models.api.{ApiDeploymentStatuses, ApiDetail, ApiDetailWithoutOAS, PlatformContact}
 import models.application.*
 import models.deployment.DeploymentDetails
 import models.exception.ApplicationsException
@@ -91,7 +91,7 @@ class ApiHubService @Inject()(
     applicationsConnector.getDeploymentDetails(publisherReference)
   }
 
-  def getApis(platform: Option[String] = None)(implicit hc: HeaderCarrier): Future[Seq[ApiDetail]] = {
+  def getApis(platform: Option[String] = None)(implicit hc: HeaderCarrier): Future[Seq[ApiDetailWithoutOAS]] = {
     integrationCatalogueConnector.getApis(platform)
   }
 
@@ -164,14 +164,14 @@ class ApiHubService @Inject()(
     applicationsConnector.removeTeamMemberFromTeam(id, teamMember)
   }
 
-  def getUserApis(teamMember: TeamMember)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[ApiDetail]] = {
+  def getUserApis(teamMember: TeamMember)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[ApiDetailWithoutOAS]] = {
     findTeams(Some(teamMember.email)) flatMap {
       case teams if teams.nonEmpty => integrationCatalogueConnector.filterApis(teams.map(_.id))
       case _ => Future.successful(Seq.empty)
     }
   }
 
-  def deepSearchApis(searchText: String)(implicit hc: HeaderCarrier): Future[Seq[ApiDetail]]  = {
+  def deepSearchApis(searchText: String)(implicit hc: HeaderCarrier): Future[Seq[ApiDetailWithoutOAS]]  = {
     integrationCatalogueConnector.deepSearchApis(searchText)
   }
 

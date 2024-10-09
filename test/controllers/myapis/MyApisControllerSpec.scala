@@ -19,12 +19,12 @@ package controllers.myapis
 import base.SpecBase
 import controllers.actions.FakeUser
 import generators.ApiDetailGenerators
-import models.api.{ApiDetail, Live, Maintainer}
+import models.api.{ApiDetailWithoutOAS, Live, Maintainer}
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
-import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.OptionValues
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import play.api.Application
 import play.api.inject.bind
@@ -52,7 +52,7 @@ class MyApisControllerSpec
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[MyApisView]
 
-        forAll { (apiDetail: ApiDetail) =>
+        forAll { (apiDetail: ApiDetailWithoutOAS) =>
           when(fixture.apiHubService.getUserApis(any)(any, any))
             .thenReturn(Future.successful(Seq(apiDetail)))
 
@@ -89,13 +89,13 @@ class MyApisControllerSpec
     running(fixture.application) {
       val view = fixture.application.injector.instanceOf[MyApisView]
 
-      val zebras = ApiDetail("id1", "ref1", "zebras", "zebras api", "1.0.0", Seq.empty, None, "oas", Live,
+      val zebras = ApiDetailWithoutOAS("id1", "ref1", "zebras", "zebras api", "1.0.0", Seq.empty, None, Live,
         reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
-      val molluscs = ApiDetail("id2", "ref2", "MOLLUSCS", "molluscs api", "1.0.0", Seq.empty, None, "oas", Live,
+      val molluscs = ApiDetailWithoutOAS("id2", "ref2", "MOLLUSCS", "molluscs api", "1.0.0", Seq.empty, None, Live,
         reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
-      val aardvarks = ApiDetail("id3", "ref3", "aardvarks", "aardvarks api", "1.0.0", Seq.empty, None, "oas", Live,
+      val aardvarks = ApiDetailWithoutOAS("id3", "ref3", "aardvarks", "aardvarks api", "1.0.0", Seq.empty, None, Live,
         reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
-      val pigeons = ApiDetail("id4", "ref4", "PIGEONS", "pigeons api", "1.0.0", Seq.empty, None, "oas", Live,
+      val pigeons = ApiDetailWithoutOAS("id4", "ref4", "PIGEONS", "pigeons api", "1.0.0", Seq.empty, None, Live,
         reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
 
       when(fixture.apiHubService.getUserApis(any)(any, any))
