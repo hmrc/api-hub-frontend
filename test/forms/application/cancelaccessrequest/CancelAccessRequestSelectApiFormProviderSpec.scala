@@ -34,7 +34,7 @@ class CancelAccessRequestSelectApiFormProviderSpec extends CheckboxFieldBehaviou
     behave like checkboxField[String](
       form,
       fieldName,
-      validValues  = accessRequests.map(_.apiId),
+      validValues  = accessRequests.map(_.id),
       invalidError = FormError(s"$fieldName[0]", "error.invalid")
     )
 

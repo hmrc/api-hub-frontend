@@ -85,14 +85,14 @@ class CancelAccessRequestSelectApiControllerSpec extends SpecBase with MockitoSu
 
       running(fixture.application) {
         val request = FakeRequest(POST, cancelAccessRequestSelectApiRoute)
-          .withFormUrlEncodedBody(("value[0]", accessRequests.head.apiId))
+          .withFormUrlEncodedBody(("value[0]", accessRequests.head.id))
 
         val result = route(fixture.application, request).value
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe onwardRoute.url
 
-        val expectedAnswers = fixture.userAnswers.value.setQuick(CancelAccessRequestSelectApiPage, Set(accessRequests.head.apiId))
+        val expectedAnswers = fixture.userAnswers.value.setQuick(CancelAccessRequestSelectApiPage, Set(accessRequests.head.id))
         verify(fixture.sessionRepository).set(ArgumentMatchers.eq(expectedAnswers))
       }
     }

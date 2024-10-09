@@ -21,7 +21,7 @@ import models.*
 import models.myapis.produce.ProduceApiHowToCreate.{Editor, Upload}
 import pages.*
 import pages.application.accessrequest.{ProvideSupportingInformationPage, RequestProductionAccessPage, RequestProductionAccessSelectApisPage, RequestProductionAccessStartPage}
-import pages.application.cancelaccessrequest.{CancelAccessRequestConfirmPage, CancelAccessRequestSelectApiPage, CancelAccessRequestStartPage}
+import pages.application.cancelaccessrequest.{CancelAccessRequestApplicationPage, CancelAccessRequestConfirmPage, CancelAccessRequestSelectApiPage, CancelAccessRequestStartPage}
 import pages.application.register.{RegisterApplicationNamePage, RegisterApplicationStartPage, RegisterApplicationTeamPage}
 import pages.myapis.produce.{ProduceApiBeforeYouStartPage, ProduceApiHowToCreatePage, ProduceApiStartPage}
 import play.api.mvc.Call
@@ -107,9 +107,9 @@ class Navigator @Inject()() {
   }
 
   private def cancelAccessRequestConfirmNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
-    (mode, userAnswers.get(CancelAccessRequestConfirmPage)) match {
-      case (_, Some(true)) => controllers.application.cancelaccessrequest.routes.CancelAccessRequestEndJourneyController.submitRequest()
-      case (_, Some(false)) => routes.IndexController.onPageLoad
+    (mode, userAnswers.get(CancelAccessRequestConfirmPage), userAnswers.get(CancelAccessRequestApplicationPage)) match {
+      case (_, Some(true), _) => controllers.application.cancelaccessrequest.routes.CancelAccessRequestEndJourneyController.submitRequest()
+      case (_, Some(false), Some(application)) => controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id)
       case _ => routes.JourneyRecoveryController.onPageLoad()
     }
   }

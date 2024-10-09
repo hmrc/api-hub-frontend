@@ -70,7 +70,7 @@ class CancelAccessRequestEndJourneyController @Inject()(
   }
 
   private def getCancellableRequests(data: CancelAccessRequestEndJourneyController.Data) = {
-    data.accessRequests.filter(accessRequest => data.apis.contains(accessRequest.apiId))
+    data.accessRequests.filter(accessRequest => data.apis.contains(accessRequest.id))
   }
 
   private def validate(request: DataRequest[?]): Either[Call, Data] = {
