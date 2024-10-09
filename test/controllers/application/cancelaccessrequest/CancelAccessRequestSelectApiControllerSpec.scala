@@ -208,7 +208,7 @@ class CancelAccessRequestSelectApiControllerSpec extends SpecBase with MockitoSu
 
 object CancelAccessRequestSelectApiControllerSpec {
 
-  private val onwardRoute = Call("GET", "/CancelAccessRequestSelectApiControllerSpec")
+  private val onwardRoute = Call("GET", routes.CancelAccessRequestConfirmController.onPageLoad(NormalMode).url)
   private lazy val cancelAccessRequestSelectApiRoute = routes.CancelAccessRequestSelectApiController.onPageLoad(NormalMode).url
 
   private case class Fixture(

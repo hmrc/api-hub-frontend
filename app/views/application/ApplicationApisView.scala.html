@@ -147,6 +147,9 @@
                         </p>
                         <p class="govuk-body additional-message">
                         @messages("applicationApis.pending.message")
+                        <br>
+                        <br>
+                        <a href="@controllers.application.cancelaccessrequest.routes.CancelAccessRequestStartController.startJourney(application.id)">Cancel production access requests</a>
                         </p>
                     </div>
                 }

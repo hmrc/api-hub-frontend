@@ -17,6 +17,7 @@
 package controllers.application.cancelaccessrequest
 
 import controllers.actions.*
+import controllers.routes
 import forms.application.cancelaccessrequest.CancelAccessRequestConfirmFormProvider
 import models.Mode
 import models.accessrequest.AccessRequest
@@ -64,14 +65,14 @@ class CancelAccessRequestConfirmController @Inject()(
   private def getCancellableRequests(request: DataRequest[AnyContent]) = {
     val pendingAccessRequests = request.userAnswers.get(CancelAccessRequestPendingPage).getOrElse(Seq.empty)
     val apisToCancel = request.userAnswers.get(CancelAccessRequestSelectApiPage).getOrElse(Set.empty)
-
     val accessRequestsToCancel = pendingAccessRequests.filter(accessRequest => apisToCancel.contains(accessRequest.apiId))
     accessRequestsToCancel
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
       implicit request => {
-        (request.userAnswers.get(CancelAccessRequestPendingPage), request.userAnswers.get(CancelAccessRequestSelectApiPage)) match {
+        (request.userAnswers.get(CancelAccessRequestPendingPage),
+          request.userAnswers.get(CancelAccessRequestSelectApiPage)) match {
           case (_, None) => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
           case (None, _) => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
           case (Some(accessRequests), Some(apiIds)) =>

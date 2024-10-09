@@ -50,13 +50,29 @@
             @messages("applicationHistory.secondaryTitle")
         </h2>
 
-        <p class="govuk-body">
+        <div class="govuk-body">
         @if(accessRequests.isEmpty) {
             @messages("applicationHistory.noRequests")
         } else {
+            @if(!accessRequests.filter(_.status == Pending).isEmpty) {
+                <div class="call-out-panel call-out-panel__small govuk-!-margin-top-2">
+                    <div class="govuk-body information-tag">
+                        <i class="fa-solid fa-circle-exclamation warning-colour"></i>
+                        <span class="call-out-type warning">
+                        @messages("applicationApis.pending.heading")
+                        </span>
+                    </div>
+                    <div class="govuk-body additional-message">
+                        @messages("applicationApis.pending.message")
+                        <br>
+                        <br>
+                        <a href="@controllers.application.cancelaccessrequest.routes.CancelAccessRequestStartController.startJourney(application.id)">Cancel production access requests</a>
+                    </div>
+                </div>
+            }
             @messages("applicationHistory.requests")
         }
-        </p>
+        </div>
 
         @for(accessRequest <- accessRequests) {
             @accessRequestPanel(AccessRequestPanelViewModel.consumerViewModel(accessRequest))

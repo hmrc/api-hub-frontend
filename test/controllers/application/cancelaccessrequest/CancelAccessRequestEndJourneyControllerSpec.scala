@@ -61,7 +61,7 @@ class CancelAccessRequestEndJourneyControllerSpec extends SpecBase with MockitoS
           when(fixture.cancelAccessRequestSessionRepository.clear(any())).thenReturn(Future.successful(true))
 
           running(fixture.application) {
-            val request = FakeRequest(POST, controllers.application.cancelaccessrequest.routes.CancelAccessRequestEndJourneyController.submitRequest().url)
+            val request = FakeRequest(GET, controllers.application.cancelaccessrequest.routes.CancelAccessRequestEndJourneyController.submitRequest().url)
             val result = route(fixture.application, request).value
 
             val view = fixture.application.injector.instanceOf[CancelAccessRequestSuccessView]
@@ -113,7 +113,7 @@ class CancelAccessRequestEndJourneyControllerSpec extends SpecBase with MockitoS
           val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
 
           running(fixture.application) {
-            val request = FakeRequest(POST, controllers.application.cancelaccessrequest.routes.CancelAccessRequestEndJourneyController.submitRequest().url)
+            val request = FakeRequest(GET, controllers.application.cancelaccessrequest.routes.CancelAccessRequestEndJourneyController.submitRequest().url)
             val result = route(fixture.application, request).value
 
             status(result) mustEqual SEE_OTHER
@@ -193,14 +193,14 @@ object CancelAccessRequestEndJourneyControllerSpec extends OptionValues{
   private val data: Data = Data(
     application = anApplication,
     accessRequests = Seq(anAccessRequest),
-    apis = Set(applicationApi.apiId)
+    selectedAccessRequests = Set(anAccessRequest.id)
   )
 
   private def buildUserAnswers(without: Seq[QuestionPage[?]] = Seq.empty): UserAnswers = {
     val fullUserAnswers = UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
       .set(CancelAccessRequestApplicationPage, data.application).toOption.value
       .set(CancelAccessRequestPendingPage, data.accessRequests).toOption.value
-      .set(CancelAccessRequestSelectApiPage, data.apis).toOption.value
+      .set(CancelAccessRequestSelectApiPage, data.selectedAccessRequests).toOption.value
       .set(CancelAccessRequestConfirmPage, true).toOption.value
 
     without.foldRight(fullUserAnswers)((page, userAnswers) => userAnswers.remove(page).toOption.value)

@@ -49,7 +49,7 @@ class CancelAccessRequestEndJourneyController @Inject()(
   import CancelAccessRequestEndJourneyController.*
 
   def submitRequest(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+    implicit request => {
       validate(request).fold(
         call => Future.successful(Redirect(call)),
         data => {
@@ -62,6 +62,7 @@ class CancelAccessRequestEndJourneyController @Inject()(
             }
         }
       )
+    }
   }
 
   private def cancelAccessRequests(data: CancelAccessRequestEndJourneyController.Data, user: UserModel)(implicit hc:HeaderCarrier): Future[Seq[Option[Unit]]] = {
@@ -69,7 +70,7 @@ class CancelAccessRequestEndJourneyController @Inject()(
   }
 
   private def getCancellableRequests(data: CancelAccessRequestEndJourneyController.Data) = {
-    data.accessRequests.filter(accessRequest => data.apis.contains(accessRequest.apiId))
+    data.accessRequests.filter(accessRequest => data.selectedAccessRequests.contains(accessRequest.id))
   }
 
   private def validate(request: DataRequest[?]): Either[Call, Data] = {
@@ -118,8 +119,8 @@ class CancelAccessRequestEndJourneyController @Inject()(
 object CancelAccessRequestEndJourneyController {
 
   case class Data(
-    application: Application,
-    accessRequests: Seq[AccessRequest],
-    apis: Set[String]
+                   application: Application,
+                   accessRequests: Seq[AccessRequest],
+                   selectedAccessRequests: Set[String]
   )
 }
