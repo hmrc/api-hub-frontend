@@ -19,8 +19,8 @@
 @import models.user.UserModel
 @import viewmodels.application.{ApplicationNavItems, ApplicationSideNavPages}
 @import views.html.components.IconsLink
-@import views.html.helper.CSPNonce
 @import views.html.components.ApplicationDetailsTable
+@import views.html.components.TeamSelection
 
 @this(
     layout: templates.Layout,
@@ -30,15 +30,14 @@
     govukErrorSummary: GovukErrorSummary,
     govukButton: GovukButton,
     iconsLink: IconsLink,
-    applicationDetailsTable: ApplicationDetailsTable
+    applicationDetailsTable: ApplicationDetailsTable,
+    teamSelection: TeamSelection
 )
 
 @(form: Form[?], application: Application, owningTeam: Option[Team], teams: Seq[Team], user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @scripts() = {
     @iconsLink()
-    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/accessible-autocomplete.min.css")"  type="text/css">
-    <script src="@routes.Assets.versioned("javascripts/selectOwningTeam.js")" type="module" @{CSPNonce.attr}></script>
 }
 
 @contactSupportLink() = {
@@ -61,15 +60,7 @@
             @if(user.permissions.canSupport) {
                 <h3 class="govuk-heading-s">@messages("application.update.team.selectNew")</h3>
 
-                <select id="owningTeamSelection" name="owningTeam">
-                    <option value="">Select an owning team</option>
-                    <option value="unassigned">Unassigned</option>
-                    @for(team <- teams){
-                      @if(!owningTeam.exists(_.id == team.id)){
-                        <option value="@team.id">@team.name</option>
-                      }
-                    }
-                </select>
+                @teamSelection(teams, owningTeam)
 
                 @govukButton(
                     ButtonViewModel(

@@ -20,25 +20,24 @@
 @import viewmodels.myapis.{MyApisNavItems, MyApisNavPages}
 @import views.html.components.IconsLink
 @import views.ViewUtils
-@import views.html.helper.CSPNonce
 @import models.api.ApiDeploymentStatuses
+@import views.html.components.TeamSelection
 
 @this(
-layout: templates.Layout,
-formHelper: FormWithCSRF,
-govukSummaryList: GovukSummaryList,
-govukSelect: GovukSelect,
-govukErrorSummary: GovukErrorSummary,
-govukButton: GovukButton,
-iconsLink: IconsLink,
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukSummaryList: GovukSummaryList,
+    govukSelect: GovukSelect,
+    govukErrorSummary: GovukErrorSummary,
+    govukButton: GovukButton,
+    iconsLink: IconsLink,
+    teamSelection: TeamSelection
 )
 
 @(form: Form[?], apiDetail: ApiDetail, owningTeam: Option[Team], teams: Seq[Team], userModel: UserModel, maybeDeploymentStatuses: Option[ApiDeploymentStatuses])(implicit request: Request[?], messages: Messages)
 
 @scripts() = {
     @iconsLink()
-    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/accessible-autocomplete.min.css")"  type="text/css">
-    <script src="@routes.Assets.versioned("javascripts/selectOwningTeam.js")" type="module" @{CSPNonce.attr}></script>
 }
 
 @contactSupportLink() = {
@@ -100,15 +99,7 @@ iconsLink: IconsLink,
             @if(userModel.permissions.canSupport) {
                 <h3 class="govuk-heading-s">@messages("myApis.update.team.selectNew")</h3>
 
-                <select id="owningTeamSelection" name="owningTeam">
-                    <option value="">Select an owning team</option>
-                    <option value="unassigned">Unassigned</option>
-                    @for(team <- teams){
-                      @if(!owningTeam.exists(_.id == team.id)){
-                        <option value="@team.id">@team.name</option>
-                      }
-                    }
-                </select>
+                @teamSelection(teams, owningTeam)
 
                 @govukButton(
                     ButtonViewModel(
