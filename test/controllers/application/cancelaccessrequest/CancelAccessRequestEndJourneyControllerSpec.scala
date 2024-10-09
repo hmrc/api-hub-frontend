@@ -61,7 +61,7 @@ class CancelAccessRequestEndJourneyControllerSpec extends SpecBase with MockitoS
           when(fixture.cancelAccessRequestSessionRepository.clear(any())).thenReturn(Future.successful(true))
 
           running(fixture.application) {
-            val request = FakeRequest(POST, controllers.application.cancelaccessrequest.routes.CancelAccessRequestEndJourneyController.submitRequest().url)
+            val request = FakeRequest(GET, controllers.application.cancelaccessrequest.routes.CancelAccessRequestEndJourneyController.submitRequest().url)
             val result = route(fixture.application, request).value
 
             val view = fixture.application.injector.instanceOf[CancelAccessRequestSuccessView]
@@ -113,7 +113,7 @@ class CancelAccessRequestEndJourneyControllerSpec extends SpecBase with MockitoS
           val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
 
           running(fixture.application) {
-            val request = FakeRequest(POST, controllers.application.cancelaccessrequest.routes.CancelAccessRequestEndJourneyController.submitRequest().url)
+            val request = FakeRequest(GET, controllers.application.cancelaccessrequest.routes.CancelAccessRequestEndJourneyController.submitRequest().url)
             val result = route(fixture.application, request).value
 
             status(result) mustEqual SEE_OTHER
