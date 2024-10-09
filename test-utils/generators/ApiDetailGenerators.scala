@@ -97,14 +97,11 @@ trait ApiDetailGenerators {
       Gen.nonEmptyListOf(arbitraryApiDetail.arbitrary)
     }
 
-  private def genApiDetailWithoutOAS: Gen[ApiDetailWithoutOAS] = Gen.sized {size =>
+  private def genCompactApiDetail: Gen[CompactApiDetail] = Gen.sized {size =>
     for {
       id <- Gen.uuid
       title <- sensiblySizedAlphaNumStr
-      description <- sensiblySizedAlphaNumStr
       publisherReference <- sensiblySizedAlphaNumStr
-      version <- sensiblySizedAlphaNumStr
-      endpoints <- Gen.listOfN(size / listSizeQuota, arbitraryEndpoint.arbitrary).suchThat(_.nonEmpty)
       shortDescription <- sensiblySizedAlphaNumStr
       apiStatus <- Gen.oneOf(ApiStatus.values)
       domain <- Gen.oneOf(FakeDomains.domains)
@@ -113,32 +110,26 @@ trait ApiDetailGenerators {
       reviewedDate <- Gen.const(Instant.now().truncatedTo(ChronoUnit.SECONDS))
       platform <- sensiblySizedAlphaNumStr
       maintainerName <- sensiblySizedAlphaNumStr
-      maintainerSlack <- sensiblySizedAlphaNumStr
       apiType <- Gen.oneOf(ApiType.values.toIndexedSeq)
-    } yield ApiDetailWithoutOAS(
+    } yield CompactApiDetail(
       id.toString,
       publisherReference,
       title,
-      description,
-      version,
-      endpoints,
       Some(shortDescription),
       apiStatus,
       domain = Some(domain.code),
       subDomain = Some(subDomain.code),
       hods = hods,
-      reviewedDate = reviewedDate,
       platform = platform,
-      maintainer = Maintainer(maintainerName, s"#$maintainerSlack", List.empty),
       apiType = Some(apiType)
     )
   }
 
-  implicit lazy val arbitraryApiDetailWithoutOAS: Arbitrary[ApiDetailWithoutOAS] = Arbitrary(genApiDetailWithoutOAS)
+  implicit lazy val arbitraryCompactApiDetail: Arbitrary[CompactApiDetail] = Arbitrary(genCompactApiDetail)
 
-  implicit val arbitraryApiDetailsWithoutOAS: Arbitrary[Seq[ApiDetailWithoutOAS]] =
+  implicit val arbitraryApiDetailsWithoutOAS: Arbitrary[Seq[CompactApiDetail]] =
     Arbitrary {
-      Gen.nonEmptyListOf(arbitraryApiDetailWithoutOAS.arbitrary)
+      Gen.nonEmptyListOf(arbitraryCompactApiDetail.arbitrary)
     }
 
   private val parameters = Gen.Parameters.default
@@ -146,8 +137,8 @@ trait ApiDetailGenerators {
   def sampleApiDetail(): ApiDetail =
     genApiDetail.pureApply(parameters, Seed.random())
 
-  def sampleApiDetailWithoutOAS(): ApiDetailWithoutOAS =
-    genApiDetailWithoutOAS.pureApply(parameters, Seed.random())
+  def sampleCompactApiDetail(): CompactApiDetail =
+    genCompactApiDetail.pureApply(parameters, Seed.random())
 
   def sampleApis() : IntegrationResponse =
     IntegrationResponse(1, None, arbitraryApiDetailsWithoutOAS.arbitrary.pureApply(parameters, Seed.random()))

@@ -17,7 +17,7 @@
 package config
 
 import com.google.inject.{Inject, Singleton}
-import models.api.{ApiDetail, ApiDetailWithoutOAS, Domain, SubDomain}
+import models.api.{ApiDetail, CompactApiDetail, Domain, SubDomain}
 import play.api.Configuration
 
 import scala.jdk.CollectionConverters.CollectionHasAsScala
@@ -45,7 +45,7 @@ trait Domains {
     getDomainDescription(apiDetail.domain)
   }
 
-  def getDomainDescription(apiDetail: ApiDetailWithoutOAS): Option[String] = {
+  def getDomainDescription(apiDetail: CompactApiDetail): Option[String] = {
     getDomainDescription(apiDetail.domain)
   }
 
@@ -76,7 +76,7 @@ trait Domains {
     getSubDomainDescription(apiDetail.domain, apiDetail.subDomain)
   }
 
-  def getSubDomainDescription(apiDetail: ApiDetailWithoutOAS): Option[String] =
+  def getSubDomainDescription(apiDetail: CompactApiDetail): Option[String] =
     getSubDomainDescription(apiDetail.domain, apiDetail.subDomain)
 
   private def normalise(s: String): String = {

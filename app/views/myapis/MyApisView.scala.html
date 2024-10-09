@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import models.api.ApiDetailWithoutOAS
+@import models.api.CompactApiDetail
 @import models.user.UserModel
 @import views.html.helper.CSPNonce
 @import views.html.components.SearchBox
@@ -28,7 +28,7 @@
         paginator: Paginator
 )
 
-@(myApis: Seq[ApiDetailWithoutOAS], user: UserModel)(implicit request: Request[?], messages: Messages)
+@(myApis: Seq[CompactApiDetail], user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @scripts() = {
     <script src='@routes.Assets.versioned("javascripts/myApis.js")' type="module" @{

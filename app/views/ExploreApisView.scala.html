@@ -37,7 +37,7 @@
     paginator: Paginator
 )
 
-@(user: Option[UserModel], apiDetails: Seq[ApiDetailWithoutOAS] = Seq.empty, domains: Domains, hods: Hods, platforms: Platforms)(implicit request: Request[?], messages: Messages)
+@(user: Option[UserModel], apiDetails: Seq[CompactApiDetail] = Seq.empty, domains: Domains, hods: Hods, platforms: Platforms)(implicit request: Request[?], messages: Messages)
 
 @scripts() = {
     @iconsLink()
@@ -76,7 +76,7 @@
     </div>
 }
 
-@anApi(apiDetail: ApiDetailWithoutOAS) = {
+@anApi(apiDetail: CompactApiDetail) = {
     <div class="api-panel"
             data-id="@apiDetail.id"
             data-apistatus="@apiDetail.apiStatus"
@@ -117,7 +117,7 @@
     </div>
 }
 
-@apis(apiDetails: Seq[ApiDetailWithoutOAS]) = {
+@apis(apiDetails: Seq[CompactApiDetail]) = {
     @if(apiDetails.isEmpty) {
         @messages("exploreApis.searchResults.empty")
     } else {

@@ -18,7 +18,7 @@ package connectors
 
 import com.google.inject.{Inject, Singleton}
 import config.FrontendAppConfig
-import models.api.{ApiDetail, ApiDetailWithoutOAS, IntegrationId, IntegrationResponse, PlatformContact}
+import models.api.{ApiDetail, CompactApiDetail, IntegrationId, IntegrationResponse, PlatformContact}
 import play.api.Logging
 import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION}
 import play.api.http.MimeTypes.JSON
@@ -59,7 +59,7 @@ class IntegrationCatalogueConnector @Inject()(
     }
   }
 
-  def getApis(platformFilter: Option[String])(implicit hc: HeaderCarrier): Future[Seq[ApiDetailWithoutOAS]] = {
+  def getApis(platformFilter: Option[String])(implicit hc: HeaderCarrier): Future[Seq[CompactApiDetail]] = {
     queryApis(platformFilter.map(f => Seq(("platformFilter", f))).toSeq.flatten)
   }
 
@@ -74,15 +74,15 @@ class IntegrationCatalogueConnector @Inject()(
       }
   }
 
-  def filterApis(teamIds: Seq[String])(implicit hc: HeaderCarrier): Future[Seq[ApiDetailWithoutOAS]] = {
+  def filterApis(teamIds: Seq[String])(implicit hc: HeaderCarrier): Future[Seq[CompactApiDetail]] = {
     queryApis(teamIds.map(id => ("teamIds", id)))
   }
 
-  def deepSearchApis(searchText: String)(implicit hc: HeaderCarrier): Future[Seq[ApiDetailWithoutOAS]] = {
+  def deepSearchApis(searchText: String)(implicit hc: HeaderCarrier): Future[Seq[CompactApiDetail]] = {
     queryApis(Seq(("searchTerm", searchText)))
   }
 
-  private def queryApis(queryParams: Seq[(String,String)])(implicit hc: HeaderCarrier): Future[Seq[ApiDetailWithoutOAS]] = {
+  private def queryApis(queryParams: Seq[(String,String)])(implicit hc: HeaderCarrier): Future[Seq[CompactApiDetail]] = {
     httpClient.get(url"$integrationCatalogueBaseUrl/integration-catalogue/integrations?integrationType=api")
       .transform(wsRq => wsRq.withQueryStringParameters(queryParams*))
       .setHeader((ACCEPT, JSON))

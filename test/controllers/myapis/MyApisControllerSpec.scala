@@ -19,7 +19,7 @@ package controllers.myapis
 import base.SpecBase
 import controllers.actions.FakeUser
 import generators.ApiDetailGenerators
-import models.api.{ApiDetailWithoutOAS, Live, Maintainer}
+import models.api.{CompactApiDetail, Live, Maintainer}
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -52,7 +52,7 @@ class MyApisControllerSpec
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[MyApisView]
 
-        forAll { (apiDetail: ApiDetailWithoutOAS) =>
+        forAll { (apiDetail: CompactApiDetail) =>
           when(fixture.apiHubService.getUserApis(any)(any, any))
             .thenReturn(Future.successful(Seq(apiDetail)))
 
@@ -89,14 +89,14 @@ class MyApisControllerSpec
     running(fixture.application) {
       val view = fixture.application.injector.instanceOf[MyApisView]
 
-      val zebras = ApiDetailWithoutOAS("id1", "ref1", "zebras", "zebras api", "1.0.0", Seq.empty, None, Live,
-        reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
-      val molluscs = ApiDetailWithoutOAS("id2", "ref2", "MOLLUSCS", "molluscs api", "1.0.0", Seq.empty, None, Live,
-        reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
-      val aardvarks = ApiDetailWithoutOAS("id3", "ref3", "aardvarks", "aardvarks api", "1.0.0", Seq.empty, None, Live,
-        reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
-      val pigeons = ApiDetailWithoutOAS("id4", "ref4", "PIGEONS", "pigeons api", "1.0.0", Seq.empty, None, Live,
-        reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
+      val zebras = CompactApiDetail("id1", "ref1", "zebras", None, Live,
+         platform = "HIP")
+      val molluscs = CompactApiDetail("id2", "ref2", "MOLLUSCS", None, Live,
+         platform = "HIP")
+      val aardvarks = CompactApiDetail("id3", "ref3", "aardvarks", None, Live,
+         platform = "HIP")
+      val pigeons = CompactApiDetail("id4", "ref4", "PIGEONS", None, Live,
+         platform = "HIP")
 
       when(fixture.apiHubService.getUserApis(any)(any, any))
         .thenReturn(Future.successful(Seq(molluscs, zebras, aardvarks, pigeons)))
