@@ -17,7 +17,9 @@ export function onPageShow() {
 
     filter.onChange(matchingEls => {
         elAppCount.textContent = matchingEls.length;
-        setVisible(elNoResultsPanel,matchingEls.length === 0);
+        if (elNoResultsPanel) {
+            setVisible(elNoResultsPanel, matchingEls.length === 0);
+        }
         paginator.render(matchingEls);
     });
 }
