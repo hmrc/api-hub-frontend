@@ -57,14 +57,14 @@
         </p>
         <p class="govuk-body additional-message">
             @if(user.isDefined) {
-            @govukButton(
-            Button(
-            id = Some("addToAnApplicationButton"),
-            href = Some(routes.AddAnApiStartController.addAnApi(apiDetail.id).url),
-            content = Text(messages("apiDetails.addToAnApplication")),
-            classes = "govuk-!-margin-bottom-2"
-            )
-            )
+                @govukButton(
+                    Button(
+                        id = Some("addToAnApplicationButton"),
+                        href = Some(routes.AddAnApiStartController.addAnApi(apiDetail.id).url),
+                        content = Text(messages("apiDetails.addToAnApplication")),
+                        classes = "govuk-!-margin-bottom-2"
+                    )
+                )
             }
         </p>
     </div>
@@ -88,8 +88,8 @@
         <p class="govuk-body additional-message">
             @messages("apiDetails.nonSelfServe.info2")
             @{contactEmail match {
-                case ApiTeamContactEmail(emailAddress) => mailToLink("front door team", emailAddress)
-                case HubSupportContactEmail(emailAddress) => mailToLink("Integration Hub support team", emailAddress)
+                case ApiTeamContactEmail(emailAddress) => mailToLink(messages("apiDetails.contact.frontdoor"), emailAddress)
+                case HubSupportContactEmail(emailAddress) => mailToLink(messages("apiDetails.contact.hub"), emailAddress)
             }}
         </p>
     </div>
@@ -120,8 +120,12 @@
                     </li>
 
                     <li class="side-nav__list">
-                        @newTabLink(routes.OasRedocController.onPageLoad(apiDetail.id).url,
-                        messages("apiDetails.leftNav.viewApiSpec"), "side-nav__link", false)
+                        @newTabLink(
+                            routes.OasRedocController.onPageLoad(apiDetail.id).url,
+                            messages("apiDetails.leftNav.viewApiSpec"),
+                            "side-nav__link",
+                            false
+                        )
                     </li>
                 </ul>
             </div>
@@ -256,13 +260,14 @@
                     </span>
                 </p>
                 <p class="govuk-body additional-message">
-                    @Html(
-                    messages(
-                    "apiDetails.viewApiSpec.message",
-                    newTabLink(routes.OasRedocController.onPageLoad(apiDetail.id).url,
-                    messages("apiDetails.viewApiSpec.link"), "govuk-link govuk-link--no-visited-state")
-                    )
-                    )
+                    @Html(messages(
+                        "apiDetails.viewApiSpec.message",
+                        newTabLink(
+                            routes.OasRedocController.onPageLoad(apiDetail.id).url,
+                            messages("apiDetails.viewApiSpec.link"),
+                            "govuk-link govuk-link--no-visited-state"
+                        )
+                    ))
                 </p>
             </div>
 

@@ -34,6 +34,9 @@ site.live = Live
 site.total = Total
 site.noEmail = The current user does not have an email address
 site.feedback = Feedback
+site.team.select = Select an owning team
+site.team.unassigned = Unassigned
+site.signedIn = Signed in as {0} via {1}
 
 date.day = Day
 date.month = Month
@@ -140,6 +143,7 @@ applicationDetails.apis.endpointsAvailable = {0} of {1} endpoints available
 applicationDetails.apis.missing.heading = An API used by this application no longer exists
 applicationDetails.apis.missing.unavailable = The following API is no longer available:
 applicationDetails.apis.missing.remove = To remove this API from your application please visit the {0}.
+applicationDetails.apis.page = Application APIs page
 
 applicationDetails.apis.problem = Application APIs are not available.
 applicationDetails.apis.tryAgain = Please try again later.
@@ -253,6 +257,9 @@ fake-sign-in.redirectUrl.error.absolute = Redirect URL must be absolute e.g. htt
 fake-sign-in.token.lbl = Token (optional)
 fake-sign-in.permissions.lbl = Permissions
 fake-sign-in.button = Sign in
+fake-sign-in.resource.type = Resource Type
+fake-sign-in.resource.locations = Resource Locations
+fake-sign-in.resource.action = Action
 
 addTeamMemberDetails.title = Add a team member
 addTeamMemberDetails.heading = Add a team member
@@ -274,6 +281,7 @@ signIn.stride.helpLink = self-serve the role
 
 testConnectivity.heading = Test Connectivity
 testConnectivity.title = Test Connectivity
+testConnectivity.response = Connectivity response:
 
 apiDetails.title = API Details
 apiDetails.apiName = API Name
@@ -303,6 +311,8 @@ apiDetails.selfServe.info = This API can be added to an application, and credent
 apiDetails.nonSelfServe.title = This API cannot be self-served
 apiDetails.nonSelfServe.info1 = This API is not available for self-service.
 apiDetails.nonSelfServe.info2 = If you require further information, including how to consume this API please contact the
+apiDetails.contact.frontdoor = front door team
+apiDetails.contact.hub = Integration Hub support team
 
 apiDeployments.heading = Deployment status
 apiDeployments.status.deployed = Deployed
@@ -349,6 +359,13 @@ support.title = Get Support
 support.heading = Get support
 support.email.subject.consumer = Support Request from Integration Hub - Consumer
 support.email.subject.producer = Support Request from Integration Hub - Producer
+support.contactUs = If you need help with something Hub related you can use the following methods to contact us.
+support.viaEmail = Via Email
+support.whatInfo = What information will I need to provide?
+support.consumer.heading = Having an issue using an API?
+support.consumer.text = If you are having problems using an API, you can contact us via this email
+support.producer.heading = Having an issue producing an API?
+support.producer.text = If you are having problems creating an API, you can contact us via this email
 
 helpdocs.link.text = Help Docs
 
@@ -671,6 +688,11 @@ api.deployment.failure.message = Review the details of the processing error belo
 api.deployment.failure.warning = Review the processing errors
 api.deployment.failure.continue = Return to API deployment page
 api.deployment.failure.viewDetails = View full error response
+api.deployment.failure.label.errors = Errors
+api.deployment.failure.label.type = Type
+api.deployment.failure.label.message = Message
+api.deployment.failure.contact = You can try to redeploy your API, if this error continues please contact {0}
+api.deployment.failure.contact.support = support
 
 myApis.details.title = API details
 myApis.details.name = Name
@@ -690,6 +712,12 @@ myApis.usage.noApplications = There are no applications consuming your API.
 myApis.usage.table.name = Name
 myApis.usage.table.status = Status
 myApis.usage.table.date = Registered
+
+myApis.promotion.title = Promote to production
+myApis.promotion.heading = You are about to promote your API to production
+myApis.promotion.description = Your API will be available in the production environment.
+myApis.promotion.finish = Finish and deploy your API to the production environment
+myApis.promotion.deploy = Deploy API
 
 myApis.all.title = Your APIs
 myApis.all.heading = Your APIs
@@ -754,6 +782,9 @@ removeApiConfirmation.error = Please make a selection
 removeApiConfirmation.guidance1 = The API will be removed from the application. If there are any pending production access requests, they will be cancelled.
 removeApiConfirmation.guidance2 = If you need to use this API again you will need to add it to your application again.
 removeApiConfirmation.legend = Continue and remove this API?
+removeApiConfirmation.label.applicationName = Application name
+removeApiConfirmation.label.apiName = API name
+
 
 removeApiSuccess.title = API removed
 removeApiSuccess.heading = API removed successfully

@@ -35,6 +35,10 @@
     </tr>
 }
 
+@supportLink() = {
+    <a href="@routes.GetSupportController.onPageLoad.url" class="govuk-link govuk-link--no-visited-state">@messages("api.deployment.failure.contact.support")</a>
+}
+
 @layout(pageTitle = titleNoForm(messages("api.deployment.title")), showBackLink = true, user = Some(user), customScriptsBlock = Some(iconsLink())) {
 
     <div class="govuk-fieldset__legend govuk-fieldset__legend--xl">
@@ -54,11 +58,11 @@
             </span>
         </p>
         <table class="govuk-table hip-table">
-            <caption class="govuk-table__caption govuk-table__caption--s">Errors</caption>
+            <caption class="govuk-table__caption govuk-table__caption--s">@messages("api.deployment.failure.label.errors")</caption>
             <thead class="govuk-table__head govuk-!-font-size-16">
                 <tr class="govuk-table__row">
-                    <th scope="col" class="govuk-table__header app-custom-class">Type</th>
-                    <th scope="col" class="govuk-table__header app-custom-class">Message</th>
+                    <th scope="col" class="govuk-table__header app-custom-class">@messages("api.deployment.failure.label.type")</th>
+                    <th scope="col" class="govuk-table__header app-custom-class">@messages("api.deployment.failure.label.message")</th>
                 </tr>
             </thead>
             <tbody class="govuk-table__body">
@@ -81,12 +85,14 @@
             <pre class="code--block govuk-!-font-size-1">@{Json.prettyPrint(Json.toJson(failuresResponse))}</pre>
         </div>
     </details>
-    <p class="govuk-body govuk-!-margin-top-5">You can try to redeploy your API, if this error continues please contact <a href="@routes.GetSupportController.onPageLoad.url" class="govuk-link govuk-link--no-visited-state">support</a>.</p>
+    <p class="govuk-body govuk-!-margin-top-5">
+        @Html(messages("api.deployment.failure.contact", supportLink()))
+    </p>
     <br>
     <div class="govuk-button-group">
         @govukButton(
             ButtonViewModel(messages("api.deployment.failure.continue")).asLink(returnUrl)
         )
-        <a class="govuk-link govuk-link--no-visited-state govuk-!-margin-left-3" href="@routes.IndexController.onPageLoad.url">Cancel</a>
+        <a class="govuk-link govuk-link--no-visited-state govuk-!-margin-left-3" href="@routes.IndexController.onPageLoad.url">@messages("site.cancel")</a>
     </div>
 }

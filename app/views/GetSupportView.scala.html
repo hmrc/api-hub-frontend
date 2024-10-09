@@ -82,19 +82,19 @@
 ) {
     <h1 class="govuk-heading-l">@messages("support.heading")</h1>
 
-    <p class="govuk-body">If you need help with something Hub related you can use the following methods to contact us.</p>
-    <h3 class="govuk-heading-m ">Via Email</h3>
+    <p class="govuk-body">@messages("support.contactUs")</p>
+    <h3 class="govuk-heading-m ">@messages("support.viaEmail")</h3>
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-one-half govuk-!-margin-top-3">
             <div class="call-out-panel call-out-panel__small  govuk-!-margin-bottom-7">
                 <p class="govuk-body information--general-tag">
                     <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
                     <span class="call-out-type">
-                        Having an issue using an API?
+                        @messages("support.consumer.heading")
                     </span>
                 </p>
                 <p class="govuk-body additional-message">
-                    If you are having problems using an API, you can contact us via this email
+                    @messages("support.consumer.text")
                     <br>
                     <a href="mailto:@supportEmailAddress?subject=@encodeWithEscapedSpaces(messages("support.email.subject.consumer"))&body=@whatInformationToProvideText()" class="govuk-link">@supportEmailAddress</a>.
                 </p>
@@ -102,7 +102,7 @@
                 <details class="govuk-details hip-details--get-support">
                     <summary class="govuk-details__summary">
                         <span class="govuk-details__summary-text govuk-body-s">
-                            What information will I need to provide?
+                            @messages("support.whatInfo")
                         </span>
                     </summary>
                     @whatInformationToProvide()
@@ -114,17 +114,18 @@
                 <p class="govuk-body information--general-tag">
                     <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
                     <span class="call-out-type">
-                        Having an issue producing an API?
+                        @messages("support.producer.heading")
                     </span>
                 </p>
-                <p class="govuk-body additional-message">If you are having problems creating an API, you can contact us via this email
+                <p class="govuk-body additional-message">
+                    @messages("support.producer.text")
                     <br>
                     <a href="mailto:@supportEmailAddress?subject=@encodeWithEscapedSpaces(messages("support.email.subject.producer"))&body=@whatInformationToProvideText()" class="govuk-link">@supportEmailAddress</a>.
                 </p>
                 <details class="govuk-details hip-details--get-support">
                     <summary class="govuk-details__summary">
                         <span class="govuk-details__summary-text govuk-body-s">
-                            What information will I need to provide?
+                            @messages("support.whatInfo")
                         </span>
                     </summary>
                     @whatInformationToProvide()

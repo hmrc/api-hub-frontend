@@ -26,9 +26,9 @@
 
 @(apiDetail: ApiDetail, user: UserModel)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = titleNoForm("Promote to production"), user = Some(user)) {
+@layout(pageTitle = titleNoForm(messages("myApis.promotion.title")), user = Some(user)) {
 
-    <h1 class="govuk-heading-l">You are about to promote your API to production</h1>
+    <h1 class="govuk-heading-l">@messages("myApis.promotion.heading")</h1>
 
     @govukSummaryList(SummaryList(
         rows = Seq(
@@ -44,27 +44,23 @@
     ))
 
     <p class="govuk-body govuk-!-margin-bottom-9">
-        Your API will be available in the production environment.
+        @messages("myApis.promotion.description")
     </p>
 
     <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-2">
 
-    <h2 class="govuk-heading-m">Finish and deploy your API to the production environment</h2>
+    <h2 class="govuk-heading-m">@messages("myApis.promotion.finish")</h2>
 
     @formHelper(action = controllers.myapis.routes.SimpleApiPromotionController.onSubmit(apiDetail.id)) {
         <div class="govuk-button-group">
             @govukButton(
-            ButtonViewModel(
-            content = Text("Deploy API")
-            )
+                ButtonViewModel(content = Text(messages("myApis.promotion.deploy")))
             )
 
             @govukButton(
-            ButtonViewModel(
-            content = Text("Cancel")
-            )
-            .asSecondaryButton()
-            .asLink(controllers.myapis.routes.MyApiDetailsController.onPageLoad(apiDetail.id).url)
+                ButtonViewModel(content = Text(messages("site.cancel")))
+                    .asSecondaryButton()
+                    .asLink(controllers.myapis.routes.MyApiDetailsController.onPageLoad(apiDetail.id).url)
             )
         </div>
     }
