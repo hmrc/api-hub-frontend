@@ -564,7 +564,7 @@ serviceStart.beforeExploring.content = You do not need anything to explore exist
 serviceStart.beforeConsuming.heading = Before you start using an API
 serviceStart.beforeConsuming.content = You will need specific roles to make API calls, and generate production credentials.
 serviceStart.beforeProducing.heading = Before you start producing an API
-serviceStart.beforeProducing.content = To deploy a test (hello world) API to the test environment you won't need anything, however to deploy a non-test API you will need the following:
+serviceStart.beforeProducing.content = To deploy a test (hello world) API to the test environment you will not need anything, however to deploy a non-test API you will need the following:
 serviceStart.beforeProducing.list.1 = Endpoint details
 
 manageMyTeams.title = Manage teams
@@ -809,7 +809,7 @@ applicationHistory.viewRequest = View request
 
 produceApiEnterOas.title = Enter your OpenAPI Specification
 produceApiEnterOas.heading = Enter your OpenAPI Specification
-produceApiEnterOas.hint = We''ve pre-populated the editor below with the specification of an example API, you can edit it to match your own API. Note the various best practices included in the example such as a clear overall description of the API, descriptions for each endpoint, lists of error response messages, and the response that is to be expected from a successful request.
+produceApiEnterOas.hint = We have pre-populated the editor below with the specification of an example API, you can edit it to match your own API. Note the various best practices included in the example such as a clear overall description of the API, descriptions for each endpoint, lists of error response messages, and the response that is to be expected from a successful request.
 produceApiEnterOas.checkYourAnswersLabel = OpenAPI Specification
 produceApiEnterOas.error.required = Enter a valid OpenAPI Specification for your API
 produceApiEnterOas.change.hidden = OpenAPI Specification
