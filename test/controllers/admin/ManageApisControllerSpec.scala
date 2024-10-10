@@ -45,7 +45,7 @@ class ManageApisControllerSpec
     "must return the list of apis to a user with the support role" in {
       forAll(usersWhoCanSupport) { (user: UserModel) =>
         val fixture = buildFixture(user)
-        val apis = Seq(sampleCompactApiDetail())
+        val apis = Seq(sampleApiDetailSummary())
 
         when(fixture.apiHubService.getApis(any)(any)).thenReturn(Future.successful(apis))
 

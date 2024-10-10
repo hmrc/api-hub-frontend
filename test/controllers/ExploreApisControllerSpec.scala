@@ -20,7 +20,7 @@ import base.OptionallyAuthenticatedSpecBase
 import controllers.actions.FakeUser
 import fakes.{FakeDomains, FakeHods, FakePlatforms}
 import generators.ApiDetailGenerators
-import models.api.{ApiDetail, CompactApiDetail, Live, Maintainer}
+import models.api.{ApiDetail, ApiDetailSummary, Live, Maintainer}
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -53,7 +53,7 @@ class ExploreApisControllerSpec
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[ExploreApisView]
 
-        forAll { (apiDetail: CompactApiDetail) =>
+        forAll { (apiDetail: ApiDetailSummary) =>
           when(fixture.apiHubService.getApis(any())(any()))
             .thenReturn(Future.successful(Seq(apiDetail)))
 
@@ -73,7 +73,7 @@ class ExploreApisControllerSpec
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[ExploreApisView]
 
-        forAll { (apiDetail: CompactApiDetail) =>
+        forAll { (apiDetail: ApiDetailSummary) =>
           when(fixture.apiHubService.getApis(any())(any()))
             .thenReturn(Future.successful(Seq(apiDetail)))
 
@@ -95,10 +95,10 @@ class ExploreApisControllerSpec
 
         val platform = "HIP"
         val maintainer = Maintainer("name", "#slack", List.empty)
-        val zebras = CompactApiDetail("id1", "ref1", "zebras", None, Live, platform = platform)
-        val molluscs = CompactApiDetail("id2", "ref2", "MOLLUSCS", None, Live, platform = platform)
-        val aardvarks = CompactApiDetail("id3", "ref3", "aardvarks", None, Live, platform = platform)
-        val pigeons = CompactApiDetail("id4", "ref4", "PIGEONS", None, Live, platform = platform)
+        val zebras = ApiDetailSummary("id1", "ref1", "zebras", None, Live, platform = platform)
+        val molluscs = ApiDetailSummary("id2", "ref2", "MOLLUSCS", None, Live, platform = platform)
+        val aardvarks = ApiDetailSummary("id3", "ref3", "aardvarks", None, Live, platform = platform)
+        val pigeons = ApiDetailSummary("id4", "ref4", "PIGEONS", None, Live, platform = platform)
 
         when(fixture.apiHubService.getApis(any())(any()))
           .thenReturn(Future.successful(Seq(molluscs, zebras, aardvarks, pigeons)))

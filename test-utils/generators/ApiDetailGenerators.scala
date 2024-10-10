@@ -97,7 +97,7 @@ trait ApiDetailGenerators {
       Gen.nonEmptyListOf(arbitraryApiDetail.arbitrary)
     }
 
-  private def genCompactApiDetail: Gen[CompactApiDetail] = Gen.sized {size =>
+  private def genApiDetailSummary: Gen[ApiDetailSummary] = Gen.sized {size =>
     for {
       id <- Gen.uuid
       title <- sensiblySizedAlphaNumStr
@@ -111,7 +111,7 @@ trait ApiDetailGenerators {
       platform <- sensiblySizedAlphaNumStr
       maintainerName <- sensiblySizedAlphaNumStr
       apiType <- Gen.oneOf(ApiType.values.toIndexedSeq)
-    } yield CompactApiDetail(
+    } yield ApiDetailSummary(
       id.toString,
       publisherReference,
       title,
@@ -125,11 +125,11 @@ trait ApiDetailGenerators {
     )
   }
 
-  implicit lazy val arbitraryCompactApiDetail: Arbitrary[CompactApiDetail] = Arbitrary(genCompactApiDetail)
+  implicit lazy val arbitraryApiDetailSummary: Arbitrary[ApiDetailSummary] = Arbitrary(genApiDetailSummary)
 
-  implicit val arbitraryApiDetailsWithoutOAS: Arbitrary[Seq[CompactApiDetail]] =
+  implicit val arbitraryApiDetailsWithoutOAS: Arbitrary[Seq[ApiDetailSummary]] =
     Arbitrary {
-      Gen.nonEmptyListOf(arbitraryCompactApiDetail.arbitrary)
+      Gen.nonEmptyListOf(arbitraryApiDetailSummary.arbitrary)
     }
 
   private val parameters = Gen.Parameters.default
@@ -137,8 +137,8 @@ trait ApiDetailGenerators {
   def sampleApiDetail(): ApiDetail =
     genApiDetail.pureApply(parameters, Seed.random())
 
-  def sampleCompactApiDetail(): CompactApiDetail =
-    genCompactApiDetail.pureApply(parameters, Seed.random())
+  def sampleApiDetailSummary(): ApiDetailSummary =
+    genApiDetailSummary.pureApply(parameters, Seed.random())
 
   def sampleApis() : IntegrationResponse =
     IntegrationResponse(1, None, arbitraryApiDetailsWithoutOAS.arbitrary.pureApply(parameters, Seed.random()))

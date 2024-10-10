@@ -19,7 +19,7 @@ package controllers.myapis
 import base.SpecBase
 import controllers.actions.FakeUser
 import generators.ApiDetailGenerators
-import models.api.{CompactApiDetail, Live, Maintainer}
+import models.api.{ApiDetailSummary, Live, Maintainer}
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -52,7 +52,7 @@ class MyApisControllerSpec
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[MyApisView]
 
-        forAll { (apiDetail: CompactApiDetail) =>
+        forAll { (apiDetail: ApiDetailSummary) =>
           when(fixture.apiHubService.getUserApis(any)(any, any))
             .thenReturn(Future.successful(Seq(apiDetail)))
 
@@ -89,13 +89,13 @@ class MyApisControllerSpec
     running(fixture.application) {
       val view = fixture.application.injector.instanceOf[MyApisView]
 
-      val zebras = CompactApiDetail("id1", "ref1", "zebras", None, Live,
+      val zebras = ApiDetailSummary("id1", "ref1", "zebras", None, Live,
          platform = "HIP")
-      val molluscs = CompactApiDetail("id2", "ref2", "MOLLUSCS", None, Live,
+      val molluscs = ApiDetailSummary("id2", "ref2", "MOLLUSCS", None, Live,
          platform = "HIP")
-      val aardvarks = CompactApiDetail("id3", "ref3", "aardvarks", None, Live,
+      val aardvarks = ApiDetailSummary("id3", "ref3", "aardvarks", None, Live,
          platform = "HIP")
-      val pigeons = CompactApiDetail("id4", "ref4", "PIGEONS", None, Live,
+      val pigeons = ApiDetailSummary("id4", "ref4", "PIGEONS", None, Live,
          platform = "HIP")
 
       when(fixture.apiHubService.getUserApis(any)(any, any))

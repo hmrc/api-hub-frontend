@@ -19,7 +19,7 @@ package controllers.myapis
 import com.google.inject.{Inject, Singleton}
 import controllers.actions.IdentifierAction
 import controllers.helpers.ErrorResultBuilder
-import models.api.CompactApiDetail
+import models.api.ApiDetailSummary
 import models.application.TeamMember
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -41,11 +41,11 @@ class MyApisController @Inject()(
   def onPageLoad(): Action[AnyContent] = identified.async {
     implicit request =>
       apiHubService.getUserApis(TeamMember(request.user.email)).flatMap {
-        case apiDetails: Seq[CompactApiDetail] @unchecked if apiDetails.isEmpty =>
+        case apiDetails: Seq[ApiDetailSummary] @unchecked if apiDetails.isEmpty =>
           Future.successful(errorResultBuilder.notFound(
             Messages("myApis.empty.heading")
           ))
-        case apiDetails: Seq[CompactApiDetail] @unchecked =>
+        case apiDetails: Seq[ApiDetailSummary] @unchecked =>
           Future.successful(Ok(view(apiDetails.sortWith( _.title.toUpperCase < _.title.toUpperCase), request.user)))
       }
   }

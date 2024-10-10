@@ -84,7 +84,7 @@ object ApiDetail {
   }
 }
 
-case class CompactApiDetail(
+case class ApiDetailSummary(
                                 id: String,
                                 publisherReference: String,
                                 title: String,
@@ -97,14 +97,14 @@ case class CompactApiDetail(
                                 apiType: Option[ApiType] = None,
                               )
 
-object CompactApiDetail {
-  implicit val formatCompactApiDetail: OFormat[CompactApiDetail] = {
+object ApiDetailSummary {
+  implicit val formatApiDetailSummary: OFormat[ApiDetailSummary] = {
     val instantDateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
     implicit val customInstantFormat: Format[Instant] = Format(
       Reads(js => JsSuccess(instantDateFormatter.parse(js.as[String], Instant.from))),
       Writes(d => JsString(instantDateFormatter.format(d.atOffset(ZoneOffset.UTC))))
     )
-    Json.format[CompactApiDetail]
+    Json.format[ApiDetailSummary]
   }
 }
 
