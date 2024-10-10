@@ -20,12 +20,14 @@ import models.{Enumerable, WithName}
 
 sealed trait EnvironmentName
 
-case object Primary extends WithName("primary") with EnvironmentName
-case object Secondary extends WithName("secondary") with EnvironmentName
+case object Production extends WithName("primary") with EnvironmentName
+case object PreProduction extends WithName("pre-production") with EnvironmentName
+case object Test extends WithName("secondary") with EnvironmentName
+case object Development extends WithName("development") with EnvironmentName
 
 object EnvironmentName extends Enumerable.Implicits {
 
-  val values: Seq[EnvironmentName] = Seq(Primary, Secondary)
+  val values: Seq[EnvironmentName] = Seq(Production, PreProduction, Test, Development)
 
   implicit val enumerable: Enumerable[EnvironmentName] =
     Enumerable(values.map(value => value.toString -> value)*)

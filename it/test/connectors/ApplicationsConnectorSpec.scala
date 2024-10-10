@@ -319,7 +319,7 @@ class ApplicationsConnectorSpec
           )
       )
 
-      buildConnector(this).addCredential(FakeApplication.id, Primary)(HeaderCarrier()) map {
+      buildConnector(this).addCredential(FakeApplication.id, Production)(HeaderCarrier()) map {
         actual =>
           actual mustBe Right(Some(expected))
       }
@@ -336,7 +336,7 @@ class ApplicationsConnectorSpec
           )
       )
 
-      buildConnector(this).addCredential(FakeApplication.id, Primary)(HeaderCarrier()) map {
+      buildConnector(this).addCredential(FakeApplication.id, Production)(HeaderCarrier()) map {
         actual =>
           actual mustBe Right(None)
       }
@@ -353,9 +353,9 @@ class ApplicationsConnectorSpec
           )
       )
 
-      buildConnector(this).addCredential(FakeApplication.id, Primary)(HeaderCarrier()) map {
+      buildConnector(this).addCredential(FakeApplication.id, Production)(HeaderCarrier()) map {
         actual =>
-          actual mustBe Left(ApplicationCredentialLimitException.forId(FakeApplication.id, Primary))
+          actual mustBe Left(ApplicationCredentialLimitException.forId(FakeApplication.id, Production))
       }
     }
   }
@@ -373,7 +373,7 @@ class ApplicationsConnectorSpec
           )
       )
 
-      buildConnector(this).deleteCredential(FakeApplication.id, Primary, clientId)(HeaderCarrier()) map {
+      buildConnector(this).deleteCredential(FakeApplication.id, Production, clientId)(HeaderCarrier()) map {
         actual =>
           actual mustBe Right(Some(()))
       }
@@ -390,7 +390,7 @@ class ApplicationsConnectorSpec
           )
       )
 
-      buildConnector(this).deleteCredential(FakeApplication.id, Primary, clientId)(HeaderCarrier()) map {
+      buildConnector(this).deleteCredential(FakeApplication.id, Production, clientId)(HeaderCarrier()) map {
         actual =>
           actual mustBe Right(None)
       }
@@ -407,9 +407,9 @@ class ApplicationsConnectorSpec
           )
       )
 
-      buildConnector(this).deleteCredential(FakeApplication.id, Primary, clientId)(HeaderCarrier()) map {
+      buildConnector(this).deleteCredential(FakeApplication.id, Production, clientId)(HeaderCarrier()) map {
         actual =>
-          actual mustBe Left(ApplicationCredentialLimitException.forId(FakeApplication.id, Primary))
+          actual mustBe Left(ApplicationCredentialLimitException.forId(FakeApplication.id, Production))
       }
     }
   }

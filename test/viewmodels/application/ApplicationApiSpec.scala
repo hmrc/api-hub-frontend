@@ -19,7 +19,7 @@ package viewmodels.application
 import controllers.actions.FakeApplication
 import models.api.{ApiDetail, Endpoint, EndpointMethod, Live, Maintainer}
 import models.application.ApplicationLenses.ApplicationLensOps
-import models.application.{Api, Primary, Scope, Secondary, SelectedEndpoint}
+import models.application.{Api, Production, Scope, Test, SelectedEndpoint}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
@@ -32,49 +32,49 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
 
   "ApplicationEndpointAccess" - {
     "must return Accessible when an application has the scopes required by the endpoint" in {
-      val application = FakeApplication.setPrimaryScopes(scopes(testScope1, testScope2, testScope3))
+      val application = FakeApplication.setProductionScopes(scopes(testScope1, testScope2, testScope3))
       val endpointMethod = EndpointMethod("GET", None, None, Seq(testScope1, testScope3))
-      val actual = ApplicationEndpointAccess(application, false, endpointMethod, Primary)
+      val actual = ApplicationEndpointAccess(application, false, endpointMethod, Production)
 
       actual mustBe Accessible
     }
 
     "must return Inaccessible when an application does not have the scopes required by the endpoint" in {
-      val application = FakeApplication.setPrimaryScopes(scopes(testScope1))
+      val application = FakeApplication.setProductionScopes(scopes(testScope1))
       val endpointMethod = EndpointMethod("GET", None, None, Seq(testScope2, testScope3))
-      val actual = ApplicationEndpointAccess(application, false, endpointMethod, Primary)
+      val actual = ApplicationEndpointAccess(application, false, endpointMethod, Production)
 
       actual mustBe Inaccessible
     }
 
     "must return Inaccessible when an application only has a subset of the scopes required by the endpoint" in {
-      val application = FakeApplication.setPrimaryScopes(scopes(testScope1, testScope2))
+      val application = FakeApplication.setProductionScopes(scopes(testScope1, testScope2))
       val endpointMethod = EndpointMethod("GET", None, None, Seq(testScope2, testScope3))
-      val actual = ApplicationEndpointAccess(application, false, endpointMethod, Primary)
+      val actual = ApplicationEndpointAccess(application, false, endpointMethod, Production)
 
       actual mustBe Inaccessible
     }
 
     "must return Inaccessible when an application has the scopes required but in the wrong environment" in {
-      val application = FakeApplication.setPrimaryScopes(scopes("test-scope-1", "test-scope-2", "test-scope-3"))
+      val application = FakeApplication.setProductionScopes(scopes("test-scope-1", "test-scope-2", "test-scope-3"))
       val endpointMethod = EndpointMethod("GET", None, None, Seq("test-scope-1", "test-scope-3"))
-      val actual = ApplicationEndpointAccess(application, false, endpointMethod, Secondary)
+      val actual = ApplicationEndpointAccess(application, false, endpointMethod, Test)
 
       actual mustBe Inaccessible
     }
 
     "must return Requested for a primary endpoint without required scopes when there is a pending production access request" in {
-      val application = FakeApplication.setPrimaryScopes(scopes(testScope1))
+      val application = FakeApplication.setProductionScopes(scopes(testScope1))
       val endpointMethod = EndpointMethod("GET", None, None, Seq(testScope2, testScope3))
-      val actual = ApplicationEndpointAccess(application, true, endpointMethod, Primary)
+      val actual = ApplicationEndpointAccess(application, true, endpointMethod, Production)
 
       actual mustBe Requested
     }
 
     "must return Accessible for a primary endpoint with required scopes when there is a pending production access request" in {
-      val application = FakeApplication.setPrimaryScopes(scopes(testScope1, testScope2, testScope3))
+      val application = FakeApplication.setProductionScopes(scopes(testScope1, testScope2, testScope3))
       val endpointMethod = EndpointMethod("GET", None, None, Seq(testScope1, testScope3))
-      val actual = ApplicationEndpointAccess(application, true, endpointMethod, Primary)
+      val actual = ApplicationEndpointAccess(application, true, endpointMethod, Production)
 
       actual mustBe Accessible
     }

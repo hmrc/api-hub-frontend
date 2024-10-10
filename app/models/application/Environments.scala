@@ -21,7 +21,13 @@ import play.api.libs.json.{Format, Json}
 case class Environments(
   primary:Environment,
   secondary:Environment
-)
+) {
+
+  def toNewEnvironments: Map[EnvironmentName, Environment] = {
+    Map(Production -> primary, Test -> secondary)
+  }
+
+}
 
 object Environments {
 

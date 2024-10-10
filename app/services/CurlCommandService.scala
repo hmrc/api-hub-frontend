@@ -54,7 +54,7 @@ class CurlCommandService extends Logging {
 
   private def getCommonHeaders(application: Application): Map[String,String] = {
     val maybeAuthHeader = for {
-      credential <- application.getSecondaryMasterCredential
+      credential <- application.getTestMasterCredential
       secret <- credential.clientSecret
       credentials = s"${credential.clientId}:$secret"
       encodedCredentials = getEncoder.encodeToString(credentials.getBytes)

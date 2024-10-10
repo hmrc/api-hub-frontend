@@ -21,6 +21,7 @@
 @import views.html.components.SearchBox
 @import views.html.components.IconsLink
 @import models.application.Application
+@import models.application.ApplicationLenses._
 @import views.html.helper.CSPNonce
 @import views.html.components.Paginator
 
@@ -41,7 +42,7 @@
 }
 
 @clientIds(application: Application) = @{
-    Seq(application.environments.primary, application.environments.secondary).flatMap(_.credentials.map(_.clientId)).mkString(",")
+    Seq(application.getProductionCredentials, application.getTestCredentials).flatten.map(_.clientId).mkString(",")
 }
 
 @layout(

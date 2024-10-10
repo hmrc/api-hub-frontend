@@ -18,7 +18,7 @@ package viewmodels.application
 
 import models.{Enumerable, WithName}
 import models.api.{ApiDetail, EndpointMethod}
-import models.application.{Api, Application, EnvironmentName, Primary, Secondary, SelectedEndpoint}
+import models.application.{Api, Application, EnvironmentName, Production, Test, SelectedEndpoint}
 import models.application.ApplicationLenses.ApplicationLensOps
 import play.api.libs.json.{Format, Json, Writes}
 
@@ -52,8 +52,9 @@ object ApplicationEndpointAccess extends Enumerable.Implicits{
   ): ApplicationEndpointAccess = {
 
     val scopes = environmentName match {
-      case Primary => application.getPrimaryScopes
-      case Secondary => application.getSecondaryScopes
+      case Production => application.getProductionScopes
+      case Test => application.getTestScopes
+      case _ => throw new IllegalArgumentException(s"Unsupported environment: $environmentName")  // TODO
     }
 
     if (endpointMethod.scopes.toSet.subsetOf(scopes.map(_.name).toSet)) {
