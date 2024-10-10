@@ -16,17 +16,13 @@
 
 package pages.myapis.produce
 
-import models.myapis.produce.ProduceApiHowToCreate
-import pages.behaviours.PageBehaviours
+import models.team.Team
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-class ProduceApiHowToCreatePageSpec extends PageBehaviours {
+case object ProduceApiChooseTeamPage extends QuestionPage[Team] {
 
-  "ProduceApiHowToCreatePage" - {
+  override def path: JsPath = JsPath \ toString
 
-    beRetrievable[ProduceApiHowToCreate](ProduceApiHowToCreatePage)
-
-    beSettable[ProduceApiHowToCreate](ProduceApiHowToCreatePage)
-
-    beRemovable[ProduceApiHowToCreate](ProduceApiHowToCreatePage)
-  }
+  override def toString: String = "produceApiChooseTeam"
 }

@@ -30,3 +30,8 @@ GET     /produce/how-to-create                              controllers.myapis.p
 POST    /produce/how-to-create                              controllers.myapis.produce.ProduceApiHowToCreateController.onSubmit(mode: Mode = NormalMode)
 GET     /produce/change-how-to-create                       controllers.myapis.produce.ProduceApiHowToCreateController.onPageLoad(mode: Mode = CheckMode)
 POST    /produce/change-how-to-create                       controllers.myapis.produce.ProduceApiHowToCreateController.onSubmit(mode: Mode = CheckMode)
+
+GET     /produce/enter-owning-team                          controllers.myapis.produce.ProduceApiChooseTeamController.onPageLoad(mode: Mode = NormalMode)
+POST    /produce/enter-owning-team                          controllers.myapis.produce.ProduceApiChooseTeamController.onSubmit(mode: Mode = NormalMode)
+GET     /produce/change-enter-owning-team                   controllers.myapis.produce.ProduceApiChooseTeamController.onPageLoad(mode: Mode = CheckMode)
+POST    /produce/change-enter-owning-team                   controllers.myapis.produce.ProduceApiChooseTeamController.onSubmit(mode: Mode = CheckMode)

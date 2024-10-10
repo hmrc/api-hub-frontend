@@ -16,17 +16,18 @@
 
 package pages.myapis.produce
 
-import models.myapis.produce.ProduceApiHowToCreate
+import models.team.Team
 import pages.behaviours.PageBehaviours
 
-class ProduceApiHowToCreatePageSpec extends PageBehaviours {
 
-  "ProduceApiHowToCreatePage" - {
+class ProduceApiChooseTeamPageSpec extends PageBehaviours {
 
-    beRetrievable[ProduceApiHowToCreate](ProduceApiHowToCreatePage)
+  "ProduceApiChooseTeamPage" - {
 
-    beSettable[ProduceApiHowToCreate](ProduceApiHowToCreatePage)
+    beRetrievable[Team](ProduceApiChooseTeamPage)
 
-    beRemovable[ProduceApiHowToCreate](ProduceApiHowToCreatePage)
+    beSettable[Team](ProduceApiChooseTeamPage)
+
+    beRemovable[Team](ProduceApiChooseTeamPage)
   }
 }
