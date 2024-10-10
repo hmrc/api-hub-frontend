@@ -60,7 +60,7 @@ class ApplicationApisControllerSpec extends SpecBase with MockitoSugar with Test
             val view = fixture.playApplication.injector.instanceOf[ApplicationApisView]
 
             status(result) mustEqual OK
-            contentAsString(result) mustBe view(FakeApplication, Seq.empty, Some(user))(request, messages(fixture.playApplication)).toString
+            contentAsString(result) mustBe view(FakeApplication, Seq.empty, 0, Some(user))(request, messages(fixture.playApplication)).toString
             contentAsString(result) must validateAsHtml
           }
       }
@@ -107,7 +107,7 @@ class ApplicationApisControllerSpec extends SpecBase with MockitoSugar with Test
         val view = fixture.playApplication.injector.instanceOf[ApplicationApisView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustBe view(application, applicationApis, Some(FakeUser))(request, messages(fixture.playApplication)).toString
+        contentAsString(result) mustBe view(application, applicationApis, 0, Some(FakeUser))(request, messages(fixture.playApplication)).toString
         contentAsString(result) must validateAsHtml
       }
     }

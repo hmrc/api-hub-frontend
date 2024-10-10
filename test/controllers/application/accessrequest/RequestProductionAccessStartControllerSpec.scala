@@ -53,7 +53,7 @@ class RequestProductionAccessStartControllerSpec extends SpecBase with MockitoSu
         .thenReturn(Future.successful(Some(application)))
 
       when(fixture.applicationApiBuilder.build(eqTo(application))(any))
-        .thenReturn(Future.successful(Seq(applicationApi)))
+        .thenReturn(Future.successful(Seq(applicationApi), 0))
 
       when(fixture.accessRequestSessionRepository.set(any())).thenReturn(Future.successful(true))
 
@@ -80,7 +80,7 @@ class RequestProductionAccessStartControllerSpec extends SpecBase with MockitoSu
         .thenReturn(Future.successful(Some(application)))
 
       when(fixture.applicationApiBuilder.build(eqTo(application))(any))
-        .thenReturn(Future.successful(Seq(applicationApi)))
+        .thenReturn(Future.successful(Seq(applicationApi), 0))
 
       when(fixture.accessRequestSessionRepository.set(any())).thenReturn(Future.successful(true))
 

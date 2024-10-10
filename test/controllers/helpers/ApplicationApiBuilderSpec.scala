@@ -64,7 +64,7 @@ class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
 
         val actual = fixture.applicationApiBuilder.build(application).futureValue
 
-        val expected = Seq(
+        val expected = (Seq(
           ApplicationApi(
             apiDetail1,
             Seq(
@@ -88,7 +88,7 @@ class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
             ),
             true
           )
-        )
+        ), 1)
 
         actual mustBe expected
       }
@@ -106,7 +106,7 @@ class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
 
         val actual = fixture.applicationApiBuilder.build(application).futureValue
 
-        actual mustBe Seq.empty
+        actual mustBe (Seq.empty, 0)
       }
     }
 
@@ -134,7 +134,7 @@ class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
 
         val actual = fixture.applicationApiBuilder.build(application).futureValue
 
-        val expected = Seq(
+        val expected = (Seq(
           ApplicationApi(missingApi, false),
           ApplicationApi(
             apiDetail2,
@@ -143,7 +143,7 @@ class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
             ),
             false
           )
-        )
+        ), 0)
 
         actual mustBe expected
       }
