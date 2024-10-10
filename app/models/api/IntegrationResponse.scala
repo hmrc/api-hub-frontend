@@ -21,5 +21,6 @@ import play.api.libs.json.{Format, Json}
 case class IntegrationResponse(count: Int, pagedCount: Option[Int] = None, results: Seq[ApiDetail])
 
 object IntegrationResponse {
+  private implicit val formatApiDetailSummary: Format[ApiDetail] = ApiDetail.formatApiDetailSummary
   implicit val formatIntegrationResponse: Format[IntegrationResponse] = Json.format[IntegrationResponse]
 }

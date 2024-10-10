@@ -106,7 +106,7 @@ class IntegrationCatalogueConnectorSpec
 
         buildConnector().getApis(None)(HeaderCarrier()) map {
           actual =>
-            actual mustBe expected.results
+            actual mustBe expected.results.map(_.copy(openApiSpecification = ""))
         }
       }
 
@@ -125,7 +125,7 @@ class IntegrationCatalogueConnectorSpec
 
         buildConnector().getApis(Some("hip"))(HeaderCarrier()) map {
           actual =>
-            actual mustBe expected.results
+            actual mustBe expected.results.map(_.copy(openApiSpecification = ""))
         }
       }
 
@@ -181,7 +181,7 @@ class IntegrationCatalogueConnectorSpec
 
         buildConnector().filterApis(Seq("team1", "team2"))(HeaderCarrier()) map {
           actual =>
-            actual mustBe expected.results
+            actual mustBe expected.results.map(_.copy(openApiSpecification = ""))
         }
       }
 
@@ -236,7 +236,7 @@ class IntegrationCatalogueConnectorSpec
 
         buildConnector().deepSearchApis(searchTerm)(HeaderCarrier()) map {
           actual =>
-            actual mustBe expected.results
+            actual mustBe expected.results.map(_.copy(openApiSpecification = ""))
         }
       }
 
