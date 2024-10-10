@@ -33,19 +33,37 @@ Should we have fixed or variable structure?
 Fixed structure is this:
 
 ```json
-"environments": {
-  "primary": {"scopes": [], "credentials": []},
-  "secondary": {"scopes": [], "credentials": []}
+{
+  "environments": {
+    "primary": {
+      "scopes": [],
+      "credentials": []
+    },
+    "secondary": {
+      "scopes": [],
+      "credentials": []
+    }
+  }
 }
 ```
 
 Variable (normalised) structure is this:
 
 ```json
-"environments": [
-  {"environmentName": "production", "scopes": [], "credentials": []},
-  {"environmentName": "test", "scopes": [], "credentials": []}
-]
+{
+  "environments": [
+    {
+      "name": "production",
+      "scopes": [],
+      "credentials": []
+    },
+    {
+      "name": "test",
+      "scopes": [],
+      "credentials": []
+    }
+  ]
+}
 ```
 
 The spike has assumed a normalised data model, just to see if that can be done and whether this causes issues. We know
@@ -133,8 +151,35 @@ Questions:
 * Should we automatically grant scopes in all "on" non-production environments?
 * Should we revoke scopes from all "on" environments?
 
+## APIM Connectors
+In the backend we have several connectors that speak to APIM. Most of them accept an environment parameter and should 
+need little to no change.
+
+The configuration should change to match the new environment names and add the additional environments too. We might
+need some thought around configuration for unused environments. Hopefully just configuring an environment off means
+its remaining configuration is ignored.
+
+There are some methods that specify environments in their names, for example:
+* validateInPrimary
+* deployToSecondary
+
+These are on the whole V2 journeys that we expect to work on further. We should try and make them configuration driven
+through. So `validateInPrimary` should be something like `validateOas` and take an environment parameter. The value
+of that parameter should come from configuration.
+
+```
+Environments {
+  production {
+    on: true
+  },
+  ...,
+  deployTo: test,
+  validateOasIn: production
+}
+```
+
 ## Journeys
-Analysis of al user journeys based on backend service methods.
+Analysis of all user journeys based on backend service methods.
 
 ### approveAccessRequest
 This grants scopes in Production.
