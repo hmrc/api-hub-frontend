@@ -22,12 +22,15 @@
 @import models.application.Application
 @import views.html.components.ApplicationDetailsTable
 @import viewmodels.application.ApplicationSideNavPages
+@import views.html.components.IconsLink
+
 
 @this(
     layout: templates.Layout,
     govukTable: GovukTable,
     accessRequestPanel: AccessRequestPanel,
-    applicationDetailsTable: ApplicationDetailsTable
+    applicationDetailsTable: ApplicationDetailsTable,
+    iconsLink: IconsLink
 )
 
 @(application: Application, accessRequests: Seq[AccessRequest], user: UserModel)(implicit request: Request[?], messages: Messages)
@@ -40,7 +43,8 @@
     pageTitle = titleNoForm(messages("applicationHistory.title")),
     user = Some(user),
     fullWidth = true,
-    activeLink = Some("apiHubAdmin")
+    activeLink = Some("apiHubAdmin"),
+    customScriptsBlock = Some(iconsLink())
 ) {
     @views.html.templates.SideNav(application.name, ApplicationNavItems(Some(user), application, ApplicationSideNavPages.ApplicationHistoryPage)) {
 
