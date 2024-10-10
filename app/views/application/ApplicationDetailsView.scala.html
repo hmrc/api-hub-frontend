@@ -29,6 +29,10 @@
 
 @(application: Application, applicationApis: Seq[ApplicationApi], user: Option[UserModel])(implicit request: Request[?], messages: Messages)
 
+@pendingAccessRequestsCount = @{
+    applicationApis.map(_.pendingAccessRequestCount).sum
+}
+
 @exploreApisLink(messageId: String) = {
     <a id="addExploreApisLink" href="@{routes.ExploreApisController.onPageLoad().url}" class="govuk-link govuk-link--no-visited-state">
         @messages(messageId)
@@ -141,11 +145,12 @@
                         <p class="govuk-body information-tag">
                             <i class="fa-solid fa-circle-exclamation warning-colour"></i>
                             <span class="call-out-type warning">
-                                @messages("applicationDetails.pending.heading")
+                                @messages("applicationDetails.pending.heading", pendingAccessRequestsCount)
                             </span>
                         </p>
                         <p class="govuk-body additional-message">
-                            @messages("applicationDetails.pending.message")
+                            @messages("applicationDetails.pending.message.1", pendingAccessRequestsCount)
+                            @messages("applicationDetails.pending.message.2", pendingAccessRequestsCount)
                             <br>
                             <br>
                             <a href="@controllers.application.cancelaccessrequest.routes.CancelAccessRequestStartController.startJourney(application.id)">Cancel production access requests</a>

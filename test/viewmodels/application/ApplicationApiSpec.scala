@@ -34,7 +34,7 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
     "must return Accessible when an application has the scopes required by the endpoint" in {
       val application = FakeApplication.setPrimaryScopes(scopes(testScope1, testScope2, testScope3))
       val endpointMethod = EndpointMethod("GET", None, None, Seq(testScope1, testScope3))
-      val actual = ApplicationEndpointAccess(application, false, endpointMethod, Primary)
+      val actual = ApplicationEndpointAccess(application, 0, endpointMethod, Primary)
 
       actual mustBe Accessible
     }
@@ -42,7 +42,7 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
     "must return Inaccessible when an application does not have the scopes required by the endpoint" in {
       val application = FakeApplication.setPrimaryScopes(scopes(testScope1))
       val endpointMethod = EndpointMethod("GET", None, None, Seq(testScope2, testScope3))
-      val actual = ApplicationEndpointAccess(application, false, endpointMethod, Primary)
+      val actual = ApplicationEndpointAccess(application, 0, endpointMethod, Primary)
 
       actual mustBe Inaccessible
     }
@@ -50,7 +50,7 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
     "must return Inaccessible when an application only has a subset of the scopes required by the endpoint" in {
       val application = FakeApplication.setPrimaryScopes(scopes(testScope1, testScope2))
       val endpointMethod = EndpointMethod("GET", None, None, Seq(testScope2, testScope3))
-      val actual = ApplicationEndpointAccess(application, false, endpointMethod, Primary)
+      val actual = ApplicationEndpointAccess(application, 0, endpointMethod, Primary)
 
       actual mustBe Inaccessible
     }
@@ -58,7 +58,7 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
     "must return Inaccessible when an application has the scopes required but in the wrong environment" in {
       val application = FakeApplication.setPrimaryScopes(scopes("test-scope-1", "test-scope-2", "test-scope-3"))
       val endpointMethod = EndpointMethod("GET", None, None, Seq("test-scope-1", "test-scope-3"))
-      val actual = ApplicationEndpointAccess(application, false, endpointMethod, Secondary)
+      val actual = ApplicationEndpointAccess(application, 0, endpointMethod, Secondary)
 
       actual mustBe Inaccessible
     }
@@ -66,7 +66,7 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
     "must return Requested for a primary endpoint without required scopes when there is a pending production access request" in {
       val application = FakeApplication.setPrimaryScopes(scopes(testScope1))
       val endpointMethod = EndpointMethod("GET", None, None, Seq(testScope2, testScope3))
-      val actual = ApplicationEndpointAccess(application, true, endpointMethod, Primary)
+      val actual = ApplicationEndpointAccess(application, 1, endpointMethod, Primary)
 
       actual mustBe Requested
     }
@@ -74,7 +74,7 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
     "must return Accessible for a primary endpoint with required scopes when there is a pending production access request" in {
       val application = FakeApplication.setPrimaryScopes(scopes(testScope1, testScope2, testScope3))
       val endpointMethod = EndpointMethod("GET", None, None, Seq(testScope1, testScope3))
-      val actual = ApplicationEndpointAccess(application, true, endpointMethod, Primary)
+      val actual = ApplicationEndpointAccess(application, 1, endpointMethod, Primary)
 
       actual mustBe Accessible
     }
@@ -100,7 +100,7 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
 
   "ApplicationApi" - {
     "must produce the correct summary values" in {
-      forAll { (hasPendingAccessRequest: Boolean) =>
+      Range.inclusive(0,1) map (pendingAccessRequestCount =>
         val apiDetail = ApiDetail(
           id = "test-id",
           publisherReference = "test-pub-ref",
@@ -169,13 +169,13 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
           )
         )
 
-        val applicationApi = ApplicationApi(apiDetail, endpoints, hasPendingAccessRequest)
+        val applicationApi = ApplicationApi(apiDetail, endpoints, pendingAccessRequestCount)
 
         applicationApi.selectedEndpoints mustBe 4
         applicationApi.totalEndpoints mustBe 3
         applicationApi.availablePrimaryEndpoints mustBe 2
         applicationApi.availableSecondaryEndpoints mustBe 3
-        applicationApi.needsProductionAccessRequest mustBe !hasPendingAccessRequest
+        applicationApi.needsProductionAccessRequest mustBe !applicationApi.hasPendingAccessRequest )
       }
     }
 
@@ -189,21 +189,19 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
         )
       )
 
-      val actual = ApplicationApi(api, true)
+      val actual = ApplicationApi(api, 1)
 
       val expected = ApplicationApi(
         apiId = api.id,
         apiTitle = api.title,
         totalEndpoints = 0,
         endpoints = api.endpoints.map(ApplicationEndpoint.forMissingApi),
-        hasPendingAccessRequest = true,
+        pendingAccessRequestCount = 1,
         isMissing = true
       )
 
       actual mustBe expected
     }
-  }
-
 }
 
 object ApplicationApiSpec {

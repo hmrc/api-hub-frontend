@@ -72,21 +72,21 @@ class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
               ApplicationEndpoint("POST", "/test1/1", None, None, Seq("all:test-scope-1", "post:test-scope-1-1"), Inaccessible, Accessible),
               ApplicationEndpoint("GET", "/test1/2", None, None, Seq("all:test-scope-1", "get:test-scope-1-2"), Accessible, Accessible)
             ),
-            false
+            0
           ),
           ApplicationApi(
             apiDetail2,
             Seq(
               ApplicationEndpoint("GET", "/test2/1", None, None, Seq("get:test-scope-2-1"), Inaccessible, Inaccessible)
             ),
-            false
+            0
           ),
           ApplicationApi(
             apiDetail3,
             Seq(
               ApplicationEndpoint("GET", "/test3/1", None, None, Seq("get:test-scope-3-1"), Requested, Accessible)
             ),
-            true
+            1
           )
         )
 
@@ -135,13 +135,13 @@ class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
         val actual = fixture.applicationApiBuilder.build(application).futureValue
 
         val expected = Seq(
-          ApplicationApi(missingApi, false),
+          ApplicationApi(missingApi, 0),
           ApplicationApi(
             apiDetail2,
             Seq(
               ApplicationEndpoint("GET", "/test2/1", None, None, Seq("get:test-scope-2-1"), Inaccessible, Inaccessible)
             ),
-            false
+            0
           )
         )
 

@@ -86,7 +86,7 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
       val fixture = buildFixture(userAnswers = Some(userAnswers))
 
       val applicationApis = Seq(
-        ApplicationApi(anApiDetail, Seq(ApplicationEndpoint("GET", "/test", Some("A summary"), Some("A description"), Seq("test-scope"), Inaccessible, Accessible)), false)
+        ApplicationApi(anApiDetail, Seq(ApplicationEndpoint("GET", "/test", Some("A summary"), Some("A description"), Seq("test-scope"), Inaccessible, Accessible)), 0)
       )
 
       when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(true), eqTo(false))(any()))
@@ -174,12 +174,12 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
                 summary = method.summary,
                 description = method.description,
                 scopes = method.scopes,
-                primaryAccess = ApplicationEndpointAccess(application, false, method, Primary),
+                primaryAccess = ApplicationEndpointAccess(application, 0, method, Primary),
                 secondaryAccess = Inaccessible
               )
           )
       ),
-      hasPendingAccessRequest = false,
+      pendingAccessRequestCount = 0,
       isMissing = false
     )
 

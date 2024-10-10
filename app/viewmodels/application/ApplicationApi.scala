@@ -46,7 +46,7 @@ object ApplicationEndpointAccess extends Enumerable.Implicits{
 
   def apply(
     application: Application,
-    hasPendingAccessRequest: Boolean,
+    pendingAccessRequestCount: Int,
     endpointMethod: EndpointMethod,
     environmentName: EnvironmentName
   ): ApplicationEndpointAccess = {
@@ -59,7 +59,7 @@ object ApplicationEndpointAccess extends Enumerable.Implicits{
     if (endpointMethod.scopes.toSet.subsetOf(scopes.map(_.name).toSet)) {
       Accessible
     }
-    else if (hasPendingAccessRequest) {
+    else if (pendingAccessRequestCount > 0) {
       Requested
     }
     else {
@@ -113,7 +113,7 @@ case class ApplicationApi(
   apiTitle: String,
   totalEndpoints: Int,
   endpoints: Seq[ApplicationEndpoint],
-  hasPendingAccessRequest: Boolean,
+  pendingAccessRequestCount: Int,
   isMissing: Boolean
 ) {
 
@@ -121,29 +121,29 @@ case class ApplicationApi(
   def availablePrimaryEndpoints: Int = endpoints.count(_.primaryAccess.isAccessible)
   def availableSecondaryEndpoints: Int = endpoints.count(_.secondaryAccess.isAccessible)
   def needsProductionAccessRequest: Boolean = !hasPendingAccessRequest && endpoints.exists(_.primaryAccess == Inaccessible)
-
+  def hasPendingAccessRequest: Boolean = pendingAccessRequestCount > 0
 }
 
 object ApplicationApi {
 
-  def apply(apiDetail: ApiDetail, endpoints: Seq[ApplicationEndpoint], hasPendingAccessRequest: Boolean): ApplicationApi = {
+  def apply(apiDetail: ApiDetail, endpoints: Seq[ApplicationEndpoint], pendingAccessRequestCount: Int): ApplicationApi = {
     ApplicationApi(
       apiId = apiDetail.id,
       apiTitle = apiDetail.title,
       totalEndpoints = apiDetail.endpoints.flatMap(_.methods).size,
       endpoints = endpoints,
-      hasPendingAccessRequest = hasPendingAccessRequest,
+      pendingAccessRequestCount = pendingAccessRequestCount,
       isMissing = false
     )
   }
 
-  def apply(api: Api, hasPendingAccessRequest: Boolean): ApplicationApi = {
+  def apply(api: Api, pendingAccessRequestCount: Int): ApplicationApi = {
     ApplicationApi(
       apiId = api.id,
       apiTitle = api.title,
       totalEndpoints = 0,
       endpoints = api.endpoints.map(ApplicationEndpoint.forMissingApi),
-      hasPendingAccessRequest = hasPendingAccessRequest,
+      pendingAccessRequestCount = pendingAccessRequestCount,
       isMissing = true
     )
   }
