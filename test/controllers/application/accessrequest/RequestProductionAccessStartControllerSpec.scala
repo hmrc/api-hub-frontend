@@ -53,7 +53,7 @@ class RequestProductionAccessStartControllerSpec extends SpecBase with MockitoSu
         .thenReturn(Future.successful(Some(application)))
 
       when(fixture.applicationApiBuilder.build(eqTo(application))(any))
-        .thenReturn(Future.successful(Seq(applicationApi), 0))
+        .thenReturn(Future.successful(Seq(applicationApi)))
 
       when(fixture.accessRequestSessionRepository.set(any())).thenReturn(Future.successful(true))
 
@@ -80,7 +80,7 @@ class RequestProductionAccessStartControllerSpec extends SpecBase with MockitoSu
         .thenReturn(Future.successful(Some(application)))
 
       when(fixture.applicationApiBuilder.build(eqTo(application))(any))
-        .thenReturn(Future.successful(Seq(applicationApi), 0))
+        .thenReturn(Future.successful(Seq(applicationApi)))
 
       when(fixture.accessRequestSessionRepository.set(any())).thenReturn(Future.successful(true))
 
@@ -166,7 +166,7 @@ object RequestProductionAccessStartControllerSpec {
   private val applicationApi = ApplicationApi(
     apiDetail = apiDetail,
     endpoints = Seq.empty,
-    hasPendingAccessRequest = false
+    pendingAccessRequestCount = 0
   )
 
 }

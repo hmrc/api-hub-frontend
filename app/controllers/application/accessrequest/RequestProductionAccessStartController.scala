@@ -45,14 +45,14 @@ class RequestProductionAccessStartController @Inject()(
   def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id, enrich = true)).async {
     implicit request =>
       for {
-        applicationApisAndPendingCount <- applicationApiBuilder.build(request.application)
+        applicationApis <- applicationApiBuilder.build(request.application)
         userAnswers <- Future.fromTry(
           UserAnswers(
             id = request.identifierRequest.user.userId,
             lastUpdated = clock.instant()
           )
           .set(RequestProductionAccessApplicationPage, request.application)
-            .flatMap(_.set(RequestProductionAccessApisPage, applicationApisAndPendingCount._1))
+            .flatMap(_.set(RequestProductionAccessApisPage, applicationApis))
         )
         _ <- accessRequestSessionRepository.set(userAnswers)
       } yield Redirect(navigator.nextPage(RequestProductionAccessStartPage, NormalMode, userAnswers))

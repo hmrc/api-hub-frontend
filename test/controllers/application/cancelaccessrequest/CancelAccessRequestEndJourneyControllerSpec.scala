@@ -185,7 +185,7 @@ object CancelAccessRequestEndJourneyControllerSpec extends OptionValues{
             secondaryAccess = Accessible
           )
       ),
-      hasPendingAccessRequest = false,
+      pendingAccessRequestCount = 0,
       isMissing = false
     )
   }

@@ -37,7 +37,7 @@ class ApplicationApisController @Inject()(
   def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id, enrich = true)).async {
     implicit request =>
       applicationApiBuilder.build(request.application).map(
-        applicationApisAndPendingCount => Ok(view(request.application, applicationApisAndPendingCount._1, applicationApisAndPendingCount._2, Some(request.identifierRequest.user)))
+        applicationApis => Ok(view(request.application, applicationApis, Some(request.identifierRequest.user)))
       )
   }
 

@@ -26,7 +26,11 @@
         iconsLink: IconsLink
 )
 
-@(application: Application, applicationApis: Seq[ApplicationApi], pendingAccessRequestsCount: Int, user: Option[UserModel])(implicit request: Request[?], messages: Messages)
+@(application: Application, applicationApis: Seq[ApplicationApi], user: Option[UserModel])(implicit request: Request[?], messages: Messages)
+
+@pendingAccessRequestsCount = @{
+    applicationApis.map(_.pendingAccessRequestCount).sum
+}
 
 @exploreApisLink(messageId: String) = {
     <a href="@{routes.ExploreApisController.onPageLoad().url}" class="govuk-link govuk-link--no-visited-state">
