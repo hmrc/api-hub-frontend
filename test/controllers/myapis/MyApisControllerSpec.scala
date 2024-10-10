@@ -19,12 +19,12 @@ package controllers.myapis
 import base.SpecBase
 import controllers.actions.FakeUser
 import generators.ApiDetailGenerators
-import models.api.{ApiDetail, Live, Maintainer}
+import models.api.{ApiDetailSummary, Live, Maintainer}
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
-import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.OptionValues
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import play.api.Application
 import play.api.inject.bind
@@ -52,7 +52,7 @@ class MyApisControllerSpec
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[MyApisView]
 
-        forAll { (apiDetail: ApiDetail) =>
+        forAll { (apiDetail: ApiDetailSummary) =>
           when(fixture.apiHubService.getUserApis(any)(any, any))
             .thenReturn(Future.successful(Seq(apiDetail)))
 
@@ -89,14 +89,14 @@ class MyApisControllerSpec
     running(fixture.application) {
       val view = fixture.application.injector.instanceOf[MyApisView]
 
-      val zebras = ApiDetail("id1", "ref1", "zebras", "zebras api", "1.0.0", Seq.empty, None, "oas", Live,
-        reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
-      val molluscs = ApiDetail("id2", "ref2", "MOLLUSCS", "molluscs api", "1.0.0", Seq.empty, None, "oas", Live,
-        reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
-      val aardvarks = ApiDetail("id3", "ref3", "aardvarks", "aardvarks api", "1.0.0", Seq.empty, None, "oas", Live,
-        reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
-      val pigeons = ApiDetail("id4", "ref4", "PIGEONS", "pigeons api", "1.0.0", Seq.empty, None, "oas", Live,
-        reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
+      val zebras = ApiDetailSummary("id1", "ref1", "zebras", None, Live,
+         platform = "HIP")
+      val molluscs = ApiDetailSummary("id2", "ref2", "MOLLUSCS", None, Live,
+         platform = "HIP")
+      val aardvarks = ApiDetailSummary("id3", "ref3", "aardvarks", None, Live,
+         platform = "HIP")
+      val pigeons = ApiDetailSummary("id4", "ref4", "PIGEONS", None, Live,
+         platform = "HIP")
 
       when(fixture.apiHubService.getUserApis(any)(any, any))
         .thenReturn(Future.successful(Seq(molluscs, zebras, aardvarks, pigeons)))
