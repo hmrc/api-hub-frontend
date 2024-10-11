@@ -19,9 +19,10 @@ package controllers.myapis.produce
 import controllers.actions.*
 import forms.myapis.produce.ProduceApiEnterOasFormProvider
 import models.Mode
+import models.curl.OpenApiDoc
 import navigation.Navigator
 import pages.myapis.produce.ProduceApiEnterOasPage
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.{I18nSupport, Messages, MessagesApi, MessagesProvider}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.ProduceApiSessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -57,16 +58,24 @@ class ProduceApiEnterOasController @Inject()(
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+      val boundedForm = form.bindFromRequest()
 
-      form.bindFromRequest().fold(
+      boundedForm.fold(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, mode))),
 
         value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(ProduceApiEnterOasPage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(ProduceApiEnterOasPage, mode, updatedAnswers))
+          validateOAS(value).fold(
+            error =>
+              Future.successful(BadRequest(view(boundedForm.withGlobalError(error), mode))),
+            _ => for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(ProduceApiEnterOasPage, value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(ProduceApiEnterOasPage, mode, updatedAnswers))
+          )
       )
   }
+
+  private def validateOAS(oas: String)(implicit messagesProvider: MessagesProvider): Either[String, Unit] =
+    OpenApiDoc.parse(oas).map(_ => ())
 }

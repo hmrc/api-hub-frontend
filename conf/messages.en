@@ -791,6 +791,7 @@ produceApiEnterOas.heading = Enter your OpenAPI Specification
 produceApiEnterOas.hint = We''ve pre-populated the editor below with the specification of an example API, you can edit it to match your own API. Note the various best practices included in the example such as a clear overall description of the API, descriptions for each endpoint, lists of error response messages, and the response that is to be expected from a successful request.
 produceApiEnterOas.checkYourAnswersLabel = OpenAPI Specification
 produceApiEnterOas.error.required = Enter a valid OpenAPI Specification for your API
+produceApiEnterOas.error.malformed = Unable to parse the OAS document
 produceApiEnterOas.change.hidden = OpenAPI Specification
 
 produceApiBeforeYouStart.title = Produce an API

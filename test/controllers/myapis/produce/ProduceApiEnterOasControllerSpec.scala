@@ -82,6 +82,29 @@ class ProduceApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
     "must redirect to the next page when valid data is submitted" in {
 
       val mockSessionRepository = mock[ProduceApiSessionRepository]
+      val validOAS =
+        """
+          |openapi: 3.0.1
+          |info:
+          |  title: title
+          |  description: This is a sample server
+          |  license:
+          |    name: Apache-2.0
+          |    url: http://www.apache.org/licenses/LICENSE-2.0.html
+          |  version: 1.0.0
+          |servers:
+          |- url: https://api.absolute.org/v2
+          |  description: An absolute path
+          |paths:
+          |  /whatever:
+          |    get:
+          |      summary: Some operation
+          |      description: Some operation
+          |      operationId: doWhatever
+          |      responses:
+          |        "200":
+          |          description: OK
+          |""".stripMargin
 
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
@@ -96,7 +119,7 @@ class ProduceApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, produceApiEnterOasRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+            .withFormUrlEncodedBody(("value", validOAS))
 
         val result = route(application, request).value
 

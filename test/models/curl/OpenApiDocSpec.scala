@@ -22,10 +22,20 @@ import io.swagger.v3.oas.models.parameters.{Parameter, RequestBody}
 import io.swagger.v3.oas.models.servers.Server
 import io.swagger.v3.oas.models.{OpenAPI, Operation, PathItem}
 import models.{CORPORATE, MDTP}
-import org.scalatest.freespec.AnyFreeSpec
+import org.mockito.ArgumentMatchers.{any, anyString}
 import org.scalatest.prop.TableDrivenPropertyChecks.{Table, forAll}
+import org.scalatestplus.mockito.MockitoSugar
+import org.mockito.Mockito.when
+import play.api.i18n.*
 
-class OpenApiDocSpec extends SpecBase{
+class OpenApiDocSpec extends SpecBase with MockitoSugar {
+
+  private implicit val messagesProvider: MessagesProvider = mock[MessagesProvider]
+  private val messages: Messages = mock[Messages]
+  private val errorMessage = "Error message"
+  when(messagesProvider.messages).thenReturn(messages)
+  when(messages.apply(anyString, any)).thenReturn(errorMessage)
+
   "getServerForApiWorld" - {
     val openApi = OpenAPI()
 
@@ -145,6 +155,112 @@ class OpenApiDocSpec extends SpecBase{
         buildOpenApiOperation(Operation().requestBody(requestBody), openAPI).exampleRequestBody.isDefined mustBe true
       }
 
+    }
+
+    "parse" - {
+      "must return a valid result if the provided OAS is correct" in {
+        val validOAS =
+          """
+            |openapi: 3.0.1
+            |info:
+            |  title: title
+            |  description: This is a sample server
+            |  license:
+            |    name: Apache-2.0
+            |    url: http://www.apache.org/licenses/LICENSE-2.0.html
+            |  version: 1.0.0
+            |servers:
+            |- url: https://api.absolute.org/v2
+            |  description: An absolute path
+            |paths:
+            |  /whatever:
+            |    get:
+            |      summary: Some operation
+            |      description: Some operation
+            |      operationId: doWhatever
+            |      responses:
+            |        "200":
+            |          description: OK
+            |""".stripMargin
+
+        val result = OpenApiDoc.parse(validOAS)
+
+        result mustBe a[Right[?, ?]]
+      }
+      "must return an error if the provided OAS is a malformed yaml" in {
+        val invalidYaml =
+          """
+            |openapi: 3.0.1
+            |info
+            |  title: title
+            |  description: This is a sample server
+            |  license:
+            |    name: Apache-2.0
+            |    url: http://www.apache.org/licenses/LICENSE-2.0.html
+            |  version: 1.0.0
+            |servers:
+            |- url: https://api.absolute.org/v2
+            |  description: An absolute path
+            |paths:
+            |  /whatever:
+            |    get:
+            |      summary: Some operation
+            |      description: Some operation
+            |      operationId: doWhatever
+            |      responses:
+            |        "200":
+            |          description: OK
+            |""".stripMargin
+
+        val result = OpenApiDoc.parse(invalidYaml)
+
+        result match {
+          case Left(error) => error mustBe s"""$errorMessage, [while scanning a simple key
+                                              | in 'reader', line 3, column 1:
+                                              |    info
+                                              |    ^
+                                              |could not find expected ':'
+                                              | in 'reader', line 4, column 8:
+                                              |      title: title
+                                              |           ^
+                                              |]""".stripMargin
+          case _ => fail()
+        }
+      }
+      "must return an error if the provided OAS is an invalid OAS" in {
+        val invalidOAS =
+          """
+            |openapi: 3.0.1
+            |info:
+            |  title: title
+            |  description: This is a sample server
+            |  license:
+            |    name: Apache-2.0
+            |    url: http://www.apache.org/licenses/LICENSE-2.0.html
+            |  version: 1.0.0
+            |servers:
+            |- url: https://api.absolute.org/v2
+            |  description: An absolute path
+            |paths:
+            |  /whatever:
+            |    get:
+            |      summary: Some operation
+            |      description: Some operation
+            |      operationId: doWhatever
+            |      responses:
+            |        "200":
+            |          description: OK
+            |        "200":
+            |          description: duplicate HTTP status code
+            |""".stripMargin
+
+        val result  = OpenApiDoc.parse(invalidOAS)
+
+        result match {
+          case Left(error) => error mustBe s"$errorMessage, [Duplicate field 200 in `null`]"
+          case _ => fail()
+        }
+      }
     }
   }
 }

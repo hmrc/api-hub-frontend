@@ -23,13 +23,15 @@ import models.application.ApplicationLenses.*
 import models.curl.OpenApiDoc
 import models.{ApiWorld, CurlCommand}
 import play.api.Logging
+import play.api.i18n.MessagesProvider
 
 import java.util.Base64.getEncoder
 
 @Singleton
 class CurlCommandService extends Logging {
 
-  def buildCurlCommandsForApi(application: Application, apiDetail: ApiDetail, apiWorld: ApiWorld): Either[String, Seq[CurlCommand]] = {
+  def buildCurlCommandsForApi(application: Application, apiDetail: ApiDetail, apiWorld: ApiWorld)
+                             (implicit messagesProvider: MessagesProvider): Either[String, Seq[CurlCommand]] = {
     OpenApiDoc.parse(apiDetail.openApiSpecification).map(openApiDoc =>
       val operationResults = for {
         api <- application.apis
