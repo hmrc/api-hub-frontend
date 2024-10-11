@@ -25,7 +25,7 @@ import org.scalatest.TryValues
 import pages.application.accessrequest.{ProvideSupportingInformationPage, RequestProductionAccessPage, RequestProductionAccessSelectApisPage, RequestProductionAccessStartPage}
 import pages.application.cancelaccessrequest.CancelAccessRequestStartPage
 import pages.application.register.{RegisterApplicationNamePage, RegisterApplicationStartPage, RegisterApplicationTeamPage}
-import pages.myapis.produce.{ProduceApiBeforeYouStartPage, ProduceApiHowToCreatePage, ProduceApiStartPage}
+import pages.myapis.produce.*
 
 class NavigatorSpec extends SpecBase with TryValues {
 
@@ -120,8 +120,11 @@ class NavigatorSpec extends SpecBase with TryValues {
         "must start with the Before you Start page" in {
           navigator.nextPage(ProduceApiStartPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiBeforeYouStartController.onPageLoad()
         }
+        "must go from the Before You Start page to the Choose owning team page" in {
+          navigator.nextPage(ProduceApiBeforeYouStartPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiChooseTeamController.onPageLoad(NormalMode)
+        }
         "must go from the Before You Start page to the How To Create page" in {
-          navigator.nextPage(ProduceApiBeforeYouStartPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiHowToCreateController.onPageLoad(NormalMode)
+          navigator.nextPage(ProduceApiChooseTeamPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiHowToCreateController.onPageLoad(NormalMode)
         }
         "must go from the How To Create page to the Produce Api Enter OAS page" in {
           navigator.nextPage(ProduceApiHowToCreatePage, NormalMode, emptyUserAnswers.set(ProduceApiHowToCreatePage, Editor).get) mustBe controllers.myapis.produce.routes.ProduceApiEnterOasController.onPageLoad(NormalMode)

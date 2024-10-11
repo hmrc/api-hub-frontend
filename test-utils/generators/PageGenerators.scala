@@ -21,10 +21,12 @@ import pages.*
 import pages.application.accessrequest.RequestProductionAccessSelectApisPage
 import pages.application.cancelaccessrequest.{CancelAccessRequestConfirmPage, CancelAccessRequestSelectApiPage}
 import pages.application.register.RegisterApplicationTeamPage
-import pages.myapis.produce.ProduceApiEnterOasPage
-import pages.myapis.produce.ProduceApiHowToCreatePage
+import pages.myapis.produce.*
 
 trait PageGenerators {
+
+  implicit lazy val arbitraryProduceApiChooseTeamPage: Arbitrary[ProduceApiChooseTeamPage.type] =
+    Arbitrary(ProduceApiChooseTeamPage)
 
   implicit lazy val arbitraryCancelAccessRequestConfirmPage: Arbitrary[CancelAccessRequestConfirmPage.type] =
     Arbitrary(CancelAccessRequestConfirmPage)

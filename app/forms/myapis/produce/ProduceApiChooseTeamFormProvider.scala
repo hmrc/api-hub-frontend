@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package pages.myapis.produce
+package forms.myapis.produce
 
-import models.myapis.produce.ProduceApiHowToCreate
-import pages.behaviours.PageBehaviours
+import forms.mappings.Mappings
+import play.api.data.Form
 
-class ProduceApiHowToCreatePageSpec extends PageBehaviours {
+import javax.inject.Inject
 
-  "ProduceApiHowToCreatePage" - {
+class ProduceApiChooseTeamFormProvider @Inject() extends Mappings {
 
-    beRetrievable[ProduceApiHowToCreate](ProduceApiHowToCreatePage)
-
-    beSettable[ProduceApiHowToCreate](ProduceApiHowToCreatePage)
-
-    beRemovable[ProduceApiHowToCreate](ProduceApiHowToCreatePage)
-  }
+  def apply(): Form[String] =
+    Form(
+      "value" -> text("produceApiChooseTeam.error.required")
+        .verifying(maxLength(100, "produceApiChooseTeam.error.length"))
+    )
 }

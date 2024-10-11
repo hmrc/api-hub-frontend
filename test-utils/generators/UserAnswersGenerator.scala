@@ -24,14 +24,14 @@ import pages.*
 import pages.application.accessrequest.RequestProductionAccessSelectApisPage
 import pages.application.cancelaccessrequest.CancelAccessRequestConfirmPage
 import pages.application.register.RegisterApplicationTeamPage
-import pages.myapis.produce.ProduceApiHowToCreatePage
-import pages.myapis.produce.ProduceApiEnterOasPage
+import pages.myapis.produce.*
 import play.api.libs.json.{JsValue, Json}
 
 trait UserAnswersGenerator extends TryValues {
   self: Generators =>
 
   val generators: Seq[Gen[(QuestionPage[?], JsValue)]] =
+    arbitrary[(ProduceApiChooseTeamPage.type, JsValue)] ::
     arbitrary[(CancelAccessRequestConfirmPage.type, JsValue)] ::
     arbitrary[(RequestProductionAccessSelectApisPage.type, JsValue)] ::
     arbitrary[(ProduceApiEnterOasPage.type, JsValue)] ::
