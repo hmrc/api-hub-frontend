@@ -850,6 +850,8 @@ cancelAccessRequestConfirm.error.required = Select yes if you wish to cancel the
 cancelAccessRequestConfirm.change.hidden = CancelAccessRequestConfirm
 
 produceApiChooseTeam.title = Select owning team
+produceApiChooseTeam.hint.guidance = If you need to use another team you can {0}, you will be navigated away from this page and your progress will be lost.
+produceApiChooseTeam.hint.link = create a new team
 produceApiChooseTeam.checkYourAnswersLabel = Owning Team
-produceApiChooseTeam.error.required = Please enter an owning team
+produceApiChooseTeam.error.required = Please select an owning team
 produceApiChooseTeam.change.hidden = ProduceApiChooseTeam

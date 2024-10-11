@@ -35,7 +35,7 @@
     </p>
     <p class="govuk-body-s govuk-!-margin-left-2 govuk-!-margin-left-2 govuk-!-margin-bottom-2">
         @Html(messages(
-        "registerApplicationTeam.hint.guidance",
+        "produceApiChooseTeam.hint.guidance",
         createTeamLink()
         ))
     </p>
@@ -44,11 +44,11 @@
 
 @createTeamLink() = {
 <a href="@controllers.team.routes.CreateTeamStartController.startCreateTeam().url" class="govuk-link clear-link govuk-link--no-visited-state">
-    @messages("registerApplicationTeam.hint.link")
+    @messages("produceApiChooseTeam.hint.link")
 </a>
 }
 
-@layout(pageTitle = title(form, messages("produceApiChooseTeam.title"))) {
+@layout(pageTitle = title(form, messages("produceApiChooseTeam.title")), customScriptsBlock = Some(iconsLink())) {
 
     @formHelper(action = controllers.myapis.produce.routes.ProduceApiChooseTeamController.onSubmit(mode)) {
 
