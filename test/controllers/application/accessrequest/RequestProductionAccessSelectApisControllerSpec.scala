@@ -68,7 +68,7 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
       apiTitle = "API title 1",
       totalEndpoints = 0,
       endpoints = Seq(applicationEndpoint),
-      hasPendingAccessRequest = false,
+      pendingAccessRequestCount = 0,
       isMissing = false
     )
   private val applicationApiEndpointNotAccessible =
@@ -77,7 +77,7 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
       apiTitle = "API title 1",
       totalEndpoints = 0,
       endpoints = Seq(applicationEndpointNotAccessibleInProd),
-      hasPendingAccessRequest = false,
+      pendingAccessRequestCount = 0,
       isMissing = false
     )
   private val applicationApiMissing =
@@ -86,7 +86,7 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
       apiTitle = "API title 2",
       totalEndpoints = 0,
       endpoints = Seq(applicationEndpoint),
-      hasPendingAccessRequest = false,
+      pendingAccessRequestCount = 0,
       isMissing = true
     )
   private val applicationApiPendingRequest =
@@ -95,7 +95,7 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
       apiTitle = "API title 3",
       totalEndpoints = 0,
       endpoints = Seq(applicationEndpoint),
-      hasPendingAccessRequest = true,
+      pendingAccessRequestCount = 1,
       isMissing = false
     )
   private val applicationApis = Seq(

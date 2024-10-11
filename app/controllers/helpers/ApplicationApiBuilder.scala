@@ -34,8 +34,7 @@ class ApplicationApiBuilder @Inject()(
   def build(application: Application)(implicit request: Request[?]): Future[Seq[ApplicationApi]] = {
     apiHubService.getAccessRequests(Some(application.id), Some(Pending)).flatMap (
       pendingAccessRequests =>
-        fetchApiDetails(application).map(apis => build(application, apis, pendingAccessRequests))
-    )
+        fetchApiDetails(application).map(apis => build(application, apis, pendingAccessRequests)))
   }
 
   private def build(application: Application, apis: Seq[(Api, Option[ApiDetail])], pendingAccessRequests: Seq[AccessRequest]): Seq[ApplicationApi] = {
@@ -54,19 +53,19 @@ class ApplicationApiBuilder @Inject()(
                     endpointMethod.summary,
                     endpointMethod.description,
                     endpointMethod.scopes,
-                    ApplicationEndpointAccess(application, hasPendingAccessRequest(apiDetail.id, pendingAccessRequests), endpointMethod, Primary),
-                    ApplicationEndpointAccess(application, hasPendingAccessRequest(apiDetail.id, pendingAccessRequests), endpointMethod, Secondary)
+                    ApplicationEndpointAccess(application, pendingAccessRequestCount(apiDetail.id, pendingAccessRequests), endpointMethod, Primary),
+                    ApplicationEndpointAccess(application, pendingAccessRequestCount(apiDetail.id, pendingAccessRequests), endpointMethod, Secondary)
                   )
               )
         }
-        ApplicationApi(apiDetail, endpoints, hasPendingAccessRequest(apiDetail.id, pendingAccessRequests))
+        ApplicationApi(apiDetail, endpoints, pendingAccessRequestCount(apiDetail.id, pendingAccessRequests))
       case (api, None) =>
-        ApplicationApi(api, hasPendingAccessRequest(api.id, pendingAccessRequests))
+        ApplicationApi(api, pendingAccessRequestCount(api.id, pendingAccessRequests))
     }
   }
 
-  private def hasPendingAccessRequest(apiId: String, pendingAccessRequests: Seq[AccessRequest]): Boolean = {
-    pendingAccessRequests.exists(_.apiId == apiId)
+  private def pendingAccessRequestCount(apiId: String, pendingAccessRequests: Seq[AccessRequest]): Int = {
+    pendingAccessRequests.count(_.apiId == apiId)
   }
 
   private def fetchApiDetails(application: Application)(implicit request: Request[?]): Future[Seq[(Api, Option[ApiDetail])]] = {
