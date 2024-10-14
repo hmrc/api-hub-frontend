@@ -874,3 +874,10 @@ produceApiChooseTeam.hint.link = create a new team
 produceApiChooseTeam.checkYourAnswersLabel = Owning Team
 produceApiChooseTeam.error.required = Please select an owning team
 produceApiChooseTeam.change.hidden = ProduceApiChooseTeam
+
+produceApiShortDescription.title = Enter a short description for your API
+produceApiShortDescription.hint = The short description will be used to help identify your API, and will be displayed on the Explore APIs page.
+produceApiShortDescription.checkYourAnswersLabel = Short API description
+produceApiShortDescription.error.required = Enter a short API description
+produceApiShortDescription.error.length = The API short description must be between 8 and 180 characters
+produceApiShortDescription.change.hidden = ProduceApiShortDescription

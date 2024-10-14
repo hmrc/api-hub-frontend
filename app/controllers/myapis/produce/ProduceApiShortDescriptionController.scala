@@ -16,11 +16,14 @@
 
 package controllers.myapis.produce
 
-import controllers.actions.*
+import controllers.actions._
+import forms.myapis.produce.ProduceApiShortDescriptionFormProvider
 import models.Mode
-import play.api.data.Form
+import navigation.Navigator
+import pages.myapis.produce.ProduceApiShortDescriptionPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.{ProduceApiSessionRepository, SessionRepository}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.myapis.produce.ProduceApiShortDescriptionView
 
@@ -28,17 +31,42 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class ProduceApiShortDescriptionController @Inject()(
-                                                      override val messagesApi: MessagesApi,
-                                                      identify: IdentifierAction,
-                                                      val controllerComponents: MessagesControllerComponents,
-                                                      view: ProduceApiShortDescriptionView
-                                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                        override val messagesApi: MessagesApi,
+                                        sessionRepository: ProduceApiSessionRepository,
+                                        navigator: Navigator,
+                                        identify: IdentifierAction,
+                                        getData: ProduceApiDataRetrievalAction,
+                                        requireData: DataRequiredAction,
+                                        formProvider: ProduceApiShortDescriptionFormProvider,
+                                        val controllerComponents: MessagesControllerComponents,
+                                        view: ProduceApiShortDescriptionView
+                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = identify {
-    implicit request => Ok(view(mode))
+  val form = formProvider()
+
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+    implicit request =>
+
+      val preparedForm = request.userAnswers.get(ProduceApiShortDescriptionPage) match {
+        case None => form
+        case Some(value) => form.fill(value)
+      }
+
+      Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = identify {
-    implicit request => Redirect(routes.ProduceApiReviewAppearanceController.onPageLoad())
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request =>
+
+      form.bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, mode))),
+
+        value =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(ProduceApiShortDescriptionPage, value))
+            _              <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(navigator.nextPage(ProduceApiShortDescriptionPage, mode, updatedAnswers))
+      )
   }
 }
