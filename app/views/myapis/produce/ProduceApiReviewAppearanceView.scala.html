@@ -22,11 +22,11 @@
     govukButton: GovukButton
 )
 
-@(mode: Mode)(implicit request: Request[?], messages: Messages)
+@()(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = titleNoForm("Enter a short description for your API")) {
-    @formHelper(action = controllers.myapis.produce.routes.ProduceApiShortDescriptionController.onSubmit(mode)) {
-        <h1 class="govuk-heading-l">Enter a short description for your API</h1>
+@layout(pageTitle = titleNoForm("Review how your API will appear to consumers")) {
+    @formHelper(action = controllers.myapis.produce.routes.ProduceApiReviewAppearanceController.onSubmit()) {
+        <h1 class="govuk-heading-l">Review how your API will appear to consumers</h1>
         @govukButton(
             ButtonViewModel(messages("site.continue"))
         )
