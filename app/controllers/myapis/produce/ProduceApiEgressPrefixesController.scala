@@ -38,6 +38,6 @@ class ProduceApiEgressPrefixesController @Inject()(
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = identify {
-    implicit request => Redirect(routes.ProduceApiReviewAppearanceController.onPageLoad())
+    implicit request => Redirect(routes.ProduceApiHodController.onPageLoad(mode))
   }
 }
