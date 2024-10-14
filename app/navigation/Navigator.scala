@@ -52,6 +52,7 @@ class Navigator @Inject()() {
     case ProduceApiChooseTeamPage => _ => controllers.myapis.produce.routes.ProduceApiHowToCreateController.onPageLoad(NormalMode)
     case ProduceApiEnterOasPage => _ => controllers.myapis.produce.routes.ProduceApiShortDescriptionController.onPageLoad(NormalMode)
     case ProduceApiHowToCreatePage => produceApiHowToCreateNextPage(NormalMode)
+    case ProduceApiEnterOasPage => _ => controllers.myapis.produce.routes.ProduceApiShortDescriptionController.onPageLoad(NormalMode)
     case CancelAccessRequestStartPage => _ => controllers.application.cancelaccessrequest.routes.CancelAccessRequestSelectApiController.onPageLoad(NormalMode)
     case CancelAccessRequestSelectApiPage => _ => controllers.application.cancelaccessrequest.routes.CancelAccessRequestConfirmController.onPageLoad(NormalMode)
     case CancelAccessRequestConfirmPage => cancelAccessRequestConfirmNextPage(NormalMode)

@@ -80,12 +80,6 @@ lazy val root = (project in file("."))
         throw new MessageOnlyException("jsHint checks failed")
       }
     },
-    dependencyOverrides ++= Seq(
-      "com.fasterxml.jackson.core"     %% "jackson-databind"        % "2.17.0",
-      "com.fasterxml.jackson.core"     %% "jackson-core"            % "2.17.0",
-      "com.fasterxml.jackson.core"     %% "jackson-annotations"     % "2.17.0",
-      "com.fasterxml.jackson.datatype" %% "jackson-datatype-jsr310" % "2.17.0",
-    )
   )
   .settings(scalacOptions := scalacOptions.value.diff(Seq("-Wunused:all")))
   .settings(scalacOptions += "-Wconf:msg=Flag.*repeatedly:s")

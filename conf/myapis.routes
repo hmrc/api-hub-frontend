@@ -40,8 +40,8 @@ POST    /produce/upload-oas                                 controllers.myapis.p
 GET     /produce/change-upload-oas                          controllers.myapis.produce.ProduceApiUploadOasController.onPageLoad(mode: Mode = CheckMode)
 POST    /produce/change-upload-oas                          controllers.myapis.produce.ProduceApiUploadOasController.onSubmit(mode: Mode = CheckMode)
 
-GET     /produce/short-description                          controllers.myapis.produce.ProduceApiShortDescriptionController.onPageLoad(mode: Mode = NormalMode)
-POST    /produce/short-description                          controllers.myapis.produce.ProduceApiShortDescriptionController.onSubmit(mode: Mode = NormalMode)
+GET     /produce/enter-short-description                    controllers.myapis.produce.ProduceApiShortDescriptionController.onPageLoad(mode: Mode = NormalMode)
+POST    /produce/enter-short-description                    controllers.myapis.produce.ProduceApiShortDescriptionController.onSubmit(mode: Mode = NormalMode)
 GET     /produce/change-short-description                   controllers.myapis.produce.ProduceApiShortDescriptionController.onPageLoad(mode: Mode = CheckMode)
 POST    /produce/change-short-description                   controllers.myapis.produce.ProduceApiShortDescriptionController.onSubmit(mode: Mode = CheckMode)
 
