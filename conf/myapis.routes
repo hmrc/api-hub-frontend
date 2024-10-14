@@ -62,3 +62,8 @@ GET     /produce/hod                                        controllers.myapis.p
 POST    /produce/hod                                        controllers.myapis.produce.ProduceApiHodController.onSubmit(mode: Mode = NormalMode)
 GET     /produce/change-hod                                 controllers.myapis.produce.ProduceApiHodController.onPageLoad(mode: Mode = CheckMode)
 POST    /produce/change-hod                                 controllers.myapis.produce.ProduceApiHodController.onSubmit(mode: Mode = CheckMode)
+
+GET     /produce/domain                                     controllers.myapis.produce.ProduceApiDomainController.onPageLoad(mode: Mode = NormalMode)
+POST    /produce/domain                                     controllers.myapis.produce.ProduceApiDomainController.onSubmit(mode: Mode = NormalMode)
+GET     /produce/change-domain                              controllers.myapis.produce.ProduceApiDomainController.onPageLoad(mode: Mode = CheckMode)
+POST    /produce/change-domain                              controllers.myapis.produce.ProduceApiDomainController.onSubmit(mode: Mode = CheckMode)

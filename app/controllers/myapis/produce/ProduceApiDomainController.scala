@@ -22,23 +22,23 @@ import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.myapis.produce.ProduceApiHodView
+import views.html.myapis.produce.ProduceApiDomainView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class ProduceApiHodController @Inject()(
-                                         override val messagesApi: MessagesApi,
-                                         identify: IdentifierAction,
-                                         val controllerComponents: MessagesControllerComponents,
-                                         view: ProduceApiHodView
-                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+class ProduceApiDomainController @Inject()(
+                                            override val messagesApi: MessagesApi,
+                                            identify: IdentifierAction,
+                                            val controllerComponents: MessagesControllerComponents,
+                                            view: ProduceApiDomainView
+                                          )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(mode: Mode): Action[AnyContent] = identify {
     implicit request => Ok(view(mode))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = identify {
-    implicit request => Redirect(routes.ProduceApiDomainController.onPageLoad(mode))
+    implicit request => Redirect(routes.ProduceApiReviewAppearanceController.onPageLoad())
   }
 }
