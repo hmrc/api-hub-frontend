@@ -52,3 +52,8 @@ GET     /produce/egress                                     controllers.myapis.p
 POST    /produce/egress                                     controllers.myapis.produce.ProduceApiEgressController.onSubmit(mode: Mode = NormalMode, next: String)
 GET     /produce/change-egress                              controllers.myapis.produce.ProduceApiEgressController.onPageLoad(mode: Mode = CheckMode)
 POST    /produce/change-egress                              controllers.myapis.produce.ProduceApiEgressController.onSubmit(mode: Mode = CheckMode, next: String)
+
+GET     /produce/egress-prefixes                            controllers.myapis.produce.ProduceApiEgressPrefixesController.onPageLoad(mode: Mode = NormalMode)
+POST    /produce/egress-prefixes                            controllers.myapis.produce.ProduceApiEgressPrefixesController.onSubmit(mode: Mode = NormalMode)
+GET     /produce/change-egress-prefixes                     controllers.myapis.produce.ProduceApiEgressPrefixesController.onPageLoad(mode: Mode = CheckMode)
+POST    /produce/change-egress-prefixes                     controllers.myapis.produce.ProduceApiEgressPrefixesController.onSubmit(mode: Mode = CheckMode)
