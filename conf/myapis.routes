@@ -74,7 +74,10 @@ GET     /produce/change-details                             controllers.myapis.p
 POST    /produce/change-details                             controllers.myapis.produce.ProduceApiDetailsController.onSubmit(mode: Mode = CheckMode)
 
 GET     /produce/check-your-answers                         controllers.myapis.produce.ProduceApiCheckYourAnswersController.onPageLoad()
-POST    /produce/check-your-answers                         controllers.myapis.produce.ProduceApiCheckYourAnswersController.onSubmit()
+POST    /produce/check-your-answers                         controllers.myapis.produce.ProduceApiCheckYourAnswersController.onSubmit(next: String)
 
 GET     /produce/deploying                                  controllers.myapis.produce.ProduceApiDeploymentController.onPageLoad()
 POST    /produce/deploying                                  controllers.myapis.produce.ProduceApiDeploymentController.onSubmit()
+
+GET     /produce/deployment-error                           controllers.myapis.produce.ProduceApiDeploymentErrorController.onPageLoad()
+POST    /produce/deployment-error                           controllers.myapis.produce.ProduceApiDeploymentErrorController.onSubmit()

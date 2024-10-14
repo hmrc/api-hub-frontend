@@ -22,28 +22,23 @@ import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.myapis.produce.ProduceApiCheckYourAnswersView
+import views.html.myapis.produce.ProduceApiDeploymentErrorView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class ProduceApiCheckYourAnswersController @Inject()(
-                                             override val messagesApi: MessagesApi,
-                                             identify: IdentifierAction,
-                                             val controllerComponents: MessagesControllerComponents,
-                                             view: ProduceApiCheckYourAnswersView
-                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+class ProduceApiDeploymentErrorController @Inject()(
+                                                     override val messagesApi: MessagesApi,
+                                                     identify: IdentifierAction,
+                                                     val controllerComponents: MessagesControllerComponents,
+                                                     view: ProduceApiDeploymentErrorView
+                                                   )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = identify {
     implicit request => Ok(view())
   }
 
-  def onSubmit(next: String): Action[AnyContent] = identify {
-    implicit request => {
-      next match {
-        case "ok" => Redirect(routes.ProduceApiDeploymentController.onPageLoad())
-        case "error" => Redirect(routes.ProduceApiDeploymentErrorController.onPageLoad())
-      }
-    }
+  def onSubmit(): Action[AnyContent] = identify {
+    implicit request => Redirect(routes.ProduceApiStartController.startProduceApi())
   }
 }
