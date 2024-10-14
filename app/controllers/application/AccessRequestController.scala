@@ -63,5 +63,4 @@ class AccessRequestController @Inject()(
       Redirect(controllers.routes.UnauthorisedController.onPageLoad)
     }
   }
-
 }

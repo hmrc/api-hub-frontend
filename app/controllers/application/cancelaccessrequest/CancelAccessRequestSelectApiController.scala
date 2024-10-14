@@ -49,8 +49,14 @@ class CancelAccessRequestSelectApiController @Inject()(
           val form = formProvider(accessRequests)
 
           val preparedForm = request.userAnswers.get(CancelAccessRequestSelectApiPage) match {
-            case None => form
-            case Some(value) => form.fill(value)
+            case None => {
+              Console.println("OIYAF: Nothing")
+              form
+            }
+            case Some(value) => {
+              Console.println(s"OIYAF: $value")
+              form.fill(value)
+            }
           }
 
           Ok(view(accessRequests, preparedForm, mode, request.user))

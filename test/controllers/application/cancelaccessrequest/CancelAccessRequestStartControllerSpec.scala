@@ -27,19 +27,19 @@ import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, verifyNoInteractions, when}
 import org.scalatest.OptionValues
 import org.scalatestplus.mockito.MockitoSugar
-import pages.application.cancelaccessrequest.{CancelAccessRequestApplicationPage, CancelAccessRequestPendingPage, CancelAccessRequestStartPage}
+import pages.application.cancelaccessrequest.{CancelAccessRequestApplicationPage, CancelAccessRequestPendingPage, CancelAccessRequestSelectApiPage, CancelAccessRequestStartPage}
 import play.api.Application as PlayApplication
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.CancelAccessRequestSessionRepository
 import services.ApiHubService
-import utils.TestHelpers
+import utils.{TestHelpers, UserAnswersSugar}
 
 import java.time.{Clock, Instant, ZoneId}
 import scala.concurrent.Future
 
-class CancelAccessRequestStartControllerSpec extends SpecBase with MockitoSugar with TestHelpers with AccessRequestGenerator with FakeApplicationAuthActions {
+class CancelAccessRequestStartControllerSpec extends SpecBase with MockitoSugar with TestHelpers with AccessRequestGenerator with FakeApplicationAuthActions with UserAnswersSugar {
 
   import CancelAccessRequestStartControllerSpec.*
 
@@ -92,6 +92,57 @@ class CancelAccessRequestStartControllerSpec extends SpecBase with MockitoSugar 
     }
   }
 
+  "CancelAccessRequestStartControllerSpec.startJourneyWithAccessRequest" - {
+    "must initiate user answers and persist this in the session repository" in {
+      forAll(teamMemberAndSupporterTable) { (user: UserModel) =>
+        val fixture = buildFixture(user)
+        val accessRequestId = fixture.accessRequests.head.id
+        val userAnswers = buildUserAnswers(user, fixture, Some(Set(accessRequestId)))
+
+        running(fixture.playApplication) {
+          val request = FakeRequest(routes.CancelAccessRequestStartController.startJourneyWithAccessRequest(FakeApplication.id, accessRequestId))
+          val result = route(fixture.playApplication, request).value
+
+          status(result) mustBe SEE_OTHER
+          verify(fixture.apiHubService).getAccessRequests(eqTo(Some(FakeApplication.id)), eqTo(Some(Pending)))(any)
+          verify(fixture.sessionRepository).set(eqTo(userAnswers))
+        }
+      }
+    }
+
+    "must redirect to the first page in the journey" in {
+      forAll(teamMemberAndSupporterTable) { (user: UserModel) =>
+        val fixture = buildFixture(user)
+        val accessRequestId = fixture.accessRequests.head.id
+        val userAnswers = buildUserAnswers(user, fixture, Some(Set(accessRequestId)))
+
+        running(fixture.playApplication) {
+          val request = FakeRequest(routes.CancelAccessRequestStartController.startJourneyWithAccessRequest(FakeApplication.id, accessRequestId))
+          val result = route(fixture.playApplication, request).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe onwardRoute.url
+          verify(fixture.navigator).nextPage(eqTo(CancelAccessRequestStartPage), eqTo(NormalMode), eqTo(userAnswers))
+        }
+      }
+    }
+
+    "must redirect to unauthorised if the user is not a team member or support" in {
+      forAll(nonTeamMembersOrSupport) { (user: UserModel) =>
+        val fixture = buildFixture(user)
+
+        running(fixture.playApplication) {
+          val request = FakeRequest(routes.CancelAccessRequestStartController.startJourneyWithAccessRequest(FakeApplication.id, "an access request id"))
+          val result = route(fixture.playApplication, request).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe controllers.routes.UnauthorisedController.onPageLoad.url
+          verifyNoInteractions(fixture.sessionRepository)
+        }
+      }
+    }
+  }
+
   private def buildFixture(user: UserModel): Fixture = {
     val sessionRepository = mock[CancelAccessRequestSessionRepository]
     val apiHubService = mock[ApiHubService]
@@ -130,10 +181,18 @@ object CancelAccessRequestStartControllerSpec extends OptionValues {
     accessRequests: Seq[AccessRequest]
   )
 
-  private def buildUserAnswers(user: UserModel, fixture: Fixture): UserAnswers = {
-    UserAnswers(id = user.userId, lastUpdated = clock.instant())
+  private def buildUserAnswers(user: UserModel, fixture: Fixture, maybeSelectedRequests: Option[Set[String]] = None): UserAnswers = {
+
+    val userAnswers = UserAnswers(id = user.userId, lastUpdated = clock.instant())
       .set(CancelAccessRequestApplicationPage, FakeApplication).toOption.value
       .set(CancelAccessRequestPendingPage, fixture.accessRequests).toOption.value
+
+    if (maybeSelectedRequests.isDefined) {
+      userAnswers.set(CancelAccessRequestSelectApiPage, maybeSelectedRequests.get).toOption.value
+    } else {
+      userAnswers
+    }
+
   }
 
 }
