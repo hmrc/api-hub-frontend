@@ -47,3 +47,8 @@ POST    /produce/change-short-description                   controllers.myapis.p
 
 GET     /produce/review-appearance                          controllers.myapis.produce.ProduceApiReviewAppearanceController.onPageLoad()
 POST    /produce/review-appearance                          controllers.myapis.produce.ProduceApiReviewAppearanceController.onSubmit(next: String)
+
+GET     /produce/egress                                     controllers.myapis.produce.ProduceApiEgressController.onPageLoad(mode: Mode = NormalMode)
+POST    /produce/egress                                     controllers.myapis.produce.ProduceApiEgressController.onSubmit(mode: Mode = NormalMode, next: String)
+GET     /produce/change-egress                              controllers.myapis.produce.ProduceApiEgressController.onPageLoad(mode: Mode = CheckMode)
+POST    /produce/change-egress                              controllers.myapis.produce.ProduceApiEgressController.onSubmit(mode: Mode = CheckMode, next: String)

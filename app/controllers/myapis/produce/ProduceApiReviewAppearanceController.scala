@@ -43,9 +43,9 @@ class ProduceApiReviewAppearanceController @Inject()(
       next match {
         case "name" => Redirect(routes.ProduceApiEnterOasController.onPageLoad(models.NormalMode))
         case "description" => Redirect(routes.ProduceApiShortDescriptionController.onPageLoad(models.NormalMode))
-        case _ => Redirect(controllers.myapis.produce.routes.ProduceApiStartController.startProduceApi())
+        case _ => Redirect(routes.ProduceApiEgressController.onPageLoad(models.NormalMode))
       }
     }
-    
+
   }
 }
