@@ -38,7 +38,14 @@ class ProduceApiReviewAppearanceController @Inject()(
     implicit request => Ok(view())
   }
 
-  def onSubmit(): Action[AnyContent] = identify {
-    implicit request => Redirect(routes.ProduceApiEnterOasController.onPageLoad(models.NormalMode))
+  def onSubmit(next: String): Action[AnyContent] = identify {
+    implicit request => {
+      next match {
+        case "name" => Redirect(routes.ProduceApiEnterOasController.onPageLoad(models.NormalMode))
+        case "description" => Redirect(routes.ProduceApiShortDescriptionController.onPageLoad(models.NormalMode))
+        case _ => Redirect(controllers.myapis.produce.routes.ProduceApiStartController.startProduceApi())
+      }
+    }
+    
   }
 }

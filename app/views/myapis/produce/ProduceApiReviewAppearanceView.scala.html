@@ -25,10 +25,20 @@
 @()(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = titleNoForm("Review how your API will appear to consumers")) {
-    @formHelper(action = controllers.myapis.produce.routes.ProduceApiReviewAppearanceController.onSubmit()) {
-        <h1 class="govuk-heading-l">Review how your API will appear to consumers</h1>
+    <h1 class="govuk-heading-l">Review how your API will appear to consumers</h1>
+    @formHelper(action = controllers.myapis.produce.routes.ProduceApiReviewAppearanceController.onSubmit("")) {
         @govukButton(
             ButtonViewModel(messages("site.continue"))
+        )
+    }
+    @formHelper(action = controllers.myapis.produce.routes.ProduceApiReviewAppearanceController.onSubmit("description")) {
+        @govukButton(
+            ButtonViewModel("Change short description").asSecondaryButton()
+        )
+    }
+    @formHelper(action = controllers.myapis.produce.routes.ProduceApiReviewAppearanceController.onSubmit("name")) {
+        @govukButton(
+            ButtonViewModel("Change name").asSecondaryButton()
         )
     }
 }

@@ -46,4 +46,4 @@ GET     /produce/change-short-description                   controllers.myapis.p
 POST    /produce/change-short-description                   controllers.myapis.produce.ProduceApiShortDescriptionController.onSubmit(mode: Mode = CheckMode)
 
 GET     /produce/review-appearance                          controllers.myapis.produce.ProduceApiReviewAppearanceController.onPageLoad()
-POST    /produce/review-appearance                          controllers.myapis.produce.ProduceApiReviewAppearanceController.onSubmit()
+POST    /produce/review-appearance                          controllers.myapis.produce.ProduceApiReviewAppearanceController.onSubmit(next: String)
