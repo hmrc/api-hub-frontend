@@ -67,3 +67,8 @@ GET     /produce/domain                                     controllers.myapis.p
 POST    /produce/domain                                     controllers.myapis.produce.ProduceApiDomainController.onSubmit(mode: Mode = NormalMode)
 GET     /produce/change-domain                              controllers.myapis.produce.ProduceApiDomainController.onPageLoad(mode: Mode = CheckMode)
 POST    /produce/change-domain                              controllers.myapis.produce.ProduceApiDomainController.onSubmit(mode: Mode = CheckMode)
+
+GET     /produce/details                                    controllers.myapis.produce.ProduceApiDetailsController.onPageLoad(mode: Mode = NormalMode)
+POST    /produce/details                                    controllers.myapis.produce.ProduceApiDetailsController.onSubmit(mode: Mode = NormalMode)
+GET     /produce/change-details                             controllers.myapis.produce.ProduceApiDetailsController.onPageLoad(mode: Mode = CheckMode)
+POST    /produce/change-details                             controllers.myapis.produce.ProduceApiDetailsController.onSubmit(mode: Mode = CheckMode)
