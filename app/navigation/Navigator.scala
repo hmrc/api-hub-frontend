@@ -118,7 +118,7 @@ class Navigator @Inject()() {
   private def produceApiHowToCreateNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
     (mode, userAnswers.get(ProduceApiHowToCreatePage)) match {
       case (_, Some(Editor)) => controllers.myapis.produce.routes.ProduceApiEnterOasController.onPageLoad(mode)
-      case (_, Some(Upload)) => routes.JourneyRecoveryController.onPageLoad()
+      case (_, Some(Upload)) => controllers.myapis.produce.routes.ProduceApiUploadOasController.onPageLoad(mode)
       case _ => routes.JourneyRecoveryController.onPageLoad()
     }
   }

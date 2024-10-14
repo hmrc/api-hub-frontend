@@ -20,7 +20,6 @@ GET     /produce/start                                      controllers.myapis.p
 
 GET     /produce/enter-oas                                  controllers.myapis.produce.ProduceApiEnterOasController.onPageLoad(mode: Mode = NormalMode)
 POST    /produce/enter-oas                                  controllers.myapis.produce.ProduceApiEnterOasController.onSubmit(mode: Mode = NormalMode)
-
 GET     /produce/change-enter-oas                           controllers.myapis.produce.ProduceApiEnterOasController.onPageLoad(mode: Mode = CheckMode)
 POST    /produce/change-enter-oas                           controllers.myapis.produce.ProduceApiEnterOasController.onSubmit(mode: Mode = CheckMode)
 
@@ -35,3 +34,8 @@ GET     /produce/enter-owning-team                          controllers.myapis.p
 POST    /produce/enter-owning-team                          controllers.myapis.produce.ProduceApiChooseTeamController.onSubmit(mode: Mode = NormalMode)
 GET     /produce/change-enter-owning-team                   controllers.myapis.produce.ProduceApiChooseTeamController.onPageLoad(mode: Mode = CheckMode)
 POST    /produce/change-enter-owning-team                   controllers.myapis.produce.ProduceApiChooseTeamController.onSubmit(mode: Mode = CheckMode)
+
+GET     /produce/upload-oas                                 controllers.myapis.produce.ProduceApiUploadOasController.onPageLoad(mode: Mode = NormalMode)
+POST    /produce/upload-oas                                 controllers.myapis.produce.ProduceApiUploadOasController.onSubmit(mode: Mode = NormalMode)
+GET     /produce/change-upload-oas                          controllers.myapis.produce.ProduceApiUploadOasController.onPageLoad(mode: Mode = CheckMode)
+POST    /produce/change-upload-oas                          controllers.myapis.produce.ProduceApiUploadOasController.onSubmit(mode: Mode = CheckMode)
