@@ -26,4 +26,5 @@ If there’s a point of style that is not covered here, check the [GOV.UK style 
 * are APIs registered, created, deployed or produced? (we use all 4 terms in different places)
 * use 'search' when the results are ordered by relevance, use 'filter' when the order is unchanged. should we change the magnifying glass icon to a filter icon?
 * Do we say 'HoD/Backend' or just 'HoD'?
+* in a couple of places we talk about deploying APIs to 'the HIP', should we change this to 'the Integration Hub'?
 * technical style guide suggests 'create/revoke' for API keys
