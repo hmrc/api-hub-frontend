@@ -28,7 +28,7 @@ import models.application.*
 import models.application.ApplicationLenses.*
 import models.deployment.{DeploymentDetails, DeploymentsRequest, EgressMapping, Error, FailuresResponse, InvalidOasResponse, RedeploymentRequest, SuccessfulDeploymentsResponse}
 import models.exception.{ApplicationCredentialLimitException, TeamNameNotUniqueException}
-import models.requests.{AddApiRequest, AddApiRequestEndpoint, ChangeTeamNameRequest, TeamMemberRequest}
+import models.requests.{AddApiRequest, AddApiRequestEndpoint, ChangeTeamNameRequest, OASValidateRequest, TeamMemberRequest}
 import models.stats.ApisInProductionStatistic
 import models.team.{NewTeam, Team}
 import models.user.{LdapUser, UserContactDetails, UserModel}
@@ -1616,6 +1616,52 @@ class ApplicationsConnectorSpec
       buildConnector(this).apisInProduction()(HeaderCarrier()).map {
         result =>
           result mustBe statistic
+      }
+    }
+  }
+
+  "validateOAS" - {
+    "must place the correct request and return a valid response" in {
+      val oas = OASValidateRequest("oas")
+
+      stubFor(
+        post(urlEqualTo("/api-hub-applications/oas/validate"))
+          .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .withRequestBody(equalToJson(Json.toJson(oas).toString))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+          )
+      )
+
+      buildConnector(this).validateOAS(oas.oas)(HeaderCarrier()).map {
+        result =>
+          result mustBe Right(())
+      }
+    }
+
+    "must return 400 request a valid response" in {
+      val oas = OASValidateRequest("oas")
+      val invalidOasResponse = InvalidOasResponse(FailuresResponse(
+        "400", "reason", None
+      ))
+
+      stubFor(
+        post(urlEqualTo("/api-hub-applications/oas/validate"))
+          .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .withRequestBody(equalToJson(Json.toJson(oas).toString))
+          .willReturn(
+            aResponse()
+              .withStatus(BAD_REQUEST)
+              .withBody(Json.toJson(invalidOasResponse).toString)
+          )
+      )
+
+      buildConnector(this).validateOAS(oas.oas)(HeaderCarrier()).map {
+        result =>
+          result mustBe Left(invalidOasResponse)
       }
     }
   }

@@ -17,14 +17,17 @@
 package controllers.myapis.produce
 
 import base.SpecBase
+import connectors.ApplicationsConnector
 import controllers.routes
 import forms.myapis.produce.ProduceApiEnterOasFormProvider
+import models.deployment.{Error, FailuresResponse, InvalidOasResponse}
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.myapis.produce.ProduceApiEnterOasPage
+import play.api.Application
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -47,17 +50,17 @@ class ProduceApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val fixture = buildFixture(userAnswers = Some(emptyUserAnswers))
 
-      running(application) {
+      running(fixture.application) {
         val request = FakeRequest(GET, produceApiEnterOasRoute)
 
-        val result = route(application, request).value
+        val result = route(fixture.application, request).value
 
-        val view = application.injector.instanceOf[ProduceApiEnterOasView]
+        val view = fixture.application.injector.instanceOf[ProduceApiEnterOasView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(fixture.application)).toString
       }
     }
 
@@ -65,23 +68,22 @@ class ProduceApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswers = UserAnswers(userAnswersId).set(ProduceApiEnterOasPage, "answer").success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val fixture = buildFixture(userAnswers = Some(userAnswers))
 
-      running(application) {
+      running(fixture.application) {
         val request = FakeRequest(GET, produceApiEnterOasRoute)
 
-        val view = application.injector.instanceOf[ProduceApiEnterOasView]
+        val view = fixture.application.injector.instanceOf[ProduceApiEnterOasView]
 
-        val result = route(application, request).value
+        val result = route(fixture.application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(fixture.application)).toString
       }
     }
 
     "must redirect to the next page when valid data is submitted" in {
 
-      val mockSessionRepository = mock[ProduceApiSessionRepository]
       val validOAS =
         """
           |openapi: 3.0.1
@@ -106,22 +108,17 @@ class ProduceApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
           |          description: OK
           |""".stripMargin
 
-      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+      val fixture = buildFixture(userAnswers = Some(emptyUserAnswers))
+      when(fixture.sessionRepository.set(any())).thenReturn(Future.successful(true))
+      when(fixture.applicationsConnector.validateOAS(eqTo(validOAS))(any))
+        .thenReturn(Future.successful(Right(())))
 
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[ProduceApiSessionRepository].toInstance(mockSessionRepository)
-          )
-          .build()
-
-      running(application) {
+      running(fixture.application) {
         val request =
           FakeRequest(POST, produceApiEnterOasRoute)
             .withFormUrlEncodedBody(("value", validOAS))
 
-        val result = route(application, request).value
+        val result = route(fixture.application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual onwardRoute.url
@@ -130,32 +127,43 @@ class ProduceApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val invalidOAS = "invalid oas"
+      val errorMessage = "error message"
+      val fixture = buildFixture(userAnswers = Some(emptyUserAnswers))
+      when(fixture.applicationsConnector.validateOAS(eqTo(invalidOAS))(any))
+        .thenReturn(Future.successful(Left(
+          InvalidOasResponse(FailuresResponse(
+            "400", "reason", Some(Seq(
+              Error("type", errorMessage)
+            ))
+          ))
+        )))
 
-      running(application) {
+      running(fixture.application) {
         val request =
           FakeRequest(POST, produceApiEnterOasRoute)
-            .withFormUrlEncodedBody(("value", ""))
+            .withFormUrlEncodedBody(("value", invalidOAS))
 
-        val boundForm = form.bind(Map("value" -> ""))
+        val boundForm = form.bind(Map("value" -> invalidOAS))
+          .withGlobalError(s"Unable to parse the OAS document, $errorMessage")
 
-        val view = application.injector.instanceOf[ProduceApiEnterOasView]
+        val view = fixture.application.injector.instanceOf[ProduceApiEnterOasView]
 
-        val result = route(application, request).value
+        val result = route(fixture.application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(fixture.application)).toString
       }
     }
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val fixture = buildFixture(userAnswers = None)
 
-      running(application) {
+      running(fixture.application) {
         val request = FakeRequest(GET, produceApiEnterOasRoute)
 
-        val result = route(application, request).value
+        val result = route(fixture.application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
@@ -164,18 +172,34 @@ class ProduceApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val fixture = buildFixture(userAnswers = None)
 
-      running(application) {
+      running(fixture.application) {
         val request =
           FakeRequest(POST, produceApiEnterOasRoute)
             .withFormUrlEncodedBody(("value", "answer"))
 
-        val result = route(application, request).value
+        val result = route(fixture.application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
+  }
+
+  private case class Fixture(application: Application, applicationsConnector: ApplicationsConnector, sessionRepository: ProduceApiSessionRepository)
+
+  private def buildFixture(userAnswers: Option[UserAnswers] = None): Fixture = {
+    val applicationsConnector = mock[ApplicationsConnector]
+    val sessionRepository = mock[ProduceApiSessionRepository]
+    val application = applicationBuilder(userAnswers)
+      .overrides(
+        bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+        bind[ApplicationsConnector].toInstance(applicationsConnector),
+        bind[ProduceApiSessionRepository].toInstance(sessionRepository)
+      )
+      .build()
+
+    Fixture(application, applicationsConnector, sessionRepository)
   }
 }

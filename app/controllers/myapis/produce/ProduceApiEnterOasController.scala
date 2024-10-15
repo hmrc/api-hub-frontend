@@ -16,15 +16,16 @@
 
 package controllers.myapis.produce
 
+import connectors.ApplicationsConnector
 import controllers.actions.*
 import forms.myapis.produce.ProduceApiEnterOasFormProvider
 import models.Mode
-import models.curl.OpenApiDoc
 import navigation.Navigator
 import pages.myapis.produce.ProduceApiEnterOasPage
-import play.api.i18n.{I18nSupport, Messages, MessagesApi, MessagesProvider}
+import play.api.i18n.*
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.ProduceApiSessionRepository
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.myapis.produce.ProduceApiEnterOasView
 
@@ -40,7 +41,8 @@ class ProduceApiEnterOasController @Inject()(
                                         requireData: DataRequiredAction,
                                         formProvider: ProduceApiEnterOasFormProvider,
                                         val controllerComponents: MessagesControllerComponents,
-                                        view: ProduceApiEnterOasView
+                                        view: ProduceApiEnterOasView,
+                                        applicationsConnector: ApplicationsConnector
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form = formProvider()
@@ -65,7 +67,7 @@ class ProduceApiEnterOasController @Inject()(
           Future.successful(BadRequest(view(formWithErrors, mode))),
 
         value =>
-          validateOAS(value).fold(
+          validateOAS(value).flatMap(_.fold(
             error =>
               Future.successful(BadRequest(view(boundedForm.withGlobalError(error), mode))),
             _ => for {
@@ -73,9 +75,17 @@ class ProduceApiEnterOasController @Inject()(
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(ProduceApiEnterOasPage, mode, updatedAnswers))
           )
-      )
+      ))
   }
 
-  private def validateOAS(oas: String)(implicit messagesProvider: MessagesProvider): Either[String, Unit] =
-    OpenApiDoc.parse(oas).map(_ => ())
+  private def validateOAS(oas: String)(implicit messagesProvider: MessagesProvider, hc: HeaderCarrier): Future[Either[String, Unit]] =
+    applicationsConnector.validateOAS(oas).map(
+      _.fold(
+        error =>
+          val errorMessage = error.failure.errors.map(_.map(_.message).mkString("\n"))
+            .getOrElse(error.failure.reason)
+          Left(s"${Messages("produceApiEnterOas.error.malformed")}, $errorMessage"),
+        _ => Right(())
+      )
+    )
 }

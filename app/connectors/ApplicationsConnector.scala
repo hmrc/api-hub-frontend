@@ -24,7 +24,7 @@ import models.api.ApiDeploymentStatuses
 import models.application.*
 import models.deployment.*
 import models.exception.{ApplicationCredentialLimitException, ApplicationsException, TeamNameNotUniqueException}
-import models.requests.{AddApiRequest, ChangeTeamNameRequest, TeamMemberRequest}
+import models.requests.{AddApiRequest, ChangeTeamNameRequest, OASValidateRequest, TeamMemberRequest}
 import models.stats.ApisInProductionStatistic
 import models.team.{NewTeam, Team}
 import models.user.UserContactDetails
@@ -545,6 +545,26 @@ class ApplicationsConnector @Inject()(
       .setHeader(ACCEPT -> JSON)
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[ApisInProductionStatistic]
+  }
+
+  def validateOAS(oas: String)(implicit hc: HeaderCarrier): Future[Either[InvalidOasResponse, Unit]] = {
+    httpClient.post(url"$applicationsBaseUrl/api-hub-applications/oas/validate")
+      .setHeader(ACCEPT -> JSON)
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .withBody(Json.toJson(OASValidateRequest(oas)))
+      .execute[HttpResponse]
+      .flatMap {
+        response =>
+          if (is2xx(response.status)) {
+            Future.successful(Right(()))
+          }
+          else if (response.status == BAD_REQUEST) {
+            handleInvalidOasResponse(response).map(Left(_))
+          }
+          else {
+            Future.failed(UpstreamErrorResponse("Unexpected response", response.status))
+          }
+      }
   }
 
   private def handleSuccessfulDeploymentsResponse(response: HttpResponse): Future[SuccessfulDeploymentsResponse] = {
