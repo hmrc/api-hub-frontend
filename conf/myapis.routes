@@ -20,7 +20,6 @@ GET     /produce/start                                      controllers.myapis.p
 
 GET     /produce/enter-oas                                  controllers.myapis.produce.ProduceApiEnterOasController.onPageLoad(mode: Mode = NormalMode)
 POST    /produce/enter-oas                                  controllers.myapis.produce.ProduceApiEnterOasController.onSubmit(mode: Mode = NormalMode)
-
 GET     /produce/change-enter-oas                           controllers.myapis.produce.ProduceApiEnterOasController.onPageLoad(mode: Mode = CheckMode)
 POST    /produce/change-enter-oas                           controllers.myapis.produce.ProduceApiEnterOasController.onSubmit(mode: Mode = CheckMode)
 
@@ -35,3 +34,50 @@ GET     /produce/enter-owning-team                          controllers.myapis.p
 POST    /produce/enter-owning-team                          controllers.myapis.produce.ProduceApiChooseTeamController.onSubmit(mode: Mode = NormalMode)
 GET     /produce/change-enter-owning-team                   controllers.myapis.produce.ProduceApiChooseTeamController.onPageLoad(mode: Mode = CheckMode)
 POST    /produce/change-enter-owning-team                   controllers.myapis.produce.ProduceApiChooseTeamController.onSubmit(mode: Mode = CheckMode)
+
+GET     /produce/upload-oas                                 controllers.myapis.produce.ProduceApiUploadOasController.onPageLoad(mode: Mode = NormalMode)
+POST    /produce/upload-oas                                 controllers.myapis.produce.ProduceApiUploadOasController.onSubmit(mode: Mode = NormalMode)
+GET     /produce/change-upload-oas                          controllers.myapis.produce.ProduceApiUploadOasController.onPageLoad(mode: Mode = CheckMode)
+POST    /produce/change-upload-oas                          controllers.myapis.produce.ProduceApiUploadOasController.onSubmit(mode: Mode = CheckMode)
+
+GET     /produce/short-description                          controllers.myapis.produce.ProduceApiShortDescriptionController.onPageLoad(mode: Mode = NormalMode)
+POST    /produce/short-description                          controllers.myapis.produce.ProduceApiShortDescriptionController.onSubmit(mode: Mode = NormalMode)
+GET     /produce/change-short-description                   controllers.myapis.produce.ProduceApiShortDescriptionController.onPageLoad(mode: Mode = CheckMode)
+POST    /produce/change-short-description                   controllers.myapis.produce.ProduceApiShortDescriptionController.onSubmit(mode: Mode = CheckMode)
+
+GET     /produce/review-appearance                          controllers.myapis.produce.ProduceApiReviewAppearanceController.onPageLoad()
+POST    /produce/review-appearance                          controllers.myapis.produce.ProduceApiReviewAppearanceController.onSubmit(next: String)
+
+GET     /produce/egress                                     controllers.myapis.produce.ProduceApiEgressController.onPageLoad(mode: Mode = NormalMode)
+POST    /produce/egress                                     controllers.myapis.produce.ProduceApiEgressController.onSubmit(mode: Mode = NormalMode, next: String)
+GET     /produce/change-egress                              controllers.myapis.produce.ProduceApiEgressController.onPageLoad(mode: Mode = CheckMode)
+POST    /produce/change-egress                              controllers.myapis.produce.ProduceApiEgressController.onSubmit(mode: Mode = CheckMode, next: String)
+
+GET     /produce/egress-prefixes                            controllers.myapis.produce.ProduceApiEgressPrefixesController.onPageLoad(mode: Mode = NormalMode)
+POST    /produce/egress-prefixes                            controllers.myapis.produce.ProduceApiEgressPrefixesController.onSubmit(mode: Mode = NormalMode)
+GET     /produce/change-egress-prefixes                     controllers.myapis.produce.ProduceApiEgressPrefixesController.onPageLoad(mode: Mode = CheckMode)
+POST    /produce/change-egress-prefixes                     controllers.myapis.produce.ProduceApiEgressPrefixesController.onSubmit(mode: Mode = CheckMode)
+
+GET     /produce/hod                                        controllers.myapis.produce.ProduceApiHodController.onPageLoad(mode: Mode = NormalMode)
+POST    /produce/hod                                        controllers.myapis.produce.ProduceApiHodController.onSubmit(mode: Mode = NormalMode)
+GET     /produce/change-hod                                 controllers.myapis.produce.ProduceApiHodController.onPageLoad(mode: Mode = CheckMode)
+POST    /produce/change-hod                                 controllers.myapis.produce.ProduceApiHodController.onSubmit(mode: Mode = CheckMode)
+
+GET     /produce/domain                                     controllers.myapis.produce.ProduceApiDomainController.onPageLoad(mode: Mode = NormalMode)
+POST    /produce/domain                                     controllers.myapis.produce.ProduceApiDomainController.onSubmit(mode: Mode = NormalMode)
+GET     /produce/change-domain                              controllers.myapis.produce.ProduceApiDomainController.onPageLoad(mode: Mode = CheckMode)
+POST    /produce/change-domain                              controllers.myapis.produce.ProduceApiDomainController.onSubmit(mode: Mode = CheckMode)
+
+GET     /produce/details                                    controllers.myapis.produce.ProduceApiDetailsController.onPageLoad(mode: Mode = NormalMode)
+POST    /produce/details                                    controllers.myapis.produce.ProduceApiDetailsController.onSubmit(mode: Mode = NormalMode)
+GET     /produce/change-details                             controllers.myapis.produce.ProduceApiDetailsController.onPageLoad(mode: Mode = CheckMode)
+POST    /produce/change-details                             controllers.myapis.produce.ProduceApiDetailsController.onSubmit(mode: Mode = CheckMode)
+
+GET     /produce/check-your-answers                         controllers.myapis.produce.ProduceApiCheckYourAnswersController.onPageLoad()
+POST    /produce/check-your-answers                         controllers.myapis.produce.ProduceApiCheckYourAnswersController.onSubmit(next: String)
+
+GET     /produce/deploying                                  controllers.myapis.produce.ProduceApiDeploymentController.onPageLoad()
+POST    /produce/deploying                                  controllers.myapis.produce.ProduceApiDeploymentController.onSubmit()
+
+GET     /produce/deployment-error                           controllers.myapis.produce.ProduceApiDeploymentErrorController.onPageLoad()
+POST    /produce/deployment-error                           controllers.myapis.produce.ProduceApiDeploymentErrorController.onSubmit()
