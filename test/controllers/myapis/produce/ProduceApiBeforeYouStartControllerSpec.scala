@@ -68,7 +68,7 @@ object ProduceApiBeforeYouStartControllerSpec {
 
   private val relatedContentLinks: Seq[RelatedContentLink] = Seq(
     RelatedContentLink(
-      "Generating production credentials",
+      "Creating production credentials",
       "http://localhost:8490/guides/integration-hub-guide/documentation/how-do-I-consume-apis.html#managing-your-applications"
     ),
     RelatedContentLink(

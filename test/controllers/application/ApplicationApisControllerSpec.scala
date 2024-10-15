@@ -128,7 +128,7 @@ class ApplicationApisControllerSpec extends SpecBase with MockitoSugar with Test
           view(
             "Page not found - 404",
             "Application not found",
-            s"Cannot find an application with Id ${FakeApplication.id}."
+            s"Cannot find an application with ID ${FakeApplication.id}."
           )(request, messages(fixture.playApplication))
             .toString()
         contentAsString(result) must validateAsHtml

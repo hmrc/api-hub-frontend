@@ -53,7 +53,7 @@
 ) {
     @views.html.templates.SideNav(messages("manageApplications.admin"), AdminNavItems(user, AdminSideNavPages.ManageApplicationsPage)) {
 
-        <h1 class="govuk-heading-m govuk-!-margin-bottom-7">
+        <h1 class="govuk-heading-m">
             @Html(messages("manageApplications.heading", <span id="appCount">{applications.size}</span>))
         </h1>
 

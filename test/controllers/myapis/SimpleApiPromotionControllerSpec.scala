@@ -78,7 +78,7 @@ class SimpleApiPromotionControllerSpec
         contentAsString(result) mustBe view(
           "Page not found - 404",
           "API not found",
-          s"Cannot find an API with Id ${FakeApiDetail.id}.")(request, messages(fixture.playApplication)).toString()
+          s"Cannot find an API with ID ${FakeApiDetail.id}.")(request, messages(fixture.playApplication)).toString()
         contentAsString(result) must validateAsHtml
       }
     }
@@ -170,7 +170,7 @@ class SimpleApiPromotionControllerSpec
         contentAsString(result) mustBe view(
           "Page not found - 404",
           "API not found",
-          s"Cannot find an API with Id ${FakeApiDetail.id}.")(request, messages(fixture.playApplication)).toString()
+          s"Cannot find an API with ID ${FakeApiDetail.id}.")(request, messages(fixture.playApplication)).toString()
         contentAsString(result) must validateAsHtml
       }
     }

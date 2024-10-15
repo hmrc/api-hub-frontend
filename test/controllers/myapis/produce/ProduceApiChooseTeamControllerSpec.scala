@@ -161,7 +161,7 @@ class ProduceApiChooseTeamControllerSpec extends SpecBase with MockitoSugar with
           view(
             "Page not found - 404",
             "Team not found",
-            s"Cannot find a team with Id $teamId."
+            s"Cannot find a team with ID $teamId."
           )(request, messages(fixture.application))
             .toString()
         contentAsString(result) must validateAsHtml

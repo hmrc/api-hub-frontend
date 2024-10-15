@@ -137,7 +137,7 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation with M
           view(
             "Page not found - 404",
             "Application not found",
-            s"Cannot find an application with Id ${FakeApplication.id}."
+            s"Cannot find an application with ID ${FakeApplication.id}."
           )(request, messages(fixture.application))
             .toString()
         contentAsString(result) must validateAsHtml

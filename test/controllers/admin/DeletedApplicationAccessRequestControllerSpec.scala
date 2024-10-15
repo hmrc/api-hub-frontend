@@ -103,7 +103,7 @@ class DeletedApplicationAccessRequestControllerSpec
               view(
                 "Page not found - 404",
                 "Production access request not found",
-                s"Cannot find a production access request with Id $accessRequestId."
+                s"Cannot find a production access request with ID $accessRequestId."
               )(request, messages(fixture.application))
                 .toString()
           contentAsString(result) must validateAsHtml
@@ -129,7 +129,7 @@ class DeletedApplicationAccessRequestControllerSpec
             view(
               "Page not found - 404",
               "Application not found",
-              s"Cannot find an application with Id ${accessRequest.applicationId}."
+              s"Cannot find an application with ID ${accessRequest.applicationId}."
             )(request, messages(fixture.application))
               .toString()
           contentAsString(result) must validateAsHtml

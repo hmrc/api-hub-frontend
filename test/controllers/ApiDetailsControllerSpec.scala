@@ -194,7 +194,7 @@ class ApiDetailsControllerSpec
           view(
             "Page not found - 404",
             "API not found",
-            s"Cannot find an API with Id $id."
+            s"Cannot find an API with ID $id."
           )(request, messages(fixture.application))
             .toString()
 
