@@ -22,7 +22,8 @@ If there’s a point of style that is not covered here, check the [GOV.UK style 
 * we say 'your teams' to mean teams that the user is a member of, not just teams that the user personally created
 * the live environment is referred to as 'production'. The collective term for all other environments is 'non-production'. 
 
-## Integration Hub specific terms and language - suggested
-* use 'search' when the results are ordered by relevance, use 'filter' when the order is unchanged. should we change the magnifying glass icon to a filter icon?
+## Integration Hub specific terms and language - suggested/to discuss
 * are APIs registered, created, deployed or produced? (we use all 4 terms in different places)
+* use 'search' when the results are ordered by relevance, use 'filter' when the order is unchanged. should we change the magnifying glass icon to a filter icon?
+* Do we say 'HoD/Backend' or just 'HoD'?
 * technical style guide suggests 'create/revoke' for API keys
