@@ -120,6 +120,10 @@
 
 }
 
+@cancelAccessRequestLink() = {
+    <a id="cancelAccessRequestLink" class="govuk-link govuk-link--no-visited-state govuk-!-margin-left-3" href="@controllers.application.cancelaccessrequest.routes.CancelAccessRequestStartController.startJourneyWithAccessRequest(model.applicationId, model.accessRequestId)">@messages("accessRequest.cancelRequest")</a>
+}
+
 @applicationNameValue() = {
     @model.applicationName
     @for(deleted <- model.applicationDeleted){
@@ -236,17 +240,22 @@
                         href = Some(controllers.admin.routes.AccessRequestsController.onPageLoad().url)
                     ).withId("cancelButton")
                 )
+                @cancelAccessRequestLink()
             </div>
         }
     } else {
         @accessRequestDetail()
 
-        @govukButton(
-            Button(
-                content = Text(model.returnMessage),
-                href = Some(model.returnCall.url)
-            ).withId("returnButton")
-        )
+        <div>
+            @govukButton(
+                Button(
+                    content = Text(model.returnMessage),
+                    href = Some(model.returnCall.url)
+                ).withId("returnButton")
+            )
+
+            @cancelAccessRequestLink()
+        </div>
     }
 
 }

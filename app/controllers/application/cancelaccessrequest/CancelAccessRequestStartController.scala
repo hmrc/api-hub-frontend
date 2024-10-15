@@ -20,7 +20,7 @@ import controllers.actions.{ApplicationAuthActionProvider, IdentifierAction}
 import models.{NormalMode, UserAnswers}
 import models.accessrequest.Pending
 import navigation.Navigator
-import pages.application.cancelaccessrequest.{CancelAccessRequestApplicationPage, CancelAccessRequestPendingPage, CancelAccessRequestStartPage}
+import pages.application.cancelaccessrequest.{CancelAccessRequestApplicationPage, CancelAccessRequestPendingPage, CancelAccessRequestStartPage, CancelAccessRequestSelectApiPage}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.CancelAccessRequestSessionRepository
@@ -32,14 +32,14 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class CancelAccessRequestStartController @Inject()(
-  override val controllerComponents: MessagesControllerComponents,
-  identify: IdentifierAction,
-  sessionRepository: CancelAccessRequestSessionRepository,
-  clock: Clock,
-  applicationAuth: ApplicationAuthActionProvider,
-  navigator: Navigator,
-  apiHubService: ApiHubService
-)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                                    override val controllerComponents: MessagesControllerComponents,
+                                                    identify: IdentifierAction,
+                                                    sessionRepository: CancelAccessRequestSessionRepository,
+                                                    clock: Clock,
+                                                    applicationAuth: ApplicationAuthActionProvider,
+                                                    navigator: Navigator,
+                                                    apiHubService: ApiHubService
+                                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def startJourney(id: String): Action[AnyContent] = (identify andThen applicationAuth(id)).async {
     implicit request =>
@@ -56,4 +56,20 @@ class CancelAccessRequestStartController @Inject()(
       } yield Redirect(navigator.nextPage(CancelAccessRequestStartPage, NormalMode, userAnswers))
   }
 
+  def startJourneyWithAccessRequest(appId: String, accessRequestId: String): Action[AnyContent] = (identify andThen applicationAuth(appId)).async {
+
+    implicit request =>
+      for {
+        accessRequests <- apiHubService.getAccessRequests(Some(appId), Some(Pending))
+        userAnswers <- Future.fromTry(
+          UserAnswers(
+            id = request.identifierRequest.user.userId,
+            lastUpdated = clock.instant()
+          ).set(CancelAccessRequestApplicationPage, request.application)
+            .flatMap(_.set(CancelAccessRequestPendingPage, accessRequests))
+            .flatMap(_.set(CancelAccessRequestSelectApiPage, Set(accessRequestId)))
+        )
+        _ <- sessionRepository.set(userAnswers)
+      } yield Redirect(navigator.nextPage(CancelAccessRequestStartPage, NormalMode, userAnswers))
+  }
 }

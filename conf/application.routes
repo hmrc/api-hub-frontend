@@ -62,6 +62,7 @@ GET         /access-requests/:applicationId                             controll
 GET         /curl/:applicationId                                        controllers.application.CurlCommandController.buildCurlCommand(applicationId: String, world: models.ApiWorld)
 
 GET         /cancel-access-request/start/:id                            controllers.application.cancelaccessrequest.CancelAccessRequestStartController.startJourney(id: String)
+GET         /cancel-access-request/:rqid/start/:appid                   controllers.application.cancelaccessrequest.CancelAccessRequestStartController.startJourneyWithAccessRequest(appid: String, rqid: String)
 
 GET         /cancel-access-request/select-api                           controllers.application.cancelaccessrequest.CancelAccessRequestSelectApiController.onPageLoad(mode: Mode = NormalMode)
 POST        /cancel-access-request/select-api                           controllers.application.cancelaccessrequest.CancelAccessRequestSelectApiController.onSubmit(mode: Mode = NormalMode)
