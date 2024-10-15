@@ -39,6 +39,6 @@ class ProduceApiDeploymentController @Inject()(
   }
 
   def onSubmit(): Action[AnyContent] = identify {
-    implicit request => Redirect(routes.ProduceApiStartController.startProduceApi())
+    implicit request => Redirect(controllers.routes.IndexController.onPageLoad)
   }
 }
