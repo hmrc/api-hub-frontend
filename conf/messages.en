@@ -456,6 +456,7 @@ accessRequest.decision.reject = Reject request
 accessRequest.rejectedReason = Specify a reason for rejection
 accessRequest.rejectedReason.hint = The reason will be included in the email response to the user.
 accessRequest.rejectedReason.required = You must enter a rejection reason
+accessRequest.cancelRequest = Cancel this request
 
 accessRequestApprovedSuccess.title = API production request successfully approved
 accessRequestApprovedSuccess.heading = API production request successfully approved

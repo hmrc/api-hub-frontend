@@ -121,7 +121,7 @@
 }
 
 @cancelAccessRequestLink() = {
-    <a id="cancelAccessRequestLink" class="govuk-link govuk-link--no-visited-state govuk-!-margin-left-3" href="@controllers.application.cancelaccessrequest.routes.CancelAccessRequestStartController.startJourneyWithAccessRequest(model.applicationId, model.accessRequestId)">Cancel this request</a>
+    <a id="cancelAccessRequestLink" class="govuk-link govuk-link--no-visited-state govuk-!-margin-left-3" href="@controllers.application.cancelaccessrequest.routes.CancelAccessRequestStartController.startJourneyWithAccessRequest(model.applicationId, model.accessRequestId)">@messages("accessRequest.cancelRequest")</a>
 }
 
 @applicationNameValue() = {
