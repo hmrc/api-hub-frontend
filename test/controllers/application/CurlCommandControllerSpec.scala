@@ -18,17 +18,19 @@ package controllers.application
 
 import base.SpecBase
 import controllers.actions.{FakeApiDetail, FakeApplication, FakeUser}
-import controllers.routes as mustBe
+import controllers.routes
+import play.api.i18n.{Messages, MessagesProvider}
 import forms.AddCredentialChecklistFormProvider
 import io.swagger.v3.oas.models.servers.Server
 import models.application.*
 import models.user.UserModel
 import models.{CurlCommand, MDTP}
-import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.ArgumentMatchers.{any, anyString, eq as eqTo}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.Application as PlayApplication
 import play.api.inject.bind
+import play.api.i18n.MessagesProvider
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -41,6 +43,12 @@ import scala.concurrent.Future
 class CurlCommandControllerSpec extends SpecBase with MockitoSugar with TestHelpers {
 
   import CurlCommandControllerSpec.*
+
+  private implicit val messagesProvider: MessagesProvider = mock[MessagesProvider]
+  private val messages: Messages = mock[Messages]
+  private val errorMessage = "Error message"
+  when(messagesProvider.messages).thenReturn(messages)
+  when(messages.apply(anyString, any)).thenReturn(errorMessage)
 
   "CurlCommandController.buildCurlCommand" - {
     "must return OK and the correct JSON for a GET from a support user when the application has no APIs" in {
@@ -74,8 +82,8 @@ class CurlCommandControllerSpec extends SpecBase with MockitoSugar with TestHelp
 
           when(fixture.apiHubService.getApiDetail(eqTo(api1.id))(any())).thenReturn(Future.successful(Some(apiDetail1)))
           when(fixture.apiHubService.getApiDetail(eqTo(api2.id))(any())).thenReturn(Future.successful(Some(apiDetail2)))
-          when(fixture.curlCommandService.buildCurlCommandsForApi(any(), eqTo(apiDetail1), any())).thenReturn(Right(Seq(curl1)))
-          when(fixture.curlCommandService.buildCurlCommandsForApi(any(), eqTo(apiDetail2), any())).thenReturn(Right(Seq(curl2)))
+          when(fixture.curlCommandService.buildCurlCommandsForApi(any(), eqTo(apiDetail1), any())(any())).thenReturn(Right(Seq(curl1)))
+          when(fixture.curlCommandService.buildCurlCommandsForApi(any(), eqTo(apiDetail2), any())(any())).thenReturn(Right(Seq(curl2)))
 
           running(fixture.playApplication) {
             val request = FakeRequest(GET, controllers.application.routes.CurlCommandController.buildCurlCommand(FakeApplication.id, MDTP).url)
@@ -96,7 +104,7 @@ class CurlCommandControllerSpec extends SpecBase with MockitoSugar with TestHelp
           val fixture = buildFixture(user, application)
 
           when(fixture.apiHubService.getApiDetail(eqTo(api.id))(any())).thenReturn(Future.successful(Some(apiDetail)))
-          when(fixture.curlCommandService.buildCurlCommandsForApi(any(), eqTo(apiDetail), any())).thenReturn(Left("nope"))
+          when(fixture.curlCommandService.buildCurlCommandsForApi(any(), eqTo(apiDetail), any())(any())).thenReturn(Left("nope"))
 
           running(fixture.playApplication) {
             val request = FakeRequest(GET, controllers.application.routes.CurlCommandController.buildCurlCommand(FakeApplication.id, MDTP).url)

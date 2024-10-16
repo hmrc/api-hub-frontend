@@ -27,18 +27,23 @@ import models.api.ApiDetailLensesSpec.sampleApiDetail
 import models.application.*
 import models.application.ApplicationLenses.*
 import models.deployment.{DeploymentDetails, DeploymentsRequest, EgressMapping, Error, FailuresResponse, InvalidOasResponse, RedeploymentRequest, SuccessfulDeploymentsResponse}
-import models.exception.{ApplicationCredentialLimitException, TeamNameNotUniqueException}
+import models.exception.{ApplicationCredentialLimitException, OASException, TeamNameNotUniqueException}
 import models.requests.{AddApiRequest, AddApiRequestEndpoint, ChangeTeamNameRequest, TeamMemberRequest}
 import models.stats.ApisInProductionStatistic
 import models.team.{NewTeam, Team}
 import models.user.{LdapUser, UserContactDetails, UserModel}
+import org.mockito.ArgumentMatchers.{any, anyString}
+import org.mockito.Mockito.when
 import org.scalatest.{EitherValues, OptionValues}
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.Configuration
 import play.api.http.ContentTypes
 import play.api.http.Status.*
+import play.api.i18n.{Messages, MessagesProvider}
+import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.test.Helpers.{ACCEPT, AUTHORIZATION, CONTENT_TYPE}
@@ -55,7 +60,14 @@ class ApplicationsConnectorSpec
   extends OptionValues
   with EitherValues
   with ApplicationGetterBehaviours
-  with TableDrivenPropertyChecks {
+  with TableDrivenPropertyChecks
+  with MockitoSugar {
+
+  private implicit val messagesProvider: MessagesProvider = mock[MessagesProvider]
+  private val messages: Messages = mock[Messages]
+  private val errorMessage = "Error message"
+  when(messagesProvider.messages).thenReturn(messages)
+  when(messages.apply(anyString, any)).thenReturn(errorMessage)
 
   import ApplicationsConnectorSpec._
 
@@ -624,7 +636,7 @@ class ApplicationsConnectorSpec
       )
     }
   }
-  
+
   "ApplicationsConnector.rejectAccessRequest" - {
     "must place the correct request" in {
       val id = "test-id"
@@ -863,7 +875,7 @@ class ApplicationsConnectorSpec
   "ApplicationsConnector.generateDeployment" - {
     "must place the correct request and return the response" in {
       val request = DeploymentsRequest("test-lob", "test-name", "test-description", "test-egress", "test-team-id",
-        "test-oas", false, "ALPHA", "domain", "subdomain", Seq("hod1", "hod2"), Seq("test-prefix-1", "test-prefix-2"), 
+        "test-oas", false, "ALPHA", "domain", "subdomain", Seq("hod1", "hod2"), Seq("test-prefix-1", "test-prefix-2"),
         Some(Seq(EgressMapping("prefix", "egress-prefix"))))
       val response = SuccessfulDeploymentsResponse("test-id", "1.0.0", 102, "test-url")
 
@@ -1616,6 +1628,58 @@ class ApplicationsConnectorSpec
       buildConnector(this).apisInProduction()(HeaderCarrier()).map {
         result =>
           result mustBe statistic
+      }
+    }
+  }
+
+  "validateOAS" - {
+    "must place the correct request and return a valid response" in {
+      val oas = "oas"
+
+      stubFor(
+        post(urlEqualTo("/api-hub-applications/oas/validate"))
+          .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .withRequestBody(equalTo(oas))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+          )
+      )
+
+      buildConnector(this).validateOAS(oas)(HeaderCarrier(), messagesProvider).map {
+        result =>
+          result mustBe Right(())
+      }
+    }
+
+    "must return 400 request a valid response" in {
+      val oas = "oas"
+      val invalidOasResponse = InvalidOasResponse(FailuresResponse(
+        "400", errorMessage, None
+      ))
+      val expectedResponse = OASException.forError(
+        s"""{
+          |  "code" : "400",
+          |  "reason" : "$errorMessage"
+          |}""".stripMargin
+      )
+
+      stubFor(
+        post(urlEqualTo("/api-hub-applications/oas/validate"))
+          .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .withRequestBody(equalTo(oas))
+          .willReturn(
+            aResponse()
+              .withStatus(BAD_REQUEST)
+              .withBody(Json.toJson(invalidOasResponse).toString)
+          )
+      )
+
+      buildConnector(this).validateOAS(oas)(HeaderCarrier(), messagesProvider).map {
+        result =>
+          result mustBe Left(expectedResponse)
       }
     }
   }

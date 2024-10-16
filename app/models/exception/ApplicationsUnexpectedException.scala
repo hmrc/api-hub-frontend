@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,7 @@
  * limitations under the License.
  */
 
-package models.deployment
+package models.exception
 
-import play.api.i18n.{Messages, MessagesProvider}
-import play.api.libs.json.{Format, Json}
-
-case class FailuresResponse(code: String, reason: String, errors: Option[Seq[Error]]) {
-  def errorMessage(): String =
-    Json.prettyPrint(Json.toJson(this))
-}
-
-object FailuresResponse {
-
-  implicit val formatFailuresResponse: Format[FailuresResponse] = Json.format[FailuresResponse]
-
-}
+//noinspection ScalaStyle
+case class ApplicationsUnexpectedException(message: String) extends ApplicationsException(message, null)
