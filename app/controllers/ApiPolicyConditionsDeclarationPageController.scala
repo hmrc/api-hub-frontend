@@ -89,7 +89,8 @@ class ApiPolicyConditionsDeclarationPageController @Inject()(
             form,
             mode,
             context,
-            apiDetail
+            apiDetail,
+            request.user
           )
         ))
       case _ => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))

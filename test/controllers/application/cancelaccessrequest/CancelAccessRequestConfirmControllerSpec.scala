@@ -17,6 +17,7 @@
 package controllers.application.cancelaccessrequest
 
 import base.SpecBase
+import controllers.actions.FakeUser
 import forms.application.cancelaccessrequest.CancelAccessRequestConfirmFormProvider
 import generators.AccessRequestGenerator
 import models.accessrequest.AccessRequest
@@ -56,7 +57,7 @@ class CancelAccessConfirmControllerSpec extends SpecBase with MockitoSugar with 
 
         status(result) mustBe OK
 
-        contentAsString(result) mustBe fixture.view(fixture.form, NormalMode, accessRequests)(request, messages(fixture.application)).toString
+        contentAsString(result) mustBe fixture.view(fixture.form, NormalMode, accessRequests, FakeUser)(request, messages(fixture.application)).toString
         contentAsString(result) must validateAsHtml
       }
     }
@@ -72,7 +73,7 @@ class CancelAccessConfirmControllerSpec extends SpecBase with MockitoSugar with 
         val filledForm = fixture.form.fill(true)
 
         status(result) mustBe OK
-        contentAsString(result) mustBe fixture.view(filledForm, NormalMode, accessRequests)(request, messages(fixture.application)).toString
+        contentAsString(result) mustBe fixture.view(filledForm, NormalMode, accessRequests, FakeUser)(request, messages(fixture.application)).toString
         contentAsString(result) must validateAsHtml
       }
     }
@@ -111,7 +112,7 @@ class CancelAccessConfirmControllerSpec extends SpecBase with MockitoSugar with 
         val result = route(fixture.application, request).value
 
         status(result) mustBe BAD_REQUEST
-        contentAsString(result) mustBe fixture.view(boundForm, NormalMode, accessRequests)(request, messages(fixture.application)).toString
+        contentAsString(result) mustBe fixture.view(boundForm, NormalMode, accessRequests, FakeUser)(request, messages(fixture.application)).toString
         contentAsString(result) must validateAsHtml
       }
     }

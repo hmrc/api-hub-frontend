@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import models.user.UserModel
 @import models.myapis.produce.ProduceApiHowToCreate
 
 @this(
@@ -22,9 +23,9 @@
     govukButton: GovukButton
 )
 
-@()(implicit request: Request[?], messages: Messages)
+@(userModel: UserModel)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = titleNoForm("Review the details of your API")) {
+@layout(pageTitle = titleNoForm("Review the details of your API"), user = Some(userModel)) {
     <h1 class="govuk-heading-l">Review the details of your API</h1>
     @formHelper(action = controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onSubmit("ok")) {
         @govukButton(

@@ -17,6 +17,7 @@
 package controllers.myapis.produce
 
 import base.SpecBase
+import controllers.actions.FakeUser
 import controllers.routes
 import forms.myapis.produce.ProduceApiEnterOasFormProvider
 import models.{NormalMode, UserAnswers}
@@ -57,7 +58,7 @@ class ProduceApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[ProduceApiEnterOasView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, FakeUser)(request, messages(application)).toString
       }
     }
 
@@ -75,7 +76,7 @@ class ProduceApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, FakeUser)(request, messages(application)).toString
       }
     }
 
@@ -121,7 +122,7 @@ class ProduceApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, FakeUser)(request, messages(application)).toString
       }
     }
 

@@ -15,6 +15,7 @@
  *@
 
 @import models.accessrequest.AccessRequest
+@import models.user.UserModel
 
 @this(
 layout: templates.Layout,
@@ -24,9 +25,9 @@ govukRadios: GovukRadios,
 govukButton: GovukButton
 )
 
-@(form: Form[?], mode: Mode, requestsToCancel: Seq[AccessRequest])(implicit request: Request[?], messages: Messages)
+@(form: Form[?], mode: Mode, requestsToCancel: Seq[AccessRequest], userModel: UserModel)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = title(form, messages("cancelAccessRequestConfirm.title"))) {
+@layout(pageTitle = title(form, messages("cancelAccessRequestConfirm.title")), user = Some(userModel)) {
 
     @formHelper(action = controllers.application.cancelaccessrequest.routes.CancelAccessRequestConfirmController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
