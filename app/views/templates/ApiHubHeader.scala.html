@@ -24,10 +24,10 @@
     showBackLink: Boolean,
     user: Option[UserModel],
     helpDocsPath: String,
-    activeLink: Option[String] = None)(implicit request: RequestHeader, messages: Messages)
+    activeLink: Option[String] = None
+)(implicit request: RequestHeader, messages: Messages)
 <!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PLWQQZB"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PLWQQZB" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
 
 <header class="govuk-header " role="banner" data-module="govuk-header">
@@ -65,10 +65,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <div class="govuk-grid-column-one half govuk-!-text-align-right">
                     @for(aUser <- user) {
                         <div data-user-type="@aUser.userType" data-user-email="@aUser.email" class="hip-header__signed-in">
-                            Signed in as <strong>@aUser.email</strong> via
-                            <strong class="govuk-tag govuk-tag--blue small-tag">
-                                @aUser.userType
-                            </strong>
+                            @Html(messages("site.signedIn",
+                                <strong>{aUser.email}</strong>,
+                                <strong class="govuk-tag govuk-tag--blue small-tag">{aUser.userType}</strong>
+                            ))
                         </div>
                     }
                 </div>

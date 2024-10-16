@@ -1,0 +1,35 @@
+@*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.team.Team
+@import views.html.helper.CSPNonce
+
+@this()
+
+@(teams: Seq[Team], owningTeam: Option[Team])(implicit request: RequestHeader, messages: Messages)
+
+<link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/accessible-autocomplete.min.css")"  type="text/css">
+<script src="@routes.Assets.versioned("javascripts/selectOwningTeam.js")" type="module" @{CSPNonce.attr}></script>
+
+<select id="owningTeamSelection" name="owningTeam">
+    <option value="">@messages("site.team.select")</option>
+    <option value="unassigned">@messages("site.team.unassigned")</option>
+    @for(team <- teams){
+        @if(!owningTeam.exists(_.id == team.id)){
+            <option value="@team.id">@team.name</option>
+        }
+    }
+</select>

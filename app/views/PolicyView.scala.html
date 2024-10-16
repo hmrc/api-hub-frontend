@@ -19,21 +19,21 @@
 @()(implicit request: Request[?], messages: Messages)
 
 @bullet(i: Int) = {
- <li>@messages(s"policyDeclaration.bullet.$i")</li>
+    <li>@messages(s"policyDeclaration.bullet.$i")</li>
 }
 
 @bullets() = @{
- val bulletsHtml = (1 to 10) map (i => bullet(i))
- HtmlFormat.fill(bulletsHtml)
+    val bulletsHtml = (1 to 10) map (i => bullet(i))
+    HtmlFormat.fill(bulletsHtml)
 }
 
 <p class="govuk-body">@messages("policyDeclaration.paragraph.1")</p>
 <p class="govuk-body">@messages("policyDeclaration.paragraph.2")</p>
 <p class="govuk-body">@messages("policyDeclaration.paragraph.3")</p>
 <div class="govuk-grid-row">
- <ul class="govuk-list govuk-list--bullet govuk-!-margin-left-3 govuk-!-margin-right-3">
-   @bullets()
- </ul>
+    <ul class="govuk-list govuk-list--bullet govuk-!-margin-left-3 govuk-!-margin-right-3">
+        @bullets()
+    </ul>
 </div>
 <p class="govuk-body">@messages("policyDeclaration.paragraph.4")</p>
 

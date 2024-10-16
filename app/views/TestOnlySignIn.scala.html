@@ -86,9 +86,9 @@
             <h3 class="govuk-heading-l">@messages("fake-sign-in.permissions.lbl")</h3>
             @govukTable(Table(
                 head = Some(Seq(
-                           HeadCell(Text("Resource Type")),
-                           HeadCell(Text("Resource Locations")),
-                           HeadCell(Text("Action"))
+                            HeadCell(Text(messages("fake-sign-in.resource.type"))),
+                            HeadCell(Text(messages("fake-sign-in.resource.locations"))),
+                            HeadCell(Text(messages("fake-sign-in.resource.action")))
                        )),
                 rows = List.range(0, 4).map { i =>
                         Seq(

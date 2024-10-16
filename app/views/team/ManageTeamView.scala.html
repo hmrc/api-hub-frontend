@@ -38,7 +38,7 @@
 @layout(pageTitle = titleNoForm(messages("manageTeam.title", team.name)), user = Some(user), fullWidth = true) {
 
     @views.html.templates.SideNav(team.name, ManageTeamNavItems(team, ManageTeamSideNavPages.ManageTeamMembersPage)) {
-        <h1 id="h1" class="govuk-heading-l">@messages("manageTeam.title", team.name)</h1>
+        <h1 id="h1" class="govuk-heading-l">@messages("manageTeam.heading", team.name)</h1>
         <div class="hip-flex-container govuk-!-margin-bottom-2">
             <h2 class="govuk-heading-m">@messages("manageTeam.teamMembers", team.teamMembers.size)</h2>
             @govukButton(

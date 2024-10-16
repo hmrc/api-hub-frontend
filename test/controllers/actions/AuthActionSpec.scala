@@ -152,7 +152,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar {
         val result = controller.onPageLoad()(FakeRequest())
         val content = contentAsString(result)
         content must include("You are not authorised to access this service")
-        content must include("You do not have a valid email address associated with your Stride account.")
+        content must include("You do not have a valid email address associated with your STRIDE account.")
         status(result) mustBe OK
       }
     }

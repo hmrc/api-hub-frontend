@@ -135,7 +135,7 @@ class MyApiDetailsControllerSpec
       contentAsString(result) mustBe view(
         "Page not found - 404",
         "API not found",
-        s"Cannot find an API with Id $missingApiId.")(request, messages(fixture.application)).toString()
+        s"Cannot find an API with ID $missingApiId.")(request, messages(fixture.application)).toString()
       contentAsString(result) must validateAsHtml
     }
   }

@@ -64,7 +64,7 @@
 ) {
     @views.html.templates.SideNav(apiDetail.title, MyApisNavItems(apiDetail.id, userModel, MyApisNavPages.ApiUsagePage, maybeDeploymentStatuses)) {
         <h1 class="govuk-heading-l">
-        @messages("myApis.usage.title")
+        @messages("myApis.usage.heading")
         </h1>
 
         @govukSummaryList(SummaryList(
@@ -126,7 +126,7 @@
                                 Seq(
                                     TableRow(content = HtmlContent(applicationName(application))),
                                     TableRow(content = application.deleted.map(_ => HtmlContent(govukTag(Tag(
-                                        content = Text("Deleted"),
+                                        content = Text(messages("site.deleted")),
                                         classes = "govuk-tag--grey"
                                     )))).getOrElse(Empty)),
                                     TableRow(content = Text(ViewUtils.formatLocalDateTimeContainingUtc(application.created)), classes = "utcDateShort")

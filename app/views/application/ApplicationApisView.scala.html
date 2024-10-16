@@ -39,7 +39,7 @@
 }
 
 @endpointScopes(scopes: Seq[String]) = {
-    <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-1"><strong>Scopes:</strong></p>
+    <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-1"><strong>@messages("applicationApis.apis.headings.scopes"):</strong></p>
     <ul class="api-scopes-list-inline">
     @for(scope <- scopes) {
         <li><strong class="hip-tag--scope">@scope</strong></li>

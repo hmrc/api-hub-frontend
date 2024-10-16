@@ -78,7 +78,7 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
           view(
             "Page not found - 404",
             "Application not found",
-            s"Cannot find an application with Id ${FakeApplication.id}."
+            s"Cannot find an application with ID ${FakeApplication.id}."
           )(request, messages(fixture.playApplication))
             .toString()
         contentAsString(result) must validateAsHtml
@@ -173,7 +173,7 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
           view(
             "Page not found - 404",
             "Credential not found",
-            s"Cannot find credential with Id $clientId for application ${application.id}."
+            s"Cannot find credential with ID $clientId for application ${application.id}."
           )(request, messages(fixture.playApplication))
             .toString()
 
@@ -203,8 +203,8 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
         contentAsString(result) mustBe
           view(
             "Bad request - 400",
-            "Cannot delete last credential",
-            "You cannot delete the last credential for an application."
+            "Cannot revoke last credential",
+            "You cannot revoke the last credential for an application."
           )(request, messages(fixture.playApplication))
             .toString()
 
@@ -284,7 +284,7 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
           view(
             "Page not found - 404",
             "Credential not found",
-            s"Cannot find credential with Id $clientId for application ${application.id}."
+            s"Cannot find credential with ID $clientId for application ${application.id}."
           )(request, messages(fixture.playApplication))
             .toString()
 
@@ -314,8 +314,8 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
         contentAsString(result) mustBe
           view(
             "Bad request - 400",
-            "Cannot delete last credential",
-            "You cannot delete the last credential for an application."
+            "Cannot revoke last credential",
+            "You cannot revoke the last credential for an application."
           )(request, messages(fixture.playApplication))
             .toString()
 

@@ -25,26 +25,24 @@ govukPanel: GovukPanel
 @(application: Application, user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @apiLink() = {
-<a class="govuk-link govuk-link--no-visited-state" href="@controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id)">
-    @application.name
-</a>
+    <a class="govuk-link govuk-link--no-visited-state" href="@controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id)">
+        @application.name
+    </a>
 }
 
 @layout(pageTitle = titleNoForm(messages("application.update.team.success.title")), user = Some(user), showBackLink = false) {
+    @govukPanel(
+        Panel(
+            title = Text(messages("application.update.team.success.mainHeading")),
+            classes = "govuk-!-margin-bottom-7",
+        )
+    )
 
-@govukPanel(
-Panel(
-title = Text(messages("application.update.team.success.mainHeading")),
-classes = "govuk-!-margin-bottom-7",
-)
-)
+    <h2 class="govuk-heading-m">
+        @messages("application.update.team.success.subHeading")
+    </h2>
 
-<h2 class="govuk-heading-m">
-    @messages("application.update.team.success.subHeading")
-</h2>
-
-<p class="govuk-body">
-    @Html(messages("application.update.team.success.text", apiLink()))
-</p>
-
+    <p class="govuk-body">
+        @Html(messages("application.update.team.success.text", apiLink()))
+    </p>
 }

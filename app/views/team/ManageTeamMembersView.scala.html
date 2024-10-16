@@ -33,11 +33,11 @@
         </div>
         <div class="govuk-grid-column-one-half govuk-!-text-align-right">
             @govukButton(
-            Button(
-            classes = "govuk-button--secondary",
-            content = messages("createTeamManageMembers.addTeamMember"),
-            href = Some(controllers.team.routes.CreateTeamMemberController.onPageLoad().url)
-            ).withId("addTeamMemberButton")
+                Button(
+                    classes = "govuk-button--secondary",
+                    content = messages("createTeamManageMembers.addTeamMember"),
+                    href = Some(controllers.team.routes.CreateTeamMemberController.onPageLoad().url)
+                ).withId("addTeamMemberButton")
             )
         </div>
     </div>

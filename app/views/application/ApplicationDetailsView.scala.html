@@ -39,9 +39,9 @@
     </a>
 }
 
-@applicationApisLink() = {
+@applicationApisLink(messageId: String) = {
     <a href="@{controllers.application.routes.ApplicationApisController.onPageLoad(application.id).url}" class="govuk-link govuk-link--no-visited-state">
-        @messages("applicationDetails.apis.appApis")
+        @messages(messageId)
     </a>
 }
 
@@ -135,7 +135,7 @@
                         </ul>
 
                         <p class="govuk-body additional-message">
-                            @Html(messages("applicationDetails.apis.missing.remove", <a href={controllers.application.routes.ApplicationApisController.onPageLoad(application.id).url}>Application APIs page</a>))
+                            @Html(messages("applicationDetails.apis.missing.remove", applicationApisLink("applicationDetails.apis.page")))
                         </p>
                     </div>
                 }
@@ -167,7 +167,7 @@
                             </span>
                         </p>
                         <p class="govuk-body additional-message">
-                            @Html(messages("applicationDetails.no.prod.access.message", <a href={controllers.application.routes.ApplicationApisController.onPageLoad(application.id).url}>Application APIs page</a>))
+                            @Html(messages("applicationDetails.no.prod.access.message", applicationApisLink("applicationDetails.apis.page")))
                         </p>
                     </div>
                 }
@@ -194,7 +194,7 @@
                     )
                 )
             <p class="govuk-body">
-                @Html(messages("applicationDetails.apis.manageOrAddMore", applicationApisLink(), exploreApisLink("applicationDetails.apis.addMore")))
+                @Html(messages("applicationDetails.apis.manageOrAddMore", applicationApisLink("applicationDetails.apis.appApis"), exploreApisLink("applicationDetails.apis.addMore")))
             </p>
             }
         }

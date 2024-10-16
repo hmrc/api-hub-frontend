@@ -95,7 +95,7 @@ class AddAnApiSuccessControllerSpec extends SpecBase with MockitoSugar with Html
           view(
             "Page not found - 404",
             "API not found",
-            s"Cannot find an API with Id ${apiDetail.id}."
+            s"Cannot find an API with ID ${apiDetail.id}."
           )(request, messages(fixture.application))
             .toString()
 
@@ -124,7 +124,7 @@ class AddAnApiSuccessControllerSpec extends SpecBase with MockitoSugar with Html
           view(
             "Page not found - 404",
             "Application not found",
-            s"Cannot find an application with Id ${app.id}."
+            s"Cannot find an application with ID ${app.id}."
           )(request, messages(fixture.application))
             .toString()
 
@@ -152,8 +152,8 @@ class AddAnApiSuccessControllerSpec extends SpecBase with MockitoSugar with Html
         contentAsString(result) mustBe
           view(
             "Page not found - 404",
-            "Neither Api nor application found",
-            s"Cannot find an API with Id ${apiDetail.id} or an application with Id ${app.id}."
+            "Neither API nor application found",
+            s"Cannot find an API with ID ${apiDetail.id} or an application with ID ${app.id}."
           )(request, messages(fixture.application))
             .toString()
 
