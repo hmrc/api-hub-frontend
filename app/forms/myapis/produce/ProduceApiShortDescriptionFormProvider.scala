@@ -26,6 +26,7 @@ class ProduceApiShortDescriptionFormProvider @Inject() extends Mappings {
   def apply(): Form[String] =
     Form(
       "value" -> text("produceApiShortDescription.error.required")
+        .transform[String](_.trim, identity)
         .verifying(maxLength(180, "produceApiShortDescription.error.length"))
         .verifying(minLength(8, "produceApiShortDescription.error.length"))
     )

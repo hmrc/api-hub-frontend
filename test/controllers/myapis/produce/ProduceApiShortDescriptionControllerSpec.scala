@@ -17,7 +17,8 @@
 package controllers.myapis.produce
 
 import base.SpecBase
-import controllers.myapis.produce.{routes as apiProduceRoutes}
+import controllers.actions.FakeUser
+import controllers.myapis.produce.{routes => apiProduceRoutes}
 import controllers.routes
 import forms.myapis.produce.ProduceApiShortDescriptionFormProvider
 import models.{NormalMode, UserAnswers}
@@ -58,7 +59,7 @@ class ProduceApiShortDescriptionControllerSpec extends SpecBase with MockitoSuga
         val view = application.injector.instanceOf[ProduceApiShortDescriptionView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, FakeUser)(request, messages(application)).toString
       }
     }
 
@@ -76,7 +77,7 @@ class ProduceApiShortDescriptionControllerSpec extends SpecBase with MockitoSuga
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, FakeUser)(request, messages(application)).toString
       }
     }
 
@@ -122,7 +123,7 @@ class ProduceApiShortDescriptionControllerSpec extends SpecBase with MockitoSuga
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, FakeUser)(request, messages(application)).toString
       }
     }
 
