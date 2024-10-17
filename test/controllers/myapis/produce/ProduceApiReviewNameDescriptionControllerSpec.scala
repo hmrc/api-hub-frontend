@@ -17,6 +17,7 @@
 package controllers.myapis.produce
 
 import base.SpecBase
+import controllers.actions.FakeUser
 import controllers.routes
 import forms.myapis.produce.ProduceApiReviewNameDescriptionFormProvider
 import models.UserAnswers
@@ -65,7 +66,7 @@ class ProduceApiReviewNameDescriptionControllerSpec extends SpecBase with Mockit
 
         status(result) mustEqual OK
 
-        contentAsString(result) mustEqual view(form, apiName, apiDescription)(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(form, apiName, apiDescription, FakeUser)(request, messages(fixture.application)).toString
       }
     }
 
@@ -80,7 +81,7 @@ class ProduceApiReviewNameDescriptionControllerSpec extends SpecBase with Mockit
         val result = route(fixture.application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(Set(Confirm)), apiName, apiDescription)(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(form.fill(Set(Confirm)), apiName, apiDescription, FakeUser)(request, messages(fixture.application)).toString
       }
     }
 
@@ -114,7 +115,7 @@ class ProduceApiReviewNameDescriptionControllerSpec extends SpecBase with Mockit
         val result = route(fixture.application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, apiName, apiDescription)(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(boundForm, apiName, apiDescription, FakeUser)(request, messages(fixture.application)).toString
       }
     }
 
