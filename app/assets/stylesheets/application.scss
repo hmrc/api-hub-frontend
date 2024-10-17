@@ -832,7 +832,7 @@ header {
 
 .hip-details--headed-paragraphs {
     h3 {
-        @extend %govuk-heading-s;
+        @extend .govuk-heading-s;
         margin-bottom: govuk-spacing(1) !important;
     }
     p {

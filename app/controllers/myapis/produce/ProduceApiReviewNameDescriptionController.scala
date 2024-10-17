@@ -18,18 +18,14 @@ package controllers.myapis.produce
 
 import controllers.actions.*
 import forms.myapis.produce.ProduceApiReviewNameDescriptionFormProvider
-import io.swagger.v3.parser.OpenAPIV3Parser
-import models.curl.OpenApiDoc
-import navigation.Navigator
 import models.{NormalMode, UserAnswers}
-import pages.myapis.produce.{ProduceApiEnterOasPage, ProduceApiReviewNameDescriptionPage}
+import navigation.Navigator
+import pages.myapis.produce.{ProduceApiReviewNameDescriptionPage, ProduceApiShortDescriptionPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.ProduceApiSessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.myapis.produce.ProduceApiReviewNameDescriptionView
-import io.swagger.v3.parser.OpenAPIV3Parser
-import io.swagger.v3.parser.core.models.ParseOptions
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -63,23 +59,11 @@ class ProduceApiReviewNameDescriptionController @Inject()(
   }
 
   def getApiName(userAnswers: UserAnswers): String = {
-    userAnswers.get(ProduceApiEnterOasPage) match {
-      case Some(oasFile) => {
-        val options: ParseOptions = new ParseOptions()
-        options.setResolve(false)
-
-        val parseResult = new OpenAPIV3Parser().readContents(oasFile, null, options)
-        parseResult.getOpenAPI match {
-          case openApi => openApi.getInfo.getTitle
-          case _ => "API"
-        }
-      }
-      case None => "API"
-    }
+    "API NAME" // this will be implemented as part of HIPP-1606
   }
   
   def getApiShortDescription(userAnswers: UserAnswers): String = {
-    "TODO" //request.userAnswers.get(ProduceApiShortDescriptionPage).map(_.getName).getOrElse("API")
+    userAnswers.get(ProduceApiShortDescriptionPage).getOrElse("")
   }
 
   def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
