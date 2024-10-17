@@ -23,11 +23,12 @@ import models.accessrequest.{AccessRequest, AccessRequestCancelRequest, AccessRe
 import models.api.ApiDeploymentStatuses
 import models.application.*
 import models.deployment.*
-import models.exception.{ApplicationCredentialLimitException, ApplicationsException, ApplicationsUnexpectedException, OASException, TeamNameNotUniqueException}
+import models.exception.{ApplicationCredentialLimitException, ApplicationsException, TeamNameNotUniqueException}
 import models.requests.{AddApiRequest, ChangeTeamNameRequest, TeamMemberRequest}
 import models.stats.ApisInProductionStatistic
 import models.team.{NewTeam, Team}
 import models.user.UserContactDetails
+import play.api.Logging
 import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION, CONTENT_TYPE}
 import play.api.http.MimeTypes.JSON
 import play.api.http.Status.*
@@ -49,7 +50,7 @@ class ApplicationsConnector @Inject()(
                                        crypto: ApplicationCrypto,
                                        servicesConfig: ServicesConfig,
                                        frontEndConfig: FrontendAppConfig
-                                     )(implicit ec: ExecutionContext) extends HttpErrorFunctions {
+                                     )(implicit ec: ExecutionContext) extends HttpErrorFunctions with Logging {
 
   private val applicationsBaseUrl = servicesConfig.baseUrl("api-hub-applications")
   private val clientAuthToken = frontEndConfig.appAuthToken
@@ -550,7 +551,7 @@ class ApplicationsConnector @Inject()(
   }
 
   def validateOAS(oas: String)
-                 (implicit hc: HeaderCarrier, messagesProvider: MessagesProvider): Future[Either[ApplicationsException, Unit]] = httpClient.post(url"$applicationsBaseUrl/api-hub-applications/oas/validate")
+                 (implicit hc: HeaderCarrier, messagesProvider: MessagesProvider): Future[Either[InvalidOasResponse, Unit]] = httpClient.post(url"$applicationsBaseUrl/api-hub-applications/oas/validate")
                    .setHeader(ACCEPT -> JSON)
                    .setHeader(CONTENT_TYPE -> "application/yaml")
                    .setHeader(AUTHORIZATION -> clientAuthToken)
@@ -559,11 +560,13 @@ class ApplicationsConnector @Inject()(
                    .flatMap {
                      response =>
                        if (is2xx(response.status)) Future.successful(Right(()))
-                       else if (response.status == BAD_REQUEST) handleInvalidOasResponse(response)
-                           .map(r => Left(
-                             OASException.forError(r.failure.errorMessage())
-                           ))
-                       else Future.successful(Left(ApplicationsUnexpectedException(s"${Messages("site.unexpecteError")}, ${response.status}")))
+                       else if (response.status == BAD_REQUEST) {
+                         handleInvalidOasResponse(response).map { failure =>
+                           logger.warn(s"Error while validating OAS:\n${Json.prettyPrint(Json.toJson(failure))}")
+                           Left(failure)
+                         }
+                       } else
+                         Future.failed(UpstreamErrorResponse("Unexpected response", response.status))
                    }
 
   private def handleSuccessfulDeploymentsResponse(response: HttpResponse) =

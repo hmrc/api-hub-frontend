@@ -23,6 +23,7 @@ import models.Mode
 import navigation.Navigator
 import pages.myapis.produce.ProduceApiEnterOasPage
 import play.api.i18n.*
+import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.ProduceApiSessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
@@ -69,7 +70,7 @@ class ProduceApiEnterOasController @Inject()(
         value =>
           validateOAS(value).flatMap(_.fold(
             error =>
-              Future.successful(BadRequest(view(boundedForm.withGlobalError(error), mode))),
+              Future.successful(BadRequest(view(boundedForm.withGlobalError(error), mode, request.user))),
             _ => for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(ProduceApiEnterOasPage, value))
               _              <- sessionRepository.set(updatedAnswers)
@@ -82,7 +83,7 @@ class ProduceApiEnterOasController @Inject()(
     applicationsConnector.validateOAS(oas).map(
       _.fold(
         error =>
-          Left(error.getMessage),
+          Left(Json.prettyPrint(Json.toJson(error))),
         _ => Right(())
       )
     )

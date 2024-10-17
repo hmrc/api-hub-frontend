@@ -27,7 +27,7 @@ import models.api.ApiDetailLensesSpec.sampleApiDetail
 import models.application.*
 import models.application.ApplicationLenses.*
 import models.deployment.{DeploymentDetails, DeploymentsRequest, EgressMapping, Error, FailuresResponse, InvalidOasResponse, RedeploymentRequest, SuccessfulDeploymentsResponse}
-import models.exception.{ApplicationCredentialLimitException, OASException, TeamNameNotUniqueException}
+import models.exception.{ApplicationCredentialLimitException, TeamNameNotUniqueException}
 import models.requests.{AddApiRequest, AddApiRequestEndpoint, ChangeTeamNameRequest, TeamMemberRequest}
 import models.stats.ApisInProductionStatistic
 import models.team.{NewTeam, Team}
@@ -1658,12 +1658,6 @@ class ApplicationsConnectorSpec
       val invalidOasResponse = InvalidOasResponse(FailuresResponse(
         "400", errorMessage, None
       ))
-      val expectedResponse = OASException.forError(
-        s"""{
-          |  "code" : "400",
-          |  "reason" : "$errorMessage"
-          |}""".stripMargin
-      )
 
       stubFor(
         post(urlEqualTo("/api-hub-applications/oas/validate"))
@@ -1679,7 +1673,7 @@ class ApplicationsConnectorSpec
 
       buildConnector(this).validateOAS(oas)(HeaderCarrier(), messagesProvider).map {
         result =>
-          result mustBe Left(expectedResponse)
+          result mustBe Left(invalidOasResponse)
       }
     }
   }

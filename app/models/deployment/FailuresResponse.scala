@@ -19,10 +19,7 @@ package models.deployment
 import play.api.i18n.{Messages, MessagesProvider}
 import play.api.libs.json.{Format, Json}
 
-case class FailuresResponse(code: String, reason: String, errors: Option[Seq[Error]]) {
-  def errorMessage(): String =
-    Json.prettyPrint(Json.toJson(this))
-}
+case class FailuresResponse(code: String, reason: String, errors: Option[Seq[Error]])
 
 object FailuresResponse {
 

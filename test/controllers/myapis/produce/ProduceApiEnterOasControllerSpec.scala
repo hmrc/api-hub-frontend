@@ -22,7 +22,6 @@ import connectors.ApplicationsConnector
 import controllers.routes
 import forms.myapis.produce.ProduceApiEnterOasFormProvider
 import models.deployment.{Error, FailuresResponse, InvalidOasResponse}
-import models.exception.OASException
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
@@ -31,6 +30,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import pages.myapis.produce.ProduceApiEnterOasPage
 import play.api.Application
 import play.api.inject.bind
+import play.api.libs.json.Json
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -62,7 +62,7 @@ class ProduceApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
         val view = fixture.application.injector.instanceOf[ProduceApiEnterOasView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, FakeUser)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, FakeUser)(request, messages(fixture.application)).toString
       }
     }
 
@@ -80,7 +80,7 @@ class ProduceApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
         val result = route(fixture.application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, FakeUser)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, FakeUser)(request, messages(fixture.application)).toString
       }
     }
 
@@ -131,10 +131,11 @@ class ProduceApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
 
       val invalidOAS = "invalid oas"
       val errorMessage = "Unable to parse the OAS document, errorMessage"
+      val invalidResponse = InvalidOasResponse(FailuresResponse("400", errorMessage, None))
       val fixture = buildFixture(userAnswers = Some(emptyUserAnswers))
       when(fixture.applicationsConnector.validateOAS(eqTo(invalidOAS))(any, any))
         .thenReturn(Future.successful(Left(
-          OASException(errorMessage)
+          invalidResponse
         )))
 
       running(fixture.application) {
@@ -143,14 +144,14 @@ class ProduceApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", invalidOAS))
 
         val boundForm = form.bind(Map("value" -> invalidOAS))
-          .withGlobalError(errorMessage)
+          .withGlobalError(Json.prettyPrint(Json.toJson(invalidResponse)))
 
         val view = fixture.application.injector.instanceOf[ProduceApiEnterOasView]
 
         val result = route(fixture.application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, FakeUser)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, FakeUser)(request, messages(fixture.application)).toString
       }
     }
 
