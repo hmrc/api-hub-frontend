@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import models.user.UserModel
 @import models.myapis.produce.ProduceApiHowToCreate
 
 @this(
@@ -22,9 +23,9 @@
     govukButton: GovukButton
 )
 
-@()(implicit request: Request[?], messages: Messages)
+@(userModel: UserModel)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = titleNoForm("OAS is processing")) {
+@layout(pageTitle = titleNoForm("OAS is processing"), user = Some(userModel)) {
     @formHelper(action = controllers.myapis.produce.routes.ProduceApiDeploymentController.onSubmit()) {
         <h1 class="govuk-heading-l">OAS is processing</h1>
         @govukButton(

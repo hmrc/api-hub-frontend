@@ -35,7 +35,7 @@ class ProduceApiReviewAppearanceController @Inject()(
                                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = identify {
-    implicit request => Ok(view())
+    implicit request => Ok(view(request.user))
   }
 
   def onSubmit(next: String): Action[AnyContent] = identify {

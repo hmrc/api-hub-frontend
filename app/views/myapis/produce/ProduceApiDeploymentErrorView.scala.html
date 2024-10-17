@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import models.user.UserModel
 @import models.myapis.produce.ProduceApiHowToCreate
 
 @this(
@@ -22,9 +23,9 @@
     govukButton: GovukButton
 )
 
-@()(implicit request: Request[?], messages: Messages)
+@(userModel: UserModel)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = titleNoForm("There was an error processing your deployment request")) {
+@layout(pageTitle = titleNoForm("There was an error processing your deployment request"), user = Some(userModel)) {
     @formHelper(action = controllers.myapis.produce.routes.ProduceApiDeploymentErrorController.onSubmit()) {
         <h1 class="govuk-heading-l">There was an error processing your deployment request</h1>
         @govukButton(

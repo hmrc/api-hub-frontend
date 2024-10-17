@@ -34,7 +34,7 @@ class ProduceApiEgressPrefixesController @Inject()(
                                                   )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(mode: Mode): Action[AnyContent] = identify {
-    implicit request => Ok(view(mode))
+    implicit request => Ok(view(mode, request.user))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = identify {

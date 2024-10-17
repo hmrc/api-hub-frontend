@@ -57,7 +57,7 @@ class CancelAccessRequestConfirmController @Inject()(
             case None => form
             case Some(value) => form.fill(value)
           }
-          Future.successful(Ok(view(preparedForm, mode, getCancellableRequests(request))))
+          Future.successful(Ok(view(preparedForm, mode, getCancellableRequests(request), request.user)))
       }
     }
   }
@@ -78,7 +78,7 @@ class CancelAccessRequestConfirmController @Inject()(
           case (Some(accessRequests), Some(apiIds)) =>
             form.bindFromRequest().fold(
               formWithErrors =>
-                Future.successful(BadRequest(view(formWithErrors, mode, accessRequests))),
+                Future.successful(BadRequest(view(formWithErrors, mode, accessRequests, request.user))),
 
               value =>
                 for {

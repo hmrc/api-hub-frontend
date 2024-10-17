@@ -17,11 +17,12 @@
 package controllers.myapis.produce
 
 import base.SpecBase
+import controllers.actions.FakeUser
 import forms.myapis.produce.ProduceApiChooseTeamFormProvider
 import generators.TeamGenerator
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.myapis.produce.ProduceApiChooseTeamPage
@@ -64,7 +65,7 @@ class ProduceApiChooseTeamControllerSpec extends SpecBase with MockitoSugar with
         val view = fixture.application.injector.instanceOf[ProduceApiChooseTeamView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, teams.sortBy(_.name.toLowerCase))(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, teams.sortBy(_.name.toLowerCase), FakeUser)(request, messages(fixture.application)).toString
         contentAsString(result) must validateAsHtml
       }
     }
@@ -88,7 +89,7 @@ class ProduceApiChooseTeamControllerSpec extends SpecBase with MockitoSugar with
         val result = route(fixture.application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(team.id), NormalMode, teams.sortBy(_.name.toLowerCase))(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(form.fill(team.id), NormalMode, teams.sortBy(_.name.toLowerCase), FakeUser)(request, messages(fixture.application)).toString
         contentAsString(result) must validateAsHtml
       }
     }
@@ -136,7 +137,7 @@ class ProduceApiChooseTeamControllerSpec extends SpecBase with MockitoSugar with
         val result = route(fixture.application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, teams.sortBy(_.name.toLowerCase))(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, teams.sortBy(_.name.toLowerCase), FakeUser)(request, messages(fixture.application)).toString
         contentAsString(result) must validateAsHtml
       }
     }

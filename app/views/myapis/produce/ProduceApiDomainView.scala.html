@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import models.user.UserModel
 @import models.myapis.produce.ProduceApiHowToCreate
 
 @this(
@@ -22,9 +23,9 @@
     govukButton: GovukButton
 )
 
-@(mode: Mode)(implicit request: Request[?], messages: Messages)
+@(mode: Mode, userModel: UserModel)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = titleNoForm("Which domain and sub domain does your API belong to?")) {
+@layout(pageTitle = titleNoForm("Which domain and sub domain does your API belong to?"), user = Some(userModel)) {
     @formHelper(action = controllers.myapis.produce.routes.ProduceApiDomainController.onSubmit(mode)) {
         <h1 class="govuk-heading-l">Which domain and sub domain does your API belong to?</h1>
         @govukButton(

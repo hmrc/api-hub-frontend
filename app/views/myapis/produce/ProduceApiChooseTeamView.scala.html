@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import models.user.UserModel
 @import models.team.Team
 @import views.html.components.IconsLink
 
@@ -26,7 +27,7 @@
     iconsLink: IconsLink
 )
 
-@(form: Form[?], mode: Mode, teams: Seq[Team])(implicit request: Request[?], messages: Messages)
+@(form: Form[?], mode: Mode, teams: Seq[Team], userModel: UserModel)(implicit request: Request[?], messages: Messages)
 
 @hintPanel() = {
 <div class="call-out-panel govuk-!-margin-top-2 ">
@@ -48,7 +49,7 @@
 </a>
 }
 
-@layout(pageTitle = title(form, messages("produceApiChooseTeam.title")), customScriptsBlock = Some(iconsLink())) {
+@layout(pageTitle = title(form, messages("produceApiChooseTeam.title")), customScriptsBlock = Some(iconsLink()), user = Some(userModel)) {
 
     @formHelper(action = controllers.myapis.produce.routes.ProduceApiChooseTeamController.onSubmit(mode)) {
 

@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import models.user.UserModel
 @import models.myapis.produce.ProduceApiHowToCreate
 
 @this(
@@ -22,9 +23,9 @@
     govukButton: GovukButton
 )
 
-@(mode: Mode)(implicit request: Request[?], messages: Messages)
+@(mode: Mode, userModel: UserModel)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = titleNoForm("Select the Egress for your API")) {
+@layout(pageTitle = titleNoForm("Select the Egress for your API"), user = Some(userModel)) {
     <h1 class="govuk-heading-l">Select the Egress for your API</h1>
     @formHelper(action = controllers.myapis.produce.routes.ProduceApiEgressController.onSubmit(mode, "hods")) {
         @govukButton(

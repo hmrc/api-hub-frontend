@@ -19,6 +19,7 @@ package controllers.team
 import controllers.actions._
 import forms.CreateTeamNameFormProvider
 import models.Mode
+import models.requests.DataRequest
 import navigation.Navigator
 import pages.CreateTeamNamePage
 import play.api.data.{Form, FormError}
@@ -51,14 +52,14 @@ class CreateTeamNameController @Inject()(
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       request.userAnswers.get(CreateTeamNamePage) match {
-        case None => Future.successful(Ok(view(form, mode)))
+        case None => Future.successful(Ok(view(form, mode, request.user)))
         case Some(name) =>
           val preparedForm = form.fill(name)
 
           isUniqueName(name).map(
             isUnique =>
               if (isUnique) {
-                Ok(view(preparedForm, mode))
+                Ok(view(preparedForm, mode, request.user))
               }
               else {
                 nameNotUnique(preparedForm, mode)
@@ -72,7 +73,7 @@ class CreateTeamNameController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+          Future.successful(BadRequest(view(formWithErrors, mode, request.user))),
 
         name =>
           isUniqueName(name).flatMap(
@@ -94,8 +95,8 @@ class CreateTeamNameController @Inject()(
     apiHubService.findTeamByName(name).map(_.isEmpty)
   }
 
-  private def nameNotUnique(form: Form[String], mode: Mode)(implicit request: Request[?]) = {
-    BadRequest(view(form.withError(FormError("value", "createTeamName.error.nameNotUnique")), mode))
+  private def nameNotUnique(form: Form[String], mode: Mode)(implicit request: DataRequest[?]) = {
+    BadRequest(view(form.withError(FormError("value", "createTeamName.error.nameNotUnique")), mode, request.user))
   }
 
 }

@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import models.user.UserModel
 @import models.AddAnApiContext
 @import models.api.ApiDetail
 
@@ -26,9 +27,9 @@
         policyView: PolicyView
 )
 
-@(form: Form[?], mode: Mode, context: AddAnApiContext, apiDetail: ApiDetail)(implicit request: Request[?], messages: Messages)
+@(form: Form[?], mode: Mode, context: AddAnApiContext, apiDetail: ApiDetail, userModel: UserModel)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = title(form, messages("apiPolicyConditionsDeclarationPage.title", apiDetail.title))) {
+@layout(pageTitle = title(form, messages("apiPolicyConditionsDeclarationPage.title", apiDetail.title)), user = Some(userModel)) {
 
     @formHelper(action = routes.ApiPolicyConditionsDeclarationPageController.onSubmit(mode, context), Symbol("autoComplete") -> "off") {
 

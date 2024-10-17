@@ -17,6 +17,7 @@
 package controllers.team
 
 import base.SpecBase
+import controllers.actions.FakeUser
 import controllers.{routes, team}
 import forms.CreateTeamNameFormProvider
 import models.team.Team
@@ -63,7 +64,7 @@ class CreateTeamNameControllerSpec extends SpecBase with MockitoSugar with HtmlV
 
         redirectLocation(result) mustBe None
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, FakeUser)(request, messages(fixture.application)).toString
         contentAsString(result) must validateAsHtml
       }
     }
@@ -83,7 +84,7 @@ class CreateTeamNameControllerSpec extends SpecBase with MockitoSugar with HtmlV
         val result = route(fixture.application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(name), NormalMode)(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(form.fill(name), NormalMode, FakeUser)(request, messages(fixture.application)).toString
         contentAsString(result) must validateAsHtml
 
         verify(fixture.apiHubService).findTeamByName(eqTo(name))(any)
@@ -108,7 +109,7 @@ class CreateTeamNameControllerSpec extends SpecBase with MockitoSugar with HtmlV
         val formWithErrors = form.fill(team.name).withError(FormError("value", "createTeamName.error.nameNotUnique"))
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(formWithErrors, NormalMode)(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(formWithErrors, NormalMode, FakeUser)(request, messages(fixture.application)).toString
         contentAsString(result) must validateAsHtml
 
         verify(fixture.apiHubService).findTeamByName(eqTo(team.name))(any)
@@ -148,7 +149,7 @@ class CreateTeamNameControllerSpec extends SpecBase with MockitoSugar with HtmlV
         val result = route(fixture.application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, FakeUser)(request, messages(fixture.application)).toString
         contentAsString(result) must validateAsHtml
       }
     }
@@ -172,7 +173,7 @@ class CreateTeamNameControllerSpec extends SpecBase with MockitoSugar with HtmlV
         val formWithErrors = form.fill(team.name).withError(FormError("value", "createTeamName.error.nameNotUnique"))
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(formWithErrors, NormalMode)(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(formWithErrors, NormalMode, FakeUser)(request, messages(fixture.application)).toString
         contentAsString(result) must validateAsHtml
 
         verify(fixture.apiHubService).findTeamByName(eqTo(team.name))(any)

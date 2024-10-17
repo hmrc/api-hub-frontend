@@ -195,7 +195,8 @@ class ApiPolicyConditionsDeclarationPageControllerSpec extends SpecBase with Moc
         form = form,
         mode = mode,
         context = AddAnApi,
-        apiDetail = apiDetail
+        apiDetail = apiDetail,
+        userModel = FakeUser
       )(request, messages(application))
       .toString()
   }
