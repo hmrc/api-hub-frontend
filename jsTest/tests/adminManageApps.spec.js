@@ -96,8 +96,6 @@ describe('adminManageApps', () => {
         onPageShow();
         enterAppFilterText(`ClientId10`);
 
-        console.log('============', paginationHelper.getVisiblePanelData('.hip-application', 'clientIds'));
-
         expect(paginationHelper.getVisiblePanelData('.hip-application', 'clientIds').map(o => o.clientIds)).toEqual(
             ['ClientId10,ClientId11', 'ClientId100,ClientId101', 'ClientId102,ClientId103', 'ClientId104,ClientId105', 'ClientId106,ClientId107', 'ClientId108,ClientId109']
         );
