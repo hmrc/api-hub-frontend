@@ -129,6 +129,9 @@ class NavigatorSpec extends SpecBase with TryValues {
         "must go from the How To Create page to the Produce Api Enter OAS page" in {
           navigator.nextPage(ProduceApiHowToCreatePage, NormalMode, emptyUserAnswers.set(ProduceApiHowToCreatePage, Editor).get) mustBe controllers.myapis.produce.routes.ProduceApiEnterOasController.onPageLoad(NormalMode)
         }
+        "must go from the Produce Api Enter OAS page to the Enter a short description page" in {
+          navigator.nextPage(ProduceApiEnterOasPage, NormalMode, emptyUserAnswers.set(ProduceApiEnterOasPage, "oas").get) mustBe controllers.myapis.produce.routes.ProduceApiShortDescriptionController.onPageLoad(NormalMode)
+        }
       }
 
       "during the Cancel access request journey" - {

@@ -14,19 +14,51 @@
  * limitations under the License.
  *@
 
-@import models.myapis.produce.ProduceApiHowToCreate
+@import models.user.UserModel
+@import viewmodels.InputWidth._
+@import uk.gov.hmrc.govukfrontend.views.html.components.CharacterCount
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukCharacterCount: GovukCharacterCount,
     govukButton: GovukButton
 )
 
-@(mode: Mode)(implicit request: Request[?], messages: Messages)
+@(form: Form[?], mode: Mode, userModel: UserModel)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = titleNoForm("Enter a short description for your API")) {
+@hintContent() = {
+    <h1 class="govuk-label-wrapper">
+        <label class="govuk-label govuk-label--l" for="value">
+            @messages("produceApiShortDescription.title")
+        </label>
+    </h1>
+    <div id="with-hint-hint" class="govuk-hint">
+        @messages("produceApiShortDescription.hint")
+    </div>
+}
+
+@layout(pageTitle = title(form, messages("produceApiShortDescription.title")), user = Some(userModel)) {
+
     @formHelper(action = controllers.myapis.produce.routes.ProduceApiShortDescriptionController.onSubmit(mode)) {
-        <h1 class="govuk-heading-l">Enter a short description for your API</h1>
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form))
+        }
+
+        @govukCharacterCount(
+            CharacterCount(
+                id = form("value").id,
+                name = form("value").id,
+                maxLength = Some(180),
+                value = form("value").value,
+                hint = Some(Hint(
+                    content = HtmlContent(hintContent())
+                ))
+            )
+        )
+
         @govukButton(
             ButtonViewModel(messages("site.continue"))
         )
