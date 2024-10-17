@@ -899,3 +899,5 @@ produceApiReviewNameDescription.namingConventions.3.title = Avoid putting techno
 produceApiReviewNameDescription.namingConventions.3.content = The technology used to implement an API may change in the future. If you include this information in the name of your API be prepared to decommission the API if the technology changes and stand up a new API with a more suitable name. To avoid this situation try to name APIs based on the data which they handle rather than the technology which they use.
 produceApiReviewNameDescription.namingConventions.4.title = Avoid putting a platform name in an API name:
 produceApiReviewNameDescription.namingConventions.4.content = This is very similar to the previous point - the API may move to a different platform in the future. Including the platform name in the API name is also redundant, this should already be known to the user based on the OAS file, URI and authentication mechanism.
+produceApiReviewNameDescription.changeDescription = Change short description
+produceApiReviewNameDescription.changeName = Change name (in the OAS)

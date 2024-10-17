@@ -97,8 +97,20 @@
             ))
         </div>
 
-        @govukButton(
-            ButtonViewModel(messages("site.continue"))
-        )
+        <div class="govuk-button-group">
+            @govukButton(
+                ButtonViewModel(messages("site.continue"))
+            )
+            @govukButton(
+                ButtonViewModel(messages("produceApiReviewNameDescription.changeDescription"))
+                    .asSecondaryButton()
+                    .asLink(controllers.myapis.produce.routes.ProduceApiShortDescriptionController.onPageLoad(NormalMode).url)
+            )
+            @govukButton(
+                ButtonViewModel(messages("produceApiReviewNameDescription.changeName"))
+                    .asSecondaryButton()
+                    .asLink(controllers.myapis.produce.routes.ProduceApiEnterOasController.onPageLoad(NormalMode).url)
+            )
+        </div>
     }
 }
