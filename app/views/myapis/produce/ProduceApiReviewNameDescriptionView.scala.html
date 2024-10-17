@@ -1,0 +1,104 @@
+@*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.myapis.produce.ProduceApiReviewNameDescription
+
+@this(
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukCheckboxes: GovukCheckboxes,
+    govukButton: GovukButton,
+    govukDetails : GovukDetails
+)
+
+@(form: Form[?], apiName: String, apiShortDescription: String)(implicit request: Request[?], messages: Messages)
+
+@apiNamingConventions = {
+    <h3>@messages("produceApiReviewNameDescription.namingConventions.1.title")</h3>
+    <p>@messages("produceApiReviewNameDescription.namingConventions.1.content")</p>
+
+    <h3>@messages("produceApiReviewNameDescription.namingConventions.2.title")</h3>
+    <p>@messages("produceApiReviewNameDescription.namingConventions.2.content")</p>
+
+    <h3>@messages("produceApiReviewNameDescription.namingConventions.3.title")</h3>
+    <p>@messages("produceApiReviewNameDescription.namingConventions.3.content")</p>
+
+    <h3>@messages("produceApiReviewNameDescription.namingConventions.4.title")</h3>
+    <p>@messages("produceApiReviewNameDescription.namingConventions.4.content")</p>
+}
+
+@apiPanelPlaceholder = {
+    <div class="api-panel hip-api-panel--fake">
+        <div class="api-panel-top">
+            <span class="govuk-link hip-dummy-content--medium"></span>
+            <strong class="hip-dummy-content--narrow"></strong>
+        </div>
+        <p class="hip-dummy-content--wide"></p>
+        <p class="hip-dummy-content--narrow"></p>
+    </div>
+}
+
+@layout(pageTitle = title(form, messages("produceApiReviewNameDescription.title"))) {
+    @if(form.errors.nonEmpty) {
+        @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
+    }
+
+    <h1 class="govuk-heading-l">@messages("produceApiReviewNameDescription.heading")</h1>
+
+    <p class="govuk-body">@messages("produceApiReviewNameDescription.preamble")</p>
+
+    @formHelper(action = controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onSubmit(), Symbol("autoComplete") -> "off") {
+
+        <div>
+            @apiPanelPlaceholder
+
+            <div class="api-panel hip-api-panel--preview">
+                <div class="api-panel-top">
+                    <span class="call-out-type information govuk-!-margin-bottom-0">
+                        <span class="govuk-link govuk-link--no-visited-state">@apiName</span>
+                    </span>
+                    <strong class="hip-tag--platform__self-serve">Self-serve</strong>
+                </div>
+
+                <p class="govuk-body additional-message">@apiShortDescription</p>
+            </div>
+
+            @apiPanelPlaceholder
+        </div>
+
+        <div class="hip-checkbox-with-details">
+            @govukCheckboxes(
+                CheckboxesViewModel(
+                    form   = form,
+                    name   = "value",
+                    legend = LegendViewModel(messages("produceApiReviewNameDescription.subheading")).withCssClass("govuk-!-font-weight-bold"),
+                    items  = ProduceApiReviewNameDescription.checkboxItems
+                )
+            )
+
+            @govukDetails(Details(
+                summary = Text(messages("produceApiReviewNameDescription.namingConventions.title")),
+                content = HtmlContent(apiNamingConventions),
+                classes = "hip-details--headed-paragraphs"
+            ))
+        </div>
+
+        @govukButton(
+            ButtonViewModel(messages("site.continue"))
+        )
+    }
+}

@@ -1,6 +1,7 @@
 $govuk-include-default-font-face: false;
 @import "lib/govuk-frontend/dist/govuk/base";
 @import "lib/govuk-frontend/dist/govuk/components/tag";
+@import "lib/govuk-frontend/dist/govuk/core";
 
 // Non-GOV.UK Colours
 $off-white: #fbfbfb;
@@ -826,5 +827,50 @@ header {
     margin-bottom: govuk-spacing(2);
     summary {
         @include govuk-font($size: 16);
+    }
+}
+
+.hip-details--headed-paragraphs {
+    h3 {
+        @extend %govuk-heading-s;
+        margin-bottom: govuk-spacing(1) !important;
+    }
+    p {
+        @extend .govuk-body;
+    }
+}
+
+.hip-checkbox-with-details {
+    .govuk-form-group {
+        margin-bottom: govuk-spacing(1);
+    }
+    details {
+        margin-left: govuk-spacing(9);
+    }
+}
+
+.hip-api-panel--fake {
+    padding-bottom: 0;
+
+    .govuk-link, strong, p {
+        display: block;
+        height: govuk-spacing(4);
+        background-color: govuk-tint(govuk-colour("mid-grey"), 70);
+    }
+    .hip-dummy-content--narrow {
+        width: 20%;
+    }
+    .hip-dummy-content--medium {
+        width: 50%;
+    }
+    .hip-dummy-content--wide {
+        width: 75%;
+    }
+}
+
+.hip-api-panel--preview {
+    span.govuk-link {
+        color: govuk-colour("blue");
+        cursor: pointer;
     }
 }
