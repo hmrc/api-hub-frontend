@@ -15,6 +15,7 @@
  *@
 
 @import models.myapis.produce.ProduceApiReviewNameDescription
+@import models.user.UserModel
 
 @this(
     layout: templates.Layout,
@@ -25,7 +26,7 @@
     govukDetails : GovukDetails
 )
 
-@(form: Form[?], apiName: String, apiShortDescription: String)(implicit request: Request[?], messages: Messages)
+@(form: Form[?], apiName: String, apiShortDescription: String, userModel: UserModel)(implicit request: Request[?], messages: Messages)
 
 @apiNamingConventions = {
     <h3>@messages("produceApiReviewNameDescription.namingConventions.1.title")</h3>
@@ -52,7 +53,7 @@
     </div>
 }
 
-@layout(pageTitle = title(form, messages("produceApiReviewNameDescription.title"))) {
+@layout(pageTitle = title(form, messages("produceApiReviewNameDescription.title")), user = Some(userModel)) {
     @if(form.errors.nonEmpty) {
         @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
     }

@@ -51,7 +51,7 @@ class Navigator @Inject()() {
     case ProduceApiBeforeYouStartPage => _ => controllers.myapis.produce.routes.ProduceApiChooseTeamController.onPageLoad(NormalMode)
     case ProduceApiChooseTeamPage => _ => controllers.myapis.produce.routes.ProduceApiHowToCreateController.onPageLoad(NormalMode)
     case ProduceApiEnterOasPage => _ => controllers.myapis.produce.routes.ProduceApiShortDescriptionController.onPageLoad(NormalMode)
-    case ProduceApiShortDescriptionPage => _ => controllers.myapis.produce.routes.ProduceApiReviewAppearanceController.onPageLoad()
+    case ProduceApiShortDescriptionPage => _ => controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onPageLoad()
     case ProduceApiHowToCreatePage => produceApiHowToCreateNextPage(NormalMode)
     case ProduceApiShortDescriptionPage => _ => controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onPageLoad()
     case ProduceApiReviewNameDescriptionPage => _ => controllers.myapis.produce.routes.ProduceApiEgressController.onPageLoad(NormalMode)

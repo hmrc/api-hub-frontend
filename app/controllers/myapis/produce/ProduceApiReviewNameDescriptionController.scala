@@ -55,7 +55,7 @@ class ProduceApiReviewNameDescriptionController @Inject()(
       val apiName = getApiName(request.userAnswers)
       val apiShortDescription = getApiShortDescription(request.userAnswers)
 
-      Ok(view(preparedForm, apiName, apiShortDescription))
+      Ok(view(preparedForm, apiName, apiShortDescription, request.user))
   }
 
   def getApiName(userAnswers: UserAnswers): String = {
@@ -71,7 +71,7 @@ class ProduceApiReviewNameDescriptionController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, getApiName(request.userAnswers), getApiShortDescription(request.userAnswers)))),
+          Future.successful(BadRequest(view(formWithErrors, getApiName(request.userAnswers), getApiShortDescription(request.userAnswers), request.user))),
 
         value =>
           for {
