@@ -33,6 +33,7 @@ site.live = Live
 site.total = Total
 site.noEmail = The current user does not have an email address
 site.feedback = Feedback
+site.unexpecteError = Unexpected error: {0}
 site.team.select = Select an owning team
 site.team.unassigned = Unassigned
 site.signedIn = Signed in as {0} via {1}
@@ -812,6 +813,7 @@ produceApiEnterOas.heading = Enter your OAS document
 produceApiEnterOas.hint = We have pre-populated the editor below with the specification of an example API, you can edit it to match your own API. Note the various best practices included in the example such as a clear overall description of the API, descriptions for each endpoint, lists of error response messages, and the response that is to be expected from a successful request.
 produceApiEnterOas.checkYourAnswersLabel = OAS document
 produceApiEnterOas.error.required = Enter a valid OAS document for your API
+produceApiEnterOas.error.malformed = Unable to parse the OAS document
 produceApiEnterOas.change.hidden = OAS
 
 produceApiBeforeYouStart.title = Register an API

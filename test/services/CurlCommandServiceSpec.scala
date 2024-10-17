@@ -20,13 +20,23 @@ import base.SpecBase
 import controllers.actions.{FakeApiDetail, FakeApplication}
 import io.swagger.v3.oas.models.servers.Server
 import models.api.{Endpoint, EndpointMethod}
-import models.application.{Credential, Environment, Environments, SelectedEndpoint, Api}
+import models.application.{Api, Credential, Environment, Environments, SelectedEndpoint}
 import models.{CORPORATE, CurlCommand, MDTP}
+import org.mockito.ArgumentMatchers.{any, anyString}
+import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.i18n.{Messages, MessagesProvider}
 
 import java.time.LocalDateTime
 
 class CurlCommandServiceSpec extends SpecBase with MockitoSugar {
+
+  private implicit val messagesProvider: MessagesProvider = mock[MessagesProvider]
+  private val messages: Messages = mock[Messages]
+  private val errorMessage = "Error message"
+  when(messagesProvider.messages).thenReturn(messages)
+  when(messages.apply(anyString, any)).thenReturn(errorMessage)
+
   "CurlCommandService.buildCurlCommandsForApi" - {
     "must return an error if the oas file cannot be parsed" in {
       val service = new CurlCommandService()
@@ -36,7 +46,10 @@ class CurlCommandServiceSpec extends SpecBase with MockitoSugar {
 
       val result = service.buildCurlCommandsForApi(application, apiDetail, apiWorld)
 
-      result mustBe Left("Unable to parse the OAS document")
+      result match {
+        case Left(error) => error must include(errorMessage)
+        case _ => fail()
+      }
     }
 
     "must return the correct curl command for a minimal valid oas file" in {
@@ -107,6 +120,12 @@ class CurlCommandServiceSpec extends SpecBase with MockitoSugar {
           |          description: successful operation
           |    delete:
           |      description: request that shouldn't generate a curl command
+          |      parameters:
+          |      - name: id
+          |        in: path
+          |        required: true
+          |        schema:
+          |          type: string
           |      responses:
           |        "200":
           |          description: successful operation

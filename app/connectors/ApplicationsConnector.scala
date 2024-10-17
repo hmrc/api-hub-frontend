@@ -28,10 +28,13 @@ import models.requests.{AddApiRequest, ChangeTeamNameRequest, TeamMemberRequest}
 import models.stats.ApisInProductionStatistic
 import models.team.{NewTeam, Team}
 import models.user.UserContactDetails
+import play.api.Logging
 import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION, CONTENT_TYPE}
 import play.api.http.MimeTypes.JSON
 import play.api.http.Status.*
-import play.api.libs.json.{JsResultException, Json}
+import play.api.i18n.{Messages, MessagesProvider}
+import play.api.libs.json.{JsResultException, JsString, Json}
+import play.api.libs.ws.DefaultBodyWritables.writeableOf_String
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
 import uk.gov.hmrc.http.HttpReads.Implicits.*
@@ -43,11 +46,11 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ApplicationsConnector @Inject()(
-    httpClient: HttpClientV2,
-    crypto: ApplicationCrypto,
-    servicesConfig: ServicesConfig,
-    frontEndConfig: FrontendAppConfig
-  )(implicit ec: ExecutionContext) extends HttpErrorFunctions {
+                                       httpClient: HttpClientV2,
+                                       crypto: ApplicationCrypto,
+                                       servicesConfig: ServicesConfig,
+                                       frontEndConfig: FrontendAppConfig
+                                     )(implicit ec: ExecutionContext) extends HttpErrorFunctions with Logging {
 
   private val applicationsBaseUrl = servicesConfig.baseUrl("api-hub-applications")
   private val clientAuthToken = frontEndConfig.appAuthToken
@@ -183,9 +186,9 @@ class ApplicationsConnector @Inject()(
   }
 
   def addCredential(
-    id: String,
-    environmentName: EnvironmentName
-  )(implicit hc:HeaderCarrier): Future[Either[ApplicationsException, Option[Credential]]] = {
+                     id: String,
+                     environmentName: EnvironmentName
+                   )(implicit hc:HeaderCarrier): Future[Either[ApplicationsException, Option[Credential]]] = {
     httpClient
       .post(url"$applicationsBaseUrl/api-hub-applications/applications/$id/environments/$environmentName/credentials")
       .setHeader((ACCEPT, JSON))
@@ -200,10 +203,10 @@ class ApplicationsConnector @Inject()(
   }
 
   def deleteCredential(
-    id: String,
-    environmentName: EnvironmentName,
-    clientId: String
-  )(implicit hc: HeaderCarrier): Future[Either[ApplicationsException, Option[Unit]]] = {
+                        id: String,
+                        environmentName: EnvironmentName,
+                        clientId: String
+                      )(implicit hc: HeaderCarrier): Future[Either[ApplicationsException, Option[Unit]]] = {
     httpClient
       .delete(url"$applicationsBaseUrl/api-hub-applications/applications/$id/environments/$environmentName/credentials/$clientId")
       .setHeader(AUTHORIZATION -> clientAuthToken)
@@ -547,25 +550,39 @@ class ApplicationsConnector @Inject()(
       .execute[ApisInProductionStatistic]
   }
 
-  private def handleSuccessfulDeploymentsResponse(response: HttpResponse): Future[SuccessfulDeploymentsResponse] = {
+  def validateOAS(oas: String)
+                 (implicit hc: HeaderCarrier, messagesProvider: MessagesProvider): Future[Either[InvalidOasResponse, Unit]] = httpClient.post(url"$applicationsBaseUrl/api-hub-applications/oas/validate")
+                   .setHeader(ACCEPT -> JSON)
+                   .setHeader(CONTENT_TYPE -> "application/yaml")
+                   .setHeader(AUTHORIZATION -> clientAuthToken)
+                   .withBody(oas)
+                   .execute[HttpResponse]
+                   .flatMap {
+                     response =>
+                       if (is2xx(response.status)) Future.successful(Right(()))
+                       else if (response.status == BAD_REQUEST) {
+                         handleInvalidOasResponse(response).map { failure =>
+                           logger.warn(s"Error while validating OAS:\n${Json.prettyPrint(Json.toJson(failure))}")
+                           Left(failure)
+                         }
+                       } else
+                         Future.failed(UpstreamErrorResponse("Unexpected response", response.status))
+                   }
+
+  private def handleSuccessfulDeploymentsResponse(response: HttpResponse) =
     response.json.validate[SuccessfulDeploymentsResponse].fold(
       invalid => Future.failed(JsResultException(invalid)),
       response => Future.successful(response)
     )
-  }
 
-  private def handleInvalidOasResponse(response: HttpResponse): Future[InvalidOasResponse] = {
-    (if (response.body.isEmpty) {
-      None
-    }
-    else {
+  private def handleInvalidOasResponse(response: HttpResponse) =
+    (if (response.body.isEmpty) None
+    else
       response.json.validate[InvalidOasResponse].fold(
         _ => None,
         response => Some(response)
-      )
-    })
-      .map(invalidOasResponse => Future.successful(invalidOasResponse))
-      .getOrElse(Future.failed(UpstreamErrorResponse("Bad request", response.status)))
-  }
+      ))
+    .map(invalidOasResponse => Future.successful(invalidOasResponse))
+    .getOrElse(Future.failed(UpstreamErrorResponse("Bad request", response.status)))
 
 }

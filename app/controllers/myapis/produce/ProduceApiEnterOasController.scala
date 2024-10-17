@@ -16,14 +16,17 @@
 
 package controllers.myapis.produce
 
+import connectors.ApplicationsConnector
 import controllers.actions.*
 import forms.myapis.produce.ProduceApiEnterOasFormProvider
 import models.Mode
 import navigation.Navigator
 import pages.myapis.produce.ProduceApiEnterOasPage
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.*
+import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.ProduceApiSessionRepository
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.myapis.produce.ProduceApiEnterOasView
 
@@ -39,7 +42,8 @@ class ProduceApiEnterOasController @Inject()(
                                         requireData: DataRequiredAction,
                                         formProvider: ProduceApiEnterOasFormProvider,
                                         val controllerComponents: MessagesControllerComponents,
-                                        view: ProduceApiEnterOasView
+                                        view: ProduceApiEnterOasView,
+                                        applicationsConnector: ApplicationsConnector
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form = formProvider()
@@ -57,16 +61,30 @@ class ProduceApiEnterOasController @Inject()(
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+      val boundedForm = form.bindFromRequest()
 
-      form.bindFromRequest().fold(
+      boundedForm.fold(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, mode, request.user))),
 
         value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(ProduceApiEnterOasPage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(ProduceApiEnterOasPage, mode, updatedAnswers))
-      )
+          validateOAS(value).flatMap(_.fold(
+            error =>
+              Future.successful(BadRequest(view(boundedForm.withGlobalError(error), mode, request.user))),
+            _ => for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(ProduceApiEnterOasPage, value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(ProduceApiEnterOasPage, mode, updatedAnswers))
+          )
+      ))
   }
+
+  private def validateOAS(oas: String)(implicit messagesProvider: MessagesProvider, hc: HeaderCarrier): Future[Either[String, Unit]] =
+    applicationsConnector.validateOAS(oas).map(
+      _.fold(
+        error =>
+          Left(Json.prettyPrint(Json.toJson(error))),
+        _ => Right(())
+      )
+    )
 }

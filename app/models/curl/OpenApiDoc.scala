@@ -22,13 +22,15 @@ import io.swagger.oas.inflector.processors.JsonNodeExampleSerializer
 import io.swagger.v3.oas.models.{Components, OpenAPI, Operation, PathItem, Paths}
 import io.swagger.v3.oas.models.servers.Server
 import io.swagger.v3.parser.OpenAPIV3Parser
-import io.swagger.v3.parser.core.models.ParseOptions
+import io.swagger.v3.parser.core.models.{ParseOptions, SwaggerParseResult}
 import models.CurlCommand.missingValue
 import models.{ApiWorld, CORPORATE, MDTP}
 import play.api.Logging
+import play.api.i18n.{Messages, MessagesProvider}
 import play.api.libs.json.Json
 
 import scala.jdk.CollectionConverters.*
+import scala.util.Try
 
 class OpenApiDoc(openApi: OpenAPI) {
   private val schemas = Option(openApi.getComponents).getOrElse(Components()).getSchemas
@@ -92,15 +94,16 @@ object OpenApiDoc extends Logging {
   private val simpleModule = SimpleModule().addSerializer(JsonNodeExampleSerializer());
   io.swagger.util.Json.mapper().registerModule(simpleModule);
 
-  def parse(openApiSpecification: String): Either[String, OpenApiDoc] = {
+  def parse(openApiSpecification: String)(implicit messagesProvider: MessagesProvider): Either[String, OpenApiDoc] = {
     val options: ParseOptions = new ParseOptions()
     options.setResolve(false)
 
+    val errorMessage = Messages("produceApiEnterOas.error.malformed")
     val parseResult = new OpenAPIV3Parser().readContents(openApiSpecification, null, options)
     parseResult.getOpenAPI match {
       case null => {
-        logger.warn(("Unable to parse the OAS document" :: List(parseResult.getMessages)).mkString(", "))
-        Left("Unable to parse the OAS document")
+        logger.warn((errorMessage :: List(parseResult.getMessages)).mkString(", "))
+        Left(errorMessage)
       }
       case openApi => Right(OpenApiDoc(openApi))
     }
