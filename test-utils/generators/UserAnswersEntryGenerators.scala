@@ -17,7 +17,6 @@
 package generators
 
 import models.ApiPolicyConditionsDeclaration
-import models.application.TeamMember
 import models.team.Team
 import models.myapis.produce.*
 import org.scalacheck.Arbitrary
@@ -36,6 +35,14 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators wit
       for {
         page  <- arbitrary[ProduceApiShortDescriptionPage.type]
         value <- arbitrary[String].suchThat(_.nonEmpty).map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitraryProduceApiReviewNameDescriptionUserAnswersEntry: Arbitrary[(ProduceApiReviewNameDescriptionPage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[ProduceApiReviewNameDescriptionPage.type]
+        value <- arbitrary[ProduceApiReviewNameDescription].map(Json.toJson(_))
       } yield (page, value)
     }
 
