@@ -52,8 +52,8 @@ class OpenApiDoc(openApi: OpenAPI) {
     } yield OpenApiOperation(operation, method, path)
   }
 
-  def getApiName()(implicit messagesProvider: MessagesProvider): Either[String, String] =
-    Option(openApi.getInfo.getTitle).toRight(Messages.apply("produceApiEnterOas.error.missingApiName"))
+  def getApiName()(implicit messagesProvider: MessagesProvider): Option[String] =
+    Option(openApi.getInfo.getTitle)
 
   private def getOperationForMethod(method: String, pathItem: PathItem): Option[Operation] = {
     Option(method match {
