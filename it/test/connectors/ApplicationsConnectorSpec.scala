@@ -23,7 +23,7 @@ import connectors.ApplicationsConnectorSpec.ApplicationGetterBehaviours
 import models.UserEmail
 import models.accessrequest.*
 import models.api.ApiDeploymentStatuses
-import models.api.ApiDetailLensesSpec.sampleApiDetail
+import models.api.ApiDetailLensesSpec.{sampleApiDetail, sampleApiDetailSummary}
 import models.application.*
 import models.application.ApplicationLenses.*
 import models.deployment.{DeploymentDetails, DeploymentsRequest, EgressMapping, Error, FailuresResponse, InvalidOasResponse, RedeploymentRequest, SuccessfulDeploymentsResponse}
@@ -1632,52 +1632,26 @@ class ApplicationsConnectorSpec
     }
   }
 
-  "validateOAS" - {
-    "must place the correct request and return a valid response" in {
-      val oas = "oas"
+  "listApisInProduction" - {
+    "must place the correct request and return a Seq[ApiDetail]" in {
+      val apis = Seq(sampleApiDetailSummary(), sampleApiDetailSummary())
 
       stubFor(
-        post(urlEqualTo("/api-hub-applications/oas/validate"))
+        get(urlEqualTo("/api-hub-applications/stats/list-apis-in-production"))
           .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
           .withHeader(AUTHORIZATION, equalTo("An authentication token"))
-          .withRequestBody(equalTo(oas))
           .willReturn(
             aResponse()
-              .withStatus(OK)
+              .withBody(Json.toJson(apis).toString())
           )
       )
 
-      buildConnector(this).validateOAS(oas)(HeaderCarrier(), messagesProvider).map {
+      buildConnector(this).listApisInProduction()(HeaderCarrier()).map {
         result =>
-          result mustBe Right(())
-      }
-    }
-
-    "must return 400 request a valid response" in {
-      val oas = "oas"
-      val invalidOasResponse = InvalidOasResponse(FailuresResponse(
-        "400", errorMessage, None
-      ))
-
-      stubFor(
-        post(urlEqualTo("/api-hub-applications/oas/validate"))
-          .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
-          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
-          .withRequestBody(equalTo(oas))
-          .willReturn(
-            aResponse()
-              .withStatus(BAD_REQUEST)
-              .withBody(Json.toJson(invalidOasResponse).toString)
-          )
-      )
-
-      buildConnector(this).validateOAS(oas)(HeaderCarrier(), messagesProvider).map {
-        result =>
-          result mustBe Left(invalidOasResponse)
+          result mustBe apis
       }
     }
   }
-
 }
 
 object ApplicationsConnectorSpec extends HttpClientV2Support {

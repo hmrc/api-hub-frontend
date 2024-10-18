@@ -48,4 +48,11 @@ class StatisticsController @Inject()(
       }
   }
 
+  def listApisInProduction(): Action[AnyContent] = (identify andThen isSupport).async {
+    implicit request =>
+      apiHubService.listApisInProduction().map { apiDetails =>
+        Ok(Json.toJson(apiDetails.map(_.title).sortBy(_.toLowerCase)))
+      }
+  }
+
 }

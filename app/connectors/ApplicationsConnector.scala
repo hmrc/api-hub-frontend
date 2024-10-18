@@ -20,7 +20,7 @@ import com.google.inject.{Inject, Singleton}
 import config.FrontendAppConfig
 import models.UserEmail
 import models.accessrequest.{AccessRequest, AccessRequestCancelRequest, AccessRequestDecisionRequest, AccessRequestRequest, AccessRequestStatus}
-import models.api.ApiDeploymentStatuses
+import models.api.{ApiDeploymentStatuses, ApiDetail, ApiDetailSummary}
 import models.application.*
 import models.deployment.*
 import models.exception.{ApplicationCredentialLimitException, ApplicationsException, TeamNameNotUniqueException}
@@ -568,6 +568,13 @@ class ApplicationsConnector @Inject()(
                        } else
                          Future.failed(UpstreamErrorResponse("Unexpected response", response.status))
                    }
+
+  def listApisInProduction()(implicit hc: HeaderCarrier): Future[Seq[ApiDetailSummary]] = {
+    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/stats/list-apis-in-production")
+      .setHeader(ACCEPT -> JSON)
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Seq[ApiDetailSummary]]
+  }
 
   private def handleSuccessfulDeploymentsResponse(response: HttpResponse) =
     response.json.validate[SuccessfulDeploymentsResponse].fold(

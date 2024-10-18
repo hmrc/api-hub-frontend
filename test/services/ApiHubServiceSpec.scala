@@ -21,6 +21,7 @@ import controllers.actions.FakeApplication
 import generators.{AccessRequestGenerator, ApiDetailGenerators}
 import models.AvailableEndpoint
 import models.accessrequest.*
+import models.api.ApiDetailLensesSpec.sampleApiDetailSummary
 import models.api.{ApiDeploymentStatuses, ContactInfo, EndpointMethod, PlatformContact}
 import models.application.ApplicationLenses.*
 import models.application.*
@@ -810,6 +811,20 @@ class ApiHubServiceSpec
       fixture.service.apisInProduction()(HeaderCarrier()).map {
         result =>
           result mustBe expected
+      }
+    }
+
+    "listApisInProduction" - {
+      "must make the correct request to the applications connector and return the api details" in {
+        val fixture = buildFixture()
+        val apis = Seq(sampleApiDetailSummary(), sampleApiDetailSummary())
+
+        when(fixture.applicationsConnector.listApisInProduction()(any)).thenReturn(Future.successful(apis))
+
+        fixture.service.listApisInProduction()(HeaderCarrier()).map {
+          result =>
+            result mustBe apis
+        }
       }
     }
   }

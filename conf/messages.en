@@ -856,6 +856,7 @@ statistics.menuTitle = Hub stats
 statistics.fetchStat = Fetch stat
 statistics.apisInProductionStatistic.totalApis = Total APIs
 statistics.apisInProductionStatistic.totalInProduction = APIs in production
+statistics.apisInProductionStatistic.list = List of APIs in production
 
 cancelAccessRequestSelectApi.title = Select APIs
 cancelAccessRequestSelectApi.heading = Which APIs do you want to cancel production access requests for?

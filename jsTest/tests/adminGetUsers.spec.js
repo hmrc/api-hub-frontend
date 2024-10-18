@@ -1,9 +1,10 @@
 import {JSDOM} from 'jsdom';
 import {onDomLoaded} from '../../app/assets/javascripts/adminGetUsers.js';
+import {buildFakeClipboard} from "./testUtils.js";
 
 describe('adminManageApps', () => {
     const emails = "user1@example.com; user2@example.com;";
-    let document, clipboardContents;
+    let document, clipboard;
 
     beforeEach(() => {
         const dom = new JSDOM(`
@@ -12,20 +13,7 @@ describe('adminManageApps', () => {
         `);
         document = dom.window.document;
         globalThis.document = document;
-        Object.defineProperty(globalThis, 'navigator', {
-           value: dom.window.navigator,
-           writable: true
-        });
-
-        clipboardContents = null;
-        Object.defineProperty(globalThis.navigator, 'clipboard', {
-            value: {
-                writeText: text => {
-                    clipboardContents = text;
-                    return Promise.resolve();
-                }
-            }
-        });
+        clipboard = buildFakeClipboard(dom);
     });
 
     it("when button is clicked then emails are written to clipboard",  () => {
@@ -33,7 +21,7 @@ describe('adminManageApps', () => {
 
         document.getElementById('copyButton').click();
 
-        expect(clipboardContents).toEqual(emails);
+        expect(clipboard.getContents()).toEqual(emails);
     });
 
 });

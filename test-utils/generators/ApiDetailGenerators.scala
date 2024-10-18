@@ -105,6 +105,23 @@ trait ApiDetailGenerators {
   def sampleApis() : IntegrationResponse =
     IntegrationResponse(1, None, arbitraryApiDetails.arbitrary.pureApply(parameters, Seed.random()))
 
+  def sampleApiDetailSummary() :ApiDetailSummary = {
+    val apiDetail = sampleApiDetail()
+    ApiDetailSummary(
+      apiDetail.id,
+      apiDetail.publisherReference,
+      apiDetail.title,
+      apiDetail.shortDescription,
+      apiDetail.apiStatus,
+      apiDetail.domain,
+      apiDetail.subDomain,
+      apiDetail.hods,
+      apiDetail.platform,
+      apiDetail.apiType,
+      apiDetail.teamId
+    )
+  }
+
   def sampleOas: String =
     """openapi: 3.0.3
       |info:

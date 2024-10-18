@@ -102,3 +102,26 @@ export function buildFakeAceEditor()  {
     };
     return fakeAce;
 }
+
+export function buildFakeClipboard(dom) {
+    Object.defineProperty(globalThis, 'navigator', {
+        value: dom.window.navigator,
+        writable: true
+    });
+
+    let clipboardContents = null;
+    Object.defineProperty(globalThis.navigator, 'clipboard', {
+        value: {
+            writeText: text => {
+                clipboardContents = text;
+                return Promise.resolve();
+            }
+        }
+    });
+
+    return {
+        getContents() {
+            return clipboardContents;
+        }
+    };
+}
