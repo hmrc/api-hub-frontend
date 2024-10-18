@@ -27,7 +27,7 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.myapis.produce.{ProduceApiEnterOasAnswers, ProduceApiEnterOasPage, ProduceApiReviewNameDescriptionPage, ProduceApiShortDescriptionPage}
+import pages.myapis.produce.{ProduceApiEnterOasPage, ProduceApiReviewNameDescriptionPage, ProduceApiShortDescriptionPage}
 import play.api.Application as PlayApplication
 import play.api.inject.bind
 import play.api.mvc.Call
@@ -44,13 +44,37 @@ class ProduceApiReviewNameDescriptionControllerSpec extends SpecBase with Mockit
 
   lazy val produceApiReviewNameDescriptionRoute = controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onPageLoad().url
 
-  val formProvider = new ProduceApiReviewNameDescriptionFormProvider()
-  val form = formProvider()
   val apiName = "API NAME"
   val apiDescription = "API Description"
+  private val validOAS =
+    s"""
+       |openapi: 3.0.1
+       |info:
+       |  title: $apiName
+       |  description: This is a sample server
+       |  license:
+       |    name: Apache-2.0
+       |    url: http://www.apache.org/licenses/LICENSE-2.0.html
+       |  version: 1.0.0
+       |servers:
+       |- url: https://api.absolute.org/v2
+       |  description: An absolute path
+       |paths:
+       |  /whatever:
+       |    get:
+       |      summary: Some operation
+       |      description: Some operation
+       |      operationId: doWhatever
+       |      responses:
+       |        "200":
+       |          description: OK
+       |""".stripMargin
+
+  val formProvider = new ProduceApiReviewNameDescriptionFormProvider()
+  val form = formProvider()
   val userAnswersWithDescription = UserAnswers(userAnswersId)
     .set(ProduceApiShortDescriptionPage, apiDescription).success.value
-    .set(ProduceApiEnterOasPage, ProduceApiEnterOasAnswers("oas", apiName)).success.value
+    .set(ProduceApiEnterOasPage, validOAS).success.value
   val userAnswersWithPreviousConfirmation = userAnswersWithDescription.set(ProduceApiReviewNameDescriptionPage, Set(Confirm)).success.value
 
   "ProduceApiReviewNameDescription Controller" - {

@@ -18,10 +18,11 @@ package controllers.myapis.produce
 
 import controllers.actions.*
 import forms.myapis.produce.ProduceApiReviewNameDescriptionFormProvider
+import models.curl.OpenApiDoc
 import models.{NormalMode, UserAnswers}
 import navigation.Navigator
 import pages.myapis.produce.{ProduceApiEnterOasPage, ProduceApiReviewNameDescriptionPage, ProduceApiShortDescriptionPage}
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.{I18nSupport, MessagesApi, MessagesProvider}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.ProduceApiSessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -58,8 +59,10 @@ class ProduceApiReviewNameDescriptionController @Inject()(
       Ok(view(preparedForm, apiName, apiShortDescription, request.user))
   }
 
-  def getApiName(userAnswers: UserAnswers): String = {
-    userAnswers.get(ProduceApiEnterOasPage).map(_.apiTitle).getOrElse("")
+  def getApiName(userAnswers: UserAnswers)(implicit messagesProvider: MessagesProvider): String = {
+    userAnswers.get(ProduceApiEnterOasPage).flatMap(
+      OpenApiDoc.parse(_).flatMap(_.getApiName()).toOption
+    ).getOrElse("")
   }
   
   def getApiShortDescription(userAnswers: UserAnswers): String = {

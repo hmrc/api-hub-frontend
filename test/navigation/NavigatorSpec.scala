@@ -130,7 +130,7 @@ class NavigatorSpec extends SpecBase with TryValues {
           navigator.nextPage(ProduceApiHowToCreatePage, NormalMode, emptyUserAnswers.set(ProduceApiHowToCreatePage, Editor).get) mustBe controllers.myapis.produce.routes.ProduceApiEnterOasController.onPageLoad(NormalMode)
         }
         "must go from the Produce Api Enter OAS page to the Enter a short description page" in {
-          navigator.nextPage(ProduceApiEnterOasPage, NormalMode, emptyUserAnswers.set(ProduceApiEnterOasPage, ProduceApiEnterOasAnswers("oas", "api name")).get) mustBe controllers.myapis.produce.routes.ProduceApiShortDescriptionController.onPageLoad(NormalMode)
+          navigator.nextPage(ProduceApiEnterOasPage, NormalMode, emptyUserAnswers.set(ProduceApiEnterOasPage, "oas").get) mustBe controllers.myapis.produce.routes.ProduceApiShortDescriptionController.onPageLoad(NormalMode)
         }
         "must go from the Enter a short description page to the API review page" in {
           navigator.nextPage(ProduceApiShortDescriptionPage, NormalMode, emptyUserAnswers.set(ProduceApiShortDescriptionPage, "short description").get) mustBe controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onPageLoad()

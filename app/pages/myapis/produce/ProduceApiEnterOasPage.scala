@@ -17,15 +17,9 @@
 package pages.myapis.produce
 
 import pages.QuestionPage
-import play.api.libs.json.{Format, JsPath, Json}
+import play.api.libs.json.JsPath
 
-case class ProduceApiEnterOasAnswers(oas: String, apiTitle: String)
-
-case object ProduceApiEnterOasAnswers {
-  implicit val formatProduceApiEnterOasAnswers: Format[ProduceApiEnterOasAnswers] = Json.format[ProduceApiEnterOasAnswers]
-}
-
-case object ProduceApiEnterOasPage extends QuestionPage[ProduceApiEnterOasAnswers] {
+case object ProduceApiEnterOasPage extends QuestionPage[String] {
 
   override def path: JsPath = JsPath \ toString
 
