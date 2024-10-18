@@ -1633,7 +1633,7 @@ class ApplicationsConnectorSpec
   }
 
   "listApisInProduction" - {
-    "must place the correct request and return a Seq[ApiDetail]" in {
+    "must place the correct request and return a Seq[ApiDetailSummary]" in {
       val apis = Seq(sampleApiDetailSummary(), sampleApiDetailSummary())
 
       stubFor(

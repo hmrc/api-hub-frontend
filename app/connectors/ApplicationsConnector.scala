@@ -20,7 +20,7 @@ import com.google.inject.{Inject, Singleton}
 import config.FrontendAppConfig
 import models.UserEmail
 import models.accessrequest.{AccessRequest, AccessRequestCancelRequest, AccessRequestDecisionRequest, AccessRequestRequest, AccessRequestStatus}
-import models.api.{ApiDeploymentStatuses, ApiDetail, ApiDetailSummary}
+import models.api.{ApiDeploymentStatuses, ApiDetailSummary}
 import models.application.*
 import models.deployment.*
 import models.exception.{ApplicationCredentialLimitException, ApplicationsException, TeamNameNotUniqueException}
