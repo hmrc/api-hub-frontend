@@ -553,7 +553,7 @@ class ApplicationsConnector @Inject()(
   def validateOAS(oas: String)
                  (implicit hc: HeaderCarrier, messagesProvider: MessagesProvider): Future[Either[InvalidOasResponse, Unit]] = httpClient.post(url"$applicationsBaseUrl/api-hub-applications/oas/validate")
                    .setHeader(ACCEPT -> JSON)
-                   .setHeader(CONTENT_TYPE -> "application/yaml")
+                   .setHeader(CONTENT_TYPE -> "text/plain")
                    .setHeader(AUTHORIZATION -> clientAuthToken)
                    .withBody(oas)
                    .execute[HttpResponse]
