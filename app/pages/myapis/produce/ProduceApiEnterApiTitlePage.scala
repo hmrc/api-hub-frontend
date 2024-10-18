@@ -16,17 +16,12 @@
 
 package pages.myapis.produce
 
-import pages.behaviours.PageBehaviours
+import pages.QuestionPage
+import play.api.libs.json.{Format, JsPath, Json}
 
+case object ProduceApiEnterApiTitlePage extends QuestionPage[String] {
 
-class ProduceApiEnterOasPageSpec extends PageBehaviours {
+  override def path: JsPath = JsPath \ toString
 
-  "ProduceApiEnterOasPage" - {
-
-    beRetrievable[String](ProduceApiEnterOasPage)
-
-    beSettable[String](ProduceApiEnterOasPage)
-
-    beRemovable[String](ProduceApiEnterOasPage)
-  }
+  override def toString: String = "produceApiEnterApiTitle"
 }

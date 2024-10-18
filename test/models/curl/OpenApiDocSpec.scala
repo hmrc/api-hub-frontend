@@ -21,6 +21,8 @@ import io.swagger.v3.oas.models.media.*
 import io.swagger.v3.oas.models.parameters.{Parameter, RequestBody}
 import io.swagger.v3.oas.models.servers.Server
 import io.swagger.v3.oas.models.{OpenAPI, Operation, PathItem}
+import io.swagger.v3.parser.core.models.ParseOptions
+import io.swagger.v3.parser.OpenAPIV3Parser
 import models.{CORPORATE, MDTP}
 import org.mockito.ArgumentMatchers.{any, anyString}
 import org.scalatest.prop.TableDrivenPropertyChecks.{Table, forAll}
@@ -186,6 +188,68 @@ class OpenApiDocSpec extends SpecBase with MockitoSugar {
         val result = OpenApiDoc.parse(validOAS)
 
         result mustBe a[Right[?, ?]]
+      }
+    }
+
+    "getApiName" - {
+      "must return the API name when it exists" in {
+        val name = "title"
+        val validOAS =
+          s"""
+            |openapi: 3.0.1
+            |info:
+            |  title: $name
+            |  description: This is a sample server
+            |  license:
+            |    name: Apache-2.0
+            |    url: http://www.apache.org/licenses/LICENSE-2.0.html
+            |  version: 1.0.0
+            |servers:
+            |- url: https://api.absolute.org/v2
+            |  description: An absolute path
+            |paths:
+            |  /whatever:
+            |    get:
+            |      summary: Some operation
+            |      description: Some operation
+            |      operationId: doWhatever
+            |      responses:
+            |        "200":
+            |          description: OK
+            |""".stripMargin
+        val openApiDoc = OpenApiDoc(new OpenAPIV3Parser().readContents(validOAS, null, new ParseOptions()).getOpenAPI)
+        val result = openApiDoc.getApiName()
+
+        result mustBe Some(name)
+      }
+      "must return an error when the API name does not exist" in {
+        val name = "title"
+        val oasWitNoApiName =
+          s"""
+             |openapi: 3.0.1
+             |info:
+             |  description: This is a sample server
+             |  license:
+             |    name: Apache-2.0
+             |    url: http://www.apache.org/licenses/LICENSE-2.0.html
+             |  version: 1.0.0
+             |servers:
+             |- url: https://api.absolute.org/v2
+             |  description: An absolute path
+             |paths:
+             |  /whatever:
+             |    get:
+             |      summary: Some operation
+             |      description: Some operation
+             |      operationId: doWhatever
+             |      responses:
+             |        "200":
+             |          description: OK
+             |""".stripMargin
+        val openApiDoc = OpenApiDoc(new OpenAPIV3Parser().readContents(oasWitNoApiName, null, new ParseOptions()).getOpenAPI)
+        val result = openApiDoc.getApiName()
+
+        result mustBe None
       }
     }
   }

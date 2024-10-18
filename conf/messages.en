@@ -814,6 +814,7 @@ produceApiEnterOas.hint = We have pre-populated the editor below with the specif
 produceApiEnterOas.checkYourAnswersLabel = OAS document
 produceApiEnterOas.error.required = Enter a valid OAS document for your API
 produceApiEnterOas.error.malformed = Unable to parse the OAS document
+produceApiEnterOas.error.missingApiName = Provide an API name in the OAS document (i.e. provide a value for the attribute 'info.title')
 produceApiEnterOas.change.hidden = OAS
 
 produceApiBeforeYouStart.title = Register an API

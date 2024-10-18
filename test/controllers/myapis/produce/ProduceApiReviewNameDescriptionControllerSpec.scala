@@ -27,7 +27,7 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.myapis.produce.{ProduceApiReviewNameDescriptionPage, ProduceApiShortDescriptionPage}
+import pages.myapis.produce.{ProduceApiEnterApiTitlePage, ProduceApiEnterOasPage, ProduceApiReviewNameDescriptionPage, ProduceApiShortDescriptionPage}
 import play.api.Application as PlayApplication
 import play.api.inject.bind
 import play.api.mvc.Call
@@ -48,7 +48,13 @@ class ProduceApiReviewNameDescriptionControllerSpec extends SpecBase with Mockit
   val form = formProvider()
   val apiName = "API NAME"
   val apiDescription = "API Description"
-  val userAnswersWithDescription = UserAnswers(userAnswersId).set(ProduceApiShortDescriptionPage, apiDescription).success.value
+  val userAnswersWithDescription = UserAnswers(userAnswersId)
+    .set(ProduceApiShortDescriptionPage, apiDescription).success.value
+    .set(ProduceApiEnterOasPage, "oas").success.value
+    .set(ProduceApiEnterApiTitlePage, apiName).success.value
+  val userAnswersWithNoApiName = UserAnswers(userAnswersId)
+    .set(ProduceApiShortDescriptionPage, apiDescription).success.value
+    .set(ProduceApiEnterOasPage, "oas").success.value
   val userAnswersWithPreviousConfirmation = userAnswersWithDescription.set(ProduceApiReviewNameDescriptionPage, Set(Confirm)).success.value
 
   "ProduceApiReviewNameDescription Controller" - {
@@ -121,6 +127,19 @@ class ProduceApiReviewNameDescriptionControllerSpec extends SpecBase with Mockit
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
       val fixture = buildFixture(None)
+
+      running(fixture.application) {
+        val request = FakeRequest(GET, produceApiReviewNameDescriptionRoute)
+
+        val result = route(fixture.application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST if no API data is found" in {
+      val fixture = buildFixture(Some(userAnswersWithNoApiName))
 
       running(fixture.application) {
         val request = FakeRequest(GET, produceApiReviewNameDescriptionRoute)
