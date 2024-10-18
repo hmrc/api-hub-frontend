@@ -11,3 +11,4 @@ GET         /deleted-application/access-request/:accessRequestId                
 GET         /configuration                                                          controllers.admin.ConfigurationController.onPageLoad()
 GET         /statistics                                                             controllers.admin.StatisticsController.onPageLoad()
 GET         /statistics/apis-in-production                                          controllers.admin.StatisticsController.apisInProduction()
+GET         /statistics/list-apis-in-production                                     controllers.admin.StatisticsController.listApisInProduction()

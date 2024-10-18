@@ -29,6 +29,20 @@
     <script src='@routes.Assets.versioned("javascripts/hubStatistics.js")' type="module" @{CSPNonce.attr}></script>
 }
 
+@statPanel(elementId: String, messageId: String) = {
+    <div id="@elementId" class="hip-stat-item">
+        <span class="hip-stat-title">@messages(messageId)</span>
+        <span class="hip-stat-value"></span>
+
+        @govukButton(
+            Button(
+                content = Text(messages("statistics.fetchStat")),
+                classes = "hip-stats-button"
+            )
+        )
+    </div>
+}
+
 @layout(pageTitle = titleNoForm(messages("statistics.title")), fullWidth = true, user = Some(user), customScriptsBlock = Some(scripts())) {
 
     @views.html.templates.SideNav(messages("manageApplications.admin"), AdminNavItems(user, AdminSideNavPages.StatisticsPage)) {
@@ -38,29 +52,9 @@
         <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-bottom-5">
 
         <div class="hip-stat-container govuk-!-margin-bottom-6">
-            <div id="statTotalApis" class="hip-stat-item">
-                <span class="hip-stat-title">@messages("statistics.apisInProductionStatistic.totalApis")</span>
-                <span class="hip-stat-number"></span>
-
-                @govukButton(
-                    Button(
-                        content = Text(messages("statistics.fetchStat")),
-                        classes = "hip-stats-button"
-                    )
-                )
-            </div>
-
-            <div id="statProdApis" class="hip-stat-item">
-                <span class="hip-stat-title">@messages("statistics.apisInProductionStatistic.totalInProduction")</span>
-                <span class="hip-stat-number"></span>
-
-                @govukButton(
-                    Button(
-                        content = Text(messages("statistics.fetchStat")),
-                        classes = "hip-stats-button"
-                    )
-                )
-            </div>
+            @statPanel("statTotalApis", "statistics.apisInProductionStatistic.totalApis")
+            @statPanel("statProdApis", "statistics.apisInProductionStatistic.totalInProduction")
+            @statPanel("statProdList", "statistics.apisInProductionStatistic.list")
         </div>
 
     }

@@ -1,17 +1,30 @@
 import {noop} from "./utils.js";
 
-function buildStatDisplay(el) {
+function buildCopyLink(valueToCopy, elContainer) {
+    const elLink = document.createElement('a');
+    elLink.textContent = 'Copy';
+    elLink.href = '#';
+    elLink.addEventListener('click', () => {
+        navigator.clipboard.writeText(valueToCopy).catch(err => {
+            console.error('Failed to copy value to clipboard: ', err);
+        });
+    });
+    elContainer.innerHTML = '';
+    elContainer.appendChild(elLink);
+}
+
+function buildStatDisplay(el, onSuccess) {
     const noValuePlaceholder = '...',
         loadingText = noValuePlaceholder,
         errorText = 'Error',
         elFetchStatButton = el.querySelector('button'),
-        elStatValue = el.querySelector('.hip-stat-number');
+        elStatValueContainer = el.querySelector('.hip-stat-value');
 
     let onFetchClickHandler = noop;
     elFetchStatButton.addEventListener('click', () => onFetchClickHandler());
 
     function setValue(value) {
-        elStatValue.textContent = value;
+        elStatValueContainer.textContent = value;
     }
     setValue(noValuePlaceholder);
 
@@ -25,7 +38,11 @@ function buildStatDisplay(el) {
             elFetchStatButton.disabled = false;
         },
         success(statValue) {
-            setValue(statValue);
+            if (onSuccess) {
+                onSuccess(statValue, elStatValueContainer);
+            } else {
+                setValue(statValue);
+            }
             elFetchStatButton.disabled = false;
         },
         onFetch(handler) {
@@ -36,9 +53,10 @@ function buildStatDisplay(el) {
 
 export function onDomLoaded() {
     const totalApisStat = buildStatDisplay(document.getElementById('statTotalApis')),
-        prodApisStat = buildStatDisplay(document.getElementById('statProdApis'));
+        prodApisStat = buildStatDisplay(document.getElementById('statProdApis')),
+        listProdApisStat = buildStatDisplay(document.getElementById('statProdList'), buildCopyLink);
 
-    function onFetchClick() {
+    function onFetchApisInProductionClick() {
         totalApisStat.loading();
         prodApisStat.loading();
 
@@ -55,8 +73,24 @@ export function onDomLoaded() {
             });
     }
 
-    totalApisStat.onFetch(onFetchClick);
-    prodApisStat.onFetch(onFetchClick);
+    totalApisStat.onFetch(onFetchApisInProductionClick);
+    prodApisStat.onFetch(onFetchApisInProductionClick);
+
+    function onFetchListOfApisInProductionClick() {
+        listProdApisStat.loading();
+
+        fetch(`./statistics/list-apis-in-production`)
+            .then(response => response.json())
+            .then(result => {
+                listProdApisStat.success(result.join('\n'));
+            })
+            .catch(e => {
+                console.error(e);
+                listProdApisStat.error();
+            });
+    }
+    listProdApisStat.onFetch(onFetchListOfApisInProductionClick);
+
 }
 
 if (typeof window !== 'undefined') {

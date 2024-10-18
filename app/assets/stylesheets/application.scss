@@ -799,10 +799,17 @@ header {
             margin-bottom: govuk-spacing(2);
         }
 
-        .hip-stat-number {
+        .hip-stat-value {
+            min-height: govuk-spacing(6);
             display: block;
             @include govuk-font($size: 24, $weight: bold);
             color: $input-text-border;
+        }
+
+        .hip-stat-value a {
+            @extend .govuk-link;
+            @include govuk-font($size: 16);
+            cursor: pointer;
         }
 
         .govuk-button.hip-stats-button {

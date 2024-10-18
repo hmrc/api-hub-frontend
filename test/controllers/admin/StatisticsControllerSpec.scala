@@ -31,6 +31,7 @@ import views.html.admin.StatisticsView
 import org.mockito.Mockito.when
 import scala.concurrent.Future
 import models.stats.ApisInProductionStatistic
+import models.api.ApiDetailLensesSpec.sampleApiDetailSummary
 
 class StatisticsControllerSpec
   extends SpecBase
@@ -101,6 +102,42 @@ class StatisticsControllerSpec
           }
         }
       }      
+    }
+
+    "listApisInProduction" - {
+      "must return Ok and the sorted list of API names for a support user" in {
+        forAll(usersWhoCanSupport) { (user: UserModel) =>
+          val fixture = buildFixture(user)
+          val apis = Seq(
+            sampleApiDetailSummary().copy(title = "Api 2"),
+            sampleApiDetailSummary().copy(title = "api 1"),
+            sampleApiDetailSummary().copy(title = "api 3")
+          )
+          when(fixture.apiHubService.listApisInProduction()(any)).thenReturn(Future.successful(apis))
+
+          running(fixture.application) {
+            val request = FakeRequest(controllers.admin.routes.StatisticsController.listApisInProduction())
+            val result = route(fixture.application, request).value
+
+            status(result) mustBe OK
+            contentAsJson(result) mustBe Json.toJson(Seq("api 1", "Api 2", "api 3"))
+          }
+        }
+      }
+
+      "must return Unauthorized for a non-support user" in {
+        forAll(usersWhoCannotSupport) { (user: UserModel) =>
+          val fixture = buildFixture(user)
+
+          running(fixture.application) {
+            val request = FakeRequest(controllers.admin.routes.StatisticsController.listApisInProduction())
+            val result = route(fixture.application, request).value
+
+            status(result) mustBe SEE_OTHER
+            redirectLocation(result) mustBe Some(controllers.routes.UnauthorisedController.onPageLoad.url)
+          }
+        }
+      }
     }
   }
 
