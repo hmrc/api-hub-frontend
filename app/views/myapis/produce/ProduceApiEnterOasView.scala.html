@@ -37,7 +37,7 @@
     @formHelper(action = controllers.myapis.produce.routes.ProduceApiEnterOasController.onSubmit(mode)) {
 
         @if(form.errors.nonEmpty) {
-            @govukErrorSummary(ErrorSummaryViewModel(form))
+            @govukErrorSummary(ErrorSummaryViewModel(form, preFormat = true))
         }
 
         <h1 class="govuk-heading-l">@messages("produceApiEnterOas.heading")</h1>
