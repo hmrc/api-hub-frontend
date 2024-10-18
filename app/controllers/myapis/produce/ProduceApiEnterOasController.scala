@@ -23,7 +23,7 @@ import forms.myapis.produce.ProduceApiEnterOasFormProvider
 import models.Mode
 import models.curl.OpenApiDoc
 import navigation.Navigator
-import pages.myapis.produce.ProduceApiEnterOasPage
+import pages.myapis.produce.{ProduceApiEnterApiTitlePage, ProduceApiEnterOasPage}
 import play.api.i18n.*
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -73,20 +73,23 @@ class ProduceApiEnterOasController @Inject()(
           validateOAS(value).flatMap(_.fold(
             error =>
               Future.successful(BadRequest(view(boundedForm.withGlobalError(error), mode, request.user))),
-            _ => for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(ProduceApiEnterOasPage, value))
-              _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(ProduceApiEnterOasPage, mode, updatedAnswers))
+            apiName =>
+              for {
+                updatedAnswers <- Future.fromTry(
+                  request.userAnswers.set(ProduceApiEnterOasPage, value)
+                    .flatMap(_.set(ProduceApiEnterApiTitlePage, apiName))
+                )
+                _ <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(navigator.nextPage(ProduceApiEnterOasPage, mode, updatedAnswers))
           )
       ))
   }
 
-  private def validateOAS(oas: String)(implicit messagesProvider: MessagesProvider, hc: HeaderCarrier): Future[Either[String, Unit]] =
-    applicationsConnector.validateOAS(oas).map(
-      _.fold(
-        error =>
-          Left(Json.prettyPrint(Json.toJson(error))),
-        _ => Right(())
-      )
-    )
+  private def validateOAS(oas: String)(implicit messagesProvider: MessagesProvider, hc: HeaderCarrier): Future[Either[String, String]] = {
+    (for {
+      _ <- EitherT(applicationsConnector.validateOAS(oas)).leftMap(error => Json.prettyPrint(Json.toJson(error)))
+      openApiDoc <- EitherT.fromEither(OpenApiDoc.parse(oas))
+      apiName <- EitherT.fromOption(openApiDoc.getApiName(), Messages("produceApiEnterOas.error.missingApiName"))
+    } yield apiName).value
+  }
 }

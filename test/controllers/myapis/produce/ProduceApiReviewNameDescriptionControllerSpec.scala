@@ -27,7 +27,7 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.myapis.produce.{ProduceApiEnterOasPage, ProduceApiReviewNameDescriptionPage, ProduceApiShortDescriptionPage}
+import pages.myapis.produce.{ProduceApiEnterApiTitlePage, ProduceApiEnterOasPage, ProduceApiReviewNameDescriptionPage, ProduceApiShortDescriptionPage}
 import play.api.Application as PlayApplication
 import play.api.inject.bind
 import play.api.mvc.Call
@@ -44,37 +44,17 @@ class ProduceApiReviewNameDescriptionControllerSpec extends SpecBase with Mockit
 
   lazy val produceApiReviewNameDescriptionRoute = controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onPageLoad().url
 
-  val apiName = "API NAME"
-  val apiDescription = "API Description"
-  private val validOAS =
-    s"""
-       |openapi: 3.0.1
-       |info:
-       |  title: $apiName
-       |  description: This is a sample server
-       |  license:
-       |    name: Apache-2.0
-       |    url: http://www.apache.org/licenses/LICENSE-2.0.html
-       |  version: 1.0.0
-       |servers:
-       |- url: https://api.absolute.org/v2
-       |  description: An absolute path
-       |paths:
-       |  /whatever:
-       |    get:
-       |      summary: Some operation
-       |      description: Some operation
-       |      operationId: doWhatever
-       |      responses:
-       |        "200":
-       |          description: OK
-       |""".stripMargin
-
   val formProvider = new ProduceApiReviewNameDescriptionFormProvider()
   val form = formProvider()
+  val apiName = "API NAME"
+  val apiDescription = "API Description"
   val userAnswersWithDescription = UserAnswers(userAnswersId)
     .set(ProduceApiShortDescriptionPage, apiDescription).success.value
-    .set(ProduceApiEnterOasPage, validOAS).success.value
+    .set(ProduceApiEnterOasPage, "oas").success.value
+    .set(ProduceApiEnterApiTitlePage, apiName).success.value
+  val userAnswersWithNoApiName = UserAnswers(userAnswersId)
+    .set(ProduceApiShortDescriptionPage, apiDescription).success.value
+    .set(ProduceApiEnterOasPage, "oas").success.value
   val userAnswersWithPreviousConfirmation = userAnswersWithDescription.set(ProduceApiReviewNameDescriptionPage, Set(Confirm)).success.value
 
   "ProduceApiReviewNameDescription Controller" - {
@@ -147,6 +127,19 @@ class ProduceApiReviewNameDescriptionControllerSpec extends SpecBase with Mockit
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
       val fixture = buildFixture(None)
+
+      running(fixture.application) {
+        val request = FakeRequest(GET, produceApiReviewNameDescriptionRoute)
+
+        val result = route(fixture.application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST if no API data is found" in {
+      val fixture = buildFixture(Some(userAnswersWithNoApiName))
 
       running(fixture.application) {
         val request = FakeRequest(GET, produceApiReviewNameDescriptionRoute)

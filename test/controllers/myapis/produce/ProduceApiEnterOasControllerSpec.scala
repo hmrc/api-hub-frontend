@@ -48,31 +48,6 @@ class ProduceApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
 
   lazy val produceApiEnterOasRoute = controllers.myapis.produce.routes.ProduceApiEnterOasController.onPageLoad(NormalMode).url
 
-  private val name = "api name"
-  private val validOAS =
-    s"""
-       |openapi: 3.0.1
-       |info:
-       |  title: $name
-       |  description: This is a sample server
-       |  license:
-       |    name: Apache-2.0
-       |    url: http://www.apache.org/licenses/LICENSE-2.0.html
-       |  version: 1.0.0
-       |servers:
-       |- url: https://api.absolute.org/v2
-       |  description: An absolute path
-       |paths:
-       |  /whatever:
-       |    get:
-       |      summary: Some operation
-       |      description: Some operation
-       |      operationId: doWhatever
-       |      responses:
-       |        "200":
-       |          description: OK
-       |""".stripMargin
-
   "ProduceApiEnterOas Controller" - {
 
     "must return OK and the correct view for a GET" in {
@@ -93,7 +68,7 @@ class ProduceApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(ProduceApiEnterOasPage, validOAS).success.value
+      val userAnswers = UserAnswers(userAnswersId).set(ProduceApiEnterOasPage, "oas").success.value
 
       val fixture = buildFixture(userAnswers = Some(userAnswers))
 
@@ -105,11 +80,35 @@ class ProduceApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
         val result = route(fixture.application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(validOAS), NormalMode, FakeUser)(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(form.fill("oas"), NormalMode, FakeUser)(request, messages(fixture.application)).toString
       }
     }
 
     "must redirect to the next page when valid data is submitted" in {
+
+      val validOAS =
+        """
+          |openapi: 3.0.1
+          |info:
+          |  title: title
+          |  description: This is a sample server
+          |  license:
+          |    name: Apache-2.0
+          |    url: http://www.apache.org/licenses/LICENSE-2.0.html
+          |  version: 1.0.0
+          |servers:
+          |- url: https://api.absolute.org/v2
+          |  description: An absolute path
+          |paths:
+          |  /whatever:
+          |    get:
+          |      summary: Some operation
+          |      description: Some operation
+          |      operationId: doWhatever
+          |      responses:
+          |        "200":
+          |          description: OK
+          |""".stripMargin
 
       val fixture = buildFixture(userAnswers = Some(emptyUserAnswers))
       when(fixture.sessionRepository.set(any())).thenReturn(Future.successful(true))

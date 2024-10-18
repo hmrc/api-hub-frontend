@@ -220,7 +220,7 @@ class OpenApiDocSpec extends SpecBase with MockitoSugar {
         val openApiDoc = OpenApiDoc(new OpenAPIV3Parser().readContents(validOAS, null, new ParseOptions()).getOpenAPI)
         val result = openApiDoc.getApiName()
 
-        result mustBe Right(name)
+        result mustBe Some(name)
       }
       "must return an error when the API name does not exist" in {
         val name = "title"
@@ -249,7 +249,7 @@ class OpenApiDocSpec extends SpecBase with MockitoSugar {
         val openApiDoc = OpenApiDoc(new OpenAPIV3Parser().readContents(oasWitNoApiName, null, new ParseOptions()).getOpenAPI)
         val result = openApiDoc.getApiName()
 
-        result mustBe Left(errorMessage)
+        result mustBe None
       }
     }
   }
