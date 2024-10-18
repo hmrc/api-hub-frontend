@@ -18,6 +18,7 @@ package viewmodels.govuk
 
 import play.api.data.Form
 import play.api.i18n.Messages
+import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Content, HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.{ErrorLink, ErrorSummary}
 
@@ -39,7 +40,7 @@ trait ErrorSummaryFluency {
           ErrorLink(
             href    = Some(s"#${errorLinkOverrides.getOrElse(error.key, error.key)}"),
             content = if (preFormat)
-                HtmlContent(s"<pre>$errormessage</pre>")
+                HtmlContent(s"<pre>${HtmlFormat.escape(errormessage)}</pre>")
               else
                 Text(errormessage)
           )
