@@ -9,7 +9,7 @@ info:
     name: HMRC NPS Live Service
     url: http://{placeholderforurl}.hmrc.gov.uk
     email: user@hmrc.gov.uk
-  version: 0.0.2 draft
+  version: 0.0.2
   license:
     name: HMRC
     url: https://license.example.hmrc.gov.uk
@@ -29,8 +29,6 @@ paths:
   /nps-json-service/nps/v1/api/reconciliation/p800/{identifier}/{paymentNumber}:
     get:
       summary: NPS Interface Specification to validate a P800 Reference and retrieve Payment Reference data.
-      security:
-        - basicAuth: []
       description: |-
         # Purpose
         This API provides the capability to validate a P800 Reference when provided and if valid, returns the relative Payment Reference details. This endpoint requires Mutual Authentication over TLS 1.2.
