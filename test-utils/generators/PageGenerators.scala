@@ -25,6 +25,9 @@ import pages.myapis.produce.*
 
 trait PageGenerators {
 
+  implicit lazy val arbitraryProduceApiDomainPage: Arbitrary[ProduceApiDomainPage.type] =
+    Arbitrary(ProduceApiDomainPage)
+
   implicit lazy val arbitraryProduceApiShortDescriptionPage: Arbitrary[ProduceApiShortDescriptionPage.type] =
     Arbitrary(ProduceApiShortDescriptionPage)
 

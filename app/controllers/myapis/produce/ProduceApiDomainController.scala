@@ -16,29 +16,60 @@
 
 package controllers.myapis.produce
 
-import controllers.actions.*
+import config.Domains
+import controllers.actions._
+import forms.myapis.produce.ProduceApiDomainFormProvider
+
+import javax.inject.Inject
 import models.Mode
-import play.api.data.Form
+import navigation.Navigator
+import pages.myapis.produce.ProduceApiDomainPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.ProduceApiSessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.myapis.produce.ProduceApiDomainView
 
-import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class ProduceApiDomainController @Inject()(
                                             override val messagesApi: MessagesApi,
+                                            sessionRepository: ProduceApiSessionRepository,
+                                            navigator: Navigator,
                                             identify: IdentifierAction,
+                                            getData: ProduceApiDataRetrievalAction,
+                                            requireData: DataRequiredAction,
+                                            formProvider: ProduceApiDomainFormProvider,
                                             val controllerComponents: MessagesControllerComponents,
-                                            view: ProduceApiDomainView
+                                            view: ProduceApiDomainView,
+                                            domains: Domains,
                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = identify {
-    implicit request => Ok(view(mode, request.user))
+  val form = formProvider()
+
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+    implicit request =>
+
+      val preparedForm = request.userAnswers.get(ProduceApiDomainPage) match {
+        case None => form
+        case Some(value) => form.fill(value)
+      }
+
+      Ok(view(preparedForm, mode, request.user, domains))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = identify {
-    implicit request => Redirect(routes.ProduceApiDetailsController.onPageLoad(mode))
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request =>
+
+      form.bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, mode, request.user, domains))),
+
+        value =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(ProduceApiDomainPage, value))
+            _              <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(navigator.nextPage(ProduceApiDomainPage, mode, updatedAnswers))
+      )
   }
 }
