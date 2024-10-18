@@ -16,18 +16,24 @@
 
 package pages.myapis.produce
 
+import org.scalacheck.{Arbitrary, Gen}
 import pages.behaviours.PageBehaviours
-import pages.myapis.produce.ProduceApiEnterOasPage
 
 
 class ProduceApiEnterOasPageSpec extends PageBehaviours {
 
+  private implicit lazy val produceApiEnterOasAnswersArb: Arbitrary[ProduceApiEnterOasAnswers] =
+    Arbitrary(for {
+      oas <- Gen.asciiStr
+      apiTitle <- Gen.asciiStr
+    } yield ProduceApiEnterOasAnswers(oas, apiTitle))
+
   "ProduceApiEnterOasPage" - {
 
-    beRetrievable[String](ProduceApiEnterOasPage)
+    beRetrievable[ProduceApiEnterOasAnswers](ProduceApiEnterOasPage)
 
-    beSettable[String](ProduceApiEnterOasPage)
+    beSettable[ProduceApiEnterOasAnswers](ProduceApiEnterOasPage)
 
-    beRemovable[String](ProduceApiEnterOasPage)
+    beRemovable[ProduceApiEnterOasAnswers](ProduceApiEnterOasPage)
   }
 }

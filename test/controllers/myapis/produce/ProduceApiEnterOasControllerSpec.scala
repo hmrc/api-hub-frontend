@@ -27,7 +27,7 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.myapis.produce.ProduceApiEnterOasPage
+import pages.myapis.produce.{ProduceApiEnterOasAnswers, ProduceApiEnterOasPage}
 import play.api.Application
 import play.api.inject.bind
 import play.api.libs.json.Json
@@ -68,7 +68,7 @@ class ProduceApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(ProduceApiEnterOasPage, "answer").success.value
+      val userAnswers = UserAnswers(userAnswersId).set(ProduceApiEnterOasPage, ProduceApiEnterOasAnswers("oas", "api name")).success.value
 
       val fixture = buildFixture(userAnswers = Some(userAnswers))
 
@@ -80,7 +80,7 @@ class ProduceApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
         val result = route(fixture.application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, FakeUser)(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(form.fill("oas"), NormalMode, FakeUser)(request, messages(fixture.application)).toString
       }
     }
 

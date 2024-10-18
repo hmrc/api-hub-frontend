@@ -20,7 +20,7 @@ import controllers.actions.*
 import forms.myapis.produce.ProduceApiReviewNameDescriptionFormProvider
 import models.{NormalMode, UserAnswers}
 import navigation.Navigator
-import pages.myapis.produce.{ProduceApiReviewNameDescriptionPage, ProduceApiShortDescriptionPage}
+import pages.myapis.produce.{ProduceApiEnterOasPage, ProduceApiReviewNameDescriptionPage, ProduceApiShortDescriptionPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.ProduceApiSessionRepository
@@ -59,7 +59,7 @@ class ProduceApiReviewNameDescriptionController @Inject()(
   }
 
   def getApiName(userAnswers: UserAnswers): String = {
-    "API NAME" // this will be implemented as part of HIPP-1606
+    userAnswers.get(ProduceApiEnterOasPage).map(_.apiTitle).getOrElse("")
   }
   
   def getApiShortDescription(userAnswers: UserAnswers): String = {

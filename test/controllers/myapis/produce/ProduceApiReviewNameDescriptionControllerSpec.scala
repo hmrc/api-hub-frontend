@@ -27,7 +27,7 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.myapis.produce.{ProduceApiReviewNameDescriptionPage, ProduceApiShortDescriptionPage}
+import pages.myapis.produce.{ProduceApiEnterOasAnswers, ProduceApiEnterOasPage, ProduceApiReviewNameDescriptionPage, ProduceApiShortDescriptionPage}
 import play.api.Application as PlayApplication
 import play.api.inject.bind
 import play.api.mvc.Call
@@ -48,7 +48,9 @@ class ProduceApiReviewNameDescriptionControllerSpec extends SpecBase with Mockit
   val form = formProvider()
   val apiName = "API NAME"
   val apiDescription = "API Description"
-  val userAnswersWithDescription = UserAnswers(userAnswersId).set(ProduceApiShortDescriptionPage, apiDescription).success.value
+  val userAnswersWithDescription = UserAnswers(userAnswersId)
+    .set(ProduceApiShortDescriptionPage, apiDescription).success.value
+    .set(ProduceApiEnterOasPage, ProduceApiEnterOasAnswers("oas", apiName)).success.value
   val userAnswersWithPreviousConfirmation = userAnswersWithDescription.set(ProduceApiReviewNameDescriptionPage, Set(Confirm)).success.value
 
   "ProduceApiReviewNameDescription Controller" - {

@@ -16,12 +16,14 @@
 
 package controllers.myapis.produce
 
+import cats.data.EitherT
 import connectors.ApplicationsConnector
 import controllers.actions.*
 import forms.myapis.produce.ProduceApiEnterOasFormProvider
 import models.Mode
+import models.curl.OpenApiDoc
 import navigation.Navigator
-import pages.myapis.produce.ProduceApiEnterOasPage
+import pages.myapis.produce.{ProduceApiEnterOasAnswers, ProduceApiEnterOasPage}
 import play.api.i18n.*
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -53,7 +55,7 @@ class ProduceApiEnterOasController @Inject()(
 
       val preparedForm = request.userAnswers.get(ProduceApiEnterOasPage) match {
         case None => form
-        case Some(value) => form.fill(value)
+        case Some(value) => form.fill(value.oas)
       }
 
       Ok(view(preparedForm, mode, request.user))
@@ -71,20 +73,19 @@ class ProduceApiEnterOasController @Inject()(
           validateOAS(value).flatMap(_.fold(
             error =>
               Future.successful(BadRequest(view(boundedForm.withGlobalError(error), mode, request.user))),
-            _ => for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(ProduceApiEnterOasPage, value))
+            answers => for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(ProduceApiEnterOasPage, answers))
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(ProduceApiEnterOasPage, mode, updatedAnswers))
           )
       ))
   }
 
-  private def validateOAS(oas: String)(implicit messagesProvider: MessagesProvider, hc: HeaderCarrier): Future[Either[String, Unit]] =
-    applicationsConnector.validateOAS(oas).map(
-      _.fold(
-        error =>
-          Left(Json.prettyPrint(Json.toJson(error))),
-        _ => Right(())
-      )
-    )
+  private def validateOAS(oas: String)(implicit messagesProvider: MessagesProvider, hc: HeaderCarrier): Future[Either[String, ProduceApiEnterOasAnswers]] = {
+    (for {
+      _       <- EitherT(applicationsConnector.validateOAS(oas)).leftMap(error => Json.prettyPrint(Json.toJson(error)))
+      apiName <- EitherT.fromEither(OpenApiDoc.parse(oas).flatMap(_.getApiName()))
+      result  = ProduceApiEnterOasAnswers(oas, apiName)
+    } yield result).value
+  }
 }
