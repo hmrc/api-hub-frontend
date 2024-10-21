@@ -19,14 +19,14 @@ package pages.myapis.produce
 import pages.behaviours.PageBehaviours
 
 
-class ProduceApiEnterOasPageSpec extends PageBehaviours {
+class ProduceApiEnterApiTitlePageSpec extends PageBehaviours {
 
-  "ProduceApiEnterOasPage" - {
+  "ProduceApiEnterApiTitlePage" - {
 
-    beRetrievable[String](ProduceApiEnterOasPage)
+    beRetrievable[String](ProduceApiEnterApiTitlePage)
 
-    beSettable[String](ProduceApiEnterOasPage)
+    beSettable[String](ProduceApiEnterApiTitlePage)
 
-    beRemovable[String](ProduceApiEnterOasPage)
+    beRemovable[String](ProduceApiEnterApiTitlePage)
   }
 }

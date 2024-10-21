@@ -17,12 +17,15 @@
 package controllers.myapis.produce
 
 import controllers.actions.*
+import controllers.routes
 import forms.myapis.produce.ProduceApiReviewNameDescriptionFormProvider
+import models.requests.DataRequest
 import models.{NormalMode, UserAnswers}
 import navigation.Navigator
-import pages.myapis.produce.{ProduceApiReviewNameDescriptionPage, ProduceApiShortDescriptionPage}
+import pages.myapis.produce.{ProduceApiEnterApiTitlePage, ProduceApiReviewNameDescriptionPage, ProduceApiShortDescriptionPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.Results.Redirect
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.ProduceApiSessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.myapis.produce.ProduceApiReviewNameDescriptionView
@@ -52,18 +55,17 @@ class ProduceApiReviewNameDescriptionController @Inject()(
         case Some(value) => form.fill(value)
       }
 
-      val apiName = getApiName(request.userAnswers)
-      val apiShortDescription = getApiShortDescription(request.userAnswers)
-
-      Ok(view(preparedForm, apiName, apiShortDescription, request.user))
+      withJorneyRecovery { case (apiName, apiShortDescription) =>
+        Ok (view(preparedForm, apiName, apiShortDescription, request.user))
+      }
   }
 
-  def getApiName(userAnswers: UserAnswers): String = {
-    "API NAME" // this will be implemented as part of HIPP-1606
+  def getApiName(userAnswers: UserAnswers): Option[String] = {
+    userAnswers.get(ProduceApiEnterApiTitlePage)
   }
   
-  def getApiShortDescription(userAnswers: UserAnswers): String = {
-    userAnswers.get(ProduceApiShortDescriptionPage).getOrElse("")
+  def getApiShortDescription(userAnswers: UserAnswers): Option[String] = {
+    userAnswers.get(ProduceApiShortDescriptionPage)
   }
 
   def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
@@ -71,7 +73,11 @@ class ProduceApiReviewNameDescriptionController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, getApiName(request.userAnswers), getApiShortDescription(request.userAnswers), request.user))),
+          Future.successful(
+            withJorneyRecovery { case (apiName, apiShortDescription) =>
+              BadRequest(view(formWithErrors, apiName, apiShortDescription, request.user))
+            }
+          ),
 
         value =>
           for {
@@ -80,4 +86,13 @@ class ProduceApiReviewNameDescriptionController @Inject()(
           } yield Redirect(navigator.nextPage(ProduceApiReviewNameDescriptionPage, NormalMode, updatedAnswers))
       )
   }
+
+  private def withJorneyRecovery(f: (String, String) => Result)(implicit request: DataRequest[?]) =
+    val apiName = getApiName(request.userAnswers)
+    val apiShortDescription = getApiShortDescription(request.userAnswers)
+    (apiName, apiShortDescription) match {
+      case (Some(name), Some(description)) => f(name, description)
+      case _ => Redirect(routes.JourneyRecoveryController.onPageLoad())
+    }
+
 }
