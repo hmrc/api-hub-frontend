@@ -361,6 +361,11 @@ body, input {
     word-break: break-word;
 }
 
+.hip-example-config .code--header {
+    @include govuk-typography-weight-bold();
+    margin-bottom: govuk-spacing(4);
+}
+
 .environment-block-header {
     display: flex;
 
