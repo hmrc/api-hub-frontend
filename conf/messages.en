@@ -905,6 +905,7 @@ produceApiReviewNameDescription.namingConventions.4.title = Avoid putting a plat
 produceApiReviewNameDescription.namingConventions.4.content = This is very similar to the previous point - the API may move to a different platform in the future. Including the platform name in the API name is also redundant, this should already be known to the user based on the OAS file, URI and authentication mechanism.
 produceApiReviewNameDescription.changeDescription = Change short description
 produceApiReviewNameDescription.changeName = Change name (in the OAS)
+
 produceApiDomain.title = Which domain and subdomain does your API belong to?
 produceApiDomain.heading = Help users find and identify the API by setting which domain and subdomain the API belongs to.
 produceApiDomain.checkYourAnswersLabel = Domain and subdomain
@@ -913,3 +914,12 @@ produceApiDomain.error.subDomainRequired = Select a subdomain
 produceApiDomain.error.invalidDomain = Select a valid domain
 produceApiDomain.error.invalidSubDomain = Select a valid subdomains
 produceApiDomain.change.hidden = ProduceApiDomain
+
+produceApiStatus.title = Set the API status
+produceApiStatus.hint.0 = Not ready to use (documentation only and could change)
+produceApiStatus.hint.1 = Early stage of development and may be available (expect breaking changes)
+produceApiStatus.hint.2 = Available to use
+produceApiStatus.hint.3 = Not recommended for use
+produceApiStatus.checkYourAnswersLabel = API status
+produceApiStatus.error.required = Select API status
+produceApiStatus.change.hidden = ProduceApiStatus
