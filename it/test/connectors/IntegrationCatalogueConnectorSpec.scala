@@ -92,10 +92,10 @@ class IntegrationCatalogueConnectorSpec
 
     "getApis" - {
       "must place the correct request and return some ApiDetails if no platform filter supplied" in {
-        val expected = sampleApis()
+        val expected = sampleApiDetailSummaries()
 
         stubFor(
-          get(urlEqualTo(s"/integration-catalogue/integrations?integrationType=api"))
+          get(urlEqualTo(s"/integration-catalogue/integrations/summaries"))
             .withHeader("Accept", equalTo("application/json"))
             .withHeader("Authorization", equalTo("An authentication token"))
             .willReturn(
@@ -106,15 +106,15 @@ class IntegrationCatalogueConnectorSpec
 
         buildConnector().getApis(None)(HeaderCarrier()) map {
           actual =>
-            actual mustBe expected.results.map(_.copy(openApiSpecification = ""))
+            actual mustBe expected
         }
       }
 
       "must place the correct request and return some ApiDetails if platform filter is supplied" in {
-        val expected = sampleApis()
+        val expected = sampleApiDetailSummaries()
 
         stubFor(
-          get(urlEqualTo(s"/integration-catalogue/integrations?integrationType=api&platformFilter=hip"))
+          get(urlEqualTo(s"/integration-catalogue/integrations/summaries?platformFilter=hip"))
             .withHeader("Accept", equalTo("application/json"))
             .withHeader("Authorization", equalTo("An authentication token"))
             .willReturn(
@@ -125,20 +125,18 @@ class IntegrationCatalogueConnectorSpec
 
         buildConnector().getApis(Some("hip"))(HeaderCarrier()) map {
           actual =>
-            actual mustBe expected.results.map(_.copy(openApiSpecification = ""))
+            actual mustBe expected
         }
       }
 
       "Must return empty Seq if no search results" in {
-        val expected = IntegrationResponse(0,None, Seq.empty)
-
         stubFor(
-          get(urlEqualTo(s"/integration-catalogue/integrations?integrationType=api"))
+          get(urlEqualTo(s"/integration-catalogue/integrations/summaries"))
             .withHeader("Accept", equalTo("application/json"))
             .withHeader("Authorization", equalTo("An authentication token"))
             .willReturn(
               aResponse()
-                .withBody(Json.toJson(expected).toString())
+                .withBody(Json.arr().toString)
             )
         )
 
@@ -150,7 +148,7 @@ class IntegrationCatalogueConnectorSpec
 
       "must fail with an exception when integration catalogue returns a failure response" in {
         stubFor(
-          get(urlEqualTo(s"/integration-catalogue/integrations"))
+          get(urlEqualTo(s"/integration-catalogue/integrations/summaries"))
             .withQueryParam("platformFilter", equalTo("hip"))
             .withQueryParam("integrationType", equalTo("api"))
             .willReturn(
@@ -221,11 +219,11 @@ class IntegrationCatalogueConnectorSpec
 
     "deepSearch" - {
       "must place the correct request and return some ApiDetails" in {
-        val expected = sampleApis()
+        val expected = sampleApiDetailSummaries()
         val searchTerm = "nps"
 
         stubFor(
-          get(urlEqualTo(s"/integration-catalogue/integrations?integrationType=api&searchTerm=$searchTerm"))
+          get(urlEqualTo(s"/integration-catalogue/integrations/summaries?searchTerm=$searchTerm"))
             .withHeader("Accept", equalTo("application/json"))
             .withHeader("Authorization", equalTo("An authentication token"))
             .willReturn(
@@ -236,21 +234,20 @@ class IntegrationCatalogueConnectorSpec
 
         buildConnector().deepSearchApis(searchTerm)(HeaderCarrier()) map {
           actual =>
-            actual mustBe expected.results.map(_.copy(openApiSpecification = ""))
+            actual mustBe expected
         }
       }
 
       "Must return empty Seq if no search results" in {
-        val expected = IntegrationResponse(0, None, Seq.empty)
         val noResultsTerm = "nope"
 
         stubFor(
-          get(urlEqualTo(s"/integration-catalogue/integrations?integrationType=api&searchTerm=$noResultsTerm"))
+          get(urlEqualTo(s"/integration-catalogue/integrations/summaries?searchTerm=$noResultsTerm"))
             .withHeader("Accept", equalTo("application/json"))
             .withHeader("Authorization", equalTo("An authentication token"))
             .willReturn(
               aResponse()
-                .withBody(Json.toJson(expected).toString())
+                .withBody(Json.arr().toString())
             )
         )
 
@@ -263,7 +260,7 @@ class IntegrationCatalogueConnectorSpec
       "must fail with an exception when integration catalogue returns a failure response" in {
         val searchTerm = "nps"
         stubFor(
-          get(urlEqualTo(s"/integration-catalogue/integrations?integrationType=api&searchTerm=$searchTerm"))
+          get(urlEqualTo(s"/integration-catalogue/integrations/summaries?searchTerm=$searchTerm"))
             .willReturn(
               aResponse()
                 .withStatus(INTERNAL_SERVER_ERROR)
@@ -275,6 +272,7 @@ class IntegrationCatalogueConnectorSpec
         }
       }
     }
+
     "getPlatformContacts" - {
       "must place the correct request and return some PlatformContacts" in {
         val expected = Seq(

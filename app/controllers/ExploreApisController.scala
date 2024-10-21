@@ -19,7 +19,7 @@ package controllers
 import com.google.inject.{Inject, Singleton}
 import config.{Domains, Hods, Platforms}
 import controllers.actions.OptionalIdentifierAction
-import models.api.ApiDetail
+import models.api.{ApiDetail, ApiDetailSummary}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
@@ -42,7 +42,7 @@ class ExploreApisController @Inject()(
   def onPageLoad(): Action[AnyContent] = optionallyIdentified.async {
     implicit request =>
       apiHubService.getApis().map {
-        case apiDetails: Seq[ApiDetail] => Ok(view(request.user, apiDetails.sortWith( _.title.toUpperCase < _.title.toUpperCase), domains, hods, platforms))
+        case apiDetails: Seq[ApiDetailSummary] => Ok(view(request.user, apiDetails.sortWith( _.title.toUpperCase < _.title.toUpperCase), domains, hods, platforms))
         case null => InternalServerError
       }
   }

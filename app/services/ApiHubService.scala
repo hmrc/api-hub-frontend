@@ -91,7 +91,7 @@ class ApiHubService @Inject()(
     applicationsConnector.getDeploymentDetails(publisherReference)
   }
 
-  def getApis(platform: Option[String] = None)(implicit hc: HeaderCarrier): Future[Seq[ApiDetail]] = {
+  def getApis(platform: Option[String] = None)(implicit hc: HeaderCarrier): Future[Seq[ApiDetailSummary]] = {
     integrationCatalogueConnector.getApis(platform)
   }
 
@@ -171,7 +171,7 @@ class ApiHubService @Inject()(
     }
   }
 
-  def deepSearchApis(searchText: String)(implicit hc: HeaderCarrier): Future[Seq[ApiDetail]]  = {
+  def deepSearchApis(searchText: String)(implicit hc: HeaderCarrier): Future[Seq[ApiDetailSummary]]  = {
     integrationCatalogueConnector.deepSearchApis(searchText)
   }
 

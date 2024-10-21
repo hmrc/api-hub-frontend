@@ -90,6 +90,10 @@ trait ApiDetailGenerators {
     )
   }
 
+  private def genApiDetails: Gen[Seq[ApiDetail]] = Gen.sized { size =>
+    Gen.nonEmptyListOf(genApiDetail)
+  }
+
   implicit lazy val arbitraryApiDetail: Arbitrary[ApiDetail] = Arbitrary(genApiDetail)
 
   implicit val arbitraryApiDetails: Arbitrary[Seq[ApiDetail]] =
@@ -97,29 +101,25 @@ trait ApiDetailGenerators {
       Gen.nonEmptyListOf(arbitraryApiDetail.arbitrary)
     }
 
+  implicit lazy val arbitraryApiDetailSummary: Arbitrary[ApiDetailSummary] = Arbitrary(genApiDetail.map(_.toApiDetailSummary))
+
   private val parameters = Gen.Parameters.default
 
   def sampleApiDetail(): ApiDetail =
     genApiDetail.pureApply(parameters, Seed.random())
 
+  def sampleApiDetails(): Seq[ApiDetail] =
+    genApiDetails.pureApply(parameters, Seed.random())
+
   def sampleApis() : IntegrationResponse =
     IntegrationResponse(1, None, arbitraryApiDetails.arbitrary.pureApply(parameters, Seed.random()))
 
-  def sampleApiDetailSummary() :ApiDetailSummary = {
-    val apiDetail = sampleApiDetail()
-    ApiDetailSummary(
-      apiDetail.id,
-      apiDetail.publisherReference,
-      apiDetail.title,
-      apiDetail.shortDescription,
-      apiDetail.apiStatus,
-      apiDetail.domain,
-      apiDetail.subDomain,
-      apiDetail.hods,
-      apiDetail.platform,
-      apiDetail.apiType,
-      apiDetail.teamId
-    )
+  def sampleApiDetailSummary(): ApiDetailSummary = {
+    sampleApiDetail().toApiDetailSummary
+  }
+
+  def sampleApiDetailSummaries(): Seq[ApiDetailSummary] = {
+    sampleApiDetails().map(_.toApiDetailSummary)
   }
 
   def sampleOas: String =
