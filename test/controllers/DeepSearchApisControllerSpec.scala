@@ -46,7 +46,7 @@ class DeepSearchApisControllerSpec
     "must return OK and the correct view for an unauthenticated user" in {
       val fixture = buildFixture()
       val searchTerm = "nps"
-      val results = (1 to 10).map(_ => sampleApiDetail())
+      val results = (1 to 10).map(_ => sampleApiDetailSummary())
 
       running(fixture.application) {
           when(fixture.apiHubService.deepSearchApis(any())(any()))
@@ -59,7 +59,7 @@ class DeepSearchApisControllerSpec
           contentAsJson(result) mustBe Json.toJson(results.map(_.id))
         }
     }
- }
+  }
 
   private case class Fixture(apiHubService: ApiHubService, application: Application)
 

@@ -18,12 +18,12 @@ package connectors
 
 import com.google.inject.{Inject, Singleton}
 import config.FrontendAppConfig
-import models.api.{ApiDetail, IntegrationId, IntegrationResponse, PlatformContact}
+import models.api.{ApiDetail, ApiDetailSummary, IntegrationId, IntegrationResponse, PlatformContact}
 import play.api.Logging
 import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION}
 import play.api.http.MimeTypes.JSON
 import play.api.http.Status.NOT_FOUND
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
@@ -59,7 +59,7 @@ class IntegrationCatalogueConnector @Inject()(
     }
   }
 
-  def getApis(platformFilter: Option[String])(implicit hc: HeaderCarrier): Future[Seq[ApiDetail]] = {
+  def getApis(platformFilter: Option[String])(implicit hc: HeaderCarrier): Future[Seq[ApiDetailSummary]] = {
     queryApis(platformFilter.map(f => Seq(("platformFilter", f))).toSeq.flatten)
   }
 
@@ -75,33 +75,42 @@ class IntegrationCatalogueConnector @Inject()(
   }
 
   def filterApis(teamIds: Seq[String])(implicit hc: HeaderCarrier): Future[Seq[ApiDetail]] = {
-    queryApis(teamIds.map(id => ("teamIds", id)))
-  }
-
-  def deepSearchApis(searchText: String)(implicit hc: HeaderCarrier): Future[Seq[ApiDetail]] = {
-    queryApis(Seq(("searchTerm", searchText)))
-  }
-
-  private def queryApis(queryParams: Seq[(String,String)])(implicit hc: HeaderCarrier): Future[Seq[ApiDetail]] = {
     httpClient.get(url"$integrationCatalogueBaseUrl/integration-catalogue/integrations?integrationType=api")
-      .transform(wsRq => wsRq.withQueryStringParameters(queryParams*))
+      .transform(wsRq => wsRq.withQueryStringParameters(teamIds.map(id => ("teamIds", id))*))
       .setHeader((ACCEPT, JSON))
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Either[UpstreamErrorResponse, IntegrationResponse]]
       .flatMap {
-        case Right(integrationResponse) => {
+        case Right(integrationResponse) =>
           Future.successful(integrationResponse.results)
-        }
-        case Left(e) => {
+        case Left(e) =>
           Future.failed(e)
-        }
       }
   }
+
+  def deepSearchApis(searchText: String)(implicit hc: HeaderCarrier): Future[Seq[ApiDetailSummary]] = {
+    queryApis(Seq(("searchTerm", searchText)))
+  }
+
+  private def queryApis(queryParams: Seq[(String,String)])(implicit hc: HeaderCarrier): Future[Seq[ApiDetailSummary]] = {
+    httpClient.get(url"$integrationCatalogueBaseUrl/integration-catalogue/integrations/summaries")
+      .transform(wsRq => wsRq.withQueryStringParameters(queryParams*))
+      .setHeader((ACCEPT, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Either[UpstreamErrorResponse, Seq[ApiDetailSummary]]]
+      .flatMap {
+        case Right(summaries) =>
+          Future.successful(summaries)
+        case Left(e) =>
+          Future.failed(e)
+      }
+  }
+
 }
 
 object IntegrationCatalogueConnector extends Logging {
 
-  def stringToIntegrationId(id: String): Option[IntegrationId] = {
+  private def stringToIntegrationId(id: String): Option[IntegrationId] = {
     try {
       Some(IntegrationId(UUID.fromString(id)))
     }

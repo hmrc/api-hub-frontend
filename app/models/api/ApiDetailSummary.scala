@@ -24,14 +24,32 @@ case class ApiDetailSummary(
     title: String,
     shortDescription: Option[String],
     apiStatus: ApiStatus,
-    domain: Option[String] = None,
-    subDomain: Option[String] = None,
-    hods: Seq[String] = List.empty,
+    domain: Option[String],
+    subDomain: Option[String],
+    hods: Seq[String],
     platform: String,
-    apiType: Option[ApiType] = None,
+    apiType: Option[ApiType],
     teamId: Option[String]
 )
 
 object ApiDetailSummary {
+
+  def apply(apiDetail: ApiDetail): ApiDetailSummary = {
+    ApiDetailSummary(
+      id = apiDetail.id,
+      publisherReference = apiDetail.publisherReference,
+      title = apiDetail.title,
+      shortDescription = apiDetail.shortDescription,
+      apiStatus = apiDetail.apiStatus,
+      domain = apiDetail.domain,
+      subDomain = apiDetail.subDomain,
+      hods = apiDetail.hods,
+      platform = apiDetail.platform,
+      apiType = apiDetail.apiType,
+      teamId = apiDetail.teamId
+    )
+  }
+
   implicit val formatApiDetailSummary: Format[ApiDetailSummary] = Json.format[ApiDetailSummary]
+
 }

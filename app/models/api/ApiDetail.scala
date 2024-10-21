@@ -71,7 +71,11 @@ case class ApiDetail(
   maintainer: Maintainer,
   apiType: Option[ApiType] = None,
 ) {
+
   def isSelfServe: Boolean = platform == "HIP"
+
+  def toApiDetailSummary: ApiDetailSummary = ApiDetailSummary(this)
+  
 }
 
 object ApiDetail {

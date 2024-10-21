@@ -20,15 +20,14 @@ import base.SpecBase
 import controllers.routes
 import generators.ApiDetailGenerators
 import models.user.UserModel
-import org.mockito.ArgumentMatchers.{any, eq => eqTo, isNull}
+import org.mockito.ArgumentMatchers.{any, isNull}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.Application as PlayApplication
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import play.api.Application as PlayApplication
 import services.ApiHubService
-import uk.gov.hmrc.http.HeaderCarrier
 import utils.{HtmlValidation, TestHelpers}
 import views.html.admin.ManageApisView
 
@@ -45,7 +44,7 @@ class ManageApisControllerSpec
     "must return the list of apis to a user with the support role" in {
       forAll(usersWhoCanSupport) { (user: UserModel) =>
         val fixture = buildFixture(user)
-        val apis = Seq(sampleApiDetail())
+        val apis = Seq(sampleApiDetail().toApiDetailSummary)
 
         when(fixture.apiHubService.getApis(any)(any)).thenReturn(Future.successful(apis))
 
