@@ -97,13 +97,51 @@ trait ApiDetailGenerators {
       Gen.nonEmptyListOf(arbitraryApiDetail.arbitrary)
     }
 
+  private def genApiDetailSummary: Gen[ApiDetailSummary] = Gen.sized {size =>
+    for {
+      id <- Gen.uuid
+      title <- sensiblySizedAlphaNumStr
+      publisherReference <- sensiblySizedAlphaNumStr
+      shortDescription <- sensiblySizedAlphaNumStr
+      apiStatus <- Gen.oneOf(ApiStatus.values)
+      domain <- Gen.oneOf(FakeDomains.domains)
+      subDomain <- Gen.oneOf(domain.subDomains)
+      hods <- Gen.listOfN(size/ listSizeQuota, sensiblySizedAlphaNumStr).suchThat(_.nonEmpty)
+      reviewedDate <- Gen.const(Instant.now().truncatedTo(ChronoUnit.SECONDS))
+      platform <- sensiblySizedAlphaNumStr
+      maintainerName <- sensiblySizedAlphaNumStr
+      apiType <- Gen.oneOf(ApiType.values.toIndexedSeq)
+    } yield ApiDetailSummary(
+      id.toString,
+      publisherReference,
+      title,
+      Some(shortDescription),
+      apiStatus,
+      domain = Some(domain.code),
+      subDomain = Some(subDomain.code),
+      hods = hods,
+      platform = platform,
+      apiType = Some(apiType)
+    )
+  }
+
+  implicit lazy val arbitraryApiDetailSummary: Arbitrary[ApiDetailSummary] = Arbitrary(genApiDetailSummary)
+
+  implicit val arbitraryApiDetailsWithoutOAS: Arbitrary[Seq[ApiDetailSummary]] =
+    Arbitrary {
+      Gen.nonEmptyListOf(arbitraryApiDetailSummary.arbitrary)
+    }
+
   private val parameters = Gen.Parameters.default
 
   def sampleApiDetail(): ApiDetail =
     genApiDetail.pureApply(parameters, Seed.random())
 
+  def sampleApiDetailSummary(): ApiDetailSummary =
+    genApiDetailSummary.pureApply(parameters, Seed.random())
+
   def sampleApis() : IntegrationResponse =
-    IntegrationResponse(1, None, arbitraryApiDetails.arbitrary.pureApply(parameters, Seed.random()))
+    IntegrationResponse(1, None, arbitraryApiDetailsWithoutOAS.arbitrary.pureApply(parameters, Seed.random()))
 
   def sampleApiDetailSummary() :ApiDetailSummary = {
     val apiDetail = sampleApiDetail()

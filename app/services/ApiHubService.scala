@@ -91,7 +91,7 @@ class ApiHubService @Inject()(
     applicationsConnector.getDeploymentDetails(publisherReference)
   }
 
-  def getApis(platform: Option[String] = None)(implicit hc: HeaderCarrier): Future[Seq[ApiDetail]] = {
+  def getApis(platform: Option[String] = None)(implicit hc: HeaderCarrier): Future[Seq[ApiDetailSummary]] = {
     integrationCatalogueConnector.getApis(platform)
   }
 
@@ -164,14 +164,14 @@ class ApiHubService @Inject()(
     applicationsConnector.removeTeamMemberFromTeam(id, teamMember)
   }
 
-  def getUserApis(teamMember: TeamMember)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[ApiDetail]] = {
+  def getUserApis(teamMember: TeamMember)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[ApiDetailSummary]] = {
     findTeams(Some(teamMember.email)) flatMap {
       case teams if teams.nonEmpty => integrationCatalogueConnector.filterApis(teams.map(_.id))
       case _ => Future.successful(Seq.empty)
     }
   }
 
-  def deepSearchApis(searchText: String)(implicit hc: HeaderCarrier): Future[Seq[ApiDetail]]  = {
+  def deepSearchApis(searchText: String)(implicit hc: HeaderCarrier): Future[Seq[ApiDetailSummary]]  = {
     integrationCatalogueConnector.deepSearchApis(searchText)
   }
 
