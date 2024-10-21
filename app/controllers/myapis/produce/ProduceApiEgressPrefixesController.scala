@@ -16,28 +16,41 @@
 
 package controllers.myapis.produce
 
+import config.FrontendAppConfig
 import controllers.actions.*
+import forms.myapis.produce.ProduceApiEgressPrefixesFormProvider
 import models.Mode
+import navigation.Navigator
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.ProduceApiSessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.myapis.produce.ProduceApiEgressPrefixesView
+
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class ProduceApiEgressPrefixesController @Inject()(
                                                     override val messagesApi: MessagesApi,
+                                                    produceApiSessionRepository: ProduceApiSessionRepository,
+                                                    navigator: Navigator,
                                                     identify: IdentifierAction,
+                                                    getData: ProduceApiDataRetrievalAction,
+                                                    requireData: DataRequiredAction,
+                                                    formProvider: ProduceApiEgressPrefixesFormProvider,
                                                     val controllerComponents: MessagesControllerComponents,
-                                                    view: ProduceApiEgressPrefixesView
+                                                    view: ProduceApiEgressPrefixesView,
+                                                    config: FrontendAppConfig
                                                   )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = identify {
-    implicit request => Ok(view(mode, request.user))
+  val form = formProvider()
+
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+    implicit request => Ok(view(form, mode, request.user, config.helpDocsPath))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = identify {
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request => Redirect(routes.ProduceApiHodController.onPageLoad(mode))
   }
 }
