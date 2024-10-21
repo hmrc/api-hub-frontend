@@ -14,20 +14,64 @@
  * limitations under the License.
  *@
 
+@import config.Domains
+@import models.api.Domain
 @import models.user.UserModel
 @import models.myapis.produce.ProduceApiHowToCreate
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
-    govukButton: GovukButton
+    govukButton: GovukButton,
+    govukErrorSummary: GovukErrorSummary,
+    govukRadios: GovukRadios,
 )
 
-@(mode: Mode, userModel: UserModel)(implicit request: Request[?], messages: Messages)
+@(form: Form[?], mode: Mode, userModel: UserModel, domains: Domains)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = titleNoForm("Which domain and sub domain does your API belong to?"), user = Some(userModel)) {
+@radioDomains = @{
+    domains.domains.map(domain =>
+        RadioItem(
+            content = Text(domain.description),
+            value = Some(domain.code),
+            conditionalHtml = Option.when(domain.subDomains.nonEmpty)(
+                govukRadios(
+                    RadiosViewModel(
+                        field  = form("subDomain"),
+                        legend = LegendViewModel(Empty),
+                        items  = radioSubDomains(domain))
+                    )
+                )
+            )
+    )
+}
+
+@radioSubDomains(domain: Domain) = @{
+    domain.subDomains.map(subDomain =>
+            RadioItem(
+                content = Text(subDomain.description),
+                value = Some(subDomain.code)
+            )
+        )
+}
+
+@layout(pageTitle = titleNoForm(messages("produceApiDomain.title")), user = Some(userModel)) {
     @formHelper(action = controllers.myapis.produce.routes.ProduceApiDomainController.onSubmit(mode)) {
-        <h1 class="govuk-heading-l">Which domain and sub domain does your API belong to?</h1>
+
+        <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">@messages("produceApiDomain.title")</h1>
+        <span class="govuk-caption-m govuk-!-margin-top-0 govuk-!-margin-bottom-4">@messages("produceApiDomain.heading")</span>
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))
+        }
+
+        @govukRadios(
+            RadiosViewModel(
+                field  = form("domain"),
+                legend = LegendViewModel(Empty),
+                items  = radioDomains
+            )
+        )
         @govukButton(
             ButtonViewModel(messages("site.continue"))
         )
