@@ -18,7 +18,7 @@ package generators
 
 import models.application.TeamMember
 import models.ApiPolicyConditionsDeclaration
-import models.myapis.produce.{ProduceApiDomainSubdomain, ProduceApiHowToCreate, ProduceApiReviewNameDescription}
+import models.myapis.produce.*
 import org.scalacheck.{Arbitrary, Gen}
 import viewmodels.admin.Decision
 import viewmodels.admin.Decision.{Approve, Reject}

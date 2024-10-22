@@ -54,6 +54,7 @@ class Navigator @Inject()() {
     case ProduceApiHowToCreatePage => produceApiHowToCreateNextPage(NormalMode)
     case ProduceApiShortDescriptionPage => _ => controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onPageLoad()
     case ProduceApiReviewNameDescriptionPage => _ => controllers.myapis.produce.routes.ProduceApiEgressController.onPageLoad(NormalMode)
+    case ProduceApiHodPage => _ => controllers.myapis.produce.routes.ProduceApiDomainController.onPageLoad(NormalMode)
     case ProduceApiDomainPage => _ => controllers.myapis.produce.routes.ProduceApiStatusController.onPageLoad(NormalMode)
     case ProduceApiStatusPage => _ => controllers.myapis.produce.routes.ProduceApiPassthroughController.onPageLoad(NormalMode)
     case ProduceApiPassthroughPage => _ => controllers.myapis.produce.routes.ProduceApiDetailsController.onPageLoad(NormalMode)

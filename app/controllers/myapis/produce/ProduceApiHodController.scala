@@ -16,29 +16,60 @@
 
 package controllers.myapis.produce
 
-import controllers.actions.*
+import config.Hods
+import controllers.actions._
+import forms.myapis.produce.ProduceApiHodFormProvider
+
+import javax.inject.Inject
 import models.Mode
-import play.api.data.Form
+import navigation.Navigator
+import pages.myapis.produce.ProduceApiHodPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.ProduceApiSessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.myapis.produce.ProduceApiHodView
 
-import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class ProduceApiHodController @Inject()(
                                          override val messagesApi: MessagesApi,
+                                         sessionRepository: ProduceApiSessionRepository,
+                                         navigator: Navigator,
                                          identify: IdentifierAction,
+                                         getData: ProduceApiDataRetrievalAction,
+                                         requireData: DataRequiredAction,
+                                         formProvider: ProduceApiHodFormProvider,
                                          val controllerComponents: MessagesControllerComponents,
-                                         view: ProduceApiHodView
+                                         view: ProduceApiHodView,
+                                         hods: Hods,
                                        )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = identify {
-    implicit request => Ok(view(mode, request.user))
+  private val form = formProvider()
+
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+    implicit request =>
+
+      val preparedForm = request.userAnswers.get(ProduceApiHodPage) match {
+        case None => form
+        case Some(value) => form.fill(value)
+      }
+
+      Ok(view(preparedForm, mode, request.user, hods))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = identify {
-    implicit request => Redirect(routes.ProduceApiDomainController.onPageLoad(mode))
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request =>
+
+      form.bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, mode, request.user, hods))),
+
+        value =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(ProduceApiHodPage, value))
+            _              <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(navigator.nextPage(ProduceApiHodPage, mode, updatedAnswers))
+      )
   }
 }
