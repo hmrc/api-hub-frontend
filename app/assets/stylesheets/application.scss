@@ -886,3 +886,9 @@ header {
         cursor: pointer;
     }
 }
+
+.hip-js-link {
+    @extend .govuk-link;
+    color: govuk-colour("blue");
+    cursor: pointer;
+}
