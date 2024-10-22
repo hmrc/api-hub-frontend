@@ -86,3 +86,8 @@ GET     /produce/api-status                                 controllers.myapis.p
 POST    /produce/api-status                                 controllers.myapis.produce.ProduceApiStatusController.onSubmit(mode: Mode = NormalMode)
 GET     /produce/change-api-status                          controllers.myapis.produce.ProduceApiStatusController.onPageLoad(mode: Mode = CheckMode)
 POST    /produce/change-api-status                          controllers.myapis.produce.ProduceApiStatusController.onSubmit(mode: Mode = CheckMode)
+
+GET     /produce/api-passthrough                            controllers.myapis.produce.ProduceApiPassthroughController.onPageLoad(mode: Mode = NormalMode)
+POST    /produce/api-passthrough                            controllers.myapis.produce.ProduceApiPassthroughController.onSubmit(mode: Mode = NormalMode)
+GET     /produce/change-api-passthrough                     controllers.myapis.produce.ProduceApiPassthroughController.onPageLoad(mode: Mode = CheckMode)
+POST    /produce/change-api-passthrough                     controllers.myapis.produce.ProduceApiPassthroughController.onSubmit(mode: Mode = CheckMode)
