@@ -24,6 +24,9 @@ import pages.application.register.RegisterApplicationTeamPage
 import pages.myapis.produce.*
 
 trait PageGenerators {
+
+  implicit lazy val arbitraryProduceApiPassthroughPage: Arbitrary[ProduceApiPassthroughPage.type] =
+    Arbitrary(ProduceApiPassthroughPage)
   
   implicit lazy val arbitraryProduceApiDomainPage: Arbitrary[ProduceApiDomainPage.type] =
     Arbitrary(ProduceApiDomainPage)

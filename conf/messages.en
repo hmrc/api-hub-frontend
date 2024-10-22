@@ -923,3 +923,9 @@ produceApiStatus.hint.3 = Not recommended for use
 produceApiStatus.checkYourAnswersLabel = API status
 produceApiStatus.error.required = Select API status
 produceApiStatus.change.hidden = ProduceApiStatus
+
+produceApiPassthrough.title = Is this API a passthrough?
+produceApiPassthrough.heading = Passthrough APIs bypass validation and error handling, sending requests directly to backend systems. Using the passthrough flag, legacy APIs can be integrated into the HIP, supporting old systems and enabling platform decommissioning.
+produceApiPassthrough.checkYourAnswersLabel = API passthrough
+produceApiPassthrough.error.required = Select yes if this API is passthrough
+produceApiPassthrough.change.hidden = ProduceApiPassthrough
