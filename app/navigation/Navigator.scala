@@ -57,7 +57,7 @@ class Navigator @Inject()() {
     case ProduceApiHodPage => _ => controllers.myapis.produce.routes.ProduceApiDomainController.onPageLoad(NormalMode)
     case ProduceApiDomainPage => _ => controllers.myapis.produce.routes.ProduceApiStatusController.onPageLoad(NormalMode)
     case ProduceApiStatusPage => _ => controllers.myapis.produce.routes.ProduceApiPassthroughController.onPageLoad(NormalMode)
-    case ProduceApiPassthroughPage => _ => controllers.myapis.produce.routes.ProduceApiDetailsController.onPageLoad(NormalMode)
+    case ProduceApiPassthroughPage => _ => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
     case CancelAccessRequestStartPage => _ => controllers.application.cancelaccessrequest.routes.CancelAccessRequestSelectApiController.onPageLoad(NormalMode)
     case CancelAccessRequestSelectApiPage => _ => controllers.application.cancelaccessrequest.routes.CancelAccessRequestConfirmController.onPageLoad(NormalMode)
     case CancelAccessRequestConfirmPage => cancelAccessRequestConfirmNextPage(NormalMode)
