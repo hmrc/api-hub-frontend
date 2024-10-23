@@ -27,6 +27,7 @@
         govukInput: GovukInput,
         govukFieldset : GovukFieldset,
         govukTable: GovukTable,
+        govukErrorSummary: GovukErrorSummary,
 )
 
 @(form: Form[?], mode: Mode, userModel: UserModel, apiHubGuideUrl: String)(implicit request: Request[?], messages: Messages)
@@ -154,6 +155,9 @@
 }
 
 @layout(pageTitle = title(form, messages("produceApiEgressPrefix.title")), user = Some(userModel), customScriptsBlock = Some(scripts())) {
+    @if(form.errors.nonEmpty) {
+        @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))
+    }
     <h1 class="govuk-heading-l">@messages("produceApiEgressPrefix.heading")</h1>
 
     <p class="govuk-body">

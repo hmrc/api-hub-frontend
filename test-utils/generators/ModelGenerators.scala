@@ -18,12 +18,20 @@ package generators
 
 import models.application.TeamMember
 import models.ApiPolicyConditionsDeclaration
-import models.myapis.produce.{ProduceApiDomainSubdomain, ProduceApiHowToCreate, ProduceApiReviewNameDescription}
+import models.myapis.produce.{ProduceApiDomainSubdomain, ProduceApiHowToCreate, ProduceApiReviewNameDescription, ProduceApiEgressPrefixes}
 import org.scalacheck.{Arbitrary, Gen}
 import viewmodels.admin.Decision
 import viewmodels.admin.Decision.{Approve, Reject}
 
 trait ModelGenerators {
+
+  implicit lazy val arbitraryProduceApiEgressPrefixes: Arbitrary[ProduceApiEgressPrefixes] =
+    Arbitrary {
+      for {
+        prefixes <- arbitrary[String]
+        mappings <- arbitrary[String]
+      } yield ProduceApiEgressPrefixes(prefixes, mappings)
+    }
 
   implicit lazy val arbitraryProduceApiDomain: Arbitrary[ProduceApiDomainSubdomain] =
     Arbitrary {

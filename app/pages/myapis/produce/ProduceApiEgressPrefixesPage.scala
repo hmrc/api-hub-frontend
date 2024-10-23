@@ -14,21 +14,15 @@
  * limitations under the License.
  */
 
-package forms.myapis.produce
+package pages.myapis.produce
 
-import forms.mappings.Mappings
 import models.myapis.produce.ProduceApiEgressPrefixes
-import play.api.data.Form
-import play.api.data.Forms.*
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-import javax.inject.Inject
+case object ProduceApiEgressPrefixesPage extends QuestionPage[ProduceApiEgressPrefixes] {
 
-class ProduceApiEgressPrefixesFormProvider @Inject() extends Mappings {
+  override def path: JsPath = JsPath \ toString
 
-   def apply(): Form[ProduceApiEgressPrefixes] = Form(
-     mapping(
-      "prefixes" -> set(text()),
-      "mappings" -> set(text()),
-    )(ProduceApiEgressPrefixes.apply)(o => Some(Tuple.fromProductTyped(o))) 
-   )
- }
+  override def toString: String = "produceApiEgressPrefixes"
+}
