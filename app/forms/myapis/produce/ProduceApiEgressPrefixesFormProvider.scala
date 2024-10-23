@@ -18,7 +18,7 @@ package forms.myapis.produce
 
 import forms.mappings.Mappings
 import models.myapis.produce.ProduceApiEgressPrefixes
-import play.api.data.Form
+import play.api.data.{Form, Forms}
 import play.api.data.Forms.*
 
 import javax.inject.Inject
@@ -27,8 +27,8 @@ class ProduceApiEgressPrefixesFormProvider @Inject() extends Mappings {
 
    def apply(): Form[ProduceApiEgressPrefixes] = Form(
      mapping(
-      "prefixes" -> set(text()),
-      "mappings" -> set(text()),
-    )(ProduceApiEgressPrefixes.apply)(o => Some(Tuple.fromProductTyped(o))) 
+      "prefixes" -> Forms.seq(text()),
+      "mappings" -> Forms.seq(text()),
+    )(ProduceApiEgressPrefixes.apply)(ProduceApiEgressPrefixes.unapply) 
    )
  }

@@ -9,7 +9,8 @@ function buildView() {
         elExistingInput = document.getElementById('existing'),
         elReplacementInput = document.getElementById('replacement'),
         elMappingsTable = document.getElementById('mappingsTable'),
-        elMappingsTableBody = elMappingsTable.querySelector('tbody');
+        elMappingsTableBody = elMappingsTable.querySelector('tbody'),
+        elFormFields = document.getElementById('formFields');
 
     let onAddPrefixButtonClicked = noop,
         onAddMappingButtonClicked = noop,
@@ -74,6 +75,22 @@ function buildView() {
         return elRow;
     }
 
+    function buildPrefixFormField(prefix) {
+        const elField = document.createElement('input');
+        elField.type = 'hidden';
+        elField.name = 'prefixes[]';
+        elField.value = prefix;
+        return elField;
+    }
+
+    function buildMappingFormField(mapping) {
+        const elField = document.createElement('input');
+        elField.type = 'hidden';
+        elField.name = 'mappings[]';
+        elField.value = `${mapping.existing}->${mapping.replacement}`; //TODO change me
+        return elField;
+    }
+
     return {
         onAddPrefixButtonClicked(handler) {
             onAddPrefixButtonClicked = handler;
@@ -95,11 +112,16 @@ function buildView() {
             elReplacementInput.value = '';
         },
         render(model) {
+            elFormFields.innerHTML = '';
+
             setVisible(elPrefixesTable, model.prefixes.length);
             elPrefixesTableBody.innerHTML = '';
             model.prefixes.forEach((prefix, i) => {
                 const elRow = buildPrefixListRow(prefix, i);
                 elPrefixesTableBody.appendChild(elRow);
+
+                const elPrefixFormField = buildPrefixFormField(prefix);
+                elFormFields.appendChild(elPrefixFormField);
             });
 
             setVisible(elMappingsTable, model.mappings.length);
@@ -107,6 +129,9 @@ function buildView() {
             model.mappings.forEach((mapping, i) => {
                 const elRow = buildMappingRow(mapping, i);
                 elMappingsTableBody.appendChild(elRow);
+
+                const elMappingFormField = buildMappingFormField(mapping);
+                elFormFields.appendChild(elMappingFormField);
             });
         }
     };
