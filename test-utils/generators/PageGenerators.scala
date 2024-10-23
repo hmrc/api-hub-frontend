@@ -27,6 +27,9 @@ trait PageGenerators {
 
   implicit lazy val arbitraryProduceApiPassthroughPage: Arbitrary[ProduceApiPassthroughPage.type] =
     Arbitrary(ProduceApiPassthroughPage)
+
+  implicit lazy val arbitraryProduceApiHodPage: Arbitrary[ProduceApiHodPage.type] =
+    Arbitrary(ProduceApiHodPage)
   
   implicit lazy val arbitraryProduceApiDomainPage: Arbitrary[ProduceApiDomainPage.type] =
     Arbitrary(ProduceApiDomainPage)

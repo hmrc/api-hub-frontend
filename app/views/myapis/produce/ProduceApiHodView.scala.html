@@ -14,20 +14,52 @@
  * limitations under the License.
  *@
 
+@import config.Hods
 @import models.user.UserModel
-@import models.myapis.produce.ProduceApiHowToCreate
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukCheckboxes: GovukCheckboxes,
     govukButton: GovukButton
 )
 
-@(mode: Mode, userModel: UserModel)(implicit request: Request[?], messages: Messages)
+@(form: Form[?], mode: Mode, userModel: UserModel, hods: Hods)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = titleNoForm("Set the HOD/ backend for your API"), user = Some(userModel)) {
+@layout(pageTitle = title(form, messages("produceApiHod.title")), user = Some(userModel)) {
+
     @formHelper(action = controllers.myapis.produce.routes.ProduceApiHodController.onSubmit(mode)) {
-        <h1 class="govuk-heading-l">Set the HOD/ backend for your API</h1>
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
+        }
+
+        @govukCheckboxes(
+            CheckboxesViewModel(
+                form   = form,
+                name   = "value",
+                legend = LegendViewModel(messages("produceApiHod.title")).asPageHeading(),
+                hint   = Some(Hint(content = HtmlContent(
+                    s"""${messages("produceApiHod.heading")}
+                        <a id="getSupportLink" data-header-link-name="getSupport"
+                            class="govuk-link govuk-link--no-visited-state"
+                            href="${routes.GetSupportController.onPageLoad.url}">
+                            ${messages("support.link.text").toLowerCase}
+                        </a>."""
+                ))),
+                items  = hods.hods.zipWithIndex.map {
+                    case (value, index) =>
+                        CheckboxItemViewModel(
+                            content = Text(value.description),
+                            fieldId = "value",
+                            index   = index,
+                            value   = value.code
+                        )
+                }
+            )
+        )
+
         @govukButton(
             ButtonViewModel(messages("site.continue"))
         )

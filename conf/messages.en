@@ -929,3 +929,10 @@ produceApiPassthrough.heading = Passthrough APIs bypass validation and error han
 produceApiPassthrough.checkYourAnswersLabel = API passthrough
 produceApiPassthrough.error.required = Select yes if this API is passthrough
 produceApiPassthrough.change.hidden = ProduceApiPassthrough
+
+produceApiHod.title = Set the HOD/backend for your API
+produceApiHod.heading = Select one or more HODs/backends that your API will use.<br>If the required HOD/Backend is not on the list,
+produceApiHod.checkYourAnswersLabel = Set the HOD/backend for your API
+produceApiHod.error.required = Select a HOD/backend
+produceApiHod.error.invalidHod = Select a valid HOD/backend
+produceApiHod.change.hidden = ProduceApiHod
