@@ -21,6 +21,7 @@ import config.FrontendAppConfig
 import models.UserEmail
 import models.accessrequest.{AccessRequest, AccessRequestCancelRequest, AccessRequestDecisionRequest, AccessRequestRequest, AccessRequestStatus}
 import models.api.{ApiDeploymentStatuses, ApiDetailSummary, EgressGateway}
+import models.api.ApiDeploymentStatuses.readApiDeploymentStatuses
 import models.application.*
 import models.deployment.*
 import models.exception.{ApplicationCredentialLimitException, ApplicationsException, TeamNameNotUniqueException}
@@ -387,14 +388,13 @@ class ApplicationsConnector @Inject()(
       }
   }
 
-  def getApiDeploymentStatuses(publisherReference: String)(implicit hc:HeaderCarrier): Future[Option[ApiDeploymentStatuses]] = {
+  def getApiDeploymentStatuses(publisherReference: String)(implicit hc:HeaderCarrier): Future[ApiDeploymentStatuses] = {
     httpClient.get(url"$applicationsBaseUrl/api-hub-applications/apis/$publisherReference/deployment-status")
       .setHeader((ACCEPT, JSON))
       .setHeader(AUTHORIZATION -> clientAuthToken)
-      .execute[Either[UpstreamErrorResponse,ApiDeploymentStatuses]]
+      .execute[Either[UpstreamErrorResponse, ApiDeploymentStatuses]]
       .flatMap {
-        case Right(apiDeploymentStatuses) => Future.successful(Some(apiDeploymentStatuses))
-        case Left(e) if e.statusCode == BAD_GATEWAY => Future.successful(None)
+        case Right(apiDeploymentStatuses) => Future.successful(apiDeploymentStatuses)
         case Left(e) => Future.failed(e)
       }
   }

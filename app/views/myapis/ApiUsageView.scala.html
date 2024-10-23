@@ -37,7 +37,7 @@
         paginator: Paginator
 )
 
-@(apiDetail: ApiDetail, owningTeam: Option[Team], applications: Seq[Application],  userModel: UserModel, maybeDeploymentStatuses: Option[ApiDeploymentStatuses])(implicit request: Request[?], messages: Messages)
+@(apiDetail: ApiDetail, owningTeam: Option[Team], applications: Seq[Application],  userModel: UserModel, deploymentStatuses: ApiDeploymentStatuses)(implicit request: Request[?], messages: Messages)
 
 @applicationLink(application: Application) = {
     <a href="@controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id)" class="govuk-link">@application.name</a>
@@ -62,7 +62,7 @@
     fullWidth = true,
     customScriptsBlock = Some(scripts())
 ) {
-    @views.html.templates.SideNav(apiDetail.title, MyApisNavItems(apiDetail.id, userModel, MyApisNavPages.ApiUsagePage, maybeDeploymentStatuses)) {
+    @views.html.templates.SideNav(apiDetail.title, MyApisNavItems(apiDetail.id, userModel, MyApisNavPages.ApiUsagePage, deploymentStatuses)) {
         <h1 class="govuk-heading-l">
         @messages("myApis.usage.heading")
         </h1>

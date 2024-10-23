@@ -24,6 +24,7 @@ import generators.EgressGenerator
 import models.UserEmail
 import models.accessrequest.*
 import models.api.ApiDeploymentStatuses
+import models.api.ApiDeploymentStatus.*
 import models.api.ApiDetailLensesSpec.{sampleApiDetail, sampleApiDetailSummary}
 import models.application.*
 import models.application.ApplicationLenses.*
@@ -1077,7 +1078,21 @@ class ApplicationsConnectorSpec
   "ApplicationsConnector.getApiDeploymentStatuses" - {
     "must place the correct request and return the response" in {
       val publisherReference = "ref123"
-      val response = Some(ApiDeploymentStatuses(Some("1.0"), None))
+      val expectedResponse = ApiDeploymentStatuses(Seq(
+        Deployed(Primary, "1.0"),
+        Deployed(Secondary, "1.0"),
+      ))
+      val response = s"""{
+        |"statuses": [{
+        | "_type": "package.Deployed",
+        | "environmentName": "primary",
+        | "version": "1.0"
+        |},{
+        | "_type": "package.Deployed",
+        | "environmentName": "secondary",
+        | "version": "1.0"
+        |}]
+      }""".stripMargin
 
       stubFor(
         get(urlEqualTo(s"/api-hub-applications/apis/$publisherReference/deployment-status"))
@@ -1085,30 +1100,13 @@ class ApplicationsConnectorSpec
           .withHeader(AUTHORIZATION, equalTo("An authentication token"))
           .willReturn(
             aResponse()
-              .withBody(Json.toJson(response).toString())
+              .withBody(response)
           )
       )
 
       buildConnector(this).getApiDeploymentStatuses(publisherReference)(HeaderCarrier()).map(
         result =>
-          result mustBe response
-      )
-    }
-
-    "must handle a 502 response" in {
-      val publisherReference = "ref123"
-
-      stubFor(
-        get(urlEqualTo(s"/api-hub-applications/apis/$publisherReference/deployment-status"))
-          .willReturn(
-            aResponse()
-              .withStatus(BAD_GATEWAY)
-          )
-      )
-
-      buildConnector(this).getApiDeploymentStatuses(publisherReference)(HeaderCarrier()).map(
-        result =>
-          result mustBe None
+          result mustBe expectedResponse
       )
     }
 

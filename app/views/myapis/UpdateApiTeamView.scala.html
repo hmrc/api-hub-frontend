@@ -34,7 +34,7 @@
     teamSelection: TeamSelection
 )
 
-@(form: Form[?], apiDetail: ApiDetail, owningTeam: Option[Team], teams: Seq[Team], userModel: UserModel, maybeDeploymentStatuses: Option[ApiDeploymentStatuses])(implicit request: Request[?], messages: Messages)
+@(form: Form[?], apiDetail: ApiDetail, owningTeam: Option[Team], teams: Seq[Team], userModel: UserModel, deploymentStatuses: ApiDeploymentStatuses)(implicit request: Request[?], messages: Messages)
 
 @scripts() = {
     @iconsLink()
@@ -45,7 +45,7 @@
 }
 
 @layout(pageTitle = titleNoForm(messages("myApis.update.team.title")), user = Some(userModel), fullWidth = true, customScriptsBlock = Some(scripts())) {
-    @views.html.templates.SideNav(apiDetail.title, MyApisNavItems(apiDetail.id, userModel, MyApisNavPages.ChangeOwningTeamPage, maybeDeploymentStatuses)) {
+    @views.html.templates.SideNav(apiDetail.title, MyApisNavItems(apiDetail.id, userModel, MyApisNavPages.ChangeOwningTeamPage, deploymentStatuses)) {
         @formHelper(action = controllers.myapis.routes.UpdateApiTeamController.onSubmit(apiDetail.id), Symbol("autoComplete") -> "off") {
             @if(form.errors.nonEmpty) {
                 @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))

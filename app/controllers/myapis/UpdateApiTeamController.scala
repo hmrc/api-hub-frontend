@@ -47,15 +47,15 @@ class UpdateApiTeamController @Inject()(
 
   def onPageLoad(apiId: String): Action[AnyContent] = (identify andThen apiAuth(apiId)) async {
     implicit request => {
-      apiHubService.getApiDeploymentStatuses(request.apiDetails.publisherReference) flatMap (maybeDeploymentStatuses => showView(OK, form, maybeDeploymentStatuses))
+      apiHubService.getApiDeploymentStatuses(request.apiDetails.publisherReference).flatMap(deploymentStatuses => showView(OK, form, deploymentStatuses))
     }
   }
 
-  private def showView(code: Int, form: Form[?], maybeDeploymentStatuses: Option[ApiDeploymentStatuses])(implicit request: ApiRequest[?]): Future[Result] = {
+  private def showView(code: Int, form: Form[?], deploymentStatuses: ApiDeploymentStatuses)(implicit request: ApiRequest[?]): Future[Result] = {
     apiHubService.findTeams(None).map(teams => {
       val owningTeam = teams.find(team => request.apiDetails.teamId.contains(team.id))
       val sortedTeams = teams.sortBy(_.name.toLowerCase)
-      Status(code)(view(form, request.apiDetails, owningTeam, sortedTeams, request.identifierRequest.user, maybeDeploymentStatuses))
+      Status(code)(view(form, request.apiDetails, owningTeam, sortedTeams, request.identifierRequest.user, deploymentStatuses))
     })
   }
 
@@ -63,7 +63,7 @@ class UpdateApiTeamController @Inject()(
     implicit request =>
       form.bindFromRequest().fold(
         formWithErrors => {
-          apiHubService.getApiDeploymentStatuses(request.apiDetails.publisherReference) flatMap (maybeDeploymentStatuses => showView(BAD_REQUEST, formWithErrors, maybeDeploymentStatuses))
+          apiHubService.getApiDeploymentStatuses(request.apiDetails.publisherReference).flatMap(deploymentStatuses => showView(BAD_REQUEST, formWithErrors, deploymentStatuses))
         },
         maybeTeamId =>
           apiHubService.updateApiTeam(apiId, maybeTeamId) map   {
