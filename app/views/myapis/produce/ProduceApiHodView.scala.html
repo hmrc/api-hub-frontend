@@ -40,7 +40,14 @@
                 form   = form,
                 name   = "value",
                 legend = LegendViewModel(messages("produceApiHod.title")).asPageHeading(),
-                hint   = Some(Hint(content = Text(messages("produceApiHod.heading")))),
+                hint   = Some(Hint(content = HtmlContent(
+                    s"""${messages("produceApiHod.heading")}
+                        <a id="getSupportLink" data-header-link-name="getSupport"
+                            class="govuk-link govuk-link--no-visited-state"
+                            href="${routes.GetSupportController.onPageLoad.url}">
+                            ${messages("support.link.text").toLowerCase}
+                        </a>."""
+                ))),
                 items  = hods.hods.zipWithIndex.map {
                     case (value, index) =>
                         CheckboxItemViewModel(
