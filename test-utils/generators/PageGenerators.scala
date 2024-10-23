@@ -30,7 +30,10 @@ trait PageGenerators {
 
   implicit lazy val arbitraryProduceApiHodPage: Arbitrary[ProduceApiHodPage.type] =
     Arbitrary(ProduceApiHodPage)
-  
+
+  implicit lazy val arbitraryProduceApiEgressPrefixesPage: Arbitrary[ProduceApiEgressPrefixesPage.type] =
+    Arbitrary(ProduceApiEgressPrefixesPage)
+
   implicit lazy val arbitraryProduceApiDomainPage: Arbitrary[ProduceApiDomainPage.type] =
     Arbitrary(ProduceApiDomainPage)
 

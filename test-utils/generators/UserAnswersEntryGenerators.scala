@@ -38,6 +38,14 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators wit
       } yield (page, value)
     }
 
+  implicit lazy val arbitraryProduceApiEgressPrefixesUserAnswersEntry: Arbitrary[(ProduceApiEgressPrefixesPage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[ProduceApiEgressPrefixesPage.type]
+        value <- arbitrary[ProduceApiEgressPrefixes].map(Json.toJson(_))
+      } yield (page, value)
+    }
+
   implicit lazy val arbitraryProduceApiDomainUserAnswersEntry: Arbitrary[(ProduceApiDomainPage.type, JsValue)] =
     Arbitrary {
       for {
