@@ -62,10 +62,9 @@ class ApiDetailsController @Inject()(
 
   private def processSelfServeApiDetail(apiDetail: ApiDetail)(implicit request: OptionalIdentifierRequest[?]) = {
     for {
-      maybeApiDeploymentStatuses <- apiHubService.getApiDeploymentStatuses(apiDetail.publisherReference)
+      apiDeploymentStatuses <- apiHubService.getApiDeploymentStatuses(apiDetail.publisherReference)
       maybeTeamName <- getTeamNameForApi(apiDetail.teamId)
-    } yield maybeApiDeploymentStatuses match {
-      case Some(apiDeploymentStatuses) =>
+    } yield
         Ok(view(
           apiDetail,
           request.user,
@@ -78,9 +77,6 @@ class ApiDetailsController @Inject()(
             apiDeploymentStatuses,
           )
         ))
-      case _ =>
-        errorResultBuilder.internalServerError(s"Unable to retrieve deployment statuses for API ${apiDetail.publisherReference}")
-    }
   }
 
   private def processNonSelfServeApiDetail(apiDetail: ApiDetail)(implicit request: OptionalIdentifierRequest[?]) = {

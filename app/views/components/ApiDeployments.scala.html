@@ -14,7 +14,8 @@
  * limitations under the License.
  *@
 
-@import models.api.ApiDeploymentStatuses
+@import models.api.{ApiDeploymentStatus, ApiDeploymentStatuses}
+@import models.api.ApiDeploymentStatus.*
 @import views.html.components.IconsLink
 
 @this(govukSummaryList: GovukSummaryList, iconsLink: IconsLink)
@@ -23,23 +24,35 @@
 
 @iconsLink()
 
-@showDeploymentStatus(version: Option[String]) = {
-    <div class="apiStatusContainer">
-    @if(version.isDefined) {
-        <span>
-            <i class="fa-solid fa-circle-check ready" aria-hidden="true"></i> @messages("apiDeployments.status.deployed")<br>
-        </span>
-    } else {
-        <span>
-            <i class="fa-solid fa-times-circle" aria-hidden="true"></i> @messages("apiDeployments.status.notDeployed")
-        </span>
-    }
-    </div>
+@deploymentStatusSummary(deploymentStatus: ApiDeploymentStatus) = @{
+
+    SummaryListRow(
+        key = Key(
+            content = Text(messages(s"apiDeployments.environment.${deploymentStatus.environmentName}"))
+        ),
+        value = Value(
+            content = HtmlContent(s"""
+                <div class="apiStatusContainer">
+                ${showDeploymentStatus(deploymentStatus)}
+                </div>
+            """)
+        ),
+        actions = Some(Actions(items = Seq(ActionItem(content = HtmlContent(showDeployedVersion(deploymentStatus).toString)))))
+    )
 }
 
-@showDeployedVersion(version: Option[String]) = {
-    @if(version.isDefined) {
-        <strong class="govuk-tag govuk-tag--grey apiVersionTag">@messages("apiDeployments.versionPrefix") @version.get</strong>
+@showDeploymentStatus(deploymentStatus: ApiDeploymentStatus) = @{deploymentStatus match {
+    case Deployed(_, version) =>
+        { <span><i class="fa-solid fa-circle-check ready" aria-hidden="true"></i> {messages("apiDeployments.status.deployed")}</span> }
+    case NotDeployed(_) =>
+        { <span><i class="fa-solid fa-times-circle" aria-hidden="true"></i> {messages("apiDeployments.status.notDeployed")}</span> }
+    case Unknown(_) =>
+        { <span> {messages("apiDeployments.status.unknown")} </span> }
+}}
+
+@showDeployedVersion(deploymentStatus: ApiDeploymentStatus) = @{deploymentStatus match {
+        case Deployed(_, version) => {<strong class="govuk-tag govuk-tag--grey apiVersionTag">{s"${messages("apiDeployments.versionPrefix")} $version"}</strong>}
+        case _ => ""
     }
 }
 
@@ -50,26 +63,7 @@
 
     @govukSummaryList(
         SummaryList(
-            rows = Seq(
-                SummaryListRow(
-                    key = Key(
-                        content = Text(messages("apiDeployments.environment.secondary"))
-                    ),
-                    value = Value(
-                        content = HtmlContent(showDeploymentStatus(deploymentStatuses.secondaryVersion))
-                    ),
-                    actions = Some(Actions(items = Seq(ActionItem(content = HtmlContent(showDeployedVersion(deploymentStatuses.secondaryVersion))))))
-                ),
-                SummaryListRow(
-                    key = Key(
-                        content = Text(messages("apiDeployments.environment.primary"))
-                    ),
-                    value = Value(
-                        content = HtmlContent(showDeploymentStatus(deploymentStatuses.primaryVersion))
-                    ),
-                    actions = Some(Actions(items = Seq(ActionItem(content = HtmlContent(showDeployedVersion(deploymentStatuses.primaryVersion))))))
-                )
-            )
+            rows = deploymentStatuses.statuses.map(deploymentStatusSummary)
         )
     )
 
