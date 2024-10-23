@@ -25,8 +25,8 @@ object ProduceApiEgressPrefixMapping {
   implicit val format: Format[ProduceApiEgressPrefixMapping] = Json.format[ProduceApiEgressPrefixMapping]
 }
 
-case class ProduceApiEgressPrefixes(prefixes: Set[String], mappings: Set[String]) {
-  def getMappings: Set[ProduceApiEgressPrefixMapping] = {
+case class ProduceApiEgressPrefixes(prefixes: Seq[String], mappings: Seq[String]) {
+  def getMappings: Seq[ProduceApiEgressPrefixMapping] = {
     mappings.map { mapping =>
       val split = mapping.split("->")
       ProduceApiEgressPrefixMapping(split(0), split(1))
@@ -36,4 +36,6 @@ case class ProduceApiEgressPrefixes(prefixes: Set[String], mappings: Set[String]
 
 object ProduceApiEgressPrefixes {
   implicit val format: Format[ProduceApiEgressPrefixes] = Json.format[ProduceApiEgressPrefixes]
+
+  def unapply(egressPrefixes: ProduceApiEgressPrefixes): Option[(Seq[String], Seq[String])] = Some((egressPrefixes.prefixes, egressPrefixes.mappings))
 }
