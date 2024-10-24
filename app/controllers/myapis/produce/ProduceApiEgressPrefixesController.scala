@@ -54,7 +54,7 @@ class ProduceApiEgressPrefixesController @Inject()(
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(form, mode, request.user, config.helpDocsPath))
+      Ok(view(preparedForm, mode, request.user, config.helpDocsPath))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {

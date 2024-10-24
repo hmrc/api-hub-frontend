@@ -17,6 +17,7 @@
 @import models.user.UserModel
 @import models.myapis.produce.ProduceApiHowToCreate
 @import views.html.helper.CSPNonce
+@import models.myapis.produce.ProduceApiEgressPrefixes
 
 @this(
         layout: templates.Layout,
@@ -30,7 +31,7 @@
         govukErrorSummary: GovukErrorSummary,
 )
 
-@(form: Form[?], mode: Mode, userModel: UserModel, apiHubGuideUrl: String)(implicit request: Request[?], messages: Messages)
+@(form: Form[ProduceApiEgressPrefixes], mode: Mode, userModel: UserModel, apiHubGuideUrl: String)(implicit request: Request[?], messages: Messages)
 
 @scripts() = {
     <script src='@routes.Assets.versioned("javascripts/produceApiEgressPrefixes.js")' type="module" @{CSPNonce.attr}></script>
@@ -85,17 +86,17 @@
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-one-half">
-        @govukInput(
-            InputViewModel(
-                field = form("prefix"),
-                label = LabelViewModel(messages("produceApiEgressPrefix.prefixes.label")).withCssClass("govuk-label--s"),
-            ).withCssClass("govuk-input--width-20").withId("prefix")
-        )
+            @govukInput(
+                InputViewModel(
+                    field = form("prefix"),
+                    label = LabelViewModel(messages("produceApiEgressPrefix.prefixes.label")).withCssClass("govuk-label--s"),
+                ).withCssClass("govuk-input--width-20").withId("prefix")
+            )
         </div>
         <div class="govuk-grid-column-one-half govuk-!-padding-top-6">
-        @govukButton(
-            ButtonViewModel(messages("produceApiEgressPrefix.prefixes.button")).withId("addPrefix").asSecondaryButton()
-        )
+            @govukButton(
+                ButtonViewModel(messages("produceApiEgressPrefix.prefixes.button")).withId("addPrefix").asSecondaryButton()
+            )
         </div>
     </div>
 
@@ -190,7 +191,16 @@
     ).withCssClass("govuk-!-margin-top-4 govuk-!-margin-bottom-4"))
 
     @formHelper(action = controllers.myapis.produce.routes.ProduceApiEgressPrefixesController.onSubmit(mode)) {
-        <div id="formFields"></div>
+        <div id="formFields" data-message-enter-value="@messages("error.required")" data-message-forward-slash="@messages("produceApiEgressPrefix.error.startWithSlash")">
+            @for(previousValue <- form.value) {
+                @for(prefix <- previousValue.prefixes) {
+                    <input type="hidden" name="prefixes" value="@prefix">
+                }
+                @for(mapping <- previousValue.mappings) {
+                    <input type="hidden" name="mappings" value="@mapping">
+                }
+            }
+        </div>
 
         @govukButton(
             ButtonViewModel(messages("site.continue"))

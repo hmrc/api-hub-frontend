@@ -967,3 +967,4 @@ produceApiEgressPrefix.mappings.button = Add mapping
 produceApiEgressPrefix.mappings.table.header1 = Existing path
 produceApiEgressPrefix.mappings.table.header2 = Path to replace
 produceApiEgressPrefix.mappings.table.header3 = Action
+produceApiEgressPrefix.error.startWithSlash = Value must start with a forward slash ''/''
