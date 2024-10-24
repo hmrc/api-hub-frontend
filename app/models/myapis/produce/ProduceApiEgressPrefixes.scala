@@ -26,9 +26,11 @@ object ProduceApiEgressPrefixMapping {
 }
 
 case class ProduceApiEgressPrefixes(prefixes: Seq[String], mappings: Seq[String]) {
+  import ProduceApiEgressPrefixes.mappingSeparator
+  
   def getMappings: Seq[ProduceApiEgressPrefixMapping] = {
     mappings.map { mapping =>
-      val split = mapping.split("->")
+      val split = mapping.split(mappingSeparator)
       ProduceApiEgressPrefixMapping(split(0), split(1))
     }
   }
@@ -36,6 +38,8 @@ case class ProduceApiEgressPrefixes(prefixes: Seq[String], mappings: Seq[String]
 
 object ProduceApiEgressPrefixes {
   implicit val format: Format[ProduceApiEgressPrefixes] = Json.format[ProduceApiEgressPrefixes]
+  
+  private val mappingSeparator = "->" // see mappingSeparator in buildView() in produceApiEgressPrefixes.js 
 
   def unapply(egressPrefixes: ProduceApiEgressPrefixes): Option[(Seq[String], Seq[String])] = Some((egressPrefixes.prefixes, egressPrefixes.mappings))
 }
