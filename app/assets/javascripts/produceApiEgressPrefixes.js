@@ -15,8 +15,8 @@ function buildView() {
         elMappingExistingErrorMessage = document.createElement('p'),
         elMappingReplacementErrorMessage = document.createElement('p'),
         errorMessageEnterValue = elFormFields.dataset.messageEnterValue,
-        errorMessageStartWithSlash = elFormFields.dataset.messageForwardSlash;
-
+        errorMessageStartWithSlash = elFormFields.dataset.messageForwardSlash,
+        mappingSeparator = '->';
 
     let onAddPrefixButtonClicked = noop,
         onAddMappingButtonClicked = noop,
@@ -97,7 +97,7 @@ function buildView() {
         const elField = document.createElement('input');
         elField.type = 'hidden';
         elField.name = 'mappings[]';
-        elField.value = `${mapping.existing}->${mapping.replacement}`; //TODO change me
+        elField.value = `${mapping.existing}${mappingSeparator}${mapping.replacement}`;
         return elField;
     }
 
@@ -149,7 +149,7 @@ function buildView() {
         initialiseModel(model) {
             elFormFields.querySelectorAll('input[name=prefixes]').forEach(el => model.addPrefix(el.value));
             elFormFields.querySelectorAll('input[name=mappings]').forEach(el => {
-                const [existing, replacement] = el.value.split('->');
+                const [existing, replacement] = el.value.split(mappingSeparator);
                 model.addMapping({existing, replacement});
             });
         },
