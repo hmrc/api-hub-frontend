@@ -15,8 +15,8 @@
  *@
 
 @import models.user.UserModel
-@import models.myapis.produce.ProduceApiHowToCreate
 @import views.html.helper.CSPNonce
+@import views.ViewUtils
 @import models.myapis.produce.ProduceApiEgressPrefixes
 
 @this(
@@ -46,17 +46,17 @@
         <code class="code--header">@messages("produceApiEgressPrefix.examples.2")</code>
 
         <p class="govuk-body">
-            @messages("produceApiEgressPrefix.examples.3")
+            @ViewUtils.addFormattingMarkup(messages("produceApiEgressPrefix.examples.3"))
         </p>
 
         <code class="code--header">@messages("produceApiEgressPrefix.examples.4")</code>
 
         <p class="govuk-body">
-            @messages("produceApiEgressPrefix.examples.5")
+            @ViewUtils.addFormattingMarkup(messages("produceApiEgressPrefix.examples.5"))
         </p>
 
         <p class="govuk-body">
-            @messages("produceApiEgressPrefix.examples.6")
+            @ViewUtils.addFormattingMarkup(messages("produceApiEgressPrefix.examples.6"))
         </p>
 
         <p class="govuk-body">

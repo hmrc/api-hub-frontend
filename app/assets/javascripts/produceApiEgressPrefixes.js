@@ -208,6 +208,30 @@ function buildModel() {
     };
 }
 
+function wrapAndValidate(rawValue) {
+    const value = rawValue.trim(),
+        isEmpty = !value,
+        startsWithSlash = value.startsWith('/');
+
+    return {
+        get isValid() {
+            return !isEmpty && startsWithSlash;
+        },
+        handleErrorMessage(errorMessage) {
+            if (isEmpty) {
+                errorMessage.showEnterValueMessage();
+            } else if (!startsWithSlash) {
+                errorMessage.showStartWithSlashMessage();
+            } else {
+                errorMessage.clear();
+            }
+        },
+        get get() {
+            return value;
+        }
+    }
+}
+
 export function onDOMContentLoaded(){
     const view= buildView(),
         model = buildModel();
@@ -215,16 +239,14 @@ export function onDOMContentLoaded(){
     view.initialiseModel(model);
 
     view.onAddPrefixButtonClicked(prefix => {
-        const trimmedPrefix = prefix.trim();
+        const wrappedPrefix = wrapAndValidate(prefix);
 
-        if (trimmedPrefix) {
-            model.addPrefix(trimmedPrefix);
+        if (wrappedPrefix.isValid) {
+            model.addPrefix(wrappedPrefix.get);
             view.clearPrefix();
             view.render(model);
-            view.prefixErrorMessage.clear();
-        } else {
-            view.prefixErrorMessage.showEnterValueMessage();
         }
+        wrappedPrefix.handleErrorMessage(view.prefixErrorMessage);
     });
 
     view.onRemovePrefixLinkClicked(modelIndex => {
@@ -234,26 +256,17 @@ export function onDOMContentLoaded(){
 
     view.onAddMappingButtonClicked(mapping => {
         const {existing, replacement} = mapping,
-            trimmedExisting = existing.trim(),
-            trimmedReplacement = replacement.trim();
+            wrappedExisting = wrapAndValidate(existing),
+            wrappedReplacement = wrapAndValidate(replacement);
 
-        if (trimmedExisting && trimmedReplacement) {
-            model.addMapping({existing: trimmedExisting, replacement: trimmedReplacement});
+        if (wrappedExisting.isValid && wrappedReplacement.isValid) {
+            model.addMapping({existing: wrappedExisting.get, replacement: wrappedReplacement.get});
             view.clearMapping();
             view.render(model);
         }
 
-        if (trimmedExisting) {
-            view.mappingExistingErrorMessage.clear();
-        } else {
-            view.mappingExistingErrorMessage.showEnterValueMessage();
-        }
-
-        if (trimmedReplacement) {
-            view.mappingReplacementErrorMessage.clear();
-        } else {
-            view.mappingReplacementErrorMessage.showEnterValueMessage();
-        }
+        wrappedExisting.handleErrorMessage(view.mappingExistingErrorMessage);
+        wrappedReplacement.handleErrorMessage(view.mappingReplacementErrorMessage);
     });
 
     view.onRemoveMappingLinkClicked(modelIndex => {
