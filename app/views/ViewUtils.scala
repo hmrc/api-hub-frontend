@@ -56,4 +56,8 @@ object ViewUtils {
     }
   }
 
+  def addFormattingMarkup(messageText: String): Html = {
+    Html(messageText.replaceAll("__((?:(?!__).)+)__", "<strong>$1</strong>"))
+  }
+
 }
