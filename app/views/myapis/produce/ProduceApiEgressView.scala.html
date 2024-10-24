@@ -16,25 +16,74 @@
 
 @import models.user.UserModel
 @import models.myapis.produce.ProduceApiHowToCreate
+@import models.api.EgressGateway
 
 @this(
-    layout: templates.Layout,
-    formHelper: FormWithCSRF,
-    govukButton: GovukButton
+        layout: templates.Layout,
+        formHelper: FormWithCSRF,
+        govukButton: GovukButton,
+        govukErrorSummary: GovukErrorSummary,
+        govukSelect: GovukSelect,
+        govukRadios: GovukRadios
 )
 
-@(mode: Mode, userModel: UserModel)(implicit request: Request[?], messages: Messages)
+@(form: Form[?], mode: Mode, userModel: UserModel, guidesUrl: String, egressGateways: Seq[EgressGateway])(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = titleNoForm("Select the Egress for your API"), user = Some(userModel)) {
-    <h1 class="govuk-heading-l">Select the Egress for your API</h1>
-    @formHelper(action = controllers.myapis.produce.routes.ProduceApiEgressController.onSubmit(mode, "hods")) {
-        @govukButton(
-            ButtonViewModel(messages("site.continue"))
+@helpDocsUrlEgress = @{
+    s"$guidesUrl/documentation/how-do-i-produce.apis.html#deployment"
+}
+
+@helpDocsUrlEgressPrefix = @{
+    s"$guidesUrl/documentation/how-do-i-produce.apis.html#defining-an-egress-prefix"
+}
+
+@layout(pageTitle = title(form, messages("myApis.produce.selectegress.title")), user = Some(userModel)) {
+
+    @formHelper(action = controllers.myapis.produce.routes.ProduceApiEgressController.onSubmit(mode)) {
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form, preFormat = true))
+        }
+
+        <h1 class="govuk-heading-l">@messages("myApis.produce.selectegress.heading")</h1>
+
+        <p class="govuk-hint">
+            @messages("myApis.produce.selectegress.body")
+            <a href="@helpDocsUrlEgress" target="_blank">@messages("myApis.produce.selectegress.body.link")</a>
+        </p>
+
+        @govukSelect(
+            SelectViewModel(
+                field = form("selectEgress"),
+                items = Seq(SelectItemViewModel(
+                    value = "unassigned",
+                    text = "Select an egress"
+                )) ++ egressGateways.map(
+                    egressGateway =>
+                        SelectItemViewModel(
+                            value = egressGateway.id,
+                            text = egressGateway.friendlyName
+                        )
+                ),
+                label = LabelViewModel("")
+            )
         )
-    }
-    @formHelper(action = controllers.myapis.produce.routes.ProduceApiEgressController.onSubmit(mode, "prefixes")) {
-        @govukButton(
-            ButtonViewModel("Configure egress prefixes").asSecondaryButton()
+
+        <legend class="govuk-fieldset__legend govuk-fieldset__legend--s govuk-!-margin-top-5">
+            <h2 class="govuk-fieldset__heading">@messages("myApis.produce.selectegress.prefixes.body")</h2>
+        </legend>
+        <div class="govuk-hint">
+            @messages("myApis.produce.selectegress.prefixes.body.hint")
+            <a href="@helpDocsUrlEgressPrefix" target="_blank">@messages("myApis.produce.selectegress.prefixes.body.link")</a>
+        </div>
+
+        @govukRadios(
+            RadiosViewModel.yesNo(
+                field = form("egressPrefix"),
+                legend = LegendViewModel("")
+            )
         )
+
+        @govukButton(ButtonViewModel(messages("site.continue")))
     }
 }

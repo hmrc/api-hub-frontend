@@ -20,7 +20,7 @@ import com.google.inject.{Inject, Singleton}
 import config.FrontendAppConfig
 import models.UserEmail
 import models.accessrequest.{AccessRequest, AccessRequestCancelRequest, AccessRequestDecisionRequest, AccessRequestRequest, AccessRequestStatus}
-import models.api.{ApiDeploymentStatuses, ApiDetailSummary}
+import models.api.{ApiDeploymentStatuses, ApiDetailSummary, EgressGateway}
 import models.application.*
 import models.deployment.*
 import models.exception.{ApplicationCredentialLimitException, ApplicationsException, TeamNameNotUniqueException}
@@ -592,4 +592,10 @@ class ApplicationsConnector @Inject()(
     .map(invalidOasResponse => Future.successful(invalidOasResponse))
     .getOrElse(Future.failed(UpstreamErrorResponse("Bad request", response.status)))
 
+  def listEgressGateways()(implicit hc: HeaderCarrier): Future[Seq[EgressGateway]] = {
+    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/egress-gateways")
+      .setHeader(ACCEPT -> JSON)
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Seq[EgressGateway]]
+  }
 }
