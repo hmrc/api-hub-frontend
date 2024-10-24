@@ -25,6 +25,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
+import pages.myapis.produce.ProduceApiEgressPrefixesPage
 
 object ProduceApiEgressPrefixesSummary  {
 
