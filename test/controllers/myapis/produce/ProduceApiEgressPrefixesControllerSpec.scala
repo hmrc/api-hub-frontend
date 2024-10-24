@@ -17,6 +17,8 @@
 package controllers.myapis.produce
 
 import base.SpecBase
+import config.FrontendAppConfig
+import controllers.actions.FakeUser
 import controllers.routes
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
@@ -29,8 +31,12 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
+import forms.myapis.produce.ProduceApiEgressPrefixesFormProvider
+import pages.myapis.produce.ProduceApiEgressPrefixesPage
+import models.myapis.produce.ProduceApiEgressPrefixes
 
 import scala.concurrent.Future
+import views.html.myapis.produce.ProduceApiEgressPrefixesView
 
 class ProduceApiEgressPrefixesControllerSpec extends SpecBase with MockitoSugar {
 
@@ -38,15 +44,16 @@ class ProduceApiEgressPrefixesControllerSpec extends SpecBase with MockitoSugar 
 
   val formProvider = new ProduceApiEgressPrefixesFormProvider()
   val form = formProvider()
+  val user = FakeUser
 
-  lazy val produceApiEgressPrefixesRoute = routes.ProduceApiEgressPrefixesController.onPageLoad(NormalMode).url
+  lazy val produceApiEgressPrefixesRoute = controllers.myapis.produce.routes.ProduceApiEgressPrefixesController.onPageLoad(NormalMode).url
 
   val userAnswers = UserAnswers(
     userAnswersId,
     Json.obj(
       ProduceApiEgressPrefixesPage.toString -> Json.obj(
-        "prefixes" -> "value 1",
-        "mappings" -> "value 2"
+        "prefixes" -> Seq("/prefix"),
+        "mappings" -> Seq("/a->/b")
       )
     )
   )
@@ -61,11 +68,11 @@ class ProduceApiEgressPrefixesControllerSpec extends SpecBase with MockitoSugar 
         val request = FakeRequest(GET, produceApiEgressPrefixesRoute)
 
         val view = application.injector.instanceOf[ProduceApiEgressPrefixesView]
-
+        val config = application.injector.instanceOf[FrontendAppConfig]
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, user, config.helpDocsPath)(request, messages(application)).toString
       }
     }
 
@@ -77,11 +84,12 @@ class ProduceApiEgressPrefixesControllerSpec extends SpecBase with MockitoSugar 
         val request = FakeRequest(GET, produceApiEgressPrefixesRoute)
 
         val view = application.injector.instanceOf[ProduceApiEgressPrefixesView]
-
+        val config = application.injector.instanceOf[FrontendAppConfig]
+        val model = ProduceApiEgressPrefixes(Seq("/prefix"), Seq("/a->/b"))
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(ProduceApiEgressPrefixes("value 1", "value 2")), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(model), NormalMode, user, config.helpDocsPath)(request, messages(application)).toString
       }
     }
 
@@ -118,16 +126,16 @@ class ProduceApiEgressPrefixesControllerSpec extends SpecBase with MockitoSugar 
       running(application) {
         val request =
           FakeRequest(POST, produceApiEgressPrefixesRoute)
-            .withFormUrlEncodedBody(("value", "invalid value"))
+            .withFormUrlEncodedBody(("prefixes[]", "asdf"))
 
-        val boundForm = form.bind(Map("value" -> "invalid value"))
+        val boundForm = form.bindFromRequest(Map("prefixes[]" -> Seq("asdf")))
 
         val view = application.injector.instanceOf[ProduceApiEgressPrefixesView]
-
+        val config = application.injector.instanceOf[FrontendAppConfig]
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, user, config.helpDocsPath)(request, messages(application)).toString
       }
     }
 

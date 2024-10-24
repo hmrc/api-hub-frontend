@@ -39,7 +39,7 @@ case class ProduceApiEgressPrefixes(prefixes: Seq[String], mappings: Seq[String]
 object ProduceApiEgressPrefixes {
   implicit val format: Format[ProduceApiEgressPrefixes] = Json.format[ProduceApiEgressPrefixes]
   
-  private val mappingSeparator = "->" // see mappingSeparator in buildView() in produceApiEgressPrefixes.js 
+  val mappingSeparator = "->" // see mappingSeparator in buildView() in produceApiEgressPrefixes.js 
 
   def unapply(egressPrefixes: ProduceApiEgressPrefixes): Option[(Seq[String], Seq[String])] = Some((egressPrefixes.prefixes, egressPrefixes.mappings))
 }

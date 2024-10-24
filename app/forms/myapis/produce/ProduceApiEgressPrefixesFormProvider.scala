@@ -22,13 +22,21 @@ import play.api.data.{Form, Forms}
 import play.api.data.Forms.*
 
 import javax.inject.Inject
+import ProduceApiEgressPrefixes.mappingSeparator
 
 class ProduceApiEgressPrefixesFormProvider @Inject() extends Mappings {
 
    def apply(): Form[ProduceApiEgressPrefixes] = Form(
      mapping(
-      "prefixes" -> Forms.seq(text()),
-      "mappings" -> Forms.seq(text())
+      "prefixes" -> Forms.seq(text("produceApiEgressPrefix.prefixes.error.missing"))
+          .verifying("produceApiEgressPrefix.prefixes.error.startWithSlash", _.forall(_.startsWith("/")))
+          .transform(_.map(_.trim), identity),
+
+      "mappings" -> Forms.seq(text("produceApiEgressPrefix.mappings.error.missing"))
+          .verifying("produceApiEgressPrefix.mappings.error.separator", _.forall(_.split(mappingSeparator).length == 2))
+          .verifying("produceApiEgressPrefix.mappings.error.startWithSlash", _.flatMap(_.split(mappingSeparator)).forall(_.startsWith("/")))
+          .transform(_.map(_.trim), identity),
+
     )(ProduceApiEgressPrefixes.apply)(ProduceApiEgressPrefixes.unapply)
    )
  }

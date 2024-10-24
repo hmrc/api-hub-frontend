@@ -28,9 +28,10 @@ trait ModelGenerators {
   implicit lazy val arbitraryProduceApiEgressPrefixes: Arbitrary[ProduceApiEgressPrefixes] =
     Arbitrary {
       for {
-        prefixes <- arbitrary[String]
-        mappings <- arbitrary[String]
-      } yield ProduceApiEgressPrefixes(prefixes, mappings)
+        prefix <- Gen.asciiStr
+        mappingExisting <- Gen.asciiStr 
+        mappingReplacement <- Gen.asciiStr 
+      } yield ProduceApiEgressPrefixes(Seq(s"/$prefix"), Seq(s"/${mappingExisting}->/${mappingReplacement}"))
     }
 
   implicit lazy val arbitraryProduceApiDomain: Arbitrary[ProduceApiDomainSubdomain] =
