@@ -19,6 +19,8 @@ package viewmodels.myapis
 import base.SpecBase
 import controllers.actions.{FakeSupporter, FakeUser}
 import models.api.ApiDeploymentStatuses
+import models.api.ApiDeploymentStatus.*
+import models.application.{Primary, Secondary}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages
@@ -32,14 +34,17 @@ class MyApisNavItemsSpec extends SpecBase with Matchers with TableDrivenProperty
 
   "class MyApisNavItems" - {
 
-    val statuses = ApiDeploymentStatuses(Some("prod"), Some("qa"))
+    val statuses = ApiDeploymentStatuses(Seq(
+      Deployed(Primary, "1"),
+      Deployed(Secondary, "1")
+    ))
 
     "must return the correct list of nav items for a support user" in {
       val playApplication = applicationBuilder(None).build()
 
       running(playApplication) {
         implicit val implicitMessages: Messages = messages(playApplication)
-        val actual = MyApisNavItems(apiId, FakeSupporter, ProducerApiDetailsPage, Some(statuses))
+        val actual = MyApisNavItems(apiId, FakeSupporter, ProducerApiDetailsPage, statuses)
         val expected = Seq(producerApiDetailsPage(), updateApiPage(), changeOwningTeamPage(), viewApiAsConsumerPage(), apiUsagePage())
 
         actual mustBe expected
@@ -51,7 +56,7 @@ class MyApisNavItemsSpec extends SpecBase with Matchers with TableDrivenProperty
       
       running(playApplication) {
         implicit val implicitMessages: Messages = messages(playApplication)
-        val actual = MyApisNavItems(apiId, FakeUser, ProducerApiDetailsPage, Some(statuses))
+        val actual = MyApisNavItems(apiId, FakeUser, ProducerApiDetailsPage, statuses)
         val expected = Seq(producerApiDetailsPage(), updateApiPage(), changeOwningTeamPage(), viewApiAsConsumerPage())
 
         actual mustBe expected
@@ -63,7 +68,7 @@ class MyApisNavItemsSpec extends SpecBase with Matchers with TableDrivenProperty
 
       running(playApplication) {
         implicit val implicitMessages: Messages = messages(playApplication)
-        val actual = MyApisNavItems(apiId, FakeUser, ProducerApiDetailsPage, Some(ApiDeploymentStatuses(None,None)))
+        val actual = MyApisNavItems(apiId, FakeUser, ProducerApiDetailsPage, ApiDeploymentStatuses(Seq(NotDeployed(Primary), NotDeployed(Secondary))))
         val expected = Seq(producerApiDetailsPage(), changeOwningTeamPage(), viewApiAsConsumerPage())
 
         actual mustBe expected
@@ -86,7 +91,7 @@ class MyApisNavItemsSpec extends SpecBase with Matchers with TableDrivenProperty
 
         forAll(pages) {
           page =>
-            val actual = MyApisNavItems(apiId, FakeSupporter, page, Some(statuses))
+            val actual = MyApisNavItems(apiId, FakeSupporter, page, statuses)
               .filter(_.isCurrentPage)
               .map(_.page)
 

@@ -83,7 +83,7 @@ class ApiHubService @Inject()(
     integrationCatalogueConnector.getApiDetail(id)
   }
 
-  def getApiDeploymentStatuses(publisherReference: String)(implicit hc: HeaderCarrier): Future[Option[ApiDeploymentStatuses]] = {
+  def getApiDeploymentStatuses(publisherReference: String)(implicit hc: HeaderCarrier): Future[ApiDeploymentStatuses] = {
     applicationsConnector.getApiDeploymentStatuses(publisherReference)
   }
 

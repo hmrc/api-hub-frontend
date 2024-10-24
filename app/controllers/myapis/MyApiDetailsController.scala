@@ -16,6 +16,7 @@
 
 package controllers.myapis
 
+import cats.implicits.toTraverseOps
 import com.google.inject.{Inject, Singleton}
 import config.FrontendAppConfig
 import controllers.actions.{ApiAuthActionProvider, IdentifierAction}
@@ -41,13 +42,9 @@ class MyApiDetailsController @Inject()(
   def onPageLoad(id: String): Action[AnyContent] = (identify andThen apiAuth(id)) async {
     implicit request => for {
       deploymentStatuses <- apiHubService.getApiDeploymentStatuses(request.apiDetails.publisherReference)
-      team <- deploymentStatuses.flatMap(_ => request.apiDetails.teamId.map(apiHubService.findTeamById)).getOrElse(Future.successful(None))
-    } yield deploymentStatuses match {
-      case Some(deploymentStatuses) =>
-        Ok(view(request.apiDetails, deploymentStatuses, request.identifierRequest.user, config.supportEmailAddress, team.map(_.name)))
-      case None =>
-        errorResultBuilder.internalServerError(s"Unable to retrieve deployment statuses for API ${request.apiDetails.publisherReference}")
-    }
+      team <- request.apiDetails.teamId.flatTraverse(apiHubService.findTeamById)
+    } yield
+      Ok(view(request.apiDetails, deploymentStatuses, request.identifierRequest.user, config.supportEmailAddress, team.map(_.name)))
   }
 
 }
