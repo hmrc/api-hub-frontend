@@ -10,12 +10,22 @@ function buildView() {
         elReplacementInput = document.getElementById('replacement'),
         elMappingsTable = document.getElementById('mappingsTable'),
         elMappingsTableBody = elMappingsTable.querySelector('tbody'),
-        elFormFields = document.getElementById('formFields');
+        elFormFields = document.getElementById('formFields'),
+        elPrefixErrorMessage = document.createElement('p'),
+        elMappingExistingErrorMessage = document.createElement('p'),
+        elMappingReplacementErrorMessage = document.createElement('p'),
+        errorMessageEnterValue = elFormFields.dataset.messageEnterValue,
+        errorMessageStartWithSlash = elFormFields.dataset.messageForwardSlash;
+
 
     let onAddPrefixButtonClicked = noop,
         onAddMappingButtonClicked = noop,
         onRemovePrefixLinkClicked = noop,
         onRemoveMappingLinkClicked = noop;
+
+    elPrefixErrorMessage.classList.add('govuk-error-message');
+    elMappingExistingErrorMessage.classList.add('govuk-error-message');
+    elMappingReplacementErrorMessage.classList.add('govuk-error-message');
 
     elAddPrefixButton.addEventListener('click', () => {
         onAddPrefixButtonClicked(elPrefixInput.value);
@@ -91,6 +101,31 @@ function buildView() {
         return elField;
     }
 
+    function setErrorMessage(elInput, elErrorMessage, error) {
+        const elParent = elInput.parentElement;
+        if (error) {
+            elParent.insertBefore(elErrorMessage, elInput.nextSibling);
+        } else if (elParent.contains(elErrorMessage)) {
+            elParent.removeChild(elErrorMessage);
+        }
+        elErrorMessage.textContent = error;
+        elInput.classList.toggle('govuk-input--error', !! error);
+    }
+
+    function errorMessage(elInput, elErrorMessage) {
+        return {
+            clear() {
+                setErrorMessage(elInput, elErrorMessage);
+            },
+            showEnterValueMessage() {
+                setErrorMessage(elInput, elErrorMessage, errorMessageEnterValue);
+            },
+            showStartWithSlashMessage() {
+                setErrorMessage(elInput, elErrorMessage, errorMessageStartWithSlash);
+            }
+        };
+    }
+
     return {
         onAddPrefixButtonClicked(handler) {
             onAddPrefixButtonClicked = handler;
@@ -111,6 +146,16 @@ function buildView() {
             elExistingInput.value = '';
             elReplacementInput.value = '';
         },
+        initialiseModel(model) {
+            elFormFields.querySelectorAll('input[name=prefixes]').forEach(el => model.addPrefix(el.value));
+            elFormFields.querySelectorAll('input[name=mappings]').forEach(el => {
+                const [existing, replacement] = el.value.split('->');
+                model.addMapping({existing, replacement});
+            });
+        },
+        prefixErrorMessage : errorMessage(elPrefixInput, elPrefixErrorMessage),
+        mappingExistingErrorMessage : errorMessage(elExistingInput, elMappingExistingErrorMessage),
+        mappingReplacementErrorMessage : errorMessage(elReplacementInput, elMappingReplacementErrorMessage),
         render(model) {
             elFormFields.innerHTML = '';
 
@@ -167,6 +212,8 @@ export function onDOMContentLoaded(){
     const view= buildView(),
         model = buildModel();
 
+    view.initialiseModel(model);
+
     view.onAddPrefixButtonClicked(prefix => {
         const trimmedPrefix = prefix.trim();
 
@@ -174,6 +221,9 @@ export function onDOMContentLoaded(){
             model.addPrefix(trimmedPrefix);
             view.clearPrefix();
             view.render(model);
+            view.prefixErrorMessage.clear();
+        } else {
+            view.prefixErrorMessage.showEnterValueMessage();
         }
     });
 
@@ -192,7 +242,19 @@ export function onDOMContentLoaded(){
             view.clearMapping();
             view.render(model);
         }
-    })
+
+        if (trimmedExisting) {
+            view.mappingExistingErrorMessage.clear();
+        } else {
+            view.mappingExistingErrorMessage.showEnterValueMessage();
+        }
+
+        if (trimmedReplacement) {
+            view.mappingReplacementErrorMessage.clear();
+        } else {
+            view.mappingReplacementErrorMessage.showEnterValueMessage();
+        }
+    });
 
     view.onRemoveMappingLinkClicked(modelIndex => {
         model.removeMappingByIndex(modelIndex);
@@ -200,7 +262,6 @@ export function onDOMContentLoaded(){
     });
 
     view.render(model);
-
 }
 
 if (typeof window !== 'undefined') {

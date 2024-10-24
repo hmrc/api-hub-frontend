@@ -28,7 +28,7 @@ class ProduceApiEgressPrefixesFormProvider @Inject() extends Mappings {
    def apply(): Form[ProduceApiEgressPrefixes] = Form(
      mapping(
       "prefixes" -> Forms.seq(text()),
-      "mappings" -> Forms.seq(text()),
-    )(ProduceApiEgressPrefixes.apply)(ProduceApiEgressPrefixes.unapply) 
+      "mappings" -> Forms.seq(text())
+    )(ProduceApiEgressPrefixes.apply)(ProduceApiEgressPrefixes.unapply)
    )
  }
