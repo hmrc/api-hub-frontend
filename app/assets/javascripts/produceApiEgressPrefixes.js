@@ -48,7 +48,7 @@ function buildView() {
         elParentRow.appendChild(elCell);
         return elCell;
     }
-    function buildRemoveLink(modelIndex) {
+    function buildRemoveLink() {
         const elLink = document.createElement('a');
         elLink.classList.add('hip-js-link');
         elLink.textContent = 'Remove';
@@ -229,7 +229,7 @@ function wrapAndValidate(rawValue) {
         get get() {
             return value;
         }
-    }
+    };
 }
 
 export function onDOMContentLoaded(){
