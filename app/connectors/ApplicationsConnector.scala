@@ -593,7 +593,7 @@ class ApplicationsConnector @Inject()(
     .getOrElse(Future.failed(UpstreamErrorResponse("Bad request", response.status)))
 
   def listEgressGateways()(implicit hc: HeaderCarrier): Future[Seq[EgressGateway]] = {
-    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/egress-gateways")
+    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/egresses/gateways")
       .setHeader(ACCEPT -> JSON)
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Seq[EgressGateway]]
