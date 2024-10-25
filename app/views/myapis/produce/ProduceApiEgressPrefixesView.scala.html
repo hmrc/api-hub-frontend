@@ -15,19 +15,193 @@
  *@
 
 @import models.user.UserModel
-@import models.myapis.produce.ProduceApiHowToCreate
+@import views.html.helper.CSPNonce
+@import views.ViewUtils
+@import models.myapis.produce.ProduceApiEgressPrefixes
 
 @this(
-    layout: templates.Layout,
-    formHelper: FormWithCSRF,
-    govukButton: GovukButton
+        layout: templates.Layout,
+        formHelper: FormWithCSRF,
+        govukButton: GovukButton,
+        newTabLink: components.NewTabLink,
+        govukDetails: GovukDetails,
+        govukInput: GovukInput,
+        govukFieldset : GovukFieldset,
+        govukTable: GovukTable,
+        govukErrorSummary: GovukErrorSummary,
 )
 
-@(mode: Mode, userModel: UserModel)(implicit request: Request[?], messages: Messages)
+@(form: Form[ProduceApiEgressPrefixes], mode: Mode, userModel: UserModel, apiHubGuideUrl: String)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = titleNoForm("Configure Egress prefixes"), user = Some(userModel)) {
+@scripts() = {
+    <script src='@routes.Assets.versioned("javascripts/produceApiEgressPrefixes.js")' type="module" @{CSPNonce.attr}></script>
+}
+
+@exampleConfigContent() = {
+    <div class="hip-example-config">
+        <p class="govuk-body">
+            @messages("produceApiEgressPrefix.examples.1")
+        </p>
+
+        <code class="code--header">@messages("produceApiEgressPrefix.examples.2")</code>
+
+        <p class="govuk-body">
+            @ViewUtils.addFormattingMarkup(messages("produceApiEgressPrefix.examples.3"))
+        </p>
+
+        <code class="code--header">@messages("produceApiEgressPrefix.examples.4")</code>
+
+        <p class="govuk-body">
+            @ViewUtils.addFormattingMarkup(messages("produceApiEgressPrefix.examples.5"))
+        </p>
+
+        <p class="govuk-body">
+            @ViewUtils.addFormattingMarkup(messages("produceApiEgressPrefix.examples.6"))
+        </p>
+
+        <p class="govuk-body">
+            @messages("produceApiEgressPrefix.examples.7")
+        </p>
+
+        <code class="code--header">@messages("produceApiEgressPrefix.examples.8")</code>
+
+        <p class="govuk-body">
+            @messages("produceApiEgressPrefix.examples.9")
+        </p>
+
+        <p class="govuk-body">
+            @messages("produceApiEgressPrefix.examples.10")
+        </p>
+
+        <p class="govuk-body">
+            @messages("produceApiEgressPrefix.examples.11")
+        </p>
+    </div>
+}
+
+@prefixesSection() = {
+    <p class="govuk-body">
+        @messages("produceApiEgressPrefix.prefixes.guidance")
+    </p>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-half">
+            @govukInput(
+                InputViewModel(
+                    field = form("prefix"),
+                    label = LabelViewModel(messages("produceApiEgressPrefix.prefixes.label")).withCssClass("govuk-label--s"),
+                ).withCssClass("govuk-input--width-20").withId("prefix")
+            )
+        </div>
+        <div class="govuk-grid-column-one-half govuk-!-padding-top-6">
+            @govukButton(
+                ButtonViewModel(messages("produceApiEgressPrefix.prefixes.button")).withId("addPrefix").asSecondaryButton()
+            )
+        </div>
+    </div>
+
+    @govukTable(Table(
+        head = Some(Seq(
+            HeadCell(Text(messages("produceApiEgressPrefix.prefixes.table.header1"))),
+            HeadCell(Text(messages("produceApiEgressPrefix.prefixes.table.header2")))
+        )),
+        rows = Seq(
+            Seq(
+                TableRow(Text("1")),
+                TableRow(Text("2")),
+            )
+        ),
+        attributes = Map("id" -> "prefixesTable")
+    ))
+}
+
+@mappingsSection() = {
+    <p class="govuk-body">
+        @messages("produceApiEgressPrefix.mappings.guidance")
+    </p>
+
+    @govukInput(
+        InputViewModel(
+            field = form("mappingExisting"),
+            label = LabelViewModel(messages("produceApiEgressPrefix.mappings.existing.label")).withCssClass("govuk-label--s"),
+        ).withCssClass("govuk-input--width-20").withId("existing")
+    )
+
+    @govukInput(
+        InputViewModel(
+            field = form("mappingReplacement"),
+            label = LabelViewModel(messages("produceApiEgressPrefix.mappings.replacement.label")).withCssClass("govuk-label--s"),
+        ).withCssClass("govuk-input--width-20").withId("replacement")
+    )
+
+    @govukButton(
+        ButtonViewModel(messages("produceApiEgressPrefix.mappings.button")).withId("addMapping").asSecondaryButton()
+    )
+
+    @govukTable(Table(
+        head = Some(Seq(
+            HeadCell(Text(messages("produceApiEgressPrefix.mappings.table.header1"))),
+            HeadCell(Text(messages("produceApiEgressPrefix.mappings.table.header2"))),
+            HeadCell(Text(messages("produceApiEgressPrefix.mappings.table.header3"))),
+        )),
+        rows = Seq(
+            Seq(
+                TableRow(Text("1")),
+                TableRow(Text("2")),
+                TableRow(Text("3")),
+            )
+        ),
+        attributes = Map("id" -> "mappingsTable")
+    ))
+}
+
+@layout(pageTitle = title(form, messages("produceApiEgressPrefix.title")), user = Some(userModel), customScriptsBlock = Some(scripts())) {
+    @if(form.errors.nonEmpty) {
+        @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))
+    }
+
+    <h1 class="govuk-heading-l">@messages("produceApiEgressPrefix.heading")</h1>
+
+    <p class="govuk-body">
+    @Html(messages("produceApiEgressPrefix.hint.guidance",
+        newTabLink(apiHubGuideUrl + "/documentation/how-do-i-produce.apis.html#defining-an-egress-prefix", messages("produceApiEgressPrefix.hint.link"))))
+    </p>
+
+    @govukDetails(Details(
+        summary = Text(messages("produceApiEgressPrefix.examples.title")),
+        content = HtmlContent(exampleConfigContent())
+    ))
+
+    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+
+    @govukFieldset(Fieldset(
+        legend = Some(Legend(
+            content = Text(messages("produceApiEgressPrefix.prefixes.heading")),
+            classes = "govuk-heading-m"
+        )),
+        html = prefixesSection()
+    ))
+
+    @govukFieldset(Fieldset(
+        legend = Some(Legend(
+            content = Text(messages("produceApiEgressPrefix.mappings.heading")),
+            classes = "govuk-heading-m"
+        )),
+        html = mappingsSection()
+    ).withCssClass("govuk-!-margin-top-4 govuk-!-margin-bottom-4"))
+
     @formHelper(action = controllers.myapis.produce.routes.ProduceApiEgressPrefixesController.onSubmit(mode)) {
-        <h1 class="govuk-heading-l">Configure Egress prefixes</h1>
+        <div id="formFields" data-message-enter-value="@messages("error.required")" data-message-forward-slash="@messages("produceApiEgressPrefix.error.startWithSlash")">
+            @for(previousValue <- form.value) {
+                @for(prefix <- previousValue.prefixes) {
+                    <input type="hidden" name="prefixes" value="@prefix">
+                }
+                @for(mapping <- previousValue.mappings) {
+                    <input type="hidden" name="mappings" value="@mapping">
+                }
+            }
+        </div>
+
         @govukButton(
             ButtonViewModel(messages("site.continue"))
         )

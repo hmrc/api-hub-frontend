@@ -16,28 +16,58 @@
 
 package controllers.myapis.produce
 
+import config.FrontendAppConfig
 import controllers.actions.*
 import models.Mode
-import play.api.data.Form
+import navigation.Navigator
+import pages.myapis.produce.ProduceApiEgressPrefixesPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.ProduceApiSessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.myapis.produce.ProduceApiEgressPrefixesView
+import forms.myapis.produce.ProduceApiEgressPrefixesFormProvider
+import scala.concurrent.Future
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class ProduceApiEgressPrefixesController @Inject()(
                                                     override val messagesApi: MessagesApi,
+                                                    produceApiSessionRepository: ProduceApiSessionRepository,
+                                                    navigator: Navigator,
                                                     identify: IdentifierAction,
+                                                    getData: ProduceApiDataRetrievalAction,
+                                                    requireData: DataRequiredAction,
+                                                    formProvider: ProduceApiEgressPrefixesFormProvider,
                                                     val controllerComponents: MessagesControllerComponents,
-                                                    view: ProduceApiEgressPrefixesView
+                                                    view: ProduceApiEgressPrefixesView,
+                                                    config: FrontendAppConfig
                                                   )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = identify {
-    implicit request => Ok(view(mode, request.user))
+  val form = formProvider()
+
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+    implicit request =>
+
+      val preparedForm = request.userAnswers.get(ProduceApiEgressPrefixesPage) match {
+        case None => form
+        case Some(value) => form.fill(value)
+      }
+
+      Ok(view(preparedForm, mode, request.user, config.helpDocsPath))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = identify {
-    implicit request => Redirect(routes.ProduceApiHodController.onPageLoad(mode))
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request =>
+      form.bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, mode, request.user, config.helpDocsPath))),
+
+        value =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(ProduceApiEgressPrefixesPage, value))
+            _              <- produceApiSessionRepository.set(updatedAnswers)
+          } yield Redirect(navigator.nextPage(ProduceApiEgressPrefixesPage, mode, updatedAnswers))
+      )
   }
 }

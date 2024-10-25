@@ -25,6 +25,15 @@ import viewmodels.admin.Decision.{Approve, Reject}
 
 trait ModelGenerators {
 
+  implicit lazy val arbitraryProduceApiEgressPrefixes: Arbitrary[ProduceApiEgressPrefixes] =
+    Arbitrary {
+      for {
+        prefix <- Gen.asciiStr
+        mappingExisting <- Gen.asciiStr 
+        mappingReplacement <- Gen.asciiStr 
+      } yield ProduceApiEgressPrefixes(Seq(s"/$prefix"), Seq(s"/${mappingExisting}->/${mappingReplacement}"))
+    }
+
   implicit lazy val arbitraryProduceApiDomain: Arbitrary[ProduceApiDomainSubdomain] =
     Arbitrary {
       for {
