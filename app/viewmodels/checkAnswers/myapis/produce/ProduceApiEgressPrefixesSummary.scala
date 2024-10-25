@@ -33,14 +33,14 @@ object ProduceApiEgressPrefixesSummary  {
     answers.get(ProduceApiEgressPrefixesPage).map {
       answer =>
 
-      val value = HtmlFormat.escape(answer.prefixes.mkString(",")).toString + "<br/>" + HtmlFormat.escape(answer.mappings.mkString(",")).toString //TODO make this better
+      val value = HtmlFormat.escape(answer.prefixes.mkString(",")).toString + "<br/>" + HtmlFormat.escape(answer.getMappings.map(_.toString).mkString(",")).toString
 
         SummaryListRowViewModel(
-          key     = "produceApiEgressPrefixes.checkYourAnswersLabel",
+          key     = "produceApiEgressPrefix.checkYourAnswersLabel",
           value   = ValueViewModel(HtmlContent(value)),
           actions = Seq(
             ActionItemViewModel("site.change", controllers.myapis.produce.routes.ProduceApiEgressPrefixesController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("produceApiEgressPrefixes.change.hidden")) //TODO: Add this message to messages file
+              .withVisuallyHiddenText(messages("produceApiEgressPrefix.change.hidden"))
           )
         )
     }

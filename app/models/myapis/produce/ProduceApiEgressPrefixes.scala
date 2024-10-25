@@ -19,7 +19,9 @@ package models.myapis.produce
 import models.myapis.produce.ProduceApiEgressPrefixes
 import play.api.libs.json.*
 
-case class ProduceApiEgressPrefixMapping(existing: String, replacement: String)
+case class ProduceApiEgressPrefixMapping(existing: String, replacement: String) {
+  override def toString: String = s"$existing${ProduceApiEgressPrefixes.mappingSeparator}$replacement"
+}
 
 object ProduceApiEgressPrefixMapping {
   implicit val format: Format[ProduceApiEgressPrefixMapping] = Json.format[ProduceApiEgressPrefixMapping]

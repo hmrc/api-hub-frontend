@@ -36,6 +36,14 @@ class ProduceApiEgressPrefixesFormProviderSpec extends StringFieldBehaviours {
       result.value.value mustBe ProduceApiEgressPrefixes(prefixes, Seq())
     }
 
+    "must trim values" in {
+      val untrimmedPrefixes = Seq(" /valid1 ", "   /valid2", "/valid3   ")
+      val trimmedPrefixes = Seq("/valid1", "/valid2", "/valid3")
+      val result = form.bindFromRequest(Map(fieldName -> untrimmedPrefixes))
+      result.errors must be(empty)
+      result.value.value mustBe ProduceApiEgressPrefixes(trimmedPrefixes, Seq())
+    }
+
     "must fail if any prefix values are empty" in {
       val prefixes = Seq("/valid1", "", "/valid3")
       val result = form.bindFromRequest(Map(fieldName -> prefixes))
@@ -62,6 +70,14 @@ class ProduceApiEgressPrefixesFormProviderSpec extends StringFieldBehaviours {
       result.value.value mustBe ProduceApiEgressPrefixes(Seq(), mappings)
     }
 
+    "must trim values" in {
+      val untrimmedMappings = Seq(" /a->/b ", "/aa->/bb   ", "   /a/b->/b/c")
+      val trimmedMappings = Seq("/a->/b", "/aa->/bb", "/a/b->/b/c")
+      val result = form.bindFromRequest(Map(fieldName -> untrimmedMappings))
+      result.errors must be(empty)
+      result.value.value mustBe ProduceApiEgressPrefixes(Seq(), trimmedMappings)
+    }
+
     "must fail if any mapping values are empty" in {
       val mappings = Seq("/a->/b", "", "/a/b->/b/c")
       val result = form.bindFromRequest(Map(fieldName -> mappings))
@@ -81,13 +97,13 @@ class ProduceApiEgressPrefixesFormProviderSpec extends StringFieldBehaviours {
     }
 
     "must fail if the first part of any mapping value doesnt start with a slash" in {
-      val mappings = Seq("/a->/b", "/aa->bb", "/a/b->/b/c")
+      val mappings = Seq("/a->/b", "aa->/bb", "/a/b->/b/c")
       val result = form.bindFromRequest(Map(fieldName -> mappings))
       result.errors must contain(FormError("mappings", startWithSlashKey))
     }
 
     "must fail if the second part of any mapping value doesnt start with a slash" in {
-      val mappings = Seq("/a->/b", "aa->/bb", "/a/b->/b/c")
+      val mappings = Seq("/a->/b", "/aa->bb", "/a/b->/b/c")
       val result = form.bindFromRequest(Map(fieldName -> mappings))
       result.errors must contain(FormError("mappings", startWithSlashKey))
     }

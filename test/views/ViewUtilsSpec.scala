@@ -18,10 +18,11 @@ package views
 
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
+import org.scalatest.prop.TableDrivenPropertyChecks
 
 import java.time.{LocalDateTime, ZoneOffset}
 
-class ViewUtilsSpec extends AnyFreeSpec with Matchers {
+class ViewUtilsSpec extends AnyFreeSpec with Matchers with TableDrivenPropertyChecks {
 
   "formatLocalDateTimeContainingUtc" - {
     "must return a date/time in the correct format for GMT time" in {
@@ -60,6 +61,25 @@ class ViewUtilsSpec extends AnyFreeSpec with Matchers {
 
       val actual = ViewUtils.formatInstantAsUtc(instant)
       actual mustBe expected
+    }
+  }
+  
+  "addFormattingMarkup" - {
+    "must return a string with the correct HTML markup" in {
+      val testCases = Table(
+        ("message text", "expected HTML"),
+        ("", ""),
+        ("text", "text"),
+        ("some _text_", "some _text_"),
+        ("some __text__", "some <strong>text</strong>"),
+        ("some ____", "some ____"),
+        ("some __text", "some __text"),
+        ("some __text__ with __multiple__ __bold__ words", "some <strong>text</strong> with <strong>multiple</strong> <strong>bold</strong> words"),
+      )
+
+      forAll(testCases) { (messageText: String, expectedHtml: String) =>
+        ViewUtils.addFormattingMarkup(messageText).toString mustBe expectedHtml
+      }
     }
   }
 }

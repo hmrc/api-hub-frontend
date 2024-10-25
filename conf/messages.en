@@ -974,3 +974,5 @@ produceApiEgressPrefix.error.startWithSlash = Value must start with a ''/''
 produceApiEgressPrefix.mappings.error.missing = Mapping values must not be empty
 produceApiEgressPrefix.mappings.error.startWithSlash = Mapping values must begin with a ''/''
 produceApiEgressPrefix.mappings.error.separator = Invalid mapping value
+produceApiEgressPrefix.change.hidden = ProduceApiEgressPrefix
+produceApiEgressPrefix.checkYourAnswersLabel = Egress prefixes to remove or change

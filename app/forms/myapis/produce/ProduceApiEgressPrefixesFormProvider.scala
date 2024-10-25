@@ -29,13 +29,13 @@ class ProduceApiEgressPrefixesFormProvider @Inject() extends Mappings {
    def apply(): Form[ProduceApiEgressPrefixes] = Form(
      mapping(
       "prefixes" -> Forms.seq(text("produceApiEgressPrefix.prefixes.error.missing"))
-          .verifying("produceApiEgressPrefix.prefixes.error.startWithSlash", _.forall(_.startsWith("/")))
-          .transform(_.map(_.trim), identity),
+          .transform(_.map(_.trim), identity)
+          .verifying("produceApiEgressPrefix.prefixes.error.startWithSlash", _.forall(_.startsWith("/"))),
 
       "mappings" -> Forms.seq(text("produceApiEgressPrefix.mappings.error.missing"))
+          .transform(_.map(_.trim), identity)
           .verifying("produceApiEgressPrefix.mappings.error.separator", _.forall(_.split(mappingSeparator).length == 2))
           .verifying("produceApiEgressPrefix.mappings.error.startWithSlash", _.flatMap(_.split(mappingSeparator)).forall(_.startsWith("/")))
-          .transform(_.map(_.trim), identity),
 
     )(ProduceApiEgressPrefixes.apply)(ProduceApiEgressPrefixes.unapply)
    )
