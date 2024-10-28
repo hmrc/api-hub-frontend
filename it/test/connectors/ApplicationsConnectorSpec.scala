@@ -1084,11 +1084,11 @@ class ApplicationsConnectorSpec
       ))
       val response = s"""{
         |"statuses": [{
-        | "_type": "package.Deployed",
+        | "_type": "Deployed",
         | "environmentName": "primary",
         | "version": "1.0"
         |},{
-        | "_type": "package.Deployed",
+        | "_type": "Deployed",
         | "environmentName": "secondary",
         | "version": "1.0"
         |}]

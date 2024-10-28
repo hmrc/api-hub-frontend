@@ -83,7 +83,10 @@ class MyApiDetailsControllerSpec
 
   "must return OK and the correct view for a support user not on the api team" in {
     val fixture = buildFixture(FakeSupporter)
-    val apiDetail = sampleApiDetail()
+    val teamId = "team-id"
+    val teamName = "team name"
+    val apiTeam = Team(teamId, teamName, LocalDateTime.now(), List.empty)
+    val apiDetail = sampleApiDetail().copy(teamId = Some(teamId))
     val deploymentStatuses = ApiDeploymentStatuses(Seq(
       Deployed(Primary, "1.0"),
       NotDeployed(Secondary)
@@ -95,6 +98,8 @@ class MyApiDetailsControllerSpec
 
       when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any))
         .thenReturn(Future.successful(Some(apiDetail)))
+      when(fixture.apiHubService.findTeamById(any)(any))
+        .thenReturn(Future.successful(Some(apiTeam)))
       when(fixture.apiHubService.getApiDeploymentStatuses(eqTo(apiDetail.publisherReference))(any))
         .thenReturn(Future.successful(deploymentStatuses))
 
@@ -103,7 +108,7 @@ class MyApiDetailsControllerSpec
 
       status(result) mustBe OK
       contentAsString(result) mustBe view(apiDetail, deploymentStatuses, FakeSupporter,
-        config.supportEmailAddress, None)(request, messages(fixture.application)).toString()
+        config.supportEmailAddress, Some(apiTeam.name))(request, messages(fixture.application)).toString()
       contentAsString(result) must validateAsHtml
     }
   }

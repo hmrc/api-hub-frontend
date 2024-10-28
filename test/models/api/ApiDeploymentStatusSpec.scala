@@ -31,10 +31,10 @@ class ApiDeploymentStatusSpec extends AnyFreeSpec with Matchers {
           |{
           |  "environmentName": "primary",
           |  "version": "1",
-          |  "_type": "uk.gov.hmrc.apihubapplications.models.requests.DeploymentStatus.Deployed"
+          |  "_type": "Deployed"
           |}
           |""".stripMargin
-      val expected = Deployed(Primary, "1")
+      val expected: ApiDeploymentStatus = Deployed(Primary, "1")
 
       val deployed = Json.parse(json).as[ApiDeploymentStatus]
 
@@ -46,7 +46,7 @@ class ApiDeploymentStatusSpec extends AnyFreeSpec with Matchers {
         """
           |{
           |  "environmentName": "primary",
-          |  "_type": "uk.gov.hmrc.apihubapplications.models.requests.DeploymentStatus.NotDeployed"
+          |  "_type": "NotDeployed"
           |}
           |""".stripMargin
       val expected = NotDeployed(Primary)
@@ -61,7 +61,7 @@ class ApiDeploymentStatusSpec extends AnyFreeSpec with Matchers {
         """
           |{
           |  "environmentName": "primary",
-          |  "_type": "uk.gov.hmrc.apihubapplications.models.requests.DeploymentStatus.Unknown"
+          |  "_type": "Unknown"
           |}
           |""".stripMargin
       val expected = Unknown(Primary)

@@ -21,11 +21,12 @@ import com.google.inject.{Inject, Singleton}
 import config.FrontendAppConfig
 import controllers.actions.{ApiAuthActionProvider, IdentifierAction}
 import controllers.helpers.ErrorResultBuilder
-import play.api.i18n.I18nSupport
+import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.myapis.MyApiDetailsView
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -42,9 +43,10 @@ class MyApiDetailsController @Inject()(
   def onPageLoad(id: String): Action[AnyContent] = (identify andThen apiAuth(id)) async {
     implicit request => for {
       deploymentStatuses <- apiHubService.getApiDeploymentStatuses(request.apiDetails.publisherReference)
-      team <- request.apiDetails.teamId.flatTraverse(apiHubService.findTeamById)
+      maybeTeam <- request.apiDetails.teamId.fold(Future.successful(None))(apiHubService.findTeamById)
+      teamName = maybeTeam.map(_.name).orElse(Some(Messages("apiDetails.details.team.error")))
     } yield
-      Ok(view(request.apiDetails, deploymentStatuses, request.identifierRequest.user, config.supportEmailAddress, team.map(_.name)))
+      Ok(view(request.apiDetails, deploymentStatuses, request.identifierRequest.user, config.supportEmailAddress, teamName))
   }
 
 }

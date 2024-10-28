@@ -34,23 +34,14 @@ object ApiDeploymentStatus {
 
   case class Unknown(override val environmentName: EnvironmentName) extends ApiDeploymentStatus
 
-  implicit val readDeploymentStatus: Reads[ApiDeploymentStatus] =
-    ((__ \ "_type").read[String]
-      ~ (__ \ "environmentName").read[EnvironmentName]
-      ~ (__ \ "version").readNullable[String]
-    )(deserialize.apply)
 
-  private def deserialize(_type: String,
-                          environmentName: EnvironmentName,
-                          maybeVersion: Option[String]
-                         ): ApiDeploymentStatus =
-    (_type, maybeVersion) match {
-      case (t, Some(version)) if t.contains(Deployed.getClass.getSimpleName.replace("$", "")) =>
-        Deployed(environmentName, version)
-      case (t, _) if t.contains(NotDeployed.getClass.getSimpleName.replace("$", "")) =>
-        NotDeployed(environmentName)
-      case _ => Unknown(environmentName)
-    }
+  private implicit val jsonConfiguration: JsonConfiguration =
+    JsonConfiguration(typeNaming = JsonNaming { fullName => fullName.split('.').last })
+
+  implicit val formatDeployed: Format[Deployed] = Json.format[Deployed]
+  implicit val formatNotDeployed: Format[NotDeployed] = Json.format[NotDeployed]
+  implicit val formatUnknown: Format[Unknown] = Json.format[Unknown]
+  implicit val formatDeploymentStatus: Format[ApiDeploymentStatus] = Json.format[ApiDeploymentStatus]
 
 }
 
