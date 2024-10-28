@@ -1,6 +1,6 @@
 import {buildPaginator} from './paginationController.js';
 import {buildDomainFilters} from "./exploreApisDomainFilters.js";
-import {buildStatusFilters} from "./exploreApisStatusFilters.js";
+// import {buildStatusFilters} from "./exploreApisStatusFilters.js";
 import {buildHodsFilters} from "./exploreApisHodsFilters.js";
 import {buildPlatformFilters} from "./exploreApisPlatformFilters.js";
 import {buildModel} from "./exploreApisModel.js";
@@ -11,7 +11,7 @@ import {buildSearchResultPanel, buildFilterResultPanel} from "./exploreApisResul
 export function onPageShow() {
     const filters = [
             buildDomainFilters(),
-            buildStatusFilters(),
+            // buildStatusFilters(),
             buildHodsFilters(),
             buildPlatformFilters()
         ];

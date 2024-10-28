@@ -257,22 +257,22 @@
                     <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible hip-color-override govuk-!-margin-top-1">
                 </fieldset>
 
-                <fieldset id="statusFilters" class="govuk-fieldset">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
-                        <h2 class="govuk-fieldset__heading">
-                            @messages("exploreApis.filter.byStatus")
-                        </h2>
-                    </legend>
-                    @govukDetails(Details(
-                        id = Some("viewStatusFilters"),
-                        classes = "govuk-!-margin-bottom-1",
-                        summary = Text(messages("exploreApis.filter.byStatus.view")),
-                        content = HtmlContent(statusFilters())
-                    ))
-                    <div class="govuk-body hip-filter-selection-count">
-                        <strong id="statusFilterCount">0</strong> @messages("exploreApis.filter.selected")
-                    </div>
-                </fieldset>
+@*                <fieldset id="statusFilters" class="govuk-fieldset">*@
+@*                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">*@
+@*                        <h2 class="govuk-fieldset__heading">*@
+@*                            @messages("exploreApis.filter.byStatus")*@
+@*                        </h2>*@
+@*                    </legend>*@
+@*                    @govukDetails(Details(*@
+@*                        id = Some("viewStatusFilters"),*@
+@*                        classes = "govuk-!-margin-bottom-1",*@
+@*                        summary = Text(messages("exploreApis.filter.byStatus.view")),*@
+@*                        content = HtmlContent(statusFilters())*@
+@*                    ))*@
+@*                    <div class="govuk-body hip-filter-selection-count">*@
+@*                        <strong id="statusFilterCount">0</strong> @messages("exploreApis.filter.selected")*@
+@*                    </div>*@
+@*                </fieldset>*@
             </div>
         </div>
         <div class="govuk-grid-column-two-thirds">

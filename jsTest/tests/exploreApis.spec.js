@@ -48,15 +48,15 @@ describe('exploreApis', () => {
                 <div id="hodFilterCount"></div>
             </fieldset>
             
-            <fieldset id="statusFilters">
-                <details id="viewStatusFilters">
-                    <div><input class="govuk-checkboxes__input statusFilter" type="checkbox" value="ALPHA"></div>
-                    <div><input class="govuk-checkboxes__input statusFilter" type="checkbox" value="BETA"></div>
-                    <div><input class="govuk-checkboxes__input statusFilter" type="checkbox" value="LIVE"></div>
-                    <div><input class="govuk-checkboxes__input statusFilter" type="checkbox" value="DEPRECATED"></div>                
-                </details>
-                <div id="statusFilterCount"></div>
-            </fieldset>
+<!--            <fieldset id="statusFilters">-->
+<!--                <details id="viewStatusFilters">-->
+<!--                    <div><input class="govuk-checkboxes__input statusFilter" type="checkbox" value="ALPHA"></div>-->
+<!--                    <div><input class="govuk-checkboxes__input statusFilter" type="checkbox" value="BETA"></div>-->
+<!--                    <div><input class="govuk-checkboxes__input statusFilter" type="checkbox" value="LIVE"></div>-->
+<!--                    <div><input class="govuk-checkboxes__input statusFilter" type="checkbox" value="DEPRECATED"></div>                -->
+<!--                </details>-->
+<!--                <div id="statusFilterCount"></div>-->
+<!--            </fieldset>-->
             
             <span id="apiResultsSize"></span>
             
@@ -256,9 +256,9 @@ describe('exploreApis', () => {
     function hodFilters() {
         return document.getElementById('hodFilters');
     }
-    function statusFilters() {
-        return document.getElementById('statusFilters');
-    }
+    // function statusFilters() {
+    //     return document.getElementById('statusFilters');
+    // }
 
     describe("when page first loads", () => {
         describe("and no inputs have any values", () => {
@@ -286,7 +286,7 @@ describe('exploreApis', () => {
                 expect(hodCheckboxes().every(isVisible)).toBe(true);
                 expect(hodCheckboxes().every(el => !el.checked)).toBe(true);
             });
-            it("status filter state is correct", () => {
+            xit("status filter state is correct", () => {
                 expect(statusFilterView().open).toBe(false);
                 expect(statusFilterCount().textContent).toBe('0');
                 expect(statusCheckboxes().every(isVisible)).toBe(true);
@@ -335,7 +335,7 @@ describe('exploreApis', () => {
 
                 expect(getAttributeValuesForAllVisiblePanels('hods')).toEqual(new Set(['ems', 'ems,internal,apim']));
             });
-            it("status filter", () => {
+            xit("status filter", () => {
                 statusCheckboxes().filter(el => el.value === 'ALPHA')[0].click();
                 onPageShow();
 
@@ -423,18 +423,18 @@ describe('exploreApis', () => {
             hodCheckboxes().filter(el => el.value === 'ems')[0].click();
             expect(getAttributeValuesForAllVisiblePanels('hods')).toEqual(new Set(['ems', 'ems,internal,apim']));
         });
-        it("when a status filter is applied then the results are filtered correctly", () => {
+        xit("when a status filter is applied then the results are filtered correctly", () => {
             statusCheckboxes().filter(el => el.value === 'ALPHA')[0].click();
             expect(getAttributeValuesForAllVisiblePanels('apistatus')).toEqual(new Set(['ALPHA']));
         });
         it("when multiple filters are applied then the results are filtered correctly", () => {
             platformFilterSelfServe().click();
             domainCheckboxes().filter(el => el.value === 'd1')[0].click();
-            statusCheckboxes().filter(el => el.value === 'ALPHA')[0].click();
+            // statusCheckboxes().filter(el => el.value === 'ALPHA')[0].click();
 
             expect(getAttributeValuesForAllVisiblePanels('platform')).toEqual(new Set(['hip']));
             expect(getAttributeValuesForAllVisiblePanels('domain')).toEqual(new Set(['d1']));
-            expect(getAttributeValuesForAllVisiblePanels('apistatus')).toEqual(new Set(['ALPHA']));
+            // expect(getAttributeValuesForAllVisiblePanels('apistatus')).toEqual(new Set(['ALPHA']));
         });
         it("when the filters are cleared then the results are updated correctly", () => {
             platformFilterSelfServe().click();
@@ -468,7 +468,7 @@ describe('exploreApis', () => {
             expect(platformCheckboxes().every(el => el.disabled)).toBe(true);
             expect(domainAndSubdomainCheckboxes().every(el => el.disabled)).toBe(true);
             expect(hodCheckboxes().every(el => el.disabled)).toBe(true);
-            expect(statusCheckboxes().every(el => el.disabled)).toBe(true);
+            // expect(statusCheckboxes().every(el => el.disabled)).toBe(true);
         });
         it("the api results should be cleared", () => {
             runSearch('abc');
@@ -508,7 +508,7 @@ describe('exploreApis', () => {
                 platformFilterNonSelfServe().click();
                 domainCheckboxes().forEach(el => el.checked = true);
                 hodCheckboxes().forEach(el => el.checked = true);
-                statusCheckboxes().forEach(el => el.checked = true);
+                // statusCheckboxes().forEach(el => el.checked = true);
             });
             async function search(searchResults = ['2', '1']) {
                 setSearchResults(searchResults);
@@ -520,21 +520,21 @@ describe('exploreApis', () => {
                 expect(platformCheckboxes().every(el => !el.disabled)).toBe(true);
                 expect(domainAndSubdomainCheckboxes().every(el => !el.disabled)).toBe(true);
                 expect(hodCheckboxes().every(el => !el.disabled)).toBe(true);
-                expect(statusCheckboxes().every(el => !el.disabled)).toBe(true);
+                // expect(statusCheckboxes().every(el => !el.disabled)).toBe(true);
             });
             it("the filters should be cleared", async () => {
                 await search();
                 expect(platformFilterNonSelfServe().checked).toBe(false);
                 expect(domainAndSubdomainCheckboxes().every(el => !el.checked)).toBe(true);
                 expect(hodCheckboxes().every(el => !el.checked)).toBe(true);
-                expect(statusCheckboxes().every(el => !el.checked)).toBe(true);
+                // expect(statusCheckboxes().every(el => !el.checked)).toBe(true);
             });
             it("the filter should be repopulated so that they match only the apis returned by the search", async () => {
                 await search();
                 expect(new Set(platformCheckboxes().filter(el => isVisible(el.parentElement) && !el.dataset.selfserve).map(el => el.value))).toEqual(new Set(['sdes', 'digi']));
                 expect(new Set(domainAndSubdomainCheckboxes().filter(el => isVisible(el.parentElement)).map(el => el.value))).toEqual(new Set(['d1', 'd1s2', 'd1s3']));
                 expect(new Set(hodCheckboxes().filter(el => isVisible(el.parentElement)).map(el => el.value))).toEqual(new Set(['ems', 'internal']));
-                expect(new Set(statusCheckboxes().filter(el => isVisible(el.parentElement)).map(el => el.value))).toEqual(new Set(['BETA', 'LIVE']));
+                // expect(new Set(statusCheckboxes().filter(el => isVisible(el.parentElement)).map(el => el.value))).toEqual(new Set(['BETA', 'LIVE']));
             });
             it("only apis that matched the search are displayed, in the correct order", async () => {
                 const searchResults = ['99', '6', '11', '80', '42', '43', '10', '65', '77', '33', '30', '1', '2', '3', '50', '51', '52'];
@@ -566,7 +566,7 @@ describe('exploreApis', () => {
                 expect(isVisible(viewPlatformFilters())).toBe(false);
                 expect(isVisible(domainFilters())).toBe(false);
                 expect(isVisible(hodFilters())).toBe(false);
-                expect(isVisible(statusFilters())).toBe(false);
+                // expect(isVisible(statusFilters())).toBe(false);
             });
             it("the result count is zero", () => {
                 expect(getApiResultSize().textContent).toBe('(0)');
@@ -589,7 +589,7 @@ describe('exploreApis', () => {
                 expect(isVisible(viewPlatformFilters())).toBe(false);
                 expect(isVisible(domainFilters())).toBe(false);
                 expect(isVisible(hodFilters())).toBe(false);
-                expect(isVisible(statusFilters())).toBe(false);
+                // expect(isVisible(statusFilters())).toBe(false);
             });
             it("a result count of 0 is displayed", () => {
                 expect(getApiResultSize().textContent).toBe('(0)');
@@ -622,7 +622,7 @@ describe('exploreApis', () => {
             expect(platformCheckboxes().every(el => isVisible(el.parentElement))).toBe(true);
             expect(domainAndSubdomainCheckboxes().every(el => isVisible(el.parentElement))).toBe(true);
             expect(hodCheckboxes().every(el => isVisible(el.parentElement))).toBe(true);
-            expect(statusCheckboxes().every(el => isVisible(el.parentElement))).toBe(true);
+            // expect(statusCheckboxes().every(el => isVisible(el.parentElement))).toBe(true);
         });
     });
 
