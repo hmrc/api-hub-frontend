@@ -1652,6 +1652,27 @@ class ApplicationsConnectorSpec
       }
     }
   }
+
+  "listEgressGateways" - {
+    "must place the correct request and return a Seq[EgressGateway]" in {
+      val egressGateways = sampleEgressGateways()
+
+      stubFor(
+        get(urlEqualTo("/api-hub-applications/egress/gateways"))
+          .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withBody(Json.toJson(egressGateways).toString())
+          )
+      )
+
+      buildConnector(this).listApisInProduction()(HeaderCarrier()).map {
+        result =>
+          result mustBe egressGateways
+      }
+    }
+  }
 }
 
 object ApplicationsConnectorSpec extends HttpClientV2Support {

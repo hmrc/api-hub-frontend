@@ -16,6 +16,7 @@
 
 package generators
 
+import models.api.EgressGateway
 import models.application.TeamMember
 import models.team.Team
 import org.scalacheck.rng.Seed

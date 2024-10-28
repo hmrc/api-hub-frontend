@@ -1,0 +1,161 @@
+/*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package controllers.myapis.produce
+
+import base.SpecBase
+import controllers.actions.FakeUser
+import forms.myapis.produce.{ProduceApiChooseEgressFormProvider, ProduceApiChooseTeamFormProvider}
+import generators.{EgressGenerator, TeamGenerator}
+import models.myapis.produce.ProduceApiChooseEgress
+import models.{NormalMode, UserAnswers}
+import navigation.{FakeNavigator, Navigator}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.{verify, when}
+import org.scalatestplus.mockito.MockitoSugar
+import pages.myapis.produce.{ProduceApiChooseEgressPage, ProduceApiChooseTeamPage}
+import play.api.Application as PlayApplication
+import play.api.inject.bind
+import play.api.mvc.Call
+import play.api.test.FakeRequest
+import play.api.test.Helpers.*
+import repositories.ProduceApiSessionRepository
+import services.ApiHubService
+import utils.HtmlValidation
+import views.html.ErrorTemplate
+import views.html.myapis.produce.{ProduceApiChooseTeamView, ProduceApiEgressView}
+
+import scala.concurrent.Future
+
+class ProduceApiChooseEgressControllerSpec extends SpecBase with MockitoSugar with EgressGenerator with HtmlValidation {
+
+  private def onwardRouteYes = Call("GET", "/integration-hub/my-apis/produce/egress-prefixes")
+  private def onwardRouteNo = Call("GET", "/integration-hub/my-apis/produce/hod")
+
+
+  private val formProvider = new ProduceApiChooseEgressFormProvider()
+  private val form = formProvider()
+
+  private lazy val produceApiChooseEgressRoute = controllers.myapis.produce.routes.ProduceApiEgressController.onPageLoad(NormalMode).url
+
+  "ProduceApiChooseEgress Controller" - {
+
+    "must return OK and the correct view for a GET" in {
+
+      val egressGateways = sampleEgressGateways()
+      val fixture = buildFixture(userAnswers = Some(emptyUserAnswers))
+      when(fixture.apiHubService.listEgressGateways()(any)).thenReturn(Future.successful(egressGateways))
+
+      running(fixture.application) {
+        val request = FakeRequest(GET, produceApiChooseEgressRoute)
+
+        val result = route(fixture.application, request).value
+
+        val view = fixture.application.injector.instanceOf[ProduceApiEgressView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form, NormalMode, FakeUser, "http://localhost:8490/guides/integration-hub-guide", egressGateways )(request, messages(fixture.application)).toString
+        contentAsString(result) must validateAsHtml
+      }
+    }
+
+    "must populate the view correctly on a GET when the questions have been previously answered" in {
+
+      val egressGateways = sampleEgressGateways()
+
+      val chooseEgress = ProduceApiChooseEgress(Some(egressGateways.head.id), "yes")
+      val userAnswers = UserAnswers(userAnswersId).set(ProduceApiChooseEgressPage, chooseEgress).success.value
+
+      val fixture = buildFixture(userAnswers = Some(userAnswers))
+      when(fixture.apiHubService.listEgressGateways()(any)).thenReturn(Future.successful(egressGateways))
+
+      running(fixture.application) {
+        val request = FakeRequest(GET, produceApiChooseEgressRoute)
+
+        val view = fixture.application.injector.instanceOf[ProduceApiEgressView]
+
+        val result = route(fixture.application, request).value
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form.fill(chooseEgress), NormalMode, FakeUser, "http://localhost:8490/guides/integration-hub-guide", egressGateways)(request, messages(fixture.application)).toString
+        contentAsString(result) must validateAsHtml
+      }
+    }
+
+    "must redirect to the correct next page when valid data is submitted with a yes" in {
+      val egressGateways = sampleEgressGateways()
+
+      val fixture = buildFixture(userAnswers = Some(emptyUserAnswers))
+      when(fixture.sessionRepository.set(any())).thenReturn(Future.successful(true))
+
+      when(fixture.apiHubService.listEgressGateways()(any)).thenReturn(Future.successful(egressGateways))
+
+      running(fixture.application) {
+        val request =
+          FakeRequest(POST, produceApiChooseEgressRoute)
+            .withFormUrlEncodedBody(("selectEgress", egressGateways.head.id),("egressPrefix", "yes"))
+
+        val result = route(fixture.application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRouteYes.url
+      }
+    }
+  }
+
+  "must redirect to the correct next page when valid data is submitted with a no" in {
+    val egressGateways = sampleEgressGateways()
+
+    val fixture = buildFixture(userAnswers = Some(emptyUserAnswers), onwardRoute = onwardRouteNo)
+    when(fixture.sessionRepository.set(any())).thenReturn(Future.successful(true))
+
+    when(fixture.apiHubService.listEgressGateways()(any)).thenReturn(Future.successful(egressGateways))
+
+    running(fixture.application) {
+      val request =
+        FakeRequest(POST, produceApiChooseEgressRoute)
+          .withFormUrlEncodedBody(("selectEgress", egressGateways.head.id), ("egressPrefix", "no"))
+
+      val result = route(fixture.application, request).value
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual onwardRouteNo.url
+    }
+  }
+
+
+  private case class Fixture(
+                              application: PlayApplication,
+                              apiHubService: ApiHubService,
+                              sessionRepository: ProduceApiSessionRepository
+                            )
+
+  private def buildFixture(userAnswers: Option[UserAnswers], onwardRoute: Call = onwardRouteYes): Fixture = {
+    val apiHubService = mock[ApiHubService]
+    val sessionRepository = mock[ProduceApiSessionRepository]
+
+    val playApplication = applicationBuilder(userAnswers)
+      .overrides(
+        bind[ApiHubService].toInstance(apiHubService),
+        bind[ProduceApiSessionRepository].toInstance(sessionRepository),
+        bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
+      )
+      .build()
+
+    Fixture(playApplication, apiHubService, sessionRepository)
+  }
+
+}

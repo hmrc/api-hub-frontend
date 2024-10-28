@@ -37,27 +37,25 @@
     s"$guidesUrl/documentation/how-do-i-produce.apis.html#defining-an-egress-prefix"
 }
 
+@egressHint= {
+    @messages("myApis.produce.selectegress.body")
+    <a href="@helpDocsUrlEgress" target="_blank">@messages("myApis.produce.selectegress.body.link")</a>
+}
+
 @layout(pageTitle = title(form, messages("myApis.produce.selectegress.title")), user = Some(userModel)) {
 
     @formHelper(action = controllers.myapis.produce.routes.ProduceApiEgressController.onSubmit(mode)) {
 
         @if(form.errors.nonEmpty) {
-            @govukErrorSummary(ErrorSummaryViewModel(form, preFormat = true))
+            @govukErrorSummary(ErrorSummaryViewModel(form))
         }
-
-        <h1 class="govuk-heading-l">@messages("myApis.produce.selectegress.heading")</h1>
-
-        <p class="govuk-hint">
-            @messages("myApis.produce.selectegress.body")
-            <a href="@helpDocsUrlEgress" target="_blank">@messages("myApis.produce.selectegress.body.link")</a>
-        </p>
 
         @govukSelect(
             SelectViewModel(
                 field = form("selectEgress"),
                 items = Seq(SelectItemViewModel(
                     value = "unassigned",
-                    text = "Select an egress"
+                    text = "Select an egress",
                 )) ++ egressGateways.map(
                     egressGateway =>
                         SelectItemViewModel(
@@ -65,13 +63,13 @@
                             text = egressGateway.friendlyName
                         )
                 ),
-                label = LabelViewModel("")
-            )
+                label = LabelViewModel(HtmlContent(messages("myApis.produce.selectegress.heading"))).asPageHeading()
+            ).withHint(Hint(content = HtmlContent(egressHint)))
         )
 
-        <legend class="govuk-fieldset__legend govuk-fieldset__legend--s govuk-!-margin-top-5">
+        <div class="govuk-fieldset__legend govuk-fieldset__legend--s govuk-!-margin-top-5">
             <h2 class="govuk-fieldset__heading">@messages("myApis.produce.selectegress.prefixes.body")</h2>
-        </legend>
+        </div>
         <div class="govuk-hint">
             @messages("myApis.produce.selectegress.prefixes.body.hint")
             <a href="@helpDocsUrlEgressPrefix" target="_blank">@messages("myApis.produce.selectegress.prefixes.body.link")</a>
