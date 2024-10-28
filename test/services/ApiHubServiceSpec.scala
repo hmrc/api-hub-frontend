@@ -834,9 +834,9 @@ class ApiHubServiceSpec
         val fixture = buildFixture()
 
         val egressGateways = sampleEgressGateways()
-        when(fixture.applicationsConnector.listApisInProduction()(any)).thenReturn(Future.successful(egressGateways))
+        when(fixture.applicationsConnector.listEgressGateways()(any)).thenReturn(Future.successful(egressGateways))
 
-        fixture.service.listApisInProduction()(HeaderCarrier()).map {
+        fixture.service.listEgressGateways()(HeaderCarrier()).map {
           result =>
             result mustBe egressGateways
         }
