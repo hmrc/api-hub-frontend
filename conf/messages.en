@@ -750,6 +750,7 @@ myApis.produce.selectegress.prefixes.body = Do you want to configure prefixes fo
 myApis.produce.selectegress.prefixes.body.hint = If you need to add a common prefix to all paths within the OAS specification, or if you need to map values in your path answer yes.
 myApis.produce.selectegress.prefixes.body.link = Guidance for Egress prefixes.
 myApis.produce.selectegress.error.required = You must select an egress for your API
+myApis.produce.selectegress.unassigned = Select an egress
 myApis.produce.egressprefix.error.required = You must state whether you wish to configure path prefixes for your API
 applicationDetailsTable.applicationName = Name
 applicationDetailsTable.owningTeam = Owning team

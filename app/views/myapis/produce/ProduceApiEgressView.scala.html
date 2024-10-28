@@ -53,10 +53,10 @@
         @govukSelect(
             SelectViewModel(
                 field = form("selectEgress"),
-                items = Seq(SelectItemViewModel(
+                items = SelectItemViewModel(
                     value = "unassigned",
-                    text = "Select an egress",
-                )) ++ egressGateways.map(
+                    text = messages("myApis.produce.selectegress.unassigned")
+                ) +: egressGateways.map(
                     egressGateway =>
                         SelectItemViewModel(
                             value = egressGateway.id,
