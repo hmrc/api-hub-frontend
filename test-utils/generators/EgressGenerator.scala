@@ -25,7 +25,7 @@ trait EgressGenerator {
   private val maxSensibleStringSize = 50
   private val parameters = Gen.Parameters.default
 
-  private def sensiblySizedAlphaNumStr: Gen[String] = Gen.resize(maxSensibleStringSize, Gen.alphaNumStr)
+  private def sensiblySizedAlphaNumStr: Gen[String] = Gen.resize(maxSensibleStringSize, Gen.alphaNumStr).suchThat(_.nonEmpty)
   
   private def genEgressGateway: Gen[EgressGateway] = Gen.sized { _ =>
     for {
