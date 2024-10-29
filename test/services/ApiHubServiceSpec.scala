@@ -23,6 +23,7 @@ import models.AvailableEndpoint
 import models.accessrequest.*
 import models.api.ApiDetailLensesSpec.sampleApiDetailSummary
 import models.api.{ApiDeploymentStatuses, ContactInfo, EndpointMethod, PlatformContact}
+import models.api.ApiDeploymentStatus.*
 import models.application.ApplicationLenses.*
 import models.application.*
 import models.deployment.{DeploymentDetails, EgressMapping}
@@ -30,7 +31,7 @@ import models.requests.{AddApiRequest, AddApiRequestEndpoint}
 import models.stats.ApisInProductionStatistic
 import models.team.{NewTeam, Team}
 import models.user.UserContactDetails
-import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, verifyNoInteractions, when}
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -234,16 +235,19 @@ class ApiHubServiceSpec
   "getApiDeploymentStatuses" - {
     "must call the applications connector and return the API detail" in {
       val publisherReference = "ref123"
-      val expected = ApiDeploymentStatuses(Some("1.0"), None)
+      val expected = ApiDeploymentStatuses(Seq(
+        Deployed(Primary, "1"),
+        Deployed(Secondary, "1")
+      ))
 
       val fixture = buildFixture()
 
       when(fixture.applicationsConnector.getApiDeploymentStatuses(eqTo(publisherReference))(any()))
-        .thenReturn(Future.successful(Some(expected)))
+        .thenReturn(Future.successful(expected))
 
       fixture.service.getApiDeploymentStatuses(publisherReference)(HeaderCarrier()) map {
         actual =>
-          actual mustBe Some(expected)
+          actual mustBe expected
       }
     }
   }

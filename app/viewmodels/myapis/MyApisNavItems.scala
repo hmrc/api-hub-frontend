@@ -35,7 +35,7 @@ object MyApisNavItems {
 
   import MyApisNavPages._
 
-  def apply(apiId: String, user: UserModel, currentPage: SideNavPage, maybeApiDeploymentStatuses: Option[ApiDeploymentStatuses])(implicit messages: Messages): Seq[SideNavItem] = {
+  def apply(apiId: String, user: UserModel, currentPage: SideNavPage, apiDeploymentStatuses: ApiDeploymentStatuses)(implicit messages: Messages): Seq[SideNavItem] = {
     Seq(
       SideNavItem(
         page = ProducerApiDetailsPage,
@@ -43,7 +43,7 @@ object MyApisNavItems {
         link = controllers.myapis.routes.MyApiDetailsController.onPageLoad(apiId),
         isCurrentPage = currentPage == ProducerApiDetailsPage
       )) ++ (
-        if (maybeApiDeploymentStatuses.isDefined && maybeApiDeploymentStatuses.get.isDeployed) {
+        if (apiDeploymentStatuses.isDeployed) {
           Some(SideNavItem(
             page = UpdateApiPage,
             title = messages("myApis.update.title"),

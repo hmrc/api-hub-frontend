@@ -21,7 +21,9 @@ import config.FrontendAppConfig
 import controllers.actions.{FakeSupporter, FakeUser}
 import controllers.routes
 import generators.ApiDetailGenerators
+import models.api.ApiDeploymentStatus.{Deployed, NotDeployed}
 import models.api.ApiDeploymentStatuses
+import models.application.{Primary, Secondary}
 import models.team.Team
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
@@ -51,7 +53,10 @@ class MyApiDetailsControllerSpec
     val teamName = "teamName"
     val apiTeam = Team(teamId, teamName, LocalDateTime.now(), List.empty)
     val apiDetail = sampleApiDetail().copy(teamId = Some(apiTeam.id))
-    val deploymentStatuses = ApiDeploymentStatuses(Some("1.0"), None)
+    val deploymentStatuses = ApiDeploymentStatuses(Seq(
+      Deployed(Primary, "1.0"),
+      NotDeployed(Secondary)
+    ))
 
     running(fixture.application) {
       val view = fixture.application.injector.instanceOf[MyApiDetailsView]
@@ -64,7 +69,7 @@ class MyApiDetailsControllerSpec
       when(fixture.apiHubService.findTeamById(eqTo(teamId))(any))
         .thenReturn(Future.successful(Some(apiTeam)))
       when(fixture.apiHubService.getApiDeploymentStatuses(eqTo(apiDetail.publisherReference))(any))
-        .thenReturn(Future.successful(Some(deploymentStatuses)))
+        .thenReturn(Future.successful(deploymentStatuses))
 
       val request = FakeRequest(GET, controllers.myapis.routes.MyApiDetailsController.onPageLoad(apiDetail.id).url)
       val result = route(fixture.application, request).value
@@ -78,8 +83,14 @@ class MyApiDetailsControllerSpec
 
   "must return OK and the correct view for a support user not on the api team" in {
     val fixture = buildFixture(FakeSupporter)
-    val apiDetail = sampleApiDetail()
-    val deploymentStatuses = ApiDeploymentStatuses(Some("1.0"), None)
+    val teamId = "team-id"
+    val teamName = "team name"
+    val apiTeam = Team(teamId, teamName, LocalDateTime.now(), List.empty)
+    val apiDetail = sampleApiDetail().copy(teamId = Some(teamId))
+    val deploymentStatuses = ApiDeploymentStatuses(Seq(
+      Deployed(Primary, "1.0"),
+      NotDeployed(Secondary)
+    ))
 
     running(fixture.application) {
       val view = fixture.application.injector.instanceOf[MyApiDetailsView]
@@ -87,15 +98,17 @@ class MyApiDetailsControllerSpec
 
       when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any))
         .thenReturn(Future.successful(Some(apiDetail)))
+      when(fixture.apiHubService.findTeamById(any)(any))
+        .thenReturn(Future.successful(Some(apiTeam)))
       when(fixture.apiHubService.getApiDeploymentStatuses(eqTo(apiDetail.publisherReference))(any))
-        .thenReturn(Future.successful(Some(deploymentStatuses)))
+        .thenReturn(Future.successful(deploymentStatuses))
 
       val request = FakeRequest(GET, controllers.myapis.routes.MyApiDetailsController.onPageLoad(apiDetail.id).url)
       val result = route(fixture.application, request).value
 
       status(result) mustBe OK
       contentAsString(result) mustBe view(apiDetail, deploymentStatuses, FakeSupporter,
-        config.supportEmailAddress, None)(request, messages(fixture.application)).toString()
+        config.supportEmailAddress, Some(apiTeam.name))(request, messages(fixture.application)).toString()
       contentAsString(result) must validateAsHtml
     }
   }
@@ -137,36 +150,6 @@ class MyApiDetailsControllerSpec
         "API not found",
         s"Cannot find an API with ID $missingApiId.")(request, messages(fixture.application)).toString()
       contentAsString(result) must validateAsHtml
-    }
-  }
-
-  "must display error page when api deployments cannot be retrieved" in {
-    val fixture = buildFixture()
-    val apiTeam = Team("teamId", "teamName", LocalDateTime.now(), List.empty)
-    val apiDetail = sampleApiDetail().copy(teamId = Some(apiTeam.id))
-
-    running(fixture.application) {
-      val view = fixture.application.injector.instanceOf[ErrorTemplate]
-
-      when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any))
-        .thenReturn(Future.successful(Some(apiDetail)))
-      when(fixture.apiHubService.findTeams(eqTo(Some(FakeUser.email)))(any))
-        .thenReturn(Future.successful(List(apiTeam)))
-      when(fixture.apiHubService.getApiDeploymentStatuses(eqTo(apiDetail.publisherReference))(any))
-        .thenReturn(Future.successful(None))
-
-      val request = FakeRequest(GET, controllers.myapis.routes.MyApiDetailsController.onPageLoad(apiDetail.id).url)
-      val result = route(fixture.application, request).value
-
-      status(result) mustBe INTERNAL_SERVER_ERROR
-      contentAsString(result) mustBe view.apply(
-          pageTitle = "Sorry, there is a problem with the service - 500",
-          heading = "Sorry, there is a problem with the service",
-          message = "Try again later."
-        )(request, messages(fixture.application))
-        .toString()
-      contentAsString(result) must validateAsHtml
-      verify(fixture.apiHubService, never).findTeamById(any)(any)
     }
   }
 

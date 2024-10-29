@@ -33,7 +33,7 @@
 }
 
 @layout(pageTitle = titleNoForm(messages("myApis.details.title")), user = Some(user), fullWidth = true) {
-    @views.html.templates.SideNav(apiDetail.title, MyApisNavItems(apiDetail.id, user, MyApisNavPages.ProducerApiDetailsPage, Some(deploymentStatuses))) {
+    @views.html.templates.SideNav(apiDetail.title, MyApisNavItems(apiDetail.id, user, MyApisNavPages.ProducerApiDetailsPage, deploymentStatuses)) {
         <h1 id="details" class="govuk-heading-l">@messages("myApis.details.title")</h1>
 
         @govukSummaryList(SummaryList(

@@ -20,7 +20,9 @@ import base.SpecBase
 import controllers.actions.{ApiAuthActionProvider, FakeApiAuthActions, FakeApiDetail}
 import controllers.routes
 import forms.myapis.UpdateApiTeamFormProvider
-import models.application.TeamMember
+import models.application.{Primary, Secondary, TeamMember}
+import models.api.ApiDeploymentStatuses
+import models.api.ApiDeploymentStatus.*
 import models.team.Team
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
@@ -39,7 +41,6 @@ import views.html.myapis.{UpdateApiTeamSuccessView, UpdateApiTeamView}
 import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import models.api.ApiDeploymentStatuses
 
 class UpdateApiTeamControllerSpec
   extends SpecBase
@@ -61,8 +62,11 @@ class UpdateApiTeamControllerSpec
         val fixture = buildFixture(user)
         when(fixture.apiAuthActionProvider.apply(any)(any)).thenReturn(successfulApiAuthAction(FakeApiDetail))
         when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(allTeams))
-        val statuses = ApiDeploymentStatuses(Some("prod"), Some("qa"))
-        when(fixture.apiHubService.getApiDeploymentStatuses(any)(any)).thenReturn(Future.successful(Some(statuses)))
+        val statuses = ApiDeploymentStatuses(Seq(
+          Deployed(Primary, "1"),
+          Deployed(Secondary, "1")
+        ))
+        when(fixture.apiHubService.getApiDeploymentStatuses(any)(any)).thenReturn(Future.successful(statuses))
         
         running(fixture.playApplication) {
           val request = FakeRequest(controllers.myapis.routes.UpdateApiTeamController.onPageLoad(FakeApiDetail.id))
@@ -70,7 +74,7 @@ class UpdateApiTeamControllerSpec
           val view = fixture.playApplication.injector.instanceOf[UpdateApiTeamView]
 
           status(result) mustBe OK
-          contentAsString(result) mustBe view(form, FakeApiDetail, None, allTeams, user, Some(statuses))(request, messages(fixture.playApplication)).toString()
+          contentAsString(result) mustBe view(form, FakeApiDetail, None, allTeams, user, statuses)(request, messages(fixture.playApplication)).toString()
           contentAsString(result) must validateAsHtml
           contentAsString(result) must include("Select which team owns this API")
         }
@@ -89,8 +93,11 @@ class UpdateApiTeamControllerSpec
         val fixture = buildFixture(user)
         when(fixture.apiAuthActionProvider.apply(any)(any)).thenReturn(successfulApiAuthAction(FakeApiDetail))
         when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(unorderedTeams))
-        val statuses = ApiDeploymentStatuses(Some("prod"), Some("qa"))
-        when(fixture.apiHubService.getApiDeploymentStatuses(any)(any)).thenReturn(Future.successful(Some(statuses)))
+        val statuses = ApiDeploymentStatuses(Seq(
+          Deployed(Primary, "1"),
+          Deployed(Secondary, "1")
+        ))
+        when(fixture.apiHubService.getApiDeploymentStatuses(any)(any)).thenReturn(Future.successful(statuses))
         
         running(fixture.playApplication) {
           val request = FakeRequest(controllers.myapis.routes.UpdateApiTeamController.onPageLoad(FakeApiDetail.id))
@@ -98,7 +105,7 @@ class UpdateApiTeamControllerSpec
           val view = fixture.playApplication.injector.instanceOf[UpdateApiTeamView]
 
           status(result) mustBe OK
-          contentAsString(result) mustBe view(form, FakeApiDetail, None, orderedTeams, user, Some(statuses))(request, messages(fixture.playApplication)).toString()
+          contentAsString(result) mustBe view(form, FakeApiDetail, None, orderedTeams, user, statuses)(request, messages(fixture.playApplication)).toString()
           contentAsString(result) must validateAsHtml
           contentAsString(result) must include("Select which team owns this API")
         }
@@ -110,8 +117,11 @@ class UpdateApiTeamControllerSpec
         val fixture = buildFixture(user)
         when(fixture.apiAuthActionProvider.apply(any)(any)).thenReturn(successfulApiAuthAction(FakeApiDetail))
         when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(allTeams))
-        val statuses = ApiDeploymentStatuses(Some("prod"), Some("qa"))
-        when(fixture.apiHubService.getApiDeploymentStatuses(any)(any)).thenReturn(Future.successful(Some(statuses)))
+        val statuses = ApiDeploymentStatuses(Seq(
+          Deployed(Primary, "1"),
+          Deployed(Secondary, "1")
+        ))
+        when(fixture.apiHubService.getApiDeploymentStatuses(any)(any)).thenReturn(Future.successful(statuses))
         
         running(fixture.playApplication) {
           val request = FakeRequest(controllers.myapis.routes.UpdateApiTeamController.onPageLoad(FakeApiDetail.id))
@@ -119,7 +129,7 @@ class UpdateApiTeamControllerSpec
           val view = fixture.playApplication.injector.instanceOf[UpdateApiTeamView]
 
           status(result) mustBe OK
-          contentAsString(result) mustBe view(form, FakeApiDetail, None, allTeams, user, Some(statuses))(request, messages(fixture.playApplication)).toString()
+          contentAsString(result) mustBe view(form, FakeApiDetail, None, allTeams, user, statuses)(request, messages(fixture.playApplication)).toString()
           contentAsString(result) must validateAsHtml
           contentAsString(result) must not include ("Select which team owns this API")
         }
@@ -172,8 +182,11 @@ class UpdateApiTeamControllerSpec
         when(fixture.apiAuthActionProvider.apply(any)(any)).thenReturn(successfulApiAuthAction(FakeApiDetail))
         when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(allTeams))
         when(fixture.apiHubService.updateApiTeam(any, any)(any)).thenReturn(Future.successful(Some(())))
-        val statuses = ApiDeploymentStatuses(Some("prod"), Some("qa"))
-        when(fixture.apiHubService.getApiDeploymentStatuses(any)(any)).thenReturn(Future.successful(Some(statuses)))
+        val statuses = ApiDeploymentStatuses(Seq(
+          Deployed(Primary, "1"),
+          Deployed(Secondary, "1")
+        ))
+        when(fixture.apiHubService.getApiDeploymentStatuses(any)(any)).thenReturn(Future.successful(statuses))
         
         running(fixture.playApplication) {
           val request = FakeRequest(controllers.myapis.routes.UpdateApiTeamController.onSubmit(FakeApiDetail.id))
@@ -182,7 +195,7 @@ class UpdateApiTeamControllerSpec
           val view = fixture.playApplication.injector.instanceOf[UpdateApiTeamView]
 
           status(result) mustBe BAD_REQUEST
-          contentAsString(result) mustBe view(form.bind(Map("owningTeam" -> "")), FakeApiDetail, None, allTeams, user, Some(statuses))(request, messages(fixture.playApplication)).toString()
+          contentAsString(result) mustBe view(form.bind(Map("owningTeam" -> "")), FakeApiDetail, None, allTeams, user, statuses)(request, messages(fixture.playApplication)).toString()
           contentAsString(result) must validateAsHtml
 
           verify(fixture.apiHubService, never).updateApiTeam(eqTo(FakeApiDetail.id), any)(any)

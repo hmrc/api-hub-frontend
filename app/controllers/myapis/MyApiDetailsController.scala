@@ -16,15 +16,17 @@
 
 package controllers.myapis
 
+import cats.implicits.toTraverseOps
 import com.google.inject.{Inject, Singleton}
 import config.FrontendAppConfig
 import controllers.actions.{ApiAuthActionProvider, IdentifierAction}
 import controllers.helpers.ErrorResultBuilder
-import play.api.i18n.I18nSupport
+import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.myapis.MyApiDetailsView
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -41,13 +43,10 @@ class MyApiDetailsController @Inject()(
   def onPageLoad(id: String): Action[AnyContent] = (identify andThen apiAuth(id)) async {
     implicit request => for {
       deploymentStatuses <- apiHubService.getApiDeploymentStatuses(request.apiDetails.publisherReference)
-      team <- deploymentStatuses.flatMap(_ => request.apiDetails.teamId.map(apiHubService.findTeamById)).getOrElse(Future.successful(None))
-    } yield deploymentStatuses match {
-      case Some(deploymentStatuses) =>
-        Ok(view(request.apiDetails, deploymentStatuses, request.identifierRequest.user, config.supportEmailAddress, team.map(_.name)))
-      case None =>
-        errorResultBuilder.internalServerError(s"Unable to retrieve deployment statuses for API ${request.apiDetails.publisherReference}")
-    }
+      maybeTeam <- request.apiDetails.teamId.fold(Future.successful(None))(apiHubService.findTeamById)
+      teamName = maybeTeam.map(_.name).orElse(Some(Messages("apiDetails.details.team.error")))
+    } yield
+      Ok(view(request.apiDetails, deploymentStatuses, request.identifierRequest.user, config.supportEmailAddress, teamName))
   }
 
 }
