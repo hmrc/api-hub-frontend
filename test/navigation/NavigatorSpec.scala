@@ -20,6 +20,7 @@ import base.SpecBase
 import controllers.routes
 import pages.*
 import models.*
+import models.myapis.produce.ProduceApiChooseEgress
 import models.myapis.produce.ProduceApiHowToCreate.Editor
 import org.scalatest.TryValues
 import pages.application.accessrequest.{ProvideSupportingInformationPage, RequestProductionAccessPage, RequestProductionAccessSelectApisPage, RequestProductionAccessStartPage}
@@ -152,6 +153,14 @@ class NavigatorSpec extends SpecBase with TryValues {
         }
         "must go from the API passthrough page to the API check your answers page" in {
           navigator.nextPage(ProduceApiPassthroughPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
+        }
+        "must go from the choose egress page to the egress prefixes page when the user chooses to configure prefixes" in {
+          val userAnswers = emptyUserAnswers.set(ProduceApiChooseEgressPage, ProduceApiChooseEgress(None, true)).get
+          navigator.nextPage(ProduceApiChooseEgressPage, NormalMode, userAnswers) mustBe controllers.myapis.produce.routes.ProduceApiEgressPrefixesController.onPageLoad(NormalMode)
+        }
+        "must go from the choose egress page to the choose HoDs page when the user chooses not to configure prefixes" in {
+          val userAnswers = emptyUserAnswers.set(ProduceApiChooseEgressPage, ProduceApiChooseEgress(None, false)).get
+          navigator.nextPage(ProduceApiChooseEgressPage, NormalMode, userAnswers) mustBe controllers.myapis.produce.routes.ProduceApiHodController.onPageLoad(NormalMode)
         }
       }
 

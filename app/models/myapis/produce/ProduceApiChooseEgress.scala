@@ -18,9 +18,8 @@ package models.myapis.produce
 
 import play.api.libs.json.{Format, Json}
 
-case class ProduceApiChooseEgress(egress: Option[String], egressPrefix: String)
+case class ProduceApiChooseEgress(egress: Option[String], configureEgressPrefixes: Boolean)
 
 object ProduceApiChooseEgress {
   implicit val produceApiChooseEgressFormat: Format[ProduceApiChooseEgress] = Json.format[ProduceApiChooseEgress]
 }
-
