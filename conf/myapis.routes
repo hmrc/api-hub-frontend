@@ -49,9 +49,9 @@ GET     /produce/review-name-description                    controllers.myapis.p
 POST    /produce/review-name-description                    controllers.myapis.produce.ProduceApiReviewNameDescriptionController.onSubmit()
 
 GET     /produce/egress                                     controllers.myapis.produce.ProduceApiEgressController.onPageLoad(mode: Mode = NormalMode)
-POST    /produce/egress                                     controllers.myapis.produce.ProduceApiEgressController.onSubmit(mode: Mode = NormalMode, next: String)
+POST    /produce/egress                                     controllers.myapis.produce.ProduceApiEgressController.onSubmit(mode: Mode = NormalMode)
 GET     /produce/change-egress                              controllers.myapis.produce.ProduceApiEgressController.onPageLoad(mode: Mode = CheckMode)
-POST    /produce/change-egress                              controllers.myapis.produce.ProduceApiEgressController.onSubmit(mode: Mode = CheckMode, next: String)
+POST    /produce/change-egress                              controllers.myapis.produce.ProduceApiEgressController.onSubmit(mode: Mode = CheckMode)
 
 GET     /produce/egress-prefixes                            controllers.myapis.produce.ProduceApiEgressPrefixesController.onPageLoad(mode: Mode = NormalMode)
 POST    /produce/egress-prefixes                            controllers.myapis.produce.ProduceApiEgressPrefixesController.onSubmit(mode: Mode = NormalMode)

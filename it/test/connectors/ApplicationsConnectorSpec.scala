@@ -20,6 +20,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.typesafe.config.ConfigFactory
 import config.FrontendAppConfig
 import connectors.ApplicationsConnectorSpec.ApplicationGetterBehaviours
+import generators.EgressGenerator
 import models.UserEmail
 import models.accessrequest.*
 import models.api.ApiDeploymentStatuses
@@ -61,7 +62,8 @@ class ApplicationsConnectorSpec
   with EitherValues
   with ApplicationGetterBehaviours
   with TableDrivenPropertyChecks
-  with MockitoSugar {
+  with MockitoSugar
+  with EgressGenerator {
 
   private implicit val messagesProvider: MessagesProvider = mock[MessagesProvider]
   private val messages: Messages = mock[Messages]
@@ -1649,6 +1651,27 @@ class ApplicationsConnectorSpec
       buildConnector(this).listApisInProduction()(HeaderCarrier()).map {
         result =>
           result mustBe apis
+      }
+    }
+  }
+
+  "listEgressGateways" - {
+    "must place the correct request and return a Seq[EgressGateway]" in {
+      val egressGateways = sampleEgressGateways()
+
+      stubFor(
+        get(urlEqualTo("/api-hub-applications/egresses/gateways"))
+          .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withBody(Json.toJson(egressGateways).toString())
+          )
+      )
+
+      buildConnector(this).listEgressGateways()(HeaderCarrier()).map {
+        result =>
+          result mustBe egressGateways
       }
     }
   }

@@ -16,11 +16,19 @@
 
 package controllers.myapis.produce
 
+import config.{FrontendAppConfig, Hods}
+import connectors.ApplicationsConnector
 import controllers.actions.*
+import forms.myapis.produce.ProduceApiChooseEgressFormProvider
 import models.Mode
+import models.myapis.produce.ProduceApiChooseEgress
+import models.requests.DataRequest
+import repositories.ProduceApiSessionRepository
+import pages.myapis.produce.ProduceApiChooseEgressPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.myapis.produce.ProduceApiEgressView
 
@@ -30,20 +38,52 @@ import scala.concurrent.{ExecutionContext, Future}
 class ProduceApiEgressController @Inject()(
                                             override val messagesApi: MessagesApi,
                                             identify: IdentifierAction,
+                                            getData: ProduceApiDataRetrievalAction,
+                                            requireData: DataRequiredAction,
                                             val controllerComponents: MessagesControllerComponents,
-                                            view: ProduceApiEgressView
+                                            view: ProduceApiEgressView,
+                                            config: FrontendAppConfig,
+                                            formProvider: ProduceApiChooseEgressFormProvider,
+                                            produceApiSessionRepository: ProduceApiSessionRepository,
+                                            apiHubService: ApiHubService
                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = identify {
-    implicit request => Ok(view(mode, request.user))
+  val form = formProvider()
+
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request =>
+
+      val preparedForm = request.userAnswers.get(ProduceApiChooseEgressPage) match {
+        case None => form
+        case Some(egressChoices) => form.fill(egressChoices)
+      }
+
+      buildView(mode, preparedForm, Ok)
+
   }
 
-  def onSubmit(mode: Mode, next: String): Action[AnyContent] = identify {
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request => {
-      next match {
-        case "hods" => Redirect(routes.ProduceApiHodController.onPageLoad(mode))
-        case "prefixes" => Redirect(routes.ProduceApiEgressPrefixesController.onPageLoad(mode))
-      }
+      form.bindFromRequest().fold(
+        formWithErrors => buildView(mode, formWithErrors, BadRequest),
+
+        egressChoices =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(ProduceApiChooseEgressPage, egressChoices))
+            _ <- produceApiSessionRepository.set(updatedAnswers)
+          } yield {
+            egressChoices.egressPrefix match {
+              case "no" => Redirect(routes.ProduceApiHodController.onPageLoad(mode))
+              case "yes" => Redirect(routes.ProduceApiEgressPrefixesController.onPageLoad(mode))
+            }
+          })
     }
+  }
+
+  private def buildView(mode: Mode, form: Form[ProduceApiChooseEgress], status: Status)(implicit request: DataRequest[AnyContent]) = {
+    apiHubService.listEgressGateways().map(
+      egressGateways =>
+        status(view(form, mode, request.user, config.helpDocsPath, egressGateways))
+    )
   }
 }

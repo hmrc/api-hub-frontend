@@ -18,7 +18,7 @@ package services
 
 import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
 import controllers.actions.FakeApplication
-import generators.{AccessRequestGenerator, ApiDetailGenerators}
+import generators.{AccessRequestGenerator, ApiDetailGenerators, EgressGenerator}
 import models.AvailableEndpoint
 import models.accessrequest.*
 import models.api.ApiDetailLensesSpec.sampleApiDetailSummary
@@ -48,6 +48,7 @@ class ApiHubServiceSpec
     with ApplicationGetterBehaviours
     with ApiDetailGenerators
     with AccessRequestGenerator
+    with EgressGenerator
     with TableDrivenPropertyChecks {
 
   "registerApplication" - {
@@ -824,6 +825,20 @@ class ApiHubServiceSpec
         fixture.service.listApisInProduction()(HeaderCarrier()).map {
           result =>
             result mustBe apis
+        }
+      }
+    }
+
+    "listEgressGateways" - {
+      "must make the correct request to the applications connector and return the egress gateways" in {
+        val fixture = buildFixture()
+
+        val egressGateways = sampleEgressGateways()
+        when(fixture.applicationsConnector.listEgressGateways()(any)).thenReturn(Future.successful(egressGateways))
+
+        fixture.service.listEgressGateways()(HeaderCarrier()).map {
+          result =>
+            result mustBe egressGateways
         }
       }
     }

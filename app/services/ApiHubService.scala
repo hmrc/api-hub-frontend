@@ -20,7 +20,7 @@ import com.google.inject.{Inject, Singleton}
 import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
 import models.AvailableEndpoint
 import models.accessrequest.{AccessRequest, AccessRequestRequest, AccessRequestStatus}
-import models.api.{ApiDeploymentStatuses, ApiDetail, ApiDetailSummary, PlatformContact}
+import models.api.{ApiDeploymentStatuses, ApiDetail, ApiDetailSummary, EgressGateway, PlatformContact}
 import models.application.*
 import models.deployment.DeploymentDetails
 import models.exception.ApplicationsException
@@ -208,6 +208,10 @@ class ApiHubService @Inject()(
 
   def listApisInProduction()(implicit hc: HeaderCarrier): Future[Seq[ApiDetailSummary]] = {
     applicationsConnector.listApisInProduction()
+  }
+
+  def listEgressGateways()(implicit hc: HeaderCarrier): Future[Seq[EgressGateway]] = {
+    applicationsConnector.listEgressGateways()
   }
 
 }

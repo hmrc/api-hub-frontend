@@ -742,7 +742,16 @@ myApis.produce.howtocreate.editor.hint = If you do not have an OAS file yet and 
 myApis.produce.howtocreate.cya.label = How do you want to register an API?
 myApis.produce.howtocreate.error.required = Select how you want to register an API.
 myApis.produce.howtocreate.change.hidden = How do you want to register an API?
-
+myApis.produce.selectegress.title = Select the Egress for your API
+myApis.produce.selectegress.heading = Select the Egress for your API
+myApis.produce.selectegress.body = Select from existing egress-gateways to point to your API's backend Head of Duty system (HoD) or target service
+myApis.produce.selectegress.body.link = Guidance for Egress (opens in a new tab).
+myApis.produce.selectegress.prefixes.body = Do you want to configure prefixes for your API?
+myApis.produce.selectegress.prefixes.body.hint = If you need to add a common prefix to all paths within the OAS specification, or if you need to map values in your path answer yes.
+myApis.produce.selectegress.prefixes.body.link = Guidance for Egress prefixes.
+myApis.produce.selectegress.error.required = You must select an egress for your API
+myApis.produce.selectegress.unassigned = Select an egress
+myApis.produce.egressprefix.error.required = You must state whether you wish to configure path prefixes for your API
 applicationDetailsTable.applicationName = Name
 applicationDetailsTable.owningTeam = Owning team
 applicationDetailsTable.noTeam = Not specified
