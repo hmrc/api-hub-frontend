@@ -18,15 +18,15 @@ package controllers.myapis.produce
 
 import base.SpecBase
 import controllers.actions.FakeUser
-import forms.myapis.produce.{ProduceApiChooseEgressFormProvider, ProduceApiChooseTeamFormProvider}
-import generators.{EgressGenerator, TeamGenerator}
+import forms.myapis.produce.ProduceApiChooseEgressFormProvider
+import generators.EgressGenerator
 import models.myapis.produce.ProduceApiChooseEgress
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.{verify, when}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.myapis.produce.{ProduceApiChooseEgressPage, ProduceApiChooseTeamPage}
+import pages.myapis.produce.ProduceApiChooseEgressPage
 import play.api.Application as PlayApplication
 import play.api.inject.bind
 import play.api.mvc.Call
@@ -35,16 +35,13 @@ import play.api.test.Helpers.*
 import repositories.ProduceApiSessionRepository
 import services.ApiHubService
 import utils.HtmlValidation
-import views.html.ErrorTemplate
-import views.html.myapis.produce.{ProduceApiChooseTeamView, ProduceApiEgressView}
+import views.html.myapis.produce.ProduceApiEgressView
 
 import scala.concurrent.Future
 
 class ProduceApiChooseEgressControllerSpec extends SpecBase with MockitoSugar with EgressGenerator with HtmlValidation {
 
-  private def onwardRouteYes = Call("GET", "/integration-hub/my-apis/produce/egress-prefixes")
-  private def onwardRouteNo = Call("GET", "/integration-hub/my-apis/produce/hod")
-
+  private def onwardRoute = Call("GET", "/foo")
 
   private val formProvider = new ProduceApiChooseEgressFormProvider()
   private val form = formProvider()
@@ -76,7 +73,7 @@ class ProduceApiChooseEgressControllerSpec extends SpecBase with MockitoSugar wi
 
       val egressGateways = sampleEgressGateways()
 
-      val chooseEgress = ProduceApiChooseEgress(Some(egressGateways.head.id), "yes")
+      val chooseEgress = ProduceApiChooseEgress(Some(egressGateways.head.id), true)
       val userAnswers = UserAnswers(userAnswersId).set(ProduceApiChooseEgressPage, chooseEgress).success.value
 
       val fixture = buildFixture(userAnswers = Some(userAnswers))
@@ -95,7 +92,7 @@ class ProduceApiChooseEgressControllerSpec extends SpecBase with MockitoSugar wi
       }
     }
 
-    "must redirect to the correct next page when valid data is submitted with a yes" in {
+    "must redirect to the correct next page when valid data is submitted" in {
       val egressGateways = sampleEgressGateways()
 
       val fixture = buildFixture(userAnswers = Some(emptyUserAnswers))
@@ -106,36 +103,15 @@ class ProduceApiChooseEgressControllerSpec extends SpecBase with MockitoSugar wi
       running(fixture.application) {
         val request =
           FakeRequest(POST, produceApiChooseEgressRoute)
-            .withFormUrlEncodedBody(("selectEgress", egressGateways.head.id),("egressPrefix", "yes"))
+            .withFormUrlEncodedBody(("selectEgress", egressGateways.head.id),("egressPrefix", "true"))
 
         val result = route(fixture.application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRouteYes.url
+        redirectLocation(result).value mustEqual onwardRoute.url
       }
     }
   }
-
-  "must redirect to the correct next page when valid data is submitted with a no" in {
-    val egressGateways = sampleEgressGateways()
-
-    val fixture = buildFixture(userAnswers = Some(emptyUserAnswers), onwardRoute = onwardRouteNo)
-    when(fixture.sessionRepository.set(any())).thenReturn(Future.successful(true))
-
-    when(fixture.apiHubService.listEgressGateways()(any)).thenReturn(Future.successful(egressGateways))
-
-    running(fixture.application) {
-      val request =
-        FakeRequest(POST, produceApiChooseEgressRoute)
-          .withFormUrlEncodedBody(("selectEgress", egressGateways.head.id), ("egressPrefix", "no"))
-
-      val result = route(fixture.application, request).value
-
-      status(result) mustEqual SEE_OTHER
-      redirectLocation(result).value mustEqual onwardRouteNo.url
-    }
-  }
-
 
   private case class Fixture(
                               application: PlayApplication,
@@ -143,7 +119,7 @@ class ProduceApiChooseEgressControllerSpec extends SpecBase with MockitoSugar wi
                               sessionRepository: ProduceApiSessionRepository
                             )
 
-  private def buildFixture(userAnswers: Option[UserAnswers], onwardRoute: Call = onwardRouteYes): Fixture = {
+  private def buildFixture(userAnswers: Option[UserAnswers]): Fixture = {
     val apiHubService = mock[ApiHubService]
     val sessionRepository = mock[ProduceApiSessionRepository]
 

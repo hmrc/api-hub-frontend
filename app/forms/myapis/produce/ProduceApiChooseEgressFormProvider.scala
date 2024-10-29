@@ -30,7 +30,7 @@ class ProduceApiChooseEgressFormProvider @Inject() extends Mappings {
         "selectEgress" -> text()
           .transform(mapToEgressId, mapToEgressInput)
           .verifying("myApis.produce.selectegress.error.required", _.isDefined),
-        "egressPrefix" -> text("myApis.produce.egressprefix.error.required").verifying(!_.isBlank)
+        "egressPrefix" -> boolean("myApis.produce.egressprefix.error.required")
       )(ProduceApiChooseEgress.apply)(o => Some(Tuple.fromProductTyped(o)))
     )
   

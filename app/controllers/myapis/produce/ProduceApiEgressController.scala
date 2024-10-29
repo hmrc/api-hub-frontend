@@ -16,18 +16,18 @@
 
 package controllers.myapis.produce
 
-import config.{FrontendAppConfig, Hods}
-import connectors.ApplicationsConnector
+import config.FrontendAppConfig
 import controllers.actions.*
 import forms.myapis.produce.ProduceApiChooseEgressFormProvider
 import models.Mode
 import models.myapis.produce.ProduceApiChooseEgress
 import models.requests.DataRequest
-import repositories.ProduceApiSessionRepository
+import navigation.Navigator
 import pages.myapis.produce.ProduceApiChooseEgressPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.ProduceApiSessionRepository
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.myapis.produce.ProduceApiEgressView
@@ -45,10 +45,11 @@ class ProduceApiEgressController @Inject()(
                                             config: FrontendAppConfig,
                                             formProvider: ProduceApiChooseEgressFormProvider,
                                             produceApiSessionRepository: ProduceApiSessionRepository,
-                                            apiHubService: ApiHubService
+                                            apiHubService: ApiHubService,
+                                            navigator: Navigator
                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form = formProvider()
+  private val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
@@ -71,12 +72,8 @@ class ProduceApiEgressController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(ProduceApiChooseEgressPage, egressChoices))
             _ <- produceApiSessionRepository.set(updatedAnswers)
-          } yield {
-            egressChoices.egressPrefix match {
-              case "no" => Redirect(routes.ProduceApiHodController.onPageLoad(mode))
-              case "yes" => Redirect(routes.ProduceApiEgressPrefixesController.onPageLoad(mode))
-            }
-          })
+          } yield Redirect(navigator.nextPage(ProduceApiChooseEgressPage, mode, updatedAnswers))
+      )
     }
   }
 
@@ -86,4 +83,5 @@ class ProduceApiEgressController @Inject()(
         status(view(form, mode, request.user, config.helpDocsPath, egressGateways))
     )
   }
+
 }

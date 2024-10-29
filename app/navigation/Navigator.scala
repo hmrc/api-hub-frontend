@@ -18,6 +18,7 @@ package navigation
 
 import controllers.routes
 import models.*
+import models.myapis.produce.ProduceApiChooseEgress
 import models.myapis.produce.ProduceApiHowToCreate.{Editor, Upload}
 import pages.*
 import pages.application.accessrequest.{ProvideSupportingInformationPage, RequestProductionAccessPage, RequestProductionAccessSelectApisPage, RequestProductionAccessStartPage}
@@ -54,6 +55,7 @@ class Navigator @Inject()() {
     case ProduceApiHowToCreatePage => produceApiHowToCreateNextPage(NormalMode)
     case ProduceApiShortDescriptionPage => _ => controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onPageLoad()
     case ProduceApiReviewNameDescriptionPage => _ => controllers.myapis.produce.routes.ProduceApiEgressController.onPageLoad(NormalMode)
+    case ProduceApiChooseEgressPage => produceApiChooseEgressNextPage(NormalMode)
     case ProduceApiEgressPrefixesPage => _ => controllers.myapis.produce.routes.ProduceApiHodController.onPageLoad(NormalMode)
     case ProduceApiHodPage => _ => controllers.myapis.produce.routes.ProduceApiDomainController.onPageLoad(NormalMode)
     case ProduceApiDomainPage => _ => controllers.myapis.produce.routes.ProduceApiStatusController.onPageLoad(NormalMode)
@@ -130,4 +132,13 @@ class Navigator @Inject()() {
       case _ => routes.JourneyRecoveryController.onPageLoad()
     }
   }
+
+  private def produceApiChooseEgressNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
+    (mode, userAnswers.get(ProduceApiChooseEgressPage)) match {
+      case (NormalMode, Some(ProduceApiChooseEgress(_, true))) => controllers.myapis.produce.routes.ProduceApiEgressPrefixesController.onPageLoad(mode)
+      case (NormalMode, Some(ProduceApiChooseEgress(_, false))) => controllers.myapis.produce.routes.ProduceApiHodController.onPageLoad(mode)
+      case _ => routes.JourneyRecoveryController.onPageLoad()
+    }
+  }
+
 }
