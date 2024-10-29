@@ -81,6 +81,119 @@ class CurlCommandServiceSpec extends SpecBase with MockitoSugar {
         Map("Content-Type" -> "application/json"), None)))
     }
 
+    "must parse a request body when content is provided" in {
+      val service = new CurlCommandService()
+      val application = FakeApplication.copy(apis = Seq(Api("id", "title", Seq(SelectedEndpoint("POST", "/post_it")))))
+      val minimalValidOas =
+        """
+          |openapi: 3.0.3
+          |info:
+          |  title: Minimal valid OAS
+          |  version: 0.1.0
+          |servers:
+          |- url: http://example.com
+          |paths:
+          |  /post_it:
+          |    post:
+          |      description: Posts it
+          |      requestBody:
+          |        content:
+          |          application/json:
+          |            schema:
+          |              $ref: '#/components/requestBodies/Post'
+          |      responses:
+          |        "200":
+          |          description: Successful operation
+          |components:
+          |  schemas:
+          |    Post:
+          |      required:
+          |      - id
+          |      type: object
+          |      properties:
+          |        id:
+          |          format: int64
+          |          type: integer
+          |          example: 123456
+          |  requestBodies:
+          |    Post:
+          |      content:
+          |        application/json:
+          |          schema:
+          |            $ref: '#/components/schemas/BoardGame'
+          |      required: true
+          |""".stripMargin
+      val apiDetail = FakeApiDetail.copy(
+        openApiSpecification = minimalValidOas,
+        endpoints = Seq(
+          Endpoint("/post_it", Seq(EndpointMethod("POST", None, None, Seq.empty)))
+        )
+      )
+      val apiWorld = CORPORATE
+
+      val result = service.buildCurlCommandsForApi(application, apiDetail, apiWorld)
+
+      result match {
+        case Right(result :: Nil) => result.requestBody.map(_ must include("""{"id":123456}"""))
+        case _ => fail()
+      }
+    }
+
+    "must parse a request body from $ref when the content is not provided" in {
+      val service = new CurlCommandService()
+      val application = FakeApplication.copy(apis = Seq(Api("id", "title", Seq(SelectedEndpoint("POST", "/post_it")))))
+      val minimalValidOas =
+        """
+          |openapi: 3.0.3
+          |info:
+          |  title: Minimal valid OAS
+          |  version: 0.1.0
+          |servers:
+          |- url: http://example.com
+          |paths:
+          |  /post_it:
+          |    post:
+          |      description: Posts it
+          |      requestBody:
+          |        $ref: '#/components/requestBodies/Post'
+          |      responses:
+          |        "200":
+          |          description: Successful operation
+          |components:
+          |  schemas:
+          |    Post:
+          |      required:
+          |      - id
+          |      type: object
+          |      properties:
+          |        id:
+          |          format: int64
+          |          type: integer
+          |          example: 123456
+          |  requestBodies:
+          |    Post:
+          |      content:
+          |        application/json:
+          |          schema:
+          |            $ref: '#/components/schemas/BoardGame'
+          |      required: true
+          |""".stripMargin
+      val apiDetail = FakeApiDetail.copy(
+            openApiSpecification = minimalValidOas,
+            endpoints = Seq(
+              Endpoint("/post_it", Seq(EndpointMethod("POST", None, None, Seq.empty)))
+            )
+          )
+      val apiWorld = CORPORATE
+
+      val result = service.buildCurlCommandsForApi(application, apiDetail, apiWorld)
+
+      result match {
+        case Right(result :: Nil) => result.requestBody.map(_ must include("""{"id":123456}"""))
+        case _ => fail()
+      }
+    }
+
     "must return the correct curl commands if the oas file can be parsed" in {
       val service = new CurlCommandService()
       val credential = Credential("client-id", LocalDateTime.now, Some("client-secret"), None)
