@@ -31,11 +31,12 @@ case class CurlCommand(
                       ) {
   override def toString: String = {
     val url = Uri.unsafeParse(server.map(_.getUrl).getOrElse("http://__EXAMPLE.COM__"))
-      .withWholePath(getPathWithParameters)
+    val urlWithParams = url
+      .withWholePath(url.path.mkString("/") + getPathWithParameters)
       .addParams(queryParams)
       .toString
     val headers = getHeadersString
-    s"curl -X '${method}' $headers '$url' ${requestBody.map(json => s"--data '$json'").getOrElse("")}".replaceAll("\\s+", " ").trim
+    s"curl -X '${method}' $headers '$urlWithParams' ${requestBody.map(json => s"--data '$json'").getOrElse("")}".replaceAll("\\s+", " ").trim
   }
 
   private val pathParamRegex = "\\{([^\\}]*)\\}".r
