@@ -23,7 +23,7 @@
 @(user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @accessRequestsLink() = {
-    <a href='@accessRequestsLinkUrl()' class='govuk-link govuk-link--no-visited-state'>
+    <a id="accessRequestsLink" href='@accessRequestsLinkUrl()' class='govuk-link govuk-link--no-visited-state'>
         @messages("accessRequestRejectedSuccess.guidance.link")
     </a>
 }
