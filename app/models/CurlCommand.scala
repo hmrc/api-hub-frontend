@@ -32,7 +32,7 @@ case class CurlCommand(
   override def toString: String = {
     val url = Uri.unsafeParse(server.map(_.getUrl).getOrElse("http://__EXAMPLE.COM__"))
     val urlWithParams = url
-      .withWholePath(url.path.mkString("/") + getPathWithParameters)
+      .withWholePath(url.path.filterNot(_.isBlank).mkString("/") + getPathWithParameters)
       .addParams(queryParams)
       .toString
     val headers = getHeadersString
