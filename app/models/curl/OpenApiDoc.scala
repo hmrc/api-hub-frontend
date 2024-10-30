@@ -97,7 +97,7 @@ class OpenApiDoc(openApi: OpenAPI) {
       maybe$ref.map { $ref =>
         val schema = Schema().$ref($ref)
         val mediaType = MediaType().schema(schema)
-        Content().addMediaType("application/json", mediaType)
+        Content().addMediaType(schema.getContentMediaType, mediaType)
       }
   }
 }
