@@ -78,7 +78,9 @@ class OpenApiDoc(openApi: OpenAPI) {
     val exampleRequestBody = for {
       requestBody <- Option(operation.getRequestBody)
       content <- Option(requestBody.getContent)
-        .orElse(contentFromRef(Option(requestBody.get$ref())))
+        .orElse(
+          contentFromRef(Option(requestBody.get$ref()))
+        )
       jsonContent <- content.asScala.get("application/json")
       schema <- Option(jsonContent.getSchema)
       example = ExampleBuilder.fromSchema(schema, schemas)
@@ -97,7 +99,8 @@ class OpenApiDoc(openApi: OpenAPI) {
       maybe$ref.map { $ref =>
         val schema = Schema().$ref($ref)
         val mediaType = MediaType().schema(schema)
-        Content().addMediaType(schema.getContentMediaType, mediaType)
+        val contentType = Option(schema.getContentMediaType).getOrElse("application/json")
+        Content().addMediaType(contentType, mediaType)
       }
   }
 }

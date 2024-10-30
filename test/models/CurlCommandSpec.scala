@@ -27,10 +27,10 @@ class CurlCommandSpec extends SpecBase
   with Generators {
 
   "CurlCommand" - {
-    "must generate a string with the expected url" in {
-      forAll(genIntersperseString(Gen.alphaLowerStr.suchThat(!_.isBlank), "/") -> "path") {
+    s"must generate a string with the expected url" in {
+      forAll(genIntersperseString(Gen.alphaLowerStr.suchThat(validText), "/").suchThat(validText) -> "path") {
         (path: String) =>
-          forAll(genIntersperseString(Gen.alphaLowerStr.suchThat(!_.isBlank), "/").map(_.prepended('/')) -> "commandPath") {
+          forAll(genIntersperseString(Gen.alphaLowerStr.suchThat(validText), "/").map(_.prepended('/')) -> "commandPath") {
             (commandPath: String) =>
               val serverUrl = s"http://example.com/$path"
               val server = Server().url(serverUrl).description("MDTP - QA")
@@ -40,5 +40,9 @@ class CurlCommandSpec extends SpecBase
           }
       }
     }
+  }
+
+  private def validText(text: String) = {
+    !text.isBlank && text.nonEmpty && !text.startsWith("/") && !text.endsWith("/")
   }
 }
