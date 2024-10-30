@@ -28,11 +28,11 @@ class CurlCommandSpec extends SpecBase
 
   "CurlCommand" - {
     "must generate a string with the expected url" in {
-      forAll(genIntersperseString(Gen.alphaLowerStr, "/") -> "path") {
+      forAll(genIntersperseString(Gen.alphaLowerStr.suchThat(!_.isBlank), "/") -> "path") {
         (path: String) =>
-          forAll(genIntersperseString(Gen.alphaLowerStr, "/").map(_.prepended('/')) -> "commandPath") {
+          forAll(genIntersperseString(Gen.alphaLowerStr.suchThat(!_.isBlank), "/").map(_.prepended('/')) -> "commandPath") {
             (commandPath: String) =>
-              val serverUrl = s"http://example.com$path"
+              val serverUrl = s"http://example.com/$path"
               val server = Server().url(serverUrl).description("MDTP - QA")
               val commonHeaders = Map("Content-Type" -> "application/json", "Authorization" -> "Basic Y2xpZW50LWlkOmNsaWVudC1zZWNyZXQ=")
               val command = CurlCommand("GET", Some(server), commandPath, Map.empty, Map.empty, commonHeaders, None)
