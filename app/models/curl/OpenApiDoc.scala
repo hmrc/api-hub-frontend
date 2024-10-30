@@ -19,6 +19,7 @@ package models.curl
 import com.fasterxml.jackson.databind.module.SimpleModule
 import io.swagger.oas.inflector.examples.ExampleBuilder
 import io.swagger.oas.inflector.processors.JsonNodeExampleSerializer
+import io.swagger.v3.oas.models.media.{Content, MediaType, Schema}
 import io.swagger.v3.oas.models.{Components, OpenAPI, Operation, PathItem, Paths}
 import io.swagger.v3.oas.models.servers.Server
 import io.swagger.v3.parser.OpenAPIV3Parser
@@ -77,6 +78,7 @@ class OpenApiDoc(openApi: OpenAPI) {
     val exampleRequestBody = for {
       requestBody <- Option(operation.getRequestBody)
       content <- Option(requestBody.getContent)
+        .orElse(contentFromRef(Option(requestBody.get$ref())))
       jsonContent <- content.asScala.get("application/json")
       schema <- Option(jsonContent.getSchema)
       example = ExampleBuilder.fromSchema(schema, schemas)
@@ -90,6 +92,13 @@ class OpenApiDoc(openApi: OpenAPI) {
         .map(param => param.getName -> (if (includeNameInValue) missingValue(param.getName, param.getSchema.getType) else missingValue(param.getSchema.getType)))
         .toMap
     }
+
+    private def contentFromRef(maybe$ref: Option[String]): Option[Content] =
+      maybe$ref.map { $ref =>
+        val schema = Schema().$ref($ref)
+        val mediaType = MediaType().schema(schema)
+        Content().addMediaType(schema.getContentMediaType, mediaType)
+      }
   }
 }
 
