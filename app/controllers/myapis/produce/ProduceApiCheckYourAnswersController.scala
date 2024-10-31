@@ -17,25 +17,42 @@
 package controllers.myapis.produce
 
 import controllers.actions.*
-import models.Mode
-import play.api.data.Form
+import models.UserAnswers
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.checkAnswers.myapis.produce.{ProduceApiChooseTeamSummary, ProduceApiDomainSummary, ProduceApiEgressPrefixesSummary, ProduceApiEgressSummary, ProduceApiEnterOasSummary, ProduceApiHodSummary, ProduceApiPassthroughSummary, ProduceApiReviewNameDescriptionSummary, ProduceApiStatusSummary}
+import viewmodels.govuk.all.SummaryListViewModel
 import views.html.myapis.produce.ProduceApiCheckYourAnswersView
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class ProduceApiCheckYourAnswersController @Inject()(
                                              override val messagesApi: MessagesApi,
                                              identify: IdentifierAction,
+                                             getData: ProduceApiDataRetrievalAction,
+                                             requireData: DataRequiredAction,
                                              val controllerComponents: MessagesControllerComponents,
                                              view: ProduceApiCheckYourAnswersView
                                            )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = identify {
-    implicit request => Ok(view(request.user))
+  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) {
+    implicit request =>
+      val summaryRows = Seq(
+        ProduceApiChooseTeamSummary.row,
+        ProduceApiEnterOasSummary.row,
+        ProduceApiReviewNameDescriptionSummary.row,
+        ProduceApiEgressSummary.row,
+        ProduceApiEgressPrefixesSummary.row,
+        ProduceApiHodSummary.row,
+        ProduceApiDomainSummary.row,
+        ProduceApiStatusSummary.row,
+        ProduceApiPassthroughSummary.row
+      ).flatMap(_(request.userAnswers))
+
+      Ok(view(SummaryListViewModel(summaryRows), request.user))
   }
 
   def onSubmit(next: String): Action[AnyContent] = identify {

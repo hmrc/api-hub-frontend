@@ -20,21 +20,22 @@
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
-    govukButton: GovukButton
+    govukButton: GovukButton,
+    govukSummaryList: GovukSummaryList,
 )
 
-@(userModel: UserModel)(implicit request: Request[?], messages: Messages)
+@(summaryList: SummaryList, userModel: UserModel)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = titleNoForm("Review the details of your API"), user = Some(userModel)) {
-    <h1 class="govuk-heading-l">Review the details of your API</h1>
+@layout(pageTitle = titleNoForm(messages("produceApiCheckYourAnswers.title")), user = Some(userModel)) {
+    <h1 class="govuk-heading-l">@messages("produceApiCheckYourAnswers.heading")</h1>
+
+    <p class="govuk-body">@messages("produceApiCheckYourAnswers.description")</p>
+
+    @govukSummaryList(summaryList)
+
     @formHelper(action = controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onSubmit("ok")) {
         @govukButton(
             ButtonViewModel(messages("site.continue"))
-        )
-    }
-    @formHelper(action = controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onSubmit("error")) {
-        @govukButton(
-            ButtonViewModel("Processing error").asWarningButton()
         )
     }
 }
