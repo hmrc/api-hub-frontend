@@ -19,11 +19,11 @@ package controllers.myapis.produce
 import config.FrontendAppConfig
 import controllers.actions.*
 import forms.myapis.produce.ProduceApiChooseEgressFormProvider
-import models.Mode
+import models.{Mode, UserAnswers}
 import models.myapis.produce.ProduceApiChooseEgress
 import models.requests.DataRequest
 import navigation.Navigator
-import pages.myapis.produce.ProduceApiChooseEgressPage
+import pages.myapis.produce.{ProduceApiChooseEgressPage, ProduceApiEgressPrefixesPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -31,7 +31,7 @@ import repositories.ProduceApiSessionRepository
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.myapis.produce.ProduceApiEgressView
-
+import scala.util.{Try,Success}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -70,10 +70,20 @@ class ProduceApiEgressController @Inject()(
 
         egressChoices =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(ProduceApiChooseEgressPage, egressChoices))
+            answersWithEgressChoices <- Future.fromTry(request.userAnswers.set(ProduceApiChooseEgressPage, egressChoices))
+            updatedAnswers <- Future.fromTry(removeEgressPrefixAnswersIfNecessary(answersWithEgressChoices)) 
             _ <- produceApiSessionRepository.set(updatedAnswers)
           } yield Redirect(navigator.nextPage(ProduceApiChooseEgressPage, mode, updatedAnswers))
       )
+    }
+  }
+  
+  private def removeEgressPrefixAnswersIfNecessary(answers: UserAnswers): Try[UserAnswers] = {
+    val willConfigureEgressPrefixes = answers.get(ProduceApiChooseEgressPage).exists(_.configureEgressPrefixes)
+    if (willConfigureEgressPrefixes) {
+      Success(answers)
+    } else {
+      answers.remove(ProduceApiEgressPrefixesPage)
     }
   }
 
