@@ -20,7 +20,7 @@ import controllers.actions.*
 import controllers.routes
 import forms.myapis.produce.ProduceApiReviewNameDescriptionFormProvider
 import models.requests.DataRequest
-import models.{NormalMode, UserAnswers}
+import models.{Mode, NormalMode, UserAnswers}
 import navigation.Navigator
 import pages.myapis.produce.{ProduceApiEnterApiTitlePage, ProduceApiReviewNameDescriptionPage, ProduceApiShortDescriptionPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -47,16 +47,11 @@ class ProduceApiReviewNameDescriptionController @Inject()(
 
   val form = formProvider()
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(ProduceApiReviewNameDescriptionPage) match {
-        case None => form
-        case Some(value) => form.fill(value)
-      }
-
-      withJorneyRecovery { case (apiName, apiShortDescription) =>
-        Ok (view(preparedForm, apiName, apiShortDescription, request.user))
+      withJourneyRecovery { case (apiName, apiShortDescription) =>
+        Ok(view(form, mode, apiName, apiShortDescription, request.user)) // never pre-fill checkbox, even in CheckMode
       }
   }
 
@@ -68,14 +63,14 @@ class ProduceApiReviewNameDescriptionController @Inject()(
     userAnswers.get(ProduceApiShortDescriptionPage)
   }
 
-  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
 
       form.bindFromRequest().fold(
         formWithErrors =>
           Future.successful(
-            withJorneyRecovery { case (apiName, apiShortDescription) =>
-              BadRequest(view(formWithErrors, apiName, apiShortDescription, request.user))
+            withJourneyRecovery { case (apiName, apiShortDescription) =>
+              BadRequest(view(formWithErrors, mode, apiName, apiShortDescription, request.user))
             }
           ),
 
@@ -83,11 +78,11 @@ class ProduceApiReviewNameDescriptionController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(ProduceApiReviewNameDescriptionPage, value))
             _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(ProduceApiReviewNameDescriptionPage, NormalMode, updatedAnswers))
+          } yield Redirect(navigator.nextPage(ProduceApiReviewNameDescriptionPage, mode, updatedAnswers))
       )
   }
 
-  private def withJorneyRecovery(f: (String, String) => Result)(implicit request: DataRequest[?]) =
+  private def withJourneyRecovery(f: (String, String) => Result)(implicit request: DataRequest[?]) =
     val apiName = getApiName(request.userAnswers)
     val apiShortDescription = getApiShortDescription(request.userAnswers)
     (apiName, apiShortDescription) match {

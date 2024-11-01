@@ -16,9 +16,10 @@
 
 package viewmodels.checkAnswers.myapis.produce
 
-import controllers.routes
+import config.Domains
+import controllers.myapis.produce.routes
 import models.{CheckMode, UserAnswers}
-import pages.myapis.produce.ProduceApiReviewNameDescriptionPage
+import pages.myapis.produce.ProduceApiDomainPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
@@ -26,28 +27,21 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object ProduceApiReviewNameDescriptionSummary  {
+object ProduceApiSubDomainSummary  {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(ProduceApiReviewNameDescriptionPage).map {
-      answers =>
+  def row(answers: UserAnswers, domains: Domains)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(ProduceApiDomainPage).map {
+      answer =>
 
         val value = ValueViewModel(
           HtmlContent(
-            answers.map {
-              answer => HtmlFormat.escape(messages(s"produceApiReviewNameDescription.$answer")).toString
-            }
-            .mkString(",<br>")
+            domains.getSubDomainDescription(answer.domain, answer.subDomain)
           )
         )
 
         SummaryListRowViewModel(
-          key     = "produceApiReviewNameDescription.checkYourAnswersLabel",
-          value   = value,
-          actions = Seq(
-            ActionItemViewModel("site.change", controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onPageLoad().url)
-              .withVisuallyHiddenText(messages("produceApiReviewNameDescription.change.hidden"))
-          )
+          key     = "produceApiDomain.checkYourAnswersLabel.2",
+          value   = value
         )
     }
 }

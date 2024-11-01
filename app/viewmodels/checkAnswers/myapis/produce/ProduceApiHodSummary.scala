@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.myapis.produce
 
+import config.Hods
 import controllers.routes
 import models.{CheckMode, UserAnswers}
 import pages.myapis.produce.ProduceApiHodPage
@@ -23,21 +24,20 @@ import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.govuk.summarylist._
-import viewmodels.implicits._
+import viewmodels.govuk.summarylist.*
+import viewmodels.implicits.*
 
 object ProduceApiHodSummary  {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, hods: Hods)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(ProduceApiHodPage).map {
       answers =>
-
         val value = ValueViewModel(
           HtmlContent(
             answers.map {
-              answer => HtmlFormat.escape(messages(s"produceApiHod.$answer")).toString
+              answer => hods.getDescription(answer)
             }
-            .mkString(",<br>")
+            .mkString("<br>")
           )
         )
 

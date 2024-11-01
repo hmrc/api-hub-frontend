@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.myapis.produce
 
-import controllers.routes
+import models.myapis.produce.ProduceApiEgressPrefixMapping
 import models.{CheckMode, UserAnswers}
 import pages.myapis.produce.ProduceApiEgressPrefixesPage
 import play.api.i18n.Messages
@@ -25,7 +25,6 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
-import pages.myapis.produce.ProduceApiEgressPrefixesPage
 
 object ProduceApiEgressPrefixesSummary  {
 
@@ -33,7 +32,7 @@ object ProduceApiEgressPrefixesSummary  {
     answers.get(ProduceApiEgressPrefixesPage).map {
       answer =>
 
-      val value = HtmlFormat.escape(answer.prefixes.mkString(",")).toString + "<br/>" + HtmlFormat.escape(answer.getMappings.map(_.toString).mkString(",")).toString
+      val value = buildPrefixesToRemove(answer.prefixes) + "" + buildMappings(answer.getMappings)
 
         SummaryListRowViewModel(
           key     = "produceApiEgressPrefix.checkYourAnswersLabel",
@@ -44,4 +43,23 @@ object ProduceApiEgressPrefixesSummary  {
           )
         )
     }
+    
+  private def buildPrefixesToRemove(prefixes: Seq[String])(implicit messages: Messages): String = {
+    prefixes match {
+      case Nil => ""
+      case _ => messages("produceApiEgressPrefix.checkYourAnswersValue.prefixes") + buildList(prefixes)
+    }
+  }
+  
+  private def buildMappings(mappings: Seq[ProduceApiEgressPrefixMapping])(implicit messages: Messages): String = {
+    mappings match {
+      case Nil => ""
+      case _ => messages("produceApiEgressPrefix.checkYourAnswersValue.mappings") + 
+        buildList(mappings.map(mapping => messages("produceApiEgressPrefix.checkYourAnswersValue.mapping", mapping.existing, mapping.replacement)))
+    }
+  }
+  
+  private def buildList(items: Seq[String]): String = {
+    "<ul><li>" + items.map(HtmlFormat.escape(_)).mkString("</li><li>") + "</li></ul>"
+  }
 }

@@ -16,33 +16,26 @@
 
 package viewmodels.checkAnswers.myapis.produce
 
-import controllers.myapis.produce.routes
 import models.{CheckMode, UserAnswers}
-import pages.myapis.produce.ProduceApiStatusPage
+import pages.myapis.produce.ProduceApiEnterApiTitlePage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.govuk.summarylist._
-import viewmodels.implicits._
+import viewmodels.govuk.summarylist.*
+import viewmodels.implicits.*
 
-object ProduceApiStatusSummary  {
+object ProduceApiNameSummary  {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(ProduceApiStatusPage).map {
+  def row(userAnswers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+    userAnswers.get(ProduceApiEnterApiTitlePage).map {
       answer =>
-
-        val value = ValueViewModel(
-          HtmlContent(answer.toString)
-        )
-
         SummaryListRowViewModel(
-          key     = "produceApiStatus.checkYourAnswersLabel",
-          value   = value,
+          key     = "produceApiReviewNameDescription.checkYourAnswersLabel.1",
+          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.ProduceApiStatusController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("produceApiStatus.change.hidden"))
+            ActionItemViewModel("site.change", controllers.myapis.produce.routes.ProduceApiEnterOasController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("produceApiReviewNameDescription.change.hidden"))
           )
-        )
+        ).withCssClass("hip-summary-list__row--no-border")
     }
 }

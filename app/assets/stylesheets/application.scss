@@ -892,3 +892,14 @@ header {
     color: govuk-colour("blue");
     cursor: pointer;
 }
+
+.hip-summary-list__row--no-border {
+    border-bottom: none;
+    dt, dd {
+        padding-bottom: 0;
+    }
+}
+.govuk-summary-list__value ul {
+    margin-top: 0;
+    margin-bottom: govuk-spacing(2);
+}

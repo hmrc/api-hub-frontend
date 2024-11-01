@@ -30,14 +30,9 @@ object ProduceApiShortDescriptionSummary  {
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(ProduceApiShortDescriptionPage).map {
       answer =>
-
         SummaryListRowViewModel(
-          key     = "produceApiShortDescription.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.ProduceApiShortDescriptionController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("produceApiShortDescription.change.hidden"))
-          )
+          key     = "produceApiReviewNameDescription.checkYourAnswersLabel.2",
+          value   = ValueViewModel(HtmlFormat.escape(answer).toString)
         )
     }
 }
