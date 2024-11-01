@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.actions.FakeUser
 import controllers.routes
 import forms.myapis.produce.ProduceApiReviewNameDescriptionFormProvider
-import models.UserAnswers
+import models.{CheckMode, NormalMode, UserAnswers}
 import models.myapis.produce.ProduceApiReviewNameDescription
 import models.myapis.produce.ProduceApiReviewNameDescription.Confirm
 import navigation.{FakeNavigator, Navigator}
@@ -42,8 +42,6 @@ class ProduceApiReviewNameDescriptionControllerSpec extends SpecBase with Mockit
 
   def onwardRoute = Call("GET", "/foo")
 
-  lazy val produceApiReviewNameDescriptionRoute = controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onPageLoad().url
-
   val formProvider = new ProduceApiReviewNameDescriptionFormProvider()
   val form = formProvider()
   val apiName = "API NAME"
@@ -64,7 +62,7 @@ class ProduceApiReviewNameDescriptionControllerSpec extends SpecBase with Mockit
       val fixture = buildFixture(Some(userAnswersWithDescription))
 
       running(fixture.application) {
-        val request = FakeRequest(GET, produceApiReviewNameDescriptionRoute)
+        val request = FakeRequest(GET, controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onPageLoad(NormalMode).url)
 
         val result = route(fixture.application, request).value
 
@@ -72,22 +70,22 @@ class ProduceApiReviewNameDescriptionControllerSpec extends SpecBase with Mockit
 
         status(result) mustEqual OK
 
-        contentAsString(result) mustEqual view(form, apiName, apiDescription, FakeUser)(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, apiName, apiDescription, FakeUser)(request, messages(fixture.application)).toString
       }
     }
 
-    "must populate the view correctly on a GET when the question has previously been answered" in {
+    "must NOT populate the view on a GET even when the question has previously been answered" in {
       val fixture = buildFixture(Some(userAnswersWithPreviousConfirmation))
 
       running(fixture.application) {
-        val request = FakeRequest(GET, produceApiReviewNameDescriptionRoute)
+        val request = FakeRequest(GET, controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onPageLoad(CheckMode).url)
 
         val view = fixture.application.injector.instanceOf[ProduceApiReviewNameDescriptionView]
 
         val result = route(fixture.application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(Set(Confirm)), apiName, apiDescription, FakeUser)(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(form, CheckMode, apiName, apiDescription, FakeUser)(request, messages(fixture.application)).toString
       }
     }
 
@@ -96,7 +94,7 @@ class ProduceApiReviewNameDescriptionControllerSpec extends SpecBase with Mockit
 
       running(fixture.application) {
         val request =
-          FakeRequest(POST, produceApiReviewNameDescriptionRoute)
+          FakeRequest(POST, controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onPageLoad(NormalMode).url)
             .withFormUrlEncodedBody(("value[0]", ProduceApiReviewNameDescription.values.head.toString))
 
         val result = route(fixture.application, request).value
@@ -111,7 +109,7 @@ class ProduceApiReviewNameDescriptionControllerSpec extends SpecBase with Mockit
 
       running(fixture.application) {
         val request =
-          FakeRequest(POST, produceApiReviewNameDescriptionRoute)
+          FakeRequest(POST, controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onPageLoad(NormalMode).url)
             .withFormUrlEncodedBody(("value", "invalid value"))
 
         val boundForm = form.bind(Map("value" -> "invalid value"))
@@ -121,7 +119,7 @@ class ProduceApiReviewNameDescriptionControllerSpec extends SpecBase with Mockit
         val result = route(fixture.application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, apiName, apiDescription, FakeUser)(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, apiName, apiDescription, FakeUser)(request, messages(fixture.application)).toString
       }
     }
 
@@ -129,7 +127,7 @@ class ProduceApiReviewNameDescriptionControllerSpec extends SpecBase with Mockit
       val fixture = buildFixture(None)
 
       running(fixture.application) {
-        val request = FakeRequest(GET, produceApiReviewNameDescriptionRoute)
+        val request = FakeRequest(GET, controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onPageLoad(NormalMode).url)
 
         val result = route(fixture.application, request).value
 
@@ -142,7 +140,7 @@ class ProduceApiReviewNameDescriptionControllerSpec extends SpecBase with Mockit
       val fixture = buildFixture(Some(userAnswersWithNoApiName))
 
       running(fixture.application) {
-        val request = FakeRequest(GET, produceApiReviewNameDescriptionRoute)
+        val request = FakeRequest(GET, controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onPageLoad(NormalMode).url)
 
         val result = route(fixture.application, request).value
 
@@ -156,7 +154,7 @@ class ProduceApiReviewNameDescriptionControllerSpec extends SpecBase with Mockit
 
       running(fixture.application) {
         val request =
-          FakeRequest(POST, produceApiReviewNameDescriptionRoute)
+          FakeRequest(POST, controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onPageLoad(NormalMode).url)
             .withFormUrlEncodedBody(("value[0]", ProduceApiReviewNameDescription.values.head.toString))
 
         val result = route(fixture.application, request).value

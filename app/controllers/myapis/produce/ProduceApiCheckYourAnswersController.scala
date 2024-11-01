@@ -23,7 +23,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.checkAnswers.myapis.produce.{ProduceApiChooseTeamSummary, ProduceApiDomainSummary, ProduceApiEgressPrefixesSummary, ProduceApiEgressSummary, ProduceApiEnterOasSummary, ProduceApiHodSummary, ProduceApiNameSummary, ProduceApiPassthroughSummary, ProduceApiShortDescriptionSummary, ProduceApiStatusSummary, ProduceApiSubDomainSummary}
+import viewmodels.checkAnswers.myapis.produce._
 import viewmodels.govuk.all.SummaryListViewModel
 import views.html.myapis.produce.ProduceApiCheckYourAnswersView
 
