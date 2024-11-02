@@ -27,6 +27,7 @@ import models.deployment.*
 import models.exception.{ApplicationCredentialLimitException, ApplicationsException, TeamNameNotUniqueException}
 import models.requests.{AddApiRequest, ChangeTeamNameRequest, TeamMemberRequest}
 import models.stats.ApisInProductionStatistic
+import models.status.ServiceStatuses
 import models.team.{NewTeam, Team}
 import models.user.UserContactDetails
 import play.api.Logging
@@ -597,5 +598,12 @@ class ApplicationsConnector @Inject()(
       .setHeader(ACCEPT -> JSON)
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Seq[EgressGateway]]
+  }
+
+  def status()(implicit hc: HeaderCarrier): Future[ServiceStatuses] = {
+    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/status")
+      .setHeader(ACCEPT -> JSON)
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[ServiceStatuses]
   }
 }

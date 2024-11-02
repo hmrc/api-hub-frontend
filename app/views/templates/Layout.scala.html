@@ -16,6 +16,7 @@
 
 @import components.FullWidthMainContent
 @import config.FrontendAppConfig
+@import models.status.ServiceStatuses
 @import models.user.{StrideUser, UserModel}
 @import templates.ApiHubHeader
 @import uk.gov.hmrc.hmrcfrontend.views.config.StandardAlphaBanner
@@ -37,7 +38,8 @@
     twoThirdsMainContent: TwoThirdsMainContent,
     fullWidthMainContentLayout: FullWidthMainContent,
     header: ApiHubHeader,
-    hmrcInternalHead: HmrcInternalHead
+    hmrcInternalHead: HmrcInternalHead,
+    govukPhaseBanner: GovukPhaseBanner
 )
 
 @(
@@ -49,7 +51,8 @@
     fullWidth: Boolean = false,
     customScriptsBlock: Option[Html] = None,
     customStyles: Option[Html] = None,
-    activeLink: Option[String] = None
+    activeLink: Option[String] = None,
+    statuses: Option[ServiceStatuses] = None,
 )(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
 
 @head = {
@@ -102,6 +105,26 @@
     >
         @messages("site.feedback")
     </a>
+
+    @for(serviceStatuses <- statuses) {
+        @govukPhaseBanner(PhaseBanner(
+            tag = Some(Tag(
+                content = Text(
+                        if (serviceStatuses.hasServiceDown) then
+                            "Ongoing issues"
+                        else
+                            "Good service"
+                    ),
+                classes = s"${if (serviceStatuses.hasServiceDown) then "govuk-tag--red" else ""}"
+                )),
+            content = Text(
+                    if (serviceStatuses.hasServiceDown) then
+                        "We are experiencing some issues."
+                    else
+                        "All services are healthy."
+                )
+        ))
+    }
 
     @contentBlock
 

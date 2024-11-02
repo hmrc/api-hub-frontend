@@ -15,6 +15,7 @@
  *@
 
 @import models.application.Application
+@import models.status.ServiceStatuses
 @import models.user.UserModel
 @import views.ViewUtils
 @import models.team.Team
@@ -26,14 +27,15 @@
     govukTable: GovukTable
 )
 
-@(applications: Seq[Application], totalApplicationCount: Int, teams: Seq[Team], totalTeamCount: Int, user: Option[UserModel])(implicit request: Request[?], messages: Messages)
+@(applications: Seq[Application], totalApplicationCount: Int, teams: Seq[Team], totalTeamCount: Int, user: Option[UserModel], statuses: ServiceStatuses)(implicit request: Request[?], messages: Messages)
 
 @layout(
     pageTitle    = titleNoForm(messages("dashboard.title")),
     showBackLink = true,
     fullWidth    = true,
     user = user,
-    activeLink = Some("dashboard")
+    activeLink = Some("dashboard"),
+    statuses = Some(statuses)
 ) {
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
