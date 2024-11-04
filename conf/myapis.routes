@@ -47,8 +47,8 @@ POST    /produce/change-short-description                   controllers.myapis.p
 
 GET     /produce/review-name-description                    controllers.myapis.produce.ProduceApiReviewNameDescriptionController.onPageLoad(mode: Mode = NormalMode)
 POST    /produce/review-name-description                    controllers.myapis.produce.ProduceApiReviewNameDescriptionController.onSubmit(mode: Mode = NormalMode)
-GET     /produce/change-name-description                    controllers.myapis.produce.ProduceApiReviewNameDescriptionController.onPageLoad(mode: Mode = CheckMode)
-POST    /produce/change-name-description                    controllers.myapis.produce.ProduceApiReviewNameDescriptionController.onSubmit(mode: Mode = CheckMode)
+GET     /produce/change-review-name-description             controllers.myapis.produce.ProduceApiReviewNameDescriptionController.onPageLoad(mode: Mode = CheckMode)
+POST    /produce/change-review-name-description             controllers.myapis.produce.ProduceApiReviewNameDescriptionController.onSubmit(mode: Mode = CheckMode)
 
 GET     /produce/egress                                     controllers.myapis.produce.ProduceApiEgressController.onPageLoad(mode: Mode = NormalMode)
 POST    /produce/egress                                     controllers.myapis.produce.ProduceApiEgressController.onSubmit(mode: Mode = NormalMode)

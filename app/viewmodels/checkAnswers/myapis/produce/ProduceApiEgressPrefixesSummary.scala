@@ -29,20 +29,22 @@ import viewmodels.implicits.*
 object ProduceApiEgressPrefixesSummary  {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(ProduceApiEgressPrefixesPage).map {
-      answer =>
-
-      val value = buildPrefixesToRemove(answer.prefixes) + "" + buildMappings(answer.getMappings)
-
-        SummaryListRowViewModel(
-          key     = "produceApiEgressPrefix.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlContent(value)),
-          actions = Seq(
-            ActionItemViewModel("site.change", controllers.myapis.produce.routes.ProduceApiEgressPrefixesController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("produceApiEgressPrefix.change.hidden"))
-          )
-        )
+    val value = answers.get(ProduceApiEgressPrefixesPage) match {
+      case Some(answer) if ! answer.isEmpty => buildPrefixesToRemove(answer.prefixes) + "" + buildMappings(answer.getMappings)
+      case _ => messages("produceApiEgressPrefix.checkYourAnswersValue.none")
     }
+    val changeUrl = answers.get(ProduceApiEgressPrefixesPage) match {
+      case Some(_) => controllers.myapis.produce.routes.ProduceApiEgressPrefixesController.onPageLoad(CheckMode).url
+      case None => controllers.myapis.produce.routes.ProduceApiEgressController.onPageLoad(CheckMode).url
+    }
+    Some(SummaryListRowViewModel(
+      key     = "produceApiEgressPrefix.checkYourAnswersLabel",
+      value   = ValueViewModel(HtmlContent(value)),
+      actions = Seq(
+        ActionItemViewModel("site.change", changeUrl)
+          .withVisuallyHiddenText(messages("produceApiEgressPrefix.change.hidden"))
+      )
+    ))
     
   private def buildPrefixesToRemove(prefixes: Seq[String])(implicit messages: Messages): String = {
     prefixes match {
