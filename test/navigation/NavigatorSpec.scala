@@ -134,7 +134,7 @@ class NavigatorSpec extends SpecBase with TryValues {
           navigator.nextPage(ProduceApiEnterOasPage, NormalMode, emptyUserAnswers.set(ProduceApiEnterOasPage, "oas").get) mustBe controllers.myapis.produce.routes.ProduceApiShortDescriptionController.onPageLoad(NormalMode)
         }
         "must go from the Enter a short description page to the API review page" in {
-          navigator.nextPage(ProduceApiShortDescriptionPage, NormalMode, emptyUserAnswers.set(ProduceApiShortDescriptionPage, "short description").get) mustBe controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onPageLoad()
+          navigator.nextPage(ProduceApiShortDescriptionPage, NormalMode, emptyUserAnswers.set(ProduceApiShortDescriptionPage, "short description").get) mustBe controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onPageLoad(NormalMode)
         }
         "must go from the API review page to the Egress page" in {
           navigator.nextPage(ProduceApiReviewNameDescriptionPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiEgressController.onPageLoad(NormalMode)
@@ -222,6 +222,44 @@ class NavigatorSpec extends SpecBase with TryValues {
         }
         "must go from the Provide supporting information page to the Check your answers page" in {
           navigator.nextPage(ProvideSupportingInformationPage, CheckMode, emptyUserAnswers) mustBe controllers.application.accessrequest.routes.RequestProductionAccessController.onPageLoad()
+        }
+      }
+
+      "during the Produce an API journey" - {
+        "must go from Owning Team page to the Check Your Answers page" in {
+          navigator.nextPage(ProduceApiChooseTeamPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
+        }
+        "must go from the OAS editor page to the Short Description page" in {
+          navigator.nextPage(ProduceApiEnterOasPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiShortDescriptionController.onPageLoad(CheckMode)
+        }
+        "must go from the Short Description page to the Preview Name/Description page" in {
+          navigator.nextPage(ProduceApiShortDescriptionPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onPageLoad(CheckMode)
+        }
+        "must go from the Preview Name/Description page to the Check Your Answers page" in {
+          navigator.nextPage(ProduceApiReviewNameDescriptionPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
+        }
+        "must go from the Egress page to the Egress Prefixes page when the user chooses to configure prefixes" in {
+          val userAnswers = emptyUserAnswers.set(ProduceApiChooseEgressPage, ProduceApiChooseEgress(None, true)).get
+          navigator.nextPage(ProduceApiChooseEgressPage, CheckMode, userAnswers) mustBe controllers.myapis.produce.routes.ProduceApiEgressPrefixesController.onPageLoad(CheckMode)
+        }
+        "must go from the Egress page to the Check Your Answers page when the user chooses not to configure prefixes" in {
+          val userAnswers = emptyUserAnswers.set(ProduceApiChooseEgressPage, ProduceApiChooseEgress(None, false)).get
+          navigator.nextPage(ProduceApiChooseEgressPage, CheckMode, userAnswers) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
+        }
+        "must go from the Egress Prefixes page to the Check Your Answers page" in {
+          navigator.nextPage(ProduceApiEgressPrefixesPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
+        }
+        "must go from the HoD page to the Egress Prefixes page" in {
+          navigator.nextPage(ProduceApiHodPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
+        }
+        "must go from the Domain/Subdomain page to the Egress Prefixes page" in {
+          navigator.nextPage(ProduceApiDomainPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
+        }
+        "must go from the API status page to the Egress Prefixes page" in {
+          navigator.nextPage(ProduceApiStatusPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
+        }
+        "must go from the API passthrough page to the Egress Prefixes page" in {
+          navigator.nextPage(ProduceApiPassthroughPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
         }
       }
     }

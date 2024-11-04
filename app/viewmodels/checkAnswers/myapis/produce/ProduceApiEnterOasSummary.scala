@@ -33,7 +33,7 @@ object ProduceApiEnterOasSummary  {
 
         SummaryListRowViewModel(
           key     = "produceApiEnterOas.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
+          value   = ValueViewModel(messages("produceApiEnterOas.checkYourAnswersValue", answer)),
           actions = Seq(
             ActionItemViewModel("site.change", controllers.myapis.produce.routes.ProduceApiEnterOasController.onPageLoad(CheckMode).url)
               .withVisuallyHiddenText(messages("produceApiEnterOas.change.hidden"))

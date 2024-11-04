@@ -36,6 +36,10 @@ case class ProduceApiEgressPrefixes(prefixes: Seq[String], mappings: Seq[String]
       ProduceApiEgressPrefixMapping(split(0), split(1))
     }
   }
+  
+  def isEmpty = {
+    prefixes.isEmpty && mappings.isEmpty
+  }
 }
 
 object ProduceApiEgressPrefixes {

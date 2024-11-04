@@ -27,7 +27,7 @@ import org.scalatest.prop.TableDrivenPropertyChecks
 
 import java.time.Instant
 
-class ProduceApiEgressPrefixesSpec extends AnyFreeSpec with Matchers {
+class ProduceApiEgressPrefixesSpec extends AnyFreeSpec with Matchers with TableDrivenPropertyChecks {
 
   "ProduceApiEgressPrefixes" - {
     "getMappings must return correct values" in {
@@ -44,6 +44,18 @@ class ProduceApiEgressPrefixesSpec extends AnyFreeSpec with Matchers {
       val expected = Some((prefixes, mappings))
 
       ProduceApiEgressPrefixes.unapply(model) mustBe expected
+    }
+    
+    "isEmpty must return correct value" in {
+      forAll(Table(
+        ("Prefixes", "Mappings", "Expected"),
+        (Seq.empty, Seq.empty, true),
+        (Seq("/prefix"), Seq.empty, false),
+        (Seq.empty, Seq("/aa->/bb"), false),
+        (Seq("/prefix"), Seq("/aa->/bb"), false),
+      )) { (prefixes, mappings, expectedResult) =>
+        ProduceApiEgressPrefixes(prefixes, mappings).isEmpty mustBe expectedResult
+      }
     }
   }
 }

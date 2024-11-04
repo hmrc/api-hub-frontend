@@ -24,7 +24,8 @@
         govukButton: GovukButton,
         govukErrorSummary: GovukErrorSummary,
         govukSelect: GovukSelect,
-        govukRadios: GovukRadios
+        govukRadios: GovukRadios,
+        newTabLink: components.NewTabLink
 )
 
 @(form: Form[?], mode: Mode, userModel: UserModel, guidesUrl: String, egressGateways: Seq[EgressGateway])(implicit request: Request[?], messages: Messages)
@@ -39,7 +40,7 @@
 
 @egressHint= {
     @messages("myApis.produce.selectegress.body")
-    <a href="@helpDocsUrlEgress" target="_blank">@messages("myApis.produce.selectegress.body.link")</a>
+    @newTabLink(helpDocsUrlEgress, messages("myApis.produce.selectegress.body.link")).
 }
 
 @layout(pageTitle = title(form, messages("myApis.produce.selectegress.title")), user = Some(userModel)) {
@@ -72,7 +73,7 @@
         </div>
         <div class="govuk-hint">
             @messages("myApis.produce.selectegress.prefixes.body.hint")
-            <a href="@helpDocsUrlEgressPrefix" target="_blank">@messages("myApis.produce.selectegress.prefixes.body.link")</a>
+            @newTabLink(helpDocsUrlEgressPrefix, messages("myApis.produce.selectegress.prefixes.body.link")).
         </div>
 
         @govukRadios(
