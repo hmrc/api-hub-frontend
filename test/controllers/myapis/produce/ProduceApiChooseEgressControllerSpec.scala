@@ -20,13 +20,13 @@ import base.SpecBase
 import controllers.actions.FakeUser
 import forms.myapis.produce.ProduceApiChooseEgressFormProvider
 import generators.EgressGenerator
-import models.myapis.produce.ProduceApiChooseEgress
+import models.myapis.produce.{ProduceApiChooseEgress,ProduceApiEgressPrefixes}
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.ArgumentMatchers.{any,argThat}
+import org.mockito.Mockito.{when,verify}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.myapis.produce.ProduceApiChooseEgressPage
+import pages.myapis.produce.{ProduceApiEgressPrefixesPage,ProduceApiChooseEgressPage}
 import play.api.Application as PlayApplication
 import play.api.inject.bind
 import play.api.mvc.Call
@@ -109,6 +109,57 @@ class ProduceApiChooseEgressControllerSpec extends SpecBase with MockitoSugar wi
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual onwardRoute.url
+      }
+    }
+
+    "must remove Egress Prefixes if user changes answer from Yes to No" in {
+      val egressGateways = sampleEgressGateways()
+
+      val userAnswersWithPrefixesAndAnswerNo = emptyUserAnswers
+        .set(ProduceApiEgressPrefixesPage, ProduceApiEgressPrefixes(Seq("/prefix"), Seq("/existing->/replacement"))).success.value
+        .set(ProduceApiChooseEgressPage, ProduceApiChooseEgress(Some(egressGateways.head.id), false))
+        .success.value
+      val fixture = buildFixture(userAnswers = Some(userAnswersWithPrefixesAndAnswerNo))
+      when(fixture.sessionRepository.set(any())).thenReturn(Future.successful(true))
+
+      when(fixture.apiHubService.listEgressGateways()(any)).thenReturn(Future.successful(egressGateways))
+
+      running(fixture.application) {
+        val request =
+          FakeRequest(POST, produceApiChooseEgressRoute)
+            .withFormUrlEncodedBody(("selectEgress", egressGateways.head.id),("egressPrefix", "false"))
+
+        val result = route(fixture.application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
+        verify(fixture.sessionRepository).set(argThat((userAnswers: UserAnswers) => userAnswers.get(ProduceApiEgressPrefixesPage).isEmpty))
+      }
+    }
+
+    "must not remove Egress Prefixes if user answer remains Yes" in {
+      val egressGateways = sampleEgressGateways()
+      val previousPrefixesAnswer = ProduceApiEgressPrefixes(Seq("/prefix"), Seq("/existing->/replacement"))
+
+      val userAnswersWithPrefixesAndAnswerYes = emptyUserAnswers
+        .set(ProduceApiEgressPrefixesPage, previousPrefixesAnswer).success.value
+        .set(ProduceApiChooseEgressPage, ProduceApiChooseEgress(Some(egressGateways.head.id), true))
+        .success.value
+      val fixture = buildFixture(userAnswers = Some(userAnswersWithPrefixesAndAnswerYes))
+      when(fixture.sessionRepository.set(any())).thenReturn(Future.successful(true))
+
+      when(fixture.apiHubService.listEgressGateways()(any)).thenReturn(Future.successful(egressGateways))
+
+      running(fixture.application) {
+        val request =
+          FakeRequest(POST, produceApiChooseEgressRoute)
+            .withFormUrlEncodedBody(("selectEgress", egressGateways.head.id), ("egressPrefix", "true"))
+
+        val result = route(fixture.application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
+        verify(fixture.sessionRepository).set(argThat((userAnswers: UserAnswers) => userAnswers.get(ProduceApiEgressPrefixesPage).contains(previousPrefixesAnswer)))
       }
     }
   }
