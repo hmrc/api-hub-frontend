@@ -19,6 +19,7 @@ package models.application
 import play.api.libs.json.{Format, Json}
 
 import java.time.LocalDateTime
+import scala.math.Ordered.orderingToOrdered
 
 case class CredentialScopes(
   environmentName: EnvironmentName,
@@ -30,5 +31,9 @@ case class CredentialScopes(
 object CredentialScopes {
 
   implicit val formatCredentialScopes: Format[CredentialScopes] = Json.format[CredentialScopes]
+
+  implicit val orderingCredentialScopes: Ordering[CredentialScopes] = (x: CredentialScopes, y: CredentialScopes) => {
+    (x.environmentName.toString, x.created) compare (y.environmentName.toString, y.created)
+  }
 
 }

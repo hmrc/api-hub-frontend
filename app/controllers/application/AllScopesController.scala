@@ -39,7 +39,7 @@ class AllScopesController @Inject()(
   def onPageLoad(id: String): Action[AnyContent] = (identify andThen isSupport).async {
     implicit request =>
       apiHubService.fetchAllScopes(id).map {
-        case Some(scopes) => Ok(Json.toJson(scopes))
+        case Some(scopes) => Ok(Json.toJson(scopes.sorted))
         case None => errorResultBuilder.applicationNotFound(id)
       }
   }
