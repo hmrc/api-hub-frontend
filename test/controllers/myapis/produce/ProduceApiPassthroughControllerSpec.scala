@@ -17,9 +17,9 @@
 package controllers.myapis.produce
 
 import base.SpecBase
-import controllers.actions.FakeUser
 import controllers.routes
 import forms.myapis.produce.ProduceApiPassthroughFormProvider
+import models.user.UserModel
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
@@ -29,13 +29,13 @@ import pages.myapis.produce.ProduceApiPassthroughPage
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.SessionRepository
 import views.html.myapis.produce.ProduceApiPassthroughView
-
+import utils.TestHelpers
 import scala.concurrent.Future
 
-class ProduceApiPassthroughControllerSpec extends SpecBase with MockitoSugar {
+class ProduceApiPassthroughControllerSpec extends SpecBase with MockitoSugar with TestHelpers {
 
   def onwardRoute = Call("GET", "/foo")
 
@@ -46,113 +46,166 @@ class ProduceApiPassthroughControllerSpec extends SpecBase with MockitoSugar {
 
   "ProduceApiPassthrough Controller" - {
 
-    "must return OK and the correct view for a GET" in {
+    "must return OK and the correct view for a GET for a support user" in {
+      forAll(usersWhoCanSupport) { (user: UserModel) =>
+        val application = applicationBuilder(
+          userAnswers = Some(emptyUserAnswers),
+          user = user
+        ).build()
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+        running(application) {
+          val request = FakeRequest(GET, produceApiPassthroughRoute)
 
-      running(application) {
-        val request = FakeRequest(GET, produceApiPassthroughRoute)
+          val result = route(application, request).value
 
-        val result = route(application, request).value
+          val view = application.injector.instanceOf[ProduceApiPassthroughView]
 
-        val view = application.injector.instanceOf[ProduceApiPassthroughView]
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, FakeUser)(request, messages(application)).toString
+          status(result) mustEqual OK
+          contentAsString(result) mustEqual view(form, NormalMode, user)(request, messages(application)).toString
+        }
       }
     }
 
-    "must populate the view correctly on a GET when the question has previously been answered" in {
+    "must populate the view correctly on a GET when the question has previously been answered for a support user" in {
+      forAll(usersWhoCanSupport) { (user: UserModel) =>
+        val userAnswers = UserAnswers(userAnswersId).set(ProduceApiPassthroughPage, true).success.value
+        val application = applicationBuilder(
+          userAnswers = Some(userAnswers),
+          user = user
+        ).build()
 
-      val userAnswers = UserAnswers(userAnswersId).set(ProduceApiPassthroughPage, true).success.value
+        running(application) {
+          val request = FakeRequest(GET, produceApiPassthroughRoute)
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+          val view = application.injector.instanceOf[ProduceApiPassthroughView]
 
-      running(application) {
-        val request = FakeRequest(GET, produceApiPassthroughRoute)
+          val result = route(application, request).value
 
-        val view = application.injector.instanceOf[ProduceApiPassthroughView]
-
-        val result = route(application, request).value
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode, FakeUser)(request, messages(application)).toString
+          status(result) mustEqual OK
+          contentAsString(result) mustEqual view(form.fill(true), NormalMode, user)(request, messages(application)).toString
+        }
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must redirect to the next page when valid data is submitted for a support user" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+      forAll(usersWhoCanSupport) { (user: UserModel) =>
+        val application =
+          applicationBuilder(
+            userAnswers = Some(emptyUserAnswers),
+            user = user
+          ).overrides(
+              bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
 
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
-          .build()
+        running(application) {
+          val request =
+            FakeRequest(POST, produceApiPassthroughRoute)
+              .withFormUrlEncodedBody(("value", "true"))
 
-      running(application) {
-        val request =
-          FakeRequest(POST, produceApiPassthroughRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+          val result = route(application, request).value
 
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual onwardRoute.url
+        }
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
+      forAll(usersWhoCanSupport) { (user: UserModel) =>
+        val application = applicationBuilder(
+          userAnswers = Some(emptyUserAnswers),
+          user = user
+        ).build()
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+        running(application) {
+          val request =
+            FakeRequest(POST, produceApiPassthroughRoute)
+              .withFormUrlEncodedBody(("value", ""))
 
-      running(application) {
-        val request =
-          FakeRequest(POST, produceApiPassthroughRoute)
-            .withFormUrlEncodedBody(("value", ""))
+          val boundForm = form.bind(Map("value" -> ""))
 
-        val boundForm = form.bind(Map("value" -> ""))
+          val view = application.injector.instanceOf[ProduceApiPassthroughView]
 
-        val view = application.injector.instanceOf[ProduceApiPassthroughView]
+          val result = route(application, request).value
 
-        val result = route(application, request).value
-
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, FakeUser)(request, messages(application)).toString
+          status(result) mustEqual BAD_REQUEST
+          contentAsString(result) mustEqual view(boundForm, NormalMode, user)(request, messages(application)).toString
+        }
       }
     }
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
+      forAll(usersWhoCanSupport) { (user: UserModel) =>
+        val application = applicationBuilder(userAnswers = None, user = user).build()
 
-      val application = applicationBuilder(userAnswers = None).build()
+        running(application) {
+          val request = FakeRequest(GET, produceApiPassthroughRoute)
 
-      running(application) {
-        val request = FakeRequest(GET, produceApiPassthroughRoute)
+          val result = route(application, request).value
 
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        }
       }
     }
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
+      forAll(usersWhoCanSupport) { (user: UserModel) =>
+        val application = applicationBuilder(userAnswers = None, user = user).build()
 
-      val application = applicationBuilder(userAnswers = None).build()
+        running(application) {
+          val request =
+            FakeRequest(POST, produceApiPassthroughRoute)
+              .withFormUrlEncodedBody(("value", "true"))
 
-      running(application) {
-        val request =
-          FakeRequest(POST, produceApiPassthroughRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+          val result = route(application, request).value
 
-        val result = route(application, request).value
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+    }
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+    "must redirect to the unauthorised page for a non-support user making a GET request" in {
+      forAll(usersWhoCannotSupport) { (user: UserModel) =>
+        val application = applicationBuilder(
+          userAnswers = Some(emptyUserAnswers),
+          user = user
+        ).build()
+
+        running(application) {
+          val request = FakeRequest(GET, produceApiPassthroughRoute)
+
+          val result = route(application, request).value
+
+          val view = application.injector.instanceOf[ProduceApiPassthroughView]
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad.url)
+        }
+      }
+    }
+
+    "must redirect to the unauthorised page for a non-support user making a POST request" in {
+      forAll(usersWhoCannotSupport) { (user: UserModel) =>
+        val application = applicationBuilder(
+          userAnswers = Some(emptyUserAnswers),
+          user = user
+        ).build()
+
+        running(application) {
+          val request = FakeRequest(POST, produceApiPassthroughRoute).withFormUrlEncodedBody(("value", "true"))
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad.url)
+        }
       }
     }
   }
