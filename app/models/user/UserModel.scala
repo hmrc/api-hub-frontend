@@ -17,18 +17,27 @@
 package models.user
 
 import viewmodels.WithName
+import play.api.libs.json.{Format, Json}
+import models.Enumerable
 
 sealed trait UserType
 
 case object LdapUser extends WithName("LDAP") with UserType
 case object StrideUser extends WithName("Stride") with UserType
 
+object UserType extends Enumerable.Implicits {
+  val values = Seq(LdapUser, StrideUser)
+
+  implicit val enumerable: Enumerable[UserType] =
+    Enumerable(values.map(value => value.toString -> value)*)
+}
+
 case class Permissions(canApprove: Boolean, canSupport: Boolean, isPrivileged: Boolean)
 
 object Permissions {
-
   def apply(): Permissions = Permissions(canApprove = false, canSupport = false, isPrivileged = false)
 
+  implicit val formatPermissions: Format[Permissions] = Json.format[Permissions]
 }
 
 case class UserModel(
@@ -37,3 +46,7 @@ case class UserModel(
   email: String,
   permissions: Permissions = Permissions()
 )
+
+object UserModel {
+  implicit val formatUserModel: Format[UserModel] = Json.format[UserModel]
+}
