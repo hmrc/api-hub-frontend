@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import models.deployment.{Error, FailuresResponse}
 @import models.user.UserModel
 @import models.myapis.produce.ProduceApiHowToCreate
 
@@ -22,18 +23,38 @@
     formHelper: FormWithCSRF,
     govukButton: GovukButton,
     govukSummaryList: GovukSummaryList,
+    govukErrorSummary: GovukErrorSummary,
 )
 
-@(summaryList: SummaryList, userModel: UserModel)(implicit request: Request[?], messages: Messages)
+@(summaryList: SummaryList, userModel: UserModel, maybeFailuresResponse: Option[FailuresResponse] = None)(implicit request: Request[?], messages: Messages)
+
+@errorList(failuresResponse: FailuresResponse) = @{
+    failuresResponse.errors.map(_.map(error =>
+        ErrorLink(
+            content = Text(s"${error.`type`} - ${error.message}"),
+            href = Some("#")
+        )
+    )).getOrElse(Seq.empty)
+}
 
 @layout(pageTitle = titleNoForm(messages("produceApiCheckYourAnswers.title")), user = Some(userModel), fullWidth = true) {
+
+    @for(failuresResponse <- maybeFailuresResponse) {
+        @govukErrorSummary(
+            ErrorSummary(
+                title = Text(s"${failuresResponse.code} - ${failuresResponse.reason}"),
+                errorList = errorList(failuresResponse)
+            )
+        )
+    }
+
     <h1 class="govuk-heading-l">@messages("produceApiCheckYourAnswers.heading")</h1>
 
     <p class="govuk-body">@messages("produceApiCheckYourAnswers.description")</p>
 
     @govukSummaryList(summaryList)
 
-    @formHelper(action = controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onSubmit("ok")) {
+    @formHelper(action = controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onSubmit()) {
         @govukButton(
             ButtonViewModel(messages("site.continue"))
         )

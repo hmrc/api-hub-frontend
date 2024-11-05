@@ -22,7 +22,7 @@ import models.AvailableEndpoint
 import models.accessrequest.{AccessRequest, AccessRequestRequest, AccessRequestStatus}
 import models.api.{ApiDeploymentStatuses, ApiDetail, ApiDetailSummary, EgressGateway, PlatformContact}
 import models.application.*
-import models.deployment.DeploymentDetails
+import models.deployment.{DeploymentDetails, DeploymentsRequest, DeploymentsResponse}
 import models.exception.ApplicationsException
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
 import models.stats.ApisInProductionStatistic
@@ -89,6 +89,13 @@ class ApiHubService @Inject()(
 
   def getDeploymentDetails(publisherReference: String)(implicit hc: HeaderCarrier): Future[Option[DeploymentDetails]] = {
     applicationsConnector.getDeploymentDetails(publisherReference)
+  }
+
+  def generateDeployment(deploymentsRequest: DeploymentsRequest)(implicit hc: HeaderCarrier): Future[DeploymentsResponse] = {
+    val deploymentsRequestWithFormattedName = deploymentsRequest.copy(
+      name = formatAsKebabCase(deploymentsRequest.name)
+    )
+    applicationsConnector.generateDeployment(deploymentsRequestWithFormattedName)
   }
 
   def getApis(platform: Option[String] = None)(implicit hc: HeaderCarrier): Future[Seq[ApiDetailSummary]] = {
@@ -217,5 +224,13 @@ class ApiHubService @Inject()(
   def fetchAllScopes(applicationId: String)(implicit hc: HeaderCarrier): Future[Option[Seq[CredentialScopes]]] = {
     applicationsConnector.fetchAllScopes(applicationId)
   }
+
+  private[services] def formatAsKebabCase(text: String): String =
+    text.trim
+      .toLowerCase()
+      .replaceAll("[^\\w\\s_-]", "")
+      .split("[\\s_]")
+      .filterNot(_.isBlank)
+      .mkString("-")
 
 }
