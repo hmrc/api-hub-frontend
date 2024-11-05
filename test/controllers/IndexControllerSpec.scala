@@ -21,6 +21,7 @@ import controllers.IndexControllerSpec.buildFixture
 import controllers.actions.FakeUser
 import generators.TeamGenerator
 import models.application.{Application, Creator, TeamMember}
+import models.status.ServiceStatuses
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -66,7 +67,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with TeamGenerator 
 
         val sortedApplications = applications.sortBy(_.created).reverse
         val sortedTeams = teams.sortBy(_.created).reverse
-        contentAsString(result) mustEqual view(sortedApplications, applications.size, sortedTeams, teams.size, Some(FakeUser))(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(sortedApplications, applications.size, sortedTeams, teams.size, Some(FakeUser), ServiceStatuses(Seq.empty))(request, messages(fixture.application)).toString
         contentAsString(result) must validateAsHtml
       }
     }
@@ -93,7 +94,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with TeamGenerator 
 
         status(result) mustEqual OK
 
-        contentAsString(result) mustEqual view(applications, 0, teams, 0, Some(FakeUser))(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(applications, 0, teams, 0, Some(FakeUser), ServiceStatuses(Seq.empty))(request, messages(fixture.application)).toString
         contentAsString(result) must validateAsHtml
       }
     }

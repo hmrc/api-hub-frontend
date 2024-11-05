@@ -16,10 +16,10 @@
 
 package controllers
 
-import controllers.actions.IdentifierAction
+import controllers.actions.{IdentifierAction, StatusActionProvider}
 import play.api.Logging
 import play.api.i18n.I18nSupport
-import play.api.mvc._
+import play.api.mvc.*
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.IndexView
@@ -30,11 +30,12 @@ import scala.concurrent.ExecutionContext
 class IndexController @Inject()(
                                  val controllerComponents: MessagesControllerComponents,
                                  identify: IdentifierAction,
+                                 status: StatusActionProvider,
                                  view: IndexView,
                                  apiHubService: ApiHubService
                                )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
-  def onPageLoad: Action[AnyContent] = identify.async { implicit request =>
+  def onPageLoad: Action[AnyContent] = (identify andThen status()).async { implicit request =>
     val maxApplicationsToShow = 5
     val maxTeamsToShow = 5
 
@@ -46,7 +47,8 @@ class IndexController @Inject()(
         userApps.size,
         userTeams.sortBy(_.created).reverse.take(maxTeamsToShow),
         userTeams.size,
-        Some(request.user)
+        Some(request.user),
+        request.serviceStatuses
     ))
   }
 
