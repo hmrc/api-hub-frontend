@@ -599,7 +599,7 @@ class ApplicationsConnector @Inject()(
       .execute[Seq[EgressGateway]]
   }
 
-  def fetchALlScopes(applicationId: String)(implicit hc: HeaderCarrier): Future[Option[Seq[CredentialScopes]]] = {
+  def fetchAllScopes(applicationId: String)(implicit hc: HeaderCarrier): Future[Option[Seq[CredentialScopes]]] = {
     httpClient.get(url"$applicationsBaseUrl/api-hub-applications/applications/$applicationId/all-scopes")
       .setHeader(ACCEPT -> JSON)
       .setHeader(AUTHORIZATION -> clientAuthToken)

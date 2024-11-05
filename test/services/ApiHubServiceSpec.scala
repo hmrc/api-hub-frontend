@@ -862,7 +862,7 @@ class ApiHubServiceSpec
           )
       )
 
-      when(fixture.applicationsConnector.fetchALlScopes(eqTo(applicationId))(any))
+      when(fixture.applicationsConnector.fetchAllScopes(eqTo(applicationId))(any))
         .thenReturn(Future.successful(Some(credentialScopes)))
 
       fixture.service.fetchAllScopes(applicationId)(HeaderCarrier()).map {

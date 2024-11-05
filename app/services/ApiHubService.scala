@@ -215,7 +215,7 @@ class ApiHubService @Inject()(
   }
 
   def fetchAllScopes(applicationId: String)(implicit hc: HeaderCarrier): Future[Option[Seq[CredentialScopes]]] = {
-    applicationsConnector.fetchALlScopes(applicationId)
+    applicationsConnector.fetchAllScopes(applicationId)
   }
 
 }

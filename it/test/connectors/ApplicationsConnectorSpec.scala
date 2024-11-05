@@ -1674,7 +1674,7 @@ class ApplicationsConnectorSpec
     }
   }
 
-  "fetchALlScopes" - {
+  "fetchAllScopes" - {
     "must place the correct request and return the credential scopes" in {
       val applicationId = "test-application-id"
 
@@ -1698,7 +1698,7 @@ class ApplicationsConnectorSpec
           )
       )
 
-      buildConnector(this).fetchALlScopes(applicationId)(HeaderCarrier()).map {
+      buildConnector(this).fetchAllScopes(applicationId)(HeaderCarrier()).map {
         result =>
           result.value mustBe credentialScopes
       }
@@ -1715,7 +1715,7 @@ class ApplicationsConnectorSpec
           )
       )
 
-      buildConnector(this).fetchALlScopes(applicationId)(HeaderCarrier()).map {
+      buildConnector(this).fetchAllScopes(applicationId)(HeaderCarrier()).map {
         result =>
           result mustBe empty
       }
