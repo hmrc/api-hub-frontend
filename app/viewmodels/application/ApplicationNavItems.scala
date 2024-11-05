@@ -29,9 +29,10 @@ object ApplicationSideNavPages {
   case object EnvironmentsAndCredentialsPage extends SideNavPage
   case object ManageTeamMembersPage extends SideNavPage
   case object DeleteApplicationPage extends SideNavPage
-  case object ViewAsJsonApplicationPage extends SideNavPage
   case object ChangeOwningTeamPage extends SideNavPage
   case object ApplicationHistoryPage extends SideNavPage
+  case object ViewAsJsonApplicationPage extends SideNavPage
+  case object AllScopesPage extends SideNavPage
 
 }
 
@@ -41,66 +42,79 @@ object ApplicationNavItems {
 
   def apply(userModel: Option[UserModel], application: Application, currentPage: SideNavPage)(implicit messages: Messages): Seq[SideNavItem] = {
     Seq(
-      SideNavItem(
+      Some(SideNavItem(
         page = DetailsPage,
         title = messages("applicationNav.page.applicationDetails"),
         link = controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id),
         isCurrentPage = currentPage == DetailsPage
-      ),
-      SideNavItem(
+      )),
+      Some(SideNavItem(
         page = ApisPage,
         title = messages("applicationNav.page.applicationApis"),
         link = controllers.application.routes.ApplicationApisController.onPageLoad(application.id),
         isCurrentPage = currentPage == ApisPage
-      ),
-      SideNavItem(
+      )),
+      Some(SideNavItem(
         page = EnvironmentsAndCredentialsPage,
         title = messages("applicationNav.page.environmentsAndCredentials"),
         link = controllers.application.routes.EnvironmentAndCredentialsController.onPageLoad(application.id),
         isCurrentPage = currentPage == EnvironmentsAndCredentialsPage
-      ),
-      SideNavItem(
-        page = ManageTeamMembersPage,
-        title = messages("applicationNav.page.manageTeamMembers"),
-        link = controllers.application.routes.ManageTeamMembersController.onPageLoad(application.id),
-        isCurrentPage = currentPage == ManageTeamMembersPage
-      ),
-      SideNavItem(
+      )),
+      if (!application.isTeamMigrated) {
+        Some(SideNavItem(
+          page = ManageTeamMembersPage,
+          title = messages("applicationNav.page.manageTeamMembers"),
+          link = controllers.application.routes.ManageTeamMembersController.onPageLoad(application.id),
+          isCurrentPage = currentPage == ManageTeamMembersPage
+        ))
+      }
+      else {
+        None
+      },
+      Some(SideNavItem(
         page = DeleteApplicationPage,
         title = messages("applicationNav.page.deleteApplication"),
         link = controllers.application.routes.DeleteApplicationConfirmationController.onPageLoad(application.id),
         isCurrentPage = currentPage == DeleteApplicationPage
-      ),
-      SideNavItem(
-        page = ViewAsJsonApplicationPage,
-        title = messages("applicationNav.page.viewJson"),
-        link = controllers.application.routes.ApplicationSupportController.onPageLoad(application.id),
-        isCurrentPage = currentPage == ViewAsJsonApplicationPage,
-        opensInNewTab = true
-      ),
-      SideNavItem(
+      )),
+      Some(SideNavItem(
         page = ChangeOwningTeamPage,
         title = messages("application.update.team.title"),
         link = controllers.application.routes.UpdateApplicationTeamController.onPageLoad(application.id),
         isCurrentPage = currentPage == ChangeOwningTeamPage
-      ),
-      SideNavItem(
+      )),
+      Some(SideNavItem(
         page = ApplicationHistoryPage,
         title = messages("applicationHistory.title"),
         link = controllers.application.routes.ApplicationAccessRequestsController.onPageLoad(application.id),
         isCurrentPage = currentPage == ApplicationHistoryPage
-      )
+      )),
+      if (userModel.exists(_.permissions.canSupport)) {
+        Some(SideNavItem(
+          page = ViewAsJsonApplicationPage,
+          title = messages("applicationNav.page.viewJson"),
+          link = controllers.application.routes.ApplicationSupportController.onPageLoad(application.id),
+          isCurrentPage = currentPage == ViewAsJsonApplicationPage,
+          opensInNewTab = true
+        ))
+      }
+      else {
+        None
+      },
+      if (userModel.exists(_.permissions.canSupport)) {
+        Some(SideNavItem(
+          page = AllScopesPage,
+          title = messages("applicationNav.page.allScopes"),
+          link = controllers.application.routes.AllScopesController.onPageLoad(application.id),
+          isCurrentPage = currentPage == AllScopesPage,
+          opensInNewTab = true
+        ))
+      }
+      else {
+        None
+      }
     )
-    .filter(dontShowManageTeamForMigratedApps(application))
-    .filter(onlyShowViewAsJsonForSupportUsers(userModel))
-  }
-
-  private def dontShowManageTeamForMigratedApps(application: Application)(navItem: SideNavItem): Boolean = {
-    !navItem.page.equals(ManageTeamMembersPage) || !application.isTeamMigrated
-  }
-
-  private def onlyShowViewAsJsonForSupportUsers(userModel: Option[UserModel])(navItem: SideNavItem): Boolean = {
-    !navItem.page.equals(ViewAsJsonApplicationPage) || userModel.exists(_.permissions.canSupport)
+    .flatten
   }
 
 }

@@ -1673,6 +1673,55 @@ class ApplicationsConnectorSpec
       }
     }
   }
+
+  "fetchAllScopes" - {
+    "must place the correct request and return the credential scopes" in {
+      val applicationId = "test-application-id"
+
+      val credentialScopes = (1 to 2).map(
+        i =>
+          CredentialScopes(
+            environmentName = Primary,
+            clientId = s"test-client-id-$i",
+            created = LocalDateTime.now(),
+            scopes = Seq(s"test-scope-$i-1", s"test-scope-$i-2")
+          )
+      )
+
+      stubFor(
+        get(urlEqualTo(s"/api-hub-applications/applications/$applicationId/all-scopes"))
+          .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withBody(Json.toJson(credentialScopes).toString)
+          )
+      )
+
+      buildConnector(this).fetchAllScopes(applicationId)(HeaderCarrier()).map {
+        result =>
+          result.value mustBe credentialScopes
+      }
+    }
+
+    "must return None when the application does not exist" in {
+      val applicationId = "test-application-id"
+
+      stubFor(
+        get(urlEqualTo(s"/api-hub-applications/applications/$applicationId/all-scopes"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+          )
+      )
+
+      buildConnector(this).fetchAllScopes(applicationId)(HeaderCarrier()).map {
+        result =>
+          result mustBe empty
+      }
+    }
+  }
+
 }
 
 object ApplicationsConnectorSpec extends HttpClientV2Support {
