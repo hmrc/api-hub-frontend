@@ -818,32 +818,56 @@ class ApiHubServiceSpec
           result mustBe expected
       }
     }
+  }
 
-    "listApisInProduction" - {
-      "must make the correct request to the applications connector and return the api details" in {
-        val fixture = buildFixture()
-        val apis = Seq(sampleApiDetailSummary(), sampleApiDetailSummary())
+  "listApisInProduction" - {
+    "must make the correct request to the applications connector and return the api details" in {
+      val fixture = buildFixture()
+      val apis = Seq(sampleApiDetailSummary(), sampleApiDetailSummary())
 
-        when(fixture.applicationsConnector.listApisInProduction()(any)).thenReturn(Future.successful(apis))
+      when(fixture.applicationsConnector.listApisInProduction()(any)).thenReturn(Future.successful(apis))
 
-        fixture.service.listApisInProduction()(HeaderCarrier()).map {
-          result =>
-            result mustBe apis
-        }
+      fixture.service.listApisInProduction()(HeaderCarrier()).map {
+        result =>
+          result mustBe apis
       }
     }
+  }
 
-    "listEgressGateways" - {
-      "must make the correct request to the applications connector and return the egress gateways" in {
-        val fixture = buildFixture()
+  "listEgressGateways" - {
+    "must make the correct request to the applications connector and return the egress gateways" in {
+      val fixture = buildFixture()
 
-        val egressGateways = sampleEgressGateways()
-        when(fixture.applicationsConnector.listEgressGateways()(any)).thenReturn(Future.successful(egressGateways))
+      val egressGateways = sampleEgressGateways()
+      when(fixture.applicationsConnector.listEgressGateways()(any)).thenReturn(Future.successful(egressGateways))
 
-        fixture.service.listEgressGateways()(HeaderCarrier()).map {
-          result =>
-            result mustBe egressGateways
-        }
+      fixture.service.listEgressGateways()(HeaderCarrier()).map {
+        result =>
+          result mustBe egressGateways
+      }
+    }
+  }
+
+  "fetchAllScopes" - {
+    "must make the correct request to the applications connector and return the scopes" in {
+      val fixture = buildFixture()
+      val applicationId = "test-application-id"
+      val credentialScopes = (1 to 2).map(
+        i =>
+          CredentialScopes(
+            environmentName = Primary,
+            clientId = s"test-client-id-$i",
+            created = LocalDateTime.now(),
+            scopes = Seq(s"test-scope-$i-1", s"test-scope-$i-2")
+          )
+      )
+
+      when(fixture.applicationsConnector.fetchALlScopes(eqTo(applicationId))(any))
+        .thenReturn(Future.successful(Some(credentialScopes)))
+
+      fixture.service.fetchAllScopes(applicationId)(HeaderCarrier()).map {
+        result =>
+          result.value mustBe credentialScopes
       }
     }
   }

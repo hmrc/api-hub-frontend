@@ -19,9 +19,9 @@ package connectors
 import com.google.inject.{Inject, Singleton}
 import config.FrontendAppConfig
 import models.UserEmail
-import models.accessrequest.{AccessRequest, AccessRequestCancelRequest, AccessRequestDecisionRequest, AccessRequestRequest, AccessRequestStatus}
-import models.api.{ApiDeploymentStatuses, ApiDetailSummary, EgressGateway}
+import models.accessrequest.*
 import models.api.ApiDeploymentStatuses.readApiDeploymentStatuses
+import models.api.{ApiDeploymentStatuses, ApiDetailSummary, EgressGateway}
 import models.application.*
 import models.deployment.*
 import models.exception.{ApplicationCredentialLimitException, ApplicationsException, TeamNameNotUniqueException}
@@ -33,8 +33,8 @@ import play.api.Logging
 import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION, CONTENT_TYPE}
 import play.api.http.MimeTypes.JSON
 import play.api.http.Status.*
-import play.api.i18n.{Messages, MessagesProvider}
-import play.api.libs.json.{JsResultException, JsString, Json}
+import play.api.i18n.MessagesProvider
+import play.api.libs.json.{JsResultException, Json}
 import play.api.libs.ws.DefaultBodyWritables.writeableOf_String
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
@@ -598,4 +598,17 @@ class ApplicationsConnector @Inject()(
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Seq[EgressGateway]]
   }
+
+  def fetchALlScopes(applicationId: String)(implicit hc: HeaderCarrier): Future[Option[Seq[CredentialScopes]]] = {
+    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/applications/$applicationId/all-scopes")
+      .setHeader(ACCEPT -> JSON)
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Either[UpstreamErrorResponse, Seq[CredentialScopes]]]
+      .flatMap {
+        case Right(scopes) => Future.successful(Some(scopes))
+        case Left(e) if e.statusCode == NOT_FOUND => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
+  }
+
 }

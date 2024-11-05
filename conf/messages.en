@@ -240,6 +240,7 @@ applicationNav.page.environmentsAndCredentials = Environments and credentials
 applicationNav.page.manageTeamMembers = Manage team members
 applicationNav.page.deleteApplication = Delete application
 applicationNav.page.viewJson = View as JSON
+applicationNav.page.allScopes = All scopes
 
 deletedApplicationNav.page.applicationDetails = Application details
 deletedApplicationNav.page.viewJson = View as JSON

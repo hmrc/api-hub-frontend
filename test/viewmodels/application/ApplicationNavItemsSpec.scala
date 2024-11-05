@@ -20,6 +20,7 @@ import base.SpecBase
 import controllers.actions.{FakeApplication, FakeSupporter}
 import models.application.ApplicationLenses.*
 import models.user.UserModel
+import org.scalatest.Inspectors
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages
@@ -28,7 +29,7 @@ import utils.TestHelpers
 import viewmodels.SideNavItem
 import viewmodels.application.ApplicationSideNavPages.*
 
-class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers with TableDrivenPropertyChecks {
+class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers with TableDrivenPropertyChecks with Inspectors {
 
   "ApplicationNavItems" - {
     "must return the correct list of nav items" in {
@@ -70,13 +71,6 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
             isCurrentPage = false
           ),
           SideNavItem(
-            page = ViewAsJsonApplicationPage,
-            title = "View as JSON",
-            link = controllers.application.routes.ApplicationSupportController.onPageLoad(FakeApplication.id),
-            isCurrentPage = false,
-            opensInNewTab = true
-          ),
-          SideNavItem(
             page = ChangeOwningTeamPage,
             title = "Change owning team",
             link = controllers.application.routes.UpdateApplicationTeamController.onPageLoad(FakeApplication.id),
@@ -87,6 +81,20 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
             title = "Application history",
             link = controllers.application.routes.ApplicationAccessRequestsController.onPageLoad(FakeApplication.id),
             isCurrentPage = false
+          ),
+          SideNavItem(
+            page = ViewAsJsonApplicationPage,
+            title = "View as JSON",
+            link = controllers.application.routes.ApplicationSupportController.onPageLoad(FakeApplication.id),
+            isCurrentPage = false,
+            opensInNewTab = true
+          ),
+          SideNavItem(
+            page = AllScopesPage,
+            title = "All scopes",
+            link = controllers.application.routes.AllScopesController.onPageLoad(FakeApplication.id),
+            isCurrentPage = false,
+            opensInNewTab = true
           )
         )
 
@@ -133,7 +141,9 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
       }
     }
 
-    "must not display the View as JSON item for non-support users" in {
+    "must not display support-only items for non-support users" in {
+      val supportPages = Set(ViewAsJsonApplicationPage, AllScopesPage)
+
       forAll(usersWhoCannotSupport) { (user: UserModel) =>
         val playApplication = applicationBuilder(None).build()
 
@@ -143,10 +153,11 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
           val actual = ApplicationNavItems(Some(user), FakeApplication.setTeamId("test-team-id"), DetailsPage)
             .filter(_.page.equals(ViewAsJsonApplicationPage))
 
-          actual mustBe empty
+          forAll (actual) {page => supportPages must not contain page.page}
         }
       }
     }
+
   }
 
 }
