@@ -33,7 +33,7 @@ object ProduceApiNameSummary  {
           key     = "produceApiReviewNameDescription.checkYourAnswersLabel.1",
           value   = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
-            ActionItemViewModel("site.change", controllers.myapis.produce.routes.ProduceApiEnterOasController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onPageLoad(CheckMode).url)
               .withVisuallyHiddenText(messages("produceApiReviewNameDescription.change.hidden"))
           )
         ).withCssClass("hip-summary-list__row--no-border")
