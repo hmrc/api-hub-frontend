@@ -59,7 +59,7 @@ class Navigator @Inject()() {
     case ProduceApiEgressPrefixesPage => _ => controllers.myapis.produce.routes.ProduceApiHodController.onPageLoad(NormalMode)
     case ProduceApiHodPage => _ => controllers.myapis.produce.routes.ProduceApiDomainController.onPageLoad(NormalMode)
     case ProduceApiDomainPage => _ => controllers.myapis.produce.routes.ProduceApiStatusController.onPageLoad(NormalMode)
-    case ProduceApiStatusPage => _ => controllers.myapis.produce.routes.ProduceApiPassthroughController.onPageLoad(NormalMode)
+    case ProduceApiStatusPage => produceApiStatusNextPage(NormalMode)
     case ProduceApiPassthroughPage => _ => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
     case CancelAccessRequestStartPage => _ => controllers.application.cancelaccessrequest.routes.CancelAccessRequestSelectApiController.onPageLoad(NormalMode)
     case CancelAccessRequestSelectApiPage => _ => controllers.application.cancelaccessrequest.routes.CancelAccessRequestConfirmController.onPageLoad(NormalMode)
@@ -149,6 +149,13 @@ class Navigator @Inject()() {
       case (NormalMode, Some(ProduceApiChooseEgress(_, false))) => controllers.myapis.produce.routes.ProduceApiHodController.onPageLoad(mode)
       case (CheckMode, Some(ProduceApiChooseEgress(_, false))) => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
       case _ => routes.JourneyRecoveryController.onPageLoad()
+    }
+  }
+  
+  private def produceApiStatusNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
+    userAnswers.get(ProduceApiStartPage) match {
+      case Some(user) if user.permissions.canSupport => controllers.myapis.produce.routes.ProduceApiPassthroughController.onPageLoad(mode)
+      case _ => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
     }
   }
 

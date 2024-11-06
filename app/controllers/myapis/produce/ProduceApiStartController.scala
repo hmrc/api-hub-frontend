@@ -27,7 +27,7 @@ import repositories.ProduceApiSessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import java.time.Clock
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ProduceApiStartController @Inject() (
@@ -44,7 +44,11 @@ class ProduceApiStartController @Inject() (
         id = request.user.userId,
         lastUpdated = clock.instant()
       )
-      sessionRepository.set(userAnswers).map(_ => Redirect(navigator.nextPage(ProduceApiStartPage, NormalMode, userAnswers)))
+      
+      for {
+        updatedAnswers <- Future.fromTry(userAnswers.set(ProduceApiStartPage, request.user))
+        _              <- sessionRepository.set(updatedAnswers)
+      } yield Redirect(navigator.nextPage(ProduceApiStartPage, NormalMode, userAnswers))
     }
   }
 

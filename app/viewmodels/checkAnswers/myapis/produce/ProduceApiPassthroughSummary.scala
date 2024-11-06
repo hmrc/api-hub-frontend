@@ -18,27 +18,31 @@ package viewmodels.checkAnswers.myapis.produce
 
 import controllers.myapis.produce.routes
 import models.{CheckMode, UserAnswers}
-import pages.myapis.produce.ProduceApiPassthroughPage
+import pages.myapis.produce.{ProduceApiPassthroughPage, ProduceApiStartPage}
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.govuk.summarylist._
-import viewmodels.implicits._
+import viewmodels.govuk.summarylist.*
+import viewmodels.implicits.*
 
 object ProduceApiPassthroughSummary  {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(ProduceApiPassthroughPage).map {
-      answer =>
+    answers.get(ProduceApiStartPage) match {
+      case Some(user) if user.permissions.canSupport => answers.get(ProduceApiPassthroughPage).map {
+        answer =>
 
-        val value = if (answer) "site.yes" else "site.no"
+          val value = if (answer) "site.yes" else "site.no"
 
-        SummaryListRowViewModel(
-          key     = "produceApiPassthrough.checkYourAnswersLabel",
-          value   = ValueViewModel(value),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.ProduceApiPassthroughController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("produceApiPassthrough.change.hidden"))
+          SummaryListRowViewModel(
+            key     = "produceApiPassthrough.checkYourAnswersLabel",
+            value   = ValueViewModel(value),
+            actions = Seq(
+              ActionItemViewModel("site.change", routes.ProduceApiPassthroughController.onPageLoad(CheckMode).url)
+                .withVisuallyHiddenText(messages("produceApiPassthrough.change.hidden"))
+            )
           )
-        )
+      }
+      case _ => None
     }
+
 }

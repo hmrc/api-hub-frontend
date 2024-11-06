@@ -23,6 +23,7 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
+import pages.myapis.produce.ProduceApiStartPage
 import play.api.Application
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -37,7 +38,7 @@ class ProduceApiStartControllerSpec extends SpecBase with MockitoSugar {
   import ProduceApiStartControllerSpec.*
 
   "RegisterApplicationStartController" - {
-    "must initiate user answers and persist this in the session repository" in {
+    "must initiate user answers with current UserModel, and persist this in the session repository" in {
       val fixture = buildFixture()
       when(fixture.sessionRepository.set(any())).thenReturn(Future.successful(true))
 
@@ -47,7 +48,7 @@ class ProduceApiStartControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustBe SEE_OTHER
 
-        val expected = UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
+        val expected = UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant()).set(ProduceApiStartPage, FakeUser).success.value
 
         verify(fixture.sessionRepository).set(eqTo(expected))
       }

@@ -16,8 +16,13 @@
 
 package pages.myapis.produce
 
+import models.user.UserModel
 import pages.Page
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-case object ProduceApiStartPage extends Page {
+case object ProduceApiStartPage extends QuestionPage[UserModel] {
+  override def path: JsPath = JsPath \ toString
+  
   override def toString: String = "produceApiStart"
 }

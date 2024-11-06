@@ -17,11 +17,13 @@
 package navigation
 
 import base.SpecBase
+import controllers.actions.FakeUser
 import controllers.routes
 import pages.*
 import models.*
 import models.myapis.produce.ProduceApiChooseEgress
 import models.myapis.produce.ProduceApiHowToCreate.Editor
+import models.user.Permissions
 import org.scalatest.TryValues
 import pages.application.accessrequest.{ProvideSupportingInformationPage, RequestProductionAccessPage, RequestProductionAccessSelectApisPage, RequestProductionAccessStartPage}
 import pages.application.cancelaccessrequest.CancelAccessRequestStartPage
@@ -148,8 +150,13 @@ class NavigatorSpec extends SpecBase with TryValues {
         "must go from the API domain page to the API status page" in {
           navigator.nextPage(ProduceApiDomainPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiStatusController.onPageLoad(NormalMode)
         }
-        "must go from the API status page to the API passthrough page" in {
-          navigator.nextPage(ProduceApiStatusPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiPassthroughController.onPageLoad(NormalMode)
+        "must go from the API status page to the API passthrough page for support user" in {
+          val userAnswers = emptyUserAnswers.set(ProduceApiStartPage, FakeUser.copy(permissions = Permissions(false, true, false))).get
+          navigator.nextPage(ProduceApiStatusPage, NormalMode, userAnswers) mustBe controllers.myapis.produce.routes.ProduceApiPassthroughController.onPageLoad(NormalMode)
+        }
+        "must go from the API status page to the check your answers page for non-support user" in {
+          val userAnswers = emptyUserAnswers.set(ProduceApiStartPage, FakeUser.copy(permissions = Permissions(false, false, false))).get
+          navigator.nextPage(ProduceApiStatusPage, NormalMode, userAnswers) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
         }
         "must go from the API passthrough page to the API check your answers page" in {
           navigator.nextPage(ProduceApiPassthroughPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
