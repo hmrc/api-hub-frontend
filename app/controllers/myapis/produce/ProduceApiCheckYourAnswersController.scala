@@ -32,6 +32,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.myapis.produce.*
 import viewmodels.govuk.all.SummaryListViewModel
+import views.html.myapis.DeploymentSuccessView
 import views.html.myapis.produce.ProduceApiCheckYourAnswersView
 
 import javax.inject.Inject
@@ -44,6 +45,7 @@ class ProduceApiCheckYourAnswersController @Inject()(
                                              requireData: DataRequiredAction,
                                              val controllerComponents: MessagesControllerComponents,
                                              view: ProduceApiCheckYourAnswersView,
+                                             successView: DeploymentSuccessView,
                                              hods: Hods,
                                              domains: Domains,
                                              apiHubService: ApiHubService,
@@ -59,8 +61,8 @@ class ProduceApiCheckYourAnswersController @Inject()(
       validate(request).fold(
         call => Future.successful(Redirect(call)),
         apiHubService.generateDeployment(_).map {
-          case _: SuccessfulDeploymentsResponse =>
-            Redirect(routes.ProduceApiDeploymentController.onPageLoad())
+          case response: SuccessfulDeploymentsResponse =>
+            Ok(successView(request.user, response))
           case InvalidOasResponse(failure) => BadRequest(
             view(SummaryListViewModel(summaryListRows(request.userAnswers)), request.user, Some(failure))
           )
@@ -69,19 +71,19 @@ class ProduceApiCheckYourAnswersController @Inject()(
 
   private def validate(request: DataRequest[?]): Either[Call, DeploymentsRequest] =
     for {
-        apiTitle <- validateApiTile(request.userAnswers)
-        shortDescription <- validateShortDescription(request.userAnswers)
-        egress <- validateEgress(request.userAnswers)
-        team <- validateTeam(request.userAnswers)
-        oas <- validateOas(request.userAnswers)
-        passthrough <- validatePassthrough(request.userAnswers, request.user.permissions.canSupport)
-        apiStatus <- validateApiStatus(request.userAnswers)
-        domainSubdomain <- validateDomainSubdomain(request.userAnswers)
-        hods <- validateHods(request.userAnswers)
-        egressPrefixes <- validateEgressPrefixes(request.userAnswers)
+      apiTitle <- validateApiTile(request.userAnswers)
+      shortDescription <- validateShortDescription(request.userAnswers)
+      egress <- validateEgress(request.userAnswers)
+      team <- validateTeam(request.userAnswers)
+      oas <- validateOas(request.userAnswers)
+      passthrough <- validatePassthrough(request.userAnswers, request.user.permissions.canSupport)
+      apiStatus <- validateApiStatus(request.userAnswers)
+      domainSubdomain <- validateDomainSubdomain(request.userAnswers)
+      hods <- validateHods(request.userAnswers)
+      egressPrefixes <- validateEgressPrefixes(request.userAnswers)
     } yield DeploymentsRequest(
       lineOfBusiness = "apim",
-      name = apiTitle,
+      name = ProduceApiCheckYourAnswersController.formatAsKebabCase(apiTitle),
       description = shortDescription,
       egress = egress.egress.getOrElse("unassigned"),
       teamId = team.id,
@@ -182,5 +184,15 @@ class ProduceApiCheckYourAnswersController @Inject()(
       ProduceApiStatusSummary.row(userAnswers),
       ProduceApiPassthroughSummary.row(userAnswers),
     ).flatten
+}
+
+object ProduceApiCheckYourAnswersController {
+  private[produce] def formatAsKebabCase(text: String): String =
+    text.trim
+      .toLowerCase()
+      .replaceAll("[^\\w\\s_-]", "")
+      .split("[\\s_]")
+      .filterNot(_.isBlank)
+      .mkString("-")
 
 }

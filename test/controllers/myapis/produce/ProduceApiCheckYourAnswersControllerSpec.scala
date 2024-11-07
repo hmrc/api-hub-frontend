@@ -42,6 +42,7 @@ import services.ApiHubService
 import viewmodels.checkAnswers.myapis.produce.*
 import views.html.myapis.produce.ProduceApiCheckYourAnswersView
 import viewmodels.govuk.all.SummaryListViewModel
+import views.html.myapis.DeploymentSuccessView
 
 import java.time.LocalDateTime
 import scala.concurrent.Future
@@ -106,9 +107,10 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       }
     }
 
-    "must redirect to the deployment page for a successful POST" in {
+    "must return 200 and the deployment success view on a successful POST" in {
       val fixture = buildFixture(Some(fullyPopulatedUserAnswers))
       val response: DeploymentsResponse = SuccessfulDeploymentsResponse("id", "1.0.0", 1, "uri.com")
+      val view = fixture.application.injector.instanceOf[DeploymentSuccessView]
 
       when(fixture.apiHubService.generateDeployment(any)(any))
         .thenReturn(Future.successful(response))
@@ -118,8 +120,8 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
 
         val result = route(fixture.application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual produceApiRoutes.ProduceApiDeploymentController.onPageLoad().url
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(FakeUser, response.asInstanceOf[SuccessfulDeploymentsResponse])(request, messages(fixture.application)).toString
       }
     }
 
@@ -160,7 +162,6 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
         (ProduceApiHodPage, nonSupportUser, produceApiRoutes.ProduceApiHodController.onPageLoad(CheckMode).url),
         (ProduceApiDomainPage, nonSupportUser, produceApiRoutes.ProduceApiDomainController.onPageLoad(CheckMode).url),
         (ProduceApiStatusPage, nonSupportUser, produceApiRoutes.ProduceApiStatusController.onPageLoad(CheckMode).url),
-        (ProduceApiPassthroughPage, nonSupportUser, produceApiRoutes.ProduceApiDeploymentController.onPageLoad().url),
         (ProduceApiPassthroughPage, supportUser, produceApiRoutes.ProduceApiPassthroughController.onPageLoad(CheckMode).url),
       )){ case (userAnswerToRemove: QuestionPage[?], user: UserModel, expectedLocation: String) =>
         val fixture = buildFixture(
@@ -177,6 +178,22 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual expectedLocation
+      }
+    }
+
+    "formatAsKebabCase" - {
+      forAll(Table(
+        "text",
+        ("API title", "api-title"),
+        (" API title ", "api-title"),
+        (" API    title ", "api-title"),
+        (" API_title ", "api-title"),
+        ("A/(P)I &*^((&^ ti£*^&%tle", "api-title"),
+        ("API title 1", "api-title-1"),
+      )) { case (text, expected) =>
+        s"must transform $text into $expected" in {
+          ProduceApiCheckYourAnswersController.formatAsKebabCase(text) mustBe expected
+        }
       }
     }
   }

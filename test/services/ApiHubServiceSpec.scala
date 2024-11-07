@@ -875,8 +875,7 @@ class ApiHubServiceSpec
       "must make the correct request to the applications connector and return the deployment response" in {
         val fixture = buildFixture()
 
-        val name = "Test Name"
-        val kebabCaseName = "test-name"
+        val name = "test-name"
         val deploymentsRequest: DeploymentsRequest = DeploymentsRequest(
           lineOfBusiness = "test-line-of-business",
           name = name,
@@ -899,27 +898,8 @@ class ApiHubServiceSpec
 
         fixture.service.generateDeployment(deploymentsRequest)(HeaderCarrier()).map {
           result =>
-            val requestWithCorrectName = deploymentsRequest.copy(name = kebabCaseName)
-            verify(fixture.applicationsConnector).generateDeployment(eqTo(requestWithCorrectName))(any())
+            verify(fixture.applicationsConnector).generateDeployment(eqTo(deploymentsRequest))(any())
             result mustBe response
-        }
-      }
-    }
-
-    "formatAsKebabCase" - {
-      forAll(Table(
-        "text",
-        ("API title", "api-title"),
-        (" API title ", "api-title"),
-        (" API    title ", "api-title"),
-        (" API_title ", "api-title"),
-        ("A/(P)I &*^((&^ ti£*^&%tle", "api-title"),
-        ("API title 1", "api-title-1"),
-      )) { case (text, expected) =>
-        s"must transform $text into $expected" in {
-          val fixture = buildFixture()
-
-          fixture.service.formatAsKebabCase(text) mustBe expected
         }
       }
     }

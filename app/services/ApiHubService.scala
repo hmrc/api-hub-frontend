@@ -91,12 +91,8 @@ class ApiHubService @Inject()(
     applicationsConnector.getDeploymentDetails(publisherReference)
   }
 
-  def generateDeployment(deploymentsRequest: DeploymentsRequest)(implicit hc: HeaderCarrier): Future[DeploymentsResponse] = {
-    val deploymentsRequestWithFormattedName = deploymentsRequest.copy(
-      name = formatAsKebabCase(deploymentsRequest.name)
-    )
-    applicationsConnector.generateDeployment(deploymentsRequestWithFormattedName)
-  }
+  def generateDeployment(deploymentsRequest: DeploymentsRequest)(implicit hc: HeaderCarrier): Future[DeploymentsResponse] =
+    applicationsConnector.generateDeployment(deploymentsRequest)
 
   def getApis(platform: Option[String] = None)(implicit hc: HeaderCarrier): Future[Seq[ApiDetailSummary]] = {
     integrationCatalogueConnector.getApis(platform)
@@ -224,13 +220,5 @@ class ApiHubService @Inject()(
   def fetchAllScopes(applicationId: String)(implicit hc: HeaderCarrier): Future[Option[Seq[CredentialScopes]]] = {
     applicationsConnector.fetchAllScopes(applicationId)
   }
-
-  private[services] def formatAsKebabCase(text: String): String =
-    text.trim
-      .toLowerCase()
-      .replaceAll("[^\\w\\s_-]", "")
-      .split("[\\s_]")
-      .filterNot(_.isBlank)
-      .mkString("-")
 
 }

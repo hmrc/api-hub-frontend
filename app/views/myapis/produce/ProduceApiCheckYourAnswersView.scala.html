@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import play.api.libs.json.Json
 @import models.deployment.{Error, FailuresResponse}
 @import models.user.UserModel
 @import models.myapis.produce.ProduceApiHowToCreate
@@ -28,13 +29,11 @@
 
 @(summaryList: SummaryList, userModel: UserModel, maybeFailuresResponse: Option[FailuresResponse] = None)(implicit request: Request[?], messages: Messages)
 
-@errorList(failuresResponse: FailuresResponse) = @{
-    failuresResponse.errors.map(_.map(error =>
-        ErrorLink(
-            content = Text(s"${error.`type`} - ${error.message}"),
-            href = Some("#")
-        )
-    )).getOrElse(Seq.empty)
+@error(failuresResponse: FailuresResponse) = @{
+    ErrorLink(
+        content = HtmlContent(s"<pre>${HtmlFormat.escape(Json.prettyPrint(Json.toJson(failuresResponse)))}</pre>"),
+        href = Some("#")
+    )
 }
 
 @layout(pageTitle = titleNoForm(messages("produceApiCheckYourAnswers.title")), user = Some(userModel), fullWidth = true) {
@@ -42,8 +41,8 @@
     @for(failuresResponse <- maybeFailuresResponse) {
         @govukErrorSummary(
             ErrorSummary(
-                title = Text(s"${failuresResponse.code} - ${failuresResponse.reason}"),
-                errorList = errorList(failuresResponse)
+                title = Text(messages("error.summary.title")),
+                errorList = Seq(error(failuresResponse))
             )
         )
     }
