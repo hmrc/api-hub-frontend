@@ -37,6 +37,7 @@ class Module extends play.api.inject.Module {
       bindz(classOf[CancelAccessRequestDataRetrievalAction]).to(classOf[CancelAccessRequestDataRetrievalActionImpl]).eagerly(),
       bindz(classOf[DataRequiredAction]).to(classOf[DataRequiredActionImpl]).eagerly(),
       bindz[ApplicationAuthActionProvider].to(classOf[ApplicationAuthActionProviderImpl]).eagerly(),
+      bindz[ApproverOrApplicationAuthActionProvider].to(classOf[ApproverOrApplicationAuthActionProviderImpl]).eagerly(),
       bindz[ApiAuthActionProvider].to(classOf[ApiAuthActionProviderImpl]).eagerly(),
       bindz[TeamAuthActionProvider].to(classOf[TeamAuthActionProviderImpl]).eagerly(),
       bindz[AddAnApiCheckContextActionProvider].to(classOf[AddAnApiCheckContextActionProviderImpl]).eagerly(),

@@ -17,7 +17,7 @@
 package controllers.application
 
 import com.google.inject.{Inject, Singleton}
-import controllers.actions.{ApplicationAuthActionProvider, AuthorisedSupportAction, IdentifierAction}
+import controllers.actions.{ApplicationAuthActionProvider, ApproverOrApplicationAuthActionProvider, AuthorisedSupportAction, IdentifierAction}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
@@ -30,13 +30,12 @@ import scala.concurrent.ExecutionContext
 class ApplicationAccessRequestsController @Inject()(
   override val controllerComponents: MessagesControllerComponents,
   identify: IdentifierAction,
-  isSupport: AuthorisedSupportAction,
-  applicationAuth: ApplicationAuthActionProvider,
+  isApproverOrSupportOrApplicationTeamMember: ApproverOrApplicationAuthActionProvider,
   apiHubService: ApiHubService,
   accessRequestsView: ApplicationAccessRequestsView
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(id: String): Action[AnyContent] = (identify andThen isSupport andThen applicationAuth(id)).async {
+  def onPageLoad(id: String): Action[AnyContent] = (identify andThen isApproverOrSupportOrApplicationTeamMember(id)).async {
     implicit request =>
       apiHubService.getAccessRequests(Some(id), None).map {
         requests =>
