@@ -21,6 +21,8 @@ import controllers.actions.{FakeApplication, FakeApprover}
 import controllers.routes
 import forms.admin.ApprovalDecisionFormProvider
 import generators.AccessRequestGenerator
+import models.accessrequest.{Cancelled, Pending}
+import models.application.TeamMember
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
@@ -64,8 +66,97 @@ class AccessRequestControllerSpec
           val model = AccessRequestViewModel.adminViewModel(FakeApplication, accessRequest, user)
 
           status(result) mustBe OK
-          contentAsString(result) mustBe view(model, form, user).toString()
+          contentAsString(result) mustBe view(model, form, user, false).toString()
           contentAsString(result) must validateAsHtml
+
+          verify(fixture.apiHubService).getAccessRequest(eqTo(accessRequest.id))(any())
+          verify(fixture.apiHubService).getApplication(eqTo(accessRequest.applicationId), eqTo(false), eqTo(true))(any())
+        }
+      }
+    }
+
+    "must display the cancel request button if the user is part of the application's team and the request is in pending state" in {
+      forAll(usersWhoCanViewApprovals) { (user: UserModel) =>
+        val fixture = buildFixture(user)
+        val accessRequest = sampleAccessRequest().copy(status = Pending)
+        val application = FakeApplication.copy(teamMembers = Seq(TeamMember(user.email)))
+
+        when(fixture.apiHubService.getAccessRequest(any())(any())).thenReturn(Future.successful(Some(accessRequest)))
+        when(fixture.apiHubService.getApplication(any(), eqTo(false), eqTo(true))(any())).thenReturn(Future.successful(Some(application)))
+
+        running(fixture.playApplication) {
+          val url = controllers.admin.routes.AccessRequestController.onPageLoad(accessRequest.id).url
+          implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, url)
+          implicit val msgs: Messages = messages(fixture.playApplication)
+          val result = route(fixture.playApplication, request).value
+          val view = fixture.playApplication.injector.instanceOf[AccessRequestView]
+          val model = AccessRequestViewModel.adminViewModel(application, accessRequest, user)
+
+          val content = contentAsString(result)
+
+          status(result) mustBe OK
+          content mustBe view(model, form, user, true).toString()
+          content must validateAsHtml
+          content must include("cancelAccessRequestLink")
+
+          verify(fixture.apiHubService).getAccessRequest(eqTo(accessRequest.id))(any())
+          verify(fixture.apiHubService).getApplication(eqTo(accessRequest.applicationId), eqTo(false), eqTo(true))(any())
+        }
+      }
+    }
+
+    "must not display the cancel request button if the user is not part of the application's team" in {
+      forAll(usersWhoCanViewApprovals) { (user: UserModel) =>
+        val fixture = buildFixture(user)
+        val accessRequest = sampleAccessRequest().copy(status = Pending)
+
+        when(fixture.apiHubService.getAccessRequest(any())(any())).thenReturn(Future.successful(Some(accessRequest)))
+        when(fixture.apiHubService.getApplication(any(), eqTo(false), eqTo(true))(any())).thenReturn(Future.successful(Some(FakeApplication)))
+
+        running(fixture.playApplication) {
+          val url = controllers.admin.routes.AccessRequestController.onPageLoad(accessRequest.id).url
+          implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, url)
+          implicit val msgs: Messages = messages(fixture.playApplication)
+          val result = route(fixture.playApplication, request).value
+          val view = fixture.playApplication.injector.instanceOf[AccessRequestView]
+          val model = AccessRequestViewModel.adminViewModel(FakeApplication, accessRequest, user)
+
+          val content = contentAsString(result)
+
+          status(result) mustBe OK
+          content mustBe view(model, form, user, false).toString()
+          content must validateAsHtml
+          content mustNot include("cancelAccessRequestLink")
+
+          verify(fixture.apiHubService).getAccessRequest(eqTo(accessRequest.id))(any())
+          verify(fixture.apiHubService).getApplication(eqTo(accessRequest.applicationId), eqTo(false), eqTo(true))(any())
+        }
+      }
+    }
+
+    "must not display the cancel request button if the request is not in pending state" in {
+      forAll(usersWhoCanViewApprovals) { (user: UserModel) =>
+        val fixture = buildFixture(user)
+        val accessRequest = sampleAccessRequest().copy(status = Cancelled)
+        val application = FakeApplication.copy(teamMembers = Seq(TeamMember(user.email)))
+
+        when(fixture.apiHubService.getAccessRequest(any())(any())).thenReturn(Future.successful(Some(accessRequest)))
+        when(fixture.apiHubService.getApplication(any(), eqTo(false), eqTo(true))(any())).thenReturn(Future.successful(Some(application)))
+
+        running(fixture.playApplication) {
+          val url = controllers.admin.routes.AccessRequestController.onPageLoad(accessRequest.id).url
+          implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, url)
+          implicit val msgs: Messages = messages(fixture.playApplication)
+          val result = route(fixture.playApplication, request).value
+          val view = fixture.playApplication.injector.instanceOf[AccessRequestView]
+          val model = AccessRequestViewModel.adminViewModel(application, accessRequest, user)
+
+          val content = contentAsString(result)
+
+          status(result) mustBe OK
+          content mustBe view(model, form, user, false).toString()
+          content must validateAsHtml
+          content mustNot include("cancelAccessRequestLink")
 
           verify(fixture.apiHubService).getAccessRequest(eqTo(accessRequest.id))(any())
           verify(fixture.apiHubService).getApplication(eqTo(accessRequest.applicationId), eqTo(false), eqTo(true))(any())
@@ -200,7 +291,7 @@ class AccessRequestControllerSpec
 
         status(result) mustBe BAD_REQUEST
         contentAsString(result) mustBe
-          view(model, formWithErrors, FakeApprover).toString()
+          view(model, formWithErrors, FakeApprover, false).toString()
         contentAsString(result) must validateAsHtml
       }
     }
@@ -225,7 +316,7 @@ class AccessRequestControllerSpec
         
         status(result) mustBe BAD_REQUEST
         contentAsString(result) mustBe
-          view(model, formWithErrors, FakeApprover).toString()
+          view(model, formWithErrors, FakeApprover, false).toString()
         contentAsString(result) must validateAsHtml
       }
     }

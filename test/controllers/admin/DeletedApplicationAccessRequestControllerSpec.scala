@@ -19,6 +19,8 @@ package controllers.admin
 import base.SpecBase
 import forms.admin.ApprovalDecisionFormProvider
 import generators.{AccessRequestGenerator, ApplicationGenerator}
+import models.accessrequest.Pending
+import models.application.ApplicationLenses.*
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
@@ -63,7 +65,31 @@ class DeletedApplicationAccessRequestControllerSpec
           val model = AccessRequestViewModel.deletedApplicationViewModel(application, accessRequest, user)(messages(fixture.application))
 
           status(result) mustBe OK
-          contentAsString(result) mustBe fixture.view(model, form, user)(request, messages(fixture.application)).toString
+          contentAsString(result) mustBe fixture.view(model, form, user, false)(request, messages(fixture.application)).toString
+          contentAsString(result) must validateAsHtml
+
+          verify(fixture.apiHubService).getAccessRequest(eqTo(accessRequest.id))(any)
+          verify(fixture.apiHubService).getApplication(eqTo(application.id), eqTo(false), eqTo(true))(any)
+        }
+      }
+    }
+
+    "must display the cancel request button if the user is part of the application's team and the request is in pending state" in {
+      forAll(usersWhoCanViewApprovals) { (user: UserModel) =>
+        val fixture = buildFixture(user)
+        val application = sampleApplication().addTeamMember(user)
+        val accessRequest = sampleAccessRequest(application.id).copy(status = Pending)
+
+        when(fixture.apiHubService.getAccessRequest(any)(any)).thenReturn(Future.successful(Some(accessRequest)))
+        when(fixture.apiHubService.getApplication(any, any, any)(any)).thenReturn(Future.successful(Some(application)))
+
+        running(fixture.application) {
+          val request = FakeRequest(controllers.admin.routes.DeletedApplicationAccessRequestController.onPageLoad(accessRequest.id))
+          val result = route(fixture.application, request).value
+          val model = AccessRequestViewModel.deletedApplicationViewModel(application, accessRequest, user)(messages(fixture.application))
+
+          status(result) mustBe OK
+          contentAsString(result) mustBe fixture.view(model, form, user, true)(request, messages(fixture.application)).toString
           contentAsString(result) must validateAsHtml
 
           verify(fixture.apiHubService).getAccessRequest(eqTo(accessRequest.id))(any)

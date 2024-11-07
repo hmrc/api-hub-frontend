@@ -21,6 +21,7 @@ import com.google.inject.{Inject, Singleton}
 import controllers.actions.{AuthorisedApproverAction, AuthorisedApproverOrSupportAction, IdentifierAction}
 import controllers.helpers.{ErrorResultBuilder, Fetching}
 import forms.admin.ApprovalDecisionFormProvider
+import models.accessrequest.Pending
 import models.requests.IdentifierRequest
 import play.api.data.{Form, FormError}
 import play.api.i18n.I18nSupport
@@ -72,9 +73,11 @@ class AccessRequestController @Inject()(
     (for{
       accessRequest <- EitherT(fetchAccessRequestOrNotFound(id))
       application <- EitherT(fetchApplicationOrNotFound(accessRequest.applicationId, includeDeleted = true))
+      isUserTeamMember = application.teamMembers.exists(_.email.equalsIgnoreCase(request.user.email))
+      allowAccessRequestCancellation = accessRequest.status == Pending && isUserTeamMember
     } yield {
       val model = AccessRequestViewModel.adminViewModel(application, accessRequest, request.user)
-      Status(status)(view(model, form, request.user))
+      Status(status)(view(model, form, request.user, allowAccessRequestCancellation))
     }).merge
   }
 

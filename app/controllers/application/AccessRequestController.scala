@@ -21,9 +21,9 @@ import com.google.inject.{Inject, Singleton}
 import controllers.actions.IdentifierAction
 import controllers.helpers.{ErrorResultBuilder, Fetching}
 import forms.admin.ApprovalDecisionFormProvider
-import models.accessrequest.AccessRequest
+import models.accessrequest.{AccessRequest, Pending}
 import models.application.Application
-import models.application.ApplicationLenses._
+import models.application.ApplicationLenses.*
 import models.requests.IdentifierRequest
 import play.api.i18n.I18nSupport
 import play.api.mvc.*
@@ -57,7 +57,9 @@ class AccessRequestController @Inject()(
   private def buildView(accessRequest: AccessRequest, application: Application)(implicit request: IdentifierRequest[?]): Result = {
     if (application.isAccessible(request.user)) {
       val model = AccessRequestViewModel.consumerViewModel(application, accessRequest, request.user)
-      Ok(view(model, form, request.user))
+      val isUserTeamMember = application.teamMembers.exists(_.email.equalsIgnoreCase(request.user.email))
+      val allowAccessRequestCancellation = accessRequest.status == Pending && isUserTeamMember
+      Ok(view(model, form, request.user, allowAccessRequestCancellation))
     }
     else {
       Redirect(controllers.routes.UnauthorisedController.onPageLoad)

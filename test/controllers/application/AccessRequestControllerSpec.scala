@@ -20,6 +20,7 @@ import base.SpecBase
 import controllers.actions.FakeUser
 import forms.admin.ApprovalDecisionFormProvider
 import generators.{AccessRequestGenerator, ApplicationGenerator}
+import models.accessrequest.{Cancelled, Pending}
 import models.application.ApplicationLenses.*
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -65,8 +66,35 @@ class AccessRequestControllerSpec
           val model = AccessRequestViewModel.consumerViewModel(application, accessRequest, user)(messages(fixture.application))
 
           status(result) mustBe OK
-          contentAsString(result) mustBe fixture.view(model, form, user)(request, messages(fixture.application)).toString
+          contentAsString(result) mustBe fixture.view(model, form, user, false)(request, messages(fixture.application)).toString
           contentAsString(result) must validateAsHtml
+
+          verify(fixture.apiHubService).getAccessRequest(eqTo(accessRequest.id))(any)
+          verify(fixture.apiHubService).getApplication(eqTo(application.id), eqTo(false), eqTo(false))(any)
+        }
+      }
+    }
+
+    "must display the cancel request button if the user is part of the application's team and the request is in pending state" in {
+      forAll(teamMemberAndSupporterTable) { (user: UserModel) =>
+        val fixture = buildFixture(user)
+        val application = sampleApplication().addTeamMember(user)
+        val accessRequest = sampleAccessRequest(application.id).copy(status = Pending)
+
+        when(fixture.apiHubService.getAccessRequest(any)(any)).thenReturn(Future.successful(Some(accessRequest)))
+        when(fixture.apiHubService.getApplication(any, any, any)(any)).thenReturn(Future.successful(Some(application)))
+
+        running(fixture.application) {
+          val request = FakeRequest(controllers.application.routes.AccessRequestController.onPageLoad(accessRequest.id))
+          val result = route(fixture.application, request).value
+          val model = AccessRequestViewModel.consumerViewModel(application, accessRequest, user)(messages(fixture.application))
+
+          val content = contentAsString(result)
+
+          status(result) mustBe OK
+          content mustBe fixture.view(model, form, user, true)(request, messages(fixture.application)).toString
+          content must validateAsHtml
+          content must include("cancelAccessRequestLink")
 
           verify(fixture.apiHubService).getAccessRequest(eqTo(accessRequest.id))(any)
           verify(fixture.apiHubService).getApplication(eqTo(application.id), eqTo(false), eqTo(false))(any)
