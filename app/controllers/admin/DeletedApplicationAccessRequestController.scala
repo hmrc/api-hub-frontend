@@ -56,9 +56,7 @@ class DeletedApplicationAccessRequestController @Inject()(
 
   private def buildView(accessRequest: AccessRequest, application: Application)(implicit request: IdentifierRequest[?]): Result = {
     val model = AccessRequestViewModel.deletedApplicationViewModel(application, accessRequest, request.user)
-    val isUserTeamMember = application.teamMembers.exists(_.email.equalsIgnoreCase(request.user.email))
-    val allowAccessRequestCancellation = accessRequest.status == Pending && isUserTeamMember
-    Ok(view(model, form, request.user, allowAccessRequestCancellation))
+    Ok(view(model, form, request.user, false))
   }
 
 }

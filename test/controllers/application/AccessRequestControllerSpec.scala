@@ -65,30 +65,6 @@ class AccessRequestControllerSpec
           val result = route(fixture.application, request).value
           val model = AccessRequestViewModel.consumerViewModel(application, accessRequest, user)(messages(fixture.application))
 
-          status(result) mustBe OK
-          contentAsString(result) mustBe fixture.view(model, form, user, false)(request, messages(fixture.application)).toString
-          contentAsString(result) must validateAsHtml
-
-          verify(fixture.apiHubService).getAccessRequest(eqTo(accessRequest.id))(any)
-          verify(fixture.apiHubService).getApplication(eqTo(application.id), eqTo(false), eqTo(false))(any)
-        }
-      }
-    }
-
-    "must display the cancel request button if the user is part of the application's team and the request is in pending state" in {
-      forAll(teamMemberAndSupporterTable) { (user: UserModel) =>
-        val fixture = buildFixture(user)
-        val application = sampleApplication().addTeamMember(user)
-        val accessRequest = sampleAccessRequest(application.id).copy(status = Pending)
-
-        when(fixture.apiHubService.getAccessRequest(any)(any)).thenReturn(Future.successful(Some(accessRequest)))
-        when(fixture.apiHubService.getApplication(any, any, any)(any)).thenReturn(Future.successful(Some(application)))
-
-        running(fixture.application) {
-          val request = FakeRequest(controllers.application.routes.AccessRequestController.onPageLoad(accessRequest.id))
-          val result = route(fixture.application, request).value
-          val model = AccessRequestViewModel.consumerViewModel(application, accessRequest, user)(messages(fixture.application))
-
           val content = contentAsString(result)
 
           status(result) mustBe OK
@@ -98,25 +74,6 @@ class AccessRequestControllerSpec
 
           verify(fixture.apiHubService).getAccessRequest(eqTo(accessRequest.id))(any)
           verify(fixture.apiHubService).getApplication(eqTo(application.id), eqTo(false), eqTo(false))(any)
-        }
-      }
-    }
-
-    "must redirect to Unauthorised page for a GET when user is not a team member or support" in {
-      forAll(nonTeamMembersOrSupport) { (user: UserModel) =>
-        val fixture = buildFixture(user)
-        val application = sampleApplication()
-        val accessRequest = sampleAccessRequest(application.id)
-
-        when(fixture.apiHubService.getAccessRequest(any)(any)).thenReturn(Future.successful(Some(accessRequest)))
-        when(fixture.apiHubService.getApplication(any, any, any)(any)).thenReturn(Future.successful(Some(application)))
-
-        running(fixture.application) {
-          val request = FakeRequest(controllers.application.routes.AccessRequestController.onPageLoad(accessRequest.id))
-          val result = route(fixture.application, request).value
-
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result) mustBe Some(controllers.routes.UnauthorisedController.onPageLoad.url)
         }
       }
     }

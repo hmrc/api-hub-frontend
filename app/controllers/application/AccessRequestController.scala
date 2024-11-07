@@ -21,7 +21,7 @@ import com.google.inject.{Inject, Singleton}
 import controllers.actions.IdentifierAction
 import controllers.helpers.{ErrorResultBuilder, Fetching}
 import forms.admin.ApprovalDecisionFormProvider
-import models.accessrequest.{AccessRequest, Pending}
+import models.accessrequest.AccessRequest
 import models.application.Application
 import models.application.ApplicationLenses.*
 import models.requests.IdentifierRequest
@@ -51,18 +51,20 @@ class AccessRequestController @Inject()(
       (for {
         accessRequest <- EitherT(fetchAccessRequestOrNotFound(accessRequestId))
         application <- EitherT(fetchApplicationOrNotFound(accessRequest.applicationId))
-      } yield buildView(accessRequest, application)).merge
+        result <- EitherT.cond(
+          application.isAccessible(request.user),
+          buildView(accessRequest, application),
+          Redirect(controllers.routes.UnauthorisedController.onPageLoad)
+        )
+      } yield result).merge
   }
 
   private def buildView(accessRequest: AccessRequest, application: Application)(implicit request: IdentifierRequest[?]): Result = {
-    if (application.isAccessible(request.user)) {
-      val model = AccessRequestViewModel.consumerViewModel(application, accessRequest, request.user)
-      val isUserTeamMember = application.teamMembers.exists(_.email.equalsIgnoreCase(request.user.email))
-      val allowAccessRequestCancellation = accessRequest.status == Pending && isUserTeamMember
-      Ok(view(model, form, request.user, allowAccessRequestCancellation))
-    }
-    else {
-      Redirect(controllers.routes.UnauthorisedController.onPageLoad)
-    }
+      val model = AccessRequestViewModel.consumerViewModel(
+          application,
+          accessRequest,
+          request.user
+        )
+      Ok(view(model, form, request.user, true))
   }
 }

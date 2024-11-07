@@ -73,11 +73,9 @@ class AccessRequestController @Inject()(
     (for{
       accessRequest <- EitherT(fetchAccessRequestOrNotFound(id))
       application <- EitherT(fetchApplicationOrNotFound(accessRequest.applicationId, includeDeleted = true))
-      isUserTeamMember = application.teamMembers.exists(_.email.equalsIgnoreCase(request.user.email))
-      allowAccessRequestCancellation = accessRequest.status == Pending && isUserTeamMember
     } yield {
       val model = AccessRequestViewModel.adminViewModel(application, accessRequest, request.user)
-      Status(status)(view(model, form, request.user, allowAccessRequestCancellation))
+      Status(status)(view(model, form, request.user, false))
     }).merge
   }
 
