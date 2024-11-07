@@ -16,18 +16,51 @@
 
 @import models.user.UserModel
 @import models.myapis.produce.ProduceApiHowToCreate
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import views.html.components.IconsLink
+@import views.html.helper.CSPNonce
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
-    govukButton: GovukButton
+    govukButton: GovukButton,
+    govukFileUpload : GovukFileUpload,
+    iconsLink: IconsLink,
 )
 
-@(mode: Mode, userModel: UserModel)(implicit request: Request[?], messages: Messages)
+@(form: Form[?], mode: Mode, userModel: UserModel, maxOasUploadSizeMb: Int)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = titleNoForm("Provide the OpenAPI Specification file"), user = Some(userModel)) {
-    @formHelper(action = controllers.myapis.produce.routes.ProduceApiUploadOasController.onSubmit(mode)) {
-        <h1 class="govuk-heading-l">Provide the OpenAPI Specification file</h1>
+@scripts() = {
+    @iconsLink()
+    <script src='@routes.Assets.versioned("javascripts/produceApiUploadOas.js")' type="module" @{CSPNonce.attr}></script>
+}
+
+@layout(pageTitle = title(form, messages("produceApiUploadOas.title")), user = Some(userModel), customScriptsBlock = Some(scripts())) {
+    @formHelper(action = controllers.myapis.produce.routes.ProduceApiUploadOasController.onSubmit(mode), Symbol("enctype") -> "multipart/form-data") {
+        <h1 class="govuk-heading-l">@messages("produceApiUploadOas.heading")</h1>
+
+        <p class="govuk-body">@messages("produceApiUploadOas.description")</p>
+
+        <div id="fileDrop" class="hip-file-drop" data-maxsize="@maxOasUploadSizeMb">
+            <div class="hip-file-drop__icon fas fa-cloud-upload-alt"></div>
+            <h6 class="hip-file-drop__text">@messages("produceApiUploadOas.file.text1")</h6>
+            <h6 class="hip-file-drop__text--hover">@messages("produceApiUploadOas.file.text1.hover")</h6>
+            <p class="hip-file-drop__text">@messages("produceApiUploadOas.file.text2")</p>
+
+            @govukFileUpload(FileUpload(
+                name = "oasFile",
+                id = "oasFile",
+                label = Label(
+                    content = Text(messages("produceApiUploadOas.file.choose"))
+                )
+            ))
+        </div>
+
+        <p class="govuk-body-s govuk-!-margin-top-4">@messages("produceApiUploadOas.fileInfo", maxOasUploadSizeMb)</p>
+
+        <p id="errorMessage" class="govuk-error-message govuk-!-margin-bottom-4 govuk-!-display-none"></p>
+        <p id="fileName" class="govuk-body govuk-!-font-weight-bold govuk-!-display-none"></p>
+
         @govukButton(
             ButtonViewModel(messages("site.continue"))
         )

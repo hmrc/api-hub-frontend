@@ -63,5 +63,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val shutterMessage: String = configuration.get[String]("shutter-message")
 
   val feedbackLink: String = configuration.get[String]("feedback-link")
+  
+  val maxOasUploadSizeMb: Int = configuration.get[Int]("maxOasUploadSizeMb")
 
 }
