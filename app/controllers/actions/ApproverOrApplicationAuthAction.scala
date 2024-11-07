@@ -52,8 +52,7 @@ class ApproverOrApplicationAuthActionProviderImpl @Inject()(
 
         apiHubService.getApplication(applicationId, false) map {
           case Some(application) =>
-            val bool = isTeamMember(application, identifierRequest.user)
-            if (identifierRequest.user.permissions.canApprove || identifierRequest.user.permissions.canSupport || bool) {
+            if (identifierRequest.user.permissions.canApprove || identifierRequest.user.permissions.canSupport || isTeamMember(application, identifierRequest.user)) {
                 Right(ApplicationRequest(identifierRequest, application))
             }
             else {
