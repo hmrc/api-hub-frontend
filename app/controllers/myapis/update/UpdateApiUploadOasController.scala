@@ -35,11 +35,11 @@ class UpdateApiUploadOasController @Inject()(
                                         view: UpdateApiUploadOasView
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = identify {
-    implicit request =>  Ok(view(mode, request.user))
+  def onPageLoad(id: String, mode: Mode): Action[AnyContent] = identify {
+    implicit request =>  Ok(view(id, mode, request.user))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = identify {
-    implicit request =>  Redirect(routes.UpdateApiEnterOasController.onPageLoad(mode))
+  def onSubmit(id: String, mode: Mode): Action[AnyContent] = identify {
+    implicit request =>  Redirect(routes.UpdateApiEnterOasController.onPageLoad(id, mode))
   }
 }

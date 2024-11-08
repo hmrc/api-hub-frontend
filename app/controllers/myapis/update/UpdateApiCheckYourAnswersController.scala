@@ -38,11 +38,11 @@ class UpdateApiCheckYourAnswersController @Inject()(
                                         successView: DeploymentSuccessView
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = identify {
-    implicit request =>  Ok(view(request.user))
+  def onPageLoad(id: String): Action[AnyContent] = identify {
+    implicit request =>  Ok(view(id, request.user))
   }
 
-  def onSubmit(): Action[AnyContent] = identify {
+  def onSubmit(id: String): Action[AnyContent] = identify {
     implicit request => Ok(successView(request.user, SuccessfulDeploymentsResponse(
       id = "id",
       version = "1.0.0",
