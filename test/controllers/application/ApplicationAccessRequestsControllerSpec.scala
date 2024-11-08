@@ -42,8 +42,8 @@ class ApplicationAccessRequestsControllerSpec
   extends SpecBase with MockitoSugar with HtmlValidation with TestHelpers with AccessRequestGenerator {
 
   "ApplicationAccessRequestsController" - {
-    "must return Ok and the correct view for a support user" in {
-      forAll(usersWhoCanSupport) { (user: UserModel) =>
+    "must return Ok and the correct view for a permitted user" in {
+      forAll(teamMemberAndSupporterTable) { (user: UserModel) =>
         val fixture = buildFixture(user)
 
         val accessRequests = Seq(sampleAccessRequest())
@@ -129,20 +129,6 @@ class ApplicationAccessRequestsControllerSpec
         status(result) mustBe OK
         contentAsString(result) mustBe view(FakeApplication, orderedAccessRequests, FakeSupporter).toString()
         contentAsString(result) must validateAsHtml
-      }
-    }
-
-    "must redirect to the unauthorised page for a user who is not a supporter" in {
-      forAll(usersWhoCannotSupport) { (user: UserModel) =>
-        val fixture = buildFixture(user)
-
-        running(fixture.playApplication) {
-          val request = FakeRequest(GET, controllers.application.routes.ApplicationAccessRequestsController.onPageLoad(FakeApplication.id).url)
-          val result = route(fixture.playApplication, request).value
-
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad.url)
-        }
       }
     }
   }

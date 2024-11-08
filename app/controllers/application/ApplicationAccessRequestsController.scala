@@ -30,13 +30,12 @@ import scala.concurrent.ExecutionContext
 class ApplicationAccessRequestsController @Inject()(
   override val controllerComponents: MessagesControllerComponents,
   identify: IdentifierAction,
-  isSupport: AuthorisedSupportAction,
   applicationAuth: ApplicationAuthActionProvider,
   apiHubService: ApiHubService,
   accessRequestsView: ApplicationAccessRequestsView
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(id: String): Action[AnyContent] = (identify andThen isSupport andThen applicationAuth(id)).async {
+  def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id)).async {
     implicit request =>
       apiHubService.getAccessRequests(Some(id), None).map {
         requests =>

@@ -58,7 +58,8 @@ class AccessRequestViewModelSpec extends AnyFreeSpec with Matchers with Applicat
           canDecide = false,
           canCancel = true,
           returnCall = consumerReturnCall(application.id),
-          returnMessage = consumerReturnMessage
+          returnMessage = consumerReturnMessage,
+          activeLink = None
         )
 
         actual mustBe expected

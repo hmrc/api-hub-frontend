@@ -65,7 +65,8 @@ case class AccessRequestViewModel(
   canDecide: Boolean,
   canCancel: Boolean,
   returnCall: Call,
-  returnMessage: String
+  returnMessage: String,
+  activeLink: Option[String]
 )
 
 object AccessRequestViewModel {
@@ -74,18 +75,18 @@ object AccessRequestViewModel {
     case Consumer, Admin, DeletedApplication
 
   def consumerViewModel(application: Application, accessRequest: AccessRequest, user: UserModel)(implicit messages: Messages): AccessRequestViewModel = {
-    apply(application, accessRequest, user, ViewType.Consumer)
+    apply(application, accessRequest, user, ViewType.Consumer, None)
   }
 
   def adminViewModel(application: Application, accessRequest: AccessRequest, user: UserModel)(implicit messages: Messages): AccessRequestViewModel = {
-    apply(application, accessRequest, user, ViewType.Admin)
+    apply(application, accessRequest, user, ViewType.Admin, Some("apiHubAdmin"))
   }
 
   def deletedApplicationViewModel(application: Application, accessRequest: AccessRequest, user: UserModel)(implicit messages: Messages): AccessRequestViewModel = {
-    apply(application, accessRequest, user, ViewType.DeletedApplication)
+    apply(application, accessRequest, user, ViewType.DeletedApplication, Some("apiHubAdmin"))
   }
 
-  private def apply(application: Application, accessRequest: AccessRequest, user: UserModel, viewType: ViewType)(implicit messages: Messages): AccessRequestViewModel = {
+  private def apply(application: Application, accessRequest: AccessRequest, user: UserModel, viewType: ViewType, activeLink: Option[String])(implicit messages: Messages): AccessRequestViewModel = {
     AccessRequestViewModel(
       accessRequestId = accessRequest.id,
       apiId = accessRequest.apiId,
@@ -104,7 +105,8 @@ object AccessRequestViewModel {
       canDecide = canDecide(accessRequest, user, viewType),
       canCancel = canCancel(application, accessRequest, user, viewType),
       returnCall = returnCall(application, viewType),
-      returnMessage = returnMessage(viewType)
+      returnMessage = returnMessage(viewType),
+      activeLink = activeLink
     )
   }
 

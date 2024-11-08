@@ -179,7 +179,7 @@
 @layout(
     pageTitle = titleNoForm(messages("accessRequest.title")),
     user = Some(user),
-    activeLink = Some("apiHubAdmin"),
+    activeLink = model.activeLink,
     fullWidth = true
 ) {
 
