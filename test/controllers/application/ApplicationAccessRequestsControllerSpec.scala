@@ -42,7 +42,7 @@ class ApplicationAccessRequestsControllerSpec
   extends SpecBase with MockitoSugar with HtmlValidation with TestHelpers with AccessRequestGenerator {
 
   "ApplicationAccessRequestsController" - {
-    "must return Ok and the correct view for a support user" in {
+    "must return Ok and the correct view for a permitted user" in {
       forAll(teamMemberAndSupporterTable) { (user: UserModel) =>
         val fixture = buildFixture(user)
 
