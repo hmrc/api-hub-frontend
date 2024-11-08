@@ -54,7 +54,10 @@ class OpenApiDoc(openApi: OpenAPI) {
   }
 
   def getApiName()(implicit messagesProvider: MessagesProvider): Option[String] =
-    Option(openApi.getInfo.getTitle)
+    for {
+      info <- Option(openApi.getInfo)
+      title <- Option(info.getTitle)
+    } yield title
 
   private def getOperationForMethod(method: String, pathItem: PathItem): Option[Operation] = {
     Option(method match {
