@@ -43,7 +43,6 @@
     pageTitle = titleNoForm(messages("applicationHistory.title")),
     user = Some(user),
     fullWidth = true,
-    activeLink = Some("apiHubAdmin"),
     customScriptsBlock = Some(iconsLink())
 ) {
     @views.html.templates.SideNav(application.name, ApplicationNavItems(Some(user), application, ApplicationSideNavPages.ApplicationHistoryPage)) {
