@@ -131,21 +131,6 @@ class ApplicationAccessRequestsControllerSpec
         contentAsString(result) must validateAsHtml
       }
     }
-
-//    "must redirect to the unauthorised page for a user who is not a supporter" in {
-//      forAll(usersWhoCannotSupport) { (user: UserModel) =>
-//        val fixture = buildFixture(user)
-//
-//        running(fixture.playApplication) {
-//          val request = FakeRequest(GET, controllers.application.routes.ApplicationAccessRequestsController.onPageLoad(FakeApplication.id).url)
-//          val result = route(fixture.playApplication, request).value
-//
-//          status(result) mustBe SEE_OTHER
-//          redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad.url)
-//        }
-//      }
-//    }
-
   }
 
   private case class Fixture(playApplication: PlayApplication, apiHubService: ApiHubService)
