@@ -915,6 +915,14 @@ header {
     padding: govuk-spacing(8) 0;
     border-radius: $border-radius-size;
 
+    * {
+        /* Needed to stop dragenter/leave events being triggered whenever we drag over one of the child elements */
+        pointer-events: none;
+    }
+    label {
+        pointer-events: auto;
+    }
+
     h6.hip-file-drop__text--hover {
         display: none;
     }
@@ -946,22 +954,18 @@ header {
         margin: 0;
     }
 
-    .govuk-form-group {
-        width: 100%;
-        text-align: center;
-        margin: 0;
-        position: relative;
+    label {
+        display: inline-block;
+        @include govuk-font-size($size: 16);
+        cursor: pointer;
+        padding: govuk-spacing(2) govuk-spacing(6);
+        background-color: govuk-colour("blue");
+        color: govuk-colour("white");
+        border-radius: $border-radius-size;
+
         input {
             @extend .govuk-visually-hidden;
         }
-        label {
-            display: inline-block;
-            @include govuk-font-size($size: 16);
-            cursor: pointer;
-            padding: govuk-spacing(2) govuk-spacing(6);
-            background-color: govuk-colour("blue");
-            color: govuk-colour("white");
-            border-radius: $border-radius-size;
-        }
     }
+
 }

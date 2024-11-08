@@ -19,16 +19,17 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import views.html.components.IconsLink
 @import views.html.helper.CSPNonce
+@import models.myapis.produce.ProduceApiUploadedOasFile
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukButton: GovukButton,
-    govukFileUpload : GovukFileUpload,
+    govukErrorSummary: GovukErrorSummary,
     iconsLink: IconsLink,
 )
 
-@(form: Form[?], mode: Mode, userModel: UserModel, maxOasUploadSizeMb: Int)(implicit request: Request[?], messages: Messages)
+@(form: Form[ProduceApiUploadedOasFile], mode: Mode, userModel: UserModel, maxOasUploadSizeMb: Int)(implicit request: Request[?], messages: Messages)
 
 @scripts() = {
     @iconsLink()
@@ -36,31 +37,34 @@
 }
 
 @layout(pageTitle = title(form, messages("produceApiUploadOas.title")), user = Some(userModel), customScriptsBlock = Some(scripts())) {
-    @formHelper(action = controllers.myapis.produce.routes.ProduceApiUploadOasController.onSubmit(mode), Symbol("enctype") -> "multipart/form-data") {
-        <h1 class="govuk-heading-l">@messages("produceApiUploadOas.heading")</h1>
+    <h1 class="govuk-heading-l">@messages("produceApiUploadOas.heading")</h1>
 
-        <p class="govuk-body">@messages("produceApiUploadOas.description")</p>
+    <p class="govuk-body">@messages("produceApiUploadOas.description")</p>
 
-        <div id="fileDrop" class="hip-file-drop" data-maxsize="@maxOasUploadSizeMb">
-            <div class="hip-file-drop__icon fas fa-cloud-upload-alt"></div>
-            <h6 class="hip-file-drop__text">@messages("produceApiUploadOas.file.text1")</h6>
-            <h6 class="hip-file-drop__text--hover">@messages("produceApiUploadOas.file.text1.hover")</h6>
-            <p class="hip-file-drop__text">@messages("produceApiUploadOas.file.text2")</p>
+    @if(form.errors.nonEmpty) {
+        @govukErrorSummary(ErrorSummaryViewModel(form))
+    }
 
-            @govukFileUpload(FileUpload(
-                name = "oasFile",
-                id = "oasFile",
-                label = Label(
-                    content = Text(messages("produceApiUploadOas.file.choose"))
-                )
-            ))
-        </div>
+    <div id="fileDrop" class="hip-file-drop" data-maxsize="@maxOasUploadSizeMb">
+        <div class="hip-file-drop__icon fas fa-cloud-upload-alt"></div>
+        <h6 class="hip-file-drop__text">@messages("produceApiUploadOas.file.text1")</h6>
+        <h6 class="hip-file-drop__text--hover">@messages("produceApiUploadOas.file.text1.hover")</h6>
+        <p class="hip-file-drop__text">@messages("produceApiUploadOas.file.text2")</p>
 
-        <p class="govuk-body-s govuk-!-margin-top-4">@messages("produceApiUploadOas.fileInfo", maxOasUploadSizeMb)</p>
+        <label>
+            @messages("produceApiUploadOas.file.choose")
+            <input type="file" name="oasFile" id="oasFile">
+        </label>
+    </div>
 
-        <p id="errorMessage" class="govuk-error-message govuk-!-margin-bottom-4 govuk-!-display-none"></p>
-        <p id="fileName" class="govuk-body govuk-!-font-weight-bold govuk-!-display-none"></p>
+    <p class="govuk-body-s govuk-!-margin-top-4">@messages("produceApiUploadOas.fileInfo", maxOasUploadSizeMb)</p>
 
+    <p id="errorMessage" class="govuk-error-message govuk-!-margin-bottom-4 govuk-!-display-none"></p>
+    <p id="selectedFileName" class="govuk-body govuk-!-font-weight-bold govuk-!-display-none"></p>
+
+    @formHelper(action = controllers.myapis.produce.routes.ProduceApiUploadOasController.onSubmit(mode)) {
+        <input type="hidden" name="fileName" id="fileName" value="@form.value.map(_.fileName).getOrElse("")">
+        <input type="hidden" name="fileContents" id="fileContents" value="@form.value.map(_.fileContents).getOrElse("")">
         @govukButton(
             ButtonViewModel(messages("site.continue"))
         )

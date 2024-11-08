@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-package pages.myapis.produce
+package models.myapis.produce
 
-import models.myapis.produce.ProduceApiUploadedOasFile
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import play.api.libs.json.{Format, Json}
 
-case object ProduceApiUploadOasPage extends QuestionPage[ProduceApiUploadedOasFile] {
+case class ProduceApiUploadedOasFile(fileName: String, fileContents: String)
 
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "produceApiUploadOas"
+object ProduceApiUploadedOasFile {
+  implicit val format: Format[ProduceApiUploadedOasFile] = Json.format[ProduceApiUploadedOasFile]
 }

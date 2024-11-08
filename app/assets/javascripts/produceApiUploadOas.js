@@ -3,8 +3,12 @@ import {setVisible} from "./utils.js";
 export function onDOMContentLoaded() {
     const elFileDrop = document.getElementById('fileDrop'),
         elFileInput = document.getElementById('oasFile'),
+        elFileNameInput = document.getElementById('fileName'),
+        elFileContentsInput = document.getElementById('fileContents'),
         elErrorMessage = document.getElementById('errorMessage'),
-        elFileName = document.getElementById('fileName'),
+        elSelectedFileName = document.getElementById('selectedFileName'),
+        // elErrorSummary will be null unless we previously tried to continue without selecting a file
+        elErrorSummary = document.querySelector('.govuk-error-summary'),
         maxFileSizeMB = elFileDrop.dataset.maxsize,
         maxFileSizeBytes = maxFileSizeMB * 1024 * 1024,
         validFileExtensions = new Set(['yaml', 'yml']),
@@ -29,10 +33,7 @@ export function onDOMContentLoaded() {
 
     elFileDrop.addEventListener('drop', e => {
         elFileDrop.classList.remove(cssHoveringClass);
-
-        const files = e.dataTransfer.files;
-        elFileInput.files = files;
-        onFileSelection(files);
+        onFileSelection(e.dataTransfer.files);
     });
     elFileInput.addEventListener('change', e => {
         onFileSelection(elFileInput.files);
@@ -42,18 +43,29 @@ export function onDOMContentLoaded() {
         elErrorMessage.textContent = message;
         setVisible(elErrorMessage, true);
 
-        elFileName.textContent = '';
-        setVisible(elFileName, false);
+        elSelectedFileName.textContent = '';
+        setVisible(elSelectedFileName, false);
 
         elFileInput.value = '';
+        elFileNameInput.value = '';
+        elFileContentsInput.value = '';
     }
 
     function onFileSelectionSuccess(file) {
-        elErrorMessage.textContent = '';
-        setVisible(elErrorMessage, false);
+        file.text().then(fileContents => {
+            elErrorMessage.textContent = '';
+            setVisible(elErrorMessage, false);
 
-        elFileName.textContent = `Selected file: ${file.name} (${file.size.toLocaleString()} bytes)`;
-        setVisible(elFileName, true);
+            elSelectedFileName.textContent = `Selected file: ${file.name} (${file.size.toLocaleString()} bytes)`;
+            setVisible(elSelectedFileName, true);
+
+            elFileNameInput.value = file.name;
+            elFileContentsInput.value = fileContents;
+
+            if (elErrorSummary) {
+                setVisible(elErrorSummary, false);
+            }
+        }).catch(err => console.error(err));
     }
 
     function isFileExtensionValid(file) {
@@ -88,6 +100,12 @@ export function onDOMContentLoaded() {
 
         onFileSelectionSuccess(file);
     }
+
+    function processHiddenInputFields() {
+        //TODO
+    }
+
+    processHiddenInputFields();
 }
 
 if (typeof window !== 'undefined') {

@@ -17,14 +17,19 @@
 package forms.myapis.produce
 
 import forms.mappings.Mappings
+import models.myapis.produce.ProduceApiUploadedOasFile
 import play.api.data.Form
+import play.api.data.Forms.{mapping, optional}
 
 import javax.inject.Inject
 
 class ProduceApiUploadOasFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[String] =
+  def apply(): Form[ProduceApiUploadedOasFile] =
     Form(
-      "value" -> text("produceApiUploadOas.error.required")
+      mapping(
+        "fileName" -> text("produceApiUploadOas.error.required"),
+        "fileContents" -> text("")
+      )(ProduceApiUploadedOasFile.apply)(o => Some(Tuple.fromProductTyped(o)))
     )
 }

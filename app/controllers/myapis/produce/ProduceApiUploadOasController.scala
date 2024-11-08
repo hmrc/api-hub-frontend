@@ -24,13 +24,19 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.myapis.produce.ProduceApiUploadOasView
 import forms.myapis.produce.ProduceApiUploadOasFormProvider
 import pages.myapis.produce.ProduceApiUploadOasPage
+
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import config.FrontendAppConfig
+import models.requests.IdentifierRequest
+import navigation.Navigator
 import play.api.libs.Files.TemporaryFile
+import repositories.ProduceApiSessionRepository
 
 class ProduceApiUploadOasController @Inject()(
                                         override val messagesApi: MessagesApi,
+                                        sessionRepository: ProduceApiSessionRepository,
+                                        navigator: Navigator,
                                         identify: IdentifierAction,
                                         val controllerComponents: MessagesControllerComponents,
                                         formProvider: ProduceApiUploadOasFormProvider,
@@ -52,17 +58,18 @@ class ProduceApiUploadOasController @Inject()(
       Ok(view(preparedForm, mode, request.user, frontendAppConfig.maxOasUploadSizeMb))
   }
 
-  def onSubmit(mode: Mode): Action[MultipartFormData[TemporaryFile]] = (identify andThen getData andThen requireData).async(parse.multipartFormData) {
-    implicit request: Request[MultipartFormData[TemporaryFile]]  =>  {
-      request.body.file("oasFile") match {
-        case Some(file) => {
-          val data = file.transformRefToBytes().utf8String
-          Future.successful(Redirect(routes.ProduceApiEnterOasController.onPageLoad(mode)))
-        }
-        case None =>
-          Future.successful(Redirect(routes.ProduceApiUploadOasController.onPageLoad(mode)))
-      }
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request => {
+      form.bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, mode, request.user, frontendAppConfig.maxOasUploadSizeMb))),
 
+        value =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(ProduceApiUploadOasPage, value))
+            _ <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(navigator.nextPage(ProduceApiUploadOasPage, mode, updatedAnswers))
+      )
     }
   }
 }
