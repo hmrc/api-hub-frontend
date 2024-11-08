@@ -53,7 +53,7 @@
 
         <label>
             @messages("produceApiUploadOas.file.choose")
-            <input type="file" name="oasFile" id="oasFile">
+            <input type="file" name="oasFile" id="oasFile" accept="@config.oasUploadValidExtensions.map("." + _).mkString(",")">
         </label>
     </div>
 
