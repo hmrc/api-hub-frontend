@@ -26,12 +26,12 @@ import models.api.{ApiDeploymentStatuses, ContactInfo, EndpointMethod, PlatformC
 import models.api.ApiDeploymentStatus.*
 import models.application.ApplicationLenses.*
 import models.application.*
-import models.deployment.{DeploymentDetails, EgressMapping}
+import models.deployment.{DeploymentDetails, DeploymentsRequest, EgressMapping, SuccessfulDeploymentsResponse}
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
 import models.stats.ApisInProductionStatistic
 import models.team.{NewTeam, Team}
 import models.user.UserContactDetails
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, verifyNoInteractions, when}
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -868,6 +868,39 @@ class ApiHubServiceSpec
       fixture.service.fetchAllScopes(applicationId)(HeaderCarrier()).map {
         result =>
           result.value mustBe credentialScopes
+      }
+    }
+
+    "generateDeployment" - {
+      "must make the correct request to the applications connector and return the deployment response" in {
+        val fixture = buildFixture()
+
+        val name = "test-name"
+        val deploymentsRequest: DeploymentsRequest = DeploymentsRequest(
+          lineOfBusiness = "test-line-of-business",
+          name = name,
+          description = "test-description",
+          egress = "test-egress",
+          teamId = "test-team-id",
+          oas = "test-oas",
+          passthrough = false,
+          status = "test-status",
+          domain = "test-domain",
+          subDomain = "test-sub-domain",
+          hods = Seq("hod1"),
+          prefixesToRemove = Seq.empty,
+          egressMappings = None
+        )
+        val response = SuccessfulDeploymentsResponse("id", "version", 1, "uri.com")
+
+        when(fixture.applicationsConnector.generateDeployment(any)(any))
+          .thenReturn(Future.successful(response))
+
+        fixture.service.generateDeployment(deploymentsRequest)(HeaderCarrier()).map {
+          result =>
+            verify(fixture.applicationsConnector).generateDeployment(eqTo(deploymentsRequest))(any())
+            result mustBe response
+        }
       }
     }
   }

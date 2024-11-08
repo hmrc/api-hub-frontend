@@ -18,17 +18,25 @@ package controllers.myapis.produce
 
 import config.{Domains, Hods}
 import controllers.actions.*
-import models.UserAnswers
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import models.{CheckMode, UserAnswers}
+import models.api.ApiStatus
+import models.deployment.{DeploymentsRequest, DeploymentsResponse, EgressMapping, FailuresResponse, InvalidOasResponse, SuccessfulDeploymentsResponse}
+import models.myapis.produce.{ProduceApiChooseEgress, ProduceApiDomainSubdomain, ProduceApiEgressPrefixes}
+import models.requests.DataRequest
+import models.team.Team
+import pages.myapis.produce.*
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.mvc.*
+import services.ApiHubService
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.checkAnswers.myapis.produce._
+import viewmodels.checkAnswers.myapis.produce.*
 import viewmodels.govuk.all.SummaryListViewModel
+import views.html.myapis.DeploymentSuccessView
 import views.html.myapis.produce.ProduceApiCheckYourAnswersView
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class ProduceApiCheckYourAnswersController @Inject()(
                                              override val messagesApi: MessagesApi,
@@ -37,35 +45,154 @@ class ProduceApiCheckYourAnswersController @Inject()(
                                              requireData: DataRequiredAction,
                                              val controllerComponents: MessagesControllerComponents,
                                              view: ProduceApiCheckYourAnswersView,
+                                             successView: DeploymentSuccessView,
                                              hods: Hods,
-                                             domains: Domains
+                                             domains: Domains,
+                                             apiHubService: ApiHubService,
                                            )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
-      val summaryRows = Seq(
-        ProduceApiChooseTeamSummary.row(request.userAnswers),
-        ProduceApiEnterOasSummary.row(request.userAnswers),
-        ProduceApiNameSummary.row(request.userAnswers),
-        ProduceApiShortDescriptionSummary.row(request.userAnswers),
-        ProduceApiEgressSummary.row(request.userAnswers),
-        ProduceApiEgressPrefixesSummary.row(request.userAnswers),
-        ProduceApiHodSummary.row(request.userAnswers, hods),
-        ProduceApiDomainSummary.row(request.userAnswers, domains),
-        ProduceApiSubDomainSummary.row(request.userAnswers, domains),
-        ProduceApiStatusSummary.row(request.userAnswers),
-        ProduceApiPassthroughSummary.row(request.userAnswers),
-      ).flatten
-
-      Ok(view(SummaryListViewModel(summaryRows), request.user))
+      Ok(view(SummaryListViewModel(summaryListRows(request.userAnswers)), request.user))
   }
 
-  def onSubmit(next: String): Action[AnyContent] = identify {
-    implicit request => {
-      next match {
-        case "ok" => Redirect(routes.ProduceApiDeploymentController.onPageLoad())
-        case "error" => Redirect(routes.ProduceApiDeploymentErrorController.onPageLoad())
-      }
+  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request =>
+      validate(request).fold(
+        call => Future.successful(Redirect(call)),
+        apiHubService.generateDeployment(_).map {
+          case response: SuccessfulDeploymentsResponse =>
+            Ok(successView(request.user, response))
+          case InvalidOasResponse(failure) => BadRequest(
+            view(SummaryListViewModel(summaryListRows(request.userAnswers)), request.user, Some(failure))
+          )
+        })
+  }
+
+  private def validate(request: DataRequest[?]): Either[Call, DeploymentsRequest] =
+    for {
+      apiTitle <- validateApiTile(request.userAnswers)
+      shortDescription <- validateShortDescription(request.userAnswers)
+      egress <- validateEgress(request.userAnswers)
+      team <- validateTeam(request.userAnswers)
+      oas <- validateOas(request.userAnswers)
+      passthrough <- validatePassthrough(request.userAnswers, request.user.permissions.canSupport)
+      apiStatus <- validateApiStatus(request.userAnswers)
+      domainSubdomain <- validateDomainSubdomain(request.userAnswers)
+      hods <- validateHods(request.userAnswers)
+      egressPrefixes <- validateEgressPrefixes(request.userAnswers)
+    } yield DeploymentsRequest(
+      lineOfBusiness = "apim",
+      name = ProduceApiCheckYourAnswersController.formatAsKebabCase(apiTitle),
+      description = shortDescription,
+      egress = egress.egress.getOrElse("unassigned"),
+      teamId = team.id,
+      oas = oas,
+      passthrough = passthrough,
+      status = apiStatus.toString,
+      domain = domainSubdomain.domain,
+      subDomain = domainSubdomain.subDomain,
+      hods = hods.toSeq,
+      prefixesToRemove = egressPrefixes.prefixes,
+      egressMappings = Some(egressPrefixes.getMappings.map(m =>
+        EgressMapping(m.existing, m.replacement)
+      )),
+    )
+
+  private def validateApiTile(userAnswers: UserAnswers): Either[Call, String] = {
+    userAnswers.get(ProduceApiEnterApiTitlePage) match {
+      case Some(apiTitle) => Right(apiTitle)
+      case None => Left(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
   }
+
+  private def validateTeam(userAnswers: UserAnswers): Either[Call, Team] = {
+    userAnswers.get(ProduceApiChooseTeamPage) match {
+      case Some(team) => Right(team)
+      case None => Left(routes.ProduceApiChooseTeamController.onPageLoad(CheckMode))
+    }
+  }
+
+  private def validateOas(userAnswers: UserAnswers): Either[Call, String] = {
+    userAnswers.get(ProduceApiEnterOasPage) match {
+      case Some(oas) => Right(oas)
+      case None => Left(routes.ProduceApiEnterOasController.onPageLoad(CheckMode))
+    }
+  }
+
+  private def validateShortDescription(userAnswers: UserAnswers): Either[Call, String] = {
+    userAnswers.get(ProduceApiShortDescriptionPage) match {
+      case Some(description) => Right(description)
+      case None => Left(routes.ProduceApiShortDescriptionController.onPageLoad(CheckMode))
+    }
+  }
+
+  private def validateEgress(userAnswers: UserAnswers): Either[Call, ProduceApiChooseEgress] = {
+    userAnswers.get(ProduceApiChooseEgressPage) match {
+      case Some(egress) => Right(egress)
+      case None => Left(routes.ProduceApiEgressController.onPageLoad(CheckMode))
+    }
+  }
+
+  private def validateEgressPrefixes(userAnswers: UserAnswers): Either[Call, ProduceApiEgressPrefixes] = {
+    userAnswers.get(ProduceApiEgressPrefixesPage) match {
+      case Some(egressPrefixes) => Right(egressPrefixes)
+      case None => Left(routes.ProduceApiEgressPrefixesController.onPageLoad(CheckMode))
+    }
+  }
+
+  private def validateHods(userAnswers: UserAnswers): Either[Call, Set[String]] = {
+    userAnswers.get(ProduceApiHodPage) match {
+      case Some(hods) => Right(hods)
+      case None => Left(routes.ProduceApiHodController.onPageLoad(CheckMode))
+    }
+  }
+
+  private def validateDomainSubdomain(userAnswers: UserAnswers): Either[Call, ProduceApiDomainSubdomain] = {
+    userAnswers.get(ProduceApiDomainPage) match {
+      case Some(domainSubdomain) => Right(domainSubdomain)
+      case None => Left(routes.ProduceApiDomainController.onPageLoad(CheckMode))
+    }
+  }
+
+  private def validateApiStatus(userAnswers: UserAnswers): Either[Call, ApiStatus] = {
+    userAnswers.get(ProduceApiStatusPage) match {
+      case Some(apiStatus) => Right(apiStatus)
+      case None => Left(routes.ProduceApiStatusController.onPageLoad(CheckMode))
+    }
+  }
+
+  private def validatePassthrough(userAnswers: UserAnswers, isSupportUser: Boolean): Either[Call, Boolean] = {
+    userAnswers.get(ProduceApiPassthroughPage) match {
+      case Some(isPassThrough) => Right(isPassThrough)
+      case None if !isSupportUser => Right(false)
+      case _ => Left(routes.ProduceApiPassthroughController.onPageLoad(CheckMode))
+    }
+  }
+
+  private def summaryListRows(userAnswers: UserAnswers)(implicit messages: Messages) =
+    Seq(
+      ProduceApiChooseTeamSummary.row(userAnswers),
+      ProduceApiEnterOasSummary.row(userAnswers),
+      ProduceApiNameSummary.row(userAnswers),
+      ProduceApiShortDescriptionSummary.row(userAnswers),
+      ProduceApiEgressSummary.row(userAnswers),
+      ProduceApiEgressPrefixesSummary.row(userAnswers),
+      ProduceApiHodSummary.row(userAnswers, hods),
+      ProduceApiDomainSummary.row(userAnswers, domains),
+      ProduceApiSubDomainSummary.row(userAnswers, domains),
+      ProduceApiStatusSummary.row(userAnswers),
+      ProduceApiPassthroughSummary.row(userAnswers),
+    ).flatten
+}
+
+object ProduceApiCheckYourAnswersController {
+  private[produce] def formatAsKebabCase(text: String): String =
+    text.trim
+      .toLowerCase()
+      .replaceAll("[^\\w\\s_-]", "")
+      .split("[\\s_]")
+      .filterNot(_.isBlank)
+      .mkString("-")
+
 }

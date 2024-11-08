@@ -22,7 +22,7 @@ import models.AvailableEndpoint
 import models.accessrequest.{AccessRequest, AccessRequestRequest, AccessRequestStatus}
 import models.api.{ApiDeploymentStatuses, ApiDetail, ApiDetailSummary, EgressGateway, PlatformContact}
 import models.application.*
-import models.deployment.DeploymentDetails
+import models.deployment.{DeploymentDetails, DeploymentsRequest, DeploymentsResponse}
 import models.exception.ApplicationsException
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
 import models.stats.ApisInProductionStatistic
@@ -90,6 +90,9 @@ class ApiHubService @Inject()(
   def getDeploymentDetails(publisherReference: String)(implicit hc: HeaderCarrier): Future[Option[DeploymentDetails]] = {
     applicationsConnector.getDeploymentDetails(publisherReference)
   }
+
+  def generateDeployment(deploymentsRequest: DeploymentsRequest)(implicit hc: HeaderCarrier): Future[DeploymentsResponse] =
+    applicationsConnector.generateDeployment(deploymentsRequest)
 
   def getApis(platform: Option[String] = None)(implicit hc: HeaderCarrier): Future[Seq[ApiDetailSummary]] = {
     integrationCatalogueConnector.getApis(platform)
