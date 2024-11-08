@@ -23,7 +23,7 @@ import controllers.helpers.{ErrorResultBuilder, Fetching}
 import forms.admin.ApprovalDecisionFormProvider
 import models.accessrequest.AccessRequest
 import models.application.Application
-import models.application.ApplicationLenses._
+import models.application.ApplicationLenses.*
 import models.requests.IdentifierRequest
 import play.api.i18n.I18nSupport
 import play.api.mvc.*
@@ -51,16 +51,20 @@ class AccessRequestController @Inject()(
       (for {
         accessRequest <- EitherT(fetchAccessRequestOrNotFound(accessRequestId))
         application <- EitherT(fetchApplicationOrNotFound(accessRequest.applicationId))
-      } yield buildView(accessRequest, application)).merge
+        result <- EitherT.cond(
+          application.isAccessible(request.user),
+          buildView(accessRequest, application),
+          Redirect(controllers.routes.UnauthorisedController.onPageLoad)
+        )
+      } yield result).merge
   }
 
   private def buildView(accessRequest: AccessRequest, application: Application)(implicit request: IdentifierRequest[?]): Result = {
-    if (application.isAccessible(request.user)) {
-      val model = AccessRequestViewModel.consumerViewModel(application, accessRequest, request.user)
-      Ok(view(model, form, request.user))
-    }
-    else {
-      Redirect(controllers.routes.UnauthorisedController.onPageLoad)
-    }
+      val model = AccessRequestViewModel.consumerViewModel(
+          application,
+          accessRequest,
+          request.user
+        )
+      Ok(view(model, form, request.user, true))
   }
 }

@@ -31,7 +31,7 @@
     govukTextarea : GovukTextarea
 )
 
-@(model: AccessRequestViewModel, form: Form[?], user: UserModel)(implicit request: Request[?], messages: Messages)
+@(model: AccessRequestViewModel, form: Form[?], user: UserModel, allowAccessRequestCancellation: Boolean)(implicit request: Request[?], messages: Messages)
 
 @accessRequestDetail() = {
 
@@ -121,7 +121,9 @@
 }
 
 @cancelAccessRequestLink() = {
-    <a id="cancelAccessRequestLink" class="govuk-link govuk-link--no-visited-state govuk-!-margin-left-3" href="@controllers.application.cancelaccessrequest.routes.CancelAccessRequestStartController.startJourneyWithAccessRequest(model.applicationId, model.accessRequestId)">@messages("accessRequest.cancelRequest")</a>
+    @if(allowAccessRequestCancellation) {
+        <a id="cancelAccessRequestLink" class="govuk-link govuk-link--no-visited-state govuk-!-margin-left-3" href="@controllers.application.cancelaccessrequest.routes.CancelAccessRequestStartController.startJourneyWithAccessRequest(model.applicationId, model.accessRequestId)">@messages("accessRequest.cancelRequest")</a>
+    }
 }
 
 @applicationNameValue() = {

@@ -21,6 +21,8 @@ import controllers.actions.{FakeApplication, FakeApprover}
 import controllers.routes
 import forms.admin.ApprovalDecisionFormProvider
 import generators.AccessRequestGenerator
+import models.accessrequest.{Cancelled, Pending}
+import models.application.TeamMember
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
@@ -64,7 +66,7 @@ class AccessRequestControllerSpec
           val model = AccessRequestViewModel.adminViewModel(FakeApplication, accessRequest, user)
 
           status(result) mustBe OK
-          contentAsString(result) mustBe view(model, form, user).toString()
+          contentAsString(result) mustBe view(model, form, user, false).toString()
           contentAsString(result) must validateAsHtml
 
           verify(fixture.apiHubService).getAccessRequest(eqTo(accessRequest.id))(any())
@@ -200,7 +202,7 @@ class AccessRequestControllerSpec
 
         status(result) mustBe BAD_REQUEST
         contentAsString(result) mustBe
-          view(model, formWithErrors, FakeApprover).toString()
+          view(model, formWithErrors, FakeApprover, false).toString()
         contentAsString(result) must validateAsHtml
       }
     }
@@ -225,7 +227,7 @@ class AccessRequestControllerSpec
         
         status(result) mustBe BAD_REQUEST
         contentAsString(result) mustBe
-          view(model, formWithErrors, FakeApprover).toString()
+          view(model, formWithErrors, FakeApprover, false).toString()
         contentAsString(result) must validateAsHtml
       }
     }

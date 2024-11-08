@@ -19,6 +19,8 @@ package controllers.admin
 import base.SpecBase
 import forms.admin.ApprovalDecisionFormProvider
 import generators.{AccessRequestGenerator, ApplicationGenerator}
+import models.accessrequest.Pending
+import models.application.ApplicationLenses.*
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
@@ -63,7 +65,7 @@ class DeletedApplicationAccessRequestControllerSpec
           val model = AccessRequestViewModel.deletedApplicationViewModel(application, accessRequest, user)(messages(fixture.application))
 
           status(result) mustBe OK
-          contentAsString(result) mustBe fixture.view(model, form, user)(request, messages(fixture.application)).toString
+          contentAsString(result) mustBe fixture.view(model, form, user, false)(request, messages(fixture.application)).toString
           contentAsString(result) must validateAsHtml
 
           verify(fixture.apiHubService).getAccessRequest(eqTo(accessRequest.id))(any)
