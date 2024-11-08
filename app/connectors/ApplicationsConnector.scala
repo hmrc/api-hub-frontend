@@ -611,4 +611,15 @@ class ApplicationsConnector @Inject()(
       }
   }
 
+  def fixScopes(applicationId: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    httpClient.put(url"$applicationsBaseUrl/api-hub-applications/applications/$applicationId/fix-scopes")
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Either[UpstreamErrorResponse, Unit]]
+      .flatMap {
+        case Right(scopes) => Future.successful(Some(()))
+        case Left(e) if e.statusCode == NOT_FOUND => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
+  }
+
 }

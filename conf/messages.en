@@ -240,7 +240,7 @@ applicationNav.page.environmentsAndCredentials = Environments and credentials
 applicationNav.page.manageTeamMembers = Manage team members
 applicationNav.page.deleteApplication = Delete application
 applicationNav.page.viewJson = View as JSON
-applicationNav.page.allScopes = All scopes
+applicationNav.page.allScopes = Application scopes
 
 deletedApplicationNav.page.applicationDetails = Application details
 deletedApplicationNav.page.viewJson = View as JSON
@@ -1001,3 +1001,7 @@ produceApiEgressPrefix.checkYourAnswersValue.mapping = Replace {0} with {1}
 produceApiCheckYourAnswers.title = Review the details of your API
 produceApiCheckYourAnswers.heading = Review the details of your API
 produceApiCheckYourAnswers.description = Review the details of your API before starting the deployment.
+
+allScopes.title = Application scopes
+allScopes.heading = Application scopes
+allScopes.fixScopes = Fix scopes

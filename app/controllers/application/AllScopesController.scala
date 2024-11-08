@@ -17,13 +17,13 @@
 package controllers.application
 
 import com.google.inject.{Inject, Singleton}
-import controllers.actions.{AuthorisedSupportAction, IdentifierAction}
+import controllers.actions.{ApplicationAuthActionProvider, AuthorisedSupportAction, IdentifierAction}
 import controllers.helpers.ErrorResultBuilder
 import play.api.i18n.I18nSupport
-import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import views.html.application.AllScopesView
 
 import scala.concurrent.ExecutionContext
 
@@ -32,14 +32,24 @@ class AllScopesController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   identify: IdentifierAction,
   isSupport: AuthorisedSupportAction,
+  applicationAuth: ApplicationAuthActionProvider,
   apiHubService: ApiHubService,
-  errorResultBuilder: ErrorResultBuilder
+  errorResultBuilder: ErrorResultBuilder,
+  allScopesView: AllScopesView
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(id: String): Action[AnyContent] = (identify andThen isSupport).async {
+  def onPageLoad(id: String): Action[AnyContent] = (identify andThen isSupport andThen applicationAuth(id)).async {
     implicit request =>
       apiHubService.fetchAllScopes(id).map {
-        case Some(scopes) => Ok(Json.toJson(scopes.sorted))
+        case Some(allScopes) => Ok(allScopesView(request.application, allScopes.sorted, request.identifierRequest.user))
+        case None => errorResultBuilder.applicationNotFound(id)
+      }
+  }
+
+  def fixScopes(id: String): Action[AnyContent] = (identify andThen isSupport andThen applicationAuth(id)).async {
+    implicit request =>
+      apiHubService.fixScopes(id).map {
+        case Some(_) => Redirect(controllers.application.routes.AllScopesController.onPageLoad(id))
         case None => errorResultBuilder.applicationNotFound(id)
       }
   }

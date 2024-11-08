@@ -1722,6 +1722,43 @@ class ApplicationsConnectorSpec
     }
   }
 
+  "fixScopes" - {
+    "must place the correct request and return success" in {
+      val applicationId = "test-application-id"
+
+      stubFor(
+        put(urlEqualTo(s"/api-hub-applications/applications/$applicationId/fix-scopes"))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withStatus(NO_CONTENT)
+          )
+      )
+
+      buildConnector(this).fixScopes(applicationId)(HeaderCarrier()).map {
+        result =>
+          result.value mustBe ()
+      }
+    }
+
+    "must return None when the application does not exist" in {
+      val applicationId = "test-application-id"
+
+      stubFor(
+        put(urlEqualTo(s"/api-hub-applications/applications/$applicationId/fix-scopes"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+          )
+      )
+
+      buildConnector(this).fixScopes(applicationId)(HeaderCarrier()).map {
+        result =>
+          result mustBe empty
+      }
+    }
+  }
+
 }
 
 object ApplicationsConnectorSpec extends HttpClientV2Support {
