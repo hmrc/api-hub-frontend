@@ -15,11 +15,11 @@
  *@
 
 @import models.user.UserModel
-@import models.myapis.produce.ProduceApiHowToCreate
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import views.html.components.IconsLink
 @import views.html.helper.CSPNonce
 @import models.myapis.produce.ProduceApiUploadedOasFile
+@import config.FrontendAppConfig
 
 @this(
     layout: templates.Layout,
@@ -29,7 +29,7 @@
     iconsLink: IconsLink,
 )
 
-@(form: Form[ProduceApiUploadedOasFile], mode: Mode, userModel: UserModel, maxOasUploadSizeMb: Int)(implicit request: Request[?], messages: Messages)
+@(form: Form[ProduceApiUploadedOasFile], mode: Mode, userModel: UserModel, config: FrontendAppConfig)(implicit request: Request[?], messages: Messages)
 
 @scripts() = {
     @iconsLink()
@@ -45,7 +45,7 @@
         @govukErrorSummary(ErrorSummaryViewModel(form))
     }
 
-    <div id="fileDrop" class="hip-file-drop" data-maxsize="@maxOasUploadSizeMb">
+    <div id="fileDrop" class="hip-file-drop" data-maxsize="@config.maxOasUploadSizeMb" data-validextensions="@config.oasUploadValidExtensions.mkString(",")">
         <div class="hip-file-drop__icon fas fa-cloud-upload-alt"></div>
         <h6 class="hip-file-drop__text">@messages("produceApiUploadOas.file.text1")</h6>
         <h6 class="hip-file-drop__text--hover">@messages("produceApiUploadOas.file.text1.hover")</h6>
@@ -57,7 +57,7 @@
         </label>
     </div>
 
-    <p class="govuk-body-s govuk-!-margin-top-4">@messages("produceApiUploadOas.fileInfo", maxOasUploadSizeMb)</p>
+    <p class="govuk-body-s govuk-!-margin-top-4">@messages("produceApiUploadOas.fileInfo", config.maxOasUploadSizeMb)</p>
 
     <p id="errorMessage" class="govuk-error-message govuk-!-margin-bottom-4 govuk-!-display-none"></p>
     <p id="selectedFileName" class="govuk-body govuk-!-font-weight-bold govuk-!-display-none"></p>

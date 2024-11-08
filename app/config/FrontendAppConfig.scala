@@ -65,5 +65,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val feedbackLink: String = configuration.get[String]("feedback-link")
   
   val maxOasUploadSizeMb: Int = configuration.get[Int]("maxOasUploadSizeMb")
+  val oasUploadValidExtensions: Set[String] = configuration.get[Seq[String]]("oasUploadValidExtensions").toSet
 
 }

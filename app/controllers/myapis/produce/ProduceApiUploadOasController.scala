@@ -23,7 +23,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Multipart
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.myapis.produce.ProduceApiUploadOasView
 import forms.myapis.produce.ProduceApiUploadOasFormProvider
-import pages.myapis.produce.ProduceApiUploadOasPage
+import pages.myapis.produce.{ProduceApiEnterOasPage, ProduceApiUploadOasPage}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -55,18 +55,19 @@ class ProduceApiUploadOasController @Inject()(
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode, request.user, frontendAppConfig.maxOasUploadSizeMb))
+      Ok(view(preparedForm, mode, request.user, frontendAppConfig))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request => {
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode, request.user, frontendAppConfig.maxOasUploadSizeMb))),
+          Future.successful(BadRequest(view(formWithErrors, mode, request.user, frontendAppConfig))),
 
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(ProduceApiUploadOasPage, value))
+            updatedAnswers <- Future.fromTry(updatedAnswers.set(ProduceApiEnterOasPage, value.fileContents))
             _ <- sessionRepository.set(updatedAnswers)
           } yield Redirect(navigator.nextPage(ProduceApiUploadOasPage, mode, updatedAnswers))
       )
