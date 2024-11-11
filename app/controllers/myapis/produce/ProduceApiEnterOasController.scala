@@ -52,6 +52,7 @@ class ProduceApiEnterOasController @Inject()(
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
+
       val preparedForm = request.userAnswers.get(ProduceApiEnterOasPage) match {
         case None => form
         case Some(value) => form.fill(value)
@@ -62,10 +63,10 @@ class ProduceApiEnterOasController @Inject()(
 
   def onPageLoadWithUploadedOas(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      request.userAnswers.get(ProduceApiUploadOasPage) match {
-        case Some(uploadedOas) =>
-          val formWithUploadedOas = form.fill(uploadedOas.fileContents)
-          validateOAS(uploadedOas.fileContents).map {
+      request.userAnswers.get(ProduceApiEnterOasPage).orElse(request.userAnswers.get(ProduceApiUploadOasPage).map(_.fileContents)) match {
+        case Some(oasFileContents) =>
+          val formWithUploadedOas = form.fill(oasFileContents)
+          validateOAS(oasFileContents).map {
             case Left(error) => {
               BadRequest(view(formWithUploadedOas.withGlobalError(error), mode, request.user))
             }

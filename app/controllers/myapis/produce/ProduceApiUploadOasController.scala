@@ -28,9 +28,7 @@ import pages.myapis.produce.{ProduceApiEnterOasPage, ProduceApiUploadOasPage}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import config.FrontendAppConfig
-import models.requests.IdentifierRequest
 import navigation.Navigator
-import play.api.libs.Files.TemporaryFile
 import repositories.ProduceApiSessionRepository
 
 class ProduceApiUploadOasController @Inject()(
