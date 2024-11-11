@@ -93,8 +93,7 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
             page = AllScopesPage,
             title = "All scopes",
             link = controllers.application.routes.AllScopesController.onPageLoad(FakeApplication.id),
-            isCurrentPage = false,
-            opensInNewTab = true
+            isCurrentPage = false
           )
         )
 
