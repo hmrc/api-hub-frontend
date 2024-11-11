@@ -16,26 +16,31 @@
 
 package controllers.actions
 
-import controllers.actions.StrideAuthenticator.{API_HUB_APPROVER_ROLE, API_HUB_PRIVILEGED_USER_ROLE, API_HUB_SUPPORT_ROLE, API_HUB_USER_ROLE}
+import controllers.actions.StrideAuthenticator.*
 import controllers.actions.StrideAuthenticatorSpec.*
 import models.user.{Permissions, StrideUser, UserModel}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
+import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import services.MetricsService
 import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.AuthProvider.PrivilegedApplication
-import uk.gov.hmrc.auth.core.authorise.Predicate
+import uk.gov.hmrc.auth.core.authorise.{EmptyPredicate, Predicate}
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.retrieve.{Credentials, Retrieval, ~}
 import uk.gov.hmrc.http.UnauthorizedException
 
 import scala.concurrent.Future
 
-class StrideAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSugar {
+class StrideAuthenticatorSpec extends AsyncFreeSpec
+  with Matchers
+  with MockitoSugar
+  with TableDrivenPropertyChecks {
 
   "StrideAuthenticator" - {
     "must retrieve an authenticated user details correctly" in {
@@ -184,7 +189,6 @@ class StrideAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSu
         userId = s"STRIDE-$providerId",
         userType = StrideUser,
         email = "jo.bloggs@email.com",
-        permissions = Permissions(canApprove = false, canSupport = false, isPrivileged = false)
       )
 
       when(fixture.authConnector.authorise(eqTo(userPredicate), eqTo(userRetrieval))(any(), any()))
@@ -192,6 +196,46 @@ class StrideAuthenticatorSpec extends AsyncFreeSpec with Matchers with MockitoSu
 
       recoverToSucceededIf[UnauthorizedException] {
         fixture.strideAuthenticator.authenticate()(FakeRequest())
+      }
+    }
+
+    "must work with both API Hub and IPAAS roles" in {
+      val fixture = buildFixture()
+
+      val user = UserModel(
+        userId = s"STRIDE-$providerId",
+        userType = StrideUser,
+        email = "jo.bloggs@email.com",
+      )
+
+      forAll(
+        Table(
+          ("hip roles", "ipaasRole", "permissions"),
+          (Seq(API_HUB_USER_ROLE), IPAAS_LIVE_SERVICE, Permissions(false, false, false)),
+          (Seq(API_HUB_SUPPORT_ROLE, API_HUB_APPROVER_ROLE), IPAAS_LIVE_ADMINS, Permissions(true, true, false)),
+          (Seq(API_HUB_PRIVILEGED_USER_ROLE), IPAAS_LIVE_SERVICE_SC, Permissions(false, false, true)),
+        )
+      ) { case (hubRoles: Seq[String] @unchecked, ipassRole: String, permissions: Permissions) =>
+
+        val userWithPermissions = user.copy(
+          permissions = permissions
+        )
+        val hubEnrolments = hubRoles.map(Enrolment(_)).toSet
+        val ipaasEnrolments = hubRoles.map(Enrolment(_)).toSet
+
+        when(fixture.authConnector.authorise(eqTo(userPredicate), eqTo(userRetrieval))(any(), any()))
+          .thenReturn(Future.successful(retrievalsForUser(userWithPermissions, hubEnrolments)))
+
+        val userWithHubRoles = fixture.strideAuthenticator.authenticate()(FakeRequest())
+
+        when(fixture.authConnector.authorise(eqTo(userPredicate), eqTo(userRetrieval))(any(), any()))
+          .thenReturn(Future.successful(retrievalsForUser(userWithPermissions, ipaasEnrolments)))
+
+        val userWithIpassRoles = fixture.strideAuthenticator.authenticate()(FakeRequest())
+
+        Future.sequence(Seq(userWithHubRoles, userWithIpassRoles)).map(
+         _.distinct must have size 1
+        )
       }
     }
   }
@@ -212,11 +256,9 @@ object StrideAuthenticatorSpec {
 
   val userRetrieval: UserRetrieval = Retrievals.authorisedEnrolments and Retrievals.email and Retrievals.credentials
 
-  val userPredicate: Predicate =
-    Enrolment(API_HUB_USER_ROLE) or
-      Enrolment(API_HUB_APPROVER_ROLE) or
-      Enrolment(API_HUB_SUPPORT_ROLE) or
-      Enrolment(API_HUB_PRIVILEGED_USER_ROLE) and
+  def userPredicate: Predicate =
+    (approverRoles ++ privilegedRoles ++ supportRoles ++ userRoles)
+      .foldRight[Predicate](EmptyPredicate)(Enrolment(_) or _) and
       AuthProviders(PrivilegedApplication)
 
   val providerId: String = "test-provider-id"
@@ -232,6 +274,17 @@ object StrideAuthenticatorSpec {
         credentialsForUser()
       )
   }
+
+  def retrievalsForUser(user: UserModel, enrolments: Set[Enrolment]): Enrolments ~ Option[String] ~ Option[Credentials] = {
+    uk.gov.hmrc.auth.core.retrieve.~(
+      uk.gov.hmrc.auth.core.retrieve.~(
+        Enrolments(enrolments),
+        Some(user.email)
+      ),
+      credentialsForUser()
+    )
+  }
+
 
   def retrievalsForUserWithoutEmail(user: UserModel): Enrolments ~ Option[String] ~ Option[Credentials] = {
     uk.gov.hmrc.auth.core.retrieve.~(

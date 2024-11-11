@@ -17,11 +17,12 @@
 package controllers.actions
 
 import com.google.inject.{Inject, Singleton}
-import controllers.actions.StrideAuthenticator.{API_HUB_APPROVER_ROLE, API_HUB_PRIVILEGED_USER_ROLE, API_HUB_SUPPORT_ROLE, API_HUB_USER_ROLE}
+import controllers.actions.StrideAuthenticator.{API_HUB_APPROVER_ROLE, API_HUB_PRIVILEGED_USER_ROLE, API_HUB_SUPPORT_ROLE, API_HUB_USER_ROLE, approverRoles, privilegedRoles, supportRoles, userRoles}
 import models.user.{Permissions, StrideUser, UserModel}
 import play.api.mvc.Request
 import services.MetricsService
 import uk.gov.hmrc.auth.core.AuthProvider.PrivilegedApplication
+import uk.gov.hmrc.auth.core.authorise.{EmptyPredicate, Predicate}
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthProviders, AuthorisedFunctions, Enrolment, InsufficientEnrolments, NoActiveSession}
@@ -38,11 +39,9 @@ class StrideAuthenticator @Inject()(
 
   def authenticate()(implicit request: Request[?]): Future[UserAuthResult] = {
     authorised(
-      Enrolment(API_HUB_USER_ROLE) or
-        Enrolment(API_HUB_APPROVER_ROLE) or
-        Enrolment(API_HUB_SUPPORT_ROLE) or
-        Enrolment(API_HUB_PRIVILEGED_USER_ROLE) and
-        AuthProviders(PrivilegedApplication)
+      (approverRoles ++ privilegedRoles ++ supportRoles ++ userRoles)
+        .foldRight[Predicate](EmptyPredicate)(Enrolment(_) or _)
+          and AuthProviders(PrivilegedApplication)
     )
       .retrieve(Retrievals.authorisedEnrolments and Retrievals.email and Retrievals.credentials) {
         case authorisedEnrolments ~ email ~ credentials =>
@@ -54,9 +53,9 @@ class StrideAuthenticator @Inject()(
                   userType = StrideUser,
                   email = email.trim,
                   permissions = Permissions(
-                    canApprove = authorisedEnrolments.enrolments.exists(enrolment => enrolment.key.equals(API_HUB_APPROVER_ROLE)),
-                    canSupport = authorisedEnrolments.enrolments.exists(enrolment => enrolment.key.equals(API_HUB_SUPPORT_ROLE)),
-                    isPrivileged = authorisedEnrolments.enrolments.exists(enrolment => enrolment.key.equals(API_HUB_PRIVILEGED_USER_ROLE))
+                    canApprove = authorisedEnrolments.enrolments.exists(enrolment => approverRoles.contains(enrolment.key)),
+                    canSupport = authorisedEnrolments.enrolments.exists(enrolment => supportRoles.contains(enrolment.key)),
+                    isPrivileged = authorisedEnrolments.enrolments.exists(enrolment => privilegedRoles.contains(enrolment.key))
                   )
                 )
               ))
@@ -86,5 +85,14 @@ object StrideAuthenticator {
   val API_HUB_APPROVER_ROLE: String = "api_hub_approver"
   val API_HUB_SUPPORT_ROLE: String = "api_hub_support"
   val API_HUB_PRIVILEGED_USER_ROLE: String = "api_hub_privileged_user"
+
+  val IPAAS_LIVE_SERVICE: String = "ipaas_live_service"
+  val IPAAS_LIVE_ADMINS: String = "ipaas_live_admins"
+  val IPAAS_LIVE_SERVICE_SC: String = "ipaas_live_service_sc"
+
+  val supportRoles: Seq[String] = Seq(API_HUB_SUPPORT_ROLE, IPAAS_LIVE_ADMINS)
+  val approverRoles: Seq[String] = Seq(API_HUB_APPROVER_ROLE, IPAAS_LIVE_ADMINS)
+  val privilegedRoles: Seq[String] = Seq(API_HUB_PRIVILEGED_USER_ROLE, IPAAS_LIVE_SERVICE_SC)
+  val userRoles: Seq[String] = Seq(API_HUB_USER_ROLE, IPAAS_LIVE_SERVICE)
 
 }
