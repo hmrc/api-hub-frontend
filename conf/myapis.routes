@@ -1,9 +1,6 @@
 GET     /generate                                           controllers.myapis.SimpleApiDeploymentController.onPageLoad()
 POST    /generate                                           controllers.myapis.SimpleApiDeploymentController.onSubmit()
 
-GET     /update/:id                                         controllers.myapis.SimpleApiRedeploymentController.onPageLoad(id: String)
-POST    /update/:id                                         controllers.myapis.SimpleApiRedeploymentController.onSubmit(id: String)
-
 GET     /promote/:id                                        controllers.myapis.SimpleApiPromotionController.onPageLoad(id: String)
 POST    /promote/:id                                        controllers.myapis.SimpleApiPromotionController.onSubmit(id: String)
 
@@ -93,3 +90,53 @@ GET     /produce/hods                                       controllers.myapis.p
 POST    /produce/hods                                       controllers.myapis.produce.ProduceApiHodController.onSubmit(mode: Mode = NormalMode)
 GET     /produce/change-hods                                controllers.myapis.produce.ProduceApiHodController.onPageLoad(mode: Mode = CheckMode)
 POST    /produce/change-hods                                controllers.myapis.produce.ProduceApiHodController.onSubmit(mode: Mode = CheckMode)
+GET     /update/:id/how-to-update                               controllers.myapis.update.UpdateApiHowToUpdateController.onPageLoad(id: String, mode: Mode = NormalMode)
+POST    /update/:id/how-to-update                               controllers.myapis.update.UpdateApiHowToUpdateController.onSubmit(id: String, next: String, mode: Mode = NormalMode)
+GET     /update/:id/change-how-to-update                        controllers.myapis.update.UpdateApiHowToUpdateController.onPageLoad(id: String, mode: Mode = CheckMode)
+POST    /update/:id/change-how-to-update                        controllers.myapis.update.UpdateApiHowToUpdateController.onSubmit(id: String, next: String, mode: Mode = CheckMode)
+
+GET     /update/:id/upload-oas                                  controllers.myapis.update.UpdateApiUploadOasController.onPageLoad(id: String, mode: Mode = NormalMode)
+POST    /update/:id/upload-oas                                  controllers.myapis.update.UpdateApiUploadOasController.onSubmit(id: String, mode: Mode = NormalMode)
+GET     /update/:id/change-upload-oas                           controllers.myapis.update.UpdateApiUploadOasController.onPageLoad(id: String, mode: Mode = CheckMode)
+POST    /update/:id/change-upload-oas                           controllers.myapis.update.UpdateApiUploadOasController.onSubmit(id: String, mode: Mode = CheckMode)
+
+GET     /update/:id/enter-oas                                   controllers.myapis.update.UpdateApiEnterOasController.onPageLoad(id: String, mode: Mode = NormalMode)
+POST    /update/:id/enter-oas                                   controllers.myapis.update.UpdateApiEnterOasController.onSubmit(id: String, mode: Mode = NormalMode)
+GET     /update/:id/change-enter-oas                            controllers.myapis.update.UpdateApiEnterOasController.onPageLoad(id: String, mode: Mode = CheckMode)
+POST    /update/:id/change-enter-oas                            controllers.myapis.update.UpdateApiEnterOasController.onSubmit(id: String, mode: Mode = CheckMode)
+
+GET     /update/:id/short-description                           controllers.myapis.update.UpdateApiShortDescriptionController.onPageLoad(id: String, mode: Mode = NormalMode)
+POST    /update/:id/short-description                           controllers.myapis.update.UpdateApiShortDescriptionController.onSubmit(id: String, mode: Mode = NormalMode)
+GET     /update/:id/change-short-description                    controllers.myapis.update.UpdateApiShortDescriptionController.onPageLoad(id: String, mode: Mode = CheckMode)
+POST    /update/:id/change-short-description                    controllers.myapis.update.UpdateApiShortDescriptionController.onSubmit(id: String, mode: Mode = CheckMode)
+
+GET     /update/:id/review-name-description                     controllers.myapis.update.UpdateApiReviewNameDescriptionController.onPageLoad(id: String, mode: Mode = NormalMode)
+POST    /update/:id/review-name-description                     controllers.myapis.update.UpdateApiReviewNameDescriptionController.onSubmit(id: String, mode: Mode = NormalMode)
+GET     /update/:id/change-review-name-description              controllers.myapis.update.UpdateApiReviewNameDescriptionController.onPageLoad(id: String, mode: Mode = CheckMode)
+POST    /update/:id/change-review-name-description              controllers.myapis.update.UpdateApiReviewNameDescriptionController.onSubmit(id: String, mode: Mode = CheckMode)
+
+GET     /update/:id/review-egress                               controllers.myapis.update.UpdateApiReviewEgressController.onPageLoad(id: String, mode: Mode = NormalMode)
+POST    /update/:id/review-egress                               controllers.myapis.update.UpdateApiReviewEgressController.onSubmit(id: String, next: String, mode: Mode = NormalMode)
+GET     /update/:id/change-review-egress                        controllers.myapis.update.UpdateApiReviewEgressController.onPageLoad(id: String, mode: Mode = CheckMode)
+POST    /update/:id/change-review-egress                        controllers.myapis.update.UpdateApiReviewEgressController.onSubmit(id: String, next: String, mode: Mode = CheckMode)
+
+GET     /update/:id/egress                                      controllers.myapis.update.UpdateApiEgressController.onPageLoad(id: String, mode: Mode = NormalMode)
+POST    /update/:id/egress                                      controllers.myapis.update.UpdateApiEgressController.onSubmit(id: String, mode: Mode = NormalMode)
+GET     /update/:id/change-egress                               controllers.myapis.update.UpdateApiEgressController.onPageLoad(id: String, mode: Mode = CheckMode)
+POST    /update/:id/change-egress                               controllers.myapis.update.UpdateApiEgressController.onSubmit(id: String, mode: Mode = CheckMode)
+
+GET     /update/:id/hod                                         controllers.myapis.update.UpdateApiHodController.onPageLoad(id: String, mode: Mode = NormalMode)
+POST    /update/:id/hod                                         controllers.myapis.update.UpdateApiHodController.onSubmit(id: String, mode: Mode = NormalMode)
+GET     /update/:id/change-hod                                  controllers.myapis.update.UpdateApiHodController.onPageLoad(id: String, mode: Mode = CheckMode)
+POST    /update/:id/change-hod                                  controllers.myapis.update.UpdateApiHodController.onSubmit(id: String, mode: Mode = CheckMode)
+
+GET     /update/:id/domain                                      controllers.myapis.update.UpdateApiDomainController.onPageLoad(id: String, mode: Mode = NormalMode)
+POST    /update/:id/domain                                      controllers.myapis.update.UpdateApiDomainController.onSubmit(id: String, mode: Mode = NormalMode)
+GET     /update/:id/change-domain                               controllers.myapis.update.UpdateApiDomainController.onPageLoad(id: String, mode: Mode = CheckMode)
+POST    /update/:id/change-domain                               controllers.myapis.update.UpdateApiDomainController.onSubmit(id: String, mode: Mode = CheckMode)
+
+GET     /update/:id/check-your-answers                          controllers.myapis.update.UpdateApiCheckYourAnswersController.onPageLoad(id: String)
+POST    /update/:id/check-your-answers                          controllers.myapis.update.UpdateApiCheckYourAnswersController.onSubmit(id: String)
+
+GET     /update/:id                                         controllers.myapis.SimpleApiRedeploymentController.onPageLoad(id: String)
+POST    /update/:id                                         controllers.myapis.SimpleApiRedeploymentController.onSubmit(id: String)
