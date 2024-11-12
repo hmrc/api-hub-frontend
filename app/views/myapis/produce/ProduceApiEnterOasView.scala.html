@@ -42,7 +42,9 @@
 
         <h1 class="govuk-heading-l">@messages("produceApiEnterOas.heading")</h1>
 
-        <p class="govuk-hint">@messages("produceApiEnterOas.hint")</p>
+        @if(form("value").value.isEmpty) {
+            <p class="govuk-hint">@messages("produceApiEnterOas.hint")</p>
+        }
 
         <div id="aceEditorContainer" class="hip-ace-editor govuk-!-margin-bottom-5">+</div>
 
