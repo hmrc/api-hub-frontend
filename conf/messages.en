@@ -857,6 +857,8 @@ configuration.domains.subDomains = Subdomains
 configuration.hods.heading = HoDs data
 configuration.hods.abbreviation = Abbreviation
 configuration.hods.fullName = Full name
+configuration.email.domains.heading = Email Domains
+configuration.email.domains.domain = Email Domain
 
 requestProductionAccessSelectApis.title = Which APIs do you want to request production access for?
 requestProductionAccessSelectApis.heading = Which APIs do you want to request production access for?

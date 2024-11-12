@@ -17,7 +17,7 @@
 package controllers.admin
 
 import com.google.inject.{Inject, Singleton}
-import config.{Domains, Hods}
+import config.{Domains, EmailDomains, Hods}
 import controllers.actions.{AuthorisedSupportAction, IdentifierAction}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -31,12 +31,14 @@ class ConfigurationController @Inject()(
   isSupport: AuthorisedSupportAction,
   domains: Domains,
   hods: Hods,
+  emailDomains: EmailDomains,
   view: ConfigurationView
 ) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = (identify andThen isSupport) {
     implicit request =>
-      Ok(view(domains.domains, hods.hods, request.user))
+      val sortedEmailDomains = emailDomains.emailDomains.toSeq.sorted
+      Ok(view(domains.domains, hods.hods, sortedEmailDomains, request.user))
   }
 
 }
