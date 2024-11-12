@@ -1,5 +1,5 @@
 import {JSDOM} from "jsdom";
-import {onDOMContentLoaded} from "../../app/assets/javascripts/enterOas.js";
+import {onDOMContentLoaded} from "../../app/assets/javascripts/produceApiEnterOas.js";
 import {buildFakeAceEditor} from "./testUtils.js";
 
 describe('onDOMContentLoaded', () => {
