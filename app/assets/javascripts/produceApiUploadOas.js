@@ -48,6 +48,8 @@ export function onDOMContentLoaded() {
 
                 if (elFileNameInput.value && elFileContentsInput.value) {
                     const fileBytes = new TextEncoder().encode(elFileContentsInput.value);
+                    setVisible(elErrorMessage, false);
+                    setVisible(elSelectedFileName, true);
                     showSelectedFileDetails(elFileNameInput.value, fileBytes.length);
                 }
             },
