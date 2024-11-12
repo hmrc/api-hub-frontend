@@ -106,8 +106,7 @@ object ApplicationNavItems {
           page = AllScopesPage,
           title = messages("applicationNav.page.allScopes"),
           link = controllers.application.routes.AllScopesController.onPageLoad(application.id),
-          isCurrentPage = currentPage == AllScopesPage,
-          opensInNewTab = true
+          isCurrentPage = currentPage == AllScopesPage
         ))
       }
       else {

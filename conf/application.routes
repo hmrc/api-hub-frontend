@@ -1,6 +1,7 @@
 GET         /details/:id                                                controllers.application.ApplicationDetailsController.onPageLoad(id: String)
 GET         /support/:id                                                controllers.application.ApplicationSupportController.onPageLoad(id: String)
 GET         /all-scopes/:id                                             controllers.application.AllScopesController.onPageLoad(id: String)
+POST        /all-scopes/:id                                             controllers.application.AllScopesController.fixScopes(id: String)
 GET         /apis/:id                                                   controllers.application.ApplicationApisController.onPageLoad(id: String)
 
 GET         /environment-and-credentials/:id                            controllers.application.EnvironmentAndCredentialsController.onPageLoad(id: String)

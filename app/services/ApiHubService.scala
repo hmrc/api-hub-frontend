@@ -221,4 +221,8 @@ class ApiHubService @Inject()(
     applicationsConnector.fetchAllScopes(applicationId)
   }
 
+  def fixScopes(applicationId: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    applicationsConnector.fixScopes(applicationId)
+  }
+
 }

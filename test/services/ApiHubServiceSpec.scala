@@ -848,6 +848,39 @@ class ApiHubServiceSpec
     }
   }
 
+  "generateDeployment" - {
+    "must make the correct request to the applications connector and return the deployment response" in {
+      val fixture = buildFixture()
+
+      val name = "test-name"
+      val deploymentsRequest: DeploymentsRequest = DeploymentsRequest(
+        lineOfBusiness = "test-line-of-business",
+        name = name,
+        description = "test-description",
+        egress = "test-egress",
+        teamId = "test-team-id",
+        oas = "test-oas",
+        passthrough = false,
+        status = "test-status",
+        domain = "test-domain",
+        subDomain = "test-sub-domain",
+        hods = Seq("hod1"),
+        prefixesToRemove = Seq.empty,
+        egressMappings = None
+      )
+      val response = SuccessfulDeploymentsResponse("id", "version", 1, "uri.com")
+
+      when(fixture.applicationsConnector.generateDeployment(any)(any))
+        .thenReturn(Future.successful(response))
+
+      fixture.service.generateDeployment(deploymentsRequest)(HeaderCarrier()).map {
+        result =>
+          verify(fixture.applicationsConnector).generateDeployment(eqTo(deploymentsRequest))(any())
+          result mustBe response
+      }
+    }
+  }
+
   "fetchAllScopes" - {
     "must make the correct request to the applications connector and return the scopes" in {
       val fixture = buildFixture()
@@ -870,37 +903,19 @@ class ApiHubServiceSpec
           result.value mustBe credentialScopes
       }
     }
+  }
 
-    "generateDeployment" - {
-      "must make the correct request to the applications connector and return the deployment response" in {
-        val fixture = buildFixture()
+  "fixScopes" - {
+    "must make the correct request to the applications connector and return the result" in {
+      val fixture = buildFixture()
+      val applicationId = "test-application-id"
 
-        val name = "test-name"
-        val deploymentsRequest: DeploymentsRequest = DeploymentsRequest(
-          lineOfBusiness = "test-line-of-business",
-          name = name,
-          description = "test-description",
-          egress = "test-egress",
-          teamId = "test-team-id",
-          oas = "test-oas",
-          passthrough = false,
-          status = "test-status",
-          domain = "test-domain",
-          subDomain = "test-sub-domain",
-          hods = Seq("hod1"),
-          prefixesToRemove = Seq.empty,
-          egressMappings = None
-        )
-        val response = SuccessfulDeploymentsResponse("id", "version", 1, "uri.com")
+      when(fixture.applicationsConnector.fixScopes(eqTo(applicationId))(any))
+        .thenReturn(Future.successful(Some(())))
 
-        when(fixture.applicationsConnector.generateDeployment(any)(any))
-          .thenReturn(Future.successful(response))
-
-        fixture.service.generateDeployment(deploymentsRequest)(HeaderCarrier()).map {
-          result =>
-            verify(fixture.applicationsConnector).generateDeployment(eqTo(deploymentsRequest))(any())
-            result mustBe response
-        }
+      fixture.service.fixScopes(applicationId)(HeaderCarrier()).map {
+        result =>
+          result.value mustBe ()
       }
     }
   }
