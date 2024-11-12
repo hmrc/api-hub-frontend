@@ -258,8 +258,12 @@ object StrideAuthenticatorSpec {
 
   def userPredicate: Predicate =
     (approverRoles ++ privilegedRoles ++ supportRoles ++ userRoles)
-      .foldRight[Predicate](EmptyPredicate)(Enrolment(_) or _) and
-      AuthProviders(PrivilegedApplication)
+      .foldRight[Predicate](EmptyPredicate) {
+        case (role, EmptyPredicate) =>
+          Enrolment(role)
+        case (role, acc) =>
+          Enrolment(role) or acc
+      } and AuthProviders(PrivilegedApplication)
 
   val providerId: String = "test-provider-id"
 

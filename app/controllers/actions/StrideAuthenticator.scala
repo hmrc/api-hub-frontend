@@ -40,7 +40,12 @@ class StrideAuthenticator @Inject()(
   def authenticate()(implicit request: Request[?]): Future[UserAuthResult] = {
     authorised(
       (approverRoles ++ privilegedRoles ++ supportRoles ++ userRoles)
-        .foldRight[Predicate](EmptyPredicate)(Enrolment(_) or _)
+        .foldRight[Predicate](EmptyPredicate) {
+          case (role, EmptyPredicate) =>
+            Enrolment(role)
+          case (role, acc) =>
+            Enrolment(role) or acc
+        }
           and AuthProviders(PrivilegedApplication)
     )
       .retrieve(Retrievals.authorisedEnrolments and Retrievals.email and Retrievals.credentials) {
