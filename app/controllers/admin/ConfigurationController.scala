@@ -37,8 +37,7 @@ class ConfigurationController @Inject()(
 
   def onPageLoad(): Action[AnyContent] = (identify andThen isSupport) {
     implicit request =>
-      val sortedEmailDomains = emailDomains.emailDomains.toSeq.sorted
-      Ok(view(domains.domains, hods.hods, sortedEmailDomains, request.user))
+      Ok(view(domains.domains, hods.hods, emailDomains.emailDomains.toSeq.sorted, request.user))
   }
 
 }
