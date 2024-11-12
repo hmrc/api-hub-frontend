@@ -39,84 +39,80 @@
 
     <h2 class="govuk-heading-m">@messages("configuration.domains.heading")</h2>
 
-@govukTable(Table(
-    rows = domains.map(
-        domain =>
-            Seq(
-                TableRow(
-                    content = Text(domain.code)
-                ),
-                TableRow(
-                    content = Text(domain.description)
-                ),
-                TableRow(
-                    content = HtmlContent(subDomainsHtml(domain))
+    @govukTable(Table(
+        rows = domains.map(
+            domain =>
+                Seq(
+                    TableRow(
+                        content = Text(domain.code)
+                    ),
+                    TableRow(
+                        content = Text(domain.description)
+                    ),
+                    TableRow(
+                        content = HtmlContent(subDomainsHtml(domain))
+                    )
                 )
+        ),
+        head = Some(Seq(
+            HeadCell(
+                content = messages("configuration.domains.code")
+            ),
+            HeadCell(
+                content = messages("configuration.domains.description")
+            ),
+            HeadCell(
+                content = messages("configuration.domains.subDomains")
             )
-    ),
-    head = Some(Seq(
-        HeadCell(
-            content = messages("configuration.domains.code")
-        ),
-        HeadCell(
-            content = messages("configuration.domains.description")
-        ),
-        HeadCell(
-            content = messages("configuration.domains.subDomains")
-        )
+        ))
     ))
-))
-
 }
 
 @hodsHtml() = {
 
     <h2 class="govuk-heading-m">@messages("configuration.hods.heading")</h2>
 
-@govukTable(Table(
-    rows = hods.map(
-        hod =>
-            Seq(
-                TableRow(
-                    content = Text(hod.code)
-                ),
-                TableRow(
-                    content = Text(hod.description)
+    @govukTable(Table(
+        rows = hods.map(
+            hod =>
+                Seq(
+                    TableRow(
+                        content = Text(hod.code)
+                    ),
+                    TableRow(
+                        content = Text(hod.description)
+                    )
                 )
-            )
-    ),
-    head = Some(Seq(
-        HeadCell(
-            content = messages("configuration.hods.abbreviation")
         ),
-        HeadCell(
-            content = messages("configuration.hods.fullName")
-        )
+        head = Some(Seq(
+            HeadCell(
+                content = messages("configuration.hods.abbreviation")
+            ),
+            HeadCell(
+                content = messages("configuration.hods.fullName")
+            )
+        ))
     ))
-))
-
 }
 
 @emailDomainsHtml() = {
-
     <h2 class="govuk-heading-m">@messages("configuration.email.domains.heading")</h2>
 
-@govukTable(Table(
-    rows = emailDomains.map(
-        emailDomain =>
-            Seq(
-                TableRow(
-                    content = Text(emailDomain)
+    @govukTable(Table(
+        rows = emailDomains.map(
+            emailDomain =>
+                Seq(
+                    TableRow(
+                        content = Text(emailDomain)
+                    )
                 )
+        ),
+        head = Some(Seq(
+            HeadCell(
+                content = messages("configuration.email.domains.domain")
             )
-    ),
-    head = Some(Seq(
-        HeadCell(
-            content = messages("configuration.email.domains.domain")
-        )
+        ))
     ))
-))
-
 }
 
 @layout(pageTitle = titleNoForm(messages("configuration.title")), user = Some(user), fullWidth = true) {
@@ -149,7 +145,6 @@
                     )
                 )
             )
-        )
-        )
+        ))
     }
 }
