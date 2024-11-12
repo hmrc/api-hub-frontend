@@ -64,7 +64,8 @@ class ProduceApiUploadOasController @Inject()(
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(ProduceApiUploadOasPage, value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.remove(ProduceApiEnterOasPage))
+            updatedAnswers <- Future.fromTry(updatedAnswers.set(ProduceApiUploadOasPage, value))
             _ <- sessionRepository.set(updatedAnswers)
           } yield Redirect(navigator.nextPage(ProduceApiUploadOasPage, mode, updatedAnswers))
       )

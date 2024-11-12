@@ -14,6 +14,7 @@ describe('onDOMContentLoaded', () => {
         `);
         document = dom.window.document;
         globalThis.document = document;
+        globalThis.window = dom.window;
         globalThis.Event = dom.window.Event;
         globalThis.ace = buildFakeAceEditor();
         elHiddenInput = document.querySelector('[name="value"]');

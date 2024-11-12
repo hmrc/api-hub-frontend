@@ -31,10 +31,10 @@ export function onDOMContentLoaded() {
                     e.preventDefault();
                 });
 
-                elFileDrop.addEventListener('dragover', e => {
+                elFileDrop.addEventListener('dragover', () => {
                     elFileDrop.classList.add(cssHoveringClass);
                 });
-                elFileDrop.addEventListener('dragleave', e => {
+                elFileDrop.addEventListener('dragleave', () => {
                     elFileDrop.classList.remove(cssHoveringClass);
                 });
 
@@ -42,7 +42,7 @@ export function onDOMContentLoaded() {
                     elFileDrop.classList.remove(cssHoveringClass);
                     fileSelectionHandler(e.dataTransfer.files);
                 });
-                elFileInput.addEventListener('change', e => {
+                elFileInput.addEventListener('change', () => {
                     fileSelectionHandler(elFileInput.files);
                 });
 
@@ -84,7 +84,7 @@ export function onDOMContentLoaded() {
             },
             populateFormFields(fileName, fileContents) {
                 elFileNameInput.value = fileName;
-                elFileContentsInput.value = fileContents
+                elFileContentsInput.value = fileContents;
             }
         };
     })();
