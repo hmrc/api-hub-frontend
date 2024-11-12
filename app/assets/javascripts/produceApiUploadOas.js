@@ -85,6 +85,12 @@ export function onDOMContentLoaded() {
                 elFileContentsInput.value = '';
             },
             populateFormFields(fileName, fileContents) {
+                /*
+                Although we could just put the <input type="file"...> element inside the form and submit the file that way we would
+                run into problems when we wanted to repopulate the form if the user navigates back to the page. Browser security
+                restrictions prevent scripts from setting the value of a file input element, so instead we use a pair of hidden
+                inputs to store the file name and contents and submit those values to the server instead.
+                 */
                 elFileNameInput.value = fileName;
                 elFileContentsInput.value = fileContents;
             }
