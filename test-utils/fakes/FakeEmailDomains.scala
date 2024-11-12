@@ -29,5 +29,7 @@ object FakeEmailDomains extends EmailDomains {
       "atos.net"
     )
   }
+  
+  def sortedEmailDomains = emailDomains.toSeq.sorted
 
 }

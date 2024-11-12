@@ -16,9 +16,9 @@
 
 package base
 
-import config.{Domains, Hods, Platforms}
-import controllers.actions._
-import fakes.{FakeDomains, FakeHods, FakePlatforms}
+import config.{Domains, EmailDomains, Hods, Platforms}
+import controllers.actions.*
+import fakes.{FakeDomains, FakeEmailDomains, FakeHods, FakePlatforms}
 import models.UserAnswers
 import models.user.UserModel
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -61,6 +61,7 @@ trait SpecBase
         bind[CancelAccessRequestDataRetrievalAction].toInstance(new FakeCancelAccessRequestDataRetrievalAction(userAnswers)),
         bind[Domains].toInstance(FakeDomains),
         bind[Hods].toInstance(FakeHods),
+        bind[EmailDomains].toInstance(FakeEmailDomains),
         bind[Platforms].toInstance(FakePlatforms)
   )
 
