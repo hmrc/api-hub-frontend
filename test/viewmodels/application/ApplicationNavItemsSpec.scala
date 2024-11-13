@@ -18,6 +18,7 @@ package viewmodels.application
 
 import base.SpecBase
 import controllers.actions.{FakeApplication, FakeSupporter}
+import fakes.FakeHipEnvironments
 import models.application.ApplicationLenses.*
 import models.user.UserModel
 import org.scalatest.Inspectors
@@ -38,7 +39,8 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
       running(playApplication) {
         implicit val implicitMessages: Messages = messages(playApplication)
 
-        val actual = ApplicationNavItems(Some(FakeSupporter), FakeApplication, DetailsPage)
+        val actual = ApplicationNavItems(Some(FakeSupporter), FakeApplication, DetailsPage, FakeHipEnvironments)
+
         val expected = Seq(
           SideNavItem(
             DetailsPage,
@@ -56,6 +58,18 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
             EnvironmentsAndCredentialsPage,
             "Environments and credentials",
             controllers.application.routes.EnvironmentAndCredentialsController.onPageLoad(FakeApplication.id),
+            isCurrentPage = false
+          ),
+          SideNavItem(
+            EnvironmentPage(FakeHipEnvironments.production),
+            "Production",
+            controllers.application.routes.ApplicationEnvironmentController.onPageLoad(FakeApplication.id, FakeHipEnvironments.production.id),
+            isCurrentPage = false
+          ),
+          SideNavItem(
+            EnvironmentPage(FakeHipEnvironments.test),
+            "Test",
+            controllers.application.routes.ApplicationEnvironmentController.onPageLoad(FakeApplication.id, FakeHipEnvironments.test.id),
             isCurrentPage = false
           ),
           SideNavItem(
@@ -118,7 +132,7 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
 
         forAll(pages) {
           page =>
-            val actual = ApplicationNavItems(None, FakeApplication, page)
+            val actual = ApplicationNavItems(None, FakeApplication, page, FakeHipEnvironments)
               .filter(_.isCurrentPage)
               .map(_.page)
 
@@ -133,7 +147,7 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
       running(playApplication) {
         implicit val implicitMessages: Messages = messages(playApplication)
 
-        val actual = ApplicationNavItems(Some(FakeSupporter), FakeApplication.setTeamId("test-team-id"), DetailsPage)
+        val actual = ApplicationNavItems(Some(FakeSupporter), FakeApplication.setTeamId("test-team-id"), DetailsPage, FakeHipEnvironments)
           .filter(_.page.equals(ManageTeamMembersPage))
 
         actual mustBe empty
@@ -149,7 +163,7 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
         running(playApplication) {
           implicit val implicitMessages: Messages = messages(playApplication)
 
-          val actual = ApplicationNavItems(Some(user), FakeApplication.setTeamId("test-team-id"), DetailsPage)
+          val actual = ApplicationNavItems(Some(user), FakeApplication.setTeamId("test-team-id"), DetailsPage, FakeHipEnvironments)
             .filter(_.page.equals(ViewAsJsonApplicationPage))
 
           forAll (actual) {page => supportPages must not contain page.page}

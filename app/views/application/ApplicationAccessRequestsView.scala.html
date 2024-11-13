@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import config.HipEnvironments
 @import models.accessrequest.*
 @import models.user.UserModel
 @import views.html.components.AccessRequestPanel
@@ -30,7 +31,8 @@
     govukTable: GovukTable,
     accessRequestPanel: AccessRequestPanel,
     applicationDetailsTable: ApplicationDetailsTable,
-    iconsLink: IconsLink
+    iconsLink: IconsLink,
+    hipEnvironments: HipEnvironments
 )
 
 @(application: Application, accessRequests: Seq[AccessRequest], user: UserModel)(implicit request: Request[?], messages: Messages)
@@ -45,7 +47,7 @@
     fullWidth = true,
     customScriptsBlock = Some(iconsLink())
 ) {
-    @views.html.templates.SideNav(application.name, ApplicationNavItems(Some(user), application, ApplicationSideNavPages.ApplicationHistoryPage)) {
+    @views.html.templates.SideNav(application.name, ApplicationNavItems(Some(user), application, ApplicationSideNavPages.ApplicationHistoryPage, hipEnvironments)) {
 
         <h1 class="govuk-heading-l">
             @messages("applicationHistory.title")

@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import config.HipEnvironments
 @import models.application._
 @import models.user.UserModel
 @import viewmodels.application._
@@ -23,7 +24,8 @@
         layout: templates.Layout,
         govukTable: GovukTable,
         govukButton: GovukButton,
-        iconsLink: IconsLink
+        iconsLink: IconsLink,
+        hipEnvironments: HipEnvironments
 )
 
 @(application: Application, applicationApis: Seq[ApplicationApi], user: Option[UserModel])(implicit request: Request[?], messages: Messages)
@@ -71,7 +73,7 @@
 
 @layout(pageTitle = titleNoForm(messages("applicationApis.title")), user = user, fullWidth = true, customScriptsBlock = Some(iconsLink())) {
 
-    @views.html.templates.SideNav(application.name, ApplicationNavItems(user, application, ApplicationSideNavPages.ApisPage)) {
+    @views.html.templates.SideNav(application.name, ApplicationNavItems(user, application, ApplicationSideNavPages.ApisPage, hipEnvironments)) {
 
         <h1 class="govuk-heading-l">@messages("applicationApis.heading")</h1>
 

@@ -1017,3 +1017,9 @@ produceApiUploadOas.file.text1.hover = Release to add file
 produceApiUploadOas.file.text2 = OR
 produceApiUploadOas.file.choose = Choose file
 produceApiUploadOas.fileInfo = Only OAS files in YAML format are accepted. The maximum file size is {0}MB.
+
+hipEnvironment.production.name = Production
+hipEnvironment.test.name = Test
+
+applicationEnvironment.title = {0} environment
+applicationEnvironment.heading = {0} environment
