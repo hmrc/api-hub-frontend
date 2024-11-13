@@ -17,20 +17,21 @@
 @import models.api.{Domain, Hod}
 @import models.user.UserModel
 @import viewmodels.admin.{AdminNavItems, AdminSideNavPages}
+@import config.EmailDomains
 
 @this(
-    layout: templates.Layout,
-    govukTabs : GovukTabs,
-    govukTable : GovukTable
+        layout: templates.Layout,
+        govukTabs: GovukTabs,
+        govukTable: GovukTable
 )
 
-@(domains: Seq[Domain], hods: Seq[Hod], user: UserModel)(implicit request: Request[?], messages: Messages)
+@(domains: Seq[Domain], hods: Seq[Hod], emailDomains: Seq[String], user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @subDomainsHtml(domain: Domain) = {
     <ul class="govuk-list govuk-list-bullet">
-        @for(subDomain <- domain.subDomains) {
-            <li>@subDomain.code: @subDomain.description</li>
-        }
+    @for(subDomain <- domain.subDomains) {
+        <li>@subDomain.code: @subDomain.description</li>
+    }
     </ul>
 }
 
@@ -65,7 +66,6 @@
             )
         ))
     ))
-
 }
 
 @hodsHtml() = {
@@ -93,7 +93,26 @@
             )
         ))
     ))
+}
 
+@emailDomainsHtml() = {
+    <h2 class="govuk-heading-m">@messages("configuration.email.domains.heading")</h2>
+
+    @govukTable(Table(
+        rows = emailDomains.map(
+            emailDomain =>
+                Seq(
+                    TableRow(
+                        content = Text(emailDomain)
+                    )
+                )
+        ),
+        head = Some(Seq(
+            HeadCell(
+                content = messages("configuration.email.domains.domain")
+            )
+        ))
+    ))
 }
 
 @layout(pageTitle = titleNoForm(messages("configuration.title")), user = Some(user), fullWidth = true) {
@@ -104,24 +123,28 @@
 
         @govukTabs(Tabs(
             items = Seq(
-              TabItem(
-                id = Some("domainsTab"),
-                label = messages("configuration.domains.heading"),
-                panel = TabPanel(
-                  content = HtmlContent(domainsHtml())
+                TabItem(
+                    id = Some("domainsTab"),
+                    label = messages("configuration.domains.heading"),
+                    panel = TabPanel(
+                        content = HtmlContent(domainsHtml())
+                    )
+                ),
+                TabItem(
+                    id = Some("hodsTab"),
+                    label = messages("configuration.hods.heading"),
+                    panel = TabPanel(
+                        content = HtmlContent(hodsHtml())
+                    )
+                ),
+                TabItem(
+                    id = Some("emailDomainsTab"),
+                    label = messages("configuration.email.domains.heading"),
+                    panel = TabPanel(
+                        content = HtmlContent(emailDomainsHtml())
+                    )
                 )
-              ),
-              TabItem(
-                id = Some("hodsTab"),
-                label = messages("configuration.hods.heading"),
-                panel = TabPanel(
-                  content = HtmlContent(hodsHtml())
-                )
-              )
             )
-          )
-        )
-
+        ))
     }
-
 }

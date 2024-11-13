@@ -17,7 +17,7 @@
 package controllers.admin
 
 import base.SpecBase
-import fakes.{FakeDomains, FakeHods}
+import fakes.{FakeDomains, FakeEmailDomains, FakeHods}
 import models.user.UserModel
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.Application
@@ -43,7 +43,7 @@ class ConfigurationControllerSpec
           val view = fixture.application.injector.instanceOf[ConfigurationView]
 
           status(result) mustBe OK
-          contentAsString(result) mustBe view(FakeDomains.domains, FakeHods.hods, user)(request, messages(fixture.application)).toString
+          contentAsString(result) mustBe view(FakeDomains.domains, FakeHods.hods, FakeEmailDomains.sortedEmailDomains, user)(request, messages(fixture.application)).toString
           contentAsString(result) must validateAsHtml
         }
       }
