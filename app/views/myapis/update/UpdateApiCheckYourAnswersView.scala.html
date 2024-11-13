@@ -22,11 +22,11 @@
     govukButton: GovukButton
 )
 
-@(id: String, user: UserModel)(implicit request: Request[?], messages: Messages)
+@(user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = titleNoForm("Check your anwers"), user = Some(user)) {
     <h1 class="govuk-heading-l">Check your anwers</h1>
-    @formHelper(action = controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onSubmit(id)) {
+    @formHelper(action = controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onSubmit()) {
         @govukButton(
             ButtonViewModel(messages("Deploy"))
         )

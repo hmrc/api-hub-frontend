@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package pages
+package pages.myapis.produce
 
-import models.myapis.produce.ProduceApiDomainSubdomain
+import models.myapis.ApiDomainSubdomain
 import pages.behaviours.PageBehaviours
 import pages.myapis.produce.ProduceApiDomainPage
 
-class ProduceApiDomainSubdomainSpec extends PageBehaviours {
+class ProduceApiDomainPageSpec extends PageBehaviours {
 
   "ProduceApiDomainPage" - {
 
-    beRetrievable[ProduceApiDomainSubdomain](ProduceApiDomainPage)
+    beRetrievable[ApiDomainSubdomain](ProduceApiDomainPage)
 
-    beSettable[ProduceApiDomainSubdomain](ProduceApiDomainPage)
+    beSettable[ApiDomainSubdomain](ProduceApiDomainPage)
 
-    beRemovable[ProduceApiDomainSubdomain](ProduceApiDomainPage)
+    beRemovable[ApiDomainSubdomain](ProduceApiDomainPage)
   }
 }

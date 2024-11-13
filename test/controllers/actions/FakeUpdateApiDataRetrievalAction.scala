@@ -14,12 +14,19 @@
  * limitations under the License.
  */
 
-package models.myapis.produce
+package controllers.actions
 
-import play.api.libs.json.{Format, Json}
+import models.UserAnswers
+import models.requests.{IdentifierRequest, OptionalDataRequest}
 
-case class ProduceApiDomainSubdomain(domain: String, subDomain: String)
+import scala.concurrent.{ExecutionContext, Future}
 
-object ProduceApiDomainSubdomain {
-  implicit val format: Format[ProduceApiDomainSubdomain] = Json.format[ProduceApiDomainSubdomain]
+class FakeUpdateApiDataRetrievalAction(dataToReturn: Option[UserAnswers]) extends UpdateApiDataRetrievalAction {
+
+  override protected def transform[A](request: IdentifierRequest[A]): Future[OptionalDataRequest[A]] = {
+    Future(OptionalDataRequest(request.request, request.user, dataToReturn))
+  }
+
+  override protected implicit val executionContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+
 }

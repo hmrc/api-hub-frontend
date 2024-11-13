@@ -22,11 +22,11 @@ formHelper: FormWithCSRF,
 govukButton: GovukButton
 )
 
-@(id: String, mode: Mode, user: UserModel)(implicit request: Request[?], messages: Messages)
+@(mode: Mode, user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = titleNoForm("Upload an OAS file"), user = Some(user)) {
     <h1 class="govuk-heading-l">Upload an OAS file</h1>
-    @formHelper(action = controllers.myapis.update.routes.UpdateApiUploadOasController.onSubmit(id, mode)) {
+    @formHelper(action = controllers.myapis.update.routes.UpdateApiUploadOasController.onSubmit( mode)) {
         @govukButton(
             ButtonViewModel(messages("Continue"))
         )

@@ -1,0 +1,269 @@
+/*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package controllers.myapis.update
+
+import base.SpecBase
+import controllers.actions.{FakeApiDetail, FakeUser, FakeUserNotTeamMember}
+import controllers.routes
+import models.UserAnswers
+import models.api.{Alpha, ApiDetail}
+import models.application.TeamMember
+import models.deployment.{DeploymentDetails, EgressMapping}
+import models.myapis.ApiDomainSubdomain
+import models.myapis.produce.ProduceApiEgressPrefixes
+import models.team.Team
+import models.user.UserModel
+import navigation.{FakeNavigator, Navigator}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.{verify, when}
+import org.scalatest.prop.TableDrivenPropertyChecks
+import org.scalatestplus.mockito.MockitoSugar
+import pages.QuestionPage
+import pages.myapis.update.*
+import play.api.Application
+import play.api.inject.bind
+import play.api.libs.json.Writes
+import play.api.test.FakeRequest
+import play.api.test.Helpers.*
+import repositories.UpdateApiSessionRepository
+import services.ApiHubService
+
+import java.time.*
+import scala.concurrent.Future
+
+class UpdateApiStartControllerSpec extends SpecBase with MockitoSugar with TableDrivenPropertyChecks {
+
+  import UpdateApiStartControllerSpec.*
+
+  "UpdateApiStartController" - {
+    "must initiate user answers with the existing deployment details" in {
+      val emptyDeploymentDetails = DeploymentDetails(
+        description = None,
+        status = None,
+        domain = None,
+        subDomain = None,
+        hods = None,
+        egressMappings = None,
+        prefixesToRemove = None,
+      )
+      def initialUserAnswers(deploymentDetails: DeploymentDetails) = UserAnswers(
+          id = FakeUser.userId,
+          lastUpdated = clock.instant()
+      ).set(UpdateApiApiPage, FakeApiDetail).success.value
+
+      def setAnswer[A](userAnswers: UserAnswers, page: QuestionPage[A], value: A)(implicit w: Writes[A]) =
+        userAnswers.set(page, value).success.value
+
+      val deploymentDetailsWithDescription = emptyDeploymentDetails
+        .copy(description = Some("Description"))
+      val answersWithDescription = setAnswer(
+        initialUserAnswers(deploymentDetailsWithDescription),
+        UpdateApiShortDescriptionPage,
+        "Description"
+      )
+
+      val deploymentDetailsWithStatus = emptyDeploymentDetails
+        .copy(status = Some("alpha"))
+      val answersWithStatus = setAnswer(
+        initialUserAnswers(deploymentDetailsWithStatus),
+        UpdateApiStatusPage,
+        Alpha
+      )
+
+      val deploymentDetailsWithDomainSubdomain = emptyDeploymentDetails
+        .copy(
+          domain = Some("domain"),
+          subDomain = Some("subDomain")
+        )
+      val answersWithDomainSubdomain = setAnswer(
+        initialUserAnswers(deploymentDetailsWithDomainSubdomain),
+        UpdateApiDomainPage,
+        ApiDomainSubdomain("domain", "subDomain")
+      )
+
+      val deploymentDetailsWithHod = emptyDeploymentDetails
+        .copy(
+          hods = Some(Seq("hod")),
+        )
+      val answersWithHod = setAnswer(
+        initialUserAnswers(deploymentDetailsWithHod),
+        UpdateApiHodPage,
+        Set("hod")
+      )
+
+      val deploymentDetailsWithEgress = emptyDeploymentDetails
+        .copy(
+          prefixesToRemove = Some(Seq("/v1")),
+          egressMappings = Some(Seq(EgressMapping("/test", "/qa")))
+        )
+      val answersWithEgress = setAnswer(setAnswer(
+        initialUserAnswers(deploymentDetailsWithEgress),
+        UpdateApiEgressPrefixesPage,
+        ProduceApiEgressPrefixes(Seq("/v1"), Seq("/qa->/test"))
+      ), UpdateApiReviewEgressPage, true)
+
+      forAll(Table(
+        ("deploymentDetails", "expectedAnswers"),
+        (emptyDeploymentDetails, initialUserAnswers(emptyDeploymentDetails)),
+        (deploymentDetailsWithDescription, answersWithDescription),
+        (deploymentDetailsWithStatus, answersWithStatus),
+        (deploymentDetailsWithDomainSubdomain, answersWithDomainSubdomain),
+        (deploymentDetailsWithHod, answersWithHod),
+        (deploymentDetailsWithEgress, answersWithEgress)
+      )) { case (deploymentDetails: DeploymentDetails, expectedUserAnswers: UserAnswers) =>
+        val fixture = buildFixture()
+        when(fixture.sessionRepository.set(any())).thenReturn(Future.successful(true))
+        when(fixture.apiHubService.getDeploymentDetails(any)(any))
+          .thenReturn(Future.successful(Some(deploymentDetails)))
+
+        running(fixture.application) {
+          val request = FakeRequest(controllers.myapis.update.routes.UpdateApiStartController.startProduceApi("id"))
+          val result = route(fixture.application, request).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(nextPage.url)
+          verify(fixture.sessionRepository).set(eqTo(expectedUserAnswers))
+        }
+      }
+    }
+
+    "must redirect to the next page" in {
+      val fixture = buildFixture()
+      when(fixture.apiHubService.getDeploymentDetails(any)(any))
+        .thenReturn(Future.successful(Some(DeploymentDetails(
+          description = None,
+          status = None,
+          domain = None,
+          subDomain = None,
+          hods = None,
+          egressMappings = None,
+          prefixesToRemove = None,
+        ))))
+      when(fixture.sessionRepository.set(any())).thenReturn(Future.successful(true))
+
+      running(fixture.application) {
+        val request = FakeRequest(controllers.myapis.update.routes.UpdateApiStartController.startProduceApi("id"))
+        val result = route(fixture.application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(nextPage.url)
+      }
+    }
+
+    "must return a 404 if there are no API details" in {
+      val fixture = buildFixture(maybeApiDetail = None)
+
+      running(fixture.application) {
+        val request = FakeRequest(controllers.myapis.update.routes.UpdateApiStartController.startProduceApi("id"))
+        val result = route(fixture.application, request).value
+
+        status(result) mustBe NOT_FOUND
+      }
+    }
+
+    "must return a 404 if there are no deployment details" in {
+      val fixture = buildFixture()
+      when(fixture.apiHubService.getDeploymentDetails(any)(any))
+        .thenReturn(Future.successful(None))
+
+      running(fixture.application) {
+        val request = FakeRequest(controllers.myapis.update.routes.UpdateApiStartController.startProduceApi("id"))
+        val result = route(fixture.application, request).value
+
+        status(result) mustBe NOT_FOUND
+      }
+    }
+
+    "must return a 500 if there is an error while saving the answers" in {
+      val fixture = buildFixture()
+      when(fixture.apiHubService.getDeploymentDetails(any)(any))
+        .thenReturn(Future.successful(Some(DeploymentDetails(
+          description = None,
+          status = None,
+          domain = None,
+          subDomain = None,
+          hods = None,
+          egressMappings = None,
+          prefixesToRemove = None,
+        ))))
+      when(fixture.sessionRepository.set(any())).thenReturn(Future.failed(new Exception))
+
+      running(fixture.application) {
+        val request = FakeRequest(controllers.myapis.update.routes.UpdateApiStartController.startProduceApi("id"))
+        val result = route(fixture.application, request).value
+
+        status(result) mustBe INTERNAL_SERVER_ERROR
+      }
+    }
+
+    "must redirect to the unauthorised page if the user is not part of the API team" in {
+      val fixture = buildFixture()
+      when(fixture.apiHubService.findTeams(any)(any))
+        .thenReturn(Future.successful(Seq(
+          Team("otherTeamId", "name", LocalDateTime.now(clock), Seq.empty)
+        )))
+
+      running(fixture.application) {
+        val request = FakeRequest(controllers.myapis.update.routes.UpdateApiStartController.startProduceApi("id"))
+        val result = route(fixture.application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad.url)
+      }
+    }
+
+  }
+
+  private case class Fixture(
+    application: Application,
+    sessionRepository: UpdateApiSessionRepository,
+    apiHubService: ApiHubService
+  )
+
+  private def buildFixture(
+                            maybeApiDetail: Option[ApiDetail] = Some(FakeApiDetail),
+                            user: UserModel = FakeUser
+                          ): Fixture = {
+    val sessionRepository = mock[UpdateApiSessionRepository]
+    val apiHubService = mock[ApiHubService]
+    when(apiHubService.getApiDetail(any)(any))
+      .thenReturn(Future.successful(maybeApiDetail))
+    when(apiHubService.findTeams(any)(any))
+      .thenReturn(Future.successful(Seq(
+        Team("teamId", "name", LocalDateTime.now(clock), Seq(TeamMember(FakeUser.email)))
+      )))
+
+    val application = applicationBuilder(user = user)
+      .overrides(
+        bind[UpdateApiSessionRepository].toInstance(sessionRepository),
+        bind[Navigator].toInstance(new FakeNavigator(nextPage)),
+        bind[Clock].toInstance(clock),
+        bind[ApiHubService].toInstance(apiHubService),
+      )
+      .build()
+
+    Fixture(application, sessionRepository, apiHubService)
+  }
+
+}
+
+object UpdateApiStartControllerSpec {
+
+  private val nextPage = controllers.routes.IndexController.onPageLoad
+  private val clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
+
+}

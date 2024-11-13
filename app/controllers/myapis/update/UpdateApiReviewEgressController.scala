@@ -34,15 +34,15 @@ class UpdateApiReviewEgressController @Inject()(
                                                 view: UpdateApiReviewEgressView
                                               )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(id: String, mode: Mode): Action[AnyContent] = identify {
-    implicit request => Ok(view(id, mode, request.user))
+  def onPageLoad(mode: Mode): Action[AnyContent] = identify {
+    implicit request => Ok(view( mode, request.user))
   }
 
-  def onSubmit(id: String, next: String, mode: Mode): Action[AnyContent] = identify {
+  def onSubmit(next: String, mode: Mode): Action[AnyContent] = identify {
     implicit request => {
       next match {
-        case "yes" => Redirect(routes.UpdateApiEgressController.onPageLoad(id, mode))
-        case "no" => Redirect(routes.UpdateApiHodController.onPageLoad(id, mode))
+        case "yes" => Redirect(routes.UpdateApiEgressController.onPageLoad(mode))
+        case "no" => Redirect(routes.UpdateApiHodController.onPageLoad(mode))
       }
     }
   }

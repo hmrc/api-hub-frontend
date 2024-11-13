@@ -22,11 +22,11 @@
     govukButton: GovukButton
 )
 
-@(id: String, mode: Mode, user: UserModel)(implicit request: Request[?], messages: Messages)
+@(mode: Mode, user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = titleNoForm("Update egress configuration"), user = Some(user)) {
     <h1 class="govuk-heading-l">Update egress configuration</h1>
-    @formHelper(action = controllers.myapis.update.routes.UpdateApiEgressController.onSubmit(id, mode)) {
+    @formHelper(action = controllers.myapis.update.routes.UpdateApiEgressController.onSubmit( mode)) {
         @govukButton(
             ButtonViewModel(messages("Continue"))
         )

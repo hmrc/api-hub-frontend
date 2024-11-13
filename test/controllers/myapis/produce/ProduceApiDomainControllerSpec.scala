@@ -22,7 +22,7 @@ import controllers.actions.FakeUser
 import controllers.myapis.produce.{routes => produceApiRoutes}
 import controllers.routes
 import forms.myapis.produce.ProduceApiDomainFormProvider
-import models.myapis.produce.ProduceApiDomainSubdomain
+import models.myapis.ApiDomainSubdomain
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
@@ -69,7 +69,7 @@ class ProduceApiDomainControllerSpec extends SpecBase with MockitoSugar {
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
       val userAnswers = UserAnswers(userAnswersId)
-        .set(ProduceApiDomainPage, ProduceApiDomainSubdomain("domain", "subdomain")).success.value
+        .set(ProduceApiDomainPage, ApiDomainSubdomain("domain", "subdomain")).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -79,7 +79,7 @@ class ProduceApiDomainControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[ProduceApiDomainView]
         val domains = application.injector.instanceOf[Domains]
         val boundForm = form(domains)
-          .fill(ProduceApiDomainSubdomain("domain", "subdomain"))
+          .fill(ApiDomainSubdomain("domain", "subdomain"))
 
         val result = route(application, request).value
 

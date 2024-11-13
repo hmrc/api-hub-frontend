@@ -18,7 +18,7 @@ package forms.myapis.produce
 
 import config.Domains
 import forms.mappings.Mappings
-import models.myapis.produce.ProduceApiDomainSubdomain
+import models.myapis.ApiDomainSubdomain
 import play.api.data.Form
 import play.api.data.Forms.mapping
 
@@ -26,12 +26,12 @@ import javax.inject.Inject
 
 class ProduceApiDomainFormProvider @Inject()(domains: Domains) extends Mappings {
 
-  def apply(): Form[ProduceApiDomainSubdomain] =
+  def apply(): Form[ApiDomainSubdomain] =
     Form(
       mapping(
         "domain" -> text("produceApiDomain.error.domainRequired"),
         "subDomain" -> text("produceApiDomain.error.subDomainRequired"),
-      )(ProduceApiDomainSubdomain.apply)(o => Some(Tuple.fromProductTyped(o)))
+      )(ApiDomainSubdomain.apply)(o => Some(Tuple.fromProductTyped(o)))
         .verifying("produceApiDomain.error.invalidDomain", form => domains.domains.exists(_.code == form.domain))
         .verifying("produceApiDomain.error.invalidSubDomain", form => {
           val selectedDomain = domains.domains.find(_.code == form.domain)

@@ -22,16 +22,16 @@ formHelper: FormWithCSRF,
 govukButton: GovukButton
 )
 
-@(id: String, mode: Mode, user: UserModel)(implicit request: Request[?], messages: Messages)
+@(mode: Mode, user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = titleNoForm("How do you want to update an API?"), user = Some(user)) {
     <h1 class="govuk-heading-l">How do you want to register an API?</h1>
-    @formHelper(action = controllers.myapis.update.routes.UpdateApiHowToUpdateController.onSubmit(id, "upload", mode)) {
+    @formHelper(action = controllers.myapis.update.routes.UpdateApiHowToUpdateController.onSubmit( "upload", mode)) {
         @govukButton(
             ButtonViewModel(messages("Upload File"))
         )
     }
-    @formHelper(action = controllers.myapis.update.routes.UpdateApiHowToUpdateController.onSubmit(id, "editor", mode)) {
+    @formHelper(action = controllers.myapis.update.routes.UpdateApiHowToUpdateController.onSubmit( "editor", mode)) {
         @govukButton(
             ButtonViewModel("Editor")
         )
