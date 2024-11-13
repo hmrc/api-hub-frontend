@@ -29,7 +29,7 @@
 
 @scripts() = {
     <script src='@routes.Assets.versioned("javascripts/oaseditor/ace.js")' @{CSPNonce.attr}></script>
-    <script src='@routes.Assets.versioned("javascripts/enterOas.js")' type="module" @{CSPNonce.attr}></script>
+    <script src='@routes.Assets.versioned("javascripts/produceApiEnterOas.js")' type="module" @{CSPNonce.attr}></script>
 }
 
 @layout(pageTitle = title(form, messages("produceApiEnterOas.title")), fullWidth = true, customScriptsBlock = Some(scripts()), user = Some(userModel)) {
@@ -42,7 +42,9 @@
 
         <h1 class="govuk-heading-l">@messages("produceApiEnterOas.heading")</h1>
 
-        <p class="govuk-hint">@messages("produceApiEnterOas.hint")</p>
+        @if(form("value").value.isEmpty) {
+            <p class="govuk-hint">@messages("produceApiEnterOas.hint")</p>
+        }
 
         <div id="aceEditorContainer" class="hip-ace-editor govuk-!-margin-bottom-5">+</div>
 

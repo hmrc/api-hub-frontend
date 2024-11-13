@@ -15,19 +15,56 @@
  *@
 
 @import models.user.UserModel
-@import models.myapis.produce.ProduceApiHowToCreate
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import views.html.components.IconsLink
+@import views.html.helper.CSPNonce
+@import models.myapis.produce.ProduceApiUploadedOasFile
+@import config.FrontendAppConfig
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
-    govukButton: GovukButton
+    govukButton: GovukButton,
+    govukErrorSummary: GovukErrorSummary,
+    iconsLink: IconsLink,
 )
 
-@(mode: Mode, userModel: UserModel)(implicit request: Request[?], messages: Messages)
+@(form: Form[ProduceApiUploadedOasFile], mode: Mode, userModel: UserModel, config: FrontendAppConfig)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = titleNoForm("Provide the OpenAPI Specification file"), user = Some(userModel)) {
+@scripts() = {
+    @iconsLink()
+    <script src='@routes.Assets.versioned("javascripts/produceApiUploadOas.js")' type="module" @{CSPNonce.attr}></script>
+}
+
+@layout(pageTitle = title(form, messages("produceApiUploadOas.title")), user = Some(userModel), customScriptsBlock = Some(scripts())) {
+    <h1 class="govuk-heading-l">@messages("produceApiUploadOas.heading")</h1>
+
+    <p class="govuk-body">@messages("produceApiUploadOas.description")</p>
+
+    @if(form.errors.nonEmpty) {
+        @govukErrorSummary(ErrorSummaryViewModel(form))
+    }
+
+    <div id="fileDrop" class="hip-file-drop" data-maxsize="@config.maxOasUploadSizeMb" data-validextensions="@config.oasUploadValidExtensions.mkString(",")">
+        <div class="hip-file-drop__icon fas fa-cloud-upload-alt"></div>
+        <h6 class="hip-file-drop__text">@messages("produceApiUploadOas.file.text1")</h6>
+        <h6 class="hip-file-drop__text--hover">@messages("produceApiUploadOas.file.text1.hover")</h6>
+        <p class="hip-file-drop__text">@messages("produceApiUploadOas.file.text2")</p>
+
+        <label>
+            @messages("produceApiUploadOas.file.choose")
+            <input type="file" name="oasFile" id="oasFile" accept="@config.oasUploadValidExtensions.map("." + _).mkString(",")">
+        </label>
+    </div>
+
+    <p class="govuk-body-s govuk-!-margin-top-4">@messages("produceApiUploadOas.fileInfo", config.maxOasUploadSizeMb)</p>
+
+    <p id="errorMessage" class="govuk-error-message govuk-!-margin-bottom-4 govuk-!-display-none"></p>
+    <p id="selectedFileName" class="govuk-body govuk-!-font-weight-bold govuk-!-display-none"></p>
+
     @formHelper(action = controllers.myapis.produce.routes.ProduceApiUploadOasController.onSubmit(mode)) {
-        <h1 class="govuk-heading-l">Provide the OpenAPI Specification file</h1>
+        <input type="hidden" name="fileName" id="fileName" value="@form.value.map(_.fileName).getOrElse("")">
+        <input type="hidden" name="fileContents" id="fileContents" value="@form.value.map(_.fileContents).getOrElse("")">
         @govukButton(
             ButtonViewModel(messages("site.continue"))
         )

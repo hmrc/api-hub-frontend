@@ -19,26 +19,56 @@ package controllers.myapis.produce
 import controllers.actions.*
 import models.Mode
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, MultipartFormData, Request}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.myapis.produce.ProduceApiUploadOasView
+import forms.myapis.produce.ProduceApiUploadOasFormProvider
+import pages.myapis.produce.{ProduceApiEnterOasPage, ProduceApiUploadOasPage}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-import play.api.data.Form
+import config.FrontendAppConfig
+import navigation.Navigator
+import repositories.ProduceApiSessionRepository
 
 class ProduceApiUploadOasController @Inject()(
                                         override val messagesApi: MessagesApi,
+                                        sessionRepository: ProduceApiSessionRepository,
+                                        navigator: Navigator,
                                         identify: IdentifierAction,
                                         val controllerComponents: MessagesControllerComponents,
-                                        view: ProduceApiUploadOasView
+                                        formProvider: ProduceApiUploadOasFormProvider,
+                                        getData: ProduceApiDataRetrievalAction,
+                                        requireData: DataRequiredAction,
+                                        view: ProduceApiUploadOasView,
+                                        frontendAppConfig: FrontendAppConfig
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = identify {
-    implicit request =>  Ok(view(mode, request.user))
+  private val form = formProvider()
+
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+    implicit request =>
+      val preparedForm = request.userAnswers.get(ProduceApiUploadOasPage) match {
+        case None => form
+        case Some(value) => form.fill(value)
+      }
+
+      Ok(view(preparedForm, mode, request.user, frontendAppConfig))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = identify {
-    implicit request =>  Redirect(routes.ProduceApiEnterOasController.onPageLoad(mode))
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request => {
+      form.bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, mode, request.user, frontendAppConfig))),
+
+        value =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.remove(ProduceApiEnterOasPage))
+            updatedAnswers <- Future.fromTry(updatedAnswers.set(ProduceApiUploadOasPage, value))
+            _ <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(navigator.nextPage(ProduceApiUploadOasPage, mode, updatedAnswers))
+      )
+    }
   }
 }

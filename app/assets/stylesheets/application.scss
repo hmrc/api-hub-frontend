@@ -2,6 +2,7 @@ $govuk-include-default-font-face: false;
 @import "lib/govuk-frontend/dist/govuk/base";
 @import "lib/govuk-frontend/dist/govuk/components/tag";
 @import "lib/govuk-frontend/dist/govuk/core";
+@import "lib/govuk-frontend/dist/govuk/utilities/visually-hidden";
 
 // Non-GOV.UK Colours
 $off-white: #fbfbfb;
@@ -902,4 +903,69 @@ header {
 .govuk-summary-list__value ul {
     margin-top: 0;
     margin-bottom: govuk-spacing(2);
+}
+.hip-file-drop {
+    border: 2px dashed govuk-colour("blue");
+    width: 350px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    gap: govuk-spacing(4);
+    padding: govuk-spacing(8) 0;
+    border-radius: $border-radius-size;
+
+    * {
+        /* Needed to stop dragenter/leave events being triggered whenever we drag over one of the child elements */
+        pointer-events: none;
+    }
+    label {
+        pointer-events: auto;
+    }
+
+    h6.hip-file-drop__text--hover {
+        display: none;
+    }
+
+    &.hovering {
+        border-width: 3px;
+        margin: -1px;
+
+        h6.hip-file-drop__text--hover {
+            display: block;
+        }
+        h6.hip-file-drop__text {
+            display: none;
+        }
+    }
+
+    .hip-file-drop__icon {
+        @include govuk-font-size($size: 36);
+        color: govuk-colour("blue");
+        margin: 0;
+    }
+
+    h6 {
+        @include govuk-font-size($size: 19);
+        margin: 0;
+    }
+
+    p.hip-file-drop__text {
+        margin: 0;
+    }
+
+    label {
+        display: inline-block;
+        @include govuk-font-size($size: 16);
+        cursor: pointer;
+        padding: govuk-spacing(2) govuk-spacing(6);
+        background-color: govuk-colour("blue");
+        color: govuk-colour("white");
+        border-radius: $border-radius-size;
+
+        input {
+            @extend .govuk-visually-hidden;
+        }
+    }
+
 }

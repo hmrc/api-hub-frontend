@@ -23,7 +23,7 @@ import forms.myapis.produce.ProduceApiEnterOasFormProvider
 import models.Mode
 import models.curl.OpenApiDoc
 import navigation.Navigator
-import pages.myapis.produce.{ProduceApiEnterApiTitlePage, ProduceApiEnterOasPage}
+import pages.myapis.produce.{ProduceApiEnterApiTitlePage, ProduceApiEnterOasPage, ProduceApiUploadOasPage}
 import play.api.i18n.*
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -59,6 +59,21 @@ class ProduceApiEnterOasController @Inject()(
       }
 
       Ok(view(preparedForm, mode, request.user))
+  }
+
+  def onPageLoadWithUploadedOas(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request =>
+      request.userAnswers.get(ProduceApiEnterOasPage).orElse(request.userAnswers.get(ProduceApiUploadOasPage).map(_.fileContents)) match {
+        case Some(oasFileContents) =>
+          val formWithUploadedOas = form.fill(oasFileContents)
+          validateOAS(oasFileContents).map {
+            case Left(error) => {
+              BadRequest(view(formWithUploadedOas.withGlobalError(error), mode, request.user))
+            }
+            case Right(_) => Ok(view(formWithUploadedOas, mode, request.user))
+          }
+        case None => Future.successful(Ok(view(form, mode, request.user)))
+      }
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {

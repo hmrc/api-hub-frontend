@@ -20,6 +20,9 @@ POST    /produce/enter-oas                                  controllers.myapis.p
 GET     /produce/change-enter-oas                           controllers.myapis.produce.ProduceApiEnterOasController.onPageLoad(mode: Mode = CheckMode)
 POST    /produce/change-enter-oas                           controllers.myapis.produce.ProduceApiEnterOasController.onSubmit(mode: Mode = CheckMode)
 
+GET     /produce/review-oas                                  controllers.myapis.produce.ProduceApiEnterOasController.onPageLoadWithUploadedOas(mode: Mode = NormalMode)
+GET     /produce/change-review-oas                           controllers.myapis.produce.ProduceApiEnterOasController.onPageLoadWithUploadedOas(mode: Mode = CheckMode)
+
 GET     /produce/before-you-start                           controllers.myapis.produce.ProduceApiBeforeYouStartController.onPageLoad()
 
 GET     /produce/how-to-create                              controllers.myapis.produce.ProduceApiHowToCreateController.onPageLoad(mode: Mode = NormalMode)

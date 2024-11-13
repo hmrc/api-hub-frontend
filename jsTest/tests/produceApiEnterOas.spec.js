@@ -1,9 +1,9 @@
 import {JSDOM} from "jsdom";
-import {onDOMContentLoaded} from "../../app/assets/javascripts/enterOas.js";
+import {onDOMContentLoaded} from "../../app/assets/javascripts/produceApiEnterOas.js";
 import {buildFakeAceEditor} from "./testUtils.js";
 
 describe('onDOMContentLoaded', () => {
-    let document, elHiddenInput, elForm;
+    let document, elHiddenInput, elForm, window;
 
     beforeEach(() => {
         const dom = new JSDOM(`
@@ -13,8 +13,10 @@ describe('onDOMContentLoaded', () => {
             </form>            
         `);
         document = dom.window.document;
+        window = dom.window;
         globalThis.document = document;
-        globalThis.Event = dom.window.Event;
+        globalThis.window = window;
+        globalThis.Event = window.Event;
         globalThis.ace = buildFakeAceEditor();
         elHiddenInput = document.querySelector('[name="value"]');
         elForm = document.querySelector('form');
@@ -59,7 +61,7 @@ describe('onDOMContentLoaded', () => {
         expect(editor.setTheme).toHaveBeenCalledWith("ace/theme/monokai");
     });
 
-    it('the editor is configured to not web workers', () => {
+    it('the editor is configured to not use web workers', () => {
         const editor = ace.edit("aceEditorContainer");
 
         onDOMContentLoaded();
@@ -67,4 +69,45 @@ describe('onDOMContentLoaded', () => {
         expect(editor.setOption).toHaveBeenCalledWith('useWorker', false);
     });
 
+    it("if the contents of the editor are changed and we try to navigate away from the page the event gets cancelled",  () => {
+        const evt = new Event('beforeunload');
+        spyOn(evt, 'preventDefault');
+
+        onDOMContentLoaded();
+
+        const editor = ace.edit("aceEditorContainer"),
+            editorContent = 'some value';
+        editor.setValue(editorContent);
+
+        window.dispatchEvent(evt);
+
+        expect(evt.preventDefault).toHaveBeenCalled();
+    });
+
+    it("if the contents of the editor are unchanged and we try to navigate away from the page the event does not get cancelled",  () => {
+        const evt = new Event('beforeunload');
+        spyOn(evt, 'preventDefault');
+
+        onDOMContentLoaded();
+
+        window.dispatchEvent(evt);
+
+        expect(evt.preventDefault).not.toHaveBeenCalled();
+    });
+
+    it("if the contents of the editor are changed and we submit the form the event does not get cancelled",  () => {
+        const evt = new Event('beforeunload');
+        spyOn(evt, 'preventDefault');
+
+        onDOMContentLoaded();
+
+        const editor = ace.edit("aceEditorContainer"),
+            editorContent = 'some value';
+        editor.setValue(editorContent);
+
+        elForm.dispatchEvent(new Event('submit'));
+        window.dispatchEvent(evt);
+
+        expect(evt.preventDefault).not.toHaveBeenCalled();
+    });
 });

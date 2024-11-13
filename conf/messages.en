@@ -1005,3 +1005,13 @@ produceApiCheckYourAnswers.description = Review the details of your API before s
 allScopes.title = All scopes
 allScopes.heading = All scopes
 allScopes.fixScopes = Fix scopes
+
+produceApiUploadOas.title = Provide the OpenAPI Specification file
+produceApiUploadOas.heading = Provide the OpenAPI Specification file
+produceApiUploadOas.description = Add your OpenAPI Specification file either by dragging and dropping it below, or by using the 'Choose file' button.
+produceApiUploadOas.error.required = Select an OAS file
+produceApiUploadOas.file.text1 = Drag and Drop to Upload File
+produceApiUploadOas.file.text1.hover = Release to add file
+produceApiUploadOas.file.text2 = OR
+produceApiUploadOas.file.choose = Choose file
+produceApiUploadOas.fileInfo = Only OAS files in YAML format are accepted. The maximum file size is {0}MB.

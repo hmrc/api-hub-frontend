@@ -22,12 +22,13 @@ import connectors.ApplicationsConnector
 import controllers.routes
 import forms.myapis.produce.ProduceApiEnterOasFormProvider
 import models.deployment.{Error, FailuresResponse, InvalidOasResponse}
+import models.myapis.produce.ProduceApiUploadedOasFile
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.myapis.produce.ProduceApiEnterOasPage
+import pages.myapis.produce.{ProduceApiEnterOasPage, ProduceApiUploadOasPage}
 import play.api.Application
 import play.api.inject.bind
 import play.api.libs.json.Json
@@ -45,6 +46,30 @@ class ProduceApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new ProduceApiEnterOasFormProvider()
   val form = formProvider()
+
+  val validOAS =
+    """
+      |openapi: 3.0.1
+      |info:
+      |  title: title
+      |  description: This is a sample server
+      |  license:
+      |    name: Apache-2.0
+      |    url: http://www.apache.org/licenses/LICENSE-2.0.html
+      |  version: 1.0.0
+      |servers:
+      |- url: https://api.absolute.org/v2
+      |  description: An absolute path
+      |paths:
+      |  /whatever:
+      |    get:
+      |      summary: Some operation
+      |      description: Some operation
+      |      operationId: doWhatever
+      |      responses:
+      |        "200":
+      |          description: OK
+      |""".stripMargin
 
   lazy val produceApiEnterOasRoute = controllers.myapis.produce.routes.ProduceApiEnterOasController.onPageLoad(NormalMode).url
 
@@ -85,31 +110,6 @@ class ProduceApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to the next page when valid data is submitted" in {
-
-      val validOAS =
-        """
-          |openapi: 3.0.1
-          |info:
-          |  title: title
-          |  description: This is a sample server
-          |  license:
-          |    name: Apache-2.0
-          |    url: http://www.apache.org/licenses/LICENSE-2.0.html
-          |  version: 1.0.0
-          |servers:
-          |- url: https://api.absolute.org/v2
-          |  description: An absolute path
-          |paths:
-          |  /whatever:
-          |    get:
-          |      summary: Some operation
-          |      description: Some operation
-          |      operationId: doWhatever
-          |      responses:
-          |        "200":
-          |          description: OK
-          |""".stripMargin
-
       val fixture = buildFixture(userAnswers = Some(emptyUserAnswers))
       when(fixture.sessionRepository.set(any())).thenReturn(Future.successful(true))
       when(fixture.applicationsConnector.validateOAS(eqTo(validOAS))(any, any))
@@ -182,6 +182,71 @@ class ProduceApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must return OK and the correct view for a GET when an OAS file has been uploaded" in {
+      val oasModel = ProduceApiUploadedOasFile("name", validOAS)
+      val userAnswers = emptyUserAnswers.set(ProduceApiUploadOasPage, oasModel).success.value
+      val fixture = buildFixture(userAnswers = Some(userAnswers))
+
+      when(fixture.applicationsConnector.validateOAS(eqTo(oasModel.fileContents))(any, any))
+        .thenReturn(Future.successful(Right(())))
+
+      running(fixture.application) {
+        val request = FakeRequest(GET, controllers.myapis.produce.routes.ProduceApiEnterOasController.onPageLoadWithUploadedOas(NormalMode).url)
+
+        val result = route(fixture.application, request).value
+
+        val view = fixture.application.injector.instanceOf[ProduceApiEnterOasView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form.fill(oasModel.fileContents), NormalMode, FakeUser)(request, messages(fixture.application)).toString
+      }
+    }
+
+    "must return OK and the correct view for a GET when an OAS file has been uploaded but we have made edits" in {
+      val oasModel = ProduceApiUploadedOasFile("name", validOAS)
+      val validOASEdited = validOAS.replace("1.0.0", "1.0.1")
+      val userAnswers = emptyUserAnswers
+        .set(ProduceApiUploadOasPage, oasModel).success.value
+        .set(ProduceApiEnterOasPage, validOASEdited).success.value
+
+      val fixture = buildFixture(userAnswers = Some(userAnswers))
+
+      when(fixture.applicationsConnector.validateOAS(eqTo(validOASEdited))(any, any))
+        .thenReturn(Future.successful(Right(())))
+
+      running(fixture.application) {
+        val request = FakeRequest(GET, controllers.myapis.produce.routes.ProduceApiEnterOasController.onPageLoadWithUploadedOas(NormalMode).url)
+
+        val result = route(fixture.application, request).value
+
+        val view = fixture.application.injector.instanceOf[ProduceApiEnterOasView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form.fill(validOASEdited), NormalMode, FakeUser)(request, messages(fixture.application)).toString
+      }
+    }
+
+    "must return BadRequest and the correct view for a GET when an invalid OAS file has been uploaded" in {
+      val oasModel = ProduceApiUploadedOasFile("name", "not valid oas")
+      val userAnswers = emptyUserAnswers.set(ProduceApiUploadOasPage, oasModel).success.value
+      val fixture = buildFixture(userAnswers = Some(userAnswers))
+      val invalidResponse = InvalidOasResponse(FailuresResponse("400", "nope", None))
+
+      when(fixture.applicationsConnector.validateOAS(any())(any, any)).thenReturn(Future.successful(Left(invalidResponse)))
+
+      running(fixture.application) {
+        val request = FakeRequest(GET, controllers.myapis.produce.routes.ProduceApiEnterOasController.onPageLoadWithUploadedOas(NormalMode).url)
+
+        val result = route(fixture.application, request).value
+
+        val view = fixture.application.injector.instanceOf[ProduceApiEnterOasView]
+        val formWithError = form.bind(Map("value" -> oasModel.fileContents)).withGlobalError(Json.prettyPrint(Json.toJson(invalidResponse)))
+
+        status(result) mustEqual BAD_REQUEST
+        contentAsString(result) mustEqual view(formWithError.fill(oasModel.fileContents), NormalMode, FakeUser)(request, messages(fixture.application)).toString
       }
     }
   }
