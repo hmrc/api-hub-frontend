@@ -16,8 +16,9 @@
 
 package viewmodels.application
 
+import config.{HipEnvironment, HipEnvironments}
 import models.application.Application
-import models.application.ApplicationLenses._
+import models.application.ApplicationLenses.*
 import models.user.UserModel
 import play.api.i18n.Messages
 import viewmodels.{SideNavItem, SideNavPage}
@@ -34,14 +35,16 @@ object ApplicationSideNavPages {
   case object ViewAsJsonApplicationPage extends SideNavPage
   case object AllScopesPage extends SideNavPage
 
+  case class EnvironmentPage(hipEnvironment: HipEnvironment) extends SideNavPage
+
 }
 
 object ApplicationNavItems {
 
   import ApplicationSideNavPages._
 
-  def apply(userModel: Option[UserModel], application: Application, currentPage: SideNavPage)(implicit messages: Messages): Seq[SideNavItem] = {
-    Seq(
+  def apply(userModel: Option[UserModel], application: Application, currentPage: SideNavPage, hipEnvironments: HipEnvironments)(implicit messages: Messages): Seq[SideNavItem] = {
+    (Seq(
       Some(SideNavItem(
         page = DetailsPage,
         title = messages("applicationNav.page.applicationDetails"),
@@ -59,7 +62,18 @@ object ApplicationNavItems {
         title = messages("applicationNav.page.environmentsAndCredentials"),
         link = controllers.application.routes.EnvironmentAndCredentialsController.onPageLoad(application.id),
         isCurrentPage = currentPage == EnvironmentsAndCredentialsPage
-      )),
+      ))
+    ) ++
+    hipEnvironments.environments.map(
+      hipEnvironment =>
+        Some(SideNavItem(
+          page = EnvironmentPage(hipEnvironment),
+          title = messages(hipEnvironment.nameKey),
+          link = controllers.application.routes.ApplicationEnvironmentController.onPageLoad(application.id, hipEnvironment.id),
+          isCurrentPage = currentPage == EnvironmentPage(hipEnvironment)
+        ))
+    ) ++
+    Seq(
       if (!application.isTeamMigrated) {
         Some(SideNavItem(
           page = ManageTeamMembersPage,
@@ -112,7 +126,7 @@ object ApplicationNavItems {
       else {
         None
       }
-    )
+    ))
     .flatten
   }
 

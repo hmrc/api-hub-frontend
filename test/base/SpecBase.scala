@@ -16,9 +16,9 @@
 
 package base
 
-import config.{Domains, EmailDomains, Hods, Platforms}
+import config.{Domains, EmailDomains, HipEnvironments, Hods, Platforms}
 import controllers.actions.*
-import fakes.{FakeDomains, FakeEmailDomains, FakeHods, FakePlatforms}
+import fakes.{FakeDomains, FakeHipEnvironments, FakeEmailDomains, FakeHods, FakePlatforms}
 import models.UserAnswers
 import models.user.UserModel
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -63,7 +63,8 @@ trait SpecBase
         bind[Domains].toInstance(FakeDomains),
         bind[Hods].toInstance(FakeHods),
         bind[EmailDomains].toInstance(FakeEmailDomains),
-        bind[Platforms].toInstance(FakePlatforms)
+        bind[Platforms].toInstance(FakePlatforms),
+        bind[HipEnvironments].toInstance(FakeHipEnvironments)
   )
 
 }
