@@ -30,6 +30,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.ProduceApiSessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.myapis.ProduceApiEnterOasViewModel
 import views.html.myapis.produce.ProduceApiEnterOasView
 
 import javax.inject.Inject
@@ -48,7 +49,12 @@ class ProduceApiEnterOasController @Inject()(
                                         applicationsConnector: ApplicationsConnector
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form = formProvider()
+  private val form = formProvider()
+  private def viewModel(mode: Mode) = ProduceApiEnterOasViewModel(
+    title = "produceApiEnterOas.title",
+    heading = "produceApiEnterOas.heading",
+    formAction = routes.ProduceApiEnterOasController.onSubmit(mode)
+  )
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
@@ -58,7 +64,7 @@ class ProduceApiEnterOasController @Inject()(
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode, request.user))
+      Ok(view(preparedForm, request.user, viewModel(mode)))
   }
 
   def onPageLoadWithUploadedOas(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
@@ -68,11 +74,11 @@ class ProduceApiEnterOasController @Inject()(
           val formWithUploadedOas = form.fill(oasFileContents)
           validateOAS(oasFileContents).map {
             case Left(error) => {
-              BadRequest(view(formWithUploadedOas.withGlobalError(error), mode, request.user))
+              BadRequest(view(formWithUploadedOas.withGlobalError(error), request.user, viewModel(mode)))
             }
-            case Right(_) => Ok(view(formWithUploadedOas, mode, request.user))
+            case Right(_) => Ok(view(formWithUploadedOas, request.user, viewModel(mode)))
           }
-        case None => Future.successful(Ok(view(form, mode, request.user)))
+        case None => Future.successful(Ok(view(form, request.user, viewModel(mode))))
       }
   }
 
@@ -82,12 +88,12 @@ class ProduceApiEnterOasController @Inject()(
 
       boundedForm.fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode, request.user))),
+          Future.successful(BadRequest(view(formWithErrors, request.user, viewModel(mode)))),
 
         value =>
           validateOAS(value).flatMap(_.fold(
             error =>
-              Future.successful(BadRequest(view(boundedForm.withGlobalError(error), mode, request.user))),
+              Future.successful(BadRequest(view(boundedForm.withGlobalError(error), request.user, viewModel(mode)))),
             apiName =>
               for {
                 updatedAnswers <- Future.fromTry(
