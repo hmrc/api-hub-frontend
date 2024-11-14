@@ -111,6 +111,9 @@ POST    /update/enter-oas                                   controllers.myapis.u
 GET     /update/change-enter-oas                            controllers.myapis.update.UpdateApiEnterOasController.onPageLoad(mode: Mode = CheckMode)
 POST    /update/change-enter-oas                            controllers.myapis.update.UpdateApiEnterOasController.onSubmit(mode: Mode = CheckMode)
 
+GET     /update/review-oas                                  controllers.myapis.update.UpdateApiEnterOasController.onPageLoadWithUploadedOas(mode: Mode = NormalMode)
+GET     /update/change-review-oas                           controllers.myapis.update.UpdateApiEnterOasController.onPageLoadWithUploadedOas(mode: Mode = CheckMode)
+
 GET     /update/short-description                           controllers.myapis.update.UpdateApiShortDescriptionController.onPageLoad(mode: Mode = NormalMode)
 POST    /update/short-description                           controllers.myapis.update.UpdateApiShortDescriptionController.onSubmit(mode: Mode = NormalMode)
 GET     /update/change-short-description                    controllers.myapis.update.UpdateApiShortDescriptionController.onPageLoad(mode: Mode = CheckMode)

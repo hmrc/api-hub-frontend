@@ -176,6 +176,9 @@ class NavigatorSpec extends SpecBase with TryValues {
         "must start with the Before you Start page" in {
           navigator.nextPage(UpdateApiStartPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiHowToUpdateController.onPageLoad(NormalMode)
         }
+        "must go from the Enter the OAS page to the Review Name and Description page" in {
+          navigator.nextPage(UpdateApiEnterOasPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiReviewNameDescriptionController.onPageLoad(NormalMode)
+        }
       }
 
       "during the Cancel access request journey" - {
