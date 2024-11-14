@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,23 +12,25 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import models.user.UserModel
+package repositories
 
-@this(
-    layout: templates.Layout,
-    formHelper: FormWithCSRF,
-    govukButton: GovukButton
-)
+import com.google.inject.Singleton
+import config.{CryptoProvider, FrontendAppConfig}
+import uk.gov.hmrc.mongo.MongoComponent
 
-@(mode: Mode, user: UserModel)(implicit request: Request[?], messages: Messages)
+import java.time.Clock
+import javax.inject.Inject
+import scala.concurrent.ExecutionContext
 
-@layout(pageTitle = titleNoForm("Update HODs"), user = Some(user)) {
-    <h1 class="govuk-heading-l">Update HODs</h1>
-    @formHelper(action = controllers.myapis.update.routes.UpdateApiHodController.onSubmit( mode)) {
-        @govukButton(
-            ButtonViewModel(messages("Continue"))
-        )
-    }
+@Singleton
+class UpdateApiSessionRepository @Inject()(
+  mongoComponent: MongoComponent,
+  appConfig: FrontendAppConfig,
+  clock: Clock,
+  cryptoProvider: CryptoProvider
+)(implicit ec: ExecutionContext)
+  extends UserAnswersRepository(mongoComponent, appConfig, clock, cryptoProvider, "update-api-user-answers") {
+
 }

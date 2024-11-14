@@ -21,7 +21,7 @@ import controllers.actions.*
 import models.{CheckMode, UserAnswers}
 import models.api.ApiStatus
 import models.deployment.{DeploymentsRequest, DeploymentsResponse, EgressMapping, FailuresResponse, InvalidOasResponse, SuccessfulDeploymentsResponse}
-import models.myapis.produce.{ProduceApiChooseEgress, ProduceApiDomainSubdomain, ProduceApiEgressPrefixes}
+import models.myapis.produce.{ProduceApiDomainSubdomain, ProduceApiChooseEgress, ProduceApiEgressPrefixes}
 import models.requests.DataRequest
 import models.team.Team
 import pages.myapis.produce.*

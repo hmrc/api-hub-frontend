@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package pages.myapis.produce
+package controllers.actions
 
-import models.myapis.produce.ProduceApiDomainSubdomain
-import pages.behaviours.PageBehaviours
-import pages.myapis.produce.ProduceApiDomainPage
+import models.UserAnswers
+import models.requests.{IdentifierRequest, OptionalDataRequest}
 
-class ProduceApiDomainPageSpec extends PageBehaviours {
+import scala.concurrent.{ExecutionContext, Future}
 
-  "ProduceApiDomainPage" - {
+class FakeUpdateApiDataRetrievalAction(dataToReturn: Option[UserAnswers]) extends UpdateApiDataRetrievalAction {
 
-    beRetrievable[ProduceApiDomainSubdomain](ProduceApiDomainPage)
-
-    beSettable[ProduceApiDomainSubdomain](ProduceApiDomainPage)
-
-    beRemovable[ProduceApiDomainSubdomain](ProduceApiDomainPage)
+  override protected def transform[A](request: IdentifierRequest[A]): Future[OptionalDataRequest[A]] = {
+    Future(OptionalDataRequest(request.request, request.user, dataToReturn))
   }
+
+  override protected implicit val executionContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+
 }

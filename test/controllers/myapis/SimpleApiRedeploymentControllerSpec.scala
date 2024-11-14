@@ -76,13 +76,13 @@ class SimpleApiRedeploymentControllerSpec
       val fixture = buildFixture()
 
       val deploymentDetails = DeploymentDetails(
-        description = redeploymentRequest.description,
-        status = redeploymentRequest.status,
-        domain = redeploymentRequest.domain,
-        subDomain = redeploymentRequest.subDomain,
-        hods = redeploymentRequest.hods,
+        description = Some(redeploymentRequest.description),
+        status = Some(redeploymentRequest.status),
+        domain = Some(redeploymentRequest.domain),
+        subDomain = Some(redeploymentRequest.subDomain),
+        hods = Some(redeploymentRequest.hods),
         egressMappings = redeploymentRequest.egressMappings,
-        prefixesToRemove = redeploymentRequest.prefixesToRemove
+        prefixesToRemove = Some(redeploymentRequest.prefixesToRemove)
       )
 
       when(fixture.apiAuthActionProvider.apply(any)(any)).thenReturn(successfulApiAuthAction(FakeApiDetail))

@@ -29,6 +29,7 @@ import pages.application.accessrequest.{ProvideSupportingInformationPage, Reques
 import pages.application.cancelaccessrequest.CancelAccessRequestStartPage
 import pages.application.register.{RegisterApplicationNamePage, RegisterApplicationStartPage, RegisterApplicationTeamPage}
 import pages.myapis.produce.*
+import pages.myapis.update.*
 
 class NavigatorSpec extends SpecBase with TryValues {
 
@@ -168,6 +169,12 @@ class NavigatorSpec extends SpecBase with TryValues {
         "must go from the choose egress page to the choose HoDs page when the user chooses not to configure prefixes" in {
           val userAnswers = emptyUserAnswers.set(ProduceApiChooseEgressPage, ProduceApiChooseEgress(None, false)).get
           navigator.nextPage(ProduceApiChooseEgressPage, NormalMode, userAnswers) mustBe controllers.myapis.produce.routes.ProduceApiHodController.onPageLoad(NormalMode)
+        }
+      }
+
+      "during the Update an API journey" - {
+        "must start with the Before you Start page" in {
+          navigator.nextPage(UpdateApiStartPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiHowToUpdateController.onPageLoad(NormalMode)
         }
       }
 

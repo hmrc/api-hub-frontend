@@ -58,13 +58,13 @@ class SimpleApiRedeploymentController @Inject()(
         case Some(deploymentDetails) =>
           val filledForm = form.fill(
             RedeploymentRequest(
-              description = deploymentDetails.description,
+              description = deploymentDetails.description.getOrElse(""),
               oas = "", // We don't get this back with DeploymentDetails
-              status = deploymentDetails.status,
-              domain = deploymentDetails.domain,
-              subDomain = deploymentDetails.subDomain,
-              hods = deploymentDetails.hods,
-              prefixesToRemove = deploymentDetails.prefixesToRemove,
+              status = deploymentDetails.status.getOrElse(""),
+              domain = deploymentDetails.domain.getOrElse(""),
+              subDomain = deploymentDetails.subDomain.getOrElse(""),
+              hods = deploymentDetails.hods.getOrElse(Seq.empty),
+              prefixesToRemove = deploymentDetails.prefixesToRemove.getOrElse(Seq.empty),
               egressMappings = deploymentDetails.egressMappings
             )
           )

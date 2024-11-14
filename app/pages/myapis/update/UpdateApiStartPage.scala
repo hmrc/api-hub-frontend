@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,23 +12,12 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import models.user.UserModel
+package pages.myapis.update
 
-@this(
-    layout: templates.Layout,
-    formHelper: FormWithCSRF,
-    govukButton: GovukButton
-)
+import pages.Page
 
-@(mode: Mode, user: UserModel)(implicit request: Request[?], messages: Messages)
-
-@layout(pageTitle = titleNoForm("Update HODs"), user = Some(user)) {
-    <h1 class="govuk-heading-l">Update HODs</h1>
-    @formHelper(action = controllers.myapis.update.routes.UpdateApiHodController.onSubmit( mode)) {
-        @govukButton(
-            ButtonViewModel(messages("Continue"))
-        )
-    }
+case object UpdateApiStartPage extends Page {
+  override def toString: String = "updateApiStart"
 }

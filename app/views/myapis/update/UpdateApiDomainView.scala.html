@@ -22,11 +22,11 @@
     govukButton: GovukButton
 )
 
-@(id: String, mode: Mode, user: UserModel)(implicit request: Request[?], messages: Messages)
+@(mode: Mode, user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = titleNoForm("Update domain and subdomain"), user = Some(user)) {
     <h1 class="govuk-heading-l">Update domain and subdomain</h1>
-    @formHelper(action = controllers.myapis.update.routes.UpdateApiDomainController.onSubmit(id, mode)) {
+    @formHelper(action = controllers.myapis.update.routes.UpdateApiDomainController.onSubmit( mode)) {
         @govukButton(
             ButtonViewModel(messages("Continue"))
         )
