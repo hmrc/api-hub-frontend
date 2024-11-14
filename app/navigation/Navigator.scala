@@ -25,7 +25,7 @@ import pages.application.accessrequest.{ProvideSupportingInformationPage, Reques
 import pages.application.cancelaccessrequest.{CancelAccessRequestApplicationPage, CancelAccessRequestConfirmPage, CancelAccessRequestSelectApiPage, CancelAccessRequestStartPage}
 import pages.application.register.{RegisterApplicationNamePage, RegisterApplicationStartPage, RegisterApplicationTeamPage}
 import pages.myapis.produce.*
-import pages.myapis.update.{UpdateApiEnterOasPage, UpdateApiStartPage}
+import pages.myapis.update.*
 import play.api.mvc.Call
 
 import javax.inject.{Inject, Singleton}
@@ -68,6 +68,7 @@ class Navigator @Inject()() {
     case CancelAccessRequestConfirmPage => cancelAccessRequestConfirmNextPage(NormalMode)
     case UpdateApiStartPage => _ => controllers.myapis.update.routes.UpdateApiHowToUpdateController.onPageLoad(NormalMode)
     case UpdateApiEnterOasPage => _ => controllers.myapis.update.routes.UpdateApiReviewNameDescriptionController.onPageLoad(NormalMode)
+    case UpdateApiShortDescriptionPage => _ => controllers.myapis.update.routes.UpdateApiReviewNameDescriptionController.onPageLoad(NormalMode)
     case _ => _ => routes.IndexController.onPageLoad
   }
 

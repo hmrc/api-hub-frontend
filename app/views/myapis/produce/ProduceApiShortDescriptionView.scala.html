@@ -16,6 +16,7 @@
 
 @import models.user.UserModel
 @import viewmodels.InputWidth._
+@import viewmodels.myapis.produce.ProduceApiShortDescriptionViewModel
 @import uk.gov.hmrc.govukfrontend.views.html.components.CharacterCount
 
 @this(
@@ -26,12 +27,12 @@
     govukButton: GovukButton
 )
 
-@(form: Form[?], mode: Mode, userModel: UserModel)(implicit request: Request[?], messages: Messages)
+@(form: Form[?], viewModel: ProduceApiShortDescriptionViewModel, userModel: UserModel)(implicit request: Request[?], messages: Messages)
 
 @hintContent() = {
     <h1 class="govuk-label-wrapper">
         <label class="govuk-label govuk-label--l" for="value">
-            @messages("produceApiShortDescription.title")
+            @messages(viewModel.titleMessageKey)
         </label>
     </h1>
     <div id="with-hint-hint" class="govuk-hint">
@@ -41,7 +42,7 @@
 
 @layout(pageTitle = title(form, messages("produceApiShortDescription.title")), user = Some(userModel)) {
 
-    @formHelper(action = controllers.myapis.produce.routes.ProduceApiShortDescriptionController.onSubmit(mode)) {
+    @formHelper(action = viewModel.formAction) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
