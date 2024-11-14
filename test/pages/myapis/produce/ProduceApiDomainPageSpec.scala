@@ -16,7 +16,7 @@
 
 package pages.myapis.produce
 
-import models.myapis.ApiDomainSubdomain
+import models.myapis.produce.ProduceApiDomainSubdomain
 import pages.behaviours.PageBehaviours
 import pages.myapis.produce.ProduceApiDomainPage
 
@@ -24,10 +24,10 @@ class ProduceApiDomainPageSpec extends PageBehaviours {
 
   "ProduceApiDomainPage" - {
 
-    beRetrievable[ApiDomainSubdomain](ProduceApiDomainPage)
+    beRetrievable[ProduceApiDomainSubdomain](ProduceApiDomainPage)
 
-    beSettable[ApiDomainSubdomain](ProduceApiDomainPage)
+    beSettable[ProduceApiDomainSubdomain](ProduceApiDomainPage)
 
-    beRemovable[ApiDomainSubdomain](ProduceApiDomainPage)
+    beRemovable[ProduceApiDomainSubdomain](ProduceApiDomainPage)
   }
 }

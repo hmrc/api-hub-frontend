@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package models.myapis
+package models.myapis.produce
 
 import play.api.libs.json.{Format, Json}
 
-case class ApiDomainSubdomain(domain: String, subDomain: String)
+case class ProduceApiDomainSubdomain(domain: String, subDomain: String)
 
-object ApiDomainSubdomain {
-  implicit val format: Format[ApiDomainSubdomain] = Json.format[ApiDomainSubdomain]
+object ProduceApiDomainSubdomain {
+  implicit val format: Format[ProduceApiDomainSubdomain] = Json.format[ProduceApiDomainSubdomain]
 }

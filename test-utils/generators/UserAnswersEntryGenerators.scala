@@ -18,7 +18,6 @@ package generators
 
 import models.ApiPolicyConditionsDeclaration
 import models.team.Team
-import models.myapis.ApiDomainSubdomain
 import models.myapis.produce.*
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
@@ -51,7 +50,7 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators wit
     Arbitrary {
       for {
         page  <- arbitrary[ProduceApiDomainPage.type]
-        value <- arbitrary[ApiDomainSubdomain].map(Json.toJson(_))
+        value <- arbitrary[ProduceApiDomainSubdomain].map(Json.toJson(_))
       } yield (page, value)
     }
 

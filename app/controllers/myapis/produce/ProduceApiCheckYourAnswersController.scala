@@ -21,8 +21,7 @@ import controllers.actions.*
 import models.{CheckMode, UserAnswers}
 import models.api.ApiStatus
 import models.deployment.{DeploymentsRequest, DeploymentsResponse, EgressMapping, FailuresResponse, InvalidOasResponse, SuccessfulDeploymentsResponse}
-import models.myapis.produce.{ProduceApiChooseEgress, ProduceApiEgressPrefixes}
-import models.myapis.ApiDomainSubdomain
+import models.myapis.produce.{ProduceApiDomainSubdomain, ProduceApiChooseEgress, ProduceApiEgressPrefixes}
 import models.requests.DataRequest
 import models.team.Team
 import pages.myapis.produce.*
@@ -149,7 +148,7 @@ class ProduceApiCheckYourAnswersController @Inject()(
     }
   }
 
-  private def validateDomainSubdomain(userAnswers: UserAnswers): Either[Call, ApiDomainSubdomain] = {
+  private def validateDomainSubdomain(userAnswers: UserAnswers): Either[Call, ProduceApiDomainSubdomain] = {
     userAnswers.get(ProduceApiDomainPage) match {
       case Some(domainSubdomain) => Right(domainSubdomain)
       case None => Left(routes.ProduceApiDomainController.onPageLoad(CheckMode))

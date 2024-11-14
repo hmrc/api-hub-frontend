@@ -16,11 +16,11 @@
 
 package pages.myapis.produce
 
-import models.myapis.ApiDomainSubdomain
+import models.myapis.produce.ProduceApiDomainSubdomain
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object ProduceApiDomainPage extends QuestionPage[ApiDomainSubdomain] {
+case object ProduceApiDomainPage extends QuestionPage[ProduceApiDomainSubdomain] {
 
   override def path: JsPath = JsPath \ toString
 

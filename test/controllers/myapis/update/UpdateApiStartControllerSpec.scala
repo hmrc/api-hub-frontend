@@ -23,8 +23,7 @@ import models.UserAnswers
 import models.api.{Alpha, ApiDetail}
 import models.application.TeamMember
 import models.deployment.{DeploymentDetails, EgressMapping}
-import models.myapis.ApiDomainSubdomain
-import models.myapis.produce.ProduceApiEgressPrefixes
+import models.myapis.produce.{ProduceApiDomainSubdomain, ProduceApiEgressPrefixes}
 import models.team.Team
 import models.user.UserModel
 import navigation.{FakeNavigator, Navigator}
@@ -41,11 +40,13 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.UpdateApiSessionRepository
 import services.ApiHubService
+import utils.HtmlValidation
+import views.html.ErrorTemplate
 
 import java.time.*
 import scala.concurrent.Future
 
-class UpdateApiStartControllerSpec extends SpecBase with MockitoSugar with TableDrivenPropertyChecks {
+class UpdateApiStartControllerSpec extends SpecBase with MockitoSugar with TableDrivenPropertyChecks with HtmlValidation {
 
   import UpdateApiStartControllerSpec.*
 
@@ -92,7 +93,7 @@ class UpdateApiStartControllerSpec extends SpecBase with MockitoSugar with Table
       val answersWithDomainSubdomain = setAnswer(
         initialUserAnswers(deploymentDetailsWithDomainSubdomain),
         UpdateApiDomainPage,
-        ApiDomainSubdomain("domain", "subDomain")
+        ProduceApiDomainSubdomain("domain", "subDomain")
       )
 
       val deploymentDetailsWithHod = emptyDeploymentDetails
@@ -166,17 +167,29 @@ class UpdateApiStartControllerSpec extends SpecBase with MockitoSugar with Table
 
     "must return a 404 if there are no API details" in {
       val fixture = buildFixture(maybeApiDetail = None)
+      val view = fixture.application.injector.instanceOf[ErrorTemplate]
 
       running(fixture.application) {
         val request = FakeRequest(controllers.myapis.update.routes.UpdateApiStartController.startProduceApi("id"))
         val result = route(fixture.application, request).value
 
         status(result) mustBe NOT_FOUND
+
+        contentAsString(result) mustBe
+          view(
+            "Page not found - 404",
+            "API not found",
+            s"Cannot find an API with ID id."
+          )(request, messages(fixture.application))
+            .toString()
+
+        contentAsString(result) must validateAsHtml
       }
     }
 
     "must return a 404 if there are no deployment details" in {
       val fixture = buildFixture()
+      val view = fixture.application.injector.instanceOf[ErrorTemplate]
       when(fixture.apiHubService.getDeploymentDetails(any)(any))
         .thenReturn(Future.successful(None))
 
@@ -185,28 +198,15 @@ class UpdateApiStartControllerSpec extends SpecBase with MockitoSugar with Table
         val result = route(fixture.application, request).value
 
         status(result) mustBe NOT_FOUND
-      }
-    }
 
-    "must return a 500 if there is an error while saving the answers" in {
-      val fixture = buildFixture()
-      when(fixture.apiHubService.getDeploymentDetails(any)(any))
-        .thenReturn(Future.successful(Some(DeploymentDetails(
-          description = None,
-          status = None,
-          domain = None,
-          subDomain = None,
-          hods = None,
-          egressMappings = None,
-          prefixesToRemove = None,
-        ))))
-      when(fixture.sessionRepository.set(any())).thenReturn(Future.failed(new Exception))
 
-      running(fixture.application) {
-        val request = FakeRequest(controllers.myapis.update.routes.UpdateApiStartController.startProduceApi("id"))
-        val result = route(fixture.application, request).value
+        contentAsString(result) mustBe view(
+          "Page not found - 404",
+          "API not found",
+          s"The API ${FakeApiDetail.title} has not been deployed to HIP.")
+          (request, messages(fixture.application)).toString()
 
-        status(result) mustBe INTERNAL_SERVER_ERROR
+        contentAsString(result) must validateAsHtml
       }
     }
 

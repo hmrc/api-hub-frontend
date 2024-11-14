@@ -18,7 +18,6 @@ package generators
 
 import models.application.TeamMember
 import models.ApiPolicyConditionsDeclaration
-import models.myapis.ApiDomainSubdomain
 import models.myapis.produce.*
 import org.scalacheck.{Arbitrary, Gen}
 import viewmodels.admin.Decision
@@ -35,12 +34,12 @@ trait ModelGenerators {
       } yield ProduceApiEgressPrefixes(Seq(s"/$prefix"), Seq(s"/${mappingExisting}->/${mappingReplacement}"))
     }
 
-  implicit lazy val arbitraryProduceApiDomain: Arbitrary[ApiDomainSubdomain] =
+  implicit lazy val arbitraryProduceApiDomain: Arbitrary[ProduceApiDomainSubdomain] =
     Arbitrary {
       for {
         domain <- Gen.asciiStr
         subDomain <- Gen.asciiStr
-      } yield ApiDomainSubdomain(domain, subDomain)
+      } yield ProduceApiDomainSubdomain(domain, subDomain)
     }
 
   implicit lazy val arbitraryProduceApiReviewNameDescription: Arbitrary[ProduceApiReviewNameDescription] =

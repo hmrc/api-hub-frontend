@@ -26,7 +26,6 @@ import models.deployment.*
 import models.{CheckMode, UserAnswers}
 import models.user.{Permissions, UserModel}
 import models.team.Team
-import models.myapis.ApiDomainSubdomain
 import models.myapis.produce.*
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -60,7 +59,7 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
     .set(ProduceApiChooseEgressPage, ProduceApiChooseEgress(Some("egress"), true)).success.value
     .set(ProduceApiEgressPrefixesPage, ProduceApiEgressPrefixes(Seq("/prefix"), Seq("/existing->/replacement"))).success.value
     .set(ProduceApiHodPage, Set("hod1")).success.value
-    .set(ProduceApiDomainPage, ApiDomainSubdomain("domain", "subdomain")).success.value
+    .set(ProduceApiDomainPage, ProduceApiDomainSubdomain("domain", "subdomain")).success.value
     .set(ProduceApiStatusPage, Alpha).success.value
     .set(ProduceApiPassthroughPage, true).success.value
 
