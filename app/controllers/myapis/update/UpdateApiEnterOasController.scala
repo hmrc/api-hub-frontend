@@ -16,30 +16,96 @@
 
 package controllers.myapis.update
 
+import cats.data.EitherT
+import connectors.ApplicationsConnector
 import controllers.actions.*
-import controllers.myapis.update.routes
+import forms.myapis.produce.ProduceApiEnterOasFormProvider
 import models.Mode
-import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
+import models.curl.OpenApiDoc
+import navigation.Navigator
+import pages.myapis.update.{UpdateApiEnterApiTitlePage, UpdateApiEnterOasPage, UpdateApiUploadOasPage}
+import play.api.i18n.*
+import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.UpdateApiSessionRepository
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.myapis.update.UpdateApiEnterOasView
+import views.html.myapis.produce.ProduceApiEnterOasView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class UpdateApiEnterOasController @Inject()(
-                                        override val messagesApi: MessagesApi,
-                                        identify: IdentifierAction,
-                                        val controllerComponents: MessagesControllerComponents,
-                                        view: UpdateApiEnterOasView
-                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                             override val messagesApi: MessagesApi,
+                                             sessionRepository: UpdateApiSessionRepository,
+                                             navigator: Navigator,
+                                             identify: IdentifierAction,
+                                             getData: UpdateApiDataRetrievalAction,
+                                             requireData: DataRequiredAction,
+                                             formProvider: ProduceApiEnterOasFormProvider,
+                                             val controllerComponents: MessagesControllerComponents,
+                                             view: ProduceApiEnterOasView,
+                                             applicationsConnector: ApplicationsConnector
+                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = identify {
-    implicit request =>  Ok(view( mode, request.user))
+
+  private val form = formProvider()
+
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+    implicit request =>
+
+      val preparedForm =
+        request.userAnswers.get(UpdateApiEnterOasPage) match {
+          case Some(value) => form.fill(value)
+          case _ => form.fill("")
+        }
+
+      Ok(view(preparedForm, mode, request.user))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = identify {
-    implicit request =>  Redirect(routes.UpdateApiShortDescriptionController.onPageLoad(mode))
+  def onPageLoadWithUploadedOas(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request =>
+      request.userAnswers.get(UpdateApiEnterOasPage).orElse(request.userAnswers.get(UpdateApiUploadOasPage).map(_.fileContents)) match {
+        case Some(oasFileContents) =>
+          val formWithUploadedOas = form.fill(oasFileContents)
+          validateOAS(oasFileContents).map {
+            case Left(error) =>
+              BadRequest(view(formWithUploadedOas.withGlobalError(error), mode, request.user))
+            case Right(_) => Ok(view(formWithUploadedOas, mode, request.user))
+          }
+        case None => Future.successful(Ok(view(form, mode, request.user)))
+      }
+  }
+
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request =>
+      val boundedForm = form.bindFromRequest()
+
+      boundedForm.fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, mode, request.user))),
+
+        value =>
+          validateOAS(value).flatMap(_.fold(
+            error =>
+              Future.successful(BadRequest(view(boundedForm.withGlobalError(error), mode, request.user))),
+            apiName =>
+              for {
+                updatedAnswers <- Future.fromTry(
+                  request.userAnswers.set(UpdateApiEnterOasPage, value)
+                    .flatMap(_.set(UpdateApiEnterApiTitlePage, apiName))
+                )
+                _ <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(navigator.nextPage(UpdateApiEnterOasPage, mode, updatedAnswers))
+          )
+          ))
+  }
+
+  private def validateOAS(oas: String)(implicit messagesProvider: MessagesProvider, hc: HeaderCarrier): Future[Either[String, String]] = {
+    (for {
+      _ <- EitherT(applicationsConnector.validateOAS(oas)).leftMap(error => Json.prettyPrint(Json.toJson(error)))
+      openApiDoc <- EitherT.fromEither(OpenApiDoc.parse(oas))
+      apiName <- EitherT.fromOption(openApiDoc.getApiName(), Messages("produceApiEnterOas.error.missingApiName")) //TODO
+    } yield apiName).value
   }
 }

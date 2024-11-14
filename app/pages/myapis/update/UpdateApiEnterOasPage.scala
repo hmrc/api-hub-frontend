@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,23 +12,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import models.user.UserModel
+package pages.myapis.update
 
-@this(
-    layout: templates.Layout,
-    formHelper: FormWithCSRF,
-    govukButton: GovukButton
-)
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-@(mode: Mode, user: UserModel)(implicit request: Request[?], messages: Messages)
+case object UpdateApiEnterOasPage extends QuestionPage[String] {
 
-@layout(pageTitle = titleNoForm("Enter an OAS file"), user = Some(user)) {
-    <h1 class="govuk-heading-l">Enter an OAS file</h1>
-    @formHelper(action = controllers.myapis.update.routes.UpdateApiEnterOasController.onSubmit( mode)) {
-        @govukButton(
-            ButtonViewModel(messages("Continue"))
-        )
-    }
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "updateApiEnterOasPage"
 }
