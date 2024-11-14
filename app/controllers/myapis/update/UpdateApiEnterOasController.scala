@@ -27,7 +27,7 @@ import pages.myapis.update.{UpdateApiEnterApiTitlePage, UpdateApiEnterOasPage, U
 import play.api.i18n.*
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.ProduceApiSessionRepository
+import repositories.UpdateApiSessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.myapis.produce.ProduceApiEnterOasView
@@ -37,7 +37,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class UpdateApiEnterOasController @Inject()(
                                              override val messagesApi: MessagesApi,
-                                             sessionRepository: ProduceApiSessionRepository,
+                                             sessionRepository: UpdateApiSessionRepository,
                                              navigator: Navigator,
                                              identify: IdentifierAction,
                                              getData: UpdateApiDataRetrievalAction,

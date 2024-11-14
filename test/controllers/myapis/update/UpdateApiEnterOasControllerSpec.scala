@@ -35,7 +35,7 @@ import play.api.libs.json.Json
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import repositories.ProduceApiSessionRepository
+import repositories.UpdateApiSessionRepository
 import views.html.myapis.produce.ProduceApiEnterOasView
 
 import scala.concurrent.Future
@@ -251,16 +251,16 @@ class UpdateApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
     }
   }
 
-  private case class Fixture(application: Application, applicationsConnector: ApplicationsConnector, sessionRepository: ProduceApiSessionRepository)
+  private case class Fixture(application: Application, applicationsConnector: ApplicationsConnector, sessionRepository: UpdateApiSessionRepository)
 
   private def buildFixture(userAnswers: Option[UserAnswers] = None): Fixture = {
     val applicationsConnector = mock[ApplicationsConnector]
-    val sessionRepository = mock[ProduceApiSessionRepository]
+    val sessionRepository = mock[UpdateApiSessionRepository]
     val application = applicationBuilder(userAnswers)
       .overrides(
         bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
         bind[ApplicationsConnector].toInstance(applicationsConnector),
-        bind[ProduceApiSessionRepository].toInstance(sessionRepository)
+        bind[UpdateApiSessionRepository].toInstance(sessionRepository)
       )
       .build()
 
