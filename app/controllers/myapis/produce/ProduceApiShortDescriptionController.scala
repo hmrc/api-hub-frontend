@@ -16,15 +16,18 @@
 
 package controllers.myapis.produce
 
-import controllers.actions._
+import controllers.actions.*
 import forms.myapis.produce.ProduceApiShortDescriptionFormProvider
 import models.Mode
+import models.requests.DataRequest
 import navigation.Navigator
 import pages.myapis.produce.ProduceApiShortDescriptionPage
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.{ProduceApiSessionRepository, SessionRepository}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.myapis.produce.ProduceApiShortDescriptionViewModel
 import views.html.myapis.produce.ProduceApiShortDescriptionView
 
 import javax.inject.Inject
@@ -52,7 +55,7 @@ class ProduceApiShortDescriptionController @Inject()(
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode, request.user))
+      Ok(buildView(preparedForm, mode))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
@@ -60,7 +63,7 @@ class ProduceApiShortDescriptionController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode, request.user))),
+          Future.successful(BadRequest(buildView(formWithErrors, mode))),
 
         value =>
           for {
@@ -68,5 +71,9 @@ class ProduceApiShortDescriptionController @Inject()(
             _              <- sessionRepository.set(updatedAnswers)
           } yield Redirect(navigator.nextPage(ProduceApiShortDescriptionPage, mode, updatedAnswers))
       )
+  }
+
+  private def buildView(form: Form[String], mode: Mode)(implicit request: DataRequest[AnyContent]) = {
+    view(form, ProduceApiShortDescriptionViewModel("produceApiShortDescription.title", routes.ProduceApiShortDescriptionController.onSubmit(mode)), request.user)
   }
 }

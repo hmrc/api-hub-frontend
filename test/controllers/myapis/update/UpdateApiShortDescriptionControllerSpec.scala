@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package controllers.myapis.produce
+package controllers.myapis.update
 
 import base.SpecBase
 import controllers.actions.FakeUser
-import controllers.myapis.produce.routes as apiProduceRoutes
+import controllers.myapis.update.routes as apiUpdateRoutes
 import controllers.routes
 import forms.myapis.produce.ProduceApiShortDescriptionFormProvider
 import models.{NormalMode, UserAnswers}
@@ -26,7 +26,7 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.myapis.produce.ProduceApiShortDescriptionPage
+import pages.myapis.update.UpdateApiShortDescriptionPage
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -37,28 +37,28 @@ import views.html.myapis.produce.ProduceApiShortDescriptionView
 
 import scala.concurrent.Future
 
-class ProduceApiShortDescriptionControllerSpec extends SpecBase with MockitoSugar {
+class UpdateApiShortDescriptionControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute = Call("GET", "/foo")
 
   val formProvider = new ProduceApiShortDescriptionFormProvider()
   val form = formProvider()
 
-  lazy val produceApiShortDescriptionRoute = apiProduceRoutes.ProduceApiShortDescriptionController.onPageLoad(NormalMode).url
+  lazy val UpdateApiShortDescriptionRoute = apiUpdateRoutes.UpdateApiShortDescriptionController.onPageLoad(NormalMode).url
 
-  "ProduceApiShortDescription Controller" - {
+  "UpdateApiShortDescription Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, produceApiShortDescriptionRoute)
+        val request = FakeRequest(GET, UpdateApiShortDescriptionRoute)
 
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[ProduceApiShortDescriptionView]
-        val viewModel = ProduceApiShortDescriptionViewModel("produceApiShortDescription.title", apiProduceRoutes.ProduceApiShortDescriptionController.onSubmit(NormalMode))
+        val viewModel = ProduceApiShortDescriptionViewModel("updateApiShortDescription.title", apiUpdateRoutes.UpdateApiShortDescriptionController.onSubmit(NormalMode))
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, viewModel, FakeUser)(request, messages(application)).toString
@@ -67,15 +67,15 @@ class ProduceApiShortDescriptionControllerSpec extends SpecBase with MockitoSuga
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(ProduceApiShortDescriptionPage, "answer").success.value
+      val userAnswers = UserAnswers(userAnswersId).set(UpdateApiShortDescriptionPage, "answer").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, produceApiShortDescriptionRoute)
+        val request = FakeRequest(GET, UpdateApiShortDescriptionRoute)
 
         val view = application.injector.instanceOf[ProduceApiShortDescriptionView]
-        val viewModel = ProduceApiShortDescriptionViewModel("produceApiShortDescription.title", apiProduceRoutes.ProduceApiShortDescriptionController.onSubmit(NormalMode))
+        val viewModel = ProduceApiShortDescriptionViewModel("updateApiShortDescription.title", apiUpdateRoutes.UpdateApiShortDescriptionController.onSubmit(NormalMode))
         
         val result = route(application, request).value
 
@@ -100,7 +100,7 @@ class ProduceApiShortDescriptionControllerSpec extends SpecBase with MockitoSuga
 
       running(application) {
         val request =
-          FakeRequest(POST, produceApiShortDescriptionRoute)
+          FakeRequest(POST, UpdateApiShortDescriptionRoute)
             .withFormUrlEncodedBody(("value", "answer long enough"))
 
         val result = route(application, request).value
@@ -116,13 +116,13 @@ class ProduceApiShortDescriptionControllerSpec extends SpecBase with MockitoSuga
 
       running(application) {
         val request =
-          FakeRequest(POST, produceApiShortDescriptionRoute)
+          FakeRequest(POST, UpdateApiShortDescriptionRoute)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
 
         val view = application.injector.instanceOf[ProduceApiShortDescriptionView]
-        val viewModel = ProduceApiShortDescriptionViewModel("produceApiShortDescription.title", apiProduceRoutes.ProduceApiShortDescriptionController.onSubmit(NormalMode))
+        val viewModel = ProduceApiShortDescriptionViewModel("updateApiShortDescription.title", apiUpdateRoutes.UpdateApiShortDescriptionController.onSubmit(NormalMode))
         
         val result = route(application, request).value
 
@@ -136,7 +136,7 @@ class ProduceApiShortDescriptionControllerSpec extends SpecBase with MockitoSuga
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, produceApiShortDescriptionRoute)
+        val request = FakeRequest(GET, UpdateApiShortDescriptionRoute)
 
         val result = route(application, request).value
 
@@ -151,7 +151,7 @@ class ProduceApiShortDescriptionControllerSpec extends SpecBase with MockitoSuga
 
       running(application) {
         val request =
-          FakeRequest(POST, produceApiShortDescriptionRoute)
+          FakeRequest(POST, UpdateApiShortDescriptionRoute)
             .withFormUrlEncodedBody(("value", "answer"))
 
         val result = route(application, request).value

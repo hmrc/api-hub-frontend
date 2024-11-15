@@ -18,28 +18,63 @@ package controllers.myapis.update
 
 import controllers.actions.*
 import controllers.myapis.update.routes
+import forms.myapis.produce.ProduceApiShortDescriptionFormProvider
 import models.Mode
+import models.requests.DataRequest
+import navigation.Navigator
+import pages.myapis.update.UpdateApiShortDescriptionPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
+import repositories.UpdateApiSessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.myapis.update.UpdateApiShortDescriptionView
+import viewmodels.myapis.produce.ProduceApiShortDescriptionViewModel
+import views.html.myapis.produce.ProduceApiShortDescriptionView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class UpdateApiShortDescriptionController @Inject()(
                                         override val messagesApi: MessagesApi,
+                                        sessionRepository: UpdateApiSessionRepository,
+                                        navigator: Navigator,
                                         identify: IdentifierAction,
+                                        getData: UpdateApiDataRetrievalAction,
+                                        requireData: DataRequiredAction,
+                                        formProvider: ProduceApiShortDescriptionFormProvider,
                                         val controllerComponents: MessagesControllerComponents,
-                                        view: UpdateApiShortDescriptionView
+                                        view: ProduceApiShortDescriptionView
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = identify {
-    implicit request =>  Ok(view( mode, request.user))
+  val form = formProvider()
+
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+    implicit request =>
+
+      val preparedForm = request.userAnswers.get(UpdateApiShortDescriptionPage) match {
+        case None => form
+        case Some(value) => form.fill(value)
+      }
+
+      Ok(buildView(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = identify {
-    implicit request =>  Redirect(routes.UpdateApiReviewNameDescriptionController.onPageLoad(mode))
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request =>
+
+      form.bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(buildView(formWithErrors, mode))),
+
+        value =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(UpdateApiShortDescriptionPage, value))
+            _              <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(navigator.nextPage(UpdateApiShortDescriptionPage, mode, updatedAnswers))
+      )
+  }
+
+  private def buildView(form: Form[String], mode: Mode)(implicit request: DataRequest[AnyContent]) = {
+    view(form, ProduceApiShortDescriptionViewModel("updateApiShortDescription.title", routes.UpdateApiShortDescriptionController.onSubmit(mode)), request.user)
   }
 }

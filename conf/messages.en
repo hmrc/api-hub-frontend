@@ -903,6 +903,8 @@ produceApiShortDescription.error.required = Enter a short API description
 produceApiShortDescription.error.length = The API short description must be between 8 and 180 characters
 produceApiShortDescription.change.hidden = ProduceApiShortDescription
 
+updateApiShortDescription.title = Review the short description for your API
+
 produceApiReviewNameDescription.title = Review how your API will appear to customers
 produceApiReviewNameDescription.heading = Review how your API will appear to customers
 produceApiReviewNameDescription.subheading = Confirm your API name and short description
