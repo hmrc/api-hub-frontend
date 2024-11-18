@@ -88,7 +88,7 @@ export const paginationHelper = {
     }
 };
 
-export function buildFakeAceEditor()  {
+export function buildFakeAceEditor(hasPopulateExampleAttribute)  {
     const editor = jasmine.createSpyObj({
         setOption: null,
         setTheme: null,
@@ -97,6 +97,10 @@ export function buildFakeAceEditor()  {
     editor.session = jasmine.createSpyObj({setMode: null});
     editor.setValue = value => currentValue = value;
     editor.getValue = () => currentValue;
+    editor.container = {
+        hasAttribute: (attr) =>
+            attr === "data-populate-example" ? hasPopulateExampleAttribute : false
+    };
     const fakeAce = {
         edit: () => editor,
     };

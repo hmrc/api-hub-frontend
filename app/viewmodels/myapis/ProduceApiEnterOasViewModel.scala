@@ -18,4 +18,10 @@ package viewmodels.myapis
 
 import play.api.mvc.Call
 
-case class ProduceApiEnterOasViewModel(title: String, heading: String, formAction: Call, warning: Option[String] = None)
+case class ProduceApiEnterOasViewModel(
+                                        title: String,
+                                        heading: String,
+                                        formAction: Call,
+                                        warning: Option[String] = None,
+                                        populateExample: Boolean = true
+                                      )

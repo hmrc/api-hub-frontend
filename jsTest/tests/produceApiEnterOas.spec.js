@@ -1,6 +1,7 @@
 import {JSDOM} from "jsdom";
 import {onDOMContentLoaded} from "../../app/assets/javascripts/produceApiEnterOas.js";
 import {buildFakeAceEditor} from "./testUtils.js";
+import {oasExampleYaml} from '../../app/assets/javascripts/oaseditor/oasYamlExample.js';
 
 describe('onDOMContentLoaded', () => {
     let document, elHiddenInput, elForm, window;
@@ -20,6 +21,36 @@ describe('onDOMContentLoaded', () => {
         globalThis.ace = buildFakeAceEditor();
         elHiddenInput = document.querySelector('[name="value"]');
         elForm = document.querySelector('form');
+    });
+
+    it(`when the page is loaded, the editor has no value
+        and it has the 'data-populate-example' attribute
+        then the oas example is copied to the editor`,  () => {
+        globalThis.ace = buildFakeAceEditor(true);
+
+        const editor = ace.edit("aceEditorContainer"),
+            inputValue = '';
+
+        elHiddenInput.value = inputValue;
+
+        onDOMContentLoaded();
+
+        expect(editor.getValue()).toEqual(oasExampleYaml);
+    });
+
+    it(`when the page is loaded, the editor has no value
+        and it does not have the 'data-populate-example' attribute
+        then the editor remains empty`,  () => {
+        globalThis.ace = buildFakeAceEditor(false);
+
+        const editor = ace.edit("aceEditorContainer"),
+            inputValue = '';
+
+        elHiddenInput.value = inputValue;
+
+        onDOMContentLoaded();
+
+        expect(editor.getValue()).toEqual(inputValue);
     });
 
     it("when the page is loaded then the value of the hidden input is copied to the editor",  () => {

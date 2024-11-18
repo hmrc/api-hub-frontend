@@ -51,7 +51,8 @@ class UpdateApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
     "updateApiEnterOas.title",
     "updateApiEnterOas.heading",
     controllers.myapis.update.routes.UpdateApiEnterOasController.onSubmit(NormalMode),
-    Some("updateApiEnterOas.warning")
+    Some("updateApiEnterOas.warning"),
+    false,
   )
 
   private val validOAS =
