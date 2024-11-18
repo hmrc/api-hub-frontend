@@ -16,6 +16,7 @@
 
 @import models.api.ApiStatus
 @import models.user.UserModel
+@import viewmodels.myapis.produce.ProduceApiStatusViewModel
 
 @this(
     layout: templates.Layout,
@@ -25,7 +26,7 @@
     govukButton: GovukButton
 )
 
-@(form: Form[?], mode: Mode, userModel: UserModel)(implicit request: Request[?], messages: Messages)
+@(form: Form[?], userModel: UserModel, viewModel: ProduceApiStatusViewModel)(implicit request: Request[?], messages: Messages)
 
 @apiStatusOptions = @{
     ApiStatus.values.zipWithIndex.map { case (apiStatus, index) =>
@@ -38,9 +39,9 @@
     }
 }
 
-@layout(pageTitle = title(form, messages("produceApiStatus.title")), user = Some(userModel), fullWidth = true) {
+@layout(pageTitle = title(form, messages(viewModel.titleMessageKey)), user = Some(userModel), fullWidth = true) {
 
-    @formHelper(action = controllers.myapis.produce.routes.ProduceApiStatusController.onSubmit(mode)) {
+    @formHelper(action = viewModel.formAction) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))

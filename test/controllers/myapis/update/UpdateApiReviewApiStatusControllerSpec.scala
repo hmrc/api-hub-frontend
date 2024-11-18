@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package controllers.myapis.produce
+package controllers.myapis.update
 
 import base.SpecBase
 import controllers.actions.FakeUser
-import controllers.myapis.produce.routes as produceApiRoutes
+import controllers.myapis.update.routes as updateApiRoutes
 import controllers.routes
 import forms.myapis.produce.ProduceApiStatusFormProvider
 import models.api.Alpha
+import models.user.Permissions
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.myapis.produce.ProduceApiStatusPage
+import pages.myapis.update.UpdateApiStatusPage
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -38,52 +39,77 @@ import views.html.myapis.produce.ProduceApiStatusView
 
 import scala.concurrent.Future
 
-class ProduceApiStatusControllerSpec extends SpecBase with MockitoSugar {
+class UpdateApiReviewApiStatusControllerSpec extends SpecBase with MockitoSugar {
 
   private def onwardRoute = Call("GET", "/foo")
 
-  private lazy val produceApiStatusRoute = produceApiRoutes.ProduceApiStatusController.onPageLoad(NormalMode).url
+  private lazy val updateApiRoute = updateApiRoutes.UpdateApiReviewApiStatusController.onPageLoad(NormalMode).url
 
   private val formProvider = new ProduceApiStatusFormProvider()
   private val form = formProvider()
   private val viewModel = ProduceApiStatusViewModel(
-    "produceApiStatus.title",
-    controllers.myapis.produce.routes.ProduceApiStatusController.onSubmit(NormalMode)
+    "updateApiStatus.title",
+    updateApiRoutes.UpdateApiReviewApiStatusController.onSubmit(NormalMode)
   )
+  private val supportUser = FakeUser.copy(permissions = Permissions(false, true, false))
 
-  "ProduceApiStatus Controller" - {
+  "UpdateApiReviewApiStatus Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(
+        userAnswers = Some(emptyUserAnswers),
+        user = supportUser,
+      ).build()
 
       running(application) {
-        val request = FakeRequest(GET, produceApiStatusRoute)
+        val request = FakeRequest(GET, updateApiRoute)
 
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[ProduceApiStatusView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, FakeUser, viewModel)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, supportUser, viewModel)(request, messages(application)).toString
+      }
+    }
+
+    "must redirect to the next page if the user is not a support user" in {
+
+      val application = applicationBuilder(
+        userAnswers = Some(emptyUserAnswers)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(GET, updateApiRoute)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[ProduceApiStatusView]
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual updateApiRoutes.UpdateApiCheckYourAnswersController.onPageLoad().url
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(ProduceApiStatusPage, Alpha).success.value
+      val userAnswers = UserAnswers(userAnswersId).set(UpdateApiStatusPage, Alpha).success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application = applicationBuilder(
+        userAnswers = Some(userAnswers),
+        user = supportUser
+      ).build()
 
       running(application) {
-        val request = FakeRequest(GET, produceApiStatusRoute)
+        val request = FakeRequest(GET, updateApiRoute)
 
         val view = application.injector.instanceOf[ProduceApiStatusView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(Alpha), FakeUser, viewModel)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(Alpha), supportUser, viewModel)(request, messages(application)).toString
       }
     }
 
@@ -94,8 +120,10 @@ class ProduceApiStatusControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
+        applicationBuilder(
+          userAnswers = Some(emptyUserAnswers),
+          user = supportUser,
+        ).overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
@@ -103,7 +131,7 @@ class ProduceApiStatusControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, produceApiStatusRoute)
+          FakeRequest(POST, updateApiRoute)
             .withFormUrlEncodedBody(("value", Alpha.toString))
 
         val result = route(application, request).value
@@ -115,11 +143,14 @@ class ProduceApiStatusControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(
+        userAnswers = Some(emptyUserAnswers),
+        user = supportUser
+      ).build()
 
       running(application) {
         val request =
-          FakeRequest(POST, produceApiStatusRoute)
+          FakeRequest(POST, updateApiRoute)
             .withFormUrlEncodedBody(("value", "invalid value"))
 
         val boundForm = form.bind(Map("value" -> "invalid value"))
@@ -129,16 +160,19 @@ class ProduceApiStatusControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, FakeUser, viewModel)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, supportUser, viewModel)(request, messages(application)).toString
       }
     }
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(
+        userAnswers = None,
+        user = supportUser
+      ).build()
 
       running(application) {
-        val request = FakeRequest(GET, produceApiStatusRoute)
+        val request = FakeRequest(GET, updateApiRoute)
 
         val result = route(application, request).value
 
@@ -149,11 +183,14 @@ class ProduceApiStatusControllerSpec extends SpecBase with MockitoSugar {
 
     "redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(
+        userAnswers = None,
+        user = supportUser
+      ).build()
 
       running(application) {
         val request =
-          FakeRequest(POST, produceApiStatusRoute)
+          FakeRequest(POST, updateApiRoute)
             .withFormUrlEncodedBody(("value", Alpha.toString))
 
         val result = route(application, request).value
