@@ -67,7 +67,7 @@ class Navigator @Inject()() {
     case CancelAccessRequestSelectApiPage => _ => controllers.application.cancelaccessrequest.routes.CancelAccessRequestConfirmController.onPageLoad(NormalMode)
     case CancelAccessRequestConfirmPage => cancelAccessRequestConfirmNextPage(NormalMode)
     case UpdateApiStartPage => _ => controllers.myapis.update.routes.UpdateApiHowToUpdateController.onPageLoad(NormalMode)
-    case UpdateApiEnterOasPage => _ => controllers.myapis.update.routes.UpdateApiReviewNameDescriptionController.onPageLoad(NormalMode)
+    case UpdateApiEnterOasPage => _ => controllers.myapis.update.routes.UpdateApiShortDescriptionController.onPageLoad(NormalMode)
     case UpdateApiUploadOasPage => _ => controllers.myapis.update.routes.UpdateApiEnterOasController.onPageLoadWithUploadedOas(NormalMode)
     case UpdateApiShortDescriptionPage => _ => controllers.myapis.update.routes.UpdateApiReviewNameDescriptionController.onPageLoad(NormalMode)
     case _ => _ => routes.IndexController.onPageLoad
