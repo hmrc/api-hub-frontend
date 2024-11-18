@@ -36,6 +36,7 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.UpdateApiSessionRepository
+import viewmodels.myapis.ProduceApiEnterOasViewModel
 import views.html.myapis.produce.ProduceApiEnterOasView
 
 import scala.concurrent.Future
@@ -46,6 +47,12 @@ class UpdateApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
 
   private val formProvider = new ProduceApiEnterOasFormProvider()
   private val form = formProvider()
+  private val viewModel = ProduceApiEnterOasViewModel(
+    "updateApiEnterOas.title",
+    "updateApiEnterOas.heading",
+    controllers.myapis.update.routes.UpdateApiEnterOasController.onSubmit(NormalMode),
+    Some("updateApiEnterOas.warning")
+  )
 
   private val validOAS =
     """
@@ -73,7 +80,7 @@ class UpdateApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
 
   private lazy val updateApiEnterOasRoute = controllers.myapis.update.routes.UpdateApiEnterOasController.onPageLoad(NormalMode).url
 
-  "ProduceApiEnterOas Controller" - {
+  "UpdateApiEnterOas Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
@@ -87,7 +94,7 @@ class UpdateApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
         val view = fixture.application.injector.instanceOf[ProduceApiEnterOasView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(""), NormalMode, FakeUser)(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(form.fill(""), FakeUser, viewModel)(request, messages(fixture.application)).toString
       }
     }
 
@@ -105,7 +112,7 @@ class UpdateApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
         val result = route(fixture.application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("oas"), NormalMode, FakeUser)(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(form.fill("oas"), FakeUser, viewModel)(request, messages(fixture.application)).toString
       }
     }
 
@@ -151,7 +158,7 @@ class UpdateApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
         val result = route(fixture.application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, FakeUser)(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(boundForm, FakeUser, viewModel)(request, messages(fixture.application)).toString
       }
     }
 
@@ -201,7 +208,7 @@ class UpdateApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
         val view = fixture.application.injector.instanceOf[ProduceApiEnterOasView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(oasModel.fileContents), NormalMode, FakeUser)(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(form.fill(oasModel.fileContents),FakeUser, viewModel)(request, messages(fixture.application)).toString
       }
     }
 
@@ -225,7 +232,7 @@ class UpdateApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
         val view = fixture.application.injector.instanceOf[ProduceApiEnterOasView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(validOASEdited), NormalMode, FakeUser)(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(form.fill(validOASEdited), FakeUser, viewModel)(request, messages(fixture.application)).toString
       }
     }
 
@@ -246,7 +253,7 @@ class UpdateApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
         val formWithError = form.bind(Map("value" -> oasModel.fileContents)).withGlobalError(Json.prettyPrint(Json.toJson(invalidResponse)))
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(formWithError.fill(oasModel.fileContents), NormalMode, FakeUser)(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(formWithError.fill(oasModel.fileContents), FakeUser, viewModel)(request, messages(fixture.application)).toString
       }
     }
   }
