@@ -18,18 +18,22 @@ package controllers.myapis.produce
 
 import controllers.actions.*
 import models.Mode
+import models.requests.DataRequest
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, MultipartFormData, Request}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.myapis.produce.ProduceApiUploadOasView
 import forms.myapis.produce.ProduceApiUploadOasFormProvider
 import pages.myapis.produce.{ProduceApiEnterOasPage, ProduceApiUploadOasPage}
-
+import play.api.data.Form
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import config.FrontendAppConfig
+import models.myapis.produce.ProduceApiUploadedOasFile
 import navigation.Navigator
 import repositories.ProduceApiSessionRepository
+import viewmodels.myapis.produce.ProduceApiUploadOasViewModel
+import models.myapis.produce.ProduceApiUploadedOasFile
 
 class ProduceApiUploadOasController @Inject()(
                                         override val messagesApi: MessagesApi,
@@ -53,14 +57,14 @@ class ProduceApiUploadOasController @Inject()(
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode, request.user, frontendAppConfig))
+      Ok(buildView(preparedForm, mode))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request => {
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode, request.user, frontendAppConfig))),
+          Future.successful(BadRequest(buildView(formWithErrors, mode))),
 
         value =>
           for {
@@ -71,4 +75,9 @@ class ProduceApiUploadOasController @Inject()(
       )
     }
   }
+
+  private def buildView(form: Form[ProduceApiUploadedOasFile], mode: Mode)(implicit request: DataRequest[AnyContent]) = {
+    view(form, ProduceApiUploadOasViewModel(routes.ProduceApiUploadOasController.onSubmit(mode)), request.user, frontendAppConfig)
+  }
+
 }

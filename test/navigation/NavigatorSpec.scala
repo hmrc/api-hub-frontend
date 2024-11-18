@@ -179,9 +179,11 @@ class NavigatorSpec extends SpecBase with TryValues {
         "must go from the Enter the OAS page to the Review Name and Description page" in {
           navigator.nextPage(UpdateApiEnterOasPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiReviewNameDescriptionController.onPageLoad(NormalMode)
         }
-
         "must go from the Review a short description page to the API review page" in {
           navigator.nextPage(UpdateApiShortDescriptionPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiReviewNameDescriptionController.onPageLoad(NormalMode)
+        }
+        "must go from the Upload OAS page to the OAS editor page" in {
+          navigator.nextPage(UpdateApiUploadOasPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiEnterOasController.onPageLoadWithUploadedOas(NormalMode)
         }
       }
 
@@ -283,6 +285,13 @@ class NavigatorSpec extends SpecBase with TryValues {
           navigator.nextPage(ProduceApiPassthroughPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
         }
       }
+
+      "during the Update an API journey" - {
+        "must go from the Upload OAS page to the OAS editor page" in {
+          navigator.nextPage(UpdateApiUploadOasPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiEnterOasController.onPageLoadWithUploadedOas(CheckMode)
+        }
+      }
+      
     }
   }
 

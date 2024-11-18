@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package controllers.myapis.produce
+package controllers.myapis.update
 
 import base.SpecBase
 import config.FrontendAppConfig
 import controllers.actions.FakeUser
-import controllers.myapis.produce.routes as apiProduceRoutes
+import controllers.myapis.update.routes as apiUpdateRoutes
 import controllers.routes
 import forms.myapis.produce.ProduceApiUploadOasFormProvider
 import models.myapis.produce.ProduceApiUploadedOasFile
@@ -28,18 +28,18 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.{any, argThat}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.myapis.produce.{ProduceApiEnterOasPage, ProduceApiUploadOasPage}
+import pages.myapis.update.{UpdateApiEnterOasPage, UpdateApiUploadOasPage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import repositories.ProduceApiSessionRepository
+import repositories.UpdateApiSessionRepository
 import viewmodels.myapis.produce.ProduceApiUploadOasViewModel
 import views.html.myapis.produce.ProduceApiUploadOasView
 
 import scala.concurrent.Future
 
-class ProduceApiUploadOasControllerSpec extends SpecBase with MockitoSugar {
+class UpdateApiUploadOasControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute = Call("GET", "/foo")
 
@@ -47,21 +47,21 @@ class ProduceApiUploadOasControllerSpec extends SpecBase with MockitoSugar {
   val form = formProvider()
   val modelData = ProduceApiUploadedOasFile("name", "oas data")
 
-  lazy val produceApiUploadOasControllerRoute = apiProduceRoutes.ProduceApiUploadOasController.onPageLoad(NormalMode).url
+  lazy val updateApiUploadOasControllerRoute = apiUpdateRoutes.UpdateApiUploadOasController.onPageLoad(NormalMode).url
 
-  "ProduceApiUploadOasController Controller" - {
+  "UpdateApiUploadOasController" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, produceApiUploadOasControllerRoute)
+        val request = FakeRequest(GET, updateApiUploadOasControllerRoute)
 
         val result = route(application, request).value
         val config = application.injector.instanceOf[FrontendAppConfig]
         val view = application.injector.instanceOf[ProduceApiUploadOasView]
-        val viewModel = ProduceApiUploadOasViewModel(apiProduceRoutes.ProduceApiUploadOasController.onSubmit(NormalMode))
+        val viewModel = ProduceApiUploadOasViewModel(apiUpdateRoutes.UpdateApiUploadOasController.onSubmit(NormalMode))
         
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, viewModel, FakeUser, config)(request, messages(application)).toString
@@ -70,15 +70,15 @@ class ProduceApiUploadOasControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(ProduceApiUploadOasPage, modelData).success.value
+      val userAnswers = UserAnswers(userAnswersId).set(UpdateApiUploadOasPage, modelData).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, produceApiUploadOasControllerRoute)
+        val request = FakeRequest(GET, updateApiUploadOasControllerRoute)
         val config = application.injector.instanceOf[FrontendAppConfig]
         val view = application.injector.instanceOf[ProduceApiUploadOasView]
-        val viewModel = ProduceApiUploadOasViewModel(apiProduceRoutes.ProduceApiUploadOasController.onSubmit(NormalMode))
+        val viewModel = ProduceApiUploadOasViewModel(apiUpdateRoutes.UpdateApiUploadOasController.onSubmit(NormalMode))
         
         val result = route(application, request).value
 
@@ -88,10 +88,10 @@ class ProduceApiUploadOasControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to the next page and update user answers when valid data is submitted" in {
-      val mockSessionRepository = mock[ProduceApiSessionRepository]
-      val initialUserAnswers = emptyUserAnswers.set(ProduceApiEnterOasPage, "entered oas data").success.value
+      val mockSessionRepository = mock[UpdateApiSessionRepository]
+      val initialUserAnswers = emptyUserAnswers.set(UpdateApiEnterOasPage, "entered oas data").success.value
       val uploadedOasFileData = ProduceApiUploadedOasFile("oas.yaml", "oas data")
-      val finalUserAnswers = emptyUserAnswers.set(ProduceApiUploadOasPage, uploadedOasFileData).success.value
+      val finalUserAnswers = emptyUserAnswers.set(UpdateApiUploadOasPage, uploadedOasFileData).success.value
 
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
@@ -99,13 +99,13 @@ class ProduceApiUploadOasControllerSpec extends SpecBase with MockitoSugar {
         applicationBuilder(userAnswers = Some(initialUserAnswers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[ProduceApiSessionRepository].toInstance(mockSessionRepository)
+            bind[UpdateApiSessionRepository].toInstance(mockSessionRepository)
           )
           .build()
 
       running(application) {
         val request =
-          FakeRequest(POST, produceApiUploadOasControllerRoute)
+          FakeRequest(POST, updateApiUploadOasControllerRoute)
             .withFormUrlEncodedBody(
               ("fileName", uploadedOasFileData.fileName),
               ("fileContents", uploadedOasFileData.fileContents)
@@ -116,7 +116,7 @@ class ProduceApiUploadOasControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual onwardRoute.url
         verify(mockSessionRepository).set(argThat(userAnswers =>
-          userAnswers.get(ProduceApiEnterOasPage).isEmpty && userAnswers.get(ProduceApiUploadOasPage).contains(uploadedOasFileData)
+          userAnswers.get(UpdateApiEnterOasPage).isEmpty && userAnswers.get(UpdateApiUploadOasPage).contains(uploadedOasFileData)
         ))
       }
     }
@@ -127,7 +127,7 @@ class ProduceApiUploadOasControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, produceApiUploadOasControllerRoute)
+          FakeRequest(POST, updateApiUploadOasControllerRoute)
             .withFormUrlEncodedBody(
               ("fileName", ""),
               ("fileContents", "")
@@ -136,7 +136,7 @@ class ProduceApiUploadOasControllerSpec extends SpecBase with MockitoSugar {
         val boundForm = form.bind(Map("fileName" -> "", "fileContents" -> ""))
         val config = application.injector.instanceOf[FrontendAppConfig]
         val view = application.injector.instanceOf[ProduceApiUploadOasView]
-        val viewModel = ProduceApiUploadOasViewModel(apiProduceRoutes.ProduceApiUploadOasController.onSubmit(NormalMode))
+        val viewModel = ProduceApiUploadOasViewModel(apiUpdateRoutes.UpdateApiUploadOasController.onSubmit(NormalMode))
         
         val result = route(application, request).value
 
@@ -150,7 +150,7 @@ class ProduceApiUploadOasControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, produceApiUploadOasControllerRoute)
+        val request = FakeRequest(GET, updateApiUploadOasControllerRoute)
 
         val result = route(application, request).value
 
@@ -165,7 +165,7 @@ class ProduceApiUploadOasControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, produceApiUploadOasControllerRoute)
+          FakeRequest(POST, updateApiUploadOasControllerRoute)
             .withFormUrlEncodedBody(("value", "yes"))
 
         val result = route(application, request).value

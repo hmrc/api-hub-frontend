@@ -20,6 +20,7 @@
 @import views.html.helper.CSPNonce
 @import models.myapis.produce.ProduceApiUploadedOasFile
 @import config.FrontendAppConfig
+@import viewmodels.myapis.produce.ProduceApiUploadOasViewModel
 
 @this(
     layout: templates.Layout,
@@ -29,7 +30,7 @@
     iconsLink: IconsLink,
 )
 
-@(form: Form[ProduceApiUploadedOasFile], mode: Mode, userModel: UserModel, config: FrontendAppConfig)(implicit request: Request[?], messages: Messages)
+@(form: Form[ProduceApiUploadedOasFile], viewModel: ProduceApiUploadOasViewModel, userModel: UserModel, config: FrontendAppConfig)(implicit request: Request[?], messages: Messages)
 
 @scripts() = {
     @iconsLink()
@@ -62,7 +63,7 @@
     <p id="errorMessage" class="govuk-error-message govuk-!-margin-bottom-4 govuk-!-display-none"></p>
     <p id="selectedFileName" class="govuk-body govuk-!-font-weight-bold govuk-!-display-none"></p>
 
-    @formHelper(action = controllers.myapis.produce.routes.ProduceApiUploadOasController.onSubmit(mode)) {
+    @formHelper(action = viewModel.formAction) {
         <input type="hidden" name="fileName" id="fileName" value="@form.value.map(_.fileName).getOrElse("")">
         <input type="hidden" name="fileContents" id="fileContents" value="@form.value.map(_.fileContents).getOrElse("")">
         @govukButton(

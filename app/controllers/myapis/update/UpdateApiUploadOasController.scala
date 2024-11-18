@@ -16,30 +16,67 @@
 
 package controllers.myapis.update
 
+import config.FrontendAppConfig
 import controllers.actions.*
-import controllers.myapis.update.routes
+import forms.myapis.produce.ProduceApiUploadOasFormProvider
 import models.Mode
-import play.api.data.Form
+import navigation.Navigator
+import models.requests.DataRequest
+import pages.myapis.update.{UpdateApiEnterOasPage, UpdateApiUploadOasPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.*
+import repositories.UpdateApiSessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.myapis.update.UpdateApiUploadOasView
-
+import viewmodels.myapis.produce.ProduceApiUploadOasViewModel
+import views.html.myapis.produce.ProduceApiUploadOasView
+import play.api.data.Form
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import models.myapis.produce.ProduceApiUploadedOasFile
 
 class UpdateApiUploadOasController @Inject()(
                                         override val messagesApi: MessagesApi,
+                                        sessionRepository: UpdateApiSessionRepository,
+                                        navigator: Navigator,
                                         identify: IdentifierAction,
                                         val controllerComponents: MessagesControllerComponents,
-                                        view: UpdateApiUploadOasView
+                                        formProvider: ProduceApiUploadOasFormProvider,
+                                        getData: UpdateApiDataRetrievalAction,
+                                        requireData: DataRequiredAction,
+                                        view: ProduceApiUploadOasView,
+                                        frontendAppConfig: FrontendAppConfig
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = identify {
-    implicit request =>  Ok(view( mode, request.user))
+  private val form = formProvider()
+
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+    implicit request =>
+      val preparedForm = request.userAnswers.get(UpdateApiUploadOasPage) match {
+        case None => form
+        case Some(value) => form.fill(value)
+      }
+
+      Ok(buildView(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = identify {
-    implicit request =>  Redirect(routes.UpdateApiEnterOasController.onPageLoad(mode))
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request => {
+      form.bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(buildView(formWithErrors, mode))),
+
+        value =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.remove(UpdateApiEnterOasPage))
+            updatedAnswers <- Future.fromTry(updatedAnswers.set(UpdateApiUploadOasPage, value))
+            _ <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(navigator.nextPage(UpdateApiUploadOasPage, mode, updatedAnswers))
+      )
+    }
   }
+
+  private def buildView(form: Form[ProduceApiUploadedOasFile], mode: Mode)(implicit request: DataRequest[AnyContent]) = {
+    view(form, ProduceApiUploadOasViewModel(routes.UpdateApiUploadOasController.onSubmit(mode)), request.user, frontendAppConfig)
+  }
+  
 }
