@@ -19,12 +19,18 @@ package controllers.myapis.produce
 import controllers.actions.*
 import forms.myapis.produce.ProduceApiHowToCreateFormProvider
 import models.Mode
+import models.myapis.produce.ProduceApiHowToCreate
+import models.requests.DataRequest
+import models.user.UserModel
 import navigation.Navigator
 import pages.myapis.produce.ProduceApiHowToCreatePage
+import pages.myapis.update.UpdateApiHowToUpdatePage
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.{ProduceApiSessionRepository, SessionRepository}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.myapis.ProduceApiHowToCreateViewModel
 import views.html.myapis.produce.ProduceApiHowToCreateView
 
 import javax.inject.Inject
@@ -43,8 +49,8 @@ class ProduceApiHowToCreateController @Inject()(
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form = formProvider()
-
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+    
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
 
       val preparedForm = request.userAnswers.get(ProduceApiHowToCreatePage) match {
@@ -52,7 +58,7 @@ class ProduceApiHowToCreateController @Inject()(
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode, request.user))
+      Future.successful(Ok(buildView(preparedForm, mode, request.user)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
@@ -60,13 +66,22 @@ class ProduceApiHowToCreateController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode, request.user))),
+          Future.successful(BadRequest(buildView(formWithErrors, mode, request.user))),
 
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(ProduceApiHowToCreatePage, value))
             _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(ProduceApiHowToCreatePage, mode, updatedAnswers))
+          } yield Redirect(navigator.nextPage(UpdateApiHowToUpdatePage, mode, updatedAnswers))
       )
+  }
+
+  private def buildView(form: Form[ProduceApiHowToCreate], mode: Mode, user: UserModel)(implicit request: DataRequest[AnyContent]) = {
+    val viewModel = ProduceApiHowToCreateViewModel(
+      "myApis.produce.howtocreate.title",
+      "myApis.produce.howtocreate.heading",
+      None,
+      controllers.myapis.produce.routes.ProduceApiHowToCreateController.onSubmit(mode))
+    view(form, viewModel, user)
   }
 }

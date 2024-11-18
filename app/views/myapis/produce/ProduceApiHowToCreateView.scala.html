@@ -15,21 +15,43 @@
  *@
 
 @import models.user.UserModel
+@import viewmodels.myapis.ProduceApiHowToCreateViewModel
 @import models.myapis.produce.ProduceApiHowToCreate
+@import views.html.components.IconsLink
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukRadios: GovukRadios,
-    govukButton: GovukButton
+    govukButton: GovukButton,
+    iconsLink: IconsLink
 )
 
-@(form: Form[?], mode: Mode, userModel: UserModel)(implicit request: Request[?], messages: Messages)
+@(form: Form[?], viewModel: ProduceApiHowToCreateViewModel, userModel: UserModel)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = title(form, messages("myApis.produce.howtocreate.title")), user = Some(userModel)) {
+@banner = {
+    <div class="call-out-panel call-out-panel__small">
+        <p class="govuk-body information--general-tag govuk-!-margin-bottom-2">
+            <i class="fa-solid fa-circle-info" ></i>
+            <span class="call-out-type">
+            @messages(viewModel.bannerModel.get.bannerTitle)
+            </span>
+        </p>
+        <p class="govuk-body additional-message govuk-!-margin-bottom-1 govuk-!-margin-top-1">@messages(viewModel.bannerModel.get.bannerContent)</p>
+    </div>
+}
 
-    @formHelper(action = controllers.myapis.produce.routes.ProduceApiHowToCreateController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+@headingAndBanner() = {
+    <h1>@messages(viewModel.headingKey)</h1>
+    @if(viewModel.bannerModel.isDefined) {
+        @banner
+    }
+}
+
+@layout(pageTitle = title(form, messages(viewModel.titleKey)), user = Some(userModel), customScriptsBlock = Some(iconsLink())) {
+
+    @formHelper(action = viewModel.formAction, Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))
@@ -38,7 +60,7 @@
         @govukRadios(
             RadiosViewModel(
                 field  = form("value"),
-                legend = LegendViewModel(messages("myApis.produce.howtocreate.heading")).asPageHeading(),
+                legend = LegendViewModel(HtmlContent(headingAndBanner())),
                 items  = ProduceApiHowToCreate.options
             )
         )

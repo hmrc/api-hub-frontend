@@ -164,4 +164,12 @@ class Navigator @Inject()() {
     }
   }
 
+  private def updateApiHowToUpdateNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
+    (mode, userAnswers.get(UpdateApiHowToUpdatePage)) match {
+      case (_, Some(Editor)) => controllers.myapis.update.routes.UpdateApiEnterOasController.onPageLoad(mode)
+      case (_, Some(Upload)) => controllers.myapis.update.routes.UpdateApiUploadOasController.onPageLoad(mode)
+      case _ => routes.JourneyRecoveryController.onPageLoad()
+    }
+  }
+
 }

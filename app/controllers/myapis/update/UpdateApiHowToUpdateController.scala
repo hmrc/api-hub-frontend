@@ -16,13 +16,22 @@
 
 package controllers.myapis.update
 
+import config.FrontendAppConfig
 import controllers.actions.*
+import forms.myapis.produce.ProduceApiHowToCreateFormProvider
 import models.Mode
+import models.myapis.produce.ProduceApiHowToCreate
+import models.requests.DataRequest
+import models.user.UserModel
+import navigation.Navigator
+import pages.myapis.update.{UpdateApiApiPage, UpdateApiHowToUpdatePage, UpdateApiStartPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.UpdateApiSessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.myapis.update.UpdateApiHowToUpdateView
+import viewmodels.myapis.{ProduceApiHowToCreateViewBannerModel, ProduceApiHowToCreateViewModel}
+import views.html.myapis.produce.ProduceApiHowToCreateView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -31,19 +40,50 @@ class UpdateApiHowToUpdateController @Inject()(
                                                 override val messagesApi: MessagesApi,
                                                 identify: IdentifierAction,
                                                 val controllerComponents: MessagesControllerComponents,
-                                                view: UpdateApiHowToUpdateView
+                                                formProvider: ProduceApiHowToCreateFormProvider,
+                                                getData: ProduceApiDataRetrievalAction,
+                                                requireData: DataRequiredAction,
+                                                view: ProduceApiHowToCreateView,
+                                                frontendAppConfig: FrontendAppConfig,
+                                                sessionRepository: UpdateApiSessionRepository,
+                                                navigator: Navigator
                                               )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = identify {
-    implicit request => Ok(view( mode, request.user))
+  val form = formProvider()
+
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+    implicit request =>
+
+      val preparedForm = request.userAnswers.get(UpdateApiHowToUpdatePage) match {
+        case None => form
+        case Some(value) => form.fill(value)
+      }
+
+      Ok(buildView(preparedForm, mode, request.user, request.userAnswers.get(UpdateApiApiPage).get.id))
   }
 
-  def onSubmit(next: String, mode: Mode): Action[AnyContent] = identify {
-    implicit request => {
-      next match {
-        case "upload" => Redirect(routes.UpdateApiUploadOasController.onPageLoad(mode))
-        case "editor" => Redirect(routes.UpdateApiEnterOasController.onPageLoad(mode))
-      }
-    }
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request =>
+
+      form.bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(buildView(formWithErrors, mode, request.user, request.userAnswers.get(UpdateApiApiPage).get.id))),
+
+        value =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(UpdateApiHowToUpdatePage, value))
+            _              <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(navigator.nextPage(UpdateApiHowToUpdatePage, mode, updatedAnswers))
+      )
+  }
+
+  private def buildView(form: Form[ProduceApiHowToCreate], mode: Mode, user: UserModel, apiId: String)(implicit request: DataRequest[AnyContent]) = {
+    val viewModel = ProduceApiHowToCreateViewModel(
+      "myApis.update.howtoupdate.title",
+      "myApis.update.howtoupdate.heading",
+      Some(ProduceApiHowToCreateViewBannerModel("myApis.update.howtoupdate.banner.title","myApis.update.howtoupdate.banner.content")),
+      controllers.myapis.update.routes.UpdateApiHowToUpdateController.onSubmit(mode))
+    view(form, viewModel, user)
+
   }
 }
