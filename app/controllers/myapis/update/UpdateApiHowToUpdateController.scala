@@ -30,7 +30,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.UpdateApiSessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.myapis.{ProduceApiHowToCreateViewBannerModel, ProduceApiHowToCreateViewModel}
+import viewmodels.myapis.{UpdateApiHowToUpdateViewBannerModel, ProduceApiHowToCreateViewModel}
 import views.html.myapis.produce.ProduceApiHowToCreateView
 
 import javax.inject.Inject
@@ -81,7 +81,7 @@ class UpdateApiHowToUpdateController @Inject()(
     val viewModel = ProduceApiHowToCreateViewModel(
       "myApis.update.howtoupdate.title",
       "myApis.update.howtoupdate.heading",
-      Some(ProduceApiHowToCreateViewBannerModel("myApis.update.howtoupdate.banner.title","myApis.update.howtoupdate.banner.content")),
+      Some(UpdateApiHowToUpdateViewBannerModel("myApis.update.howtoupdate.banner.title","myApis.update.howtoupdate.banner.content")),
       controllers.myapis.update.routes.UpdateApiHowToUpdateController.onSubmit(mode))
     view(form, viewModel, user)
 

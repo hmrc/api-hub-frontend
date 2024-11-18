@@ -18,9 +18,10 @@ package viewmodels.myapis
 
 import play.api.mvc.Call
 
-case class ProduceApiHowToCreateViewBannerModel(bannerTitle: String, bannerContent: String )
+case class UpdateApiHowToUpdateViewBannerModel(bannerTitle: String, bannerContent: String )
+
 case class ProduceApiHowToCreateViewModel(
-  headingKey: String,
-  titleKey: String,
-  bannerModel: Option[ProduceApiHowToCreateViewBannerModel],
-  formAction: Call)
+                                           headingKey: String,
+                                           titleKey: String,
+                                           bannerModel: Option[UpdateApiHowToUpdateViewBannerModel],
+                                           formAction: Call)

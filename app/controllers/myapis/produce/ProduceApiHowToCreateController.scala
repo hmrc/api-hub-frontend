@@ -72,7 +72,7 @@ class ProduceApiHowToCreateController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(ProduceApiHowToCreatePage, value))
             _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(UpdateApiHowToUpdatePage, mode, updatedAnswers))
+          } yield Redirect(navigator.nextPage(ProduceApiHowToCreatePage, mode, updatedAnswers))
       )
   }
 
