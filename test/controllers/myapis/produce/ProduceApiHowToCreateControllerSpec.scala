@@ -45,12 +45,12 @@ class ProduceApiHowToCreateControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new ProduceApiHowToCreateFormProvider()
   val form = formProvider()
-  val viewModel = ProduceApiHowToCreateViewModel(
+  lazy val viewModel = ProduceApiHowToCreateViewModel(
     "myApis.produce.howtocreate.title",
     "myApis.produce.howtocreate.heading",
     None,
     controllers.myapis.produce.routes.ProduceApiHowToCreateController.onSubmit(NormalMode))
-  
+
   "ProduceApiHowToCreate Controller" - {
 
     "must return OK and the correct view for a GET" in {
@@ -65,7 +65,7 @@ class ProduceApiHowToCreateControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[ProduceApiHowToCreateView]
 
         status(result) mustEqual OK
-        
+
         contentAsString(result) mustEqual view(form, viewModel, FakeUser)(request, messages(application)).toString
       }
     }

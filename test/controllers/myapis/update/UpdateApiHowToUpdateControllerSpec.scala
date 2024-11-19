@@ -49,7 +49,7 @@ class UpdateApiHowToUpdateControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new ProduceApiHowToCreateFormProvider()
   val form = formProvider()
-  val viewModel = ProduceApiHowToCreateViewModel(
+  lazy val viewModel = ProduceApiHowToCreateViewModel(
     "myApis.update.howtoupdate.title",
     "myApis.update.howtoupdate.heading",
     Some(UpdateApiHowToUpdateViewBannerModel("myApis.update.howtoupdate.banner.title","myApis.update.howtoupdate.banner.content")),
@@ -124,7 +124,9 @@ class UpdateApiHowToUpdateControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val userAnswers = emptyUserAnswers.set(UpdateApiApiPage, apiDetail).toOption
+
+      val application = applicationBuilder(userAnswers = userAnswers).build()
 
       running(application) {
         val request =
@@ -156,6 +158,19 @@ class UpdateApiHowToUpdateControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must redirect to Journey Recovery for a GET if no api detail has been set at the start of the journey" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, updateApiHowToUpdateRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
     "redirect to Journey Recovery for a POST if no existing data is found" in {
 
       val application = applicationBuilder(userAnswers = None).build()

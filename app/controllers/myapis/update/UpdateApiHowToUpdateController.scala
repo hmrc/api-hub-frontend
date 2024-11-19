@@ -24,13 +24,14 @@ import models.myapis.produce.ProduceApiHowToCreate
 import models.requests.DataRequest
 import models.user.UserModel
 import navigation.Navigator
+import pages.AddAnApiApiPage
 import pages.myapis.update.{UpdateApiApiPage, UpdateApiHowToUpdatePage, UpdateApiStartPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.UpdateApiSessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.myapis.{UpdateApiHowToUpdateViewBannerModel, ProduceApiHowToCreateViewModel}
+import viewmodels.myapis.{ProduceApiHowToCreateViewModel, UpdateApiHowToUpdateViewBannerModel}
 import views.html.myapis.produce.ProduceApiHowToCreateView
 
 import javax.inject.Inject
@@ -41,7 +42,7 @@ class UpdateApiHowToUpdateController @Inject()(
                                                 identify: IdentifierAction,
                                                 val controllerComponents: MessagesControllerComponents,
                                                 formProvider: ProduceApiHowToCreateFormProvider,
-                                                getData: ProduceApiDataRetrievalAction,
+                                                getData: UpdateApiDataRetrievalAction,
                                                 requireData: DataRequiredAction,
                                                 view: ProduceApiHowToCreateView,
                                                 frontendAppConfig: FrontendAppConfig,
@@ -51,7 +52,7 @@ class UpdateApiHowToUpdateController @Inject()(
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
 
       val preparedForm = request.userAnswers.get(UpdateApiHowToUpdatePage) match {
@@ -59,7 +60,7 @@ class UpdateApiHowToUpdateController @Inject()(
         case Some(value) => form.fill(value)
       }
 
-      Ok(buildView(preparedForm, mode, request.user, request.userAnswers.get(UpdateApiApiPage).get.id))
+      buildView(preparedForm, mode, Ok)
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
@@ -67,7 +68,7 @@ class UpdateApiHowToUpdateController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(buildView(formWithErrors, mode, request.user, request.userAnswers.get(UpdateApiApiPage).get.id))),
+          buildView(formWithErrors, mode, BadRequest),
 
         value =>
           for {
@@ -77,13 +78,16 @@ class UpdateApiHowToUpdateController @Inject()(
       )
   }
 
-  private def buildView(form: Form[ProduceApiHowToCreate], mode: Mode, user: UserModel, apiId: String)(implicit request: DataRequest[AnyContent]) = {
+  private def buildView(form: Form[ProduceApiHowToCreate], mode: Mode, status: Status)(implicit request: DataRequest[AnyContent]) = {
     val viewModel = ProduceApiHowToCreateViewModel(
       "myApis.update.howtoupdate.title",
       "myApis.update.howtoupdate.heading",
-      Some(UpdateApiHowToUpdateViewBannerModel("myApis.update.howtoupdate.banner.title","myApis.update.howtoupdate.banner.content")),
+      Some(UpdateApiHowToUpdateViewBannerModel("myApis.update.howtoupdate.banner.title", "myApis.update.howtoupdate.banner.content")),
       controllers.myapis.update.routes.UpdateApiHowToUpdateController.onSubmit(mode))
-    view(form, viewModel, user)
 
+    request.userAnswers.get(UpdateApiApiPage) match {
+      case Some(apiDetail) => Future.successful(status(view(form, viewModel, request.user)))
+      case _ => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+    }
   }
 }

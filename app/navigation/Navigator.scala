@@ -69,6 +69,7 @@ class Navigator @Inject()() {
     case UpdateApiStartPage => _ => controllers.myapis.update.routes.UpdateApiHowToUpdateController.onPageLoad(NormalMode)
     case UpdateApiEnterOasPage => _ => controllers.myapis.update.routes.UpdateApiReviewNameDescriptionController.onPageLoad(NormalMode)
     case UpdateApiShortDescriptionPage => _ => controllers.myapis.update.routes.UpdateApiReviewNameDescriptionController.onPageLoad(NormalMode)
+    case UpdateApiHowToUpdatePage => updateApiHowToUpdateNextPage(NormalMode)
     case _ => _ => routes.IndexController.onPageLoad
   }
 
@@ -141,7 +142,6 @@ class Navigator @Inject()() {
   }
 
   private def produceApiHowToCreateNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
-    Console.println("OIYAF")
     (mode, userAnswers.get(ProduceApiHowToCreatePage)) match {
       case (_, Some(Editor)) => controllers.myapis.produce.routes.ProduceApiEnterOasController.onPageLoad(mode)
       case (_, Some(Upload)) => controllers.myapis.produce.routes.ProduceApiUploadOasController.onPageLoad(mode)
