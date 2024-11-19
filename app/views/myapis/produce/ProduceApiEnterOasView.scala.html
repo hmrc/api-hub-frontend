@@ -51,7 +51,7 @@
             <p class="govuk-hint">@messages(warning)</p>
         }
 
-        <div id="aceEditorContainer" class="hip-ace-editor govuk-!-margin-bottom-5">+</div>
+        <div id="aceEditorContainer" class="hip-ace-editor govuk-!-margin-bottom-5" @if(viewModel.populateExample){data-populate-example}>+</div>
 
         @govukInput(
             Input(inputType="hidden", name="value", id="oasMirrorValue", value=form("value").value)

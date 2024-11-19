@@ -56,7 +56,8 @@ class UpdateApiEnterOasController @Inject()(
     title = "updateApiEnterOas.title",
     heading = "updateApiEnterOas.heading",
     formAction = routes.UpdateApiEnterOasController.onSubmit(mode),
-    warning = Some("updateApiEnterOas.warning")
+    warning = Some("updateApiEnterOas.warning"),
+    populateExample = false,
   )
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {

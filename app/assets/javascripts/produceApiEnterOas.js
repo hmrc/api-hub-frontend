@@ -3,8 +3,9 @@ import {oasExampleYaml} from './oaseditor/oasYamlExample.js';
 export function onDOMContentLoaded(){
     const elForm = document.querySelector('form'),
         elOasEditorMirror = document.querySelector('[name="value"]'),
-        editor = ace.edit("aceEditorContainer"),
-        initialEditorContents = elOasEditorMirror.value || oasExampleYaml;
+        editor = ace.edit("aceEditorContainer");
+    const oasFallbackValue = editor.container.hasAttribute("data-populate-example") ? oasExampleYaml : '';
+    const initialEditorContents = elOasEditorMirror.value || oasFallbackValue;
 
     editor.setOption('useWorker', false);
     editor.setTheme("ace/theme/monokai");
