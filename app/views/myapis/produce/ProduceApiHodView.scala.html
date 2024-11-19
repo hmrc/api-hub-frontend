@@ -16,6 +16,7 @@
 
 @import config.Hods
 @import models.user.UserModel
+@import viewmodels.myapis.produce.ProduceApiHodViewModel
 
 @this(
     layout: templates.Layout,
@@ -25,11 +26,11 @@
     govukButton: GovukButton
 )
 
-@(form: Form[?], mode: Mode, userModel: UserModel, hods: Hods)(implicit request: Request[?], messages: Messages)
+@(form: Form[?], userModel: UserModel, hods: Hods, viewModel: ProduceApiHodViewModel)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = title(form, messages("produceApiHod.title")), user = Some(userModel)) {
+@layout(pageTitle = title(form, messages(viewModel.titleMessageKey)), user = Some(userModel)) {
 
-    @formHelper(action = controllers.myapis.produce.routes.ProduceApiHodController.onSubmit(mode)) {
+    @formHelper(action = viewModel.formAction) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))

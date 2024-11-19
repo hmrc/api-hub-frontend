@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.myapis.produce
+package controllers.myapis.update
 
 import base.SpecBase
 import config.Hods
@@ -28,7 +28,7 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.myapis.produce.ProduceApiHodPage
+import pages.myapis.update.UpdateApiHodPage
 import play.api.Application
 import play.api.inject.bind
 import play.api.mvc.Call
@@ -40,16 +40,16 @@ import views.html.myapis.produce.ProduceApiHodView
 
 import scala.concurrent.Future
 
-class ProduceApiHodControllerSpec extends SpecBase with MockitoSugar {
+class UpdateApiHodControllerSpec extends SpecBase with MockitoSugar {
 
   private def onwardRoute = Call("GET", "/foo")
 
-  private lazy val produceApiHodRoute = controllers.myapis.produce.routes.ProduceApiHodController.onPageLoad(NormalMode).url
+  private lazy val updateApiHodRoute = controllers.myapis.update.routes.UpdateApiHodController.onPageLoad(NormalMode).url
 
   private def viewModel(mode: Mode) =
     ProduceApiHodViewModel(
-      "produceApiHod.title",
-      controllers.myapis.produce.routes.ProduceApiHodController.onSubmit(mode)
+      "updateApiHod.title",
+      controllers.myapis.update.routes.UpdateApiHodController.onSubmit(mode)
     )
 
   private def formWithHods(application: Application) = {
@@ -58,14 +58,14 @@ class ProduceApiHodControllerSpec extends SpecBase with MockitoSugar {
     (hods, formProvider())
   }
 
-  "ProduceApiHod Controller" - {
+  "UpdateApiHod Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, produceApiHodRoute)
+        val request = FakeRequest(GET, updateApiHodRoute)
 
         val result = route(application, request).value
 
@@ -81,14 +81,14 @@ class ProduceApiHodControllerSpec extends SpecBase with MockitoSugar {
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
       val userAnswers = UserAnswers(userAnswersId)
-        .set(ProduceApiHodPage, FakeHods.hods.map(_.code).toSet).success.value
+        .set(UpdateApiHodPage, FakeHods.hods.map(_.code).toSet).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers))
         .build()
 
       running(application) {
         val (hods, form) = formWithHods(application)
-        val request = FakeRequest(GET, produceApiHodRoute)
+        val request = FakeRequest(GET, updateApiHodRoute)
 
         val view = application.injector.instanceOf[ProduceApiHodView]
 
@@ -116,7 +116,7 @@ class ProduceApiHodControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val (hods, form) = formWithHods(application)
         val request =
-          FakeRequest(POST, produceApiHodRoute)
+          FakeRequest(POST, updateApiHodRoute)
             .withFormUrlEncodedBody(("value[0]", hods.hods.head.code))
 
         val result = route(application, request).value
@@ -133,7 +133,7 @@ class ProduceApiHodControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val (hods, form) = formWithHods(application)
         val request =
-          FakeRequest(POST, produceApiHodRoute)
+          FakeRequest(POST, updateApiHodRoute)
             .withFormUrlEncodedBody(("value[0]", "invalid value"))
 
         val boundForm = form.bind(Map("value[0]" -> "invalid value"))
@@ -153,7 +153,7 @@ class ProduceApiHodControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val (hods, form) = formWithHods(application)
-        val request = FakeRequest(GET, produceApiHodRoute)
+        val request = FakeRequest(GET, updateApiHodRoute)
 
         val result = route(application, request).value
 
@@ -169,7 +169,7 @@ class ProduceApiHodControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val (hods, form) = formWithHods(application)
         val request =
-          FakeRequest(POST, produceApiHodRoute)
+          FakeRequest(POST, updateApiHodRoute)
             .withFormUrlEncodedBody(("value[0]", hods.hods.head.code))
 
         val result = route(application, request).value
