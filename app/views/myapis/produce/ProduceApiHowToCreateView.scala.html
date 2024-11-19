@@ -30,15 +30,15 @@
 
 @(form: Form[?], viewModel: ProduceApiHowToCreateViewModel, userModel: UserModel)(implicit request: Request[?], messages: Messages)
 
-@banner = {
+@banner(bannerModel: UpdateApiHowToUpdateViewBannerModel) = {
     <div class="call-out-panel call-out-panel__small">
         <p class="govuk-body information--general-tag govuk-!-margin-bottom-2">
             <i class="fa-solid fa-circle-info" ></i>
             <span class="call-out-type">
-            @messages(viewModel.bannerModel.get.bannerTitle)
+            @messages(bannerModel.bannerTitle)
             </span>
         </p>
-        <p class="govuk-body additional-message govuk-!-margin-bottom-1 govuk-!-margin-top-1">@messages(viewModel.bannerModel.get.bannerContent)</p>
+        <p class="govuk-body additional-message govuk-!-margin-bottom-1 govuk-!-margin-top-1">@messages(bannerModel.bannerContent)</p>
     </div>
 }
 
