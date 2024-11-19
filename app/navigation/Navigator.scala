@@ -71,6 +71,7 @@ class Navigator @Inject()() {
     case UpdateApiUploadOasPage => _ => controllers.myapis.update.routes.UpdateApiEnterOasController.onPageLoadWithUploadedOas(NormalMode)
     case UpdateApiShortDescriptionPage => _ => controllers.myapis.update.routes.UpdateApiReviewNameDescriptionController.onPageLoad(NormalMode)
     case UpdateApiHowToUpdatePage => updateApiHowToUpdateNextPage(NormalMode)
+    case UpdateApiReviewNameDescriptionPage => _ => controllers.myapis.update.routes.UpdateApiReviewEgressController.onPageLoad(NormalMode)
     case _ => _ => routes.IndexController.onPageLoad
   }
 

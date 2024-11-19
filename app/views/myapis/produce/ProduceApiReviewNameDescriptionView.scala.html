@@ -15,6 +15,7 @@
  *@
 
 @import models.myapis.produce.ProduceApiReviewNameDescription
+@import viewmodels.myapis.produce.ProduceApiReviewNameDescriptionViewModel
 @import models.user.UserModel
 
 @this(
@@ -26,7 +27,7 @@
     govukDetails : GovukDetails
 )
 
-@(form: Form[?], mode: Mode, apiName: String, apiShortDescription: String, userModel: UserModel)(implicit request: Request[?], messages: Messages)
+@(form: Form[?], mode: Mode, apiName: String, apiShortDescription: String, userModel: UserModel, viewModel: ProduceApiReviewNameDescriptionViewModel)(implicit request: Request[?], messages: Messages)
 
 @apiNamingConventions = {
     <h3>@messages("produceApiReviewNameDescription.namingConventions.1.title")</h3>
@@ -62,7 +63,7 @@
 
     <p class="govuk-body">@messages("produceApiReviewNameDescription.preamble")</p>
 
-    @formHelper(action = controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = viewModel.formAction, Symbol("autoComplete") -> "off") {
 
         <div>
             @apiPanelPlaceholder

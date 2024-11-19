@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package controllers.myapis.produce
+package controllers.myapis.update
 
 import base.SpecBase
 import controllers.actions.FakeUser
 import controllers.routes
 import forms.myapis.produce.ProduceApiReviewNameDescriptionFormProvider
-import models.{CheckMode, Mode, NormalMode, UserAnswers}
 import models.myapis.produce.ProduceApiReviewNameDescription
 import models.myapis.produce.ProduceApiReviewNameDescription.Confirm
+import models.{CheckMode, Mode, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.myapis.produce.{ProduceApiEnterApiTitlePage, ProduceApiEnterOasPage, ProduceApiReviewNameDescriptionPage, ProduceApiShortDescriptionPage}
+import pages.myapis.update.{UpdateApiEnterApiTitlePage, UpdateApiEnterOasPage, UpdateApiReviewNameDescriptionPage, UpdateApiShortDescriptionPage}
 import play.api.Application as PlayApplication
 import play.api.inject.bind
 import play.api.mvc.Call
@@ -39,7 +39,7 @@ import views.html.myapis.produce.ProduceApiReviewNameDescriptionView
 
 import scala.concurrent.Future
 
-class ProduceApiReviewNameDescriptionControllerSpec extends SpecBase with MockitoSugar {
+class UpdateApiReviewNameDescriptionControllerSpec extends SpecBase with MockitoSugar {
 
   private def onwardRoute = Call("GET", "/foo")
 
@@ -52,22 +52,22 @@ class ProduceApiReviewNameDescriptionControllerSpec extends SpecBase with Mockit
   private val apiName = "API NAME"
   private val apiDescription = "API Description"
   private val userAnswersWithDescription = UserAnswers(userAnswersId)
-    .set(ProduceApiShortDescriptionPage, apiDescription).success.value
-    .set(ProduceApiEnterOasPage, "oas").success.value
-    .set(ProduceApiEnterApiTitlePage, apiName).success.value
+    .set(UpdateApiShortDescriptionPage, apiDescription).success.value
+    .set(UpdateApiEnterOasPage, "oas").success.value
+    .set(UpdateApiEnterApiTitlePage, apiName).success.value
   private val userAnswersWithNoApiName = UserAnswers(userAnswersId)
-    .set(ProduceApiShortDescriptionPage, apiDescription).success.value
-    .set(ProduceApiEnterOasPage, "oas").success.value
-  private val userAnswersWithPreviousConfirmation = userAnswersWithDescription.set(ProduceApiReviewNameDescriptionPage, Set(Confirm)).success.value
+    .set(UpdateApiShortDescriptionPage, apiDescription).success.value
+    .set(UpdateApiEnterOasPage, "oas").success.value
+  private val userAnswersWithPreviousConfirmation = userAnswersWithDescription.set(UpdateApiReviewNameDescriptionPage, Set(Confirm)).success.value
 
-  "ProduceApiReviewNameDescription Controller" - {
+  "UpdateApiReviewNameDescription Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val fixture = buildFixture(Some(userAnswersWithDescription))
 
       running(fixture.application) {
-        val request = FakeRequest(GET, controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onPageLoad(NormalMode).url)
+        val request = FakeRequest(GET, controllers.myapis.update.routes.UpdateApiReviewNameDescriptionController.onPageLoad(NormalMode).url)
 
         val result = route(fixture.application, request).value
 
@@ -83,7 +83,7 @@ class ProduceApiReviewNameDescriptionControllerSpec extends SpecBase with Mockit
       val fixture = buildFixture(Some(userAnswersWithPreviousConfirmation))
 
       running(fixture.application) {
-        val request = FakeRequest(GET, controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onPageLoad(CheckMode).url)
+        val request = FakeRequest(GET, controllers.myapis.update.routes.UpdateApiReviewNameDescriptionController.onPageLoad(CheckMode).url)
 
         val view = fixture.application.injector.instanceOf[ProduceApiReviewNameDescriptionView]
 
@@ -99,7 +99,7 @@ class ProduceApiReviewNameDescriptionControllerSpec extends SpecBase with Mockit
 
       running(fixture.application) {
         val request =
-          FakeRequest(POST, controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onPageLoad(NormalMode).url)
+          FakeRequest(POST, controllers.myapis.update.routes.UpdateApiReviewNameDescriptionController.onPageLoad(NormalMode).url)
             .withFormUrlEncodedBody(("value[0]", ProduceApiReviewNameDescription.values.head.toString))
 
         val result = route(fixture.application, request).value
@@ -114,7 +114,7 @@ class ProduceApiReviewNameDescriptionControllerSpec extends SpecBase with Mockit
 
       running(fixture.application) {
         val request =
-          FakeRequest(POST, controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onPageLoad(NormalMode).url)
+          FakeRequest(POST, controllers.myapis.update.routes.UpdateApiReviewNameDescriptionController.onPageLoad(NormalMode).url)
             .withFormUrlEncodedBody(("value", "invalid value"))
 
         val boundForm = form.bind(Map("value" -> "invalid value"))
@@ -132,7 +132,7 @@ class ProduceApiReviewNameDescriptionControllerSpec extends SpecBase with Mockit
       val fixture = buildFixture(None)
 
       running(fixture.application) {
-        val request = FakeRequest(GET, controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onPageLoad(NormalMode).url)
+        val request = FakeRequest(GET, controllers.myapis.update.routes.UpdateApiReviewNameDescriptionController.onPageLoad(NormalMode).url)
 
         val result = route(fixture.application, request).value
 
@@ -145,7 +145,7 @@ class ProduceApiReviewNameDescriptionControllerSpec extends SpecBase with Mockit
       val fixture = buildFixture(Some(userAnswersWithNoApiName))
 
       running(fixture.application) {
-        val request = FakeRequest(GET, controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onPageLoad(NormalMode).url)
+        val request = FakeRequest(GET, controllers.myapis.update.routes.UpdateApiReviewNameDescriptionController.onPageLoad(NormalMode).url)
 
         val result = route(fixture.application, request).value
 
@@ -159,7 +159,7 @@ class ProduceApiReviewNameDescriptionControllerSpec extends SpecBase with Mockit
 
       running(fixture.application) {
         val request =
-          FakeRequest(POST, controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onPageLoad(NormalMode).url)
+          FakeRequest(POST, controllers.myapis.update.routes.UpdateApiReviewNameDescriptionController.onPageLoad(NormalMode).url)
             .withFormUrlEncodedBody(("value[0]", ProduceApiReviewNameDescription.values.head.toString))
 
         val result = route(fixture.application, request).value
