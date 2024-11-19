@@ -44,9 +44,9 @@
 
 @headingAndBanner() = {
     <h1>@messages(viewModel.headingKey)</h1>
-    @if(viewModel.bannerModel.isDefined) {
-        @banner
-    }
+    @viewModel.bannerModel.map(bannerModel =>
+        @banner(bannerModel)
+    )
 }
 
 @layout(pageTitle = title(form, messages(viewModel.titleKey)), user = Some(userModel), customScriptsBlock = Some(iconsLink())) {
