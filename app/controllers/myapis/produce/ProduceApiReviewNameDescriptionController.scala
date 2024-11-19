@@ -28,6 +28,7 @@ import play.api.mvc.Results.Redirect
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.ProduceApiSessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.myapis.produce.ProduceApiReviewNameDescriptionViewModel
 import views.html.myapis.produce.ProduceApiReviewNameDescriptionView
 
 import javax.inject.Inject
@@ -45,13 +46,17 @@ class ProduceApiReviewNameDescriptionController @Inject()(
                                         view: ProduceApiReviewNameDescriptionView
                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form = formProvider()
+  private val form = formProvider()
+  private def viewModel(mode: Mode) =
+    ProduceApiReviewNameDescriptionViewModel(
+      controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onSubmit(mode)
+    )
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
 
       withJourneyRecovery { case (apiName, apiShortDescription) =>
-        Ok(view(form, mode, apiName, apiShortDescription, request.user)) // never pre-fill checkbox, even in CheckMode
+        Ok(view(form, mode, apiName, apiShortDescription, request.user, viewModel(mode))) // never pre-fill checkbox, even in CheckMode
       }
   }
 
@@ -70,7 +75,7 @@ class ProduceApiReviewNameDescriptionController @Inject()(
         formWithErrors =>
           Future.successful(
             withJourneyRecovery { case (apiName, apiShortDescription) =>
-              BadRequest(view(formWithErrors, mode, apiName, apiShortDescription, request.user))
+              BadRequest(view(formWithErrors, mode, apiName, apiShortDescription, request.user, viewModel(mode)))
             }
           ),
 
