@@ -97,9 +97,9 @@ POST    /produce/change-hods                                controllers.myapis.p
 GET     /update/:id/start                                   controllers.myapis.update.UpdateApiStartController.startProduceApi(id: String)
 
 GET     /update/how-to-update                               controllers.myapis.update.UpdateApiHowToUpdateController.onPageLoad(mode: Mode = NormalMode)
-POST    /update/how-to-update                               controllers.myapis.update.UpdateApiHowToUpdateController.onSubmit(next: String, mode: Mode = NormalMode)
+POST    /update/how-to-update                               controllers.myapis.update.UpdateApiHowToUpdateController.onSubmit(mode: Mode = NormalMode)
 GET     /update/change-how-to-update                        controllers.myapis.update.UpdateApiHowToUpdateController.onPageLoad(mode: Mode = CheckMode)
-POST    /update/change-how-to-update                        controllers.myapis.update.UpdateApiHowToUpdateController.onSubmit(next: String, mode: Mode = CheckMode)
+POST    /update/change-how-to-update                        controllers.myapis.update.UpdateApiHowToUpdateController.onSubmit(mode: Mode = CheckMode)
 
 GET     /update/upload-oas                                  controllers.myapis.update.UpdateApiUploadOasController.onPageLoad(mode: Mode = NormalMode)
 POST    /update/upload-oas                                  controllers.myapis.update.UpdateApiUploadOasController.onSubmit(mode: Mode = NormalMode)

@@ -70,6 +70,7 @@ class Navigator @Inject()() {
     case UpdateApiEnterOasPage => _ => controllers.myapis.update.routes.UpdateApiShortDescriptionController.onPageLoad(NormalMode)
     case UpdateApiUploadOasPage => _ => controllers.myapis.update.routes.UpdateApiEnterOasController.onPageLoadWithUploadedOas(NormalMode)
     case UpdateApiShortDescriptionPage => _ => controllers.myapis.update.routes.UpdateApiReviewNameDescriptionController.onPageLoad(NormalMode)
+    case UpdateApiHowToUpdatePage => updateApiHowToUpdateNextPage(NormalMode)
     case _ => _ => routes.IndexController.onPageLoad
   }
 
@@ -163,6 +164,14 @@ class Navigator @Inject()() {
     userAnswers.get(ProduceApiStartPage) match {
       case Some(user) if user.permissions.canSupport => controllers.myapis.produce.routes.ProduceApiPassthroughController.onPageLoad(mode)
       case _ => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
+    }
+  }
+
+  private def updateApiHowToUpdateNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
+    (mode, userAnswers.get(UpdateApiHowToUpdatePage)) match {
+      case (_, Some(Editor)) => controllers.myapis.update.routes.UpdateApiEnterOasController.onPageLoad(mode)
+      case (_, Some(Upload)) => controllers.myapis.update.routes.UpdateApiUploadOasController.onPageLoad(mode)
+      case _ => routes.JourneyRecoveryController.onPageLoad()
     }
   }
 

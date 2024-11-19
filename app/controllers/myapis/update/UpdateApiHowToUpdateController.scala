@@ -16,13 +16,23 @@
 
 package controllers.myapis.update
 
+import config.FrontendAppConfig
 import controllers.actions.*
+import forms.myapis.produce.ProduceApiHowToCreateFormProvider
 import models.Mode
+import models.myapis.produce.ProduceApiHowToCreate
+import models.requests.DataRequest
+import models.user.UserModel
+import navigation.Navigator
+import pages.AddAnApiApiPage
+import pages.myapis.update.{UpdateApiApiPage, UpdateApiHowToUpdatePage, UpdateApiStartPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.UpdateApiSessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.myapis.update.UpdateApiHowToUpdateView
+import viewmodels.myapis.{ProduceApiHowToCreateViewModel, UpdateApiHowToUpdateViewBannerModel}
+import views.html.myapis.produce.ProduceApiHowToCreateView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -31,19 +41,53 @@ class UpdateApiHowToUpdateController @Inject()(
                                                 override val messagesApi: MessagesApi,
                                                 identify: IdentifierAction,
                                                 val controllerComponents: MessagesControllerComponents,
-                                                view: UpdateApiHowToUpdateView
+                                                formProvider: ProduceApiHowToCreateFormProvider,
+                                                getData: UpdateApiDataRetrievalAction,
+                                                requireData: DataRequiredAction,
+                                                view: ProduceApiHowToCreateView,
+                                                frontendAppConfig: FrontendAppConfig,
+                                                sessionRepository: UpdateApiSessionRepository,
+                                                navigator: Navigator
                                               )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = identify {
-    implicit request => Ok(view( mode, request.user))
+  val form = formProvider()
+
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request =>
+
+      val preparedForm = request.userAnswers.get(UpdateApiHowToUpdatePage) match {
+        case None => form
+        case Some(value) => form.fill(value)
+      }
+
+      buildView(preparedForm, mode, Ok)
   }
 
-  def onSubmit(next: String, mode: Mode): Action[AnyContent] = identify {
-    implicit request => {
-      next match {
-        case "upload" => Redirect(routes.UpdateApiUploadOasController.onPageLoad(mode))
-        case "editor" => Redirect(routes.UpdateApiEnterOasController.onPageLoad(mode))
-      }
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request =>
+
+      form.bindFromRequest().fold(
+        formWithErrors =>
+          buildView(formWithErrors, mode, BadRequest),
+
+        value =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(UpdateApiHowToUpdatePage, value))
+            _              <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(navigator.nextPage(UpdateApiHowToUpdatePage, mode, updatedAnswers))
+      )
+  }
+
+  private def buildView(form: Form[ProduceApiHowToCreate], mode: Mode, status: Status)(implicit request: DataRequest[AnyContent]) = {
+    val viewModel = ProduceApiHowToCreateViewModel(
+      "myApis.update.howtoupdate.title",
+      "myApis.update.howtoupdate.heading",
+      Some(UpdateApiHowToUpdateViewBannerModel("myApis.update.howtoupdate.banner.title", "myApis.update.howtoupdate.banner.content")),
+      controllers.myapis.update.routes.UpdateApiHowToUpdateController.onSubmit(mode))
+
+    request.userAnswers.get(UpdateApiApiPage) match {
+      case Some(apiDetail) => Future.successful(status(view(form, viewModel, request.user)))
+      case _ => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
   }
 }

@@ -14,51 +14,57 @@
  * limitations under the License.
  */
 
-package controllers.myapis.produce
+package controllers.myapis.update
 
 import base.SpecBase
 import controllers.actions.FakeUser
 import controllers.routes
 import forms.myapis.produce.ProduceApiHowToCreateFormProvider
-import models.{NormalMode, UserAnswers}
+import models.api.ApiDetail
+import models.api.ApiDetailLensesSpec.sampleApiDetail
 import models.myapis.produce.ProduceApiHowToCreate
+import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.myapis.produce.ProduceApiHowToCreatePage
+import pages.myapis.update.{UpdateApiApiPage, UpdateApiHowToUpdatePage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import viewmodels.myapis.ProduceApiHowToCreateViewModel
+import viewmodels.myapis.{UpdateApiHowToUpdateViewBannerModel, ProduceApiHowToCreateViewModel}
 import views.html.myapis.produce.ProduceApiHowToCreateView
 
+import java.util.UUID
 import scala.concurrent.Future
 
-class ProduceApiHowToCreateControllerSpec extends SpecBase with MockitoSugar {
+class UpdateApiHowToUpdateControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute = Call("GET", "/foo")
 
-  lazy val produceApiHowToCreateRoute = controllers.myapis.produce.routes.ProduceApiHowToCreateController.onPageLoad(NormalMode).url
+  lazy val updateApiHowToUpdateRoute = controllers.myapis.update.routes.UpdateApiHowToUpdateController.onPageLoad(NormalMode).url
 
   val formProvider = new ProduceApiHowToCreateFormProvider()
   val form = formProvider()
   lazy val viewModel = ProduceApiHowToCreateViewModel(
-    "myApis.produce.howtocreate.title",
-    "myApis.produce.howtocreate.heading",
-    None,
-    controllers.myapis.produce.routes.ProduceApiHowToCreateController.onSubmit(NormalMode))
+    "myApis.update.howtoupdate.title",
+    "myApis.update.howtoupdate.heading",
+    Some(UpdateApiHowToUpdateViewBannerModel("myApis.update.howtoupdate.banner.title","myApis.update.howtoupdate.banner.content")),
+    controllers.myapis.update.routes.UpdateApiHowToUpdateController.onSubmit(NormalMode))
 
-  "ProduceApiHowToCreate Controller" - {
+  val apiDetail = sampleApiDetail()
+
+  "UpdateApiHowToUpdate Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = emptyUserAnswers.set(UpdateApiApiPage, apiDetail).toOption).build()
 
       running(application) {
-        val request = FakeRequest(GET, produceApiHowToCreateRoute)
+        val request = FakeRequest(GET, updateApiHowToUpdateRoute)
 
         val result = route(application, request).value
 
@@ -72,12 +78,14 @@ class ProduceApiHowToCreateControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(ProduceApiHowToCreatePage, ProduceApiHowToCreate.values.head).success.value
+      val userAnswers = UserAnswers(userAnswersId)
+        .set(UpdateApiApiPage, apiDetail).toOption.value
+        .set(UpdateApiHowToUpdatePage, ProduceApiHowToCreate.values.head).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, produceApiHowToCreateRoute)
+        val request = FakeRequest(GET, updateApiHowToUpdateRoute)
 
         val view = application.injector.instanceOf[ProduceApiHowToCreateView]
 
@@ -104,7 +112,7 @@ class ProduceApiHowToCreateControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, produceApiHowToCreateRoute)
+          FakeRequest(POST, updateApiHowToUpdateRoute)
             .withFormUrlEncodedBody(("value", ProduceApiHowToCreate.values.head.toString))
 
         val result = route(application, request).value
@@ -116,11 +124,13 @@ class ProduceApiHowToCreateControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val userAnswers = emptyUserAnswers.set(UpdateApiApiPage, apiDetail).toOption
+
+      val application = applicationBuilder(userAnswers = userAnswers).build()
 
       running(application) {
         val request =
-          FakeRequest(POST, produceApiHowToCreateRoute)
+          FakeRequest(POST, updateApiHowToUpdateRoute)
             .withFormUrlEncodedBody(("value", "invalid value"))
 
         val boundForm = form.bind(Map("value" -> "invalid value"))
@@ -139,7 +149,7 @@ class ProduceApiHowToCreateControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, produceApiHowToCreateRoute)
+        val request = FakeRequest(GET, updateApiHowToUpdateRoute)
 
         val result = route(application, request).value
 
@@ -148,13 +158,26 @@ class ProduceApiHowToCreateControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must redirect to Journey Recovery for a GET if no api detail has been set at the start of the journey" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, updateApiHowToUpdateRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
     "redirect to Journey Recovery for a POST if no existing data is found" in {
 
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val request =
-          FakeRequest(POST, produceApiHowToCreateRoute)
+          FakeRequest(POST, updateApiHowToUpdateRoute)
             .withFormUrlEncodedBody(("value", ProduceApiHowToCreate.values.head.toString))
 
         val result = route(application, request).value
