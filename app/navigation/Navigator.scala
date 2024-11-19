@@ -72,6 +72,7 @@ class Navigator @Inject()() {
     case UpdateApiShortDescriptionPage => _ => controllers.myapis.update.routes.UpdateApiReviewNameDescriptionController.onPageLoad(NormalMode)
     case UpdateApiHowToUpdatePage => updateApiHowToUpdateNextPage(NormalMode)
     case UpdateApiReviewNameDescriptionPage => _ => controllers.myapis.update.routes.UpdateApiReviewEgressController.onPageLoad(NormalMode)
+    case UpdateApiStatusPage => _ => controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onPageLoad()
     case _ => _ => routes.IndexController.onPageLoad
   }
 

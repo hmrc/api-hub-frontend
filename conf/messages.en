@@ -1028,3 +1028,5 @@ produceApiUploadOas.fileInfo = Only OAS files in YAML format are accepted. The m
 updateApiEnterOas.title = Update your OpenAPI Specification
 updateApiEnterOas.heading = Update your OpenAPI Specification
 updateApiEnterOas.warning = You must not change the title/name of the API.
+
+updateApiStatus.title = Review the API status

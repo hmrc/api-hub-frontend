@@ -40,6 +40,6 @@ class UpdateApiDomainController @Inject()(
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = identify {
-    implicit request =>  Redirect(routes.UpdateApiCheckYourAnswersController.onPageLoad())
+    implicit request =>  Redirect(routes.UpdateApiReviewApiStatusController.onPageLoad(mode))
   }
 }

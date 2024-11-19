@@ -188,6 +188,9 @@ class NavigatorSpec extends SpecBase with TryValues {
         "must go from the Upload OAS page to the OAS editor page" in {
           navigator.nextPage(UpdateApiUploadOasPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiEnterOasController.onPageLoadWithUploadedOas(NormalMode)
         }
+        "must go from the Review the API Status page to the Check your answers page" in {
+          navigator.nextPage(UpdateApiStatusPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onPageLoad()
+        }
       }
 
       "during the Cancel access request journey" - {
