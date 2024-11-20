@@ -18,6 +18,8 @@
 @import models.api.Domain
 @import models.user.UserModel
 @import models.myapis.produce.ProduceApiHowToCreate
+@import viewmodels.myapis.produce.ProduceApiDomainViewModel
+@import models.myapis.produce.ProduceApiDomainSubdomain
 
 @this(
     layout: templates.Layout,
@@ -27,7 +29,7 @@
     govukRadios: GovukRadios,
 )
 
-@(form: Form[?], mode: Mode, userModel: UserModel, domains: Domains)(implicit request: Request[?], messages: Messages)
+@(form: Form[ProduceApiDomainSubdomain], viewModel: ProduceApiDomainViewModel, userModel: UserModel, domains: Domains)(implicit request: Request[?], messages: Messages)
 
 @radioDomains = @{
     domains.domains.map(domain =>
@@ -39,10 +41,11 @@
                     RadiosViewModel(
                         field  = form("subDomain"),
                         legend = LegendViewModel(Empty),
-                        items  = radioSubDomains(domain))
+                        items  = radioSubDomains(domain)
                     )
                 )
             )
+        )
     )
 }
 
@@ -56,10 +59,10 @@
 }
 
 @layout(pageTitle = titleNoForm(messages("produceApiDomain.title")), user = Some(userModel)) {
-    @formHelper(action = controllers.myapis.produce.routes.ProduceApiDomainController.onSubmit(mode)) {
+    @formHelper(action = viewModel.formAction) {
 
-        <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">@messages("produceApiDomain.title")</h1>
-        <span class="govuk-caption-m govuk-!-margin-top-0 govuk-!-margin-bottom-4">@messages("produceApiDomain.heading")</span>
+        <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">@messages(viewModel.headingMessageKey)</h1>
+        <span class="govuk-caption-m govuk-!-margin-top-0 govuk-!-margin-bottom-4">@messages("produceApiDomain.description")</span>
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))

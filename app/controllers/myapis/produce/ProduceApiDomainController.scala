@@ -17,20 +17,23 @@
 package controllers.myapis.produce
 
 import config.Domains
-import controllers.actions._
+import controllers.actions.*
 import forms.myapis.produce.ProduceApiDomainFormProvider
 
 import javax.inject.Inject
 import models.Mode
+import models.myapis.produce.ProduceApiDomainSubdomain
 import navigation.Navigator
 import pages.myapis.produce.ProduceApiDomainPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.data.Form
 import repositories.ProduceApiSessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.myapis.produce.ProduceApiDomainView
-
+import models.requests.DataRequest
 import scala.concurrent.{ExecutionContext, Future}
+import viewmodels.myapis.produce.ProduceApiDomainViewModel
 
 class ProduceApiDomainController @Inject()(
                                             override val messagesApi: MessagesApi,
@@ -55,7 +58,7 @@ class ProduceApiDomainController @Inject()(
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode, request.user, domains))
+      Ok(buildView(preparedForm, mode))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
@@ -63,7 +66,7 @@ class ProduceApiDomainController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode, request.user, domains))),
+          Future.successful(BadRequest(buildView(formWithErrors, mode))),
 
         value =>
           for {
@@ -72,4 +75,9 @@ class ProduceApiDomainController @Inject()(
           } yield Redirect(navigator.nextPage(ProduceApiDomainPage, mode, updatedAnswers))
       )
   }
+
+  private def buildView(form: Form[ProduceApiDomainSubdomain], mode: Mode)(implicit request: DataRequest[AnyContent]) = {
+    view(form, ProduceApiDomainViewModel("produceApiDomain.heading", routes.ProduceApiDomainController.onSubmit(mode)), request.user, domains)
+  }
+
 }
