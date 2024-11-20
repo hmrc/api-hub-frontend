@@ -50,7 +50,7 @@
         @govukRadios(
             RadiosViewModel(
                 field  = form("value"),
-                legend = LegendViewModel(messages("produceApiStatus.title")).asPageHeading(),
+                legend = LegendViewModel(messages(viewModel.titleMessageKey)).asPageHeading(),
                 items  = apiStatusOptions
             )
         )
