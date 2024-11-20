@@ -17,7 +17,7 @@
 package controllers.myapis.produce
 
 import config.Hods
-import controllers.actions._
+import controllers.actions.*
 import forms.myapis.produce.ProduceApiHodFormProvider
 
 import javax.inject.Inject
@@ -28,6 +28,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.ProduceApiSessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.myapis.produce.ProduceApiHodViewModel
 import views.html.myapis.produce.ProduceApiHodView
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -46,6 +47,11 @@ class ProduceApiHodController @Inject()(
                                        )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
+  private def viewModel(mode: Mode) =
+    ProduceApiHodViewModel(
+      "produceApiHod.title",
+      controllers.myapis.produce.routes.ProduceApiHodController.onSubmit(mode)
+    )
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
@@ -55,7 +61,7 @@ class ProduceApiHodController @Inject()(
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode, request.user, hods))
+      Ok(view(preparedForm, request.user, hods, viewModel(mode)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
@@ -63,7 +69,7 @@ class ProduceApiHodController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode, request.user, hods))),
+          Future.successful(BadRequest(view(formWithErrors, request.user, hods, viewModel(mode)))),
 
         value =>
           for {

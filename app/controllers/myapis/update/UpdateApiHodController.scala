@@ -16,30 +16,67 @@
 
 package controllers.myapis.update
 
+import config.Hods
 import controllers.actions.*
-import controllers.myapis.update.routes
-import models.Mode
-import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.myapis.update.UpdateApiHodView
+import forms.myapis.produce.ProduceApiHodFormProvider
 
 import javax.inject.Inject
+import models.Mode
+import navigation.Navigator
+import pages.myapis.update.UpdateApiHodPage
+import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.UpdateApiSessionRepository
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.myapis.produce.ProduceApiHodViewModel
+import views.html.myapis.produce.ProduceApiHodView
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class UpdateApiHodController @Inject()(
-                                        override val messagesApi: MessagesApi,
-                                        identify: IdentifierAction,
-                                        val controllerComponents: MessagesControllerComponents,
-                                        view: UpdateApiHodView
-                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                         override val messagesApi: MessagesApi,
+                                         sessionRepository: UpdateApiSessionRepository,
+                                         navigator: Navigator,
+                                         identify: IdentifierAction,
+                                         getData: UpdateApiDataRetrievalAction,
+                                         requireData: DataRequiredAction,
+                                         formProvider: ProduceApiHodFormProvider,
+                                         val controllerComponents: MessagesControllerComponents,
+                                         view: ProduceApiHodView,
+                                         hods: Hods,
+                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = identify {
-    implicit request =>  Ok(view( mode, request.user))
+  private val form = formProvider()
+  private def viewModel(mode: Mode) =
+    ProduceApiHodViewModel(
+      "updateApiHod.title",
+      controllers.myapis.update.routes.UpdateApiHodController.onSubmit(mode)
+    )
+
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+    implicit request =>
+
+      val preparedForm = request.userAnswers.get(UpdateApiHodPage) match {
+        case None => form
+        case Some(value) => form.fill(value)
+      }
+
+      Ok(view(preparedForm, request.user, hods, viewModel(mode)))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = identify {
-    implicit request =>  Redirect(routes.UpdateApiDomainController.onPageLoad(mode))
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request =>
+
+      form.bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, request.user, hods, viewModel(mode)))),
+
+        value =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(UpdateApiHodPage, value))
+            _              <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(navigator.nextPage(UpdateApiHodPage, mode, updatedAnswers))
+      )
   }
 }
+
