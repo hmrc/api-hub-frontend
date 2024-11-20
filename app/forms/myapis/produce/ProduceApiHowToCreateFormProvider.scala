@@ -24,8 +24,8 @@ import javax.inject.Inject
 
 class ProduceApiHowToCreateFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[ProduceApiHowToCreate] =
+  def apply(errorKey: String): Form[ProduceApiHowToCreate] =
     Form(
-      "value" -> enumerable[ProduceApiHowToCreate]("myApis.produce.howtocreate.error.required")
+      "value" -> enumerable[ProduceApiHowToCreate](errorKey)
     )
 }

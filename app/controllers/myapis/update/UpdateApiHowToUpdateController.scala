@@ -50,7 +50,7 @@ class UpdateApiHowToUpdateController @Inject()(
                                                 navigator: Navigator
                                               )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form = formProvider()
+  val form = formProvider("myApis.update.howtoupdate.error.required")
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>

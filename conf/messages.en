@@ -741,6 +741,8 @@ myApis.update.howtoupdate.heading = How do you want to update your API?
 myApis.update.howtoupdate.title = How do you want to update your API?
 myApis.update.howtoupdate.banner.title = Updating APIs
 myApis.update.howtoupdate.banner.content = Updating an API will overwrite the existing API, please ensure that you are happy with this before proceeding.
+myApis.update.howtoupdate.error.required = Select how you want to update your API.
+
 myApis.produce.howtocreate.upload = Upload an OAS file
 myApis.produce.howtocreate.editor = Use a Visual OAS Editor
 myApis.produce.howtocreate.upload.hint = If you already have an OAS file you can upload this file to begin registering your API

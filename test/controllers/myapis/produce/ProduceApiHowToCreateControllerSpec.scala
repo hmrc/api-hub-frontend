@@ -44,7 +44,7 @@ class ProduceApiHowToCreateControllerSpec extends SpecBase with MockitoSugar {
   lazy val produceApiHowToCreateRoute = controllers.myapis.produce.routes.ProduceApiHowToCreateController.onPageLoad(NormalMode).url
 
   val formProvider = new ProduceApiHowToCreateFormProvider()
-  val form = formProvider()
+  val form = formProvider("myApis.produce.howtocreate.error.required")
   lazy val viewModel = ProduceApiHowToCreateViewModel(
     "myApis.produce.howtocreate.title",
     "myApis.produce.howtocreate.heading",

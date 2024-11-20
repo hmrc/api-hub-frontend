@@ -48,7 +48,7 @@ class UpdateApiHowToUpdateControllerSpec extends SpecBase with MockitoSugar {
   lazy val updateApiHowToUpdateRoute = controllers.myapis.update.routes.UpdateApiHowToUpdateController.onPageLoad(NormalMode).url
 
   val formProvider = new ProduceApiHowToCreateFormProvider()
-  val form = formProvider()
+  val form = formProvider("myApis.update.howtoupdate.error.required")
   lazy val viewModel = ProduceApiHowToCreateViewModel(
     "myApis.update.howtoupdate.title",
     "myApis.update.howtoupdate.heading",
