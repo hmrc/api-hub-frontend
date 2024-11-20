@@ -23,18 +23,18 @@ import play.api.data.FormError
 
 class ProduceApiHowToCreateFormProviderSpec extends OptionFieldBehaviours {
 
-  val form = new ProduceApiHowToCreateFormProvider()()
+  val requiredKey = "myApis.produce.howtocreate.error.required"
+  val form = new ProduceApiHowToCreateFormProvider()(requiredKey)
 
   ".value" - {
 
     val fieldName = "value"
-    val requiredKey = "myApis.produce.howtocreate.error.required"
 
     behave like optionsField[ProduceApiHowToCreate](
       form,
-      fieldName,
       validValues  = ProduceApiHowToCreate.values,
-      invalidError = FormError(fieldName, "error.invalid")
+      invalidError = FormError(fieldName, "error.invalid"),
+      fieldName = fieldName
     )
 
     behave like mandatoryField(
