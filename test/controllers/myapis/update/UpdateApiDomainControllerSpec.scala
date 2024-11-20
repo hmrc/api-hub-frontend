@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package controllers.myapis.produce
+package controllers.myapis.update
 
 import base.SpecBase
 import config.Domains
 import controllers.actions.FakeUser
-import controllers.myapis.produce.{routes => produceApiRoutes}
+import controllers.myapis.update.routes as updateApiRoutes
 import controllers.routes
 import forms.myapis.produce.ProduceApiDomainFormProvider
 import models.myapis.produce.ProduceApiDomainSubdomain
@@ -28,37 +28,38 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.myapis.produce.ProduceApiDomainPage
+import pages.myapis.update.UpdateApiDomainPage
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import repositories.SessionRepository
-import views.html.myapis.produce.ProduceApiDomainView
+import play.api.test.Helpers.*
+import repositories.UpdateApiSessionRepository
 import viewmodels.myapis.produce.ProduceApiDomainViewModel
+import views.html.myapis.produce.ProduceApiDomainView
+
 import scala.concurrent.Future
 
-class ProduceApiDomainControllerSpec extends SpecBase with MockitoSugar {
+class UpdateApiDomainControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute = Call("GET", "/foo")
 
-  lazy val produceApiDomainRoute = produceApiRoutes.ProduceApiDomainController.onPageLoad(NormalMode).url
+  lazy val updateApiDomainRoute = updateApiRoutes.UpdateApiDomainController.onPageLoad(NormalMode).url
 
   def form(domains: Domains) = new ProduceApiDomainFormProvider(domains)()
 
-  "ProduceApiDomain Controller" - {
+  "UpdateApiDomainController" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, produceApiDomainRoute)
+        val request = FakeRequest(GET, updateApiDomainRoute)
 
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[ProduceApiDomainView]
-        val viewModel = ProduceApiDomainViewModel("produceApiDomain.heading", produceApiRoutes.ProduceApiDomainController.onSubmit(NormalMode))
+        val viewModel = ProduceApiDomainViewModel("updateApiDomain.heading", updateApiRoutes.UpdateApiDomainController.onSubmit(NormalMode))
         val domains = application.injector.instanceOf[Domains]
         val boundForm = form(domains)
 
@@ -70,15 +71,15 @@ class ProduceApiDomainControllerSpec extends SpecBase with MockitoSugar {
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
       val userAnswers = UserAnswers(userAnswersId)
-        .set(ProduceApiDomainPage, ProduceApiDomainSubdomain("domain", "subdomain")).success.value
+        .set(UpdateApiDomainPage, ProduceApiDomainSubdomain("domain", "subdomain")).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, produceApiDomainRoute)
+        val request = FakeRequest(GET, updateApiDomainRoute)
 
         val view = application.injector.instanceOf[ProduceApiDomainView]
-        val viewModel = ProduceApiDomainViewModel("produceApiDomain.heading", produceApiRoutes.ProduceApiDomainController.onSubmit(NormalMode))
+        val viewModel = ProduceApiDomainViewModel("updateApiDomain.heading", updateApiRoutes.UpdateApiDomainController.onSubmit(NormalMode))
         val domains = application.injector.instanceOf[Domains]
         val boundForm = form(domains)
           .fill(ProduceApiDomainSubdomain("domain", "subdomain"))
@@ -92,7 +93,7 @@ class ProduceApiDomainControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to the next page when valid data is submitted" in {
 
-      val mockSessionRepository = mock[SessionRepository]
+      val mockSessionRepository = mock[UpdateApiSessionRepository]
 
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
@@ -100,7 +101,7 @@ class ProduceApiDomainControllerSpec extends SpecBase with MockitoSugar {
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[UpdateApiSessionRepository].toInstance(mockSessionRepository),
           )
           .build()
 
@@ -109,7 +110,7 @@ class ProduceApiDomainControllerSpec extends SpecBase with MockitoSugar {
         val domain = domains.domains.head
         val subDomain = domain.subDomains.head
         val request =
-          FakeRequest(POST, produceApiDomainRoute)
+          FakeRequest(POST, updateApiDomainRoute)
             .withFormUrlEncodedBody(
               ("domain", domain.code),
               ("subDomain", subDomain.code)
@@ -128,14 +129,14 @@ class ProduceApiDomainControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, produceApiDomainRoute)
+          FakeRequest(POST, updateApiDomainRoute)
             .withFormUrlEncodedBody(("value", "invalid value"))
 
         val domains = application.injector.instanceOf[Domains]
         val boundForm = form(domains).bind(Map("value" -> "invalid value"))
 
         val view = application.injector.instanceOf[ProduceApiDomainView]
-        val viewModel = ProduceApiDomainViewModel("produceApiDomain.heading", produceApiRoutes.ProduceApiDomainController.onSubmit(NormalMode))
+        val viewModel = ProduceApiDomainViewModel("updateApiDomain.heading", updateApiRoutes.UpdateApiDomainController.onSubmit(NormalMode))
 
         val result = route(application, request).value
 
@@ -149,7 +150,7 @@ class ProduceApiDomainControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, produceApiDomainRoute)
+        val request = FakeRequest(GET, updateApiDomainRoute)
 
         val result = route(application, request).value
 
@@ -164,7 +165,7 @@ class ProduceApiDomainControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, produceApiDomainRoute)
+          FakeRequest(POST, updateApiDomainRoute)
             .withFormUrlEncodedBody(
               ("domain", "domain"),
               ("subDomain", "subDomain")

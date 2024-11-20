@@ -934,15 +934,18 @@ produceApiReviewNameDescription.changeDescription = Change short description
 produceApiReviewNameDescription.changeName = Change name (in the OAS)
 
 produceApiDomain.title = Which domain and subdomain does your API belong to?
-produceApiDomain.heading = Help users find and identify the API by setting which domain and subdomain the API belongs to.
+produceApiDomain.heading = Which domain and subdomain does your API belong to?
+produceApiDomain.description = Help users find and identify the API by setting which domain and subdomain the API belongs to.
 produceApiDomain.checkYourAnswersLabel = Domain and subdomain
 produceApiDomain.error.domainRequired = Select a domain
 produceApiDomain.error.subDomainRequired = Select a subdomain
 produceApiDomain.error.invalidDomain = Select a valid domain
-produceApiDomain.error.invalidSubDomain = Select a valid subdomains
+produceApiDomain.error.invalidSubDomain = Select a valid subdomain
 produceApiDomain.change.hidden = ProduceApiDomain
 produceApiDomain.checkYourAnswersLabel.1 = Domain
 produceApiDomain.checkYourAnswersLabel.2 = Subdomain
+
+updateApiDomain.heading = Review domain and subdomain for the API
 
 produceApiStatus.title = Set the API status
 produceApiStatus.hint.0 = Not ready to use (documentation only and could change)
