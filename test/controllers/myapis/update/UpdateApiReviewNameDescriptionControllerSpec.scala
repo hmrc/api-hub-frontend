@@ -47,7 +47,7 @@ class UpdateApiReviewNameDescriptionControllerSpec extends SpecBase with Mockito
   private val form = formProvider()
   private def viewModel(mode: Mode) =
     ProduceApiReviewNameDescriptionViewModel(
-      controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onSubmit(mode)
+      controllers.myapis.update.routes.UpdateApiReviewNameDescriptionController.onSubmit(mode)
     )
   private val apiName = "API NAME"
   private val apiDescription = "API Description"
