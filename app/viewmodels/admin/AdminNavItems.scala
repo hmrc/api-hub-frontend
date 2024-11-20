@@ -30,6 +30,7 @@ object AdminSideNavPages {
   case object TeamMigrationPage extends SideNavPage
   case object ConfigurationPage extends SideNavPage
   case object StatisticsPage extends SideNavPage
+  case object EnvParityConfigTestPage extends SideNavPage
 
 }
 
@@ -88,6 +89,12 @@ object AdminNavItems {
           title = messages("statistics.menuTitle"),
           link = controllers.admin.routes.StatisticsController.onPageLoad(),
           isCurrentPage = currentPage == StatisticsPage
+        ),
+        SideNavItem(
+          page = EnvParityConfigTestPage,
+          title = messages("envParityConfigTest.title"),
+          link = controllers.admin.routes.EnvParityConfigTestController.onPageLoad(),
+          isCurrentPage = currentPage == EnvParityConfigTestPage
         ),
         accessRequestsNavItem
       )

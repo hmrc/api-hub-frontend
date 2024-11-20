@@ -12,3 +12,4 @@ GET         /configuration                                                      
 GET         /statistics                                                             controllers.admin.StatisticsController.onPageLoad()
 GET         /statistics/apis-in-production                                          controllers.admin.StatisticsController.apisInProduction()
 GET         /statistics/list-apis-in-production                                     controllers.admin.StatisticsController.listApisInProduction()
+GET         /environment-parity-test                                               controllers.admin.EnvParityConfigTestController.onPageLoad()

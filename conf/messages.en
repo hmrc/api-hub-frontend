@@ -1037,3 +1037,7 @@ updateApiEnterOas.warning = You must not change the title/name of the API.
 updateApiStatus.title = Review the API status
 
 updateApiHod.title = Review the HOD/backend for your API
+
+envParityConfigTest.title = Env parity config
+envParityConfigTest.heading = Environment parity configuration test
+envParityConfigTest.admin = Integration Hub admin
