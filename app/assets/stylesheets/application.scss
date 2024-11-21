@@ -967,5 +967,29 @@ header {
             @extend .govuk-visually-hidden;
         }
     }
+}
 
+.hip-config-test {
+    .hip-inline-label {
+        line-height: 2.5rem;
+        width: 10rem;
+    }
+    .govuk-form-group {
+        display: flex;
+        margin-bottom: 1rem;
+        fieldset {
+            display: flex;
+            flex-direction: row;
+            legend {
+                float: left;
+            }
+        }
+        #scopeClientId {
+            max-width: 25rem;
+        }
+    }
+    textarea {
+        font-family: monospace;
+        font-size: 1rem;
+    }
 }

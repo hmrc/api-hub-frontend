@@ -12,3 +12,7 @@ GET         /configuration                                                      
 GET         /statistics                                                             controllers.admin.StatisticsController.onPageLoad()
 GET         /statistics/apis-in-production                                          controllers.admin.StatisticsController.apisInProduction()
 GET         /statistics/list-apis-in-production                                     controllers.admin.StatisticsController.listApisInProduction()
+GET         /environment-parity-test                                                controllers.admin.EnvParityConfigTestController.onPageLoad()
+GET         /environment-parity-test/client-scopes/:environmentName/:clientId       controllers.admin.EnvParityConfigTestController.fetchClientScopes(environmentName: models.application.EnvironmentName, clientId: String)
+GET         /environment-parity-test/egresses/:environmentName                      controllers.admin.EnvParityConfigTestController.fetchEgresses(environmentName: models.application.EnvironmentName)
+GET         /environment-parity-test/deployments/:environmentName                   controllers.admin.EnvParityConfigTestController.fetchDeployments(environmentName: models.application.EnvironmentName)
