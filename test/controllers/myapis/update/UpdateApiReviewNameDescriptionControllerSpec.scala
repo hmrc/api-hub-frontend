@@ -47,7 +47,9 @@ class UpdateApiReviewNameDescriptionControllerSpec extends SpecBase with Mockito
   private val form = formProvider()
   private def viewModel(mode: Mode) =
     ProduceApiReviewNameDescriptionViewModel(
-      controllers.myapis.update.routes.UpdateApiReviewNameDescriptionController.onSubmit(mode)
+      controllers.myapis.update.routes.UpdateApiReviewNameDescriptionController.onSubmit(mode),
+      controllers.myapis.update.routes.UpdateApiShortDescriptionController.onPageLoad(mode).url,
+      controllers.myapis.update.routes.UpdateApiEnterOasController.onPageLoad(mode).url
     )
   private val apiName = "API NAME"
   private val apiDescription = "API Description"
@@ -76,6 +78,8 @@ class UpdateApiReviewNameDescriptionControllerSpec extends SpecBase with Mockito
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual view(form, NormalMode, apiName, apiDescription, FakeUser, viewModel(NormalMode))(request, messages(fixture.application)).toString
+        contentAsString(result) must include(controllers.myapis.update.routes.UpdateApiEnterOasController.onPageLoad(NormalMode).url)
+        contentAsString(result) must include(controllers.myapis.update.routes.UpdateApiShortDescriptionController.onPageLoad(NormalMode).url)
       }
     }
 

@@ -106,12 +106,12 @@
             @govukButton(
                 ButtonViewModel(messages("produceApiReviewNameDescription.changeDescription"))
                     .asSecondaryButton()
-                    .asLink(controllers.myapis.produce.routes.ProduceApiShortDescriptionController.onPageLoad(mode).url)
+                    .asLink(viewModel.changeDescriptionAction)
             )
             @govukButton(
                 ButtonViewModel(messages("produceApiReviewNameDescription.changeName"))
                     .asSecondaryButton()
-                    .asLink(controllers.myapis.produce.routes.ProduceApiEnterOasController.onPageLoad(mode).url)
+                    .asLink(viewModel.changeNameAction)
             )
         </div>
     }

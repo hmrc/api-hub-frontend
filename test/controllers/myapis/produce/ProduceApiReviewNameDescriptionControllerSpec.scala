@@ -47,7 +47,9 @@ class ProduceApiReviewNameDescriptionControllerSpec extends SpecBase with Mockit
   private val form = formProvider()
   private def viewModel(mode: Mode) =
     ProduceApiReviewNameDescriptionViewModel(
-      controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onSubmit(mode)
+      controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onSubmit(mode),
+      controllers.myapis.produce.routes.ProduceApiShortDescriptionController.onPageLoad(mode).url,
+      controllers.myapis.produce.routes.ProduceApiEnterOasController.onPageLoad(mode).url
     )
   private val apiName = "API NAME"
   private val apiDescription = "API Description"
@@ -76,6 +78,8 @@ class ProduceApiReviewNameDescriptionControllerSpec extends SpecBase with Mockit
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual view(form, NormalMode, apiName, apiDescription, FakeUser, viewModel(NormalMode))(request, messages(fixture.application)).toString
+        contentAsString(result) must include(controllers.myapis.produce.routes.ProduceApiEnterOasController.onPageLoad(NormalMode).url)
+        contentAsString(result) must include(controllers.myapis.produce.routes.ProduceApiShortDescriptionController.onPageLoad(NormalMode).url)
       }
     }
 

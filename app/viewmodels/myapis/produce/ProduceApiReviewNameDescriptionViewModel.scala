@@ -18,4 +18,4 @@ package viewmodels.myapis.produce
 
 import play.api.mvc.Call
 
-case class ProduceApiReviewNameDescriptionViewModel(formAction: Call)
+case class ProduceApiReviewNameDescriptionViewModel(formAction: Call, changeNameAction: String, changeDescriptionAction: String)
