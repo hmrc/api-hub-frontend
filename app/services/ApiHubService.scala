@@ -20,7 +20,7 @@ import com.google.inject.{Inject, Singleton}
 import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
 import models.AvailableEndpoint
 import models.accessrequest.{AccessRequest, AccessRequestRequest, AccessRequestStatus}
-import models.api.{ApiDeploymentStatuses, ApiDetail, ApiDetailSummary, EgressGateway, PlatformContact}
+import models.api.{ApiDeploymentStatuses, ApiDetail, ApiDeployment, ApiDetailSummary, EgressGateway, PlatformContact}
 import models.application.*
 import models.deployment.{DeploymentDetails, DeploymentsRequest, DeploymentsResponse}
 import models.exception.ApplicationsException
@@ -223,6 +223,18 @@ class ApiHubService @Inject()(
 
   def fixScopes(applicationId: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
     applicationsConnector.fixScopes(applicationId)
+  }
+
+  def fetchClientScopes(environmentName: EnvironmentName, clientId: String)(implicit hc: HeaderCarrier): Future[Option[Seq[ClientScope]]] = {
+    applicationsConnector.fetchClientScopes(environmentName, clientId)
+  }
+
+  def fetchEgresses(environmentName: EnvironmentName)(implicit hc: HeaderCarrier): Future[Seq[EgressGateway]] = {
+    applicationsConnector.fetchEgresses(environmentName)
+  }
+
+  def fetchDeployments(environmentName: EnvironmentName)(implicit hc: HeaderCarrier): Future[Seq[ApiDeployment]] = {
+    applicationsConnector.fetchDeployments(environmentName)
   }
 
 }

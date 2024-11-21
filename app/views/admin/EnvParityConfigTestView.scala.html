@@ -20,13 +20,92 @@
 
 @this(
     layout: templates.Layout,
-    govukButton: GovukButton
+    govukRadios : GovukRadios,
+    govukButton: GovukButton,
+    govukInput : GovukInput,
+    govukTabs: GovukTabs,
+    govukTextarea : GovukTextarea
 )
 
 @(user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @scripts() = {
-    <script src='@routes.Assets.versioned("javascripts/adminGetUsers.js")' type="module" @{CSPNonce.attr}></script>
+    <script src='@routes.Assets.versioned("javascripts/adminEnvParityConfigTest.js")' type="module" @{CSPNonce.attr}></script>
+}
+
+@environmentRadios() = {
+    @govukRadios(Radios(
+        fieldset = Some(Fieldset(
+            legend = Some(Legend(
+                content = Text("Environment"),
+                classes = "govuk-fieldset__legend--s hip-inline-label"
+            ))
+        )),
+        name = "environment",
+        classes = "govuk-radios--inline",
+        items = Seq(
+            RadioItem(
+                content = Text("Primary"),
+                value = Some("primary"),
+                checked = true
+            ),
+            RadioItem(
+                content = Text("Secondary"),
+                value = Some("secondary")
+            ),
+        )
+    ))
+}
+
+@clientIdInput() = {
+    @govukInput(Input(
+        id = "clientId",
+        name = "clientId",
+        label = Label(
+            classes = "govuk-label--s hip-inline-label",
+            content = Text("Client ID")
+        )
+    ))
+}
+
+@fetchButton() = {
+    @govukButton(
+        ButtonViewModel("Fetch")
+    )
+}
+
+@resultTextarea() = {
+    @govukTextarea(Textarea(
+        id = "result",
+        name = "result",
+        attributes = Map("readonly" -> "readonly"),
+        rows = 15
+    ))
+}
+
+@scopesTab() = {
+    <form id="scopes">
+        @environmentRadios()
+        @clientIdInput()
+        @fetchButton()
+        @resultTextarea()
+    </form>
+}
+
+@egressesTab() = {
+    <form id="egresses">
+        @environmentRadios()
+        @fetchButton()
+        @resultTextarea()
+    </form>
+}
+
+@deploymentsTab() = {
+    <form id="deployments">
+        @environmentRadios()
+        @fetchButton()
+        @resultTextarea()
+    </form>
 }
 
 @layout(
@@ -37,13 +116,36 @@
     customScriptsBlock = Some(scripts())
 ) {
     @views.html.templates.SideNav(messages("envParityConfigTest.admin"), AdminNavItems(user, AdminSideNavPages.EnvParityConfigTestPage)) {
-        <h1 class="govuk-heading-m govuk-!-margin-bottom-7">
+        <h1 class="govuk-heading-l">
             @messages("envParityConfigTest.heading")
         </h1>
 
-        @govukButton(
-            ButtonViewModel(messages("getUsers.copy"))
-                .withId("copyButton")
-        )
+        @govukTabs(Tabs(
+            classes = "hip-config-test",
+            items = Seq(
+                TabItem(
+                    id = Some("scopesTab"),
+                    label = "Scopes",
+                    panel = TabPanel(
+                        content = HtmlContent(scopesTab())
+                    )
+                ),
+                TabItem(
+                    id = Some("egressesTab"),
+                    label = "Egresses",
+                    panel = TabPanel(
+                        content = HtmlContent(egressesTab())
+                    )
+                ),
+                TabItem(
+                    id = Some("deploymentsTab"),
+                    label = "Deployments",
+                    panel = TabPanel(
+                        content = HtmlContent(deploymentsTab())
+                    )
+                )
+            )
+        ))
+
     }
 }

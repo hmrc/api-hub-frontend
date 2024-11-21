@@ -21,7 +21,7 @@ import config.FrontendAppConfig
 import models.UserEmail
 import models.accessrequest.*
 import models.api.ApiDeploymentStatuses.readApiDeploymentStatuses
-import models.api.{ApiDeploymentStatuses, ApiDetailSummary, EgressGateway}
+import models.api.{ApiDeploymentStatuses, ApiDeployment, ApiDetailSummary, EgressGateway}
 import models.application.*
 import models.deployment.*
 import models.exception.{ApplicationCredentialLimitException, ApplicationsException, TeamNameNotUniqueException}
@@ -620,6 +620,33 @@ class ApplicationsConnector @Inject()(
         case Left(e) if e.statusCode == NOT_FOUND => Future.successful(None)
         case Left(e) => Future.failed(e)
       }
+  }
+
+  def fetchClientScopes(environmentName: EnvironmentName, clientId: String)(implicit hc: HeaderCarrier): Future[Option[Seq[ClientScope]]] = {
+    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/environment-parity-test/client-scopes/$environmentName/$clientId")
+      .setHeader(ACCEPT -> JSON)
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Either[UpstreamErrorResponse, Seq[ClientScope]]]
+      .flatMap {
+        case Right(scopes) => Future.successful(Some(scopes))
+        case Left(e) if e.statusCode == NOT_FOUND => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
+
+  }
+
+  def fetchEgresses(environmentName: EnvironmentName)(implicit hc: HeaderCarrier): Future[Seq[EgressGateway]] = {
+    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/environment-parity-test/egresses/$environmentName")
+      .setHeader(ACCEPT -> JSON)
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Seq[EgressGateway]]
+  }
+
+  def fetchDeployments(environmentName: EnvironmentName)(implicit hc: HeaderCarrier): Future[Seq[ApiDeployment]] = {
+    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/environment-parity-test/deployments/$environmentName")
+      .setHeader(ACCEPT -> JSON)
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Seq[ApiDeployment]]
   }
 
 }

@@ -17,6 +17,7 @@
 package models.application
 
 import models.{Enumerable, WithName}
+import play.api.mvc.PathBindable
 
 sealed trait EnvironmentName
 
@@ -30,4 +31,15 @@ object EnvironmentName extends Enumerable.Implicits {
   implicit val enumerable: Enumerable[EnvironmentName] =
     Enumerable(values.map(value => value.toString -> value)*)
 
+  implicit val pathBindableEnvironmentName: PathBindable[EnvironmentName] = new PathBindable[EnvironmentName] {
+    override def bind(key: String, value: String): Either[String, EnvironmentName] = {
+      enumerable
+        .withName(value)
+        .toRight(s"Unknown environment name: $value")
+    }
+
+    override def unbind(key: String, value: EnvironmentName): String = {
+      value.toString
+    }
+  }
 }

@@ -18,12 +18,13 @@ package controllers.admin
 
 import com.google.inject.{Inject, Singleton}
 import controllers.actions.{AuthorisedSupportAction, IdentifierAction}
+import models.application.{Environment, EnvironmentName}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.admin.EnvParityConfigTestView
-
+import play.api.libs.json.Json
 import scala.concurrent.ExecutionContext
 
 @Singleton
@@ -38,5 +39,19 @@ class EnvParityConfigTestController @Inject()(
   def onPageLoad(): Action[AnyContent] = (identify andThen isSupport) {
     implicit request => Ok(view(request.user))
   }
+  
+  def fetchClientScopes(environmentName: EnvironmentName, clientId: String): Action[AnyContent] = (identify andThen isSupport).async {
+    implicit request => apiHubService.fetchClientScopes(environmentName, clientId).map(_ match {
+      case Some(scopes) => Ok(Json.toJson(scopes))
+      case None => NotFound
+    })
+  }
 
+  def fetchEgresses(environmentName: EnvironmentName): Action[AnyContent] = (identify andThen isSupport).async {
+    implicit request => apiHubService.fetchEgresses(environmentName).map(egresses => Ok(Json.toJson(egresses)))
+  }
+
+  def fetchDeployments(environmentName: EnvironmentName): Action[AnyContent] = (identify andThen isSupport).async {
+    implicit request => apiHubService.fetchDeployments(environmentName).map(deployments => Ok(Json.toJson(deployments)))
+  }
 }
