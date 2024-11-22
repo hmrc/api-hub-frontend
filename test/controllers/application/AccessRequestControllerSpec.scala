@@ -55,7 +55,7 @@ class AccessRequestControllerSpec
       forAll(teamMemberAndSupporterTable) { (user: UserModel) =>
         val fixture = buildFixture(user)
         val application = sampleApplication().addTeamMember(FakeUser)
-        val accessRequest = sampleAccessRequest(application.id)
+        val accessRequest = sampleAccessRequest(application.id).copy(status = Pending)
 
         when(fixture.apiHubService.getAccessRequest(any)(any)).thenReturn(Future.successful(Some(accessRequest)))
         when(fixture.apiHubService.getApplication(any, any, any)(any)).thenReturn(Future.successful(Some(application)))
@@ -71,6 +71,33 @@ class AccessRequestControllerSpec
           content mustBe fixture.view(model, form, user, true)(request, messages(fixture.application)).toString
           content must validateAsHtml
           content must include("cancelAccessRequestLink")
+
+          verify(fixture.apiHubService).getAccessRequest(eqTo(accessRequest.id))(any)
+          verify(fixture.apiHubService).getApplication(eqTo(application.id), eqTo(false), eqTo(false))(any)
+        }
+      }
+    }
+
+    "must not display the cancel request link if the access request is cancelled" in {
+      forAll(teamMemberAndSupporterTable) { (user: UserModel) =>
+        val fixture = buildFixture(user)
+        val application = sampleApplication().addTeamMember(FakeUser)
+        val accessRequest = sampleAccessRequest(application.id).copy(status = Cancelled)
+
+        when(fixture.apiHubService.getAccessRequest(any)(any)).thenReturn(Future.successful(Some(accessRequest)))
+        when(fixture.apiHubService.getApplication(any, any, any)(any)).thenReturn(Future.successful(Some(application)))
+
+        running(fixture.application) {
+          val request = FakeRequest(controllers.application.routes.AccessRequestController.onPageLoad(accessRequest.id))
+          val result = route(fixture.application, request).value
+          val model = AccessRequestViewModel.consumerViewModel(application, accessRequest, user)(messages(fixture.application))
+
+          val content = contentAsString(result)
+
+          status(result) mustBe OK
+          content mustBe fixture.view(model, form, user, false)(request, messages(fixture.application)).toString
+          content must validateAsHtml
+          content must not include("cancelAccessRequestLink")
 
           verify(fixture.apiHubService).getAccessRequest(eqTo(accessRequest.id))(any)
           verify(fixture.apiHubService).getApplication(eqTo(application.id), eqTo(false), eqTo(false))(any)
