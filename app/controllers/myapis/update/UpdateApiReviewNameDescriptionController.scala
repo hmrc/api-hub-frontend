@@ -50,8 +50,8 @@ class UpdateApiReviewNameDescriptionController @Inject()(
   private def viewModel(mode: Mode) =
     ProduceApiReviewNameDescriptionViewModel(
       controllers.myapis.update.routes.UpdateApiReviewNameDescriptionController.onSubmit(mode),
-      controllers.myapis.update.routes.UpdateApiShortDescriptionController.onPageLoad(mode).url,
-      controllers.myapis.update.routes.UpdateApiEnterOasController.onPageLoad(mode).url
+      controllers.myapis.update.routes.UpdateApiEnterOasController.onPageLoad(mode).url,
+      controllers.myapis.update.routes.UpdateApiShortDescriptionController.onPageLoad(mode).url
     )
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {

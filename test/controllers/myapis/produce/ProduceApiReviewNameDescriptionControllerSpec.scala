@@ -48,8 +48,8 @@ class ProduceApiReviewNameDescriptionControllerSpec extends SpecBase with Mockit
   private def viewModel(mode: Mode) =
     ProduceApiReviewNameDescriptionViewModel(
       controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onSubmit(mode),
-      controllers.myapis.produce.routes.ProduceApiShortDescriptionController.onPageLoad(mode).url,
-      controllers.myapis.produce.routes.ProduceApiEnterOasController.onPageLoad(mode).url
+      controllers.myapis.produce.routes.ProduceApiEnterOasController.onPageLoad(mode).url,
+      controllers.myapis.produce.routes.ProduceApiShortDescriptionController.onPageLoad(mode).url
     )
   private val apiName = "API NAME"
   private val apiDescription = "API Description"
