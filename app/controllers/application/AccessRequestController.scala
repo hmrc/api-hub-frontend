@@ -21,7 +21,7 @@ import com.google.inject.{Inject, Singleton}
 import controllers.actions.IdentifierAction
 import controllers.helpers.{ErrorResultBuilder, Fetching}
 import forms.admin.ApprovalDecisionFormProvider
-import models.accessrequest.AccessRequest
+import models.accessrequest.{AccessRequest, Pending}
 import models.application.Application
 import models.application.ApplicationLenses.*
 import models.requests.IdentifierRequest
@@ -65,6 +65,6 @@ class AccessRequestController @Inject()(
           accessRequest,
           request.user
         )
-      Ok(view(model, form, request.user, true))
+      Ok(view(model, form, request.user, accessRequest.status == Pending))
   }
 }
