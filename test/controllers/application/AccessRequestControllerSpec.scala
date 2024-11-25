@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.actions.FakeUser
 import forms.admin.ApprovalDecisionFormProvider
 import generators.{AccessRequestGenerator, ApplicationGenerator}
-import models.accessrequest.{Cancelled, Pending}
+import models.accessrequest.*
 import models.application.ApplicationLenses.*
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -78,29 +78,36 @@ class AccessRequestControllerSpec
       }
     }
 
-    "must not display the cancel request link if the access request is cancelled" in {
+    "must not display the cancel request link if the access request is not pending" in {
       forAll(teamMemberAndSupporterTable) { (user: UserModel) =>
-        val fixture = buildFixture(user)
-        val application = sampleApplication().addTeamMember(FakeUser)
-        val accessRequest = sampleAccessRequest(application.id).copy(status = Cancelled)
+        forAll(Table(
+          "nonPendingStatus",
+          Cancelled,
+          Approved,
+          Rejected
+        )) { (accessRequestStatus: AccessRequestStatus) =>
+          val fixture = buildFixture(user)
+          val application = sampleApplication().addTeamMember(FakeUser)
+          val accessRequest = sampleAccessRequest(application.id).copy(status = accessRequestStatus)
 
-        when(fixture.apiHubService.getAccessRequest(any)(any)).thenReturn(Future.successful(Some(accessRequest)))
-        when(fixture.apiHubService.getApplication(any, any, any)(any)).thenReturn(Future.successful(Some(application)))
+          when(fixture.apiHubService.getAccessRequest(any)(any)).thenReturn(Future.successful(Some(accessRequest)))
+          when(fixture.apiHubService.getApplication(any, any, any)(any)).thenReturn(Future.successful(Some(application)))
 
-        running(fixture.application) {
-          val request = FakeRequest(controllers.application.routes.AccessRequestController.onPageLoad(accessRequest.id))
-          val result = route(fixture.application, request).value
-          val model = AccessRequestViewModel.consumerViewModel(application, accessRequest, user)(messages(fixture.application))
+          running(fixture.application) {
+            val request = FakeRequest(controllers.application.routes.AccessRequestController.onPageLoad(accessRequest.id))
+            val result = route(fixture.application, request).value
+            val model = AccessRequestViewModel.consumerViewModel(application, accessRequest, user)(messages(fixture.application))
 
-          val content = contentAsString(result)
+            val content = contentAsString(result)
 
-          status(result) mustBe OK
-          content mustBe fixture.view(model, form, user, false)(request, messages(fixture.application)).toString
-          content must validateAsHtml
-          content must not include("cancelAccessRequestLink")
+            status(result) mustBe OK
+            content mustBe fixture.view(model, form, user, false)(request, messages(fixture.application)).toString
+            content must validateAsHtml
+            content must not include ("cancelAccessRequestLink")
 
-          verify(fixture.apiHubService).getAccessRequest(eqTo(accessRequest.id))(any)
-          verify(fixture.apiHubService).getApplication(eqTo(application.id), eqTo(false), eqTo(false))(any)
+            verify(fixture.apiHubService).getAccessRequest(eqTo(accessRequest.id))(any)
+            verify(fixture.apiHubService).getApplication(eqTo(application.id), eqTo(false), eqTo(false))(any)
+          }
         }
       }
     }
