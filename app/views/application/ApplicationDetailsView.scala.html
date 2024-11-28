@@ -62,7 +62,7 @@
     @if(applicationApi.isMissing) {
         n/a
     } else {
-        @Html(messages("applicationDetails.apis.endpointsAvailable", boldNumber(applicationApi.availableSecondaryEndpoints), boldNumber(applicationApi.totalEndpoints)))
+        @Html(messages("applicationDetails.apis.endpointsAvailable", boldNumber(applicationApi.availableNonProductionEndpoints), boldNumber(applicationApi.totalEndpoints)))
     }
 }
 
@@ -70,7 +70,7 @@
     @if(applicationApi.isMissing) {
         n/a
     } else {
-        @Html(messages("applicationDetails.apis.endpointsAvailable", boldNumber(applicationApi.availablePrimaryEndpoints), boldNumber(applicationApi.totalEndpoints)))
+        @Html(messages("applicationDetails.apis.endpointsAvailable", boldNumber(applicationApi.availableProductionEndpoints), boldNumber(applicationApi.totalEndpoints)))
     }
 }
 

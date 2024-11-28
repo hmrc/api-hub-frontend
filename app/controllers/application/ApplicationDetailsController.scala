@@ -35,7 +35,7 @@ class ApplicationDetailsController @Inject()(
   applicationApiBuilder: ApplicationApiBuilder,
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id, enrich = true)).async {
+  def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id)).async {
     implicit request =>
       applicationApiBuilder.build(request.application).map(
         applicationApis =>
