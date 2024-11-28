@@ -216,8 +216,8 @@
                                             endpoint =>
                                                 Seq(
                                                     TableRow(content = HtmlContent(endpointNameAndScopes(endpoint))),
-                                                    TableRow(content = HtmlContent(endpointAccess(endpoint.secondaryAccess))),
-                                                    TableRow(content = HtmlContent(endpointAccess(endpoint.primaryAccess)))
+                                                    TableRow(content = HtmlContent(endpointAccess(endpoint.nonProductionAccess))),
+                                                    TableRow(content = HtmlContent(endpointAccess(endpoint.productionAccess)))
                                                 )
                                         ),
                                         firstCellIsHeader = true

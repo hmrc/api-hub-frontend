@@ -16,8 +16,10 @@
 
 package viewmodels.application
 
+import models.accessrequest.{AccessRequest, Approved}
 import models.{Enumerable, WithName}
 import models.api.{ApiDetail, EndpointMethod}
+import models.api.ApiDetailLenses.ApiDetailLensOps
 import models.application.{Api, Application, EnvironmentName, Primary, Secondary, SelectedEndpoint}
 import models.application.ApplicationLenses.ApplicationLensOps
 import play.api.libs.json.{Format, Json, Writes}
@@ -44,6 +46,39 @@ case object Unknown extends WithName("unknown") with ApplicationEndpointAccess {
 
 object ApplicationEndpointAccess extends Enumerable.Implicits{
 
+  def production(
+    applicationScopes: ApplicationScopes,
+    pendingAccessRequestCount: Int,
+    endpointMethod: EndpointMethod,
+  ): ApplicationEndpointAccess = {
+    apply(applicationScopes.allowedScopes, pendingAccessRequestCount, endpointMethod)
+  }
+
+  def nonProduction(
+    applicationScopes: ApplicationScopes,
+    pendingAccessRequestCount: Int,
+    endpointMethod: EndpointMethod,
+  ): ApplicationEndpointAccess = {
+    apply(applicationScopes.requiredScopes, pendingAccessRequestCount, endpointMethod)
+  }
+
+  private def apply(
+    scopes: Set[String],
+    pendingAccessRequestCount: Int,
+    endpointMethod: EndpointMethod
+  ): ApplicationEndpointAccess = {
+    if (endpointMethod.scopes.toSet.subsetOf(scopes)) {
+      Accessible
+    }
+    else if (pendingAccessRequestCount > 0) {
+      Requested
+    }
+    else {
+      Inaccessible
+    }
+  }
+
+  // TODO: remove
   def apply(
     application: Application,
     pendingAccessRequestCount: Int,
@@ -86,8 +121,8 @@ case class ApplicationEndpoint(
   summary: Option[String],
   description: Option[String],
   scopes: Seq[String],
-  primaryAccess: ApplicationEndpointAccess,
-  secondaryAccess: ApplicationEndpointAccess
+  productionAccess: ApplicationEndpointAccess,
+  nonProductionAccess: ApplicationEndpointAccess
 )
 
 object ApplicationEndpoint {
@@ -99,8 +134,8 @@ object ApplicationEndpoint {
       summary = None,
       description = None,
       scopes = Seq.empty,
-      primaryAccess = Unknown,
-      secondaryAccess = Unknown
+      productionAccess = Unknown,
+      nonProductionAccess = Unknown
     )
   }
 
@@ -118,10 +153,11 @@ case class ApplicationApi(
 ) {
 
   def selectedEndpoints: Int = endpoints.size
-  def availablePrimaryEndpoints: Int = endpoints.count(_.primaryAccess.isAccessible)
-  def availableSecondaryEndpoints: Int = endpoints.count(_.secondaryAccess.isAccessible)
-  def needsProductionAccessRequest: Boolean = !hasPendingAccessRequest && endpoints.exists(_.primaryAccess == Inaccessible)
+  def availableProductionEndpoints: Int = endpoints.count(_.productionAccess.isAccessible)
+  def availableNonProductionEndpoints: Int = endpoints.count(_.nonProductionAccess.isAccessible)
+  def needsProductionAccessRequest: Boolean = !hasPendingAccessRequest && endpoints.exists(_.productionAccess == Inaccessible)
   def hasPendingAccessRequest: Boolean = pendingAccessRequestCount > 0
+
 }
 
 object ApplicationApi {
@@ -149,5 +185,40 @@ object ApplicationApi {
   }
 
   implicit val formatApplicationApi: Format[ApplicationApi] = Json.format[ApplicationApi]
+
+}
+
+case class ApplicationScopes(requiredScopes: Set[String], approvedScopes: Set[String]) {
+  def allowedScopes: Set[String] = {
+    requiredScopes.intersect(approvedScopes)
+  }
+}
+
+object ApplicationScopes {
+
+  def apply(apis: Seq[(Api, Option[ApiDetail])], accessRequests: Seq[AccessRequest]): ApplicationScopes = {
+    ApplicationScopes(
+      requiredScopes = buildRequiredScopes(apis),
+      approvedScopes = buildApprovedScopes(accessRequests)
+    )
+  }
+
+  private def buildRequiredScopes(apis: Seq[(Api, Option[ApiDetail])]): Set[String] = {
+    apis
+      .flatMap(
+        api =>
+          api._2
+            .map(_.getRequiredScopeNames)
+            .getOrElse(Set.empty)
+      )
+      .toSet
+  }
+
+  private def buildApprovedScopes(accessRequests: Seq[AccessRequest]): Set[String] = {
+    accessRequests
+      .filter(_.status == Approved)
+      .flatMap(_.endpoints.flatMap(_.scopes))
+      .toSet
+  }
 
 }

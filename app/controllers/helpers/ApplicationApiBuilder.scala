@@ -32,12 +32,24 @@ class ApplicationApiBuilder @Inject()(
 )(implicit ec: ExecutionContext) extends FrontendHeaderCarrierProvider {
 
   def build(application: Application)(implicit request: Request[?]): Future[Seq[ApplicationApi]] = {
-    apiHubService.getAccessRequests(Some(application.id), Some(Pending)).flatMap (
-      pendingAccessRequests =>
-        fetchApiDetails(application).map(apis => build(application, apis, pendingAccessRequests)))
+    apiHubService.getAccessRequests(Some(application.id), None).flatMap (
+      accessRequests =>
+        fetchApiDetails(application).map(
+          apis =>
+            build(
+              apis = apis,
+              pendingAccessRequests = accessRequests.filter(_.status == Pending),
+              applicationScopes = ApplicationScopes(apis, accessRequests)
+            )
+          )
+    )
   }
 
-  private def build(application: Application, apis: Seq[(Api, Option[ApiDetail])], pendingAccessRequests: Seq[AccessRequest]): Seq[ApplicationApi] = {
+  private def build(
+    apis: Seq[(Api, Option[ApiDetail])],
+    pendingAccessRequests: Seq[AccessRequest],
+    applicationScopes: ApplicationScopes
+  ): Seq[ApplicationApi] = {
     apis.map {
       case (api, Some(apiDetail)) =>
         val endpoints = api.endpoints.flatMap {
@@ -53,8 +65,8 @@ class ApplicationApiBuilder @Inject()(
                     endpointMethod.summary,
                     endpointMethod.description,
                     endpointMethod.scopes,
-                    ApplicationEndpointAccess(application, pendingAccessRequestCount(apiDetail.id, pendingAccessRequests), endpointMethod, Primary),
-                    ApplicationEndpointAccess(application, pendingAccessRequestCount(apiDetail.id, pendingAccessRequests), endpointMethod, Secondary)
+                    ApplicationEndpointAccess.production(applicationScopes, pendingAccessRequestCount(apiDetail.id, pendingAccessRequests), endpointMethod),
+                    ApplicationEndpointAccess.nonProduction(applicationScopes, pendingAccessRequestCount(apiDetail.id, pendingAccessRequests), endpointMethod)
                   )
               )
         }
