@@ -16,17 +16,22 @@
 
 package viewmodels.application
 
+import config.{FrontendAppConfig, HipEnvironment, HipEnvironments}
 import models.application.Application
-import models.application.ApplicationLenses._
+import models.application.ApplicationLenses.*
 import models.user.UserModel
 import play.api.i18n.Messages
+import play.twirl.api.Html
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import viewmodels.{SideNavItem, SideNavPage}
+import views.html.components.SideNavItems
 
 object ApplicationSideNavPages {
 
   case object DetailsPage extends SideNavPage
   case object ApisPage extends SideNavPage
   case object EnvironmentsAndCredentialsPage extends SideNavPage
+  case object EnvironmentsPage extends SideNavPage
   case object ManageTeamMembersPage extends SideNavPage
   case object DeleteApplicationPage extends SideNavPage
   case object ChangeOwningTeamPage extends SideNavPage
@@ -40,7 +45,7 @@ object ApplicationNavItems {
 
   import ApplicationSideNavPages._
 
-  def apply(userModel: Option[UserModel], application: Application, currentPage: SideNavPage)(implicit messages: Messages): Seq[SideNavItem] = {
+  def apply(userModel: Option[UserModel], application: Application, currentPage: SideNavPage, currentEnvironment: Option[HipEnvironment] = None)(implicit messages: Messages, config: FrontendAppConfig, hipEnvironments: HipEnvironments): Seq[SideNavItem] = {
     Seq(
       Some(SideNavItem(
         page = DetailsPage,
@@ -54,12 +59,22 @@ object ApplicationNavItems {
         link = controllers.application.routes.ApplicationApisController.onPageLoad(application.id),
         isCurrentPage = currentPage == ApisPage
       )),
-      Some(SideNavItem(
-        page = EnvironmentsAndCredentialsPage,
-        title = messages("applicationNav.page.environmentsAndCredentials"),
-        link = controllers.application.routes.EnvironmentAndCredentialsController.onPageLoad(application.id),
-        isCurrentPage = currentPage == EnvironmentsAndCredentialsPage
-      )),
+      if config.applicationDetailsEnvironmentsLeftSideNav then
+        hipEnvironments.environments.headOption.map(hipEnvironment =>
+          SideNavItem(
+            page = EnvironmentsPage,
+            title = messages("applicationNav.page.environments"),
+            link = controllers.application.routes.EnvironmentsController.onPageLoad(application.id, hipEnvironment.id),
+            isCurrentPage = currentPage == EnvironmentsPage,
+            content = Some(HtmlContent(environmentsSideNavItems(currentPage, application, currentEnvironment)))
+          ))
+      else
+        Some(SideNavItem(
+          page = EnvironmentsAndCredentialsPage,
+          title = messages("applicationNav.page.environmentsAndCredentials"),
+          link = controllers.application.routes.EnvironmentAndCredentialsController.onPageLoad(application.id),
+          isCurrentPage = currentPage == EnvironmentsAndCredentialsPage
+        )),
       if (!application.isTeamMigrated) {
         Some(SideNavItem(
           page = ManageTeamMembersPage,
@@ -115,5 +130,16 @@ object ApplicationNavItems {
     )
     .flatten
   }
+
+  private[application] def environmentsSideNavItems(currentPage: SideNavPage, application: Application, currentEnvironment: Option[HipEnvironment])(implicit messages: Messages, hipEnvironments: HipEnvironments) =
+    SideNavItems(
+      hipEnvironments.environments.map(hipEnvironment =>
+        SideNavItem(
+          page = EnvironmentsPage,
+          title = messages(s"site.environment.${hipEnvironment.id}"),
+          link = controllers.application.routes.EnvironmentsController.onPageLoad(application.id, hipEnvironment.id),
+          isCurrentPage = currentEnvironment.contains(hipEnvironment),
+        )
+      ), level = 1)
 
 }

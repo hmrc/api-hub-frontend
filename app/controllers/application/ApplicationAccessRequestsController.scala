@@ -17,6 +17,7 @@
 package controllers.application
 
 import com.google.inject.{Inject, Singleton}
+import config.{FrontendAppConfig, HipEnvironments}
 import controllers.actions.{ApplicationAuthActionProvider, AuthorisedSupportAction, IdentifierAction}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -33,7 +34,7 @@ class ApplicationAccessRequestsController @Inject()(
   applicationAuth: ApplicationAuthActionProvider,
   apiHubService: ApiHubService,
   accessRequestsView: ApplicationAccessRequestsView
-)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+)(implicit ec: ExecutionContext, config: FrontendAppConfig, hipEnvironments: HipEnvironments) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id)).async {
     implicit request =>

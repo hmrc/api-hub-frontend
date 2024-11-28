@@ -18,6 +18,7 @@
 @import models.user.UserModel
 @import viewmodels.application.{ApplicationSideNavPages, ApplicationNavItems}
 @import views.html.components.IconsLink
+@import config.{FrontendAppConfig, HipEnvironments}
 
 @this(
     layout: templates.Layout,
@@ -27,7 +28,7 @@
     govukButton: GovukButton
 )
 
-@(application: Application, allScopes: Seq[CredentialScopes], user: UserModel)(implicit request: Request[?], messages: Messages)
+@(application: Application, allScopes: Seq[CredentialScopes], user: UserModel)(implicit request: Request[?], messages: Messages, config: FrontendAppConfig, hipEnvironments: HipEnvironments)
 
 @layout(pageTitle = titleNoForm(messages("allScopes.title")), user = Some(user), fullWidth = true, customScriptsBlock = Some(iconsLink())) {
 

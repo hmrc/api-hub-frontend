@@ -20,10 +20,7 @@ import base.SpecBase
 import config.{FrontendAppConfig, HipEnvironments}
 import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
 import controllers.routes
-import models.accessrequest.Pending
-import models.api.{ApiDetail, Endpoint, EndpointMethod, Live, Maintainer}
-import models.application.ApplicationLenses.ApplicationLensOps
-import models.application.{Api, Scope, SelectedEndpoint}
+import fakes.FakeHipEnvironments
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
@@ -34,16 +31,14 @@ import play.api.test.Helpers.*
 import play.api.Application as PlayApplication
 import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
-import viewmodels.application.{Accessible, ApplicationApi, ApplicationEndpoint, Inaccessible}
 import views.html.ErrorTemplate
-import views.html.application.ApplicationApisView
+import views.html.application.EnvironmentsView
 
-import java.time.Instant
 import scala.concurrent.Future
 
-class ApplicationApisControllerSpec extends SpecBase with MockitoSugar with TestHelpers with HtmlValidation {
+class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHelpers with HtmlValidation {
 
-  "ApplicationApisController" - {
+  "Environments Controller" - {
     "must return OK and the correct view for a GET for a team member or supporter" in {
       forAll(teamMemberAndSupporterTable) {
         (user: UserModel) =>
@@ -52,68 +47,20 @@ class ApplicationApisControllerSpec extends SpecBase with MockitoSugar with Test
           when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(true), eqTo(false))(any()))
             .thenReturn(Future.successful(Some(FakeApplication)))
 
-          when(fixture.apiHubService.getAccessRequests(eqTo(Some(FakeApplication.id)), eqTo(Some(Pending)))(any()))
-            .thenReturn(Future.successful(Seq.empty))
-
           running(fixture.playApplication) {
-            val request = FakeRequest(GET, controllers.application.routes.ApplicationApisController.onPageLoad(FakeApplication.id).url)
+            val request = FakeRequest(GET, controllers.application.routes.EnvironmentsController.onPageLoad(FakeApplication.id, "test").url)
             val result = route(fixture.playApplication, request).value
-            val view = fixture.playApplication.injector.instanceOf[ApplicationApisView]
+            val view = fixture.playApplication.injector.instanceOf[EnvironmentsView]
             implicit val config: FrontendAppConfig = fixture.playApplication.injector.instanceOf[FrontendAppConfig]
             implicit val hipEnvironments: HipEnvironments = fixture.playApplication.injector.instanceOf[HipEnvironments]
 
             status(result) mustEqual OK
-            contentAsString(result) mustBe view(FakeApplication, Seq.empty, Some(user))(request, messages(fixture.playApplication)).toString
+            contentAsString(result) mustBe view(FakeApplication, user, FakeHipEnvironments.test)(request, messages(fixture.playApplication)).toString
             contentAsString(result) must validateAsHtml
+            contentAsString(result) must include("""id="test-apis"""")
+            contentAsString(result) must include("""id="test-credentials"""")
+            contentAsString(result) must include("""id="test-curl"""")
           }
-      }
-    }
-
-    "must return the correct view when the applications has APIs" in {
-      val fixture = buildFixture()
-
-      val apiDetail = ApiDetail(
-        id = "test-id",
-        publisherReference = "test-pub-ref",
-        title = "test-title",
-        description = "test-description",
-        version = "test-version",
-        endpoints = Seq(Endpoint(path = "/test", methods = Seq(EndpointMethod("GET", None, None, Seq("test-scope"))))),
-        shortDescription = None,
-        openApiSpecification = "test-oas-spec",
-        apiStatus = Live,
-        reviewedDate = Instant.now(),
-        platform = "HIP",
-        maintainer = Maintainer("name", "#slack", List.empty)
-      )
-
-      val application = FakeApplication
-        .addApi(Api(apiDetail.id, apiDetail.title, Seq(SelectedEndpoint("GET", "/test"))))
-        .setSecondaryScopes(Seq(Scope("test-scope")))
-
-      val applicationApis = Seq(
-        ApplicationApi(apiDetail, Seq(ApplicationEndpoint("GET", "/test", None, None, Seq("test-scope"), Inaccessible, Accessible)), 0)
-      )
-
-      when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(true), eqTo(false))(any()))
-        .thenReturn(Future.successful(Some(application)))
-
-      when(fixture.apiHubService.getAccessRequests(eqTo(Some(FakeApplication.id)), eqTo(Some(Pending)))(any()))
-        .thenReturn(Future.successful(Seq.empty))
-
-      when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
-        .thenReturn(Future.successful(Some(apiDetail)))
-
-      running(fixture.playApplication) {
-        val request = FakeRequest(GET, controllers.application.routes.ApplicationApisController.onPageLoad(application.id).url)
-        val result = route(fixture.playApplication, request).value
-        val view = fixture.playApplication.injector.instanceOf[ApplicationApisView]
-        implicit val config: FrontendAppConfig = fixture.playApplication.injector.instanceOf[FrontendAppConfig]
-        implicit val hipEnvironments: HipEnvironments = fixture.playApplication.injector.instanceOf[HipEnvironments]
-
-        status(result) mustEqual OK
-        contentAsString(result) mustBe view(application, applicationApis, Some(FakeUser))(request, messages(fixture.playApplication)).toString
-        contentAsString(result) must validateAsHtml
       }
     }
 
@@ -124,7 +71,7 @@ class ApplicationApisControllerSpec extends SpecBase with MockitoSugar with Test
         .thenReturn(Future.successful(None))
 
       running(fixture.playApplication) {
-        val request = FakeRequest(GET, controllers.application.routes.ApplicationApisController.onPageLoad(FakeApplication.id).url)
+        val request = FakeRequest(GET, controllers.application.routes.EnvironmentsController.onPageLoad(FakeApplication.id, "test").url)
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[ErrorTemplate]
 
@@ -140,6 +87,29 @@ class ApplicationApisControllerSpec extends SpecBase with MockitoSugar with Test
       }
     }
 
+    "must return 404 Not Found when the environment does not exist" in {
+      val fixture = buildFixture()
+
+      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(true), eqTo(false))(any()))
+        .thenReturn(Future.successful(Some(FakeApplication)))
+
+      running(fixture.playApplication) {
+        val request = FakeRequest(GET, controllers.application.routes.EnvironmentsController.onPageLoad(FakeApplication.id, "badEnvironment").url)
+        val result = route(fixture.playApplication, request).value
+        val view = fixture.playApplication.injector.instanceOf[ErrorTemplate]
+
+        status(result) mustBe NOT_FOUND
+        contentAsString(result) mustBe
+          view(
+            "Page not found - 404",
+            "Environment not found",
+            s"Cannot find environment badEnvironment."
+          )(request, messages(fixture.playApplication))
+            .toString()
+        contentAsString(result) must validateAsHtml
+      }
+    }
+
     "must redirect to Unauthorised page for a GET when user is not a team member or supporter" in {
       val fixture = buildFixture(userModel = FakeUserNotTeamMember)
 
@@ -147,7 +117,7 @@ class ApplicationApisControllerSpec extends SpecBase with MockitoSugar with Test
         .thenReturn(Future.successful(Some(FakeApplication)))
 
       running(fixture.playApplication) {
-        val request = FakeRequest(GET, controllers.application.routes.ApplicationApisController.onPageLoad(FakeApplication.id).url)
+        val request = FakeRequest(GET, controllers.application.routes.EnvironmentsController.onPageLoad(FakeApplication.id, "test").url)
         val result = route(fixture.playApplication, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -170,3 +140,4 @@ class ApplicationApisControllerSpec extends SpecBase with MockitoSugar with Test
   }
 
 }
+

@@ -17,6 +17,7 @@
 package controllers.application
 
 import base.SpecBase
+import config.{FrontendAppConfig, HipEnvironments}
 import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
 import controllers.routes
 import models.accessrequest.Pending
@@ -25,13 +26,13 @@ import models.application.{Api, Scope, SelectedEndpoint, TeamMember}
 import models.application.ApplicationLenses.ApplicationLensOps
 import models.team.Team
 import models.user.UserModel
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import play.api.{Application => PlayApplication}
+import play.api.test.Helpers.*
+import play.api.Application as PlayApplication
 import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
 import viewmodels.application.{Accessible, ApplicationApi, ApplicationEndpoint, Inaccessible}
@@ -59,6 +60,8 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
             val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id).url)
             val result = route(fixture.playApplication, request).value
             val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
+            implicit val config: FrontendAppConfig = fixture.playApplication.injector.instanceOf[FrontendAppConfig]
+            implicit val hipEnvironments: HipEnvironments = fixture.playApplication.injector.instanceOf[HipEnvironments]
 
             status(result) mustEqual OK
             contentAsString(result) mustBe view(FakeApplication, Seq.empty, Some(user))(request, messages(fixture.playApplication)).toString
@@ -86,6 +89,8 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url)
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
+        implicit val config: FrontendAppConfig = fixture.playApplication.injector.instanceOf[FrontendAppConfig]
+        implicit val hipEnvironments: HipEnvironments = fixture.playApplication.injector.instanceOf[HipEnvironments]
 
         status(result) mustEqual OK
         contentAsString(result) mustBe view(application, Seq.empty, Some(FakeUser))(request, messages(fixture.playApplication)).toString
@@ -128,6 +133,8 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url)
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
+        implicit val config: FrontendAppConfig = fixture.playApplication.injector.instanceOf[FrontendAppConfig]
+        implicit val hipEnvironments: HipEnvironments = fixture.playApplication.injector.instanceOf[HipEnvironments]
 
         status(result) mustBe OK
         contentAsString(result) mustBe view(expected, Seq.empty, Some(FakeUser))(request, messages(fixture.playApplication)).toString
@@ -173,6 +180,8 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id).url)
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
+        implicit val config: FrontendAppConfig = fixture.playApplication.injector.instanceOf[FrontendAppConfig]
+        implicit val hipEnvironments: HipEnvironments = fixture.playApplication.injector.instanceOf[HipEnvironments]
 
         status(result) mustEqual OK
         contentAsString(result) mustBe view(application, applicationApis, Some(FakeUser))(request, messages(fixture.playApplication)).toString
@@ -208,6 +217,8 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id).url)
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
+        implicit val config: FrontendAppConfig = fixture.playApplication.injector.instanceOf[FrontendAppConfig]
+        implicit val hipEnvironments: HipEnvironments = fixture.playApplication.injector.instanceOf[HipEnvironments]
 
         status(result) mustEqual OK
         contentAsString(result) mustBe view(application, applicationApis, Some(FakeUser))(request, messages(fixture.playApplication)).toString

@@ -17,7 +17,8 @@
 package viewmodels
 
 import play.api.mvc.Call
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Content
 
 trait SideNavPage
 
-case class SideNavItem(page: SideNavPage, title: String, link: Call, isCurrentPage: Boolean, opensInNewTab: Boolean = false)
+case class SideNavItem(page: SideNavPage, title: String, link: Call, isCurrentPage: Boolean, opensInNewTab: Boolean = false, content: Option[Content] = None)

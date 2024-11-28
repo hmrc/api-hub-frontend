@@ -32,6 +32,11 @@
                         <a class="side-nav__link govuk-link--no-visited-state" href="@navItem.link.url" data-nav-item-page="@navItem.page.toString" @if(navItem.opensInNewTab){target="_blank"}>
                             @navItem.title @if(navItem.opensInNewTab){<i class="fa-solid fa-arrow-up-right-from-square"></i>}
                         </a>
+                        @if(navItem.isCurrentPage) {
+                            @for(content <- navItem.content) {
+                                @content.asHtml
+                            }
+                        }
                     </li>
                 }
             </ul>

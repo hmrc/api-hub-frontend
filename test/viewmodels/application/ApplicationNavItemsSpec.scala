@@ -17,14 +17,18 @@
 package viewmodels.application
 
 import base.SpecBase
+import com.typesafe.config.ConfigFactory
+import config.{FrontendAppConfig, HipEnvironments}
 import controllers.actions.{FakeApplication, FakeSupporter}
 import models.application.ApplicationLenses.*
 import models.user.UserModel
 import org.scalatest.Inspectors
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
+import play.api.Configuration
 import play.api.i18n.Messages
 import play.api.test.Helpers.*
+import uk.gov.hmrc.govukfrontend.views.Aliases.HtmlContent
 import utils.TestHelpers
 import viewmodels.SideNavItem
 import viewmodels.application.ApplicationSideNavPages.*
@@ -33,10 +37,22 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
 
   "ApplicationNavItems" - {
     "must return the correct list of nav items" in {
-      val playApplication = applicationBuilder(None).build()
+      val config = Configuration(ConfigFactory.parseString(
+        """
+          |features {
+          |  application-details-environments-left-side-nav: false
+          |}
+          |""".stripMargin
+      ))
+      val playApplication = applicationBuilder(
+        None,
+        testConfiguration = config
+      ).build()
 
       running(playApplication) {
         implicit val implicitMessages: Messages = messages(playApplication)
+        implicit val config: FrontendAppConfig = playApplication.injector.instanceOf[FrontendAppConfig]
+        implicit val hipEnvironments: HipEnvironments = playApplication.injector.instanceOf[HipEnvironments]
 
         val actual = ApplicationNavItems(Some(FakeSupporter), FakeApplication, DetailsPage)
         val expected = Seq(
@@ -101,6 +117,88 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
       }
     }
 
+    "must return the correct list of nav items when the environments flag is true" in {
+      val config = Configuration(ConfigFactory.parseString(
+        """
+          |features {
+          |  application-details-environments-left-side-nav: true
+          |}
+          |""".stripMargin
+      ))
+      val playApplication = applicationBuilder(
+        None,
+        testConfiguration = config
+      ).build()
+
+      running(playApplication) {
+        implicit val implicitMessages: Messages = messages(playApplication)
+        implicit val config: FrontendAppConfig = playApplication.injector.instanceOf[FrontendAppConfig]
+        implicit val hipEnvironments: HipEnvironments = playApplication.injector.instanceOf[HipEnvironments]
+
+        val actual = ApplicationNavItems(Some(FakeSupporter), FakeApplication, DetailsPage)
+        val expected = Seq(
+          SideNavItem(
+            DetailsPage,
+            "Application details",
+            controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id),
+            isCurrentPage = true
+          ),
+          SideNavItem(
+            ApisPage,
+            "Application APIs",
+            controllers.application.routes.ApplicationApisController.onPageLoad(FakeApplication.id),
+            isCurrentPage = false
+          ),
+          SideNavItem(
+            EnvironmentsPage,
+            "Environments",
+            controllers.application.routes.EnvironmentsController.onPageLoad(FakeApplication.id, "production"),
+            isCurrentPage = false,
+            content = Some(HtmlContent(ApplicationNavItems.environmentsSideNavItems(DetailsPage, FakeApplication, None)))
+          ),
+          SideNavItem(
+            ManageTeamMembersPage,
+            "Manage team members",
+            controllers.application.routes.ManageTeamMembersController.onPageLoad(FakeApplication.id),
+            isCurrentPage = false
+          ),
+          SideNavItem(
+            DeleteApplicationPage,
+            "Delete application",
+            controllers.application.routes.DeleteApplicationConfirmationController.onPageLoad(FakeApplication.id),
+            isCurrentPage = false
+          ),
+          SideNavItem(
+            page = ChangeOwningTeamPage,
+            title = "Change owning team",
+            link = controllers.application.routes.UpdateApplicationTeamController.onPageLoad(FakeApplication.id),
+            isCurrentPage = false
+          ),
+          SideNavItem(
+            page = ApplicationHistoryPage,
+            title = "Application history",
+            link = controllers.application.routes.ApplicationAccessRequestsController.onPageLoad(FakeApplication.id),
+            isCurrentPage = false
+          ),
+          SideNavItem(
+            page = ViewAsJsonApplicationPage,
+            title = "View as JSON",
+            link = controllers.application.routes.ApplicationSupportController.onPageLoad(FakeApplication.id),
+            isCurrentPage = false,
+            opensInNewTab = true
+          ),
+          SideNavItem(
+            page = AllScopesPage,
+            title = "All scopes",
+            link = controllers.application.routes.AllScopesController.onPageLoad(FakeApplication.id),
+            isCurrentPage = false
+          )
+        )
+
+        actual mustBe expected
+      }
+    }
+
     "must select the correct current page" in {
       val pages = Table(
         "page",
@@ -111,10 +209,22 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
         DeleteApplicationPage
       )
 
-      val playApplication = applicationBuilder(None).build()
+      val config = Configuration(ConfigFactory.parseString(
+        """
+          |features {
+          |  application-details-environments-left-side-nav: false
+          |}
+          |""".stripMargin
+      ))
+      val playApplication = applicationBuilder(
+        None,
+        testConfiguration = config
+      ).build()
 
       running(playApplication) {
         implicit val implicitMessages: Messages = messages(playApplication)
+        implicit val config: FrontendAppConfig = playApplication.injector.instanceOf[FrontendAppConfig]
+        implicit val hipEnvironments: HipEnvironments = playApplication.injector.instanceOf[HipEnvironments]
 
         forAll(pages) {
           page =>
@@ -132,6 +242,8 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
 
       running(playApplication) {
         implicit val implicitMessages: Messages = messages(playApplication)
+        implicit val config: FrontendAppConfig = playApplication.injector.instanceOf[FrontendAppConfig]
+        implicit val hipEnvironments: HipEnvironments = playApplication.injector.instanceOf[HipEnvironments]
 
         val actual = ApplicationNavItems(Some(FakeSupporter), FakeApplication.setTeamId("test-team-id"), DetailsPage)
           .filter(_.page.equals(ManageTeamMembersPage))
@@ -148,6 +260,8 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
 
         running(playApplication) {
           implicit val implicitMessages: Messages = messages(playApplication)
+          implicit val config: FrontendAppConfig = playApplication.injector.instanceOf[FrontendAppConfig]
+          implicit val hipEnvironments: HipEnvironments = playApplication.injector.instanceOf[HipEnvironments]
 
           val actual = ApplicationNavItems(Some(user), FakeApplication.setTeamId("test-team-id"), DetailsPage)
             .filter(_.page.equals(ViewAsJsonApplicationPage))

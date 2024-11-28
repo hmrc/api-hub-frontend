@@ -336,7 +336,7 @@ body, input {
 }
 
 .side-nav__list--selected {
-    .side-nav__link, &:hover .side-nav__link {
+    > .side-nav__link, &:hover > .side-nav__link {
         color: $side-nav-selected-color;
         background-color: $side-nav-selected-background;
     }

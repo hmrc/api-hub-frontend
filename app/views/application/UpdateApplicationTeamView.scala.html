@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import config.{FrontendAppConfig, HipEnvironments}
 @import models.application.Application
 @import models.team.Team
 @import models.user.UserModel
@@ -34,7 +35,7 @@
     teamSelection: TeamSelection
 )
 
-@(form: Form[?], application: Application, owningTeam: Option[Team], teams: Seq[Team], user: UserModel)(implicit request: Request[?], messages: Messages)
+@(form: Form[?], application: Application, owningTeam: Option[Team], teams: Seq[Team], user: UserModel)(implicit request: Request[?], messages: Messages, config: FrontendAppConfig, hipEnvironments: HipEnvironments)
 
 @scripts() = {
     @iconsLink()

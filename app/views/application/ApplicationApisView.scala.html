@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import config.{FrontendAppConfig, HipEnvironments}
 @import models.application._
 @import models.user.UserModel
 @import viewmodels.application._
@@ -26,7 +27,7 @@
         iconsLink: IconsLink
 )
 
-@(application: Application, applicationApis: Seq[ApplicationApi], user: Option[UserModel])(implicit request: Request[?], messages: Messages)
+@(application: Application, applicationApis: Seq[ApplicationApi], user: Option[UserModel])(implicit request: Request[?], messages: Messages, config: FrontendAppConfig, hipEnvironments: HipEnvironments)
 
 @pendingAccessRequestsCount = @{
     applicationApis.map(_.pendingAccessRequestCount).sum
