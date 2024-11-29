@@ -24,7 +24,8 @@
     govukButton: GovukButton,
     govukInput : GovukInput,
     govukTabs: GovukTabs,
-    govukTextarea : GovukTextarea
+    govukTextarea : GovukTextarea,
+    sideNav: views.html.templates.SideNav,
 )
 
 @(user: UserModel)(implicit request: Request[?], messages: Messages)
@@ -115,7 +116,7 @@
     activeLink = Some("apiHubAdmin"),
     customScriptsBlock = Some(scripts())
 ) {
-    @views.html.templates.SideNav(messages("envParityConfigTest.admin"), AdminNavItems(user, AdminSideNavPages.EnvParityConfigTestPage)) {
+    @sideNav(messages("envParityConfigTest.admin"), AdminNavItems(user, AdminSideNavPages.EnvParityConfigTestPage)) {
         <h1 class="govuk-heading-l">
             @messages("envParityConfigTest.heading")
         </h1>

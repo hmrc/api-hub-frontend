@@ -17,7 +17,6 @@
 package controllers.application
 
 import base.SpecBase
-import config.{FrontendAppConfig, HipEnvironments}
 import controllers.actions.{FakeApplication, FakeSupporter}
 import models.application.{CredentialScopes, Primary}
 import models.user.UserModel
@@ -60,8 +59,6 @@ class AllScopesControllerSpec
           val request = FakeRequest(controllers.application.routes.AllScopesController.onPageLoad(FakeApplication.id))
           val result = route(fixture.playApplication, request).value
           val view = fixture.playApplication.injector.instanceOf[AllScopesView]
-          implicit val config: FrontendAppConfig = fixture.playApplication.injector.instanceOf[FrontendAppConfig]
-          implicit val hipEnvironments: HipEnvironments = fixture.playApplication.injector.instanceOf[HipEnvironments]
 
           status(result) mustBe OK
           contentAsString(result) mustBe view(FakeApplication, credentialScopes, user)(request, messages(fixture.playApplication)).toString

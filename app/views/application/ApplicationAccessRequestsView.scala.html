@@ -14,7 +14,6 @@
  * limitations under the License.
  *@
 
-@import config.{FrontendAppConfig, HipEnvironments}
 @import models.accessrequest.*
 @import models.user.UserModel
 @import views.html.components.AccessRequestPanel
@@ -30,10 +29,12 @@
     govukTable: GovukTable,
     accessRequestPanel: AccessRequestPanel,
     applicationDetailsTable: ApplicationDetailsTable,
-    iconsLink: IconsLink
+    iconsLink: IconsLink,
+    sideNav: views.html.templates.SideNav,
+    applicationNavItems: ApplicationNavItems,
 )
 
-@(application: Application, accessRequests: Seq[AccessRequest], user: UserModel)(implicit request: Request[?], messages: Messages, config: FrontendAppConfig, hipEnvironments: HipEnvironments)
+@(application: Application, accessRequests: Seq[AccessRequest], user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @pendingAccessRequestsCount = @{
     accessRequests.count(_.status == Pending)
@@ -45,7 +46,7 @@
     fullWidth = true,
     customScriptsBlock = Some(iconsLink())
 ) {
-    @views.html.templates.SideNav(application.name, ApplicationNavItems(Some(user), application, ApplicationSideNavPages.ApplicationHistoryPage)) {
+    @sideNav(application.name, applicationNavItems(Some(user), application, ApplicationSideNavPages.ApplicationHistoryPage)) {
 
         <h1 class="govuk-heading-l">
             @messages("applicationHistory.title")

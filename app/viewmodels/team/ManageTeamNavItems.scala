@@ -19,6 +19,7 @@ package viewmodels.team
 import models.team.Team
 import play.api.i18n.Messages
 import viewmodels.{SideNavItem, SideNavPage}
+import SideNavItem.SideNavItemLeaf
 
 object ManageTeamSideNavPages {
 
@@ -34,19 +35,19 @@ object ManageTeamNavItems {
 
   def apply(team: Team, currentPage: SideNavPage)(implicit messages: Messages): Seq[SideNavItem] = {
       Seq(
-        SideNavItem(
+        SideNavItemLeaf(
           page = ManageTeamMembersPage,
           title = messages("manageTeamMembers.title"),
           link = controllers.team.routes.ManageTeamController.onPageLoad(team.id),
           isCurrentPage = currentPage == ManageTeamMembersPage
         ),
-        SideNavItem(
+        SideNavItemLeaf(
           page = ChangeTeamNamePage,
           title = messages("changeTeamName.title"),
           link = controllers.team.routes.ChangeTeamNameController.onPageLoad(team.id),
           isCurrentPage = currentPage == ChangeTeamNamePage
         ),
-        SideNavItem(
+        SideNavItemLeaf(
           page = ViewTeamApplicationsPage,
           title = messages("viewTeamApplications.title"),
           link = controllers.team.routes.ViewTeamApplicationsController.onPageLoad(team.id),

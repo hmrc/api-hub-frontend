@@ -45,17 +45,10 @@ class EnvironmentsController @Inject()(
     implicit request =>
       hipEnvironments.environments.find(_.id == environment)
         .map(hipEnvironment =>
-          Ok(view(request.application, request.identifierRequest.user, hipEnvironment)(request, summon[Messages], config, hipEnvironments))
+          Ok(view(request.application, request.identifierRequest.user, hipEnvironment))
         ).getOrElse(
-          environmentNotFound(environment)
+          errorResultBuilder.environmentNotFound(environment)
         )
-  }
-
-  private def environmentNotFound(environment: String)(implicit request: Request[?]): Result = {
-    errorResultBuilder.notFound(
-      heading = Messages("site.environmentNotFoundHeading"),
-      message = Messages("site.environmentNotFoundMessage", environment)
-    )
   }
 
 }

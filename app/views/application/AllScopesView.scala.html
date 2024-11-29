@@ -25,14 +25,16 @@
     govukTable: GovukTable,
     iconsLink: IconsLink,
     formHelper: FormWithCSRF,
-    govukButton: GovukButton
-)
+    govukButton: GovukButton,
+    sideNav: views.html.templates.SideNav,
+    applicationNavItems: ApplicationNavItems,
+)(implicit frontendAppConfig: FrontendAppConfig, hipEnvironments: HipEnvironments)
 
-@(application: Application, allScopes: Seq[CredentialScopes], user: UserModel)(implicit request: Request[?], messages: Messages, config: FrontendAppConfig, hipEnvironments: HipEnvironments)
+@(application: Application, allScopes: Seq[CredentialScopes], user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("allScopes.title")), user = Some(user), fullWidth = true, customScriptsBlock = Some(iconsLink())) {
 
-    @views.html.templates.SideNav(application.name, ApplicationNavItems(Some(user), application, ApplicationSideNavPages.AllScopesPage)) {
+    @sideNav(application.name, applicationNavItems(Some(user), application, ApplicationSideNavPages.AllScopesPage)) {
 
         <h1 class="govuk-heading-l">@messages("allScopes.heading")</h1>
 

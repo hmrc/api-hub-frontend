@@ -17,7 +17,6 @@
 package controllers.application
 
 import com.google.inject.{Inject, Singleton}
-import config.{FrontendAppConfig, HipEnvironments}
 import controllers.actions.{ApplicationAuthActionProvider, AuthorisedSupportAction, IdentifierAction}
 import controllers.helpers.ErrorResultBuilder
 import play.api.i18n.I18nSupport
@@ -37,7 +36,7 @@ class AllScopesController @Inject()(
   apiHubService: ApiHubService,
   errorResultBuilder: ErrorResultBuilder,
   allScopesView: AllScopesView
-)(implicit ec: ExecutionContext, config: FrontendAppConfig, hipEnvironments: HipEnvironments) extends FrontendBaseController with I18nSupport {
+)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(id: String): Action[AnyContent] = (identify andThen isSupport andThen applicationAuth(id)).async {
     implicit request =>

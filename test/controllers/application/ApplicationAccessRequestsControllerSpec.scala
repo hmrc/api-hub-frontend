@@ -17,7 +17,6 @@
 package controllers.application
 
 import base.SpecBase
-import config.{FrontendAppConfig, HipEnvironments}
 import controllers.actions.{FakeApplication, FakeSupporter}
 import controllers.routes
 import generators.AccessRequestGenerator
@@ -56,8 +55,6 @@ class ApplicationAccessRequestsControllerSpec
           implicit val msgs: Messages = messages(fixture.playApplication)
           val result = route(fixture.playApplication, request).value
           val view = fixture.playApplication.injector.instanceOf[ApplicationAccessRequestsView]
-          implicit val config: FrontendAppConfig = fixture.playApplication.injector.instanceOf[FrontendAppConfig]
-          implicit val hipEnvironments: HipEnvironments = fixture.playApplication.injector.instanceOf[HipEnvironments]
 
           status(result) mustBe OK
           contentAsString(result) mustBe view(FakeApplication, accessRequests, user).toString()
@@ -128,8 +125,6 @@ class ApplicationAccessRequestsControllerSpec
         implicit val msgs: Messages = messages(fixture.playApplication)
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[ApplicationAccessRequestsView]
-        implicit val config: FrontendAppConfig = fixture.playApplication.injector.instanceOf[FrontendAppConfig]
-        implicit val hipEnvironments: HipEnvironments = fixture.playApplication.injector.instanceOf[HipEnvironments]
 
         status(result) mustBe OK
         contentAsString(result) mustBe view(FakeApplication, orderedAccessRequests, FakeSupporter).toString()

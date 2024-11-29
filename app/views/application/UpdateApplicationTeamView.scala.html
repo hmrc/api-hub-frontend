@@ -14,7 +14,6 @@
  * limitations under the License.
  *@
 
-@import config.{FrontendAppConfig, HipEnvironments}
 @import models.application.Application
 @import models.team.Team
 @import models.user.UserModel
@@ -32,10 +31,12 @@
     govukButton: GovukButton,
     iconsLink: IconsLink,
     applicationDetailsTable: ApplicationDetailsTable,
-    teamSelection: TeamSelection
+    teamSelection: TeamSelection,
+    sideNav: views.html.templates.SideNav,
+    applicationNavItems: ApplicationNavItems,
 )
 
-@(form: Form[?], application: Application, owningTeam: Option[Team], teams: Seq[Team], user: UserModel)(implicit request: Request[?], messages: Messages, config: FrontendAppConfig, hipEnvironments: HipEnvironments)
+@(form: Form[?], application: Application, owningTeam: Option[Team], teams: Seq[Team], user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @scripts() = {
     @iconsLink()
@@ -46,7 +47,7 @@
 }
 
 @layout(pageTitle = titleNoForm(messages("application.update.team.title")), user = Some(user), fullWidth = true, customScriptsBlock = Some(scripts())) {
-    @views.html.templates.SideNav(application.name, ApplicationNavItems(Some(user), application, ApplicationSideNavPages.ChangeOwningTeamPage)) {
+    @sideNav(application.name, applicationNavItems(Some(user), application, ApplicationSideNavPages.ChangeOwningTeamPage)) {
         @formHelper(action = controllers.application.routes.UpdateApplicationTeamController.onSubmit(application.id), Symbol("autoComplete") -> "off") {
             @if(form.errors.nonEmpty) {
                 @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))

@@ -14,7 +14,6 @@
  * limitations under the License.
  *@
 
-@import config.{FrontendAppConfig, HipEnvironments}
 @import models.application._
 @import models.user.UserModel
 @import viewmodels.application.{ApplicationApi, ApplicationSideNavPages, ApplicationNavItems}
@@ -25,10 +24,12 @@
     layout: templates.Layout,
     govukTable: GovukTable,
     iconsLink: IconsLink,
-    applicationDetailsTable: ApplicationDetailsTable
+    applicationDetailsTable: ApplicationDetailsTable,
+    sideNav: views.html.templates.SideNav,
+    applicationNavItems: ApplicationNavItems,
 )
 
-@(application: Application, applicationApis: Seq[ApplicationApi], user: Option[UserModel])(implicit request: Request[?], messages: Messages, config: FrontendAppConfig, hipEnvironments: HipEnvironments)
+@(application: Application, applicationApis: Seq[ApplicationApi], user: Option[UserModel])(implicit request: Request[?], messages: Messages)
 
 @pendingAccessRequestsCount = @{
     applicationApis.map(_.pendingAccessRequestCount).sum
@@ -77,7 +78,7 @@
 
 @layout(pageTitle = titleNoForm(messages("applicationDetails.title")), user = user, fullWidth = true, customScriptsBlock = Some(iconsLink())) {
 
-    @views.html.templates.SideNav(application.name, ApplicationNavItems(user, application, ApplicationSideNavPages.DetailsPage)) {
+    @sideNav(application.name, applicationNavItems(user, application, ApplicationSideNavPages.DetailsPage)) {
 
         <h1 class="govuk-heading-l">@messages("applicationDetails.heading")</h1>
 

@@ -17,7 +17,6 @@
 package controllers.application
 
 import base.SpecBase
-import config.{FrontendAppConfig, HipEnvironments}
 import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
 import controllers.routes
 import models.accessrequest.Pending
@@ -59,8 +58,6 @@ class ApplicationApisControllerSpec extends SpecBase with MockitoSugar with Test
             val request = FakeRequest(GET, controllers.application.routes.ApplicationApisController.onPageLoad(FakeApplication.id).url)
             val result = route(fixture.playApplication, request).value
             val view = fixture.playApplication.injector.instanceOf[ApplicationApisView]
-            implicit val config: FrontendAppConfig = fixture.playApplication.injector.instanceOf[FrontendAppConfig]
-            implicit val hipEnvironments: HipEnvironments = fixture.playApplication.injector.instanceOf[HipEnvironments]
 
             status(result) mustEqual OK
             contentAsString(result) mustBe view(FakeApplication, Seq.empty, Some(user))(request, messages(fixture.playApplication)).toString
@@ -108,8 +105,6 @@ class ApplicationApisControllerSpec extends SpecBase with MockitoSugar with Test
         val request = FakeRequest(GET, controllers.application.routes.ApplicationApisController.onPageLoad(application.id).url)
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[ApplicationApisView]
-        implicit val config: FrontendAppConfig = fixture.playApplication.injector.instanceOf[FrontendAppConfig]
-        implicit val hipEnvironments: HipEnvironments = fixture.playApplication.injector.instanceOf[HipEnvironments]
 
         status(result) mustEqual OK
         contentAsString(result) mustBe view(application, applicationApis, Some(FakeUser))(request, messages(fixture.playApplication)).toString

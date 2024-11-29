@@ -23,6 +23,7 @@ import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import viewmodels.SideNavItem
+import SideNavItem.SideNavItemLeaf
 import viewmodels.application.DeletedApplicationSideNavPages.{DetailsPage, JsonViewPage}
 
 class DeletedApplicationNavItemsSpec extends SpecBase with Matchers with TableDrivenPropertyChecks {
@@ -36,13 +37,13 @@ class DeletedApplicationNavItemsSpec extends SpecBase with Matchers with TableDr
 
         val actual = DeletedApplicationNavItems(FakeApplication)
         val expected = Seq(
-          SideNavItem(
+          SideNavItemLeaf(
             page = DetailsPage,
             title = "Application details",
             link = controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id),
             isCurrentPage = true
           ),
-          SideNavItem(
+          SideNavItemLeaf(
             page = JsonViewPage,
             title = "View as JSON",
             link = controllers.application.routes.ApplicationSupportController.onPageLoad(FakeApplication.id),

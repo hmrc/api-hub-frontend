@@ -22,7 +22,8 @@
 @this(
         layout: templates.Layout,
         govukTabs: GovukTabs,
-        govukTable: GovukTable
+        govukTable: GovukTable,
+        sideNav: views.html.templates.SideNav,
 )
 
 @(domains: Seq[Domain], hods: Seq[Hod], emailDomains: Seq[String], user: UserModel)(implicit request: Request[?], messages: Messages)
@@ -117,7 +118,7 @@
 
 @layout(pageTitle = titleNoForm(messages("configuration.title")), user = Some(user), fullWidth = true) {
 
-    @views.html.templates.SideNav(messages("manageApplications.admin"), AdminNavItems(user, AdminSideNavPages.ConfigurationPage)) {
+    @sideNav(messages("manageApplications.admin"), AdminNavItems(user, AdminSideNavPages.ConfigurationPage)) {
 
         <h1 class="govuk-heading-l">@messages("configuration.title")</h1>
 

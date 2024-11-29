@@ -17,7 +17,7 @@
 package controllers.application
 
 import base.SpecBase
-import config.{FrontendAppConfig, HipEnvironments}
+import config.FrontendAppConfig
 import controllers.actions.{FakeApplication, FakePrivilegedUser, FakeUser, FakeUserNotTeamMember}
 import controllers.routes
 import models.application.{Primary, Secondary}
@@ -54,7 +54,6 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
             val result = route(fixture.playApplication, request).value
             val view = fixture.playApplication.injector.instanceOf[EnvironmentAndCredentialsView]
             implicit val config: FrontendAppConfig = fixture.playApplication.injector.instanceOf[FrontendAppConfig]
-            implicit val hipEnvironments: HipEnvironments = fixture.playApplication.injector.instanceOf[HipEnvironments]
 
             status(result) mustEqual OK
             contentAsString(result) mustBe view(FakeApplication, user, config.helpDocsPath)(request, messages(fixture.playApplication)).toString

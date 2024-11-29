@@ -17,7 +17,6 @@
 package controllers.application;
 
 import base.SpecBase
-import config.{FrontendAppConfig, HipEnvironments}
 import controllers.actions.{ApplicationAuthActionProvider, FakeApplication, FakeApplicationAuthActions}
 import controllers.routes
 import forms.application.UpdateApplicationTeamFormProvider
@@ -66,8 +65,6 @@ class UpdateApplicationTeamControllerSpec
                     val request = FakeRequest(controllers.application.routes.UpdateApplicationTeamController.onPageLoad(FakeApplication.id))
                     val result = route(fixture.playApplication, request).value
                     val view = fixture.playApplication.injector.instanceOf[UpdateApplicationTeamView]
-                    implicit val config: FrontendAppConfig = fixture.playApplication.injector.instanceOf[FrontendAppConfig]
-                    implicit val hipEnvironments: HipEnvironments = fixture.playApplication.injector.instanceOf[HipEnvironments]
 
                     status(result) mustBe OK
                     contentAsString(result) mustBe view(form, FakeApplication, None, allTeams, user)(request, messages(fixture.playApplication)).toString()
@@ -93,8 +90,6 @@ class UpdateApplicationTeamControllerSpec
                     val request = FakeRequest(controllers.application.routes.UpdateApplicationTeamController.onPageLoad(FakeApplication.id))
                     val result = route(fixture.playApplication, request).value
                     val view = fixture.playApplication.injector.instanceOf[UpdateApplicationTeamView]
-                    implicit val config: FrontendAppConfig = fixture.playApplication.injector.instanceOf[FrontendAppConfig]
-                    implicit val hipEnvironments: HipEnvironments = fixture.playApplication.injector.instanceOf[HipEnvironments]
 
                     status(result) mustBe OK
                     contentAsString(result) mustBe view(form, FakeApplication, None, orderedTeams, user)(request, messages(fixture.playApplication)).toString()
@@ -114,8 +109,6 @@ class UpdateApplicationTeamControllerSpec
                     val request = FakeRequest(controllers.application.routes.UpdateApplicationTeamController.onPageLoad(FakeApplication.id))
                     val result = route(fixture.playApplication, request).value
                     val view = fixture.playApplication.injector.instanceOf[UpdateApplicationTeamView]
-                    implicit val config: FrontendAppConfig = fixture.playApplication.injector.instanceOf[FrontendAppConfig]
-                    implicit val hipEnvironments: HipEnvironments = fixture.playApplication.injector.instanceOf[HipEnvironments]
 
                     status(result) mustBe OK
                     contentAsString(result) mustBe view(form, FakeApplication, None, allTeams, user)(request, messages(fixture.playApplication)).toString()
@@ -177,8 +170,6 @@ class UpdateApplicationTeamControllerSpec
                             .withFormUrlEncodedBody(("owningTeam", ""))
                     val result = route(fixture.playApplication, request).value
                     val view = fixture.playApplication.injector.instanceOf[UpdateApplicationTeamView]
-                    implicit val config: FrontendAppConfig = fixture.playApplication.injector.instanceOf[FrontendAppConfig]
-                    implicit val hipEnvironments: HipEnvironments = fixture.playApplication.injector.instanceOf[HipEnvironments]
 
                     status(result) mustBe BAD_REQUEST
                     contentAsString(result) mustBe view(form.bind(Map("owningTeam" -> "")), FakeApplication, None, allTeams, user)(request, messages(fixture.playApplication)).toString()

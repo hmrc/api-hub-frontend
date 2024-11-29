@@ -39,10 +39,10 @@ site.unexpecteError = Unexpected error: {0}
 site.team.select = Select an owning team
 site.team.unassigned = Unassigned
 site.signedIn = Signed in as {0} via {1}
-site.environment.dev = Dev environment
+site.environment.dev = Development environment
 site.environment.test = Test environment
-site.environment.preprod = Pre prod environment
-site.environment.production = Prod environment
+site.environment.preprod = Pre-Production environment
+site.environment.production = Production environment
 
 date.day = Day
 date.month = Month
@@ -223,6 +223,10 @@ environmentAndCredentials.cannotDeleteLastCredential.message = You cannot revoke
 
 environments.title = Environments and Credentials
 environments.heading = Environments and credentials
+environments.clientId = Client ID
+environments.clientSecret = Client secret
+environments.created = Created
+environments.noCredentials = No production credentials have been created.
 
 addCredentialChecklist.title = Creating production credentials
 addCredentialChecklist.heading = Creating production credentials

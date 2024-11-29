@@ -18,7 +18,6 @@ package controllers.application
 
 
 import com.google.inject.{Inject, Singleton}
-import config.{FrontendAppConfig, HipEnvironments}
 import controllers.actions.{ApplicationAuthActionProvider, IdentifierAction}
 import controllers.helpers.ErrorResultBuilder
 import forms.application.UpdateApplicationTeamFormProvider
@@ -42,7 +41,7 @@ class UpdateApplicationTeamController @Inject()(
                                                  view: UpdateApplicationTeamView,
                                                  successView: UpdateApplicationTeamSuccessView,
                                                  errorResultBuilder: ErrorResultBuilder
-                                       )(implicit ec: ExecutionContext, config: FrontendAppConfig, hipEnvironments: HipEnvironments) extends FrontendBaseController with I18nSupport {
+                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
 

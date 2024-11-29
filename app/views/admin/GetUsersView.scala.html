@@ -20,7 +20,8 @@
 
 @this(
     layout: templates.Layout,
-    govukButton: GovukButton
+    govukButton: GovukButton,
+    sideNav: views.html.templates.SideNav,
 )
 
 @(userEmails: Seq[String], user: UserModel)(implicit request: Request[?], messages: Messages)
@@ -36,7 +37,7 @@
     activeLink = Some("apiHubAdmin"),
     customScriptsBlock = Some(scripts())
 ) {
-    @views.html.templates.SideNav(messages("getUsers.admin"), AdminNavItems(user, AdminSideNavPages.GetUsersPage)) {
+    @sideNav(messages("getUsers.admin"), AdminNavItems(user, AdminSideNavPages.GetUsersPage)) {
         <h1 class="govuk-heading-m govuk-!-margin-bottom-7">
             @messages("getUsers.heading")
         </h1>

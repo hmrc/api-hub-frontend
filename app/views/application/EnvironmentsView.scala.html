@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import config.{FrontendAppConfig, HipEnvironment, HipEnvironments}
+@import config.HipEnvironment
 @import models.application._
 @import models.application.ApplicationLenses._
 @import models.user.UserModel
@@ -28,45 +28,11 @@
     govukButton : GovukButton,
     formHelper: FormWithCSRF,
     iconsLink: IconsLink,
+    sideNav: views.html.templates.SideNav,
+    applicationNavItems: ApplicationNavItems,
 )
 
-@(application: Application, user: UserModel, hipEnvironment: HipEnvironment)(implicit request: Request[?], messages: Messages, config: FrontendAppConfig, hipEnvironments: HipEnvironments)
-
-@canDeleteCredentials() = @{
-    application.getCredentialsFor(hipEnvironment.environmentName).size > 1 &&
-        (user.permissions.canSupport ||
-        (application.hasTeamMember(user) && (hipEnvironment.environmentName == Secondary || user.permissions.isPrivileged)))
-}
-
-@apisTabContent() = {
-
-    <div class="environment-block-header">
-        <div class="left">
-            <h2 class="govuk-heading-m">APIs</h2>
-        </div>
-    </div>
-
-    @if(application.apis.isEmpty) {
-        <div class="call-out-panel">
-            <p class="govuk-body information-tag ">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-                <span class="call-out-type">
-                    @messages("environmentAndCredentials.test.noApis")
-                </span>
-            </p>
-            <p class="govuk-body additional-message">
-                @messages("environmentAndCredentials.test.noApis.additional")
-            </p>
-        </div>
-    } else {
-        <ul class="govuk-list govuk-list--bullet">
-            @for(api <- application.apis) {
-                <li>@api.title</li>
-            }
-        </ul>
-    }
-
-}
+@(application: Application, user: UserModel, hipEnvironment: HipEnvironment)(implicit request: Request[?], messages: Messages)
 
 @credentialsTabContent() = {
 
@@ -74,61 +40,27 @@
         <div class="left">
             <h2 class="govuk-heading-m">Credentials</h2>
         </div>
-
-        @if(!hipEnvironment.isProductionLike || user.permissions.isPrivileged) {
-            <div class="right govuk-!-text-align-right">
-                @formHelper(action = controllers.application.routes.AddCredentialController.addDevelopmentCredential(application.id), Symbol("autoComplete") -> "off") {
-                    @govukButton(
-                        Button(
-                            classes = "govuk-button--secondary",
-                            content = Text(messages("environmentAndCredentials.addNewCredential"))
-                        ).disabled(application.getSecondaryCredentials.size >= 5).withId("addNewCredential")
-                    )
-                }
-            </div>
-        }
     </div>
-
-    @if(application.apis.isEmpty) {
-        <div class="call-out-panel">
-            <p class="govuk-body information-tag ">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-                <span class="call-out-type">
-                            @messages("environmentAndCredentials.test.noApis")
-                        </span>
-            </p>
-            <p class="govuk-body additional-message">
-                @messages("environmentAndCredentials.test.noApis.additional")
-            </p>
-        </div>
-    }
 
     @if(hipEnvironment.isProductionLike && application.getCredentialsFor(hipEnvironment.environmentName).isEmpty) {
         <p class="govuk-body">
-            @messages("environmentAndCredentials.noCredentials")
+            @messages("environments.noCredentials")
         </p>
     } else {
         @for(credential <- application.getCredentialsFor(hipEnvironment.environmentName)) {
             <div class="api-panel api-panel--small">
                 <p data-test-credential-client-id="@credential.clientId" class="govuk-body govuk-!-margin-bottom-3">
-                    <strong>@messages("environmentAndCredentials.clientId"):</strong>
+                    <strong>@messages("environments.clientId"):</strong>
                     @credential.clientId
                 </p>
                 <p class="govuk-body govuk-!-margin-bottom-3">
-                    <strong>@messages("environmentAndCredentials.clientSecret"):</strong>
+                    <strong>@messages("environments.clientSecret"):</strong>
                     @credential.clientSecret.getOrElse("")
                 </p>
                 <p class="govuk-body govuk-!-margin-bottom-3">
-                    <strong>@messages("environmentAndCredentials.created"):</strong>
+                    <strong>@messages("environments.created"):</strong>
                     <span class="utcDateTime">@ViewUtils.formatLocalDateTimeContainingUtc(credential.created)</span>
                 </p>
-                @if(canDeleteCredentials()) {
-                <div class="govuk-button-group govuk-!-margin-bottom-3">
-                    <a data-test-credential-client-id="@credential.clientId" class="govuk-link govuk-!-margin-bottom-0" href="@controllers.application.routes.EnvironmentAndCredentialsController.deleteSecondaryCredential(application.id, credential.clientId).url">
-                        @messages("environmentAndCredentials.deleteCredential")
-                    </a>
-                </div>
-                }
             </div>
         }
     }
@@ -137,31 +69,17 @@
 
 @layout(pageTitle = titleNoForm(messages("environments.title")), user = Some(user), fullWidth = true, customScriptsBlock = Some(iconsLink())) {
 
-    @views.html.templates.SideNav(application.name, ApplicationNavItems(Some(user), application, ApplicationSideNavPages.EnvironmentsPage, Some(hipEnvironment))) {
+    @sideNav(application.name, applicationNavItems(Some(user), application, ApplicationSideNavPages.EnvironmentPage(hipEnvironment))) {
 
         <h1 class="govuk-heading-l">@messages(s"site.environment.${hipEnvironment.id}")</h1>
 
         @govukTabs(Tabs(
             items = Seq(
                 TabItem(
-                    id = Some(s"${hipEnvironment.id}-apis"),
-                    label = messages("applicationDetails.environments.apis"),
-                    panel = TabPanel(
-                        content = HtmlContent(apisTabContent())
-                    )
-                ),
-                TabItem(
                     id = Some(s"${hipEnvironment.id}-credentials"),
                     label = messages("applicationDetails.environments.crendentials"),
                     panel = TabPanel(
                         content = HtmlContent(credentialsTabContent())
-                    )
-                ),
-                TabItem(
-                    id = Some(s"${hipEnvironment.id}-curl"),
-                    label = messages("applicationDetails.environments.exampleCurlCommands"),
-                    panel = TabPanel(
-                        content = Empty
                     )
                 ),
             )

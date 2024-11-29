@@ -24,10 +24,12 @@
         layout: templates.Layout,
         govukTable: GovukTable,
         govukButton: GovukButton,
-        iconsLink: IconsLink
-)
+        iconsLink: IconsLink,
+        sideNav: views.html.templates.SideNav,
+        applicationNavItems: ApplicationNavItems,
+)(implicit frontendAppConfig: FrontendAppConfig, hipEnvironments: HipEnvironments)
 
-@(application: Application, applicationApis: Seq[ApplicationApi], user: Option[UserModel])(implicit request: Request[?], messages: Messages, config: FrontendAppConfig, hipEnvironments: HipEnvironments)
+@(application: Application, applicationApis: Seq[ApplicationApi], user: Option[UserModel])(implicit request: Request[?], messages: Messages)
 
 @pendingAccessRequestsCount = @{
     applicationApis.map(_.pendingAccessRequestCount).sum
@@ -72,7 +74,7 @@
 
 @layout(pageTitle = titleNoForm(messages("applicationApis.title")), user = user, fullWidth = true, customScriptsBlock = Some(iconsLink())) {
 
-    @views.html.templates.SideNav(application.name, ApplicationNavItems(user, application, ApplicationSideNavPages.ApisPage)) {
+    @sideNav(application.name, applicationNavItems(user, application, ApplicationSideNavPages.ApisPage)) {
 
         <h1 class="govuk-heading-l">@messages("applicationApis.heading")</h1>
 

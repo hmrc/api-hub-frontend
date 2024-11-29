@@ -17,7 +17,7 @@
 package controllers.application
 
 import com.google.inject.Inject
-import config.{FrontendAppConfig, HipEnvironments}
+import config.FrontendAppConfig
 import controllers.actions.{ApplicationAuthActionProvider, IdentifierAction}
 import controllers.helpers.ErrorResultBuilder
 import models.application.{EnvironmentName, Primary, Secondary}
@@ -39,11 +39,11 @@ class EnvironmentAndCredentialsController @Inject()(
   apiHubService: ApiHubService,
   errorResultBuilder: ErrorResultBuilder,
   config: FrontendAppConfig
-)(implicit ec: ExecutionContext, hipEnvironments: HipEnvironments) extends FrontendBaseController with I18nSupport {
+)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id, enrich = true)) {
     implicit request =>
-      Ok(view(request.application, request.identifierRequest.user, config.helpDocsPath)(request, summon[Messages], config))
+      Ok(view(request.application, request.identifierRequest.user, config.helpDocsPath))
   }
 
   def deletePrimaryCredential(id: String, clientId: String): Action[AnyContent] = (identify andThen applicationAuth(id, enrich = true)).async {

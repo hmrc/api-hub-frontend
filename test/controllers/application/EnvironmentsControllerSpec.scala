@@ -17,7 +17,6 @@
 package controllers.application
 
 import base.SpecBase
-import config.{FrontendAppConfig, HipEnvironments}
 import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
 import controllers.routes
 import fakes.FakeHipEnvironments
@@ -51,15 +50,11 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
             val request = FakeRequest(GET, controllers.application.routes.EnvironmentsController.onPageLoad(FakeApplication.id, "test").url)
             val result = route(fixture.playApplication, request).value
             val view = fixture.playApplication.injector.instanceOf[EnvironmentsView]
-            implicit val config: FrontendAppConfig = fixture.playApplication.injector.instanceOf[FrontendAppConfig]
-            implicit val hipEnvironments: HipEnvironments = fixture.playApplication.injector.instanceOf[HipEnvironments]
 
             status(result) mustEqual OK
             contentAsString(result) mustBe view(FakeApplication, user, FakeHipEnvironments.test)(request, messages(fixture.playApplication)).toString
             contentAsString(result) must validateAsHtml
-            contentAsString(result) must include("""id="test-apis"""")
             contentAsString(result) must include("""id="test-credentials"""")
-            contentAsString(result) must include("""id="test-curl"""")
           }
       }
     }
