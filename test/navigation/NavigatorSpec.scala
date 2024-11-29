@@ -139,8 +139,8 @@ class NavigatorSpec extends SpecBase with TryValues {
         "must go from the Enter a short description page to the API review page" in {
           navigator.nextPage(ProduceApiShortDescriptionPage, NormalMode, emptyUserAnswers.set(ProduceApiShortDescriptionPage, "short description").get) mustBe controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onPageLoad(NormalMode)
         }
-        "must go from the API review page to the Egress page" in {
-          navigator.nextPage(ProduceApiReviewNameDescriptionPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiEgressController.onPageLoad(NormalMode)
+        "must go from the API review page to the Define Wiremock page" in {
+          navigator.nextPage(ProduceApiReviewNameDescriptionPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiHowToAddWiremockController.onPageLoad(NormalMode)
         }
         "must go from the API Egress Prefixes page to the HoD page" in {
           navigator.nextPage(ProduceApiEgressPrefixesPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiHodController.onPageLoad(NormalMode)
@@ -182,8 +182,8 @@ class NavigatorSpec extends SpecBase with TryValues {
         "must go from the Review a short description page to the API review page" in {
           navigator.nextPage(UpdateApiShortDescriptionPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiReviewNameDescriptionController.onPageLoad(NormalMode)
         }
-        "must go from the API review page to the Egress review page" in {
-          navigator.nextPage(UpdateApiReviewNameDescriptionPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiReviewEgressController.onPageLoad(NormalMode)
+        "must go from the API review page to the Define Wiremock page" in {
+          navigator.nextPage(UpdateApiReviewNameDescriptionPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiHowToAddWiremockController.onPageLoad(NormalMode)
         }
         "must go from the Upload OAS page to the OAS editor page" in {
           navigator.nextPage(UpdateApiUploadOasPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiEnterOasController.onPageLoadWithUploadedOas(NormalMode)

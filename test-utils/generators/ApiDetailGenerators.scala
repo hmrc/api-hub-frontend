@@ -103,7 +103,7 @@ trait ApiDetailGenerators {
 
   implicit lazy val arbitraryApiDetailSummary: Arbitrary[ApiDetailSummary] = Arbitrary(genApiDetail.map(_.toApiDetailSummary))
 
-  private val parameters = Gen.Parameters.default
+  private val parameters = Gen.Parameters.default.withSize(50)
 
   def sampleApiDetail(): ApiDetail =
     genApiDetail.pureApply(parameters, Seed.random())
