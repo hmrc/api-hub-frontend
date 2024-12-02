@@ -92,12 +92,14 @@ class Navigator @Inject()() {
     case ProduceApiEnterOasPage => _ => controllers.myapis.produce.routes.ProduceApiShortDescriptionController.onPageLoad(CheckMode)
     case ProduceApiShortDescriptionPage => _ => controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onPageLoad(CheckMode)
     case ProduceApiReviewNameDescriptionPage => _ => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
+    case ProduceApiAddPrefixesPage => produceApiAddPrefixNextPage(CheckMode)
     case ProduceApiEgressPrefixesPage => _ => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
     case ProduceApiHodPage => _ => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
     case ProduceApiDomainPage => _ => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
     case ProduceApiStatusPage => _ => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
     case ProduceApiPassthroughPage => _ => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
     case UpdateApiUploadOasPage => _ => controllers.myapis.update.routes.UpdateApiEnterOasController.onPageLoadWithUploadedOas(CheckMode)
+    case UpdateApiAddPrefixesPage => updateApiAddPrefixNextPage(CheckMode)
     case _ => _ => routes.IndexController.onPageLoad
   }
 
@@ -180,7 +182,7 @@ class Navigator @Inject()() {
   }
 
   private def updateApiAddPrefixNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
-    (mode, userAnswers.get(ProduceApiAddPrefixesPage)) match {
+    (mode, userAnswers.get(UpdateApiAddPrefixesPage)) match {
 //      case (_, Some(true)) => controllers.myapis.update.routes.UpdateApiEgressPrefixesController.onPageLoad(mode) not implemented yet
       case (NormalMode, Some(false)) => controllers.myapis.update.routes.UpdateApiHodController.onPageLoad(mode)
       case (CheckMode, Some(false)) => controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onPageLoad()
