@@ -57,6 +57,7 @@ class Navigator @Inject()() {
     case ProduceApiHowToCreatePage => produceApiHowToCreateNextPage(NormalMode)
     case ProduceApiShortDescriptionPage => _ => controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onPageLoad(NormalMode)
     case ProduceApiReviewNameDescriptionPage => _ => controllers.myapis.produce.routes.ProduceApiHowToAddWiremockController.onPageLoad(NormalMode)
+    case ProduceApiAddPrefixesPage => produceApiAddPrefixNextPage(NormalMode)
     case ProduceApiChooseEgressPage => produceApiChooseEgressNextPage(NormalMode)
     case ProduceApiEgressPrefixesPage => _ => controllers.myapis.produce.routes.ProduceApiHodController.onPageLoad(NormalMode)
     case ProduceApiHodPage => _ => controllers.myapis.produce.routes.ProduceApiDomainController.onPageLoad(NormalMode)
@@ -163,7 +164,16 @@ class Navigator @Inject()() {
       case _ => routes.JourneyRecoveryController.onPageLoad()
     }
   }
-  
+
+  private def produceApiAddPrefixNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
+    (mode, userAnswers.get(ProduceApiAddPrefixesPage)) match {
+      case (_, Some(true)) => controllers.myapis.produce.routes.ProduceApiEgressPrefixesController.onPageLoad(mode)
+      case (NormalMode, Some(false)) => controllers.myapis.produce.routes.ProduceApiHodController.onPageLoad(mode)
+      case (CheckMode, Some(false)) => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
+      case _ => routes.JourneyRecoveryController.onPageLoad()
+    }
+  }
+
   private def produceApiStatusNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
     userAnswers.get(ProduceApiStartPage) match {
       case Some(user) if user.permissions.canSupport => controllers.myapis.produce.routes.ProduceApiPassthroughController.onPageLoad(mode)
