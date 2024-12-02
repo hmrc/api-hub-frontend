@@ -70,11 +70,6 @@ POST    /produce/add-prefixes                               controllers.myapis.p
 GET     /produce/change-add-prefixes                        controllers.myapis.produce.ProduceApiAddPrefixesController.onPageLoad(mode: Mode = CheckMode)
 POST    /produce/change-add-prefixes                        controllers.myapis.produce.ProduceApiAddPrefixesController.onSubmit(mode: Mode = CheckMode)
 
-GET     /produce/egress                                     controllers.myapis.produce.ProduceApiEgressController.onPageLoad(mode: Mode = NormalMode)
-POST    /produce/egress                                     controllers.myapis.produce.ProduceApiEgressController.onSubmit(mode: Mode = NormalMode)
-GET     /produce/change-egress                              controllers.myapis.produce.ProduceApiEgressController.onPageLoad(mode: Mode = CheckMode)
-POST    /produce/change-egress                              controllers.myapis.produce.ProduceApiEgressController.onSubmit(mode: Mode = CheckMode)
-
 GET     /produce/egress-prefixes                            controllers.myapis.produce.ProduceApiEgressPrefixesController.onPageLoad(mode: Mode = NormalMode)
 POST    /produce/egress-prefixes                            controllers.myapis.produce.ProduceApiEgressPrefixesController.onSubmit(mode: Mode = NormalMode)
 GET     /produce/change-egress-prefixes                     controllers.myapis.produce.ProduceApiEgressPrefixesController.onPageLoad(mode: Mode = CheckMode)
@@ -163,16 +158,6 @@ GET     /update/add-prefixes                               controllers.myapis.up
 POST    /update/add-prefixes                               controllers.myapis.update.UpdateApiAddPrefixesController.onSubmit(mode: Mode = NormalMode)
 GET     /update/change-add-prefixes                        controllers.myapis.update.UpdateApiAddPrefixesController.onPageLoad(mode: Mode = CheckMode)
 POST    /update/change-add-prefixes                        controllers.myapis.update.UpdateApiAddPrefixesController.onSubmit(mode: Mode = CheckMode)
-
-GET     /update/review-egress                               controllers.myapis.update.UpdateApiReviewEgressController.onPageLoad(mode: Mode = NormalMode)
-POST    /update/review-egress                               controllers.myapis.update.UpdateApiReviewEgressController.onSubmit(next: String, mode: Mode = NormalMode)
-GET     /update/change-review-egress                        controllers.myapis.update.UpdateApiReviewEgressController.onPageLoad(mode: Mode = CheckMode)
-POST    /update/change-review-egress                        controllers.myapis.update.UpdateApiReviewEgressController.onSubmit(next: String, mode: Mode = CheckMode)
-
-GET     /update/egress                                      controllers.myapis.update.UpdateApiEgressController.onPageLoad(mode: Mode = NormalMode)
-POST    /update/egress                                      controllers.myapis.update.UpdateApiEgressController.onSubmit(mode: Mode = NormalMode)
-GET     /update/change-egress                               controllers.myapis.update.UpdateApiEgressController.onPageLoad(mode: Mode = CheckMode)
-POST    /update/change-egress                               controllers.myapis.update.UpdateApiEgressController.onSubmit(mode: Mode = CheckMode)
 
 GET     /update/hod                                         controllers.myapis.update.UpdateApiHodController.onPageLoad(mode: Mode = NormalMode)
 POST    /update/hod                                         controllers.myapis.update.UpdateApiHodController.onSubmit(mode: Mode = NormalMode)

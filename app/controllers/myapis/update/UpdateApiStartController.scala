@@ -77,7 +77,6 @@ class UpdateApiStartController @Inject()(
             case _ => None
           }
           updatedAnswers <- updateOptionalAnswer(updatedAnswers, UpdateApiEgressPrefixesPage, egressPrefixesMappings)
-          updatedAnswers <- updateOptionalAnswer(updatedAnswers, UpdateApiReviewEgressPage, egressPrefixesMappings.map(!_.isEmpty))
           response <- sessionRepository.set(updatedAnswers)
           result = Redirect(navigator.nextPage(UpdateApiStartPage, NormalMode, updatedAnswers))
         } yield result

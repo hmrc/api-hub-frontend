@@ -162,14 +162,6 @@ class NavigatorSpec extends SpecBase with TryValues {
         "must go from the API passthrough page to the API check your answers page" in {
           navigator.nextPage(ProduceApiPassthroughPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
         }
-        "must go from the choose egress page to the egress prefixes page when the user chooses to configure prefixes" in {
-          val userAnswers = emptyUserAnswers.set(ProduceApiChooseEgressPage, ProduceApiChooseEgress(None, true)).get
-          navigator.nextPage(ProduceApiChooseEgressPage, NormalMode, userAnswers) mustBe controllers.myapis.produce.routes.ProduceApiEgressPrefixesController.onPageLoad(NormalMode)
-        }
-        "must go from the choose egress page to the choose HoDs page when the user chooses not to configure prefixes" in {
-          val userAnswers = emptyUserAnswers.set(ProduceApiChooseEgressPage, ProduceApiChooseEgress(None, false)).get
-          navigator.nextPage(ProduceApiChooseEgressPage, NormalMode, userAnswers) mustBe controllers.myapis.produce.routes.ProduceApiHodController.onPageLoad(NormalMode)
-        }
       }
 
       "during the Update an API journey" - {
@@ -272,14 +264,6 @@ class NavigatorSpec extends SpecBase with TryValues {
         }
         "must go from the Preview Name/Description page to the Check Your Answers page" in {
           navigator.nextPage(ProduceApiReviewNameDescriptionPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
-        }
-        "must go from the Egress page to the Egress Prefixes page when the user chooses to configure prefixes" in {
-          val userAnswers = emptyUserAnswers.set(ProduceApiChooseEgressPage, ProduceApiChooseEgress(None, true)).get
-          navigator.nextPage(ProduceApiChooseEgressPage, CheckMode, userAnswers) mustBe controllers.myapis.produce.routes.ProduceApiEgressPrefixesController.onPageLoad(CheckMode)
-        }
-        "must go from the Egress page to the Check Your Answers page when the user chooses not to configure prefixes" in {
-          val userAnswers = emptyUserAnswers.set(ProduceApiChooseEgressPage, ProduceApiChooseEgress(None, false)).get
-          navigator.nextPage(ProduceApiChooseEgressPage, CheckMode, userAnswers) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
         }
         "must go from the Egress Prefixes page to the Check Your Answers page" in {
           navigator.nextPage(ProduceApiEgressPrefixesPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
