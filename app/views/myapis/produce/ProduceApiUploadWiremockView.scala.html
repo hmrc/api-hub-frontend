@@ -30,12 +30,42 @@
 
 @(action: Call)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = titleNoForm("Upload WireMock")) {
-    <h1 class="govuk-heading-l">Upload Wiremock</h1>
-    @formHelper(action = action) {
-     @govukButton(
-      Button(classes = "govuk-button--secondary", content = "Continue")
-     )
+@scripts() = {
+@iconsLink()
+ <script src='@routes.Assets.versioned("javascripts/produceApiUploadWiremock.js")' type="module" @{CSPNonce.attr}></script>
+}
 
-    }
+@layout(pageTitle = title(form, messages("produceApiUploadWiremock.title")), user = Some(userModel), customScriptsBlock = Some(scripts())) {
+ <h1 class="govuk-heading-l">@messages("produceApiUploadWiremock.heading")</h1>
+
+ <p class="govuk-body">@messages("produceApiUploadWiremock.description")</p>
+
+ @if(form.errors.nonEmpty) {
+  @govukErrorSummary(ErrorSummaryViewModel(form))
+ }
+
+ <div id="fileDrop" class="hip-file-drop" data-maxsize="@config.maxWiremockUploadSizeMb" data-validextensions="json">
+  <div class="hip-file-drop__icon fas fa-cloud-upload-alt"></div>
+  <h6 class="hip-file-drop__text">@messages("produceApiUploadWiremock.file.text1")</h6>
+  <h6 class="hip-file-drop__text--hover">@messages("produceApiUploadWiremock.file.text1.hover")</h6>
+  <p class="hip-file-drop__text">@messages("produceApiUploadWiremock.file.text2")</p>
+
+  <label>
+   @messages("produceApiUploadWiremock.file.choose")
+   <input type="file" name="wiremockFile" id="wiremockFile" accept=".json">
+  </label>
+ </div>
+
+ <p class="govuk-body-s govuk-!-margin-top-4">@messages("produceApiUploadWiremock.fileInfo", config.maxWiremockUploadSizeMb)</p>
+
+ <p id="errorMessage" class="govuk-error-message govuk-!-margin-bottom-4 govuk-!-display-none"></p>
+ <p id="selectedFileName" class="govuk-body govuk-!-font-weight-bold govuk-!-display-none"></p>
+
+ @formHelper(action = viewModel.formAction) {
+  <input type="hidden" name="fileName" id="fileName" value="@form.value.map(_.fileName).getOrElse("")">
+  <input type="hidden" name="fileContents" id="fileContents" value="@form.value.map(_.fileContents).getOrElse("")">
+  @govukButton(
+   ButtonViewModel(messages("site.continue"))
+  )
+ }
 }
