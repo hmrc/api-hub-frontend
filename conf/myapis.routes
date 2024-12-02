@@ -51,9 +51,9 @@ GET     /produce/change-review-name-description             controllers.myapis.p
 POST    /produce/change-review-name-description             controllers.myapis.produce.ProduceApiReviewNameDescriptionController.onSubmit(mode: Mode = CheckMode)
 
 GET     /produce/how-to-add-wiremock                        controllers.myapis.produce.ProduceApiHowToAddWiremockController.onPageLoad(mode: Mode = NormalMode)
-POST    /produce/how-to-add-wiremock                        controllers.myapis.produce.ProduceApiHowToAddWiremockController.onSubmit(mode: Mode = NormalMode, answer: String)
+POST    /produce/how-to-add-wiremock                        controllers.myapis.produce.ProduceApiHowToAddWiremockController.onSubmit(mode: Mode = NormalMode)
 GET     /produce/change-how-to-add-wiremock                 controllers.myapis.produce.ProduceApiHowToAddWiremockController.onPageLoad(mode: Mode = CheckMode)
-POST    /produce/change-how-to-add-wiremock                 controllers.myapis.produce.ProduceApiHowToAddWiremockController.onSubmit(mode: Mode = CheckMode, answer: String)
+POST    /produce/change-how-to-add-wiremock                 controllers.myapis.produce.ProduceApiHowToAddWiremockController.onSubmit(mode: Mode = CheckMode)
 
 GET     /produce/upload-wiremock                            controllers.myapis.produce.ProduceApiUploadWiremockController.onPageLoad(mode: Mode = NormalMode)
 POST    /produce/upload-wiremock                            controllers.myapis.produce.ProduceApiUploadWiremockController.onSubmit(mode: Mode = NormalMode)
@@ -140,9 +140,9 @@ GET     /update/change-review-name-description              controllers.myapis.u
 POST    /update/change-review-name-description              controllers.myapis.update.UpdateApiReviewNameDescriptionController.onSubmit(mode: Mode = CheckMode)
 
 GET     /update/how-to-add-wiremock                        controllers.myapis.update.UpdateApiHowToAddWiremockController.onPageLoad(mode: Mode = NormalMode)
-POST    /update/how-to-add-wiremock                        controllers.myapis.update.UpdateApiHowToAddWiremockController.onSubmit(mode: Mode = NormalMode, answer: String)
+POST    /update/how-to-add-wiremock                        controllers.myapis.update.UpdateApiHowToAddWiremockController.onSubmit(mode: Mode = NormalMode)
 GET     /update/change-how-to-add-wiremock                 controllers.myapis.update.UpdateApiHowToAddWiremockController.onPageLoad(mode: Mode = CheckMode)
-POST    /update/change-how-to-add-wiremock                 controllers.myapis.update.UpdateApiHowToAddWiremockController.onSubmit(mode: Mode = CheckMode, answer: String)
+POST    /update/change-how-to-add-wiremock                 controllers.myapis.update.UpdateApiHowToAddWiremockController.onSubmit(mode: Mode = CheckMode)
 
 GET     /update/upload-wiremock                            controllers.myapis.update.UpdateApiUploadWiremockController.onPageLoad(mode: Mode = NormalMode)
 POST    /update/upload-wiremock                            controllers.myapis.update.UpdateApiUploadWiremockController.onSubmit(mode: Mode = NormalMode)

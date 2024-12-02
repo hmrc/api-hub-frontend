@@ -25,6 +25,11 @@ import viewmodels.admin.Decision.{Approve, Reject}
 
 trait ModelGenerators {
 
+  implicit lazy val arbitraryProduceApiHowToAddWiremock: Arbitrary[ProduceApiHowToAddWiremock] =
+    Arbitrary {
+      Gen.oneOf(ProduceApiHowToAddWiremock.values.toSeq)
+    }
+
   implicit lazy val arbitraryProduceApiEgressPrefixes: Arbitrary[ProduceApiEgressPrefixes] =
     Arbitrary {
       for {

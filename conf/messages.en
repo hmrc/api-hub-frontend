@@ -1070,3 +1070,14 @@ envParityConfigTest.admin = Integration Hub admin
 hipEnvironment.production.name = Production
 hipEnvironment.test.name = Test
 
+produceApiHowToAddWiremock.title = Define WireMock for your API
+produceApiHowToAddWiremock.heading = Define WireMock for your API
+produceApiHowToAddWiremock.description = To use your API in the development environment, you need to configure a WireMock. {0}.
+produceApiHowToAddWiremock.description.link = Guidance for configuring WireMocks (opens in a new tab)
+produceApiHowToAddWiremock.upload = Upload the WireMock
+produceApiHowToAddWiremock.upload.description = If you already have a WireMock defined as JSON, you can upload it.
+produceApiHowToAddWiremock.editor = Use a Visual Editor
+produceApiHowToAddWiremock.editor.description = Create a WireMock from scratch using our visual editor.
+produceApiHowToAddWiremock.checkYourAnswersLabel = produceApiHowToAddWiremock
+produceApiHowToAddWiremock.error.required = Select how you want to add a WireMock to your API. 
+produceApiHowToAddWiremock.change.hidden = ProduceApiHowToAddWiremock
