@@ -18,17 +18,19 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import views.html.components.IconsLink
 @import views.html.helper.CSPNonce
-@import models.myapis.produce.ProduceApiUploadedOasFile
+@import models.myapis.produce.ProduceApiUploadedWiremockFile
 @import config.FrontendAppConfig
-@import viewmodels.myapis.produce.ProduceApiUploadOasViewModel
+@import viewmodels.myapis.produce.ProduceApiUploadWiremockViewModel
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukButton: GovukButton,
+    iconsLink: IconsLink,
+    govukErrorSummary: GovukErrorSummary
 )
 
-@(action: Call)(implicit request: Request[?], messages: Messages)
+@(form: Form[ProduceApiUploadedWiremockFile], viewModel: ProduceApiUploadWiremockViewModel, userModel: UserModel, config: FrontendAppConfig)(implicit request: Request[?], messages: Messages)
 
 @scripts() = {
 @iconsLink()
