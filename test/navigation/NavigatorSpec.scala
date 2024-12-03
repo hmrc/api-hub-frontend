@@ -142,6 +142,14 @@ class NavigatorSpec extends SpecBase with TryValues {
         "must go from the API review page to the Define Wiremock page" in {
           navigator.nextPage(ProduceApiReviewNameDescriptionPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiHowToAddWiremockController.onPageLoad(NormalMode)
         }
+        "must go from the Add Prefixes page to the Enter Prefixes page if user answered Yes" in {
+          val userAnswers = emptyUserAnswers.set(ProduceApiAddPrefixesPage, true).get
+          navigator.nextPage(ProduceApiAddPrefixesPage, NormalMode, userAnswers) mustBe controllers.myapis.produce.routes.ProduceApiEgressPrefixesController.onPageLoad(NormalMode)
+        }
+        "must go from the Add Prefixes page to the HoDs page if user answered No" in {
+          val userAnswers = emptyUserAnswers.set(ProduceApiAddPrefixesPage, false).get
+          navigator.nextPage(ProduceApiAddPrefixesPage, NormalMode, userAnswers) mustBe controllers.myapis.produce.routes.ProduceApiHodController.onPageLoad(NormalMode)
+        }
         "must go from the API Egress Prefixes page to the HoD page" in {
           navigator.nextPage(ProduceApiEgressPrefixesPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiHodController.onPageLoad(NormalMode)
         }
@@ -176,6 +184,10 @@ class NavigatorSpec extends SpecBase with TryValues {
         }
         "must go from the API review page to the Define Wiremock page" in {
           navigator.nextPage(UpdateApiReviewNameDescriptionPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiHowToAddWiremockController.onPageLoad(NormalMode)
+        }
+        "must go from the Add Prefixes page to the HoDs page if user answered No" in {
+          val userAnswers = emptyUserAnswers.set(UpdateApiAddPrefixesPage, false).get
+          navigator.nextPage(UpdateApiAddPrefixesPage, NormalMode, userAnswers) mustBe controllers.myapis.update.routes.UpdateApiHodController.onPageLoad(NormalMode)
         }
         "must go from the Upload OAS page to the OAS editor page" in {
           navigator.nextPage(UpdateApiUploadOasPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiEnterOasController.onPageLoadWithUploadedOas(NormalMode)
@@ -265,6 +277,14 @@ class NavigatorSpec extends SpecBase with TryValues {
         "must go from the Preview Name/Description page to the Check Your Answers page" in {
           navigator.nextPage(ProduceApiReviewNameDescriptionPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
         }
+        "must go from the Add Prefixes page to the Enter Prefixes page if user answered Yes" in {
+          val userAnswers = emptyUserAnswers.set(ProduceApiAddPrefixesPage, true).get
+          navigator.nextPage(ProduceApiAddPrefixesPage, CheckMode, userAnswers) mustBe controllers.myapis.produce.routes.ProduceApiEgressPrefixesController.onPageLoad(CheckMode)
+        }
+        "must go from the Add Prefixes page to the Check Your Answers page if user answered No" in {
+          val userAnswers = emptyUserAnswers.set(ProduceApiAddPrefixesPage, false).get
+          navigator.nextPage(ProduceApiAddPrefixesPage, CheckMode, userAnswers) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
+        }
         "must go from the Egress Prefixes page to the Check Your Answers page" in {
           navigator.nextPage(ProduceApiEgressPrefixesPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
         }
@@ -286,6 +306,11 @@ class NavigatorSpec extends SpecBase with TryValues {
         "must go from the Upload OAS page to the OAS editor page" in {
           navigator.nextPage(UpdateApiUploadOasPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiEnterOasController.onPageLoadWithUploadedOas(CheckMode)
         }
+        "must go from the Add Prefixes page to the Check Your Answers page if user answered No" in {
+          val userAnswers = emptyUserAnswers.set(UpdateApiAddPrefixesPage, false).get
+          navigator.nextPage(UpdateApiAddPrefixesPage, CheckMode, userAnswers) mustBe controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onPageLoad()
+        }
+
       }
       
     }
