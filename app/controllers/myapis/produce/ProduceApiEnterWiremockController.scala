@@ -17,11 +17,16 @@
 package controllers.myapis.produce
 
 import controllers.actions.*
+import forms.myapis.produce.ProduceApiEnterWiremockFormProvider
 import models.Mode
-import play.api.i18n.{I18nSupport, MessagesApi}
+import navigation.Navigator
+import play.api.i18n.{I18nSupport, MessagesApi, MessagesProvider}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.myapis.produce.ProduceApiEnterWiremockView
+import repositories.ProduceApiSessionRepository
+import uk.gov.hmrc.http.HeaderCarrier
+import viewmodels.myapis.produce.ProduceApiEnterWiremockViewModel
 import pages.myapis.produce.{ProduceApiEnterWiremockPage, ProduceApiUploadWiremockPage}
 
 import javax.inject.Inject
@@ -29,7 +34,12 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ProduceApiEnterWiremockController @Inject()(
                                                    override val messagesApi: MessagesApi,
+                                                   sessionRepository: ProduceApiSessionRepository,
+                                                   navigator: Navigator,
                                                    identify: IdentifierAction,
+                                                   getData: ProduceApiDataRetrievalAction,
+                                                   requireData: DataRequiredAction,
+                                                   formProvider: ProduceApiEnterWiremockFormProvider,
                                                    val controllerComponents: MessagesControllerComponents,
                                                    view: ProduceApiEnterWiremockView,
                                                    getData: ProduceApiDataRetrievalAction,
@@ -37,16 +47,49 @@ class ProduceApiEnterWiremockController @Inject()(
                                                  )
                                                  (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = identify {
-    implicit request => Ok(view(controllers.myapis.produce.routes.ProduceApiEnterWiremockController.onSubmit(mode)))
+  private val form = formProvider()
+
+  private def viewModel(mode: Mode) = ProduceApiEnterWiremockViewModel(
+    formAction = routes.ProduceApiEnterWiremockController.onSubmit(mode), None, true
+  )
+
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+    implicit request =>
+
+      val preparedForm = request.userAnswers.get(ProduceApiEnterWiremockPage) match {
+        case None => form
+        case Some(value) => form.fill(value)
+      }
+
+      Ok(view(preparedForm, request.user, viewModel(mode)))
   }
 
   def onPageLoadWithUploadedWiremock(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request => Ok(view(controllers.myapis.produce.routes.ProduceApiEnterWiremockController.onSubmit(mode)))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = identify {
-    implicit request => Redirect(controllers.myapis.produce.routes.ProduceApiAddPrefixesController.onPageLoad(mode))
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request =>
+      val boundedForm = form.bindFromRequest()
+
+      boundedForm.fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, request.user, viewModel(mode)))),
+
+        value =>
+          validateWiremock(value).flatMap(_.fold(
+            error =>
+              Future.successful(BadRequest(view(boundedForm.withGlobalError(error), request.user, viewModel(mode)))),
+            apiName =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(ProduceApiEnterWiremockPage, value))
+                _ <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(navigator.nextPage(ProduceApiEnterWiremockPage, mode, updatedAnswers))
+          )
+        ))
   }
 
+  private def validateWiremock(wiremockJson: String)(implicit messagesProvider: MessagesProvider, hc: HeaderCarrier): Future[Either[String, String]] = {
+    Future.successful(Right(wiremockJson))
+  }
 }

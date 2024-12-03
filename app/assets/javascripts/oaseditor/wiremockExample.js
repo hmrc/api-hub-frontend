@@ -1,0 +1,13 @@
+export const oasExampleWiremock = `{
+  "request": {
+    "method": "GET",
+    "url": "/some/thing"
+  },
+  "response": {
+    "status": 200,
+    "body": "Hello, world!",
+    "headers": {
+        "Content-Type": "text/plain"
+    }
+  }
+}`;
