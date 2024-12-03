@@ -56,7 +56,6 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
     .set(ProduceApiEnterOasPage, "oas").success.value
     .set(ProduceApiEnterApiTitlePage, "api name").success.value
     .set(ProduceApiShortDescriptionPage, "api description").success.value
-    .set(ProduceApiChooseEgressPage, ProduceApiChooseEgress(Some("egress"), true)).success.value
     .set(ProduceApiEgressPrefixesPage, ProduceApiEgressPrefixes(Seq("/prefix"), Seq("/existing->/replacement"))).success.value
     .set(ProduceApiHodPage, Set("hod1")).success.value
     .set(ProduceApiDomainPage, ProduceApiDomainSubdomain("domain", "subdomain")).success.value
@@ -68,7 +67,6 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
     ProduceApiEnterOasSummary.row(fullyPopulatedUserAnswers),
     ProduceApiNameSummary.row(fullyPopulatedUserAnswers),
     ProduceApiShortDescriptionSummary.row(fullyPopulatedUserAnswers),
-    ProduceApiEgressSummary.row(fullyPopulatedUserAnswers),
     ProduceApiEgressPrefixesSummary.row(fullyPopulatedUserAnswers),
     ProduceApiHodSummary.row(fullyPopulatedUserAnswers, FakeHods),
     ProduceApiDomainSummary.row(fullyPopulatedUserAnswers, FakeDomains),
@@ -157,7 +155,6 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
         (ProduceApiEnterOasPage, nonSupportUser, produceApiRoutes.ProduceApiEnterOasController.onPageLoad(CheckMode).url),
         (ProduceApiEnterApiTitlePage, nonSupportUser, routes.JourneyRecoveryController.onPageLoad().url),
         (ProduceApiShortDescriptionPage, nonSupportUser, produceApiRoutes.ProduceApiShortDescriptionController.onPageLoad(CheckMode).url),
-        (ProduceApiChooseEgressPage, nonSupportUser, produceApiRoutes.ProduceApiEgressController.onPageLoad(CheckMode).url),
         (ProduceApiEgressPrefixesPage, nonSupportUser, produceApiRoutes.ProduceApiEgressPrefixesController.onPageLoad(CheckMode).url),
         (ProduceApiHodPage, nonSupportUser, produceApiRoutes.ProduceApiHodController.onPageLoad(CheckMode).url),
         (ProduceApiDomainPage, nonSupportUser, produceApiRoutes.ProduceApiDomainController.onPageLoad(CheckMode).url),

@@ -19,9 +19,9 @@ package pages.myapis.update
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object UpdateApiReviewEgressPage extends QuestionPage[Boolean] {
+case object UpdateApiAddPrefixesPage extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "updateApiReviewEgress"
+  override def toString: String = "updateApiAddPrefixesPage"
 }

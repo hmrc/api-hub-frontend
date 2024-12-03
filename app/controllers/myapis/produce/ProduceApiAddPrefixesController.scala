@@ -16,37 +16,66 @@
 
 package controllers.myapis.produce
 
+import config.FrontendAppConfig
 import controllers.actions.*
+import forms.myapis.produce.ProduceApiAddPrefixesFormProvider
 import models.Mode
+import models.requests.DataRequest
+import navigation.Navigator
+import pages.myapis.produce.ProduceApiAddPrefixesPage
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.ProduceApiSessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.myapis.produce.ProduceApiAddPrefixesViewModel
 import views.html.myapis.produce.ProduceApiAddPrefixesView
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class ProduceApiAddPrefixesController @Inject()(
                                                  override val messagesApi: MessagesApi,
+                                                 config: FrontendAppConfig,
+                                                 sessionRepository: ProduceApiSessionRepository,
+                                                 navigator: Navigator,
                                                  identify: IdentifierAction,
+                                                 getData: ProduceApiDataRetrievalAction,
+                                                 requireData: DataRequiredAction,
                                                  val controllerComponents: MessagesControllerComponents,
+                                                 formProvider: ProduceApiAddPrefixesFormProvider,
                                                  view: ProduceApiAddPrefixesView
                                                )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = identify {
-    implicit request => Ok(view(
-      controllers.myapis.produce.routes.ProduceApiAddPrefixesController.onSubmit(mode, "yes"),
-      controllers.myapis.produce.routes.ProduceApiAddPrefixesController.onSubmit(mode, "no")
-    ))
-  }
-
-  def onSubmit(mode: Mode, answer: String): Action[AnyContent] = identify {
+  val form = formProvider()
+  
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
-      answer match {
-        case "yes" => Redirect(controllers.myapis.produce.routes.ProduceApiEgressPrefixesController.onPageLoad(mode))
-        case "no" => Redirect(controllers.myapis.produce.routes.ProduceApiHodController.onPageLoad(mode))
+
+      val preparedForm = request.userAnswers.get(ProduceApiAddPrefixesPage) match {
+        case None => form
+        case Some(value) => form.fill(value)
       }
 
+      Ok(buildView(preparedForm, mode))
   }
 
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request =>
+
+      form.bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(buildView(formWithErrors, mode))),
+
+        value =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(ProduceApiAddPrefixesPage, value))
+            _ <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(navigator.nextPage(ProduceApiAddPrefixesPage, mode, updatedAnswers))
+      )
+  }
+
+  private def buildView(form: Form[Boolean], mode: Mode)(implicit request: DataRequest[AnyContent]) = {
+    view(form, ProduceApiAddPrefixesViewModel(routes.ProduceApiAddPrefixesController.onSubmit(mode)), config.helpDocsPath, request.user)
+  }
 }

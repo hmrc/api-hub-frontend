@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,23 +12,19 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import models.user.UserModel
+package forms.myapis.produce
 
-@this(
-    layout: templates.Layout,
-    formHelper: FormWithCSRF,
-    govukButton: GovukButton
-)
+import forms.mappings.Mappings
+import play.api.data.Form
 
-@(mode: Mode, user: UserModel)(implicit request: Request[?], messages: Messages)
+import javax.inject.Inject
 
-@layout(pageTitle = titleNoForm("Update egress configuration"), user = Some(user)) {
-    <h1 class="govuk-heading-l">Update egress configuration</h1>
-    @formHelper(action = controllers.myapis.update.routes.UpdateApiEgressController.onSubmit( mode)) {
-        @govukButton(
-            ButtonViewModel(messages("Continue"))
-        )
-    }
+class ProduceApiAddPrefixesFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[Boolean] =
+    Form(
+      "value" -> boolean("produceApiAddPrefixes.error.required")
+    )
 }

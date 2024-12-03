@@ -15,13 +15,13 @@
  */
 
 package pages.myapis.produce
-import models.myapis.produce.ProduceApiChooseEgress
+
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object ProduceApiChooseEgressPage extends QuestionPage[ProduceApiChooseEgress] {
+case object ProduceApiAddPrefixesPage extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "produceApiChooseEgress"
+  override def toString: String = "produceApiAddPrefixesPage"
 }

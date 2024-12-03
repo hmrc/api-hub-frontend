@@ -947,6 +947,12 @@ produceApiDomain.checkYourAnswersLabel.2 = Subdomain
 
 updateApiDomain.heading = Review domain and subdomain for the API
 
+produceApiAddPrefixes.title = Do you want to configure prefixes for your API?
+produceApiAddPrefixes.heading = Do you want to configure prefixes for your API?
+produceApiAddPrefixes.hint = If you need to add a common prefix to all paths within your OAS, or if you need to map values in your path, answer Yes. {0}.
+produceApiAddPrefixes.guidance = Guidance for Egress prefixes
+produceApiAddPrefixes.error.required = Select an answer
+
 produceApiStatus.title = Set the API status
 produceApiStatus.hint.0 = Not ready to use (documentation only and could change)
 produceApiStatus.hint.1 = Early stage of development and may be available (expect breaking changes)
