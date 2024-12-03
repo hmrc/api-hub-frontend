@@ -17,36 +17,69 @@
 package controllers.myapis.update
 
 import controllers.actions.*
+import forms.myapis.produce.ProduceApiHowToAddWiremockFormProvider
 import models.Mode
+import models.myapis.produce.ProduceApiHowToAddWiremock
+import models.requests.DataRequest
+import models.user.UserModel
+import navigation.Navigator
+import pages.myapis.update.UpdateApiHowToAddWiremockPage
+import pages.myapis.update.UpdateApiHowToUpdatePage
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.{ProduceApiSessionRepository, SessionRepository}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.myapis.produce.ProduceApiHowToAddWiremockViewModel
 import views.html.myapis.produce.ProduceApiHowToAddWiremockView
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class UpdateApiHowToAddWiremockController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       identify: IdentifierAction,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       view: ProduceApiHowToAddWiremockView
-                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                                      override val messagesApi: MessagesApi,
+                                                      sessionRepository: ProduceApiSessionRepository,
+                                                      navigator: Navigator,
+                                                      identify: IdentifierAction,
+                                                      getData: UpdateApiDataRetrievalAction,
+                                                      requireData: DataRequiredAction,
+                                                      formProvider: ProduceApiHowToAddWiremockFormProvider,
+                                                      val controllerComponents: MessagesControllerComponents,
+                                                      view: ProduceApiHowToAddWiremockView
+                                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = identify {
-    implicit request => Ok(view(
-      controllers.myapis.update.routes.UpdateApiHowToAddWiremockController.onSubmit(mode, "upload"),
-      controllers.myapis.update.routes.UpdateApiHowToAddWiremockController.onSubmit(mode, "editor")
-    ))
-  }
+  private val form = formProvider()
 
-  def onSubmit(mode: Mode, action: String): Action[AnyContent] = identify {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      action match {
-        case "upload" => Redirect(controllers.myapis.update.routes.UpdateApiUploadWiremockController.onPageLoad(mode))
-        case "editor" => Redirect(controllers.myapis.update.routes.UpdateApiEnterWiremockController.onPageLoad(mode))
+
+      val preparedForm = request.userAnswers.get(UpdateApiHowToAddWiremockPage) match {
+        case None => form
+        case Some(value) => form.fill(value)
       }
 
+      Future.successful(Ok(buildView(preparedForm, mode, request.user)))
   }
 
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request =>
+
+      form.bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(buildView(formWithErrors, mode, request.user))),
+
+        value =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(UpdateApiHowToAddWiremockPage, value))
+            _              <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(navigator.nextPage(UpdateApiHowToAddWiremockPage, mode, updatedAnswers))
+      )
+  }
+
+  private def buildView(form: Form[ProduceApiHowToAddWiremock], mode: Mode, user: UserModel)(implicit request: DataRequest[AnyContent]) = {
+    val viewModel = ProduceApiHowToAddWiremockViewModel(
+      controllers.myapis.update.routes.UpdateApiHowToAddWiremockController.onSubmit(mode))
+    view(form, user, viewModel)
+  }
 }
+

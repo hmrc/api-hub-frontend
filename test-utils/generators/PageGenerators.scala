@@ -25,6 +25,9 @@ import pages.myapis.produce.*
 
 trait PageGenerators {
 
+  implicit lazy val arbitraryProduceApiHowToAddWiremockPage: Arbitrary[ProduceApiHowToAddWiremockPage.type] =
+    Arbitrary(ProduceApiHowToAddWiremockPage)
+
   implicit lazy val arbitraryProduceApiPassthroughPage: Arbitrary[ProduceApiPassthroughPage.type] =
     Arbitrary(ProduceApiPassthroughPage)
 
