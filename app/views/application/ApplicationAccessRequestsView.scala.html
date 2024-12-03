@@ -24,13 +24,14 @@
 @import viewmodels.application.ApplicationSideNavPages
 @import views.html.components.IconsLink
 
-
 @this(
     layout: templates.Layout,
     govukTable: GovukTable,
     accessRequestPanel: AccessRequestPanel,
     applicationDetailsTable: ApplicationDetailsTable,
-    iconsLink: IconsLink
+    iconsLink: IconsLink,
+    sideNav: views.html.templates.SideNav,
+    applicationNavItems: ApplicationNavItems,
 )
 
 @(application: Application, accessRequests: Seq[AccessRequest], user: UserModel)(implicit request: Request[?], messages: Messages)
@@ -45,7 +46,7 @@
     fullWidth = true,
     customScriptsBlock = Some(iconsLink())
 ) {
-    @views.html.templates.SideNav(application.name, ApplicationNavItems(Some(user), application, ApplicationSideNavPages.ApplicationHistoryPage)) {
+    @sideNav(application.name, applicationNavItems(Some(user), application, ApplicationSideNavPages.ApplicationHistoryPage)) {
 
         <h1 class="govuk-heading-l">
             @messages("applicationHistory.title")

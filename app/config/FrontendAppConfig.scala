@@ -66,5 +66,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   
   val maxOasUploadSizeMb: Int = configuration.get[Int]("maxOasUploadSizeMb")
   val oasUploadValidExtensions: Set[String] = configuration.get[Seq[String]]("oasUploadValidExtensions").toSet
+  val applicationDetailsEnvironmentsLeftSideNav: Boolean = configuration.get[Boolean]("features.application-details-environments-left-side-nav")
 
 }

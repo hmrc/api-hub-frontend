@@ -14,10 +14,38 @@
  * limitations under the License.
  *@
 
+@import config.{FrontendAppConfig, HipEnvironments}
 @import viewmodels.SideNavItem
+@import SideNavItem.*
 @import views.html.helper.CSPNonce
 
+@this(
+    frontendAppConfig: FrontendAppConfig,
+    hipEnvironments: HipEnvironments,
+)
+
 @(title: String, navItems: Seq[SideNavItem])(contentBlock: Html)(implicit request: Request[?], messages: Messages)
+
+@sideNavItemLeaf(navItem: SideNavItemLeaf) = {
+    <li class="side-nav__list  @if(navItem.isCurrentPage){side-nav__list--selected}">
+        <a class="side-nav__link govuk-link--no-visited-state" href="@navItem.link.url" data-nav-item-page="@navItem.page.toString" @if(navItem.opensInNewTab){target="_blank"}>
+            @navItem.title @if(navItem.opensInNewTab){<i class="fa-solid fa-arrow-up-right-from-square"></i>}
+        </a>
+    </li>
+}
+
+@sideNavItemBranch(navItem: SideNavItemBranch) = {
+    <li class="side-nav__list">
+            <span class="side-nav__text">
+                @navItem.title
+            </span>
+        <ul class="side-nav__component govuk-!-margin-top-0 govuk-!-padding-left-2">
+            @for(navItem <- navItem.sideNavItems){
+            @sideNavItemLeaf(navItem)
+            }
+        </ul>
+    </li>
+}
 
 <div class="govuk-grid-row">
     <div id="navContent" class="govuk-grid-column-one-quarter sidebar hip-sticky-side-menu">
@@ -28,11 +56,10 @@
 
             <ul class="side-nav__component">
                 @for(navItem <- navItems) {
-                    <li class="side-nav__list  @if(navItem.isCurrentPage){side-nav__list--selected}">
-                        <a class="side-nav__link govuk-link--no-visited-state" href="@navItem.link.url" data-nav-item-page="@navItem.page.toString" @if(navItem.opensInNewTab){target="_blank"}>
-                            @navItem.title @if(navItem.opensInNewTab){<i class="fa-solid fa-arrow-up-right-from-square"></i>}
-                        </a>
-                    </li>
+                    @(navItem match {
+                        case navItem: SideNavItemLeaf => sideNavItemLeaf(navItem)
+                        case navItem: SideNavItemBranch => sideNavItemBranch(navItem)
+                    })
                 }
             </ul>
 

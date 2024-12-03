@@ -26,6 +26,7 @@
     layout: templates.Layout,
     paginator: Paginator,
     searchBox: SearchBox,
+    sideNav: views.html.templates.SideNav,
 )
 
 @(teams: Seq[Team], user: UserModel)(implicit request: Request[?], messages: Messages)
@@ -45,7 +46,7 @@
     activeLink = Some("apiHubAdmin"),
     customScriptsBlock = Some(scripts()),
 ) {
-    @views.html.templates.SideNav(messages("manageTeams.admin"), AdminNavItems(user, AdminSideNavPages.ManageTeamsPage)) {
+    @sideNav(messages("manageTeams.admin"), AdminNavItems(user, AdminSideNavPages.ManageTeamsPage)) {
 
         <h1 class="govuk-heading-m govuk-!-margin-bottom-7">
             @Html(messages("manageTeams.heading", <span id="teamCount">{teams.size}</span>))

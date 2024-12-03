@@ -19,6 +19,7 @@ package viewmodels.application
 import models.application.Application
 import play.api.i18n.Messages
 import viewmodels.{SideNavItem, SideNavPage}
+import SideNavItem.SideNavItemLeaf
 
 object DeletedApplicationSideNavPages {
   case object DetailsPage extends SideNavPage
@@ -30,13 +31,13 @@ object DeletedApplicationNavItems {
 
   def apply(application: Application)(implicit messages: Messages): Seq[SideNavItem] = {
     Seq(
-      SideNavItem(
+      SideNavItemLeaf(
         page = DetailsPage,
         title = messages("deletedApplicationNav.page.applicationDetails"),
         link = controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id),
         isCurrentPage = true
       ),
-      SideNavItem(
+      SideNavItemLeaf(
         page = JsonViewPage,
         title = messages("deletedApplicationNav.page.viewJson"),
         link = controllers.application.routes.ApplicationSupportController.onPageLoad(application.id),

@@ -20,6 +20,7 @@ import models.api.ApiDeploymentStatuses
 import models.user.UserModel
 import play.api.i18n.Messages
 import viewmodels.{SideNavItem, SideNavPage}
+import SideNavItem.SideNavItemLeaf
 
 object MyApisNavPages {
 
@@ -37,14 +38,14 @@ object MyApisNavItems {
 
   def apply(apiId: String, user: UserModel, currentPage: SideNavPage, apiDeploymentStatuses: ApiDeploymentStatuses)(implicit messages: Messages): Seq[SideNavItem] = {
     Seq(
-      SideNavItem(
+      SideNavItemLeaf(
         page = ProducerApiDetailsPage,
         title = messages("myApis.details.title"),
         link = controllers.myapis.routes.MyApiDetailsController.onPageLoad(apiId),
         isCurrentPage = currentPage == ProducerApiDetailsPage
       )) ++ (
         if (apiDeploymentStatuses.isDeployed) {
-          Some(SideNavItem(
+          Some(SideNavItemLeaf(
             page = UpdateApiPage,
             title = messages("myApis.update.title"),
             link = controllers.myapis.routes.SimpleApiRedeploymentController.onPageLoad(apiId),
@@ -53,13 +54,13 @@ object MyApisNavItems {
         } else {
           None
         }) ++ Seq (
-      SideNavItem(
+      SideNavItemLeaf(
         page = ChangeOwningTeamPage,
         title = messages("myApis.update.team.title"),
         link = controllers.myapis.routes.UpdateApiTeamController.onPageLoad(apiId),
         isCurrentPage = currentPage == ChangeOwningTeamPage
       ),
-      SideNavItem(
+      SideNavItemLeaf(
         page = ViewApiAsConsumerPage,
         title = messages("myApis.viewApiAsConsumer.title"),
         link = controllers.routes.ApiDetailsController.onPageLoad(apiId),
@@ -68,7 +69,7 @@ object MyApisNavItems {
       )
     ) ++ (
       if (user.permissions.canSupport) {
-        Some(SideNavItem(
+        Some(SideNavItemLeaf(
           page = ApiUsagePage,
           title = messages("myApis.usage.link"),
           link = controllers.myapis.routes.ApiUsageController.onPageLoad(apiId),

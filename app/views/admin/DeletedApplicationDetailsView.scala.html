@@ -29,7 +29,8 @@
     iconsLink: IconsLink,
     govukSummaryList : GovukSummaryList,
     govukTag : GovukTag,
-    accessRequestPanel: AccessRequestPanel
+    accessRequestPanel: AccessRequestPanel,
+    sideNav: views.html.templates.SideNav,
 )
 
 @(application: Application, accessRequests: Seq[AccessRequest], user: Option[UserModel])(implicit request: Request[?], messages: Messages)
@@ -44,7 +45,7 @@
 
 @layout(pageTitle = titleNoForm(messages("applicationDetails.title")), user = user, fullWidth = true, customScriptsBlock = Some(iconsLink())) {
 
-    @views.html.templates.SideNav(application.name, DeletedApplicationNavItems(application)) {
+    @sideNav(application.name, DeletedApplicationNavItems(application)) {
 
         <h1 class="govuk-heading-l">@messages("applicationDetails.heading")</h1>
 

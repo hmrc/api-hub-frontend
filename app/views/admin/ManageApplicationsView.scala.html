@@ -31,6 +31,7 @@
     searchBox: SearchBox,
     paginator: Paginator,
     iconsLink: IconsLink,
+    sideNav: views.html.templates.SideNav,
 )
 
 @(applications: Seq[Application], user: UserModel)(implicit request: Request[?], messages: Messages)
@@ -51,7 +52,7 @@
     activeLink = Some("apiHubAdmin"),
     customScriptsBlock = Some(scripts()),
 ) {
-    @views.html.templates.SideNav(messages("manageApplications.admin"), AdminNavItems(user, AdminSideNavPages.ManageApplicationsPage)) {
+    @sideNav(messages("manageApplications.admin"), AdminNavItems(user, AdminSideNavPages.ManageApplicationsPage)) {
 
         <h1 class="govuk-heading-m">
             @Html(messages("manageApplications.heading", <span id="appCount">{applications.size}</span>))

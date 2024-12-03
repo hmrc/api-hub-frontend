@@ -31,7 +31,8 @@
     govukErrorSummary: GovukErrorSummary,
     govukButton: GovukButton,
     iconsLink: IconsLink,
-    teamSelection: TeamSelection
+    teamSelection: TeamSelection,
+    sideNav: views.html.templates.SideNav,
 )
 
 @(form: Form[?], apiDetail: ApiDetail, owningTeam: Option[Team], teams: Seq[Team], userModel: UserModel, deploymentStatuses: ApiDeploymentStatuses)(implicit request: Request[?], messages: Messages)
@@ -45,7 +46,7 @@
 }
 
 @layout(pageTitle = titleNoForm(messages("myApis.update.team.title")), user = Some(userModel), fullWidth = true, customScriptsBlock = Some(scripts())) {
-    @views.html.templates.SideNav(apiDetail.title, MyApisNavItems(apiDetail.id, userModel, MyApisNavPages.ChangeOwningTeamPage, deploymentStatuses)) {
+    @sideNav(apiDetail.title, MyApisNavItems(apiDetail.id, userModel, MyApisNavPages.ChangeOwningTeamPage, deploymentStatuses)) {
         @formHelper(action = controllers.myapis.routes.UpdateApiTeamController.onSubmit(apiDetail.id), Symbol("autoComplete") -> "off") {
             @if(form.errors.nonEmpty) {
                 @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))

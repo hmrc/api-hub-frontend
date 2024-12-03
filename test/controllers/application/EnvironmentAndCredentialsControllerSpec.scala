@@ -21,16 +21,16 @@ import config.FrontendAppConfig
 import controllers.actions.{FakeApplication, FakePrivilegedUser, FakeUser, FakeUserNotTeamMember}
 import controllers.routes
 import models.application.{Primary, Secondary}
-import models.application.ApplicationLenses._
+import models.application.ApplicationLenses.*
 import models.exception.ApplicationCredentialLimitException
 import models.user.UserModel
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import play.api.{Application => PlayApplication}
+import play.api.test.Helpers.*
+import play.api.Application as PlayApplication
 import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
 import views.html.ErrorTemplate
@@ -40,7 +40,7 @@ import scala.concurrent.Future
 
 class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar with TestHelpers with HtmlValidation {
 
-  "ApplicationDetails Controller" - {
+  "EnvironmentAndCredentials Controller" - {
     "must return OK and the correct view for a GET for a team member or supporter" in {
       forAll(teamMemberAndSupporterTable) {
         (user: UserModel) =>
@@ -53,7 +53,7 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
             val request = FakeRequest(GET, controllers.application.routes.EnvironmentAndCredentialsController.onPageLoad(FakeApplication.id).url)
             val result = route(fixture.playApplication, request).value
             val view = fixture.playApplication.injector.instanceOf[EnvironmentAndCredentialsView]
-            val config = fixture.playApplication.injector.instanceOf[FrontendAppConfig]
+            implicit val config: FrontendAppConfig = fixture.playApplication.injector.instanceOf[FrontendAppConfig]
 
             status(result) mustEqual OK
             contentAsString(result) mustBe view(FakeApplication, user, config.helpDocsPath)(request, messages(fixture.playApplication)).toString

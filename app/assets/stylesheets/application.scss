@@ -315,6 +315,14 @@ body, input {
     margin: govuk-spacing(3) 0 0 0;
 }
 
+.side-nav__text {
+    padding: govuk-spacing(3) govuk-spacing(6) govuk-spacing(2) govuk-spacing(3);
+    text-decoration: none;
+    display: block;
+    @include govuk-font($size: 16);
+    color: govuk-colour("black");
+}
+
 .side-nav__link {
     padding: govuk-spacing(3) govuk-spacing(6) govuk-spacing(2) govuk-spacing(3);
     text-decoration: none;
@@ -336,7 +344,7 @@ body, input {
 }
 
 .side-nav__list--selected {
-    .side-nav__link, &:hover .side-nav__link {
+    > .side-nav__link, &:hover > .side-nav__link {
         color: $side-nav-selected-color;
         background-color: $side-nav-selected-background;
     }

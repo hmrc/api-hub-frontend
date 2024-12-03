@@ -23,6 +23,7 @@ import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages
 import play.api.test.Helpers.running
 import viewmodels.SideNavItem
+import SideNavItem.SideNavItemLeaf
 import viewmodels.admin.AdminSideNavPages.{AccessRequestsPage, ConfigurationPage, EnvParityConfigTestPage, GetUsersPage, ManageApisPage, ManageApplicationsPage, ManageTeamsPage, StatisticsPage, TeamMigrationPage}
 
 class AdminNavItemsSpec extends SpecBase with Matchers with TableDrivenPropertyChecks {
@@ -79,6 +80,7 @@ class AdminNavItemsSpec extends SpecBase with Matchers with TableDrivenPropertyC
         forAll(pages) {
           page =>
             val actual = AdminNavItems(FakeSupporter, page)
+              .collect { case ni: SideNavItemLeaf => ni }
               .filter(_.isCurrentPage)
               .map(_.page)
 
@@ -94,7 +96,7 @@ class AdminNavItemsSpec extends SpecBase with Matchers with TableDrivenPropertyC
 object AdminNavItemsSpec {
 
   private def accessRequestsNavItem(): SideNavItem = {
-    SideNavItem(
+    SideNavItemLeaf(
       page = AccessRequestsPage,
       title = "API requests",
       link = controllers.admin.routes.AccessRequestsController.onPageLoad(),
@@ -103,7 +105,7 @@ object AdminNavItemsSpec {
   }
 
   private def manageApplicationsNavItem(): SideNavItem = {
-    SideNavItem(
+    SideNavItemLeaf(
       page = ManageApplicationsPage,
       title = "Manage applications",
       link = controllers.admin.routes.ManageApplicationsController.onPageLoad(),
@@ -112,7 +114,7 @@ object AdminNavItemsSpec {
   }
 
   private def manageApisNavItem(): SideNavItem = {
-    SideNavItem(
+    SideNavItemLeaf(
       page = ManageApisPage,
       title = "Manage APIs",
       link = controllers.admin.routes.ManageApisController.onPageLoad(),
@@ -121,7 +123,7 @@ object AdminNavItemsSpec {
   }
 
   private def getUsersNavItem(): SideNavItem = {
-    SideNavItem(
+    SideNavItemLeaf(
       page = GetUsersPage,
       title = "View users",
       link = controllers.admin.routes.GetUsersController.onPageLoad(),
@@ -130,7 +132,7 @@ object AdminNavItemsSpec {
   }
 
   private def manageTeamsNavItem(): SideNavItem = {
-    SideNavItem(
+    SideNavItemLeaf(
       page = ManageTeamsPage,
       title = "Manage teams",
       link = controllers.admin.routes.ManageTeamsController.onPageLoad(),
@@ -139,7 +141,7 @@ object AdminNavItemsSpec {
   }
 
   private def teamMigrationNavItem(): SideNavItem = {
-    SideNavItem(
+    SideNavItemLeaf(
       page = TeamMigrationPage,
       title = "Team migration",
       link = controllers.admin.routes.TeamMigrationController.onPageLoad(),
@@ -148,7 +150,7 @@ object AdminNavItemsSpec {
   }
 
   private def configurationNavItem(): SideNavItem = {
-    SideNavItem(
+    SideNavItemLeaf(
       page = ConfigurationPage,
       title = "API configuration",
       link = controllers.admin.routes.ConfigurationController.onPageLoad(),
@@ -157,7 +159,7 @@ object AdminNavItemsSpec {
   }
 
   private def statisticsNavItem(): SideNavItem = {
-    SideNavItem(
+    SideNavItemLeaf(
       page = StatisticsPage,
       title = "Hub stats",
       link = controllers.admin.routes.StatisticsController.onPageLoad(),
@@ -166,7 +168,7 @@ object AdminNavItemsSpec {
   }
 
   private def envParityConfigTestNavItem(): SideNavItem = {
-    SideNavItem(
+    SideNavItemLeaf(
       page = EnvParityConfigTestPage,
       title = "Env parity config",
       link = controllers.admin.routes.EnvParityConfigTestController.onPageLoad(),

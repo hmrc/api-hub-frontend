@@ -20,7 +20,8 @@
 
 @this(
     layout: templates.Layout,
-    govukButton: GovukButton
+    govukButton: GovukButton,
+    sideNav: views.html.templates.SideNav,
 )
 
 @(user: UserModel)(implicit request: Request[?], messages: Messages)
@@ -45,7 +46,7 @@
 
 @layout(pageTitle = titleNoForm(messages("statistics.title")), fullWidth = true, user = Some(user), customScriptsBlock = Some(scripts())) {
 
-    @views.html.templates.SideNav(messages("manageApplications.admin"), AdminNavItems(user, AdminSideNavPages.StatisticsPage)) {
+    @sideNav(messages("manageApplications.admin"), AdminNavItems(user, AdminSideNavPages.StatisticsPage)) {
 
         <h1 class="govuk-heading-m govuk-!-margin-bottom-4">@messages("statistics.heading")</h1>
 

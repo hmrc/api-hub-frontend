@@ -28,7 +28,8 @@
     govukTag : GovukTag,
     searchBox: SearchBox,
     iconsLink: IconsLink,
-    paginator: Paginator
+    paginator: Paginator,
+    sideNav: views.html.templates.SideNav,
 )
 
 @(apis: Seq[ApiDetailSummary], user: UserModel)(implicit request: Request[?], messages: Messages)
@@ -45,7 +46,7 @@
     activeLink = Some("apiHubAdmin"),
     customScriptsBlock = Some(scripts()),
 ) {
-    @views.html.templates.SideNav(messages("manageApis.admin"), AdminNavItems(user, AdminSideNavPages.ManageApisPage)) {
+    @sideNav(messages("manageApis.admin"), AdminNavItems(user, AdminSideNavPages.ManageApisPage)) {
 
         <h1 class="govuk-heading-m">
             @Html(messages("manageApis.heading", <span id="apiCount"></span>))

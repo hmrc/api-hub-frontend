@@ -26,7 +26,8 @@
     layout: templates.Layout,
     govukTable: GovukTable,
     accessRequestPanel: AccessRequestPanel,
-    paginator: Paginator
+    paginator: Paginator,
+    sideNav: views.html.templates.SideNav,
 )
 
 @(accessRequests: Seq[AccessRequest], user: UserModel)(implicit request: Request[?], messages: Messages)
@@ -42,7 +43,7 @@
     activeLink = Some("apiHubAdmin"),
     customScriptsBlock = Some(scripts()),
 ) {
-    @views.html.templates.SideNav(messages("accessRequests.admin"), AdminNavItems(user, AdminSideNavPages.AccessRequestsPage)) {
+    @sideNav(messages("accessRequests.admin"), AdminNavItems(user, AdminSideNavPages.AccessRequestsPage)) {
 
         <h1 class="govuk-heading-m govuk-!-margin-bottom-7">
             @Html(messages("accessRequests.heading", <span id="requestCount">{accessRequests.size}</span>))
