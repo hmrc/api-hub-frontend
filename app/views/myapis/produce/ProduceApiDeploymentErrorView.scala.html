@@ -28,7 +28,7 @@
     iconsLink: IconsLink
 )
 
-@(userModel: UserModel, maybeFailuresResponse: Option[FailuresResponse])(implicit request: Request[?], messages: Messages)
+@(userModel: UserModel, failuresResponse: FailuresResponse)(implicit request: Request[?], messages: Messages)
 
 @errorRow(deploymentError: Error) = {
     <tr class="govuk-table__row">
@@ -55,50 +55,49 @@
         </div>
     </div>
 
-    @for(failuresResponse <- maybeFailuresResponse){
-        <div class="call-out-panel call-out-panel__small govuk-!-margin-top-2 govuk-!-margin-bottom-7">
-            <p class="govuk-body information-tag govuk-!-margin-bottom-4">
-                <i class="fa-solid fa-circle-exclamation error-colour"></i>
-                <span class="call-out-type error">
-                        @messages("produceApiDeploymentError.warning")
-                </span>
-            </p>
-            <table class="govuk-table hip-table">
-                <caption class="govuk-table__caption govuk-table__caption--s">@messages("site.errors")</caption>
-                <thead class="govuk-table__head govuk-!-font-size-16">
-                    <tr class="govuk-table__row">
-                        <th scope="col" class="govuk-table__header app-custom-class">@messages("site.type")</th>
-                        <th scope="col" class="govuk-table__header app-custom-class">@messages("site.message")</th>
-                    </tr>
-                </thead>
-                <tbody class="govuk-table__body">
-                    @if(failuresResponse.errors.isDefined) {
-                        @for(error <- failuresResponse.errors.get) {
-                            @errorRow(error)
-                        }
+    <div class="call-out-panel call-out-panel__small govuk-!-margin-top-2 govuk-!-margin-bottom-7">
+        <p class="govuk-body information-tag govuk-!-margin-bottom-4">
+            <i class="fa-solid fa-circle-exclamation error-colour"></i>
+            <span class="call-out-type error">
+                    @messages("produceApiDeploymentError.warning")
+            </span>
+        </p>
+        <table class="govuk-table hip-table">
+            <caption class="govuk-table__caption govuk-table__caption--s">@messages("site.errors")</caption>
+            <thead class="govuk-table__head govuk-!-font-size-16">
+                <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header app-custom-class">@messages("site.type")</th>
+                    <th scope="col" class="govuk-table__header app-custom-class">@messages("site.message")</th>
+                </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+                @if(failuresResponse.errors.isDefined) {
+                    @for(error <- failuresResponse.errors.get) {
+                        @errorRow(error)
                     }
-                </tbody>
-            </table>
-        </div>
+                }
+            </tbody>
+        </table>
+    </div>
 
-        @govukDetails(Details(
-            id = Some("viewFullErrorResponse"),
-            classes = "govuk-!-margin-bottom-1",
-            summary = Text(messages("site.viewFullErrorResponse")),
-            content = HtmlContent(errorDetails(failuresResponse))
-        ))
-    }
+    @govukDetails(Details(
+        id = Some("viewFullErrorResponse"),
+        classes = "govuk-!-margin-bottom-1",
+        summary = Text(messages("site.viewFullErrorResponse")),
+        content = HtmlContent(errorDetails(failuresResponse))
+    ))
 
     <p class="govuk-body govuk-!-margin-top-5 govuk-!-margin-bottom-8">
         @Html(messages("produceApiDeploymentError.contact", supportLink()))
     </p>
 
     <div class="govuk-button-group">
-        @govukButton(
-            ButtonViewModel(messages("produceApiDeploymentError.return"))
-                .asLink(controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad().url)
-        )
-
-        <a class="govuk-link govuk-link--no-visited-state govuk-!-margin-left-3" href="@routes.IndexController.onPageLoad.url">@messages("site.cancel")</a>
+        @formHelper(action = controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onCancel()) {
+            @govukButton(
+                ButtonViewModel(messages("produceApiDeploymentError.return"))
+                    .asLink(controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad().url)
+            )
+            <button type="submit" class="govuk-button govuk-button--secondary govuk-!-margin-left-3">@messages("site.cancel")</button>
+        }
     </div>
 }

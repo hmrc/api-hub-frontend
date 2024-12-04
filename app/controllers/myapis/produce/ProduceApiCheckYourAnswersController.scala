@@ -34,23 +34,24 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.myapis.produce.*
 import viewmodels.govuk.all.SummaryListViewModel
 import views.html.myapis.DeploymentSuccessView
-import views.html.myapis.produce.ProduceApiCheckYourAnswersView
+import views.html.myapis.produce.{ProduceApiCheckYourAnswersView, ProduceApiDeploymentErrorView}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class ProduceApiCheckYourAnswersController @Inject()(
-                                             override val messagesApi: MessagesApi,
-                                             produceApiSessionRepository: ProduceApiSessionRepository,
-                                             identify: IdentifierAction,
-                                             getData: ProduceApiDataRetrievalAction,
-                                             requireData: DataRequiredAction,
-                                             val controllerComponents: MessagesControllerComponents,
-                                             view: ProduceApiCheckYourAnswersView,
-                                             successView: DeploymentSuccessView,
-                                             hods: Hods,
-                                             domains: Domains,
-                                             apiHubService: ApiHubService,
+                                                      override val messagesApi: MessagesApi,
+                                                      produceApiSessionRepository: ProduceApiSessionRepository,
+                                                      identify: IdentifierAction,
+                                                      getData: ProduceApiDataRetrievalAction,
+                                                      requireData: DataRequiredAction,
+                                                      val controllerComponents: MessagesControllerComponents,
+                                                      view: ProduceApiCheckYourAnswersView,
+                                                      successView: DeploymentSuccessView,
+                                                      errorView: ProduceApiDeploymentErrorView,
+                                                      hods: Hods,
+                                                      domains: Domains,
+                                                      apiHubService: ApiHubService,
                                            )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) {
@@ -64,13 +65,21 @@ class ProduceApiCheckYourAnswersController @Inject()(
         call => Future.successful(Redirect(call)),
         apiHubService.generateDeployment(_).flatMap {
           case response: SuccessfulDeploymentsResponse =>
-            Future.successful(Ok(successView(request.user, response)))
+            produceApiSessionRepository.clear(request.user.userId)
+              .map(_ =>
+                Ok(successView(request.user, response))
+              )
           case InvalidOasResponse(failure) =>
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(ProduceApiDeploymentErrorPage, failure))
-              _ <- produceApiSessionRepository.set(updatedAnswers)
-            } yield Redirect(controllers.myapis.produce.routes.ProduceApiDeploymentErrorController.onPageLoad())
+            Future.successful(BadRequest(errorView(request.user, failure)))
         })
+  }
+
+  def onCancel(): Action[AnyContent] = identify.async {
+    implicit request =>
+      produceApiSessionRepository.clear(request.user.userId)
+        .map(_ =>
+          Redirect(controllers.routes.IndexController.onPageLoad)
+        )
   }
 
   private def validate(request: DataRequest[?]): Either[Call, DeploymentsRequest] =

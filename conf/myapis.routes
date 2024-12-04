@@ -87,11 +87,10 @@ POST    /produce/change-domain                              controllers.myapis.p
 
 GET     /produce/check-your-answers                         controllers.myapis.produce.ProduceApiCheckYourAnswersController.onPageLoad()
 POST    /produce/check-your-answers                         controllers.myapis.produce.ProduceApiCheckYourAnswersController.onSubmit()
+POST    /produce/cancel                                     controllers.myapis.produce.ProduceApiCheckYourAnswersController.onCancel()
 
 GET     /produce/deploying                                  controllers.myapis.produce.ProduceApiDeploymentController.onPageLoad()
 POST    /produce/deploying                                  controllers.myapis.produce.ProduceApiDeploymentController.onSubmit()
-
-GET     /produce/deployment-error                           controllers.myapis.produce.ProduceApiDeploymentErrorController.onPageLoad()
 
 GET     /produce/api-status                                 controllers.myapis.produce.ProduceApiStatusController.onPageLoad(mode: Mode = NormalMode)
 POST    /produce/api-status                                 controllers.myapis.produce.ProduceApiStatusController.onSubmit(mode: Mode = NormalMode)
