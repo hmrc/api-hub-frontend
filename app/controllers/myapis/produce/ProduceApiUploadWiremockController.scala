@@ -23,9 +23,12 @@ import models.Mode
 import models.myapis.produce.{ProduceApiUploadedOasFile, ProduceApiUploadedWiremockFile}
 import models.requests.DataRequest
 import navigation.Navigator
+import org.apache.pekko.actor.Status.Success
+import org.bson.json.JsonObject
 import pages.myapis.produce.{ProduceApiEnterWiremockPage, ProduceApiUploadWiremockPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.libs.json.JsValue
 import play.api.mvc.*
 import repositories.ProduceApiSessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -75,6 +78,11 @@ class ProduceApiUploadWiremockController @Inject()(
       )
     }
   }
+
+  private def isValidWiremock(value: String): Boolean = {
+    scala.util.Try(play.api.libs.json.Json.parse(value)).toOption.isDefined
+  }
+
 
   private def buildView(form: Form[ProduceApiUploadedWiremockFile], mode: Mode)(implicit request: DataRequest[AnyContent]) = {
     view(form, ProduceApiUploadWiremockViewModel(routes.ProduceApiUploadWiremockController.onSubmit(mode)), request.user, frontendAppConfig)
