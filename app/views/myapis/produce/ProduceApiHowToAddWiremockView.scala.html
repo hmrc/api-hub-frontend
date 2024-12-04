@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import config.FrontendAppConfig
 @import models.myapis.produce.ProduceApiHowToAddWiremock
 @import models.user.UserModel
 @import viewmodels.myapis.produce.ProduceApiHowToAddWiremockViewModel
@@ -23,12 +24,17 @@
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukRadios: GovukRadios,
-    govukButton: GovukButton
+    govukButton: GovukButton,
+    config: FrontendAppConfig,
 )
 
 @(form: Form[?], userModel: UserModel, viewModel: ProduceApiHowToAddWiremockViewModel)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = title(form, messages("produceApiHowToAddWiremock.title"))) {
+@guidanceLink = {
+    <a target="_blank" href=@config.wireMockGuidanceLink>@messages("produceApiHowToAddWiremock.description.link")</a>
+}
+
+@layout(pageTitle = title(form, messages("produceApiHowToAddWiremock.title")), user = Some(userModel)) {
 
     @formHelper(action = viewModel.formAction) {
 
@@ -36,10 +42,19 @@
             @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))
         }
 
+        <h1 class="govuk-heading-xl govuk-!-margin-bottom-1">
+            @messages("produceApiHowToAddWiremock.heading")
+        </h1>
+
+        <p class="govuk-body">
+            @messages("produceApiHowToAddWiremock.description")
+            @guidanceLink
+        </p>
+
         @govukRadios(
             RadiosViewModel(
                 field  = form("value"),
-                legend = LegendViewModel(messages("produceApiHowToAddWiremock.heading")).asPageHeading(),
+                legend = LegendViewModel(messages("produceApiHowToAddWiremock.how")).asPageHeading(viewmodels.LegendSize.Medium),
                 items  = ProduceApiHowToAddWiremock.options
             )
         )
