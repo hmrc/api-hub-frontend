@@ -18,6 +18,7 @@ package controllers.myapis.produce
 
 import controllers.actions.*
 import models.Mode
+import pages.myapis.produce.ProduceApiDeploymentErrorPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -30,15 +31,15 @@ import scala.concurrent.{ExecutionContext, Future}
 class ProduceApiDeploymentErrorController @Inject()(
                                                      override val messagesApi: MessagesApi,
                                                      identify: IdentifierAction,
+                                                     getData: ProduceApiDataRetrievalAction,
+                                                     requireData: DataRequiredAction,
                                                      val controllerComponents: MessagesControllerComponents,
                                                      view: ProduceApiDeploymentErrorView
                                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = identify {
-    implicit request => Ok(view(request.user))
-  }
-
-  def onSubmit(): Action[AnyContent] = identify {
-    implicit request => Redirect(routes.ProduceApiStartController.startProduceApi())
+  def onPageLoad(): Action[AnyContent] =  (identify andThen getData andThen requireData) {
+    implicit request =>
+      val errorDetails = request.userAnswers.get(ProduceApiDeploymentErrorPage)
+      Ok(view(request.user, errorDetails))
   }
 }

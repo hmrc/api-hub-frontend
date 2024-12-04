@@ -20,9 +20,9 @@ import com.google.inject.{Inject, Singleton}
 import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
 import models.AvailableEndpoint
 import models.accessrequest.{AccessRequest, AccessRequestRequest, AccessRequestStatus}
-import models.api.{ApiDeploymentStatuses, ApiDetail, ApiDeployment, ApiDetailSummary, EgressGateway, PlatformContact}
+import models.api.{ApiDeployment, ApiDeploymentStatuses, ApiDetail, ApiDetailSummary, EgressGateway, PlatformContact}
 import models.application.*
-import models.deployment.{DeploymentDetails, DeploymentsRequest, DeploymentsResponse}
+import models.deployment.{DeploymentDetails, DeploymentsRequest, DeploymentsResponse, FailuresResponse, InvalidOasResponse}
 import models.exception.ApplicationsException
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
 import models.stats.ApisInProductionStatistic

@@ -21,12 +21,13 @@ import controllers.actions.*
 import models.{CheckMode, UserAnswers}
 import models.api.ApiStatus
 import models.deployment.{DeploymentsRequest, DeploymentsResponse, EgressMapping, FailuresResponse, InvalidOasResponse, SuccessfulDeploymentsResponse}
-import models.myapis.produce.{ProduceApiDomainSubdomain, ProduceApiChooseEgress, ProduceApiEgressPrefixes}
+import models.myapis.produce.{ProduceApiChooseEgress, ProduceApiDomainSubdomain, ProduceApiEgressPrefixes}
 import models.requests.DataRequest
 import models.team.Team
 import pages.myapis.produce.*
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.*
+import repositories.ProduceApiSessionRepository
 import services.ApiHubService
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -40,6 +41,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ProduceApiCheckYourAnswersController @Inject()(
                                              override val messagesApi: MessagesApi,
+                                             produceApiSessionRepository: ProduceApiSessionRepository,
                                              identify: IdentifierAction,
                                              getData: ProduceApiDataRetrievalAction,
                                              requireData: DataRequiredAction,
@@ -60,12 +62,14 @@ class ProduceApiCheckYourAnswersController @Inject()(
     implicit request =>
       validate(request).fold(
         call => Future.successful(Redirect(call)),
-        apiHubService.generateDeployment(_).map {
+        apiHubService.generateDeployment(_).flatMap {
           case response: SuccessfulDeploymentsResponse =>
-            Ok(successView(request.user, response))
-          case InvalidOasResponse(failure) => BadRequest(
-            view(SummaryListViewModel(summaryListRows(request.userAnswers)), request.user, Some(failure))
-          )
+            Future.successful(Ok(successView(request.user, response)))
+          case InvalidOasResponse(failure) =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(ProduceApiDeploymentErrorPage, failure))
+              _ <- produceApiSessionRepository.set(updatedAnswers)
+            } yield Redirect(controllers.myapis.produce.routes.ProduceApiDeploymentErrorController.onPageLoad())
         })
   }
 

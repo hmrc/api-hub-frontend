@@ -92,7 +92,6 @@ GET     /produce/deploying                                  controllers.myapis.p
 POST    /produce/deploying                                  controllers.myapis.produce.ProduceApiDeploymentController.onSubmit()
 
 GET     /produce/deployment-error                           controllers.myapis.produce.ProduceApiDeploymentErrorController.onPageLoad()
-POST    /produce/deployment-error                           controllers.myapis.produce.ProduceApiDeploymentErrorController.onSubmit()
 
 GET     /produce/api-status                                 controllers.myapis.produce.ProduceApiStatusController.onPageLoad(mode: Mode = NormalMode)
 POST    /produce/api-status                                 controllers.myapis.produce.ProduceApiStatusController.onSubmit(mode: Mode = NormalMode)

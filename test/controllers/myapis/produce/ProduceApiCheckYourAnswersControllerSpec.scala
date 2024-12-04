@@ -123,7 +123,7 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       }
     }
 
-    "must return a bad request and an error for an unsuccessful POST" in {
+    "must redirect to the deployment error page for an unsuccessful POST" in {
       val fixture = buildFixture(Some(fullyPopulatedUserAnswers))
       val response = InvalidOasResponse(
         FailuresResponse("code", "reason", Some(Seq(Error("type", "message"))))
@@ -139,8 +139,8 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
 
         val result = route(fixture.application, request).value
 
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(summaryList(), FakeUser, Some(response.failure))(request, messages(fixture.application)).toString
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result) mustEqual Some(controllers.myapis.produce.routes.ProduceApiDeploymentErrorController.onPageLoad().url)
       }
     }
 
