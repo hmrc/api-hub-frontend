@@ -45,7 +45,7 @@ class ProduceApiHowToAddWiremockController @Inject()(
                                                  requireData: DataRequiredAction,
                                                  formProvider: ProduceApiHowToAddWiremockFormProvider,
                                                  val controllerComponents: MessagesControllerComponents,
-                                                 view: ProduceApiHowToAddWiremockView
+                                                 view: ProduceApiHowToAddWiremockView,
                                                )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()

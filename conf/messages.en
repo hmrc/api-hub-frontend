@@ -1072,8 +1072,9 @@ hipEnvironment.test.name = Test
 
 produceApiHowToAddWiremock.title = Define WireMock for your API
 produceApiHowToAddWiremock.heading = Define WireMock for your API
-produceApiHowToAddWiremock.description = To use your API in the development environment, you need to configure a WireMock. {0}.
-produceApiHowToAddWiremock.description.link = Guidance for configuring WireMocks (opens in a new tab)
+produceApiHowToAddWiremock.how = How do you want to provide the WireMock?
+produceApiHowToAddWiremock.description = To use your API in the development environment, you need to configure a WireMock.
+produceApiHowToAddWiremock.description.link = Guidance for configuring WireMocks (opens in a new tab).
 produceApiHowToAddWiremock.upload = Upload the WireMock
 produceApiHowToAddWiremock.upload.description = If you already have a WireMock defined as JSON, you can upload it.
 produceApiHowToAddWiremock.editor = Use a Visual Editor

@@ -20,6 +20,7 @@ import models.{Enumerable, WithName}
 import models.myapis.produce.ProduceApiHowToAddWiremock
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.Aliases.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 
 sealed trait ProduceApiHowToAddWiremock
@@ -37,6 +38,7 @@ object ProduceApiHowToAddWiremock extends Enumerable.Implicits {
     case (value, index) =>
       RadioItem(
         content = Text(messages(s"produceApiHowToAddWiremock.${value.toString}")),
+        hint    = Some(Hint(content = Text(messages(s"produceApiHowToAddWiremock.${value.toString}.description")))),
         value   = Some(value.toString),
         id      = Some(s"value_$index")
       )
