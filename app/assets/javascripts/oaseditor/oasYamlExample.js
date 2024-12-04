@@ -1,4 +1,4 @@
-export const oasExampleYaml = `
+export const exampleOasYaml = `
 openapi: 3.0.3
 info:
   title: NPS Interface Specification to validate a P800 Reference.

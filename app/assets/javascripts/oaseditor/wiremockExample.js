@@ -1,4 +1,4 @@
-export const oasExampleWiremock = `{
+export const exampleWiremock = `{
   "request": {
     "method": "GET",
     "url": "/some/thing"

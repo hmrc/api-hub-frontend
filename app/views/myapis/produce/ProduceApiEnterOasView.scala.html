@@ -16,21 +16,21 @@
 
 @import models.user.UserModel
 @import viewmodels.myapis.ProduceApiEnterOasViewModel
+@import views.html.components.CodeEditor
 @import views.html.helper.CSPNonce
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
-    govukInput: GovukInput,
-    govukButton: GovukButton
+    govukButton: GovukButton,
+    codeEditor: CodeEditor
 )
 
 @(form: Form[?], userModel: UserModel, viewModel: ProduceApiEnterOasViewModel)(implicit request: Request[?], messages: Messages)
 
 @scripts() = {
-    <script src='@routes.Assets.versioned("javascripts/oaseditor/ace.js")' @{CSPNonce.attr}></script>
-    <script src='@routes.Assets.versioned("javascripts/produceApiEnterOas.js")' type="module" @{CSPNonce.attr}></script>
+    <script src='@routes.Assets.versioned("javascripts/produceApiEnterConfig.js")' type="module" @{CSPNonce.attr}></script>
 }
 
 @layout(pageTitle = title(form, messages(viewModel.title)), fullWidth = true, customScriptsBlock = Some(scripts()), user = Some(userModel)) {
@@ -51,11 +51,7 @@
             <p class="govuk-hint">@messages(warning)</p>
         }
 
-        <div id="aceEditorContainer" class="hip-ace-editor govuk-!-margin-bottom-5" @if(viewModel.populateExample){data-populate-example}>+</div>
-
-        @govukInput(
-            Input(inputType="hidden", name="value", id="oasMirrorValue", value=form("value").value)
-        )
+        @codeEditor("yaml", "value", form("value").value, viewModel.populateExample)
 
         @govukButton(
             ButtonViewModel(messages("site.continue"))
