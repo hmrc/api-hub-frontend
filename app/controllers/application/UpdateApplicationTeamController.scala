@@ -24,7 +24,7 @@ import forms.application.UpdateApplicationTeamFormProvider
 import models.requests.ApplicationRequest
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, Messages}
-import play.api.mvc._
+import play.api.mvc.*
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.application.{UpdateApplicationTeamSuccessView, UpdateApplicationTeamView}

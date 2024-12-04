@@ -16,6 +16,8 @@ site.dashboard = Dashboard
 site.approvals = Integration Hub Admin
 site.applicationNotFoundHeading = Application not found
 site.applicationNotFoundMessage = Cannot find an application with ID {0}.
+site.environmentNotFoundHeading = Environment not found
+site.environmentNotFoundMessage = Cannot find environment {0}.
 site.apiNotFound.heading = API not found
 site.apiNotFound.message = Cannot find an API with ID {0}.
 site.apiNotFoundInApim.message = The API {0} has not been deployed to HIP.
@@ -37,6 +39,10 @@ site.unexpecteError = Unexpected error: {0}
 site.team.select = Select an owning team
 site.team.unassigned = Unassigned
 site.signedIn = Signed in as {0} via {1}
+site.environment.dev = Development environment
+site.environment.test = Test environment
+site.environment.preprod = Pre-Production environment
+site.environment.production = Production environment
 
 date.day = Day
 date.month = Month
@@ -155,6 +161,10 @@ applicationDetails.apis.toYourApp = {0} to your application
 
 applicationDetails.environment.credentials.problem = Environments and credentials are not available.
 
+applicationDetails.environments.apis = APIs
+applicationDetails.environments.crendentials = Credentials
+applicationDetails.environments.exampleCurlCommands = Example CURL commands
+
 applicationDetails.apis.apiName = API name
 applicationDetails.apis.testEnv = Test env
 applicationDetails.apis.prodEnv = Prod env
@@ -210,6 +220,14 @@ environmentAndCredentials.credentialNotFound.message = Cannot find credential wi
 environmentAndCredentials.cannotDeleteLastCredential.heading = Cannot revoke last credential
 environmentAndCredentials.cannotDeleteLastCredential.message = You cannot revoke the last credential for an application.
 
+
+environments.title = Environments and Credentials
+environments.heading = Environments and credentials
+environments.clientId = Client ID
+environments.clientSecret = Client secret
+environments.created = Created
+environments.noCredentials = No production credentials have been created.
+
 addCredentialChecklist.title = Creating production credentials
 addCredentialChecklist.heading = Creating production credentials
 addCredentialChecklist.error.required = You must confirm you meet the conditions to continue
@@ -237,6 +255,7 @@ addCredentialSuccess.tooManyCredentials.message = An application can have a maxi
 applicationNav.page.applicationDetails = Application details
 applicationNav.page.applicationApis = Application APIs
 applicationNav.page.environmentsAndCredentials = Environments and credentials
+applicationNav.page.environments = Environments
 applicationNav.page.manageTeamMembers = Manage team members
 applicationNav.page.deleteApplication = Delete application
 applicationNav.page.viewJson = View as JSON
@@ -947,6 +966,12 @@ produceApiDomain.checkYourAnswersLabel.2 = Subdomain
 
 updateApiDomain.heading = Review domain and subdomain for the API
 
+produceApiAddPrefixes.title = Do you want to configure prefixes for your API?
+produceApiAddPrefixes.heading = Do you want to configure prefixes for your API?
+produceApiAddPrefixes.hint = If you need to add a common prefix to all paths within your OAS, or if you need to map values in your path, answer Yes. {0}.
+produceApiAddPrefixes.guidance = Guidance for Egress prefixes
+produceApiAddPrefixes.error.required = Select an answer
+
 produceApiStatus.title = Set the API status
 produceApiStatus.hint.0 = Not ready to use (documentation only and could change)
 produceApiStatus.hint.1 = Early stage of development and may be available (expect breaking changes)
@@ -1054,3 +1079,16 @@ envParityConfigTest.admin = Integration Hub admin
 
 hipEnvironment.production.name = Production
 hipEnvironment.test.name = Test
+
+produceApiHowToAddWiremock.title = Define WireMock for your API
+produceApiHowToAddWiremock.heading = Define WireMock for your API
+produceApiHowToAddWiremock.how = How do you want to provide the WireMock?
+produceApiHowToAddWiremock.description = To use your API in the development environment, you need to configure a WireMock.
+produceApiHowToAddWiremock.description.link = Guidance for configuring WireMocks (opens in a new tab).
+produceApiHowToAddWiremock.upload = Upload the WireMock
+produceApiHowToAddWiremock.upload.description = If you already have a WireMock defined as JSON, you can upload it.
+produceApiHowToAddWiremock.editor = Use a Visual Editor
+produceApiHowToAddWiremock.editor.description = Create a WireMock from scratch using our visual editor.
+produceApiHowToAddWiremock.checkYourAnswersLabel = produceApiHowToAddWiremock
+produceApiHowToAddWiremock.error.required = Select how you want to add a WireMock to your API. 
+produceApiHowToAddWiremock.change.hidden = ProduceApiHowToAddWiremock

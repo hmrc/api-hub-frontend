@@ -35,7 +35,7 @@ object ProduceApiEgressPrefixesSummary  {
     }
     val changeUrl = answers.get(ProduceApiEgressPrefixesPage) match {
       case Some(_) => controllers.myapis.produce.routes.ProduceApiEgressPrefixesController.onPageLoad(CheckMode).url
-      case None => controllers.myapis.produce.routes.ProduceApiEgressController.onPageLoad(CheckMode).url
+      case None => controllers.myapis.produce.routes.ProduceApiAddPrefixesController.onPageLoad(CheckMode).url
     }
     Some(SummaryListRowViewModel(
       key     = "produceApiEgressPrefix.checkYourAnswersLabel",

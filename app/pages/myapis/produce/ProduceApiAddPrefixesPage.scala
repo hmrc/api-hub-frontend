@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package pages.myapis.update
+package pages.myapis.produce
 
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object UpdateApiReviewEgressPage extends QuestionPage[Boolean] {
+case object ProduceApiAddPrefixesPage extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "updateApiReviewEgress"
+  override def toString: String = "produceApiAddPrefixesPage"
 }

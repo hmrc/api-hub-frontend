@@ -19,6 +19,7 @@ package viewmodels.admin
 import models.user.UserModel
 import play.api.i18n.Messages
 import viewmodels.{SideNavItem, SideNavPage}
+import SideNavItem.SideNavItemLeaf
 
 object AdminSideNavPages {
 
@@ -39,7 +40,7 @@ object AdminNavItems {
   import AdminSideNavPages._
 
   def apply(user: UserModel, currentPage: SideNavPage)(implicit messages: Messages): Seq[SideNavItem] = {
-    val accessRequestsNavItem = SideNavItem(
+    val accessRequestsNavItem = SideNavItemLeaf(
       page = AccessRequestsPage,
       title = messages("accessRequests.title"),
       link = controllers.admin.routes.AccessRequestsController.onPageLoad(),
@@ -48,49 +49,49 @@ object AdminNavItems {
 
     if (user.permissions.canSupport) {
       Seq(
-        SideNavItem(
+        SideNavItemLeaf(
           page = ManageApplicationsPage,
           title = messages("manageApplications.title"),
           link = controllers.admin.routes.ManageApplicationsController.onPageLoad(),
           isCurrentPage = currentPage == ManageApplicationsPage
         ),
-        SideNavItem(
+        SideNavItemLeaf(
           page = ManageApisPage,
           title = messages("manageApis.title"),
           link = controllers.admin.routes.ManageApisController.onPageLoad(),
           isCurrentPage = currentPage == ManageApisPage
         ),
-        SideNavItem(
+        SideNavItemLeaf(
           page = ManageTeamsPage,
           title = messages("manageTeams.title"),
           link = controllers.admin.routes.ManageTeamsController.onPageLoad(),
           isCurrentPage = currentPage == ManageTeamsPage
         ),
-        SideNavItem(
+        SideNavItemLeaf(
           page = TeamMigrationPage,
           title = messages("teamMigration.title"),
           link = controllers.admin.routes.TeamMigrationController.onPageLoad(),
           isCurrentPage = currentPage == TeamMigrationPage
         ),
-        SideNavItem(
+        SideNavItemLeaf(
           page = GetUsersPage,
           title = messages("getUsers.title"),
           link = controllers.admin.routes.GetUsersController.onPageLoad(),
           isCurrentPage = currentPage == GetUsersPage
         ),
-        SideNavItem(
+        SideNavItemLeaf(
           page = ConfigurationPage,
           title = messages("configuration.title"),
           link = controllers.admin.routes.ConfigurationController.onPageLoad(),
           isCurrentPage = currentPage == ConfigurationPage
         ),
-        SideNavItem(
+        SideNavItemLeaf(
           page = StatisticsPage,
           title = messages("statistics.menuTitle"),
           link = controllers.admin.routes.StatisticsController.onPageLoad(),
           isCurrentPage = currentPage == StatisticsPage
         ),
-        SideNavItem(
+        SideNavItemLeaf(
           page = EnvParityConfigTestPage,
           title = messages("envParityConfigTest.title"),
           link = controllers.admin.routes.EnvParityConfigTestController.onPageLoad(),

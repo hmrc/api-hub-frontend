@@ -24,7 +24,9 @@
     layout: templates.Layout,
     govukTable: GovukTable,
     iconsLink: IconsLink,
-    applicationDetailsTable: ApplicationDetailsTable
+    applicationDetailsTable: ApplicationDetailsTable,
+    sideNav: views.html.templates.SideNav,
+    applicationNavItems: ApplicationNavItems,
 )
 
 @(application: Application, applicationApis: Seq[ApplicationApi], user: Option[UserModel])(implicit request: Request[?], messages: Messages)
@@ -76,7 +78,7 @@
 
 @layout(pageTitle = titleNoForm(messages("applicationDetails.title")), user = user, fullWidth = true, customScriptsBlock = Some(iconsLink())) {
 
-    @views.html.templates.SideNav(application.name, ApplicationNavItems(user, application, ApplicationSideNavPages.DetailsPage)) {
+    @sideNav(application.name, applicationNavItems(user, application, ApplicationSideNavPages.DetailsPage)) {
 
         <h1 class="govuk-heading-l">@messages("applicationDetails.heading")</h1>
 

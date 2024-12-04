@@ -31,6 +31,7 @@ trait UserAnswersGenerator extends TryValues {
   self: Generators =>
 
   val generators: Seq[Gen[(QuestionPage[?], JsValue)]] =
+    arbitrary[(ProduceApiHowToAddWiremockPage.type, JsValue)] ::
     arbitrary[(ProduceApiPassthroughPage.type, JsValue)] ::
     arbitrary[(ProduceApiEgressPrefixesPage.type, JsValue)] ::
     arbitrary[(ProduceApiDomainPage.type, JsValue)] ::

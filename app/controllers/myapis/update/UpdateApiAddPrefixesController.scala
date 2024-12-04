@@ -16,38 +16,67 @@
 
 package controllers.myapis.update
 
+import config.FrontendAppConfig
 import controllers.actions.*
+import controllers.myapis.update.routes
+import forms.myapis.produce.ProduceApiAddPrefixesFormProvider
 import models.Mode
+import models.requests.DataRequest
+import navigation.Navigator
+import pages.myapis.update.UpdateApiAddPrefixesPage
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.ProduceApiSessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.myapis.produce.ProduceApiAddPrefixesViewModel
 import views.html.myapis.produce.ProduceApiAddPrefixesView
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class UpdateApiAddPrefixesController @Inject()(
-                                                 override val messagesApi: MessagesApi,
-                                                 identify: IdentifierAction,
-                                                 val controllerComponents: MessagesControllerComponents,
-                                                 view: ProduceApiAddPrefixesView
+                                                override val messagesApi: MessagesApi,
+                                                config: FrontendAppConfig,
+                                                sessionRepository: ProduceApiSessionRepository,
+                                                navigator: Navigator,
+                                                identify: IdentifierAction,
+                                                getData: ProduceApiDataRetrievalAction,
+                                                requireData: DataRequiredAction,
+                                                val controllerComponents: MessagesControllerComponents,
+                                                formProvider: ProduceApiAddPrefixesFormProvider,
+                                                view: ProduceApiAddPrefixesView
                                                )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = identify {
-    implicit request => Ok(view(
-      controllers.myapis.update.routes.UpdateApiAddPrefixesController.onSubmit(mode, "yes"),
-      controllers.myapis.update.routes.UpdateApiAddPrefixesController.onSubmit(mode, "no")
-    ))
-
-  }
-
-  def onSubmit(mode: Mode, answer: String): Action[AnyContent] = identify {
+  val form = formProvider()
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
-      answer match {
-        case "yes" => Redirect(controllers.myapis.update.routes.UpdateApiHodController.onPageLoad(mode))
-        case "no" => Redirect(controllers.myapis.update.routes.UpdateApiHodController.onPageLoad(mode))
+
+      val preparedForm = request.userAnswers.get(UpdateApiAddPrefixesPage) match {
+        case None => form
+        case Some(value) => form.fill(value)
       }
 
+      Ok(buildView(preparedForm, mode))
+  }
+
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request =>
+
+      form.bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(buildView(formWithErrors, mode))),
+
+        value =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(UpdateApiAddPrefixesPage, value))
+            _ <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(navigator.nextPage(UpdateApiAddPrefixesPage, mode, updatedAnswers))
+      )
+  }
+
+  private def buildView(form: Form[Boolean], mode: Mode)(implicit request: DataRequest[AnyContent]) = {
+    view(form, ProduceApiAddPrefixesViewModel(routes.UpdateApiAddPrefixesController.onSubmit(mode)), config.helpDocsPath, request.user)
   }
 
 }

@@ -106,25 +106,13 @@ class UpdateApiStartControllerSpec extends SpecBase with MockitoSugar with Table
         Set("hod")
       )
 
-      val deploymentDetailsWithEgress = emptyDeploymentDetails
-        .copy(
-          prefixesToRemove = Some(Seq("/v1")),
-          egressMappings = Some(Seq(EgressMapping("/test", "/qa")))
-        )
-      val answersWithEgress = setAnswer(setAnswer(
-        initialUserAnswers(deploymentDetailsWithEgress),
-        UpdateApiEgressPrefixesPage,
-        ProduceApiEgressPrefixes(Seq("/v1"), Seq("/qa->/test"))
-      ), UpdateApiReviewEgressPage, true)
-
       forAll(Table(
         ("deploymentDetails", "expectedAnswers"),
         (emptyDeploymentDetails, initialUserAnswers(emptyDeploymentDetails)),
         (deploymentDetailsWithDescription, answersWithDescription),
         (deploymentDetailsWithStatus, answersWithStatus),
         (deploymentDetailsWithDomainSubdomain, answersWithDomainSubdomain),
-        (deploymentDetailsWithHod, answersWithHod),
-        (deploymentDetailsWithEgress, answersWithEgress)
+        (deploymentDetailsWithHod, answersWithHod)
       )) { case (deploymentDetails: DeploymentDetails, expectedUserAnswers: UserAnswers) =>
         val fixture = buildFixture()
         when(fixture.sessionRepository.set(any())).thenReturn(Future.successful(true))

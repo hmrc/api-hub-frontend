@@ -21,7 +21,7 @@ import controllers.actions.FakeUser
 import controllers.routes
 import pages.*
 import models.*
-import models.myapis.produce.ProduceApiChooseEgress
+import models.myapis.produce.{ProduceApiChooseEgress, ProduceApiHowToAddWiremock}
 import models.myapis.produce.ProduceApiHowToCreate.Editor
 import models.user.Permissions
 import org.scalatest.TryValues
@@ -142,6 +142,20 @@ class NavigatorSpec extends SpecBase with TryValues {
         "must go from the API review page to the Define Wiremock page" in {
           navigator.nextPage(ProduceApiReviewNameDescriptionPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiHowToAddWiremockController.onPageLoad(NormalMode)
         }
+        "must go from the Add Prefixes page to the Enter Prefixes page if user answered Yes" in {
+          val userAnswers = emptyUserAnswers.set(ProduceApiAddPrefixesPage, true).get
+          navigator.nextPage(ProduceApiAddPrefixesPage, NormalMode, userAnswers) mustBe controllers.myapis.produce.routes.ProduceApiEgressPrefixesController.onPageLoad(NormalMode)
+        }
+        "must go from the Add Prefixes page to the HoDs page if user answered No" in {
+          val userAnswers = emptyUserAnswers.set(ProduceApiAddPrefixesPage, false).get
+          navigator.nextPage(ProduceApiAddPrefixesPage, NormalMode, userAnswers) mustBe controllers.myapis.produce.routes.ProduceApiHodController.onPageLoad(NormalMode)
+        }
+        "must go from the Define Wiremock page to the WireMock editor page" in {
+          navigator.nextPage(ProduceApiHowToAddWiremockPage, NormalMode, emptyUserAnswers.set[ProduceApiHowToAddWiremock](ProduceApiHowToAddWiremockPage, ProduceApiHowToAddWiremock.Editor).get) mustBe controllers.myapis.produce.routes.ProduceApiEnterWiremockController.onPageLoad(NormalMode)
+        }
+        "must go from the Define Wiremock page to the WireMock upload page" in {
+          navigator.nextPage(ProduceApiHowToAddWiremockPage, NormalMode, emptyUserAnswers.set[ProduceApiHowToAddWiremock](ProduceApiHowToAddWiremockPage, ProduceApiHowToAddWiremock.Upload).get) mustBe controllers.myapis.produce.routes.ProduceApiUploadWiremockController.onPageLoad(NormalMode)
+        }
         "must go from the API Egress Prefixes page to the HoD page" in {
           navigator.nextPage(ProduceApiEgressPrefixesPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiHodController.onPageLoad(NormalMode)
         }
@@ -162,14 +176,6 @@ class NavigatorSpec extends SpecBase with TryValues {
         "must go from the API passthrough page to the API check your answers page" in {
           navigator.nextPage(ProduceApiPassthroughPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
         }
-        "must go from the choose egress page to the egress prefixes page when the user chooses to configure prefixes" in {
-          val userAnswers = emptyUserAnswers.set(ProduceApiChooseEgressPage, ProduceApiChooseEgress(None, true)).get
-          navigator.nextPage(ProduceApiChooseEgressPage, NormalMode, userAnswers) mustBe controllers.myapis.produce.routes.ProduceApiEgressPrefixesController.onPageLoad(NormalMode)
-        }
-        "must go from the choose egress page to the choose HoDs page when the user chooses not to configure prefixes" in {
-          val userAnswers = emptyUserAnswers.set(ProduceApiChooseEgressPage, ProduceApiChooseEgress(None, false)).get
-          navigator.nextPage(ProduceApiChooseEgressPage, NormalMode, userAnswers) mustBe controllers.myapis.produce.routes.ProduceApiHodController.onPageLoad(NormalMode)
-        }
       }
 
       "during the Update an API journey" - {
@@ -184,6 +190,16 @@ class NavigatorSpec extends SpecBase with TryValues {
         }
         "must go from the API review page to the Define Wiremock page" in {
           navigator.nextPage(UpdateApiReviewNameDescriptionPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiHowToAddWiremockController.onPageLoad(NormalMode)
+        }
+        "must go from the Add Prefixes page to the HoDs page if user answered No" in {
+          val userAnswers = emptyUserAnswers.set(UpdateApiAddPrefixesPage, false).get
+          navigator.nextPage(UpdateApiAddPrefixesPage, NormalMode, userAnswers) mustBe controllers.myapis.update.routes.UpdateApiHodController.onPageLoad(NormalMode)
+        }
+        "must go from the Define Wiremock page to the WireMock editor page" in {
+          navigator.nextPage(UpdateApiHowToAddWiremockPage, NormalMode, emptyUserAnswers.set[ProduceApiHowToAddWiremock](UpdateApiHowToAddWiremockPage, ProduceApiHowToAddWiremock.Editor).get) mustBe controllers.myapis.update.routes.UpdateApiEnterWiremockController.onPageLoad(NormalMode)
+        }
+        "must go from the Define Wiremock page to the WireMock upload page" in {
+          navigator.nextPage(UpdateApiHowToAddWiremockPage, NormalMode, emptyUserAnswers.set[ProduceApiHowToAddWiremock](UpdateApiHowToAddWiremockPage, ProduceApiHowToAddWiremock.Upload).get) mustBe controllers.myapis.update.routes.UpdateApiUploadWiremockController.onPageLoad(NormalMode)
         }
         "must go from the Upload OAS page to the OAS editor page" in {
           navigator.nextPage(UpdateApiUploadOasPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiEnterOasController.onPageLoadWithUploadedOas(NormalMode)
@@ -273,13 +289,13 @@ class NavigatorSpec extends SpecBase with TryValues {
         "must go from the Preview Name/Description page to the Check Your Answers page" in {
           navigator.nextPage(ProduceApiReviewNameDescriptionPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
         }
-        "must go from the Egress page to the Egress Prefixes page when the user chooses to configure prefixes" in {
-          val userAnswers = emptyUserAnswers.set(ProduceApiChooseEgressPage, ProduceApiChooseEgress(None, true)).get
-          navigator.nextPage(ProduceApiChooseEgressPage, CheckMode, userAnswers) mustBe controllers.myapis.produce.routes.ProduceApiEgressPrefixesController.onPageLoad(CheckMode)
+        "must go from the Add Prefixes page to the Enter Prefixes page if user answered Yes" in {
+          val userAnswers = emptyUserAnswers.set(ProduceApiAddPrefixesPage, true).get
+          navigator.nextPage(ProduceApiAddPrefixesPage, CheckMode, userAnswers) mustBe controllers.myapis.produce.routes.ProduceApiEgressPrefixesController.onPageLoad(CheckMode)
         }
-        "must go from the Egress page to the Check Your Answers page when the user chooses not to configure prefixes" in {
-          val userAnswers = emptyUserAnswers.set(ProduceApiChooseEgressPage, ProduceApiChooseEgress(None, false)).get
-          navigator.nextPage(ProduceApiChooseEgressPage, CheckMode, userAnswers) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
+        "must go from the Add Prefixes page to the Check Your Answers page if user answered No" in {
+          val userAnswers = emptyUserAnswers.set(ProduceApiAddPrefixesPage, false).get
+          navigator.nextPage(ProduceApiAddPrefixesPage, CheckMode, userAnswers) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
         }
         "must go from the Egress Prefixes page to the Check Your Answers page" in {
           navigator.nextPage(ProduceApiEgressPrefixesPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
@@ -302,6 +318,11 @@ class NavigatorSpec extends SpecBase with TryValues {
         "must go from the Upload OAS page to the OAS editor page" in {
           navigator.nextPage(UpdateApiUploadOasPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiEnterOasController.onPageLoadWithUploadedOas(CheckMode)
         }
+        "must go from the Add Prefixes page to the Check Your Answers page if user answered No" in {
+          val userAnswers = emptyUserAnswers.set(UpdateApiAddPrefixesPage, false).get
+          navigator.nextPage(UpdateApiAddPrefixesPage, CheckMode, userAnswers) mustBe controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onPageLoad()
+        }
+
       }
       
     }

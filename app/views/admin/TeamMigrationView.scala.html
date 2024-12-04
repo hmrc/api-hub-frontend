@@ -23,7 +23,8 @@
 @this(
     layout: templates.Layout,
     govukTag : GovukTag,
-    govukTable : GovukTable
+    govukTable : GovukTable,
+    sideNav: views.html.templates.SideNav,
 )
 
 @(applications: Seq[Application], summary: Seq[MigrationSummary], teamApplications: Seq[TeamApplications], user: UserModel)(implicit request: Request[?], messages: Messages)
@@ -76,7 +77,7 @@
 
 @layout(pageTitle = titleNoForm(messages("teamMigration.pageTitle")), user = Some(user), fullWidth = true) {
 
-    @views.html.templates.SideNav(messages("manageApplications.admin"), AdminNavItems(user, AdminSideNavPages.TeamMigrationPage)) {
+    @sideNav(messages("manageApplications.admin"), AdminNavItems(user, AdminSideNavPages.TeamMigrationPage)) {
 
         <h1 class="govuk-heading-l">@messages("teamMigration.pageTitle")</h1>
 

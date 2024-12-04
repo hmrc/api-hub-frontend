@@ -26,6 +26,7 @@ import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages
 import play.api.test.Helpers.running
 import viewmodels.SideNavItem
+import viewmodels.SideNavItem.SideNavItemLeaf
 import viewmodels.myapis.MyApisNavPages.{ApiUsagePage, ChangeOwningTeamPage, ProducerApiDetailsPage, UpdateApiPage, ViewApiAsConsumerPage}
 
 class MyApisNavItemsSpec extends SpecBase with Matchers with TableDrivenPropertyChecks {
@@ -92,6 +93,7 @@ class MyApisNavItemsSpec extends SpecBase with Matchers with TableDrivenProperty
         forAll(pages) {
           page =>
             val actual = MyApisNavItems(apiId, FakeSupporter, page, statuses)
+              .collect { case ni: SideNavItemLeaf => ni }
               .filter(_.isCurrentPage)
               .map(_.page)
 
@@ -108,7 +110,7 @@ object MyApisNavItemsSpec {
   val apiId = "apiId"
 
   private def producerApiDetailsPage(): SideNavItem = {
-    SideNavItem(
+    SideNavItemLeaf(
       page = ProducerApiDetailsPage,
       title = "API details",
       link = controllers.myapis.routes.MyApiDetailsController.onPageLoad(apiId),
@@ -117,7 +119,7 @@ object MyApisNavItemsSpec {
   }
 
   private def updateApiPage(): SideNavItem = {
-    SideNavItem(
+    SideNavItemLeaf(
       page = UpdateApiPage,
       title = "Update API",
       link = controllers.myapis.routes.SimpleApiRedeploymentController.onPageLoad(apiId),
@@ -126,7 +128,7 @@ object MyApisNavItemsSpec {
   }
 
   private def changeOwningTeamPage(): SideNavItem = {
-    SideNavItem(
+    SideNavItemLeaf(
       page = ChangeOwningTeamPage,
       title = "Change owning team",
       link = controllers.myapis.routes.UpdateApiTeamController.onPageLoad(apiId),
@@ -135,7 +137,7 @@ object MyApisNavItemsSpec {
   }
 
   private def viewApiAsConsumerPage(): SideNavItem = {
-    SideNavItem(
+    SideNavItemLeaf(
       page = ViewApiAsConsumerPage,
       title = "View API as consumer",
       link = controllers.routes.ApiDetailsController.onPageLoad(apiId),
@@ -145,7 +147,7 @@ object MyApisNavItemsSpec {
   }
 
   private def apiUsagePage(): SideNavItem = {
-    SideNavItem(
+    SideNavItemLeaf(
       page = ApiUsagePage,
       title = "View API usage",
       link = controllers.myapis.routes.ApiUsageController.onPageLoad(apiId),

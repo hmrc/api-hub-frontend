@@ -51,9 +51,9 @@ GET     /produce/change-review-name-description             controllers.myapis.p
 POST    /produce/change-review-name-description             controllers.myapis.produce.ProduceApiReviewNameDescriptionController.onSubmit(mode: Mode = CheckMode)
 
 GET     /produce/how-to-add-wiremock                        controllers.myapis.produce.ProduceApiHowToAddWiremockController.onPageLoad(mode: Mode = NormalMode)
-POST    /produce/how-to-add-wiremock                        controllers.myapis.produce.ProduceApiHowToAddWiremockController.onSubmit(mode: Mode = NormalMode, answer: String)
+POST    /produce/how-to-add-wiremock                        controllers.myapis.produce.ProduceApiHowToAddWiremockController.onSubmit(mode: Mode = NormalMode)
 GET     /produce/change-how-to-add-wiremock                 controllers.myapis.produce.ProduceApiHowToAddWiremockController.onPageLoad(mode: Mode = CheckMode)
-POST    /produce/change-how-to-add-wiremock                 controllers.myapis.produce.ProduceApiHowToAddWiremockController.onSubmit(mode: Mode = CheckMode, answer: String)
+POST    /produce/change-how-to-add-wiremock                 controllers.myapis.produce.ProduceApiHowToAddWiremockController.onSubmit(mode: Mode = CheckMode)
 
 GET     /produce/upload-wiremock                            controllers.myapis.produce.ProduceApiUploadWiremockController.onPageLoad(mode: Mode = NormalMode)
 POST    /produce/upload-wiremock                            controllers.myapis.produce.ProduceApiUploadWiremockController.onSubmit(mode: Mode = NormalMode)
@@ -66,14 +66,9 @@ GET     /produce/change-enter-wiremock                      controllers.myapis.p
 POST    /produce/change-enter-wiremock                      controllers.myapis.produce.ProduceApiEnterWiremockController.onSubmit(mode: Mode = CheckMode)
 
 GET     /produce/add-prefixes                               controllers.myapis.produce.ProduceApiAddPrefixesController.onPageLoad(mode: Mode = NormalMode)
-POST    /produce/add-prefixes                               controllers.myapis.produce.ProduceApiAddPrefixesController.onSubmit(mode: Mode = NormalMode, answer: String)
+POST    /produce/add-prefixes                               controllers.myapis.produce.ProduceApiAddPrefixesController.onSubmit(mode: Mode = NormalMode)
 GET     /produce/change-add-prefixes                        controllers.myapis.produce.ProduceApiAddPrefixesController.onPageLoad(mode: Mode = CheckMode)
-POST    /produce/change-add-prefixes                        controllers.myapis.produce.ProduceApiAddPrefixesController.onSubmit(mode: Mode = CheckMode, answer: String)
-
-GET     /produce/egress                                     controllers.myapis.produce.ProduceApiEgressController.onPageLoad(mode: Mode = NormalMode)
-POST    /produce/egress                                     controllers.myapis.produce.ProduceApiEgressController.onSubmit(mode: Mode = NormalMode)
-GET     /produce/change-egress                              controllers.myapis.produce.ProduceApiEgressController.onPageLoad(mode: Mode = CheckMode)
-POST    /produce/change-egress                              controllers.myapis.produce.ProduceApiEgressController.onSubmit(mode: Mode = CheckMode)
+POST    /produce/change-add-prefixes                        controllers.myapis.produce.ProduceApiAddPrefixesController.onSubmit(mode: Mode = CheckMode)
 
 GET     /produce/egress-prefixes                            controllers.myapis.produce.ProduceApiEgressPrefixesController.onPageLoad(mode: Mode = NormalMode)
 POST    /produce/egress-prefixes                            controllers.myapis.produce.ProduceApiEgressPrefixesController.onSubmit(mode: Mode = NormalMode)
@@ -145,9 +140,9 @@ GET     /update/change-review-name-description              controllers.myapis.u
 POST    /update/change-review-name-description              controllers.myapis.update.UpdateApiReviewNameDescriptionController.onSubmit(mode: Mode = CheckMode)
 
 GET     /update/how-to-add-wiremock                        controllers.myapis.update.UpdateApiHowToAddWiremockController.onPageLoad(mode: Mode = NormalMode)
-POST    /update/how-to-add-wiremock                        controllers.myapis.update.UpdateApiHowToAddWiremockController.onSubmit(mode: Mode = NormalMode, answer: String)
+POST    /update/how-to-add-wiremock                        controllers.myapis.update.UpdateApiHowToAddWiremockController.onSubmit(mode: Mode = NormalMode)
 GET     /update/change-how-to-add-wiremock                 controllers.myapis.update.UpdateApiHowToAddWiremockController.onPageLoad(mode: Mode = CheckMode)
-POST    /update/change-how-to-add-wiremock                 controllers.myapis.update.UpdateApiHowToAddWiremockController.onSubmit(mode: Mode = CheckMode, answer: String)
+POST    /update/change-how-to-add-wiremock                 controllers.myapis.update.UpdateApiHowToAddWiremockController.onSubmit(mode: Mode = CheckMode)
 
 GET     /update/upload-wiremock                            controllers.myapis.update.UpdateApiUploadWiremockController.onPageLoad(mode: Mode = NormalMode)
 POST    /update/upload-wiremock                            controllers.myapis.update.UpdateApiUploadWiremockController.onSubmit(mode: Mode = NormalMode)
@@ -160,19 +155,9 @@ GET     /update/change-enter-wiremock                      controllers.myapis.up
 POST    /update/change-enter-wiremock                      controllers.myapis.update.UpdateApiEnterWiremockController.onSubmit(mode: Mode = CheckMode)
 
 GET     /update/add-prefixes                               controllers.myapis.update.UpdateApiAddPrefixesController.onPageLoad(mode: Mode = NormalMode)
-POST    /update/add-prefixes                               controllers.myapis.update.UpdateApiAddPrefixesController.onSubmit(mode: Mode = NormalMode, answer: String)
+POST    /update/add-prefixes                               controllers.myapis.update.UpdateApiAddPrefixesController.onSubmit(mode: Mode = NormalMode)
 GET     /update/change-add-prefixes                        controllers.myapis.update.UpdateApiAddPrefixesController.onPageLoad(mode: Mode = CheckMode)
-POST    /update/change-add-prefixes                        controllers.myapis.update.UpdateApiAddPrefixesController.onSubmit(mode: Mode = CheckMode, answer: String)
-
-GET     /update/review-egress                               controllers.myapis.update.UpdateApiReviewEgressController.onPageLoad(mode: Mode = NormalMode)
-POST    /update/review-egress                               controllers.myapis.update.UpdateApiReviewEgressController.onSubmit(next: String, mode: Mode = NormalMode)
-GET     /update/change-review-egress                        controllers.myapis.update.UpdateApiReviewEgressController.onPageLoad(mode: Mode = CheckMode)
-POST    /update/change-review-egress                        controllers.myapis.update.UpdateApiReviewEgressController.onSubmit(next: String, mode: Mode = CheckMode)
-
-GET     /update/egress                                      controllers.myapis.update.UpdateApiEgressController.onPageLoad(mode: Mode = NormalMode)
-POST    /update/egress                                      controllers.myapis.update.UpdateApiEgressController.onSubmit(mode: Mode = NormalMode)
-GET     /update/change-egress                               controllers.myapis.update.UpdateApiEgressController.onPageLoad(mode: Mode = CheckMode)
-POST    /update/change-egress                               controllers.myapis.update.UpdateApiEgressController.onSubmit(mode: Mode = CheckMode)
+POST    /update/change-add-prefixes                        controllers.myapis.update.UpdateApiAddPrefixesController.onSubmit(mode: Mode = CheckMode)
 
 GET     /update/hod                                         controllers.myapis.update.UpdateApiHodController.onPageLoad(mode: Mode = NormalMode)
 POST    /update/hod                                         controllers.myapis.update.UpdateApiHodController.onSubmit(mode: Mode = NormalMode)

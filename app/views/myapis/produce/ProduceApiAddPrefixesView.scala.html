@@ -18,27 +18,37 @@
 @import viewmodels.myapis.{ProduceApiHowToCreateViewModel, UpdateApiHowToUpdateViewBannerModel}
 @import models.myapis.produce.ProduceApiHowToCreate
 @import views.html.components.IconsLink
+@import viewmodels.myapis.produce.ProduceApiAddPrefixesViewModel
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukButton: GovukButton,
+    govukRadios: GovukRadios,
+    govukErrorSummary: GovukErrorSummary,
 )
 
-@(yesAction: Call, noAction: Call)(implicit request: Request[?], messages: Messages)
+@(form: Form[Boolean], viewModel: ProduceApiAddPrefixesViewModel, guidesUrl: String, userModel: UserModel)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = titleNoForm("Do you want to add prefixes?")) {
-    <h1 class="govuk-heading-l">Do you want to configure prefixes for your API?</h1>
+@guidanceLink() = {
+    <a href=@{guidesUrl}/documentation/how-do-i-produce.apis.html#deployment" rel="noreferrer noopener" target="_blank" class="govuk-link">@messages("produceApiAddPrefixes.guidance")</a>
+}
 
-    @formHelper(action = yesAction) {
-        @govukButton(
-            Button(classes = "govuk-button--secondary", content = "Yes")
+@layout(pageTitle = title(form, messages("produceApiAddPrefixes.title")), user = Some(userModel)) {
+    @formHelper(action = viewModel.formAction) {
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form))
+        }
+
+        @govukRadios(
+            RadiosViewModel.yesNo(
+                field = form("value"),
+                legend = LegendViewModel(messages("produceApiAddPrefixes.heading")).asPageHeading()
+            ).withHint(Hint(content = HtmlContent(messages("produceApiAddPrefixes.hint", guidanceLink()))))
         )
-    }
-    @formHelper(action = noAction) {
-        @govukButton(
-            Button(classes = "govuk-button--secondary", content = "No")
-        )
 
+        @govukButton(
+            ButtonViewModel(messages("site.continue"))
+        )
     }
 }

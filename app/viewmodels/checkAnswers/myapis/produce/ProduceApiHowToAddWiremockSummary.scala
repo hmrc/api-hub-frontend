@@ -16,9 +16,9 @@
 
 package viewmodels.checkAnswers.myapis.produce
 
-import controllers.myapis.produce.routes
+import controllers.routes
 import models.{CheckMode, UserAnswers}
-import pages.myapis.produce.{ProduceApiChooseEgressPage, ProduceApiChooseTeamPage}
+import pages.myapis.produce.ProduceApiHowToAddWiremockPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
@@ -26,19 +26,24 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object ProduceApiEgressSummary  {
+object ProduceApiHowToAddWiremockSummary  {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(ProduceApiChooseEgressPage).map {
+    answers.get(ProduceApiHowToAddWiremockPage).map {
       answer =>
+
+        val value = ValueViewModel(
+          HtmlContent(
+            HtmlFormat.escape(messages(s"produceApiHowToAddWiremock.$answer"))
+          )
+        )
+
         SummaryListRowViewModel(
-          key     = "myApis.produce.selectegress.cya.label",
-          value   = ValueViewModel(
-            HtmlContent(HtmlFormat.escape(answer.egress.getOrElse("")))
-          ),
+          key     = "produceApiHowToAddWiremock.checkYourAnswersLabel",
+          value   = value,
           actions = Seq(
-            ActionItemViewModel("site.change", routes.ProduceApiEgressController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("produceApiChooseTeam.change.hidden"))
+            ActionItemViewModel("site.change", controllers.myapis.produce.routes.ProduceApiHowToAddWiremockController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("produceApiHowToAddWiremock.change.hidden"))
           )
         )
     }

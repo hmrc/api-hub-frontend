@@ -63,9 +63,11 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val shutterMessage: String = configuration.get[String]("shutter-message")
 
   val feedbackLink: String = configuration.get[String]("feedback-link")
-  
+  val wireMockGuidanceLink: String = configuration.get[String]("wiremock-guidance-link")
+
   val maxOasUploadSizeMb: Int = configuration.get[Int]("maxOasUploadSizeMb")
   val oasUploadValidExtensions: Set[String] = configuration.get[Seq[String]]("oasUploadValidExtensions").toSet
+  val applicationDetailsEnvironmentsLeftSideNav: Boolean = configuration.get[Boolean]("features.application-details-environments-left-side-nav")
   val maxWiremockUploadSizeMb: Int = configuration.get[Int]("maxWiremockUploadSizeMb")
 
 }

@@ -14,32 +14,53 @@
  * limitations under the License.
  *@
 
+@import config.FrontendAppConfig
+@import models.myapis.produce.ProduceApiHowToAddWiremock
 @import models.user.UserModel
-@import viewmodels.myapis.{ProduceApiHowToCreateViewModel, UpdateApiHowToUpdateViewBannerModel}
-@import models.myapis.produce.ProduceApiHowToCreate
-@import views.html.components.IconsLink
+@import viewmodels.myapis.produce.ProduceApiHowToAddWiremockViewModel
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukRadios: GovukRadios,
     govukButton: GovukButton,
+    config: FrontendAppConfig,
 )
 
-@(uploadAction: Call, enterAction: Call)(implicit request: Request[?], messages: Messages)
+@(form: Form[?], userModel: UserModel, viewModel: ProduceApiHowToAddWiremockViewModel)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = titleNoForm("Define WireMock for your API")) {
-    <h1 class="govuk-heading-l">Define WireMock for your API</h1>
+@guidanceLink = {
+    <a target="_blank" href=@config.wireMockGuidanceLink>@messages("produceApiHowToAddWiremock.description.link")</a>
+}
 
-    @formHelper(action = uploadAction) {
-        @govukButton(
-            Button(classes = "govuk-button--secondary", content = "Upload")
+@layout(pageTitle = title(form, messages("produceApiHowToAddWiremock.title")), user = Some(userModel)) {
+
+    @formHelper(action = viewModel.formAction) {
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))
+        }
+
+        <h1 class="govuk-heading-xl govuk-!-margin-bottom-1">
+            @messages("produceApiHowToAddWiremock.heading")
+        </h1>
+
+        <p class="govuk-body">
+            @messages("produceApiHowToAddWiremock.description")
+            @guidanceLink
+        </p>
+
+        @govukRadios(
+            RadiosViewModel(
+                field  = form("value"),
+                legend = LegendViewModel(messages("produceApiHowToAddWiremock.how")).asPageHeading(viewmodels.LegendSize.Medium),
+                items  = ProduceApiHowToAddWiremock.options
+            )
         )
 
-    }
-    @formHelper(action = enterAction) {
         @govukButton(
-            Button(classes = "govuk-button--secondary", content = "Editor")
+            ButtonViewModel(messages("site.continue"))
         )
-
     }
 }

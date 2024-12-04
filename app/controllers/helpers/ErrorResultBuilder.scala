@@ -117,6 +117,12 @@ class ErrorResultBuilder @Inject()(
     )
   }
 
+  def environmentNotFound(environment: String)(implicit request: Request[?]): Result =
+    notFound(
+      heading = Messages("site.environmentNotFoundHeading"),
+      message = Messages("site.environmentNotFoundMessage", environment)
+    )
+
   def notFound(title: String, heading: String, message: String)(implicit request: Request[?]): Result = {
     notFound(Some(title), Some(heading), Some(message))
   }

@@ -20,6 +20,7 @@ import controllers.routes
 import models.*
 import models.myapis.produce.ProduceApiChooseEgress
 import models.myapis.produce.ProduceApiHowToCreate.{Editor, Upload}
+import models.myapis.produce.ProduceApiHowToAddWiremock
 import pages.*
 import pages.application.accessrequest.{ProvideSupportingInformationPage, RequestProductionAccessPage, RequestProductionAccessSelectApisPage, RequestProductionAccessStartPage}
 import pages.application.cancelaccessrequest.{CancelAccessRequestApplicationPage, CancelAccessRequestConfirmPage, CancelAccessRequestSelectApiPage, CancelAccessRequestStartPage}
@@ -58,12 +59,13 @@ class Navigator @Inject()() {
     case ProduceApiHowToCreatePage => produceApiHowToCreateNextPage(NormalMode)
     case ProduceApiShortDescriptionPage => _ => controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onPageLoad(NormalMode)
     case ProduceApiReviewNameDescriptionPage => _ => controllers.myapis.produce.routes.ProduceApiHowToAddWiremockController.onPageLoad(NormalMode)
-    case ProduceApiChooseEgressPage => produceApiChooseEgressNextPage(NormalMode)
+    case ProduceApiAddPrefixesPage => produceApiAddPrefixNextPage(NormalMode)
     case ProduceApiEgressPrefixesPage => _ => controllers.myapis.produce.routes.ProduceApiHodController.onPageLoad(NormalMode)
     case ProduceApiHodPage => _ => controllers.myapis.produce.routes.ProduceApiDomainController.onPageLoad(NormalMode)
     case ProduceApiDomainPage => _ => controllers.myapis.produce.routes.ProduceApiStatusController.onPageLoad(NormalMode)
     case ProduceApiStatusPage => produceApiStatusNextPage(NormalMode)
     case ProduceApiPassthroughPage => _ => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
+    case ProduceApiHowToAddWiremockPage => produceApiHowToAddWiremockNextPage(NormalMode)
     case CancelAccessRequestStartPage => _ => controllers.application.cancelaccessrequest.routes.CancelAccessRequestSelectApiController.onPageLoad(NormalMode)
     case CancelAccessRequestSelectApiPage => _ => controllers.application.cancelaccessrequest.routes.CancelAccessRequestConfirmController.onPageLoad(NormalMode)
     case CancelAccessRequestConfirmPage => cancelAccessRequestConfirmNextPage(NormalMode)
@@ -71,8 +73,10 @@ class Navigator @Inject()() {
     case UpdateApiEnterOasPage => _ => controllers.myapis.update.routes.UpdateApiShortDescriptionController.onPageLoad(NormalMode)
     case UpdateApiUploadOasPage => _ => controllers.myapis.update.routes.UpdateApiEnterOasController.onPageLoadWithUploadedOas(NormalMode)
     case UpdateApiShortDescriptionPage => _ => controllers.myapis.update.routes.UpdateApiReviewNameDescriptionController.onPageLoad(NormalMode)
+    case UpdateApiAddPrefixesPage => updateApiAddPrefixNextPage(NormalMode)
     case UpdateApiHowToUpdatePage => updateApiHowToUpdateNextPage(NormalMode)
     case UpdateApiReviewNameDescriptionPage => _ => controllers.myapis.update.routes.UpdateApiHowToAddWiremockController.onPageLoad(NormalMode)
+    case UpdateApiHowToAddWiremockPage => updateApiHowToAddWiremockNextPage(NormalMode)
     case UpdateApiHodPage => _ => controllers.myapis.update.routes.UpdateApiDomainController.onPageLoad(NormalMode)
     case UpdateApiStatusPage => _ => controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onPageLoad()
     case UpdateApiDomainPage => _ => controllers.myapis.update.routes.UpdateApiReviewApiStatusController.onPageLoad(NormalMode)
@@ -92,13 +96,14 @@ class Navigator @Inject()() {
     case ProduceApiEnterOasPage => _ => controllers.myapis.produce.routes.ProduceApiShortDescriptionController.onPageLoad(CheckMode)
     case ProduceApiShortDescriptionPage => _ => controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onPageLoad(CheckMode)
     case ProduceApiReviewNameDescriptionPage => _ => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
-    case ProduceApiChooseEgressPage => produceApiChooseEgressNextPage(CheckMode)
+    case ProduceApiAddPrefixesPage => produceApiAddPrefixNextPage(CheckMode)
     case ProduceApiEgressPrefixesPage => _ => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
     case ProduceApiHodPage => _ => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
     case ProduceApiDomainPage => _ => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
     case ProduceApiStatusPage => _ => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
     case ProduceApiPassthroughPage => _ => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
     case UpdateApiUploadOasPage => _ => controllers.myapis.update.routes.UpdateApiEnterOasController.onPageLoadWithUploadedOas(CheckMode)
+    case UpdateApiAddPrefixesPage => updateApiAddPrefixNextPage(CheckMode)
     case _ => _ => routes.IndexController.onPageLoad
   }
 
@@ -156,15 +161,23 @@ class Navigator @Inject()() {
     }
   }
 
-  private def produceApiChooseEgressNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
-    (mode, userAnswers.get(ProduceApiChooseEgressPage)) match {
-      case (_, Some(ProduceApiChooseEgress(_, true))) => controllers.myapis.produce.routes.ProduceApiEgressPrefixesController.onPageLoad(mode)
-      case (NormalMode, Some(ProduceApiChooseEgress(_, false))) => controllers.myapis.produce.routes.ProduceApiHodController.onPageLoad(mode)
-      case (CheckMode, Some(ProduceApiChooseEgress(_, false))) => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
+  private def produceApiAddPrefixNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
+    (mode, userAnswers.get(ProduceApiAddPrefixesPage)) match {
+      case (_, Some(true)) => controllers.myapis.produce.routes.ProduceApiEgressPrefixesController.onPageLoad(mode)
+      case (NormalMode, Some(false)) => controllers.myapis.produce.routes.ProduceApiHodController.onPageLoad(mode)
+      case (CheckMode, Some(false)) => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
       case _ => routes.JourneyRecoveryController.onPageLoad()
     }
   }
-  
+
+  private def produceApiHowToAddWiremockNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
+    (mode, userAnswers.get(ProduceApiHowToAddWiremockPage)) match {
+      case (_, Some(ProduceApiHowToAddWiremock.Editor)) => controllers.myapis.produce.routes.ProduceApiEnterWiremockController.onPageLoad(mode)
+      case (_, Some(ProduceApiHowToAddWiremock.Upload)) => controllers.myapis.produce.routes.ProduceApiUploadWiremockController.onPageLoad(mode)
+      case _ => routes.JourneyRecoveryController.onPageLoad()
+    }
+  }
+
   private def produceApiStatusNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
     userAnswers.get(ProduceApiStartPage) match {
       case Some(user) if user.permissions.canSupport => controllers.myapis.produce.routes.ProduceApiPassthroughController.onPageLoad(mode)
@@ -176,6 +189,23 @@ class Navigator @Inject()() {
     (mode, userAnswers.get(UpdateApiHowToUpdatePage)) match {
       case (_, Some(Editor)) => controllers.myapis.update.routes.UpdateApiEnterOasController.onPageLoad(mode)
       case (_, Some(Upload)) => controllers.myapis.update.routes.UpdateApiUploadOasController.onPageLoad(mode)
+      case _ => routes.JourneyRecoveryController.onPageLoad()
+    }
+  }
+
+  private def updateApiAddPrefixNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
+    (mode, userAnswers.get(UpdateApiAddPrefixesPage)) match {
+      //      case (_, Some(true)) => controllers.myapis.update.routes.UpdateApiEgressPrefixesController.onPageLoad(mode) not implemented yet
+      case (NormalMode, Some(false)) => controllers.myapis.update.routes.UpdateApiHodController.onPageLoad(mode)
+      case (CheckMode, Some(false)) => controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onPageLoad()
+      case _ => routes.JourneyRecoveryController.onPageLoad()
+    }
+  }
+
+  private def updateApiHowToAddWiremockNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
+    (mode, userAnswers.get(UpdateApiHowToAddWiremockPage)) match {
+      case (_, Some(ProduceApiHowToAddWiremock.Editor)) => controllers.myapis.update.routes.UpdateApiEnterWiremockController.onPageLoad(mode)
+      case (_, Some(ProduceApiHowToAddWiremock.Upload)) => controllers.myapis.update.routes.UpdateApiUploadWiremockController.onPageLoad(mode)
       case _ => routes.JourneyRecoveryController.onPageLoad()
     }
   }
