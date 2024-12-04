@@ -43,6 +43,10 @@ site.environment.dev = Development environment
 site.environment.test = Test environment
 site.environment.preprod = Pre-Production environment
 site.environment.production = Production environment
+site.viewFullErrorResponse = View full error response
+site.errors = Errors
+site.type = Type
+site.message = Message
 
 date.day = Day
 date.month = Month
@@ -697,10 +701,6 @@ api.deployment.failure = There was an error processing your deployment request
 api.deployment.failure.message = Review the details of the processing error below
 api.deployment.failure.warning = Review the processing errors
 api.deployment.failure.continue = Return to API deployment page
-api.deployment.failure.viewDetails = View full error response
-api.deployment.failure.label.errors = Errors
-api.deployment.failure.label.type = Type
-api.deployment.failure.label.message = Message
 api.deployment.failure.contact = You can try to redeploy your API. If this error continues contact {0}
 api.deployment.failure.contact.support = support
 
@@ -1082,3 +1082,11 @@ produceApiHowToAddWiremock.editor.description = Create a WireMock from scratch u
 produceApiHowToAddWiremock.checkYourAnswersLabel = produceApiHowToAddWiremock
 produceApiHowToAddWiremock.error.required = Select how you want to add a WireMock to your API. 
 produceApiHowToAddWiremock.change.hidden = ProduceApiHowToAddWiremock
+
+produceApiDeploymentError.title = There was an error with your deployment request
+produceApiDeploymentError.heading = There was an error with your deployment request
+produceApiDeploymentError.subHeading = Review the details of the error below
+produceApiDeploymentError.warning = Review errors
+produceApiDeploymentError.contact = You can try to redeploy your API. If this error continues contact {0}.
+produceApiDeploymentError.contact.support = support
+produceApiDeploymentError.return = Return to API deployment page

@@ -28,7 +28,7 @@ import models.user.{Permissions, UserModel}
 import models.team.Team
 import models.myapis.produce.*
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{verify, when}
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatestplus.mockito.MockitoSugar
 import pages.QuestionPage
@@ -38,9 +38,10 @@ import play.api.inject.bind
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import repositories.{ProduceApiSessionRepository, SessionRepository}
 import services.ApiHubService
 import viewmodels.checkAnswers.myapis.produce.*
-import views.html.myapis.produce.ProduceApiCheckYourAnswersView
+import views.html.myapis.produce.{ProduceApiCheckYourAnswersView, ProduceApiDeploymentErrorView}
 import viewmodels.govuk.all.SummaryListViewModel
 import views.html.myapis.DeploymentSuccessView
 
@@ -113,6 +114,8 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       when(fixture.apiHubService.generateDeployment(any)(any))
         .thenReturn(Future.successful(response))
 
+      when(fixture.sessionRepository.clear(FakeUser.userId)).thenReturn(Future.successful(true))
+
       running(fixture.application) {
         val request = FakeRequest(POST, produceApiCheckYourAnswersRoute)
 
@@ -120,15 +123,16 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(FakeUser, response.asInstanceOf[SuccessfulDeploymentsResponse])(request, messages(fixture.application)).toString
+        verify(fixture.sessionRepository).clear(FakeUser.userId)
       }
     }
 
-    "must return a bad request and an error for an unsuccessful POST" in {
+    "must return Bad Request and the deployment error view for an unsuccessful POST" in {
       val fixture = buildFixture(Some(fullyPopulatedUserAnswers))
       val response = InvalidOasResponse(
         FailuresResponse("code", "reason", Some(Seq(Error("type", "message"))))
       )
-      val view = fixture.application.injector.instanceOf[ProduceApiCheckYourAnswersView]
+      val view = fixture.application.injector.instanceOf[ProduceApiDeploymentErrorView]
 
       when(fixture.apiHubService.generateDeployment(any)(any))
         .thenReturn(Future.successful[DeploymentsResponse](response))
@@ -140,7 +144,31 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
         val result = route(fixture.application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(summaryList(), FakeUser, Some(response.failure))(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(FakeUser, response.failure)(request, messages(fixture.application)).toString
+      }
+    }
+
+    "must clear the user answers and redirect to the index page on cancel" in {
+      val fixture = buildFixture(Some(fullyPopulatedUserAnswers))
+      val response = InvalidOasResponse(
+        FailuresResponse("code", "reason", Some(Seq(Error("type", "message"))))
+      )
+      val view = fixture.application.injector.instanceOf[ProduceApiDeploymentErrorView]
+
+      when(fixture.apiHubService.generateDeployment(any)(any))
+        .thenReturn(Future.successful[DeploymentsResponse](response))
+
+      when(fixture.sessionRepository.clear(FakeUser.userId)).thenReturn(Future.successful(true))
+
+      running(fixture.application) {
+        val request = FakeRequest(POST, controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onCancel().url)
+        implicit val msgs: Messages = messages(fixture.application)
+
+        val result = route(fixture.application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result) mustBe Some(controllers.routes.IndexController.onPageLoad.url)
+        verify(fixture.sessionRepository).clear(FakeUser.userId)
       }
     }
 
@@ -195,15 +223,21 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
     }
   }
 
-  private case class Fixture(application: PlayApplication, apiHubService: ApiHubService)
+  private case class Fixture(
+                              application: PlayApplication,
+                              apiHubService: ApiHubService,
+                              sessionRepository: ProduceApiSessionRepository
+                            )
 
   private def buildFixture(userAnswers: Option[UserAnswers], userModel: Option[UserModel] = None): Fixture = {
     val apiHubService = mock[ApiHubService]
+    val sessionRepository = mock[ProduceApiSessionRepository]
     val playApplication = applicationBuilder(userAnswers, userModel.getOrElse(FakeUser))
       .overrides(
-        bind[ApiHubService].toInstance(apiHubService)
+        bind[ApiHubService].toInstance(apiHubService),
+        bind[ProduceApiSessionRepository].toInstance(sessionRepository)
       )
       .build()
-    Fixture(playApplication, apiHubService)
+    Fixture(playApplication, apiHubService, sessionRepository)
   }
 }

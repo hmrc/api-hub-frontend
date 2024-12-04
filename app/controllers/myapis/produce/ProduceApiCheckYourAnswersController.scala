@@ -21,34 +21,37 @@ import controllers.actions.*
 import models.{CheckMode, UserAnswers}
 import models.api.ApiStatus
 import models.deployment.{DeploymentsRequest, DeploymentsResponse, EgressMapping, FailuresResponse, InvalidOasResponse, SuccessfulDeploymentsResponse}
-import models.myapis.produce.{ProduceApiDomainSubdomain, ProduceApiChooseEgress, ProduceApiEgressPrefixes}
+import models.myapis.produce.{ProduceApiChooseEgress, ProduceApiDomainSubdomain, ProduceApiEgressPrefixes}
 import models.requests.DataRequest
 import models.team.Team
 import pages.myapis.produce.*
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.*
+import repositories.ProduceApiSessionRepository
 import services.ApiHubService
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.myapis.produce.*
 import viewmodels.govuk.all.SummaryListViewModel
 import views.html.myapis.DeploymentSuccessView
-import views.html.myapis.produce.ProduceApiCheckYourAnswersView
+import views.html.myapis.produce.{ProduceApiCheckYourAnswersView, ProduceApiDeploymentErrorView}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class ProduceApiCheckYourAnswersController @Inject()(
-                                             override val messagesApi: MessagesApi,
-                                             identify: IdentifierAction,
-                                             getData: ProduceApiDataRetrievalAction,
-                                             requireData: DataRequiredAction,
-                                             val controllerComponents: MessagesControllerComponents,
-                                             view: ProduceApiCheckYourAnswersView,
-                                             successView: DeploymentSuccessView,
-                                             hods: Hods,
-                                             domains: Domains,
-                                             apiHubService: ApiHubService,
+                                                      override val messagesApi: MessagesApi,
+                                                      produceApiSessionRepository: ProduceApiSessionRepository,
+                                                      identify: IdentifierAction,
+                                                      getData: ProduceApiDataRetrievalAction,
+                                                      requireData: DataRequiredAction,
+                                                      val controllerComponents: MessagesControllerComponents,
+                                                      view: ProduceApiCheckYourAnswersView,
+                                                      successView: DeploymentSuccessView,
+                                                      errorView: ProduceApiDeploymentErrorView,
+                                                      hods: Hods,
+                                                      domains: Domains,
+                                                      apiHubService: ApiHubService,
                                            )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) {
@@ -60,13 +63,23 @@ class ProduceApiCheckYourAnswersController @Inject()(
     implicit request =>
       validate(request).fold(
         call => Future.successful(Redirect(call)),
-        apiHubService.generateDeployment(_).map {
+        apiHubService.generateDeployment(_).flatMap {
           case response: SuccessfulDeploymentsResponse =>
-            Ok(successView(request.user, response))
-          case InvalidOasResponse(failure) => BadRequest(
-            view(SummaryListViewModel(summaryListRows(request.userAnswers)), request.user, Some(failure))
-          )
+            produceApiSessionRepository.clear(request.user.userId)
+              .map(_ =>
+                Ok(successView(request.user, response))
+              )
+          case InvalidOasResponse(failure) =>
+            Future.successful(BadRequest(errorView(request.user, failure)))
         })
+  }
+
+  def onCancel(): Action[AnyContent] = identify.async {
+    implicit request =>
+      produceApiSessionRepository.clear(request.user.userId)
+        .map(_ =>
+          Redirect(controllers.routes.IndexController.onPageLoad)
+        )
   }
 
   private def validate(request: DataRequest[?]): Either[Call, DeploymentsRequest] =
