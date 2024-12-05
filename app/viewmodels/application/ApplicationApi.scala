@@ -46,19 +46,19 @@ case object Unknown extends WithName("unknown") with ApplicationEndpointAccess {
 object ApplicationEndpointAccess extends Enumerable.Implicits{
 
   def production(
-    applicationScopes: ApplicationScopes,
+    theoreticalScopes: TheoreticalScopes,
     pendingAccessRequestCount: Int,
     endpointMethod: EndpointMethod,
   ): ApplicationEndpointAccess = {
-    apply(applicationScopes.allowedScopes, pendingAccessRequestCount, endpointMethod)
+    apply(theoreticalScopes.allowedScopes, pendingAccessRequestCount, endpointMethod)
   }
 
   def nonProduction(
-    applicationScopes: ApplicationScopes,
+    theoreticalScopes: TheoreticalScopes,
     pendingAccessRequestCount: Int,
     endpointMethod: EndpointMethod,
   ): ApplicationEndpointAccess = {
-    apply(applicationScopes.requiredScopes, pendingAccessRequestCount, endpointMethod)
+    apply(theoreticalScopes.requiredScopes, pendingAccessRequestCount, endpointMethod)
   }
 
   private def apply(
@@ -162,16 +162,16 @@ object ApplicationApi {
 
 }
 
-case class ApplicationScopes(requiredScopes: Set[String], approvedScopes: Set[String]) {
+case class TheoreticalScopes(requiredScopes: Set[String], approvedScopes: Set[String]) {
   def allowedScopes: Set[String] = {
     requiredScopes.intersect(approvedScopes)
   }
 }
 
-object ApplicationScopes {
+object TheoreticalScopes {
 
-  def apply(apis: Seq[(Api, Option[ApiDetail])], accessRequests: Seq[AccessRequest]): ApplicationScopes = {
-    ApplicationScopes(
+  def apply(apis: Seq[(Api, Option[ApiDetail])], accessRequests: Seq[AccessRequest]): TheoreticalScopes = {
+    TheoreticalScopes(
       requiredScopes = buildRequiredScopes(apis),
       approvedScopes = buildApprovedScopes(accessRequests)
     )

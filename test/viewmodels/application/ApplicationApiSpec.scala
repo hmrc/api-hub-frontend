@@ -33,7 +33,7 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
       val endpointMethod = EndpointMethod("GET", None, None, Seq(testScope1, testScope3))
 
       val actual = ApplicationEndpointAccess.production(
-        applicationScopes = ApplicationScopes(Set(testScope1, testScope2, testScope3), Set(testScope1, testScope2, testScope3)),
+        theoreticalScopes = TheoreticalScopes(Set(testScope1, testScope2, testScope3), Set(testScope1, testScope2, testScope3)),
         pendingAccessRequestCount = 0,
         endpointMethod = endpointMethod
       )
@@ -45,7 +45,7 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
       val endpointMethod = EndpointMethod("GET", None, None, Seq(testScope2, testScope3))
 
       val actual = ApplicationEndpointAccess.production(
-        applicationScopes = ApplicationScopes(Set(testScope2, testScope3), Set(testScope1)),
+        theoreticalScopes = TheoreticalScopes(Set(testScope2, testScope3), Set(testScope1)),
         pendingAccessRequestCount = 0,
         endpointMethod = endpointMethod
       )
@@ -57,7 +57,7 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
       val endpointMethod = EndpointMethod("GET", None, None, Seq(testScope2, testScope3))
 
       val actual = ApplicationEndpointAccess.production(
-        applicationScopes = ApplicationScopes(Set(testScope2, testScope3), Set(testScope1, testScope2)),
+        theoreticalScopes = TheoreticalScopes(Set(testScope2, testScope3), Set(testScope1, testScope2)),
         pendingAccessRequestCount = 0,
         endpointMethod = endpointMethod
       )
@@ -69,7 +69,7 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
       val endpointMethod = EndpointMethod("GET", None, None, Seq(testScope2, testScope3))
 
       val actual = ApplicationEndpointAccess.production(
-        applicationScopes = ApplicationScopes(Set(testScope2, testScope3), Set(testScope1)),
+        theoreticalScopes = TheoreticalScopes(Set(testScope2, testScope3), Set(testScope1)),
         pendingAccessRequestCount = 1,
         endpointMethod = endpointMethod
       )
@@ -81,7 +81,7 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
       val endpointMethod = EndpointMethod("GET", None, None, Seq(testScope1, testScope3))
 
       val actual = ApplicationEndpointAccess.production(
-        applicationScopes = ApplicationScopes(Set(testScope1, testScope3), Set(testScope1, testScope2, testScope3)),
+        theoreticalScopes = TheoreticalScopes(Set(testScope1, testScope3), Set(testScope1, testScope2, testScope3)),
         pendingAccessRequestCount = 1,
         endpointMethod = endpointMethod
       )

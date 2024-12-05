@@ -40,7 +40,7 @@ class ApplicationApiBuilder @Inject()(
               build(
                 apis = apis,
                 pendingAccessRequests = accessRequests.filter(_.status == Pending),
-                applicationScopes = ApplicationScopes(apis, accessRequests)
+                theoreticalScopes = TheoreticalScopes(apis, accessRequests)
               )
           )
       )
@@ -53,7 +53,7 @@ class ApplicationApiBuilder @Inject()(
   private def build(
     apis: Seq[(Api, Option[ApiDetail])],
     pendingAccessRequests: Seq[AccessRequest],
-    applicationScopes: ApplicationScopes
+    theoreticalScopes: TheoreticalScopes
   ): Seq[ApplicationApi] = {
     apis.map {
       case (api, Some(apiDetail)) =>
@@ -70,8 +70,8 @@ class ApplicationApiBuilder @Inject()(
                     endpointMethod.summary,
                     endpointMethod.description,
                     endpointMethod.scopes,
-                    ApplicationEndpointAccess.production(applicationScopes, pendingAccessRequestCount(apiDetail.id, pendingAccessRequests), endpointMethod),
-                    ApplicationEndpointAccess.nonProduction(applicationScopes, pendingAccessRequestCount(apiDetail.id, pendingAccessRequests), endpointMethod)
+                    ApplicationEndpointAccess.production(theoreticalScopes, pendingAccessRequestCount(apiDetail.id, pendingAccessRequests), endpointMethod),
+                    ApplicationEndpointAccess.nonProduction(theoreticalScopes, pendingAccessRequestCount(apiDetail.id, pendingAccessRequests), endpointMethod)
                   )
               )
         }
