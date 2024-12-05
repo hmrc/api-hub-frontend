@@ -79,11 +79,6 @@ class ProduceApiUploadWiremockController @Inject()(
     }
   }
 
-  private def isValidWiremock(value: String): Boolean = {
-    scala.util.Try(play.api.libs.json.Json.parse(value)).toOption.isDefined
-  }
-
-
   private def buildView(form: Form[ProduceApiUploadedWiremockFile], mode: Mode)(implicit request: DataRequest[AnyContent]) = {
     view(form, ProduceApiUploadWiremockViewModel(routes.ProduceApiUploadWiremockController.onSubmit(mode)), request.user, frontendAppConfig)
   }
