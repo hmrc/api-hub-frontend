@@ -213,6 +213,9 @@ class NavigatorSpec extends SpecBase with TryValues {
         "must go from the Review the API Status page to the Check your answers page" in {
           navigator.nextPage(UpdateApiStatusPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onPageLoad()
         }
+        "must go from the Upload Wiremock page to the wiremock editor page" in {
+          navigator.nextPage(UpdateApiUploadWiremockPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiEnterWiremockController.onPageLoadWithUploadedWiremock(NormalMode)
+        }
       }
 
       "during the Cancel access request journey" - {
@@ -311,6 +314,9 @@ class NavigatorSpec extends SpecBase with TryValues {
         }
         "must go from the API passthrough page to the Egress Prefixes page" in {
           navigator.nextPage(ProduceApiPassthroughPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
+        }
+        "must go from the Upload wiremock page to the wiremock editor page" in {
+          navigator.nextPage(ProduceApiUploadWiremockPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiEnterWiremockController.onPageLoadWithUploadedWiremock(NormalMode)
         }
       }
 

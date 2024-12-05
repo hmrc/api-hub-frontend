@@ -1063,7 +1063,7 @@ produceApiUploadWiremock.file.text1 = Drag and Drop to Upload File
 produceApiUploadWiremock.file.text1.hover = Release to add file
 produceApiUploadWiremock.file.text2 = OR
 produceApiUploadWiremock.file.choose = Choose file
-produceApiUploadWiremock.fileInfo = Only Wiremock files in json format are accepted. The maximum file size is {0}MB.
+produceApiUploadWiremock.fileInfo = Only Wiremock files in YAML format are accepted. The maximum file size is {0}MB.
 
 updateApiEnterOas.title = Update your OpenAPI Specification
 updateApiEnterOas.heading = Update your OpenAPI Specification

@@ -73,6 +73,7 @@ class Navigator @Inject()() {
     case UpdateApiEnterOasPage => _ => controllers.myapis.update.routes.UpdateApiShortDescriptionController.onPageLoad(NormalMode)
     case UpdateApiUploadOasPage => _ => controllers.myapis.update.routes.UpdateApiEnterOasController.onPageLoadWithUploadedOas(NormalMode)
     case UpdateApiShortDescriptionPage => _ => controllers.myapis.update.routes.UpdateApiReviewNameDescriptionController.onPageLoad(NormalMode)
+    case UpdateApiUploadWiremockPage => _ => controllers.myapis.update.routes.UpdateApiEnterWiremockController.onPageLoadWithUploadedWiremock(NormalMode)
     case UpdateApiAddPrefixesPage => updateApiAddPrefixNextPage(NormalMode)
     case UpdateApiHowToUpdatePage => updateApiHowToUpdateNextPage(NormalMode)
     case UpdateApiReviewNameDescriptionPage => _ => controllers.myapis.update.routes.UpdateApiHowToAddWiremockController.onPageLoad(NormalMode)
@@ -104,6 +105,8 @@ class Navigator @Inject()() {
     case ProduceApiPassthroughPage => _ => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
     case UpdateApiUploadOasPage => _ => controllers.myapis.update.routes.UpdateApiEnterOasController.onPageLoadWithUploadedOas(CheckMode)
     case UpdateApiAddPrefixesPage => updateApiAddPrefixNextPage(CheckMode)
+    case UpdateApiUploadWiremockPage => _ => controllers.myapis.update.routes.UpdateApiEnterWiremockController.onPageLoadWithUploadedWiremock(CheckMode)
+
     case _ => _ => routes.IndexController.onPageLoad
   }
 

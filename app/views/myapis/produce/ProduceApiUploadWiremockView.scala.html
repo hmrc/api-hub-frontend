@@ -46,7 +46,7 @@
   @govukErrorSummary(ErrorSummaryViewModel(form))
  }
 
- <div id="fileDrop" class="hip-file-drop" data-maxsize="@config.maxWiremockUploadSizeMb" data-validextensions="json">
+ <div id="fileDrop" class="hip-file-drop" data-maxsize="@config.maxWiremockUploadSizeMb" data-validextensions="@config.wiremockUploadValidExtensions.mkString(",")">
   <div class="hip-file-drop__icon fas fa-cloud-upload-alt"></div>
   <h6 class="hip-file-drop__text">@messages("produceApiUploadWiremock.file.text1")</h6>
   <h6 class="hip-file-drop__text--hover">@messages("produceApiUploadWiremock.file.text1.hover")</h6>

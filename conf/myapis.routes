@@ -155,6 +155,8 @@ GET     /update/enter-wiremock                             controllers.myapis.up
 POST    /update/enter-wiremock                             controllers.myapis.update.UpdateApiEnterWiremockController.onSubmit(mode: Mode = NormalMode)
 GET     /update/change-enter-wiremock                      controllers.myapis.update.UpdateApiEnterWiremockController.onPageLoad(mode: Mode = CheckMode)
 POST    /update/change-enter-wiremock                      controllers.myapis.update.UpdateApiEnterWiremockController.onSubmit(mode: Mode = CheckMode)
+GET     /update/review-wiremock                            controllers.myapis.update.UpdateApiEnterWiremockController.onPageLoadWithUploadedWiremock(mode: Mode = NormalMode)
+GET     /update/change-review-wiremock                     controllers.myapis.update.UpdateApiEnterWiremockController.onPageLoadWithUploadedWiremock(mode: Mode = CheckMode)
 
 GET     /update/add-prefixes                               controllers.myapis.update.UpdateApiAddPrefixesController.onPageLoad(mode: Mode = NormalMode)
 POST    /update/add-prefixes                               controllers.myapis.update.UpdateApiAddPrefixesController.onSubmit(mode: Mode = NormalMode)
