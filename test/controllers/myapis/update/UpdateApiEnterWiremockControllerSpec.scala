@@ -49,21 +49,43 @@ class UpdateApiEnterWiremockControllerSpec extends SpecBase with MockitoSugar {
 
   private val validWiremock =
     """
-      |{
-      |  "request": {
-      |    "method": "GET",
-      |    "url": "/some/thing"
-      |  },
-      |  "response": {
-      |    "status": 200,
-      |    "body": "Hello, world!",
-      |    "headers": {
-      |        "Content-Type": "text/plain"
+      |mappings:
+      |  boardgames-delete-notfound.json: >
+      |    {
+      |      "request": {
+      |        "method": "DELETE",
+      |        "urlPattern": "/backend/boardgames/[0-9]+"
+      |      },
+      |      "response": {
+      |        "status": 404,
+      |        "bodyFileName": "boardgame-response.json",
+      |        "headers": {
+      |          "Content-Type": "application/json"
+      |        }
+      |      }
       |    }
-      |  }
-      |}
+      |files:
+      |  boardgame-response.json: >
+      |    {
+      |      "id": 1,
+      |      "name": "Exploding Kittens",
+      |      "category": {       
+      |        "id": 545,
+      |        "name": "Card Games"
+      |      },
+      |      "photoUrls": [       
+      |        "string"
+      |      ],
+      |      "tags": [
+      |        {
+      |          "id": 1,
+      |          "name": "Most Popular"
+      |        }
+      |      ],
+      |      "status": "available"
+      |    }
       |""".stripMargin
-
+    
   private lazy val updateApiEnterWiremockRoute = controllers.myapis.update.routes.UpdateApiEnterWiremockController.onPageLoad(NormalMode).url
 
   "UpdateApiEnterWiremock Controller" - {
@@ -122,32 +144,7 @@ class UpdateApiEnterWiremockControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result).value mustEqual onwardRoute.url
       }
     }
-
-    "must return a Bad Request and errors when invalid data is submitted" in {
-
-      val invalidWiremock = "{a:1}"
-      val errorMessage = "Invalid JSON"
-      val fixture = buildFixture(userAnswers = Some(emptyUserAnswers))
-
-      running(fixture.application) {
-        val request =
-          FakeRequest(POST, updateApiEnterWiremockRoute)
-            .withFormUrlEncodedBody(("value", invalidWiremock))
-
-        val boundForm = form.bind(Map("value" -> invalidWiremock))
-          .withGlobalError(errorMessage)
-
-        val view = fixture.application.injector.instanceOf[ProduceApiEnterWiremockView]
-        val viewModel = ProduceApiEnterWiremockViewModel(
-          controllers.myapis.update.routes.UpdateApiEnterWiremockController.onSubmit(NormalMode), false
-        )
-        val result = route(fixture.application, request).value
-
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, FakeUser, viewModel)(request, messages(fixture.application)).toString
-      }
-    }
-
+    
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
       val fixture = buildFixture(userAnswers = None)

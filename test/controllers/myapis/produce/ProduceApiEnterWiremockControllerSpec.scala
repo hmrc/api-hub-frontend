@@ -49,19 +49,41 @@ class ProduceApiEnterWiremockControllerSpec extends SpecBase with MockitoSugar {
 
   private val validWiremock =
     """
-      |{
-      |  "request": {
-      |    "method": "GET",
-      |    "url": "/some/thing"
-      |  },
-      |  "response": {
-      |    "status": 200,
-      |    "body": "Hello, world!",
-      |    "headers": {
-      |        "Content-Type": "text/plain"
+      |mappings:
+      |  boardgames-delete-notfound.json: >
+      |    {
+      |      "request": {
+      |        "method": "DELETE",
+      |        "urlPattern": "/backend/boardgames/[0-9]+"
+      |      },
+      |      "response": {
+      |        "status": 404,
+      |        "bodyFileName": "boardgame-response.json",
+      |        "headers": {
+      |          "Content-Type": "application/json"
+      |        }
+      |      }
       |    }
-      |  }
-      |}
+      |files:
+      |  boardgame-response.json: >
+      |    {
+      |      "id": 1,
+      |      "name": "Exploding Kittens",
+      |      "category": {       
+      |        "id": 545,
+      |        "name": "Card Games"
+      |      },
+      |      "photoUrls": [       
+      |        "string"
+      |      ],
+      |      "tags": [
+      |        {
+      |          "id": 1,
+      |          "name": "Most Popular"
+      |        }
+      |      ],
+      |      "status": "available"
+      |    }
       |""".stripMargin
 
   private lazy val produceApiEnterWiremockRoute = controllers.myapis.produce.routes.ProduceApiEnterWiremockController.onPageLoad(NormalMode).url
@@ -120,31 +142,6 @@ class ProduceApiEnterWiremockControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual onwardRoute.url
-      }
-    }
-
-    "must return a Bad Request and errors when invalid data is submitted" in {
-
-      val invalidWiremock = "{a:1}"
-      val errorMessage = "Invalid JSON"
-      val fixture = buildFixture(userAnswers = Some(emptyUserAnswers))
-
-      running(fixture.application) {
-        val request =
-          FakeRequest(POST, produceApiEnterWiremockRoute)
-            .withFormUrlEncodedBody(("value", invalidWiremock))
-
-        val boundForm = form.bind(Map("value" -> invalidWiremock))
-          .withGlobalError(errorMessage)
-
-        val view = fixture.application.injector.instanceOf[ProduceApiEnterWiremockView]
-        val viewModel = ProduceApiEnterWiremockViewModel(
-          controllers.myapis.produce.routes.ProduceApiEnterWiremockController.onSubmit(NormalMode), true
-        )
-        val result = route(fixture.application, request).value
-
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, FakeUser, viewModel)(request, messages(fixture.application)).toString
       }
     }
 

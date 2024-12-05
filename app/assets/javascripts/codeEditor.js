@@ -5,12 +5,12 @@ function getFormatDetails(format) {
     let exampleData = '',
         mode = "ace/mode/text";
 
-    if (format === 'yaml') {
+    if (format === 'oas') {
         exampleData = exampleOasYaml;
         mode = 'ace/mode/yaml';
-    } else if (format === 'json') {
+    } else if (format === 'wiremock') {
         exampleData = exampleWiremock;
-        mode = 'ace/mode/json';
+        mode = 'ace/mode/yaml';
     } else {
         console.warn(`Unrecognised format value of '${format}' in codeEditor.js`);
     }

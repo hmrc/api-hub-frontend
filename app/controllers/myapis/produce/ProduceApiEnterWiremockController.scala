@@ -78,22 +78,11 @@ class ProduceApiEnterWiremockController @Inject()(
           Future.successful(BadRequest(view(formWithErrors, request.user, viewModel(mode)))),
 
         value =>
-          validateWiremock(value).fold(
-            error =>
-              Future.successful(BadRequest(view(boundedForm.withGlobalError(error), request.user, viewModel(mode)))),
-            apiName =>
-              for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(ProduceApiEnterWiremockPage, value))
-                _ <- sessionRepository.set(updatedAnswers)
-              } yield Redirect(navigator.nextPage(ProduceApiEnterWiremockPage, mode, updatedAnswers))
-          )
-        )
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(ProduceApiEnterWiremockPage, value))
+            _ <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(navigator.nextPage(ProduceApiEnterWiremockPage, mode, updatedAnswers))
+      )
   }
 
-  private def validateWiremock(wiremockJson: String)(implicit messagesProvider: MessagesProvider, hc: HeaderCarrier): Either[String, String] = {
-      try
-        Right(Json.parse(wiremockJson).toString)
-      catch
-        case e: Exception => Left("Invalid JSON")
-  }
 }

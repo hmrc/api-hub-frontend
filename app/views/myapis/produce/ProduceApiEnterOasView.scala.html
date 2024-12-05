@@ -51,7 +51,7 @@
             <p class="govuk-hint">@messages(warning)</p>
         }
 
-        @codeEditor("yaml", "value", form("value").value, viewModel.populateExample)
+        @codeEditor("oas", "value", form("value").value, viewModel.populateExample)
 
         @govukButton(
             ButtonViewModel(messages("site.continue"))

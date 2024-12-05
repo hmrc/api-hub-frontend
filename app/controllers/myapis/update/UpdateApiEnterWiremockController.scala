@@ -75,15 +75,10 @@ class UpdateApiEnterWiremockController @Inject()(
           Future.successful(BadRequest(view(formWithErrors, request.user, viewModel(mode)))),
 
         value =>
-          validateWiremock(value).fold(
-            error =>
-              Future.successful(BadRequest(view(boundedForm.withGlobalError(error), request.user, viewModel(mode)))),
-            apiName =>
-              for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(UpdateApiEnterWiremockPage, value))
-                _ <- sessionRepository.set(updatedAnswers)
-              } yield Redirect(navigator.nextPage(UpdateApiEnterWiremockPage, mode, updatedAnswers))
-          )
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(UpdateApiEnterWiremockPage, value)) 
+            _ <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(navigator.nextPage(UpdateApiEnterWiremockPage, mode, updatedAnswers))
       )
   }
 

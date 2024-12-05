@@ -45,7 +45,7 @@
 
         <p class="govuk-hint govuk-!-margin-bottom-5">@messages("produceApiEnterWiremock.hint")</p>
 
-        @codeEditor("json", "value", form("value").value, viewModel.populateExample)
+        @codeEditor("wiremock", "value", form("value").value, viewModel.populateExample)
 
         @govukButton(
             ButtonViewModel(messages("site.continue"))

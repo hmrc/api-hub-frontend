@@ -26,9 +26,9 @@ describe('onDOMContentLoaded', () => {
         elForm = document.querySelector('form');
     });
 
-    it(`when the page is loaded with format "yaml", and the editor has no value and it has the 'data-populate-example' attribute then the oas example is copied to the editor`,  () => {
+    it(`when the page is loaded with format "oas", and the editor has no value and it has the 'data-populate-example' attribute then the oas example is copied to the editor`,  () => {
         elAceContainer.setAttribute('data-populate-example', 'true');
-        elAceContainer.setAttribute('data-format', 'yaml');
+        elAceContainer.setAttribute('data-format', 'oas');
         globalThis.ace = buildFakeAceEditor(true);
 
         const editor = ace.edit("aceEditorContainer"),
@@ -42,9 +42,9 @@ describe('onDOMContentLoaded', () => {
         expect(editor.session.setMode).toHaveBeenCalledWith('ace/mode/yaml');
     });
 
-    it(`when the page is loaded with format "json", and the editor has no value and it has the 'data-populate-example' attribute then the wiremock example is copied to the editor`,  () => {
+    it(`when the page is loaded with format "wiremock", and the editor has no value and it has the 'data-populate-example' attribute then the wiremock example is copied to the editor`,  () => {
         elAceContainer.setAttribute('data-populate-example', 'true');
-        elAceContainer.setAttribute('data-format', 'json');
+        elAceContainer.setAttribute('data-format', 'wiremock');
         globalThis.ace = buildFakeAceEditor(true);
 
         const editor = ace.edit("aceEditorContainer"),
@@ -55,11 +55,11 @@ describe('onDOMContentLoaded', () => {
         onDOMContentLoaded();
 
         expect(editor.getValue()).toEqual(exampleWiremock);
-        expect(editor.session.setMode).toHaveBeenCalledWith('ace/mode/json');
+        expect(editor.session.setMode).toHaveBeenCalledWith('ace/mode/yaml');
     });
 
     it(`when the page is loaded, the editor has no value and it does not have the 'data-populate-example' attribute then the editor remains empty`,  () => {
-        elAceContainer.setAttribute('data-format', 'yaml');
+        elAceContainer.setAttribute('data-format', 'oas');
         globalThis.ace = buildFakeAceEditor(false);
 
         const editor = ace.edit("aceEditorContainer"),
