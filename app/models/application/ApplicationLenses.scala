@@ -90,17 +90,6 @@ object ApplicationLenses {
 
   implicit class ApplicationLensOps(application: Application) {
 
-    def getScopes(environmentName: EnvironmentName): Seq[Scope] = {
-      environmentName match {
-        case Primary => applicationPrimaryScopes.get(application)
-        case Secondary => applicationSecondaryScopes.get(application)
-      }
-    }
-
-    def getScopes(hipEnvironment: HipEnvironment): Seq[Scope] = {
-      getScopes(hipEnvironment.environmentName)
-    }
-
     def setScopes(environmentName: EnvironmentName, scopes: Seq[Scope]): Application = {
       environmentName match {
         case Primary => applicationPrimaryScopes.set(application, scopes)

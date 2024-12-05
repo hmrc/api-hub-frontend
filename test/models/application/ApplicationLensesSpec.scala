@@ -183,22 +183,6 @@ class ApplicationLensesSpec extends LensBehaviours {
   }
 
   "ApplicationLensOps" - {
-    "getScopes" - {
-      "must" - {
-        behave like applicationScopesGetterFunction(
-          applicationPrimaryScopes,
-          application => ApplicationLensOps(application).getScopes(Primary)
-        )
-      }
-
-      "must also" - {
-        behave like applicationScopesGetterFunction(
-          applicationSecondaryScopes,
-          application => ApplicationLensOps(application).getScopes(Secondary)
-        )
-      }
-    }
-
     "setScopes" - {
       "must" - {
         behave like applicationScopesSetterFunction(
