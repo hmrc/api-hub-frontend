@@ -18,8 +18,9 @@ package controllers.helpers
 
 import base.SpecBase
 import controllers.actions.FakeApplication
-import models.accessrequest.{AccessRequest, Pending}
+import models.accessrequest.{AccessRequest, AccessRequestEndpoint, AccessRequestStatus, Approved, Pending}
 import models.api.*
+import models.api.ApiDetailLenses.ApiDetailLensOps
 import models.application.ApplicationLenses.ApplicationLensOps
 import models.application.{Api, Scope, SelectedEndpoint}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -43,12 +44,21 @@ class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
   "ApplicationApiBuilder" - {
     "must correctly stitch together data" in {
       val fixture = buildFixture()
+
+      val api1 = Api(apiId1, apiTitle1, Seq(SelectedEndpoint("GET", "/test1/1"), SelectedEndpoint("POST", "/test1/1"), SelectedEndpoint("GET", "/test1/2")))
+      val api1Approved = api1.copy(endpoints = api1.endpoints.filter(_.httpMethod == "GET"))
+      val api2 = Api(apiId2, apiTitle2, Seq(SelectedEndpoint("GET", "/test2/1")))
+      val api3 = Api(apiId3, apiTitle3, Seq(SelectedEndpoint("GET", "/test3/1")))
+
       val application = FakeApplication
-        .addApi(Api(apiId1, apiTitle1, Seq(SelectedEndpoint("GET", "/test1/1"), SelectedEndpoint("POST", "/test1/1"), SelectedEndpoint("GET", "/test1/2"))))
-        .addApi(Api(apiId2, apiTitle2, Seq(SelectedEndpoint("GET", "/test2/1"))))
-        .addApi(Api(apiId3, apiTitle3, Seq(SelectedEndpoint("GET", "/test3/1"))))
-        .setPrimaryScopes(scopes("all:test-scope-1", "get:test-scope-1-1", "get:test-scope-1-2"))
-        .setSecondaryScopes(scopes("all:test-scope-1", "get:test-scope-1-1", "post:test-scope-1-1", "get:test-scope-1-2", "get:test-scope-3-1"))
+        .addApi(api1)
+        .addApi(api2)
+        .addApi(api3)
+
+      val accessRequests = Seq(
+        buildAccessRequest(application.id, api1Approved, apiDetail1, Approved),
+        buildAccessRequest(application.id, api3, apiDetail3, Pending)
+      )
 
       when(fixture.apiHubService.getApiDetail(eqTo(apiId1))(any()))
         .thenReturn(Future.successful(Some(apiDetail1)))
@@ -56,8 +66,8 @@ class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
         .thenReturn(Future.successful(Some(apiDetail2)))
       when(fixture.apiHubService.getApiDetail(eqTo(apiId3))(any()))
         .thenReturn(Future.successful(Some(apiDetail3)))
-      when(fixture.apiHubService.getAccessRequests(eqTo(Some(FakeApplication.id)), eqTo(Some(Pending)))(any()))
-        .thenReturn(Future.successful(Seq(accessRequest)))
+      when(fixture.apiHubService.getAccessRequests(eqTo(Some(FakeApplication.id)), eqTo(None))(any()))
+        .thenReturn(Future.successful(accessRequests))
 
       running(fixture.application) {
         implicit val request: Request[?] = FakeRequest()
@@ -77,7 +87,7 @@ class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
           ApplicationApi(
             apiDetail2,
             Seq(
-              ApplicationEndpoint("GET", "/test2/1", None, None, Seq("get:test-scope-2-1"), Inaccessible, Inaccessible)
+              ApplicationEndpoint("GET", "/test2/1", None, None, Seq("get:test-scope-2-1"), Inaccessible, Accessible)
             ),
             0
           ),
@@ -121,7 +131,7 @@ class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
         .addApi(missingApi)
         .addApi(Api(apiId2, apiTitle2, Seq(SelectedEndpoint("GET", "/test2/1"))))
 
-      when(fixture.apiHubService.getAccessRequests(eqTo(Some(FakeApplication.id)), eqTo(Some(Pending)))(any()))
+      when(fixture.apiHubService.getAccessRequests(eqTo(Some(FakeApplication.id)), eqTo(None))(any()))
         .thenReturn(Future.successful(Seq.empty))
 
       when(fixture.apiHubService.getApiDetail(eqTo(missingApi.id))(any()))
@@ -139,7 +149,7 @@ class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
           ApplicationApi(
             apiDetail2,
             Seq(
-              ApplicationEndpoint("GET", "/test2/1", None, None, Seq("get:test-scope-2-1"), Inaccessible, Inaccessible)
+              ApplicationEndpoint("GET", "/test2/1", None, None, Seq("get:test-scope-2-1"), Inaccessible, Accessible)
             ),
             0
           )
@@ -265,23 +275,35 @@ object ApplicationApiBuilderSpec {
       maintainer = Maintainer("name", "#slack", List.empty)
     )
 
-  private def accessRequest = AccessRequest(
-    id = "test-access-request-id",
-    applicationId = FakeApplication.id,
-    apiId = apiDetail3.id,
-    apiName = apiDetail3.title,
-    status = Pending,
-    supportingInformation = "test-supporting-information",
-    requested = LocalDateTime.now,
-    requestedBy = "test-requested-by"
-  )
-
   private def scope(name: String): Scope = {
     Scope(name)
   }
 
   private def scopes(name: String *): Seq[Scope] = {
     name.map(scope)
+  }
+
+  private def buildAccessRequest(applicationId: String, api: Api, apiDetail: ApiDetail, status: AccessRequestStatus): AccessRequest = {
+    AccessRequest(
+      id = "test-id",
+      applicationId = applicationId,
+      apiId = api.id,
+      apiName = api.title,
+      status = status,
+      endpoints = api.endpoints.map(
+        endpoint =>
+          AccessRequestEndpoint(
+            httpMethod = endpoint.httpMethod,
+            path = endpoint.path,
+            scopes = apiDetail.getEndpointScopeNames(endpoint.httpMethod, endpoint.path)
+          )
+      ),
+      supportingInformation = "test-supporting-information",
+      requested = LocalDateTime.now(),
+      requestedBy = "test-requested-by",
+      decision = None,
+      cancelled = None
+    )
   }
 
 }

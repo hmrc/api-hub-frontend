@@ -212,7 +212,7 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
           AccessRequestApi(
             apiId = selectedApplicationApi.apiId,
             apiName = selectedApplicationApi.apiTitle,
-            endpoints = selectedApplicationApi.endpoints.filter(!_.primaryAccess.isAccessible).map(
+            endpoints = selectedApplicationApi.endpoints.filter(!_.productionAccess.isAccessible).map(
               endpoint =>
                 AccessRequestEndpoint(
                   httpMethod = endpoint.httpMethod,
@@ -273,8 +273,8 @@ object RequestProductionAccessEndJourneyControllerSpec extends OptionValues{
             summary = None,
             description = None,
             scopes = Seq(s"test-scope-$apiId-$endpointAccess"),
-            primaryAccess = endpointAccess,
-            secondaryAccess = Accessible
+            productionAccess = endpointAccess,
+            nonProductionAccess = Accessible
           )
       ),
       pendingAccessRequestCount = 0,

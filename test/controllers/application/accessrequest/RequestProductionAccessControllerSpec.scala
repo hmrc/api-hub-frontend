@@ -174,8 +174,8 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
                 summary = method.summary,
                 description = method.description,
                 scopes = method.scopes,
-                primaryAccess = ApplicationEndpointAccess(application, 0, method, Primary),
-                secondaryAccess = Inaccessible
+                productionAccess = ApplicationEndpointAccess.production(TheoreticalScopes(method.scopes.toSet, Set.empty), 0, method),
+                nonProductionAccess = Inaccessible
               )
           )
       ),

@@ -140,7 +140,7 @@ object RequestProductionAccessEndJourneyController {
               apiId = applicationApi.apiId,
               apiName = applicationApi.apiTitle,
               endpoints = applicationApi.endpoints
-                .filter(_.primaryAccess.equals(Inaccessible))
+                .filter(_.productionAccess.equals(Inaccessible))
                 .map(
                   endpoint => AccessRequestEndpoint(
                     httpMethod = endpoint.httpMethod,

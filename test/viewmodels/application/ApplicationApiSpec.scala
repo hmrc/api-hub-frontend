@@ -16,10 +16,8 @@
 
 package viewmodels.application
 
-import controllers.actions.FakeApplication
-import models.api.{ApiDetail, Endpoint, EndpointMethod, Live, Maintainer}
-import models.application.ApplicationLenses.ApplicationLensOps
-import models.application.{Api, Primary, Scope, Secondary, SelectedEndpoint}
+import models.api.*
+import models.application.{Api, Scope, SelectedEndpoint}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
@@ -28,53 +26,65 @@ import java.time.Instant
 
 class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks {
 
-  import ApplicationApiSpec._
+  import ApplicationApiSpec.*
 
   "ApplicationEndpointAccess" - {
     "must return Accessible when an application has the scopes required by the endpoint" in {
-      val application = FakeApplication.setPrimaryScopes(scopes(testScope1, testScope2, testScope3))
       val endpointMethod = EndpointMethod("GET", None, None, Seq(testScope1, testScope3))
-      val actual = ApplicationEndpointAccess(application, 0, endpointMethod, Primary)
+
+      val actual = ApplicationEndpointAccess.production(
+        theoreticalScopes = TheoreticalScopes(Set(testScope1, testScope2, testScope3), Set(testScope1, testScope2, testScope3)),
+        pendingAccessRequestCount = 0,
+        endpointMethod = endpointMethod
+      )
 
       actual mustBe Accessible
     }
 
     "must return Inaccessible when an application does not have the scopes required by the endpoint" in {
-      val application = FakeApplication.setPrimaryScopes(scopes(testScope1))
       val endpointMethod = EndpointMethod("GET", None, None, Seq(testScope2, testScope3))
-      val actual = ApplicationEndpointAccess(application, 0, endpointMethod, Primary)
+
+      val actual = ApplicationEndpointAccess.production(
+        theoreticalScopes = TheoreticalScopes(Set(testScope2, testScope3), Set(testScope1)),
+        pendingAccessRequestCount = 0,
+        endpointMethod = endpointMethod
+      )
 
       actual mustBe Inaccessible
     }
 
     "must return Inaccessible when an application only has a subset of the scopes required by the endpoint" in {
-      val application = FakeApplication.setPrimaryScopes(scopes(testScope1, testScope2))
       val endpointMethod = EndpointMethod("GET", None, None, Seq(testScope2, testScope3))
-      val actual = ApplicationEndpointAccess(application, 0, endpointMethod, Primary)
 
-      actual mustBe Inaccessible
-    }
-
-    "must return Inaccessible when an application has the scopes required but in the wrong environment" in {
-      val application = FakeApplication.setPrimaryScopes(scopes("test-scope-1", "test-scope-2", "test-scope-3"))
-      val endpointMethod = EndpointMethod("GET", None, None, Seq("test-scope-1", "test-scope-3"))
-      val actual = ApplicationEndpointAccess(application, 0, endpointMethod, Secondary)
+      val actual = ApplicationEndpointAccess.production(
+        theoreticalScopes = TheoreticalScopes(Set(testScope2, testScope3), Set(testScope1, testScope2)),
+        pendingAccessRequestCount = 0,
+        endpointMethod = endpointMethod
+      )
 
       actual mustBe Inaccessible
     }
 
     "must return Requested for a primary endpoint without required scopes when there is a pending production access request" in {
-      val application = FakeApplication.setPrimaryScopes(scopes(testScope1))
       val endpointMethod = EndpointMethod("GET", None, None, Seq(testScope2, testScope3))
-      val actual = ApplicationEndpointAccess(application, 1, endpointMethod, Primary)
+
+      val actual = ApplicationEndpointAccess.production(
+        theoreticalScopes = TheoreticalScopes(Set(testScope2, testScope3), Set(testScope1)),
+        pendingAccessRequestCount = 1,
+        endpointMethod = endpointMethod
+      )
 
       actual mustBe Requested
     }
 
     "must return Accessible for a primary endpoint with required scopes when there is a pending production access request" in {
-      val application = FakeApplication.setPrimaryScopes(scopes(testScope1, testScope2, testScope3))
       val endpointMethod = EndpointMethod("GET", None, None, Seq(testScope1, testScope3))
-      val actual = ApplicationEndpointAccess(application, 1, endpointMethod, Primary)
+
+      val actual = ApplicationEndpointAccess.production(
+        theoreticalScopes = TheoreticalScopes(Set(testScope1, testScope3), Set(testScope1, testScope2, testScope3)),
+        pendingAccessRequestCount = 1,
+        endpointMethod = endpointMethod
+      )
 
       actual mustBe Accessible
     }
@@ -90,8 +100,8 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
         summary = None,
         description = None,
         scopes = Seq.empty,
-        primaryAccess = Unknown,
-        secondaryAccess = Unknown
+        productionAccess = Unknown,
+        nonProductionAccess = Unknown
       )
 
       actual mustBe expected
@@ -137,8 +147,8 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
             summary = Some("test-summary"),
             description = Some("test-description"),
             scopes = Seq.empty,
-            primaryAccess = Accessible,
-            secondaryAccess = Accessible
+            productionAccess = Accessible,
+            nonProductionAccess = Accessible
           ),
           ApplicationEndpoint(
             httpMethod = "GET",
@@ -146,8 +156,8 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
             summary = Some("test-summary"),
             description = Some("test-description"),
             scopes = Seq.empty,
-            primaryAccess = Accessible,
-            secondaryAccess = Inaccessible
+            productionAccess = Accessible,
+            nonProductionAccess = Inaccessible
           ),
           ApplicationEndpoint(
             httpMethod = "GET",
@@ -155,8 +165,8 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
             summary = Some("test-summary"),
             description = Some("test-description"),
             scopes = Seq.empty,
-            primaryAccess = Inaccessible,
-            secondaryAccess = Accessible
+            productionAccess = Inaccessible,
+            nonProductionAccess = Accessible
           ),
           ApplicationEndpoint(
             httpMethod = "GET",
@@ -164,8 +174,8 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
             summary = Some("test-summary"),
             description = Some("test-description"),
             scopes = Seq.empty,
-            primaryAccess = Requested,
-            secondaryAccess = Accessible
+            productionAccess = Requested,
+            nonProductionAccess = Accessible
           )
         )
 
@@ -173,8 +183,8 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
 
         applicationApi.selectedEndpoints mustBe 4
         applicationApi.totalEndpoints mustBe 3
-        applicationApi.availablePrimaryEndpoints mustBe 2
-        applicationApi.availableSecondaryEndpoints mustBe 3
+        applicationApi.availableProductionEndpoints mustBe 2
+        applicationApi.availableNonProductionEndpoints mustBe 3
         applicationApi.needsProductionAccessRequest mustBe !applicationApi.hasPendingAccessRequest )
       }
     }

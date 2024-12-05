@@ -181,8 +181,8 @@ object CancelAccessRequestEndJourneyControllerSpec extends OptionValues{
             summary = None,
             description = None,
             scopes = Seq(s"test-scope-$apiId-$endpointAccess"),
-            primaryAccess = endpointAccess,
-            secondaryAccess = Accessible
+            productionAccess = endpointAccess,
+            nonProductionAccess = Accessible
           )
       ),
       pendingAccessRequestCount = 0,
