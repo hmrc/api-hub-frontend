@@ -18,7 +18,7 @@ package services
 
 import com.google.inject.Singleton
 import models.api.ApiDetail
-import models.application.Application
+import models.application.{Application, Secondary}
 import models.application.ApplicationLenses.*
 import models.curl.OpenApiDoc
 import models.{ApiWorld, CurlCommand}
@@ -56,7 +56,7 @@ class CurlCommandService extends Logging {
 
   private def getCommonHeaders(application: Application): Map[String,String] = {
     val maybeAuthHeader = for {
-      credential <- application.getSecondaryMasterCredential
+      credential <- application.getMasterCredential(Secondary)
       secret <- credential.clientSecret
       credentials = s"${credential.clientId}:$secret"
       encodedCredentials = getEncoder.encodeToString(credentials.getBytes)

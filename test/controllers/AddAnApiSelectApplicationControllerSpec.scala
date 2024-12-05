@@ -22,10 +22,10 @@ import forms.AddAnApiSelectApplicationFormProvider
 import generators.ApiDetailGenerators
 import models.api.ApiDetail
 import models.application.ApplicationLenses.ApplicationLensOps
-import models.application.{Api, Application}
+import models.application.{Api, Application, Secondary}
 import models.{AddAnApi, Mode, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.{AddAnApiApiPage, AddAnApiContextPage, AddAnApiSelectApplicationPage}
@@ -33,8 +33,8 @@ import play.api.data.Form
 import play.api.inject.bind
 import play.api.mvc.Request
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import play.api.{Application => PlayApplication}
+import play.api.test.Helpers.*
+import play.api.Application as PlayApplication
 import repositories.AddAnApiSessionRepository
 import services.ApiHubService
 import utils.HtmlValidation
@@ -360,14 +360,14 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
   private def buildApplicationWithoutAccess(): Application = {
     FakeApplication
       .copy(id = "test-application-id-2", name = "test-application-name-2")
-      .setSecondaryScopes(Seq.empty)
+      .setScopes(Secondary, Seq.empty)
   }
 
   private def buildApplicationsWithoutAccess(count: Int): Seq[Application] = {
     Seq.tabulate(count) { i =>
       FakeApplication
         .copy(id = s"test-application-id-$i", name = s"test-application-name-$i")
-        .setSecondaryScopes(Seq.empty)
+        .setScopes(Secondary, Seq.empty)
     }
   }
 
