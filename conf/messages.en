@@ -1100,3 +1100,7 @@ produceApiDeploymentError.warning = Review errors
 produceApiDeploymentError.contact = You can try to redeploy your API. If this error continues contact {0}.
 produceApiDeploymentError.contact.support = support
 produceApiDeploymentError.return = Return to API deployment page
+
+produceApiEnterWiremock.title = Enter your WireMock
+produceApiEnterWiremock.heading = Enter your WireMock
+produceApiEnterWiremock.hint = Enter your WireMock stub mappings in JSON format below.

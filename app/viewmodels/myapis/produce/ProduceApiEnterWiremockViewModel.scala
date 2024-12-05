@@ -18,4 +18,4 @@ package viewmodels.myapis.produce
 
 import play.api.mvc.Call
 
-case class ProduceApiEnterWiremockViewModel(formAction: Call, warning: Option[String], populateExample: Boolean)
+case class ProduceApiEnterWiremockViewModel(formAction: Call, populateExample: Boolean)

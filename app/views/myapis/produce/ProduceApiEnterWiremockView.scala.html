@@ -41,15 +41,9 @@
             @govukErrorSummary(ErrorSummaryViewModel(form, preFormat = true))
         }
 
-        <h1 class="govuk-heading-l">@messages("produceApiEnterWiremock.heading")</h1>
+        <h1 class="govuk-heading-l govuk-!-margin-bottom-2">@messages("produceApiEnterWiremock.heading")</h1>
 
-        @if(form("value").value.isEmpty) {
-            <p class="govuk-hint">@messages("produceApiEnterWiremock.hint")</p>
-        }
-
-        @for(warning <- viewModel.warning){
-            <p class="govuk-hint">@messages(warning)</p>
-        }
+        <p class="govuk-hint govuk-!-margin-bottom-5">@messages("produceApiEnterWiremock.hint")</p>
 
         @codeEditor("json", "value", form("value").value, viewModel.populateExample)
 

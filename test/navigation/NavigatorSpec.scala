@@ -156,6 +156,9 @@ class NavigatorSpec extends SpecBase with TryValues {
         "must go from the Define Wiremock page to the WireMock upload page" in {
           navigator.nextPage(ProduceApiHowToAddWiremockPage, NormalMode, emptyUserAnswers.set[ProduceApiHowToAddWiremock](ProduceApiHowToAddWiremockPage, ProduceApiHowToAddWiremock.Upload).get) mustBe controllers.myapis.produce.routes.ProduceApiUploadWiremockController.onPageLoad(NormalMode)
         }
+        "must go from the Wiremock Editor page to the Add Prefixes page" in {
+          navigator.nextPage(ProduceApiEnterWiremockPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiAddPrefixesController.onPageLoad(NormalMode)
+        }
         "must go from the API Egress Prefixes page to the HoD page" in {
           navigator.nextPage(ProduceApiEgressPrefixesPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiHodController.onPageLoad(NormalMode)
         }
@@ -200,6 +203,9 @@ class NavigatorSpec extends SpecBase with TryValues {
         }
         "must go from the Define Wiremock page to the WireMock upload page" in {
           navigator.nextPage(UpdateApiHowToAddWiremockPage, NormalMode, emptyUserAnswers.set[ProduceApiHowToAddWiremock](UpdateApiHowToAddWiremockPage, ProduceApiHowToAddWiremock.Upload).get) mustBe controllers.myapis.update.routes.UpdateApiUploadWiremockController.onPageLoad(NormalMode)
+        }
+        "must go from the Wiremock Editor page to the Add Prefixes page" in {
+          navigator.nextPage(UpdateApiEnterWiremockPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiAddPrefixesController.onPageLoad(NormalMode)
         }
         "must go from the Upload OAS page to the OAS editor page" in {
           navigator.nextPage(UpdateApiUploadOasPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiEnterOasController.onPageLoadWithUploadedOas(NormalMode)
@@ -291,6 +297,9 @@ class NavigatorSpec extends SpecBase with TryValues {
         }
         "must go from the Preview Name/Description page to the Check Your Answers page" in {
           navigator.nextPage(ProduceApiReviewNameDescriptionPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
+        }
+        "must go from the Wiremock Editor page to the Check Your Answers page" in {
+          navigator.nextPage(ProduceApiEnterWiremockPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
         }
         "must go from the Add Prefixes page to the Enter Prefixes page if user answered Yes" in {
           val userAnswers = emptyUserAnswers.set(ProduceApiAddPrefixesPage, true).get

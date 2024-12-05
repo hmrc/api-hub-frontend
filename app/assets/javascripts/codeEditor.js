@@ -27,15 +27,17 @@ export function buildCodeEditor() {
         oasFallbackValue = editor.container.hasAttribute("data-populate-example") ? exampleData : '',
         initialEditorContents = elAceEditorMirror.value || oasFallbackValue;
 
+    function updateMirrorValue() {
+        elAceEditorMirror.value = editor.getValue();
+    }
     editor.setOption('useWorker', false);
     editor.setTheme("ace/theme/monokai");
     editor.session.setMode(mode);
     editor.setValue(initialEditorContents);
 
-    editor.session.on('change', () => {
-        console.log('change')
-        elAceEditorMirror.value = editor.getValue();
-    });
+    editor.session.on('change', updateMirrorValue);
+
+    updateMirrorValue();
 
     return {
         get hasChanged() {

@@ -20,21 +20,22 @@ import controllers.actions.*
 import forms.myapis.produce.ProduceApiEnterWiremockFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.myapis.produce.ProduceApiEnterWiremockPage
 import pages.myapis.update.UpdateApiEnterWiremockPage
 import play.api.i18n.{I18nSupport, MessagesApi, MessagesProvider}
+import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.ProduceApiSessionRepository
+import repositories.UpdateApiSessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.myapis.produce.ProduceApiEnterWiremockView
 import viewmodels.myapis.produce.ProduceApiEnterWiremockViewModel
+
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class UpdateApiEnterWiremockController @Inject()(
                                                   override val messagesApi: MessagesApi,
-                                                  sessionRepository: ProduceApiSessionRepository,
+                                                  sessionRepository: UpdateApiSessionRepository,
                                                   navigator: Navigator,
                                                   identify: IdentifierAction,
                                                   getData: ProduceApiDataRetrievalAction,
@@ -47,7 +48,7 @@ class UpdateApiEnterWiremockController @Inject()(
   private val form = formProvider()
 
   private def viewModel(mode: Mode) = ProduceApiEnterWiremockViewModel(
-    formAction = routes.UpdateApiEnterWiremockController.onSubmit(mode), None, true
+    formAction = routes.UpdateApiEnterWiremockController.onSubmit(mode), false
   )
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {

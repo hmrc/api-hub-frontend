@@ -31,6 +31,7 @@ import pages.myapis.produce.{ProduceApiEnterWiremockPage, ProduceApiUploadWiremo
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import play.api.libs.json._
 
 class ProduceApiEnterWiremockController @Inject()(
                                                    override val messagesApi: MessagesApi,
@@ -50,7 +51,7 @@ class ProduceApiEnterWiremockController @Inject()(
   private val form = formProvider()
 
   private def viewModel(mode: Mode) = ProduceApiEnterWiremockViewModel(
-    formAction = routes.ProduceApiEnterWiremockController.onSubmit(mode), None, true
+    formAction = routes.ProduceApiEnterWiremockController.onSubmit(mode), true
   )
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
@@ -77,7 +78,7 @@ class ProduceApiEnterWiremockController @Inject()(
           Future.successful(BadRequest(view(formWithErrors, request.user, viewModel(mode)))),
 
         value =>
-          validateWiremock(value).flatMap(_.fold(
+          validateWiremock(value).fold(
             error =>
               Future.successful(BadRequest(view(boundedForm.withGlobalError(error), request.user, viewModel(mode)))),
             apiName =>
@@ -86,10 +87,13 @@ class ProduceApiEnterWiremockController @Inject()(
                 _ <- sessionRepository.set(updatedAnswers)
               } yield Redirect(navigator.nextPage(ProduceApiEnterWiremockPage, mode, updatedAnswers))
           )
-        ))
+        )
   }
 
-  private def validateWiremock(wiremockJson: String)(implicit messagesProvider: MessagesProvider, hc: HeaderCarrier): Future[Either[String, String]] = {
-    Future.successful(Right(wiremockJson))
+  private def validateWiremock(wiremockJson: String)(implicit messagesProvider: MessagesProvider, hc: HeaderCarrier): Either[String, String] = {
+      try
+        Right(Json.parse(wiremockJson).toString)
+      catch
+        case e: Exception => Left("Invalid JSON")
   }
 }
