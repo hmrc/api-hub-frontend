@@ -17,11 +17,10 @@
 package viewmodels.application
 
 import models.accessrequest.{AccessRequest, Approved}
-import models.{Enumerable, WithName}
-import models.api.{ApiDetail, EndpointMethod}
 import models.api.ApiDetailLenses.ApiDetailLensOps
-import models.application.{Api, Application, EnvironmentName, Primary, Secondary, SelectedEndpoint}
-import models.application.ApplicationLenses.ApplicationLensOps
+import models.api.{ApiDetail, EndpointMethod}
+import models.application.{Api, SelectedEndpoint}
+import models.{Enumerable, WithName}
 import play.api.libs.json.{Format, Json, Writes}
 
 sealed trait ApplicationEndpointAccess {
@@ -76,31 +75,6 @@ object ApplicationEndpointAccess extends Enumerable.Implicits{
     else {
       Inaccessible
     }
-  }
-
-  // TODO: remove
-  def apply(
-    application: Application,
-    pendingAccessRequestCount: Int,
-    endpointMethod: EndpointMethod,
-    environmentName: EnvironmentName
-  ): ApplicationEndpointAccess = {
-
-    val scopes = environmentName match {
-      case Primary => application.getPrimaryScopes
-      case Secondary => application.getSecondaryScopes
-    }
-
-    if (endpointMethod.scopes.toSet.subsetOf(scopes.map(_.name).toSet)) {
-      Accessible
-    }
-    else if (pendingAccessRequestCount > 0) {
-      Requested
-    }
-    else {
-      Inaccessible
-    }
-
   }
 
   val values: Seq[ApplicationEndpointAccess] = Seq(
