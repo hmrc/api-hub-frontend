@@ -48,10 +48,10 @@ class ApplicationApisControllerSpec extends SpecBase with MockitoSugar with Test
         (user: UserModel) =>
           val fixture = buildFixture(userModel = user)
 
-          when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(true), eqTo(false))(any()))
+          when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false), eqTo(false))(any()))
             .thenReturn(Future.successful(Some(FakeApplication)))
 
-          when(fixture.apiHubService.getAccessRequests(eqTo(Some(FakeApplication.id)), eqTo(Some(Pending)))(any()))
+          when(fixture.apiHubService.getAccessRequests(eqTo(Some(FakeApplication.id)), eqTo(None))(any()))
             .thenReturn(Future.successful(Seq.empty))
 
           running(fixture.playApplication) {
@@ -92,10 +92,10 @@ class ApplicationApisControllerSpec extends SpecBase with MockitoSugar with Test
         ApplicationApi(apiDetail, Seq(ApplicationEndpoint("GET", "/test", None, None, Seq("test-scope"), Inaccessible, Accessible)), 0)
       )
 
-      when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(true), eqTo(false))(any()))
+      when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false), eqTo(false))(any()))
         .thenReturn(Future.successful(Some(application)))
 
-      when(fixture.apiHubService.getAccessRequests(eqTo(Some(FakeApplication.id)), eqTo(Some(Pending)))(any()))
+      when(fixture.apiHubService.getAccessRequests(eqTo(Some(FakeApplication.id)), eqTo(None))(any()))
         .thenReturn(Future.successful(Seq.empty))
 
       when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
@@ -138,7 +138,7 @@ class ApplicationApisControllerSpec extends SpecBase with MockitoSugar with Test
     "must redirect to Unauthorised page for a GET when user is not a team member or supporter" in {
       val fixture = buildFixture(userModel = FakeUserNotTeamMember)
 
-      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(true), eqTo(false))(any()))
+      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false), eqTo(false))(any()))
         .thenReturn(Future.successful(Some(FakeApplication)))
 
       running(fixture.playApplication) {

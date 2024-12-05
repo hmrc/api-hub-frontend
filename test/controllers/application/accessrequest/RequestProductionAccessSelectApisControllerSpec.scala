@@ -50,8 +50,8 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
     summary = None,
     description = None,
     scopes = Seq.empty,
-    primaryAccess = Accessible,
-    secondaryAccess = Accessible
+    productionAccess = Accessible,
+    nonProductionAccess = Accessible
   )
   private val applicationEndpointNotAccessibleInProd = ApplicationEndpoint(
     httpMethod = "GET",
@@ -59,8 +59,8 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
     summary = None,
     description = None,
     scopes = Seq.empty,
-    primaryAccess = Inaccessible,
-    secondaryAccess = Accessible
+    productionAccess = Inaccessible,
+    nonProductionAccess = Accessible
   )
   private val applicationApi =
     ApplicationApi(

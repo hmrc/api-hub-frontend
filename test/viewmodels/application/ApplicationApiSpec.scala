@@ -90,8 +90,8 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
         summary = None,
         description = None,
         scopes = Seq.empty,
-        primaryAccess = Unknown,
-        secondaryAccess = Unknown
+        productionAccess = Unknown,
+        nonProductionAccess = Unknown
       )
 
       actual mustBe expected
@@ -137,8 +137,8 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
             summary = Some("test-summary"),
             description = Some("test-description"),
             scopes = Seq.empty,
-            primaryAccess = Accessible,
-            secondaryAccess = Accessible
+            productionAccess = Accessible,
+            nonProductionAccess = Accessible
           ),
           ApplicationEndpoint(
             httpMethod = "GET",
@@ -146,8 +146,8 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
             summary = Some("test-summary"),
             description = Some("test-description"),
             scopes = Seq.empty,
-            primaryAccess = Accessible,
-            secondaryAccess = Inaccessible
+            productionAccess = Accessible,
+            nonProductionAccess = Inaccessible
           ),
           ApplicationEndpoint(
             httpMethod = "GET",
@@ -155,8 +155,8 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
             summary = Some("test-summary"),
             description = Some("test-description"),
             scopes = Seq.empty,
-            primaryAccess = Inaccessible,
-            secondaryAccess = Accessible
+            productionAccess = Inaccessible,
+            nonProductionAccess = Accessible
           ),
           ApplicationEndpoint(
             httpMethod = "GET",
@@ -164,8 +164,8 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
             summary = Some("test-summary"),
             description = Some("test-description"),
             scopes = Seq.empty,
-            primaryAccess = Requested,
-            secondaryAccess = Accessible
+            productionAccess = Requested,
+            nonProductionAccess = Accessible
           )
         )
 
@@ -173,8 +173,8 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
 
         applicationApi.selectedEndpoints mustBe 4
         applicationApi.totalEndpoints mustBe 3
-        applicationApi.availablePrimaryEndpoints mustBe 2
-        applicationApi.availableSecondaryEndpoints mustBe 3
+        applicationApi.availableProductionEndpoints mustBe 2
+        applicationApi.availableNonProductionEndpoints mustBe 3
         applicationApi.needsProductionAccessRequest mustBe !applicationApi.hasPendingAccessRequest )
       }
     }

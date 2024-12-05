@@ -42,6 +42,19 @@ object ApiDetailLenses {
         .toSet
     }
 
+    def getEndpointScopeNames(httpMethod: String, path: String): Seq[String] = {
+      apiDetail
+        .endpoints
+        .filter(_.path == path)
+        .flatMap(
+          endpoint =>
+            endpoint
+              .methods
+              .filter(_.httpMethod == httpMethod)
+              .flatMap(_.scopes)
+        )
+    }
+
     def setDomain(domainCode: Option[String]): ApiDetail =
       apiDetailDomain.set(apiDetail, domainCode)
 
