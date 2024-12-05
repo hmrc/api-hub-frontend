@@ -16,6 +16,7 @@
 
 package models.application
 
+import config.HipEnvironment
 import models.Lens
 import models.user.UserModel
 
@@ -89,69 +90,54 @@ object ApplicationLenses {
 
   implicit class ApplicationLensOps(application: Application) {
 
-    def getPrimaryScopes: Seq[Scope] =
-      applicationPrimaryScopes.get(application)
-
-    def setPrimaryScopes(scopes: Seq[Scope]): Application =
-      applicationPrimaryScopes.set(application, scopes)
-
-    def addPrimaryScope(scope: Scope): Application =
-      applicationPrimaryScopes.set(
-        application,
-        applicationPrimaryScopes.get(application) :+ scope
-      )
-
-    def getPrimaryMasterCredential: Option[Credential] =
-      applicationPrimaryCredentials.get(application)
-        .sortWith((a, b) => a.created.isAfter(b.created))
-        .headOption
-
-    def getPrimaryCredentials: Seq[Credential] =
-      applicationPrimaryCredentials.get(application)
-
-    def setPrimaryCredentials(credentials: Seq[Credential]): Application =
-      applicationPrimaryCredentials.set(application, credentials)
-
-    def addPrimaryCredential(credential: Credential): Application =
-      applicationPrimaryCredentials.set(
-        application,
-        applicationPrimaryCredentials.get(application) :+ credential
-      )
-
-    def getSecondaryScopes: Seq[Scope] =
-      applicationSecondaryScopes.get(application)
-
-    def setSecondaryScopes(scopes: Seq[Scope]): Application =
-      applicationSecondaryScopes.set(application, scopes)
-
-    def addSecondaryScope(scope: Scope): Application =
-      applicationSecondaryScopes.set(
-        application,
-        applicationSecondaryScopes.get(application) :+ scope
-      )
-
-    def getSecondaryMasterCredential: Option[Credential] =
-      applicationSecondaryCredentials.get(application)
-        .sortWith((a, b) => a.created.isAfter(b.created))
-        .headOption
-
-    def getSecondaryCredentials: Seq[Credential] =
-      applicationSecondaryCredentials.get(application)
-
-    def setSecondaryCredentials(credentials: Seq[Credential]): Application =
-      applicationSecondaryCredentials.set(application, credentials)
-
-    def addSecondaryCredential(credential: Credential): Application =
-      applicationSecondaryCredentials.set(
-        application,
-        applicationSecondaryCredentials.get(application) :+ credential
-      )
-
-    def getCredentialsFor(environmentName: EnvironmentName): Seq[Credential] = {
+    def setScopes(environmentName: EnvironmentName, scopes: Seq[Scope]): Application = {
       environmentName match {
-        case Primary => application.getPrimaryCredentials
-        case Secondary => application.getSecondaryCredentials
+        case Primary => applicationPrimaryScopes.set(application, scopes)
+        case Secondary => applicationSecondaryScopes.set(application, scopes)
       }
+    }
+
+    def setScopes(hipEnvironment: HipEnvironment, scopes: Seq[Scope]): Application = {
+      setScopes(hipEnvironment.environmentName, scopes)
+    }
+
+    def getCredentials(environmentName: EnvironmentName): Seq[Credential] = {
+      environmentName match {
+        case Primary => applicationPrimaryCredentials.get(application)
+        case Secondary => applicationSecondaryCredentials.get(application)
+      }
+    }
+
+    def getCredentials(hipEnvironment: HipEnvironment): Seq[Credential] = {
+      getCredentials(hipEnvironment.environmentName)
+    }
+
+    def getMasterCredential(environmentName: EnvironmentName): Option[Credential] = {
+      environmentName match {
+        case Primary =>
+          applicationPrimaryCredentials.get(application)
+            .sortWith((a, b) => a.created.isAfter(b.created))
+            .headOption
+        case Secondary =>
+          applicationSecondaryCredentials.get(application)
+            .sortWith((a, b) => a.created.isAfter(b.created))
+            .headOption
+      }
+    }
+
+    def getMasterCredential(hipEnvironment: HipEnvironment): Option[Credential] = {
+      getMasterCredential(hipEnvironment.environmentName)
+    }
+
+    def setCredentials(environmentName: EnvironmentName, credentials: Seq[Credential]): Application = {
+      environmentName match {
+        case Primary => applicationPrimaryCredentials.set(application, credentials)
+        case Secondary => applicationSecondaryCredentials.set(application, credentials)
+      }
+    }
+
+    def setCredentials(hipEnvironment: HipEnvironment, credentials: Seq[Credential]): Application = {
+      setCredentials(hipEnvironment.environmentName, credentials)
     }
 
     def setTeamId(teamId: String): Application = {
@@ -205,13 +191,6 @@ object ApplicationLenses {
 
     def isTeamMigrated: Boolean = {
       application.teamId.isDefined
-    }
-
-    def getRequiredScopeNames: Set[String] = {
-      application
-        .getSecondaryScopes
-        .map(_.name)
-        .toSet
     }
 
     def addApi(api: Api): Application =

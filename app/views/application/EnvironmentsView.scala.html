@@ -42,12 +42,12 @@
         </div>
     </div>
 
-    @if(hipEnvironment.isProductionLike && application.getCredentialsFor(hipEnvironment.environmentName).isEmpty) {
+    @if(hipEnvironment.isProductionLike && application.getCredentials(hipEnvironment.environmentName).isEmpty) {
         <p class="govuk-body">
             @messages("environments.noCredentials")
         </p>
     } else {
-        @for(credential <- application.getCredentialsFor(hipEnvironment.environmentName)) {
+        @for(credential <- application.getCredentials(hipEnvironment.environmentName)) {
             <div class="api-panel api-panel--small">
                 <p data-test-credential-client-id="@credential.clientId" class="govuk-body govuk-!-margin-bottom-3">
                     <strong>@messages("environments.clientId"):</strong>

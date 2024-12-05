@@ -183,137 +183,75 @@ class ApplicationLensesSpec extends LensBehaviours {
   }
 
   "ApplicationLensOps" - {
-    "getPrimaryScopes" - {
-      "must" - {
-        behave like applicationScopesGetterFunction(
-          applicationPrimaryScopes,
-          application => ApplicationLensOps(application).getPrimaryScopes
-        )
-      }
-    }
-
-    "setPrimaryScopes" - {
+    "setScopes" - {
       "must" - {
         behave like applicationScopesSetterFunction(
           applicationPrimaryScopes,
-          (application, scopes) => ApplicationLensOps(application).setPrimaryScopes(scopes)
+          (application, scopes) => ApplicationLensOps(application).setScopes(Primary, scopes)
+        )
+      }
+
+      "must also" - {
+        behave like applicationScopesSetterFunction(
+          applicationSecondaryScopes,
+          (application, scopes) => ApplicationLensOps(application).setScopes(Secondary, scopes)
         )
       }
     }
 
-    "addPrimaryScope" - {
+    "getCredentials" - {
       "must" - {
-        behave like applicationAddScopeFunction(
-          applicationPrimaryScopes,
-          (application, scope) => ApplicationLensOps(application).addPrimaryScope(scope)
+        behave like applicationCredentialsGetterFunction(
+          applicationPrimaryCredentials,
+          application => ApplicationLensOps(application).getCredentials(Primary)
+        )
+      }
+
+      "must also" - {
+        behave like applicationCredentialsGetterFunction(
+          applicationSecondaryCredentials,
+          application => ApplicationLensOps(application).getCredentials(Secondary)
         )
       }
     }
 
-    "getPrimaryMasterCredential" - {
-      "must return the most recently created credential" in {
+    "setCredentials" - {
+      "must" - {
+        behave like applicationCredentialsSetterFunction(
+          applicationPrimaryCredentials,
+          (application, credentials) => ApplicationLensOps(application).setCredentials(Primary, credentials)
+        )
+      }
+
+      "must also" - {
+        behave like applicationCredentialsSetterFunction(
+          applicationSecondaryCredentials,
+          (application, credentials) => ApplicationLensOps(application).setCredentials(Secondary, credentials)
+        )
+      }
+    }
+
+    "getMasterCredential" - {
+      "must return the most recently created primary credential" in {
         val master = randomCredential().copy(created = LocalDateTime.now())
         val credential1 = randomCredential().copy(created = LocalDateTime.now().minusDays(1))
         val credential2 = randomCredential().copy(created = LocalDateTime.now().minusDays(2))
 
         val application = testApplication
-          .setPrimaryCredentials(Seq(credential1, master, credential2))
+          .setCredentials(Primary, Seq(credential1, master, credential2))
 
-        application.getPrimaryMasterCredential mustBe Some(master)
+        application.getMasterCredential(Primary) mustBe Some(master)
       }
-    }
 
-    "getPrimaryCredentials" - {
-      "must" - {
-        behave like applicationCredentialsGetterFunction(
-          applicationPrimaryCredentials,
-          application => ApplicationLensOps(application).getPrimaryCredentials
-        )
-      }
-    }
-
-    "setPrimaryCredentials" - {
-      "must" - {
-        behave like applicationCredentialsSetterFunction(
-          applicationPrimaryCredentials,
-          (application, credentials) => ApplicationLensOps(application).setPrimaryCredentials(credentials)
-        )
-      }
-    }
-
-    "addPrimaryCredential" - {
-      "must" - {
-        behave like applicationAddCredentialFunction(
-          applicationPrimaryCredentials,
-          (application, credential) => ApplicationLensOps(application).addPrimaryCredential(credential)
-        )
-      }
-    }
-
-    "getSecondaryScopes" - {
-      "must" - {
-        behave like applicationScopesGetterFunction(
-          applicationSecondaryScopes,
-          application => ApplicationLensOps(application).getSecondaryScopes
-        )
-      }
-    }
-
-    "setSecondaryScopes" - {
-      "must" - {
-        behave like applicationScopesSetterFunction(
-          applicationSecondaryScopes,
-          (application, scopes) => ApplicationLensOps(application).setSecondaryScopes(scopes)
-        )
-      }
-    }
-
-    "addSecondaryScope" - {
-      "must" - {
-        behave like applicationAddScopeFunction(
-          applicationSecondaryScopes,
-          (application, scope) => ApplicationLensOps(application).addSecondaryScope(scope)
-        )
-      }
-    }
-
-    "getSecondaryMasterCredential" - {
-      "must return the most recently created credential" in {
+      "must return the most recently created secondary credential" in {
         val master = randomCredential().copy(created = LocalDateTime.now())
         val credential1 = randomCredential().copy(created = LocalDateTime.now().minusDays(1))
         val credential2 = randomCredential().copy(created = LocalDateTime.now().minusDays(2))
 
         val application = testApplication
-          .setSecondaryCredentials(Seq(credential1, master, credential2))
+          .setCredentials(Secondary, Seq(credential1, master, credential2))
 
-        application.getSecondaryMasterCredential mustBe Some(master)
-      }
-    }
-
-    "getSecondaryCredentials" - {
-      "must" - {
-        behave like applicationCredentialsGetterFunction(
-          applicationSecondaryCredentials,
-          application => ApplicationLensOps(application).getSecondaryCredentials
-        )
-      }
-    }
-
-    "setSecondaryCredentials" - {
-      "must" - {
-        behave like applicationCredentialsSetterFunction(
-          applicationSecondaryCredentials,
-          (application, credentials) => ApplicationLensOps(application).setSecondaryCredentials(credentials)
-        )
-      }
-    }
-
-    "addSecondaryCredential" - {
-      "must" - {
-        behave like applicationAddCredentialFunction(
-          applicationSecondaryCredentials,
-          (application, credential) => ApplicationLensOps(application).addSecondaryCredential(credential)
-        )
+        application.getMasterCredential(Secondary) mustBe Some(master)
       }
     }
 
@@ -353,28 +291,6 @@ class ApplicationLensesSpec extends LensBehaviours {
 
         val actual = application.addTeamMember(added.email).teamMembers
         actual mustBe existing :+ added
-      }
-    }
-
-    "getRequiredScopeNames" - {
-      "must return the set of all secondary scopes" in {
-        val scopes = Seq(
-          Scope("test-scope-1"),
-          Scope("test-scope-1"),
-          Scope("test-scope-2")
-        )
-
-        val application = testApplication.setSecondaryScopes(scopes)
-
-        val actual = application.getRequiredScopeNames
-        actual must contain theSameElementsAs Set("test-scope-1", "test-scope-2")
-      }
-
-      "must return an empty set when there are no secondary scopes" in {
-        val application = testApplication.setSecondaryScopes(Seq.empty)
-
-        val actual = application.getRequiredScopeNames
-        actual mustBe empty
       }
     }
 
