@@ -94,7 +94,7 @@ export function buildFakeAceEditor(hasPopulateExampleAttribute)  {
         setTheme: null,
     });
     let currentValue = '';
-    editor.session = jasmine.createSpyObj({setMode: null});
+    editor.session = jasmine.createSpyObj({setMode: null, on: null});
     editor.setValue = value => currentValue = value;
     editor.getValue = () => currentValue;
     editor.container = {

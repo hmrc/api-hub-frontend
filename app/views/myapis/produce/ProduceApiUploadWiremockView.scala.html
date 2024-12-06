@@ -54,7 +54,7 @@
 
   <label>
    @messages("produceApiUploadWiremock.file.choose")
-   <input type="file" name="wiremockFile" id="wiremockFile" accept=".json">
+   <input type="file" name="wiremockFile" id="wiremockFile" accept="@config.wiremockUploadValidExtensions.map("." + _).mkString(",")">
   </label>
  </div>
 

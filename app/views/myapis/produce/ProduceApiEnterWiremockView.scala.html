@@ -15,23 +15,40 @@
  *@
 
 @import models.user.UserModel
-@import viewmodels.myapis.ProduceApiEnterOasViewModel
+@import viewmodels.myapis.produce.ProduceApiEnterWiremockViewModel
+@import views.html.components.CodeEditor
 @import views.html.helper.CSPNonce
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
-    govukButton: GovukButton
+    govukErrorSummary: GovukErrorSummary,
+    govukButton: GovukButton,
+    codeEditor: CodeEditor
 )
 
-@(action: Call)(implicit request: Request[?], messages: Messages)
+@(form: Form[?], userModel: UserModel, viewModel: ProduceApiEnterWiremockViewModel)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = titleNoForm("Enter WireMock")) {
-    <h1 class="govuk-heading-l">Enter Wiremock</h1>
-    @formHelper(action = action) {
-     @govukButton(
-      Button(classes = "govuk-button--secondary", content = "Continue")
-     )
+@scripts() = {
+    <script src='@routes.Assets.versioned("javascripts/produceApiEnterConfig.js")' type="module" @{CSPNonce.attr}></script>
+}
 
+@layout(pageTitle = title(form, messages("produceApiEnterWiremock.title")), fullWidth = true, customScriptsBlock = Some(scripts()), user = Some(userModel)) {
+
+    @formHelper(action = viewModel.formAction) {
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form, preFormat = true))
+        }
+
+        <h1 class="govuk-heading-l govuk-!-margin-bottom-2">@messages("produceApiEnterWiremock.heading")</h1>
+
+        <p class="govuk-hint govuk-!-margin-bottom-5">@messages("produceApiEnterWiremock.hint")</p>
+
+        @codeEditor("wiremock", "value", form("value").value, viewModel.populateExample)
+
+        @govukButton(
+            ButtonViewModel(messages("site.continue"))
+        )
     }
 }

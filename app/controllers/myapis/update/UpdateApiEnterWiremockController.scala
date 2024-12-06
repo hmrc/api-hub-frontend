@@ -17,34 +17,74 @@
 package controllers.myapis.update
 
 import controllers.actions.*
+import forms.myapis.produce.ProduceApiEnterWiremockFormProvider
 import models.Mode
-import play.api.i18n.{I18nSupport, MessagesApi}
+import navigation.Navigator
+import pages.myapis.update.{UpdateApiEnterWiremockPage, UpdateApiUploadWiremockPage}
+import play.api.i18n.{I18nSupport, MessagesApi, MessagesProvider}
+import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.UpdateApiSessionRepository
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.myapis.produce.ProduceApiEnterWiremockView
+import viewmodels.myapis.produce.ProduceApiEnterWiremockViewModel
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class UpdateApiEnterWiremockController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       identify: IdentifierAction,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       view: ProduceApiEnterWiremockView,
-                                       getData: ProduceApiDataRetrievalAction,
-                                       requireData: DataRequiredAction,
+                                                  override val messagesApi: MessagesApi,
+                                                  sessionRepository: UpdateApiSessionRepository,
+                                                  navigator: Navigator,
+                                                  identify: IdentifierAction,
+                                                  getData: UpdateApiDataRetrievalAction,
+                                                  requireData: DataRequiredAction,
+                                                  formProvider: ProduceApiEnterWiremockFormProvider,
+                                                  val controllerComponents: MessagesControllerComponents,
+                                                  view: ProduceApiEnterWiremockView,
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = identify {
-    implicit request => Ok(view(controllers.myapis.update.routes.UpdateApiEnterWiremockController.onSubmit(mode)))
+  private val form = formProvider()
+
+  private def viewModel(mode: Mode) = ProduceApiEnterWiremockViewModel(
+    formAction = routes.UpdateApiEnterWiremockController.onSubmit(mode), false
+  )
+
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+    implicit request =>
+
+      val preparedForm = request.userAnswers.get(UpdateApiEnterWiremockPage) match {
+        case None => form
+        case Some(value) => form.fill(value)
+      }
+
+      Ok(view(preparedForm, request.user, viewModel(mode)))
   }
 
   def onPageLoadWithUploadedWiremock(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request => Ok(view(controllers.myapis.produce.routes.ProduceApiEnterWiremockController.onSubmit(mode)))
+    implicit request =>
+      val preparedForm = request.userAnswers.get(UpdateApiEnterWiremockPage).orElse(request.userAnswers.get(UpdateApiUploadWiremockPage).map(_.fileContents)) match {
+        case Some(wiremockFileContents) => form.fill(wiremockFileContents)
+        case None => form
+      }
+      Ok(view(preparedForm, request.user, viewModel(mode)))
   }
-  
-  def onSubmit(mode: Mode): Action[AnyContent] = identify {
-    implicit request => Redirect(controllers.myapis.update.routes.UpdateApiAddPrefixesController.onPageLoad(mode))
+
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request =>
+      val boundedForm = form.bindFromRequest()
+
+      boundedForm.fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, request.user, viewModel(mode)))),
+
+        value =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(UpdateApiEnterWiremockPage, value)) 
+            _ <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(navigator.nextPage(UpdateApiEnterWiremockPage, mode, updatedAnswers))
+      )
   }
 
 }

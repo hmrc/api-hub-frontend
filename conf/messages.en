@@ -1080,17 +1080,17 @@ envParityConfigTest.admin = Integration Hub admin
 hipEnvironment.production.name = Production
 hipEnvironment.test.name = Test
 
-produceApiHowToAddWiremock.title = Define WireMock for your API
-produceApiHowToAddWiremock.heading = Define WireMock for your API
-produceApiHowToAddWiremock.how = How do you want to provide the WireMock?
-produceApiHowToAddWiremock.description = To use your API in the development environment, you need to configure a WireMock.
-produceApiHowToAddWiremock.description.link = Guidance for configuring WireMocks (opens in a new tab).
-produceApiHowToAddWiremock.upload = Upload the WireMock
-produceApiHowToAddWiremock.upload.description = If you already have a WireMock defined as JSON, you can upload it.
+produceApiHowToAddWiremock.title = WireMock configuration for your API
+produceApiHowToAddWiremock.heading = WireMock configuration for your API
+produceApiHowToAddWiremock.how = How do you want to provide the WireMock configuration?
+produceApiHowToAddWiremock.description = To use your API in the development environment, you need to provide a WireMock configuration file.
+produceApiHowToAddWiremock.description.link = Guidance for configuring WireMock (opens in a new tab).
+produceApiHowToAddWiremock.upload = Upload the WireMock configuration
+produceApiHowToAddWiremock.upload.description = If you already have a YAML WireMock configuration file, you can upload it.
 produceApiHowToAddWiremock.editor = Use a Visual Editor
-produceApiHowToAddWiremock.editor.description = Create a WireMock from scratch using our visual editor.
+produceApiHowToAddWiremock.editor.description = Create a WireMock configuration file from scratch using our visual editor.
 produceApiHowToAddWiremock.checkYourAnswersLabel = produceApiHowToAddWiremock
-produceApiHowToAddWiremock.error.required = Select how you want to add a WireMock to your API. 
+produceApiHowToAddWiremock.error.required = Select how you want to add WireMock configuration to your API.
 produceApiHowToAddWiremock.change.hidden = ProduceApiHowToAddWiremock
 
 produceApiDeploymentError.title = There was an error with your deployment request
@@ -1100,3 +1100,7 @@ produceApiDeploymentError.warning = Review errors
 produceApiDeploymentError.contact = You can try to redeploy your API. If this error continues contact {0}.
 produceApiDeploymentError.contact.support = support
 produceApiDeploymentError.return = Return to API deployment page
+
+produceApiEnterWiremock.title = Enter your WireMock configuration
+produceApiEnterWiremock.heading = Enter your WireMock configuration
+produceApiEnterWiremock.hint = Enter your WireMock configuration in YAML format below.
