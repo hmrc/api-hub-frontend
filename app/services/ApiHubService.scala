@@ -17,6 +17,7 @@
 package services
 
 import com.google.inject.{Inject, Singleton}
+import config.HipEnvironment
 import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
 import models.AvailableEndpoint
 import models.accessrequest.{AccessRequest, AccessRequestRequest, AccessRequestStatus}
@@ -98,8 +99,8 @@ class ApiHubService @Inject()(
     integrationCatalogueConnector.getApis(platform)
   }
 
-  def addCredential(id: String, environmentName: EnvironmentName)(implicit hc: HeaderCarrier): Future[Either[ApplicationsException, Option[Credential]]] = {
-    applicationsConnector.addCredential(id, environmentName)
+  def addCredential(id: String, hipEnvironment: HipEnvironment)(implicit hc: HeaderCarrier): Future[Either[ApplicationsException, Option[Credential]]] = {
+    applicationsConnector.addCredential(id, hipEnvironment)
   }
 
   def deleteCredential(

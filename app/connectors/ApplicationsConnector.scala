@@ -17,11 +17,11 @@
 package connectors
 
 import com.google.inject.{Inject, Singleton}
-import config.FrontendAppConfig
+import config.{FrontendAppConfig, HipEnvironment}
 import models.UserEmail
 import models.accessrequest.*
 import models.api.ApiDeploymentStatuses.readApiDeploymentStatuses
-import models.api.{ApiDeploymentStatuses, ApiDeployment, ApiDetailSummary, EgressGateway}
+import models.api.{ApiDeployment, ApiDeploymentStatuses, ApiDetailSummary, EgressGateway}
 import models.application.*
 import models.deployment.*
 import models.exception.{ApplicationCredentialLimitException, ApplicationsException, TeamNameNotUniqueException}
@@ -188,17 +188,17 @@ class ApplicationsConnector @Inject()(
 
   def addCredential(
                      id: String,
-                     environmentName: EnvironmentName
+                     hipEnvironment: HipEnvironment
                    )(implicit hc:HeaderCarrier): Future[Either[ApplicationsException, Option[Credential]]] = {
     httpClient
-      .post(url"$applicationsBaseUrl/api-hub-applications/applications/$id/environments/$environmentName/credentials")
+      .post(url"$applicationsBaseUrl/api-hub-applications/applications/$id/environments/${hipEnvironment.id}/credentials")
       .setHeader((ACCEPT, JSON))
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Either[UpstreamErrorResponse, Credential]]
       .flatMap {
         case Right(credential) => Future.successful(Right(Some(credential)))
         case Left(e) if e.statusCode == 404 => Future.successful(Right(None))
-        case Left(e) if e.statusCode == 409 => Future.successful(Left(ApplicationCredentialLimitException.forId(id, environmentName)))
+        case Left(e) if e.statusCode == 409 => Future.successful(Left(ApplicationCredentialLimitException.forId(id, hipEnvironment)))
         case Left(e) => Future.failed(e)
       }
   }

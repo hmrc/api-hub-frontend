@@ -39,7 +39,7 @@ import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.{EitherValues, OptionValues}
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.http.HeaderCarrier
-
+import fakes.FakeHipEnvironments
 import java.time.LocalDateTime
 import scala.concurrent.Future
 
@@ -423,10 +423,10 @@ class ApiHubServiceSpec
       val fixture = buildFixture()
       val expected = Credential("test-client-id", LocalDateTime.now(), Some("test-secret"), Some("test-fragment"))
 
-      when(fixture.applicationsConnector.addCredential(eqTo(FakeApplication.id), eqTo(Primary))(any()))
+      when(fixture.applicationsConnector.addCredential(eqTo(FakeApplication.id), eqTo(FakeHipEnvironments.production))(any()))
         .thenReturn(Future.successful(Right(Some(expected))))
 
-      fixture.service.addCredential(FakeApplication.id, Primary)(HeaderCarrier()).map {
+      fixture.service.addCredential(FakeApplication.id, FakeHipEnvironments.production)(HeaderCarrier()).map {
         actual =>
           actual mustBe Right(Some(expected))
       }

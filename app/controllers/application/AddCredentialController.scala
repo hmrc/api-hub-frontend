@@ -16,14 +16,15 @@
 
 package controllers.application
 
-import controllers.actions._
+import config.HipEnvironments
+import controllers.actions.*
 import controllers.helpers.ErrorResultBuilder
 import forms.AddCredentialChecklistFormProvider
 import models.application.{Application, Credential, Primary, Secondary}
 import models.exception.ApplicationCredentialLimitException
 import models.user.UserModel
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc._
+import play.api.mvc.*
 import services.ApiHubService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -44,7 +45,7 @@ class AddCredentialController @Inject()(
   errorResultBuilder: ErrorResultBuilder,
   apiHubService: ApiHubService,
   successView: AddCredentialSuccessView
-)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+)(implicit ec: ExecutionContext, hipEnvironments: HipEnvironments) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
 
@@ -59,7 +60,7 @@ class AddCredentialController @Inject()(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, applicationId))),
         _ =>
-          apiHubService.addCredential(request.application.id, Primary) flatMap {
+          apiHubService.addCredential(request.application.id, hipEnvironments.forId("production").get) flatMap {
             case Right(Some(credential)) =>
               fetchApiNames(request.application).map(
                 apiNames =>
@@ -74,7 +75,7 @@ class AddCredentialController @Inject()(
 
   def addDevelopmentCredential(applicationId: String): Action[AnyContent] = (identify andThen applicationAuth(applicationId)).async {
     implicit request =>
-      apiHubService.addCredential(request.application.id, Secondary) flatMap {
+      apiHubService.addCredential(request.application.id, hipEnvironments.forId("test").get) flatMap {
         case Right(Some(_)) =>
           Future.successful(SeeOther(controllers.application.routes.EnvironmentAndCredentialsController.onPageLoad(request.application.id).url))
         case Right(None) => applicationNotFound(request.application)
