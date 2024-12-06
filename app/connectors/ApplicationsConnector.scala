@@ -17,11 +17,11 @@
 package connectors
 
 import com.google.inject.{Inject, Singleton}
-import config.FrontendAppConfig
+import config.{FrontendAppConfig, HipEnvironment}
 import models.UserEmail
 import models.accessrequest.*
 import models.api.ApiDeploymentStatuses.readApiDeploymentStatuses
-import models.api.{ApiDeploymentStatuses, ApiDeployment, ApiDetailSummary, EgressGateway}
+import models.api.{ApiDeployment, ApiDeploymentStatuses, ApiDetailSummary, EgressGateway}
 import models.application.*
 import models.deployment.*
 import models.exception.{ApplicationCredentialLimitException, ApplicationsException, TeamNameNotUniqueException}
@@ -610,6 +610,17 @@ class ApplicationsConnector @Inject()(
         case Left(e) => Future.failed(e)
       }
   }
+
+  def fetchCredentials(applicationId: String, hipEnvironment: HipEnvironment)(implicit hc: HeaderCarrier): Future[Either[Throwable, Option[Seq[Credential]]]] =
+    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/applications/$applicationId/environments/${hipEnvironment.environmentName}/credentials")
+      .setHeader(ACCEPT -> JSON)
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Either[UpstreamErrorResponse, Seq[Credential]]]
+      .map {
+        case Right(credentials) => Right(Some(credentials))
+        case Left(e) if e.statusCode == NOT_FOUND => Right(None)
+        case Left(e) => Left(e)
+      }
 
   def fixScopes(applicationId: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
     httpClient.put(url"$applicationsBaseUrl/api-hub-applications/applications/$applicationId/fix-scopes")
