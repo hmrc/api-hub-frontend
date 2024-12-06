@@ -20,6 +20,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.typesafe.config.ConfigFactory
 import config.FrontendAppConfig
 import connectors.ApplicationsConnectorSpec.ApplicationGetterBehaviours
+import fakes.FakeHipEnvironments
 import generators.EgressGenerator
 import models.UserEmail
 import models.accessrequest.*
@@ -1701,6 +1702,81 @@ class ApplicationsConnectorSpec
       buildConnector(this).fetchAllScopes(applicationId)(HeaderCarrier()).map {
         result =>
           result.value mustBe credentialScopes
+      }
+    }
+
+    "fetchCredentials" - {
+      "must place the correct request and return the environment credential" in {
+
+        val applicationId = "test-application-id"
+        val environment = FakeHipEnvironments.test
+
+        val credentials = (1 to 2).map(
+          i =>
+            Credential(
+              clientId = s"test-client-id-$i",
+              created = LocalDateTime.now(),
+              clientSecret = None,
+              secretFragment = None
+            )
+        )
+
+        stubFor(
+          get(urlEqualTo(s"/api-hub-applications/applications/$applicationId/environments/${environment.environmentName}/credentials"))
+            .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
+            .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+            .willReturn(
+              aResponse()
+                .withBody(Json.toJson(credentials).toString)
+            )
+        )
+
+        buildConnector(this).fetchCredentials(applicationId, environment)(HeaderCarrier()).map {
+          result =>
+            result.value mustBe Some(credentials)
+        }
+      }
+
+      "must return None on a 404" in {
+
+        val applicationId = "test-application-id"
+        val environment = FakeHipEnvironments.test
+
+        stubFor(
+          get(urlEqualTo(s"/api-hub-applications/applications/$applicationId/environments/${environment.environmentName}/credentials"))
+            .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
+            .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+            .willReturn(
+              aResponse()
+                .withStatus(404)
+            )
+        )
+
+        buildConnector(this).fetchCredentials(applicationId, environment)(HeaderCarrier()).map {
+          result =>
+            result.value mustBe None
+        }
+      }
+
+      "must recover from an error and return a Left response" in {
+
+        val applicationId = "test-application-id"
+        val environment = FakeHipEnvironments.test
+
+        stubFor(
+          get(urlEqualTo(s"/api-hub-applications/applications/$applicationId/environments/${environment.environmentName}/credentials"))
+            .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
+            .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+            .willReturn(
+              aResponse()
+                .withStatus(500)
+            )
+        )
+
+        buildConnector(this).fetchCredentials(applicationId, environment)(HeaderCarrier()).map {
+          result =>
+            result.isLeft mustBe true
+        }
       }
     }
 

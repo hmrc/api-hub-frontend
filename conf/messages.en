@@ -167,6 +167,8 @@ applicationDetails.environment.credentials.problem = Environments and credential
 
 applicationDetails.environments.apis = APIs
 applicationDetails.environments.crendentials = Credentials
+applicationDetails.environments.credentials.error = There was an error retrieving your credentials
+applicationDetails.environments.credentials.error.description = There was an error retrieving your credentials, check back later.
 applicationDetails.environments.exampleCurlCommands = Example CURL commands
 
 applicationDetails.apis.apiName = API name
