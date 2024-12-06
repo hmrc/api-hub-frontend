@@ -38,7 +38,7 @@ class UpdateApiEnterWiremockController @Inject()(
                                                   sessionRepository: UpdateApiSessionRepository,
                                                   navigator: Navigator,
                                                   identify: IdentifierAction,
-                                                  getData: ProduceApiDataRetrievalAction,
+                                                  getData: UpdateApiDataRetrievalAction,
                                                   requireData: DataRequiredAction,
                                                   formProvider: ProduceApiEnterWiremockFormProvider,
                                                   val controllerComponents: MessagesControllerComponents,
