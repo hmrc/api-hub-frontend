@@ -30,13 +30,19 @@ class UpdateApiEnterWiremockController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        identify: IdentifierAction,
                                        val controllerComponents: MessagesControllerComponents,
-                                       view: ProduceApiEnterWiremockView
+                                       view: ProduceApiEnterWiremockView,
+                                       getData: ProduceApiDataRetrievalAction,
+                                       requireData: DataRequiredAction,
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(mode: Mode): Action[AnyContent] = identify {
     implicit request => Ok(view(controllers.myapis.update.routes.UpdateApiEnterWiremockController.onSubmit(mode)))
   }
 
+  def onPageLoadWithUploadedWiremock(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+    implicit request => Ok(view(controllers.myapis.produce.routes.ProduceApiEnterWiremockController.onSubmit(mode)))
+  }
+  
   def onSubmit(mode: Mode): Action[AnyContent] = identify {
     implicit request => Redirect(controllers.myapis.update.routes.UpdateApiAddPrefixesController.onPageLoad(mode))
   }

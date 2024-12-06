@@ -64,6 +64,8 @@ GET     /produce/enter-wiremock                             controllers.myapis.p
 POST    /produce/enter-wiremock                             controllers.myapis.produce.ProduceApiEnterWiremockController.onSubmit(mode: Mode = NormalMode)
 GET     /produce/change-enter-wiremock                      controllers.myapis.produce.ProduceApiEnterWiremockController.onPageLoad(mode: Mode = CheckMode)
 POST    /produce/change-enter-wiremock                      controllers.myapis.produce.ProduceApiEnterWiremockController.onSubmit(mode: Mode = CheckMode)
+GET     /produce/review-wiremock                            controllers.myapis.produce.ProduceApiEnterWiremockController.onPageLoadWithUploadedWiremock(mode: Mode = NormalMode)
+GET     /produce/change-review-wiremock                     controllers.myapis.produce.ProduceApiEnterWiremockController.onPageLoadWithUploadedWiremock(mode: Mode = CheckMode)
 
 GET     /produce/add-prefixes                               controllers.myapis.produce.ProduceApiAddPrefixesController.onPageLoad(mode: Mode = NormalMode)
 POST    /produce/add-prefixes                               controllers.myapis.produce.ProduceApiAddPrefixesController.onSubmit(mode: Mode = NormalMode)
@@ -151,6 +153,8 @@ GET     /update/enter-wiremock                             controllers.myapis.up
 POST    /update/enter-wiremock                             controllers.myapis.update.UpdateApiEnterWiremockController.onSubmit(mode: Mode = NormalMode)
 GET     /update/change-enter-wiremock                      controllers.myapis.update.UpdateApiEnterWiremockController.onPageLoad(mode: Mode = CheckMode)
 POST    /update/change-enter-wiremock                      controllers.myapis.update.UpdateApiEnterWiremockController.onSubmit(mode: Mode = CheckMode)
+GET     /update/review-wiremock                            controllers.myapis.update.UpdateApiEnterWiremockController.onPageLoadWithUploadedWiremock(mode: Mode = NormalMode)
+GET     /update/change-review-wiremock                     controllers.myapis.update.UpdateApiEnterWiremockController.onPageLoadWithUploadedWiremock(mode: Mode = CheckMode)
 
 GET     /update/add-prefixes                               controllers.myapis.update.UpdateApiAddPrefixesController.onPageLoad(mode: Mode = NormalMode)
 POST    /update/add-prefixes                               controllers.myapis.update.UpdateApiAddPrefixesController.onSubmit(mode: Mode = NormalMode)

@@ -1055,6 +1055,16 @@ produceApiUploadOas.file.text2 = OR
 produceApiUploadOas.file.choose = Choose file
 produceApiUploadOas.fileInfo = Only OAS files in YAML format are accepted. The maximum file size is {0}MB.
 
+produceApiUploadWiremock.title = Provide the Wiremock configuration file
+produceApiUploadWiremock.heading = Provide the Wiremock configuration file
+produceApiUploadWiremock.description = Add your Wiremock configuration file either by dragging and dropping it below, or by using the 'Choose file' button.
+produceApiUploadWiremock.error.required = Select a Wiremock configuration file
+produceApiUploadWiremock.file.text1 = Drag and Drop to Upload File
+produceApiUploadWiremock.file.text1.hover = Release to add file
+produceApiUploadWiremock.file.text2 = OR
+produceApiUploadWiremock.file.choose = Choose file
+produceApiUploadWiremock.fileInfo = Only Wiremock files in YAML format are accepted. The maximum file size is {0}MB.
+
 updateApiEnterOas.title = Update your OpenAPI Specification
 updateApiEnterOas.heading = Update your OpenAPI Specification
 updateApiEnterOas.warning = You must not change the title/name of the API.

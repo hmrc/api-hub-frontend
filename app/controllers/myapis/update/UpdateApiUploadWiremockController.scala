@@ -16,29 +16,68 @@
 
 package controllers.myapis.update
 
+import config.FrontendAppConfig
 import controllers.actions.*
+import forms.myapis.produce.ProduceApiUploadWiremockFormProvider
 import models.Mode
+import models.myapis.produce.ProduceApiUploadedWiremockFile
+import models.requests.DataRequest
+import navigation.Navigator
+import pages.myapis.update.{UpdateApiEnterWiremockPage, UpdateApiUploadWiremockPage}
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.*
+import repositories.UpdateApiSessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.myapis.produce.ProduceApiUploadWiremockViewModel
 import views.html.myapis.produce.ProduceApiUploadWiremockView
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class UpdateApiUploadWiremockController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       identify: IdentifierAction,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       view: ProduceApiUploadWiremockView
-                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                              override val messagesApi: MessagesApi,
+                                              sessionRepository: UpdateApiSessionRepository,
+                                              navigator: Navigator,
+                                              identify: IdentifierAction,
+                                              val controllerComponents: MessagesControllerComponents,
+                                              formProvider: ProduceApiUploadWiremockFormProvider,
+                                              getData: UpdateApiDataRetrievalAction,
+                                              requireData: DataRequiredAction,
+                                              view: ProduceApiUploadWiremockView,
+                                              frontendAppConfig: FrontendAppConfig
+                                            )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = identify {
-    implicit request => Ok(view(controllers.myapis.update.routes.UpdateApiUploadWiremockController.onSubmit(mode)))
+  private val form = formProvider()
+
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+    implicit request =>
+      val preparedForm = request.userAnswers.get(UpdateApiUploadWiremockPage) match {
+        case None => form
+        case Some(value) => form.fill(value)
+      }
+
+      Ok(buildView(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = identify {
-    implicit request => Redirect(controllers.myapis.update.routes.UpdateApiEnterWiremockController.onPageLoad(mode))
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request => {
+      form.bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(buildView(formWithErrors, mode))),
+
+        value =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.remove(UpdateApiEnterWiremockPage))
+            updatedAnswers <- Future.fromTry(updatedAnswers.set(UpdateApiUploadWiremockPage, value))
+            _ <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(navigator.nextPage(UpdateApiUploadWiremockPage, mode, updatedAnswers))
+      )
+    }
+  }
+
+  private def buildView(form: Form[ProduceApiUploadedWiremockFile], mode: Mode)(implicit request: DataRequest[AnyContent]) = {
+    view(form, ProduceApiUploadWiremockViewModel(routes.UpdateApiUploadWiremockController.onSubmit(mode)), request.user, frontendAppConfig)
   }
 
 }
