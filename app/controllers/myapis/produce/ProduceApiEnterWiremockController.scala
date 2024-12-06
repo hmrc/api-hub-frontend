@@ -42,9 +42,7 @@ class ProduceApiEnterWiremockController @Inject()(
                                                    requireData: DataRequiredAction,
                                                    formProvider: ProduceApiEnterWiremockFormProvider,
                                                    val controllerComponents: MessagesControllerComponents,
-                                                   view: ProduceApiEnterWiremockView,
-                                                   getData: ProduceApiDataRetrievalAction,
-                                                   requireData: DataRequiredAction,
+                                                   view: ProduceApiEnterWiremockView
                                                  )
                                                  (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
@@ -66,7 +64,12 @@ class ProduceApiEnterWiremockController @Inject()(
   }
 
   def onPageLoadWithUploadedWiremock(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request => Ok(view(controllers.myapis.produce.routes.ProduceApiEnterWiremockController.onSubmit(mode)))
+    implicit request =>
+      val preparedForm = request.userAnswers.get(ProduceApiEnterWiremockPage).orElse(request.userAnswers.get(ProduceApiUploadWiremockPage).map(_.fileContents)) match {
+        case Some(wiremockFileContents) => form.fill(wiremockFileContents)
+        case None => form
+      }
+      Ok(view(preparedForm, request.user, viewModel(mode)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {

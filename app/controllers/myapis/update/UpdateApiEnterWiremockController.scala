@@ -20,7 +20,7 @@ import controllers.actions.*
 import forms.myapis.produce.ProduceApiEnterWiremockFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.myapis.update.UpdateApiEnterWiremockPage
+import pages.myapis.update.{UpdateApiEnterWiremockPage, UpdateApiUploadWiremockPage}
 import play.api.i18n.{I18nSupport, MessagesApi, MessagesProvider}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -63,7 +63,12 @@ class UpdateApiEnterWiremockController @Inject()(
   }
 
   def onPageLoadWithUploadedWiremock(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request => Ok(view(controllers.myapis.produce.routes.ProduceApiEnterWiremockController.onSubmit(mode)))
+    implicit request =>
+      val preparedForm = request.userAnswers.get(UpdateApiEnterWiremockPage).orElse(request.userAnswers.get(UpdateApiUploadWiremockPage).map(_.fileContents)) match {
+        case Some(wiremockFileContents) => form.fill(wiremockFileContents)
+        case None => form
+      }
+      Ok(view(preparedForm, request.user, viewModel(mode)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
