@@ -635,8 +635,8 @@ class ApplicationsConnector @Inject()(
 
   }
 
-  def fetchEgresses(environmentName: EnvironmentName)(implicit hc: HeaderCarrier): Future[Seq[EgressGateway]] = {
-    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/environment-parity-test/egresses/$environmentName")
+  def fetchEgresses(hipEnvironment: HipEnvironment)(implicit hc: HeaderCarrier): Future[Seq[EgressGateway]] = {
+    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/environment-parity-test/egresses/${hipEnvironment.id}")
       .setHeader(ACCEPT -> JSON)
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Seq[EgressGateway]]

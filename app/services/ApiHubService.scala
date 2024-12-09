@@ -230,8 +230,8 @@ class ApiHubService @Inject()(
     applicationsConnector.fetchClientScopes(hipEnvironment, clientId)
   }
 
-  def fetchEgresses(environmentName: EnvironmentName)(implicit hc: HeaderCarrier): Future[Seq[EgressGateway]] = {
-    applicationsConnector.fetchEgresses(environmentName)
+  def fetchEgresses(hipEnvironment: HipEnvironment)(implicit hc: HeaderCarrier): Future[Seq[EgressGateway]] = {
+    applicationsConnector.fetchEgresses(hipEnvironment)
   }
 
   def fetchDeployments(environmentName: EnvironmentName)(implicit hc: HeaderCarrier): Future[Seq[ApiDeployment]] = {
