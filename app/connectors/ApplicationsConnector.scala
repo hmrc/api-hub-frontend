@@ -622,8 +622,8 @@ class ApplicationsConnector @Inject()(
       }
   }
 
-  def fetchClientScopes(environmentName: EnvironmentName, clientId: String)(implicit hc: HeaderCarrier): Future[Option[Seq[ClientScope]]] = {
-    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/environment-parity-test/client-scopes/$environmentName/$clientId")
+  def fetchClientScopes(hipEnvironment: HipEnvironment, clientId: String)(implicit hc: HeaderCarrier): Future[Option[Seq[ClientScope]]] = {
+    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/environment-parity-test/client-scopes/${hipEnvironment.id}/$clientId")
       .setHeader(ACCEPT -> JSON)
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Either[UpstreamErrorResponse, Seq[ClientScope]]]

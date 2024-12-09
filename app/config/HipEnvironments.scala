@@ -54,6 +54,10 @@ trait HipEnvironments {
     environments.find(_.id == id)
   }
 
+  def forEnvironmentName(environmentName: EnvironmentName): Option[HipEnvironment] = {
+    environments.find(_.environmentName == environmentName)
+  }
+
 }
 
 @Singleton

@@ -226,8 +226,8 @@ class ApiHubService @Inject()(
     applicationsConnector.fixScopes(applicationId)
   }
 
-  def fetchClientScopes(environmentName: EnvironmentName, clientId: String)(implicit hc: HeaderCarrier): Future[Option[Seq[ClientScope]]] = {
-    applicationsConnector.fetchClientScopes(environmentName, clientId)
+  def fetchClientScopes(hipEnvironment: HipEnvironment, clientId: String)(implicit hc: HeaderCarrier): Future[Option[Seq[ClientScope]]] = {
+    applicationsConnector.fetchClientScopes(hipEnvironment, clientId)
   }
 
   def fetchEgresses(environmentName: EnvironmentName)(implicit hc: HeaderCarrier): Future[Seq[EgressGateway]] = {
