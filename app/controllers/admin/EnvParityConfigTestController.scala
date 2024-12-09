@@ -54,6 +54,6 @@ class EnvParityConfigTestController @Inject()(
   }
 
   def fetchDeployments(environmentName: EnvironmentName): Action[AnyContent] = (identify andThen isSupport).async {
-    implicit request => apiHubService.fetchDeployments(environmentName).map(deployments => Ok(Json.toJson(deployments)))
+    implicit request => apiHubService.fetchDeployments(hipEnvironments.forEnvironmentName(environmentName).get).map(deployments => Ok(Json.toJson(deployments)))
   }
 }

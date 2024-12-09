@@ -191,7 +191,7 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
         .thenReturn(Future.successful(Some(application)))
 
       when(fixture.apiHubService.deleteCredential(any(), any(), any())(any()))
-        .thenReturn(Future.successful(Left(ApplicationCredentialLimitException.forId(FakeApplication.id, Primary))))
+        .thenReturn(Future.successful(Left(ApplicationCredentialLimitException.forId(FakeApplication.id, FakeHipEnvironments.production))))
 
       running(fixture.playApplication) {
         val url = controllers.application.routes.EnvironmentAndCredentialsController.deletePrimaryCredential(application.id, clientId) .url
@@ -302,7 +302,7 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
         .thenReturn(Future.successful(Some(application)))
 
       when(fixture.apiHubService.deleteCredential(any(), any(), any())(any()))
-        .thenReturn(Future.successful(Left(ApplicationCredentialLimitException.forId(FakeApplication.id, Primary))))
+        .thenReturn(Future.successful(Left(ApplicationCredentialLimitException.forId(FakeApplication.id, FakeHipEnvironments.production))))
 
       running(fixture.playApplication) {
         val url = controllers.application.routes.EnvironmentAndCredentialsController.deleteSecondaryCredential(application.id, clientId) .url
