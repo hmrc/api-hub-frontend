@@ -921,11 +921,11 @@ class ApiHubServiceSpec
       )
 
       when(fixture.applicationsConnector.fetchCredentials(eqTo(applicationId), eqTo(environment))(any))
-        .thenReturn(Future.successful(Right(Some(credentials))))
+        .thenReturn(Future.successful(Some(credentials)))
 
       fixture.service.fetchCredentials(applicationId, environment)(HeaderCarrier()).map {
         result =>
-          result.value mustBe Some(credentials)
+          result.value mustBe credentials
       }
     }
   }

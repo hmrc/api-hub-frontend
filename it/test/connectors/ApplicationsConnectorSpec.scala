@@ -1722,7 +1722,7 @@ class ApplicationsConnectorSpec
         )
 
         stubFor(
-          get(urlEqualTo(s"/api-hub-applications/applications/$applicationId/environments/${environment.environmentName}/credentials"))
+          get(urlEqualTo(s"/api-hub-applications/applications/$applicationId/environments/${environment.id}/credentials"))
             .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
             .withHeader(AUTHORIZATION, equalTo("An authentication token"))
             .willReturn(
@@ -1733,7 +1733,7 @@ class ApplicationsConnectorSpec
 
         buildConnector(this).fetchCredentials(applicationId, environment)(HeaderCarrier()).map {
           result =>
-            result.value mustBe Some(credentials)
+            result.value mustBe credentials
         }
       }
 
@@ -1743,7 +1743,7 @@ class ApplicationsConnectorSpec
         val environment = FakeHipEnvironments.test
 
         stubFor(
-          get(urlEqualTo(s"/api-hub-applications/applications/$applicationId/environments/${environment.environmentName}/credentials"))
+          get(urlEqualTo(s"/api-hub-applications/applications/$applicationId/environments/${environment.id}/credentials"))
             .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
             .withHeader(AUTHORIZATION, equalTo("An authentication token"))
             .willReturn(
@@ -1754,17 +1754,17 @@ class ApplicationsConnectorSpec
 
         buildConnector(this).fetchCredentials(applicationId, environment)(HeaderCarrier()).map {
           result =>
-            result.value mustBe None
+            result mustBe None
         }
       }
 
-      "must recover from an error and return a Left response" in {
+      "must recover from an error" in {
 
         val applicationId = "test-application-id"
         val environment = FakeHipEnvironments.test
 
         stubFor(
-          get(urlEqualTo(s"/api-hub-applications/applications/$applicationId/environments/${environment.environmentName}/credentials"))
+          get(urlEqualTo(s"/api-hub-applications/applications/$applicationId/environments/${environment.id}/credentials"))
             .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
             .withHeader(AUTHORIZATION, equalTo("An authentication token"))
             .willReturn(
@@ -1773,9 +1773,9 @@ class ApplicationsConnectorSpec
             )
         )
 
-        buildConnector(this).fetchCredentials(applicationId, environment)(HeaderCarrier()).map {
-          result =>
-            result.isLeft mustBe true
+        val result = buildConnector(this).fetchCredentials(applicationId, environment)(HeaderCarrier())
+        recoverToExceptionIf[UpstreamErrorResponse](result).map { e =>
+          e.statusCode mustBe INTERNAL_SERVER_ERROR
         }
       }
     }

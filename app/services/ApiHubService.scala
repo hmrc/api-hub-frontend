@@ -222,7 +222,7 @@ class ApiHubService @Inject()(
     applicationsConnector.fetchAllScopes(applicationId)
   }
 
-  def fetchCredentials(applicationId: String, hipEnvironment: HipEnvironment)(implicit hc: HeaderCarrier): Future[Either[Throwable, Option[Seq[Credential]]]] = {
+  def fetchCredentials(applicationId: String, hipEnvironment: HipEnvironment)(implicit hc: HeaderCarrier): Future[Option[Seq[Credential]]] = {
     applicationsConnector.fetchCredentials(applicationId, hipEnvironment)
   }
 

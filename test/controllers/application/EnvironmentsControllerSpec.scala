@@ -20,6 +20,7 @@ import base.SpecBase
 import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
 import controllers.routes
 import fakes.FakeHipEnvironments
+import models.application.ApplicationLenses.*
 import models.application.Credential
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -58,7 +59,7 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
             .thenReturn(Future.successful(Some(FakeApplication)))
 
           when(fixture.apiHubService.fetchCredentials(eqTo(FakeApplication.id), eqTo(FakeHipEnvironments.test))(any()))
-            .thenReturn(Future.successful(Right(Some(credentials))))
+            .thenReturn(Future.successful(Some(credentials)))
 
           running(fixture.playApplication) {
             val request = FakeRequest(GET, controllers.application.routes.EnvironmentsController.onPageLoad(FakeApplication.id, "test").url)
@@ -66,7 +67,7 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
             val view = fixture.playApplication.injector.instanceOf[EnvironmentsView]
 
             status(result) mustEqual OK
-            contentAsString(result) mustBe view(FakeApplication, user, FakeHipEnvironments.test, Some(credentials))(request, messages(fixture.playApplication)).toString
+            contentAsString(result) mustBe view(FakeApplication, user, FakeHipEnvironments.test, credentials, false)(request, messages(fixture.playApplication)).toString
             contentAsString(result) must validateAsHtml
             contentAsString(result) must include("""id="test-credentials"""")
           }
@@ -136,7 +137,7 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
             val view = fixture.playApplication.injector.instanceOf[EnvironmentsView]
 
             status(result) mustEqual OK
-            contentAsString(result) mustBe view(FakeApplication, user, FakeHipEnvironments.test, errorRetrievingCredentials = true)(request, messages(fixture.playApplication)).toString
+            contentAsString(result) mustBe view(FakeApplication, user, FakeHipEnvironments.test, FakeApplication.getCredentials(FakeHipEnvironments.test), errorRetrievingCredentials = true)(request, messages(fixture.playApplication)).toString
             contentAsString(result) must include("""id="test-credentials"""")
           }
       }

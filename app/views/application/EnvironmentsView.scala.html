@@ -33,7 +33,7 @@
     applicationNavItems: ApplicationNavItems,
 )
 
-@(application: Application, user: UserModel, hipEnvironment: HipEnvironment, maybeCredentials: Option[Seq[Credential]] = None, errorRetrievingCredentials: Boolean = false)(implicit request: Request[?], messages: Messages)
+@(application: Application, user: UserModel, hipEnvironment: HipEnvironment, credentials: Seq[Credential], errorRetrievingCredentials: Boolean = false)(implicit request: Request[?], messages: Messages)
 
 @credentialsNotRetrieved = {
     <h4 class="govuk-!-margin-0">
@@ -58,30 +58,29 @@
             content = HtmlContent(credentialsNotRetrieved),
             classes = "hip-warning-text govuk-!-padding-left-8"
         ))
+    }
+    @if(hipEnvironment.isProductionLike && credentials.isEmpty) {
+        <p class="govuk-body">
+            @messages("environments.noCredentials")
+        </p>
     } else {
-        @if(hipEnvironment.isProductionLike && maybeCredentials.isEmpty) {
-            <p class="govuk-body">
-                @messages("environments.noCredentials")
-            </p>
-        } else {
-            @for(credentials <- maybeCredentials) {
-                @for(credential <- credentials) {
-                    <div class="api-panel api-panel--small">
-                        <p data-test-credential-client-id="@credential.clientId" class="govuk-body govuk-!-margin-bottom-3">
-                            <strong>@messages("environments.clientId"):</strong>
-                            @credential.clientId
-                        </p>
-                        <p class="govuk-body govuk-!-margin-bottom-3">
-                            <strong>@messages("environments.clientSecret"):</strong>
-                            @credential.clientSecret.getOrElse("")
-                        </p>
-                        <p class="govuk-body govuk-!-margin-bottom-3">
-                            <strong>@messages("environments.created"):</strong>
-                            <span class="utcDateTime">@ViewUtils.formatLocalDateTimeContainingUtc(credential.created)</span>
-                        </p>
-                    </div>
-                }
-            }
+        @for(credential <- credentials) {
+            <div class="api-panel api-panel--small">
+                <p data-test-credential-client-id="@credential.clientId" class="govuk-body govuk-!-margin-bottom-3">
+                    <strong>@messages("environments.clientId"):</strong>
+                    @credential.clientId
+                </p>
+                <p class="govuk-body govuk-!-margin-bottom-3">
+                    <strong>@messages("environments.clientSecret"):</strong>
+                    @credential.clientSecret.getOrElse(
+                        credential.secretFragment.map(secret => s"****$secret").getOrElse("")
+                    )
+                </p>
+                <p class="govuk-body govuk-!-margin-bottom-3">
+                    <strong>@messages("environments.created"):</strong>
+                    <span class="utcDateTime">@ViewUtils.formatLocalDateTimeContainingUtc(credential.created)</span>
+                </p>
+            </div>
         }
     }
 

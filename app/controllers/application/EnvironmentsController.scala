@@ -23,6 +23,7 @@ import controllers.helpers.ErrorResultBuilder
 import models.application.*
 import models.exception.ApplicationCredentialLimitException
 import models.user.Permissions
+import models.application.ApplicationLenses.*
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.*
 import services.ApiHubService
@@ -31,6 +32,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.application.EnvironmentsView
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 import scala.util.control.NonFatal
 
 class EnvironmentsController @Inject()(
@@ -48,12 +50,11 @@ class EnvironmentsController @Inject()(
       hipEnvironments.environments.find(_.id == environment)
         .map(hipEnvironment =>
           retrieveCredentials(request.application, hipEnvironment)
-            .map {
-              case Left(_) =>
-                Ok(view(request.application, request.identifierRequest.user, hipEnvironment, errorRetrievingCredentials = true))
-              case Right(credentials) =>
-                Ok(view(request.application, request.identifierRequest.user, hipEnvironment, credentials))
-            } 
+            .map { case (credentials, hasFailedRetrieval) =>
+                Ok(
+                  view(request.application, request.identifierRequest.user, hipEnvironment, credentials, hasFailedRetrieval)
+                )
+            }
         ).getOrElse(
           Future.successful(errorResultBuilder.environmentNotFound(environment))
         )
@@ -62,11 +63,17 @@ class EnvironmentsController @Inject()(
   private def retrieveCredentials(
                                    application: Application,
                                    hipEnvironment: HipEnvironment
-                                 )(implicit hc: HeaderCarrier): Future[Either[Throwable, Option[Seq[Credential]]]] =
+                                 )(implicit hc: HeaderCarrier): Future[(Seq[Credential], Boolean)] =
+    val applicationEnvironmentCredentials = application.getCredentials(hipEnvironment)
     if (!hipEnvironment.isProductionLike) then
       apiHubService.fetchCredentials(application.id, hipEnvironment)
-    else Future.successful(Right(
-      Some(application.environments.primary.credentials)
-    ))
+        .map ({
+            case Some(credentials) => (credentials, false)
+            case _ => (applicationEnvironmentCredentials, false)
+          })
+        .recover {
+          case NonFatal(_) => (applicationEnvironmentCredentials, true)
+        }
+    else Future.successful((applicationEnvironmentCredentials, false))
 
 }
