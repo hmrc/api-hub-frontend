@@ -24,15 +24,15 @@ import models.api.{ApiDetail, Live, Maintainer}
 import models.application.{Api, Application, Credential, Primary, Secondary}
 import models.exception.ApplicationCredentialLimitException
 import models.user.UserModel
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, argThat, eq as eqTo}
 import org.mockito.Mockito.{never, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded}
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import play.api.{Application => PlayApplication}
+import play.api.test.Helpers.*
+import play.api.Application as PlayApplication
 import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
 import viewmodels.AddCredentialSuccessViewModel
@@ -112,7 +112,7 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
           val fixture = buildFixture(user, Some(application))
           val credential = Credential("test-client-id", LocalDateTime.now(clock), Some("test-secret"), Some("test-fragment"))
 
-          when(fixture.apiHubService.addCredential(eqTo(application.id), eqTo(Primary))(any()))
+          when(fixture.apiHubService.addCredential(eqTo(application.id), argThat(hipEnvironment => hipEnvironment.isProductionLike))(any()))
             .thenReturn(Future.successful(Right(Some(credential))))
 
           when(fixture.apiHubService.getApiDetail(eqTo(api1.id))(any()))
@@ -198,7 +198,7 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
 
       val credential = Credential("test-client-id", LocalDateTime.now(clock), Some("test-secret"), Some("test-fragment"))
 
-      when(fixture.apiHubService.addCredential(eqTo(FakeApplication.id), eqTo(Secondary))(any()))
+      when(fixture.apiHubService.addCredential(eqTo(FakeApplication.id), argThat(hipEnvironment => !hipEnvironment.isProductionLike))(any()))
         .thenReturn(Future.successful(Right(Some(credential))))
 
       running(fixture.playApplication) {

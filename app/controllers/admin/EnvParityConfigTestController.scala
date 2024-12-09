@@ -17,6 +17,7 @@
 package controllers.admin
 
 import com.google.inject.{Inject, Singleton}
+import config.HipEnvironments
 import controllers.actions.{AuthorisedSupportAction, IdentifierAction}
 import models.application.{Environment, EnvironmentName}
 import play.api.i18n.I18nSupport
@@ -25,6 +26,7 @@ import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.admin.EnvParityConfigTestView
 import play.api.libs.json.Json
+
 import scala.concurrent.ExecutionContext
 
 @Singleton
@@ -34,24 +36,24 @@ class EnvParityConfigTestController @Inject()(
   isSupport: AuthorisedSupportAction,
   apiHubService: ApiHubService,
   view: EnvParityConfigTestView
-)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+)(implicit ec: ExecutionContext, hipEnvironments: HipEnvironments) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = (identify andThen isSupport) {
     implicit request => Ok(view(request.user))
   }
   
   def fetchClientScopes(environmentName: EnvironmentName, clientId: String): Action[AnyContent] = (identify andThen isSupport).async {
-    implicit request => apiHubService.fetchClientScopes(environmentName, clientId).map(_ match {
+    implicit request => apiHubService.fetchClientScopes(hipEnvironments.forEnvironmentName(environmentName).get, clientId).map(_ match {
       case Some(scopes) => Ok(Json.toJson(scopes))
       case None => NotFound
     })
   }
 
   def fetchEgresses(environmentName: EnvironmentName): Action[AnyContent] = (identify andThen isSupport).async {
-    implicit request => apiHubService.fetchEgresses(environmentName).map(egresses => Ok(Json.toJson(egresses)))
+    implicit request => apiHubService.fetchEgresses(hipEnvironments.forEnvironmentName(environmentName).get).map(egresses => Ok(Json.toJson(egresses)))
   }
 
   def fetchDeployments(environmentName: EnvironmentName): Action[AnyContent] = (identify andThen isSupport).async {
-    implicit request => apiHubService.fetchDeployments(environmentName).map(deployments => Ok(Json.toJson(deployments)))
+    implicit request => apiHubService.fetchDeployments(hipEnvironments.forEnvironmentName(environmentName).get).map(deployments => Ok(Json.toJson(deployments)))
   }
 }
