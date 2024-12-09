@@ -205,17 +205,17 @@ class ApplicationsConnector @Inject()(
 
   def deleteCredential(
                         id: String,
-                        environmentName: EnvironmentName,
+                        hipEnvironment: HipEnvironment,
                         clientId: String
                       )(implicit hc: HeaderCarrier): Future[Either[ApplicationsException, Option[Unit]]] = {
     httpClient
-      .delete(url"$applicationsBaseUrl/api-hub-applications/applications/$id/environments/$environmentName/credentials/$clientId")
+      .delete(url"$applicationsBaseUrl/api-hub-applications/applications/$id/environments/${hipEnvironment.id}/credentials/$clientId")
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Either[UpstreamErrorResponse, Unit]]
       .flatMap {
         case Right(()) => Future.successful(Right(Some(())))
         case Left(e) if e.statusCode == 404 => Future.successful(Right(None))
-        case Left(e) if e.statusCode == 409 => Future.successful(Left(ApplicationCredentialLimitException.forId(id, environmentName)))
+        case Left(e) if e.statusCode == 409 => Future.successful(Left(ApplicationCredentialLimitException.forId(id, hipEnvironment)))
         case Left(e) => Future.failed(e)
       }
   }

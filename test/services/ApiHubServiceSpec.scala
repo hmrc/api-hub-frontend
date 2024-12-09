@@ -441,11 +441,11 @@ class ApiHubServiceSpec
       when(fixture.applicationsConnector.deleteCredential(any(), any(), any())(any()))
         .thenReturn(Future.successful(Right(Some(()))))
 
-      fixture.service.deleteCredential(FakeApplication.id, Primary, clientId)(HeaderCarrier()).map {
+      fixture.service.deleteCredential(FakeApplication.id, FakeHipEnvironments.production, clientId)(HeaderCarrier()).map {
         actual =>
           verify(fixture.applicationsConnector).deleteCredential(
             eqTo(FakeApplication.id),
-            eqTo(Primary),
+            eqTo(FakeHipEnvironments.production),
             eqTo(clientId))(any()
           )
 

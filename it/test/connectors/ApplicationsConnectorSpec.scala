@@ -381,7 +381,7 @@ class ApplicationsConnectorSpec
       val clientId = "test-client-id"
 
       stubFor(
-        delete(urlEqualTo(s"/api-hub-applications/applications/${FakeApplication.id}/environments/primary/credentials/$clientId"))
+        delete(urlEqualTo(s"/api-hub-applications/applications/${FakeApplication.id}/environments/${FakeHipEnvironments.production.id}/credentials/$clientId"))
           .withHeader("Authorization", equalTo("An authentication token"))
           .willReturn(
             aResponse()
@@ -389,7 +389,7 @@ class ApplicationsConnectorSpec
           )
       )
 
-      buildConnector(this).deleteCredential(FakeApplication.id, Primary, clientId)(HeaderCarrier()) map {
+      buildConnector(this).deleteCredential(FakeApplication.id, FakeHipEnvironments.production, clientId)(HeaderCarrier()) map {
         actual =>
           actual mustBe Right(Some(()))
       }
@@ -399,14 +399,14 @@ class ApplicationsConnectorSpec
       val clientId = "test-client-id"
 
       stubFor(
-        delete(urlEqualTo(s"/api-hub-applications/applications/${FakeApplication.id}/environments/primary/credentials/$clientId"))
+        delete(urlEqualTo(s"/api-hub-applications/applications/${FakeApplication.id}/environments/${FakeHipEnvironments.production.id}/credentials/$clientId"))
           .willReturn(
             aResponse()
               .withStatus(NOT_FOUND)
           )
       )
 
-      buildConnector(this).deleteCredential(FakeApplication.id, Primary, clientId)(HeaderCarrier()) map {
+      buildConnector(this).deleteCredential(FakeApplication.id, FakeHipEnvironments.production, clientId)(HeaderCarrier()) map {
         actual =>
           actual mustBe Right(None)
       }
@@ -416,16 +416,16 @@ class ApplicationsConnectorSpec
       val clientId = "test-client-id"
 
       stubFor(
-        delete(urlEqualTo(s"/api-hub-applications/applications/${FakeApplication.id}/environments/primary/credentials/$clientId"))
+        delete(urlEqualTo(s"/api-hub-applications/applications/${FakeApplication.id}/environments/${FakeHipEnvironments.production.id}/credentials/$clientId"))
           .willReturn(
             aResponse()
               .withStatus(CONFLICT)
           )
       )
 
-      buildConnector(this).deleteCredential(FakeApplication.id, Primary, clientId)(HeaderCarrier()) map {
+      buildConnector(this).deleteCredential(FakeApplication.id, FakeHipEnvironments.production, clientId)(HeaderCarrier()) map {
         actual =>
-          actual mustBe Left(ApplicationCredentialLimitException.forId(FakeApplication.id, Primary))
+          actual mustBe Left(ApplicationCredentialLimitException.forId(FakeApplication.id, FakeHipEnvironments.production))
       }
     }
   }
