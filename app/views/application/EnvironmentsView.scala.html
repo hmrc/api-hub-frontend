@@ -26,13 +26,23 @@
     layout: templates.Layout,
     govukTabs: GovukTabs,
     govukButton : GovukButton,
+    govukWarningText: GovukWarningText,
     formHelper: FormWithCSRF,
     iconsLink: IconsLink,
     sideNav: views.html.templates.SideNav,
     applicationNavItems: ApplicationNavItems,
 )
 
-@(application: Application, user: UserModel, hipEnvironment: HipEnvironment)(implicit request: Request[?], messages: Messages)
+@(application: Application, user: UserModel, hipEnvironment: HipEnvironment, credentials: Seq[Credential], errorRetrievingCredentials: Boolean = false)(implicit request: Request[?], messages: Messages)
+
+@credentialsNotRetrieved = {
+    <h4 class="govuk-!-margin-0">
+        @messages("applicationDetails.environments.credentials.error")
+    </h4>
+    <div class="govuk-!-font-weight-regular govuk-!-margin-top-4">
+        @messages("applicationDetails.environments.credentials.error.description")
+    </div>
+}
 
 @credentialsTabContent() = {
 
@@ -42,12 +52,19 @@
         </div>
     </div>
 
-    @if(hipEnvironment.isProductionLike && application.getCredentials(hipEnvironment.environmentName).isEmpty) {
+    @if(errorRetrievingCredentials) {
+        @govukWarningText(WarningText(
+            iconFallbackText = Some(messages("applicationDetails.environments.credentials.error")),
+            content = HtmlContent(credentialsNotRetrieved),
+            classes = "hip-warning-text govuk-!-padding-left-8"
+        ))
+    }
+    @if(hipEnvironment.isProductionLike && credentials.isEmpty) {
         <p class="govuk-body">
             @messages("environments.noCredentials")
         </p>
     } else {
-        @for(credential <- application.getCredentials(hipEnvironment.environmentName)) {
+        @for(credential <- credentials) {
             <div class="api-panel api-panel--small">
                 <p data-test-credential-client-id="@credential.clientId" class="govuk-body govuk-!-margin-bottom-3">
                     <strong>@messages("environments.clientId"):</strong>
@@ -55,7 +72,9 @@
                 </p>
                 <p class="govuk-body govuk-!-margin-bottom-3">
                     <strong>@messages("environments.clientSecret"):</strong>
-                    @credential.clientSecret.getOrElse("")
+                    @credential.clientSecret.getOrElse(
+                        credential.secretFragment.map(secret => s"****$secret").getOrElse("")
+                    )
                 </p>
                 <p class="govuk-body govuk-!-margin-bottom-3">
                     <strong>@messages("environments.created"):</strong>

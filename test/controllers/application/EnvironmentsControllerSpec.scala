@@ -20,6 +20,8 @@ import base.SpecBase
 import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
 import controllers.routes
 import fakes.FakeHipEnvironments
+import models.application.ApplicationLenses.*
+import models.application.Credential
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
@@ -33,6 +35,7 @@ import utils.{HtmlValidation, TestHelpers}
 import views.html.ErrorTemplate
 import views.html.application.EnvironmentsView
 
+import java.time.LocalDateTime
 import scala.concurrent.Future
 
 class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHelpers with HtmlValidation {
@@ -42,9 +45,21 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
       forAll(teamMemberAndSupporterTable) {
         (user: UserModel) =>
           val fixture = buildFixture(userModel = user)
+          val credentials = (1 to 2).map(
+            i =>
+              Credential(
+                clientId = s"test-client-id-$i",
+                created = LocalDateTime.now(),
+                clientSecret = None,
+                secretFragment = None,
+              )
+          )
 
-          when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(true), eqTo(false))(any()))
+          when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false), eqTo(false))(any()))
             .thenReturn(Future.successful(Some(FakeApplication)))
+
+          when(fixture.apiHubService.fetchCredentials(eqTo(FakeApplication.id), eqTo(FakeHipEnvironments.test))(any()))
+            .thenReturn(Future.successful(Some(credentials)))
 
           running(fixture.playApplication) {
             val request = FakeRequest(GET, controllers.application.routes.EnvironmentsController.onPageLoad(FakeApplication.id, "test").url)
@@ -52,7 +67,7 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
             val view = fixture.playApplication.injector.instanceOf[EnvironmentsView]
 
             status(result) mustEqual OK
-            contentAsString(result) mustBe view(FakeApplication, user, FakeHipEnvironments.test)(request, messages(fixture.playApplication)).toString
+            contentAsString(result) mustBe view(FakeApplication, user, FakeHipEnvironments.test, credentials, false)(request, messages(fixture.playApplication)).toString
             contentAsString(result) must validateAsHtml
             contentAsString(result) must include("""id="test-credentials"""")
           }
@@ -85,7 +100,7 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
     "must return 404 Not Found when the environment does not exist" in {
       val fixture = buildFixture()
 
-      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(true), eqTo(false))(any()))
+      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false), eqTo(false))(any()))
         .thenReturn(Future.successful(Some(FakeApplication)))
 
       running(fixture.playApplication) {
@@ -105,10 +120,33 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
       }
     }
 
+    "must return OK and the correct view when the credentials cannot be retrieved" in {
+      forAll(teamMemberAndSupporterTable) {
+        (user: UserModel) =>
+          val fixture = buildFixture(userModel = user)
+
+          when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false), eqTo(false))(any()))
+            .thenReturn(Future.successful(Some(FakeApplication)))
+
+          when(fixture.apiHubService.fetchCredentials(eqTo(FakeApplication.id), eqTo(FakeHipEnvironments.test))(any()))
+            .thenReturn(Future.successful(Left(new Exception)))
+
+          running(fixture.playApplication) {
+            val request = FakeRequest(GET, controllers.application.routes.EnvironmentsController.onPageLoad(FakeApplication.id, "test").url)
+            val result = route(fixture.playApplication, request).value
+            val view = fixture.playApplication.injector.instanceOf[EnvironmentsView]
+
+            status(result) mustEqual OK
+            contentAsString(result) mustBe view(FakeApplication, user, FakeHipEnvironments.test, FakeApplication.getCredentials(FakeHipEnvironments.test), errorRetrievingCredentials = true)(request, messages(fixture.playApplication)).toString
+            contentAsString(result) must include("""id="test-credentials"""")
+          }
+      }
+    }
+
     "must redirect to Unauthorised page for a GET when user is not a team member or supporter" in {
       val fixture = buildFixture(userModel = FakeUserNotTeamMember)
 
-      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(true), eqTo(false))(any()))
+      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false), eqTo(false))(any()))
         .thenReturn(Future.successful(Some(FakeApplication)))
 
       running(fixture.playApplication) {
