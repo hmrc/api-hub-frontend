@@ -242,8 +242,4 @@ class ApiHubService @Inject()(
     applicationsConnector.fetchDeployments(hipEnvironment)
   }
 
-  def fetchCredentials(applicationId: String, hipEnvironment: HipEnvironment)(implicit hc: HeaderCarrier): Future[Option[Seq[Credential]]] = {
-    applicationsConnector.fetchCredentials(applicationId, hipEnvironment)
-  }
-
 }
