@@ -1080,17 +1080,17 @@ class ApplicationsConnectorSpec
     "must place the correct request and return the response" in {
       val publisherReference = "ref123"
       val expectedResponse = ApiDeploymentStatuses(Seq(
-        Deployed(Primary, "1.0"),
-        Deployed(Secondary, "1.0"),
+        Deployed(FakeHipEnvironments.production.id, "1.0"),
+        Deployed(FakeHipEnvironments.test.id, "1.0"),
       ))
       val response = s"""{
         |"statuses": [{
         | "_type": "Deployed",
-        | "environmentName": "primary",
+        | "environmentId": "production",
         | "version": "1.0"
         |},{
         | "_type": "Deployed",
-        | "environmentName": "secondary",
+        | "environmentId": "test",
         | "version": "1.0"
         |}]
       }""".stripMargin
@@ -1682,7 +1682,7 @@ class ApplicationsConnectorSpec
       val credentialScopes = (1 to 2).map(
         i =>
           CredentialScopes(
-            environmentName = Primary,
+            environmentId = FakeHipEnvironments.production.id,
             clientId = s"test-client-id-$i",
             created = LocalDateTime.now(),
             scopes = Seq(s"test-scope-$i-1", s"test-scope-$i-2")

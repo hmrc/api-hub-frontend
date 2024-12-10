@@ -19,14 +19,14 @@ package controllers
 import base.OptionallyAuthenticatedSpecBase
 import config.FrontendAppConfig
 import controllers.actions.FakeUser
-import fakes.{FakeDomains, FakeHods, FakePlatforms}
+import fakes.{FakeDomains, FakeHipEnvironments, FakeHods, FakePlatforms}
 import generators.ApiDetailGenerators
 import models.api.ApiDeploymentStatus.*
 import models.api.{ApiDeploymentStatuses, ApiDetail, ContactInfo, ContactInformation, PlatformContact}
 import models.application.{Primary, Secondary}
 import models.team.Team
 import models.user.UserModel
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
 import org.scalatest.OptionValues
 import org.scalatestplus.mockito.MockitoSugar
@@ -34,7 +34,7 @@ import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import play.api.Application
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import services.ApiHubService
 import utils.HtmlValidation
 import viewmodels.{ApiTeamContactEmail, HubSupportContactEmail, NonSelfServeApiViewModel, SelfServeApiViewModel}
@@ -58,8 +58,8 @@ class ApiDetailsControllerSpec
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[ApiDetailsView]
         val apiDeploymentStatuses = ApiDeploymentStatuses(Seq(
-          Deployed(Primary, "1"),
-          Deployed(Secondary, "1")
+          Deployed(FakeHipEnvironments.production.id, "1"),
+          Deployed(FakeHipEnvironments.test.id, "1")
         ))
 
         forAll {(baseApiDetail: ApiDetail) =>
@@ -93,8 +93,8 @@ class ApiDetailsControllerSpec
         val view = fixture.application.injector.instanceOf[ApiDetailsView]
         val config = fixture.application.injector.instanceOf[FrontendAppConfig]
         val apiDeploymentStatuses = ApiDeploymentStatuses(Seq(
-          Deployed(Primary, "1"),
-          Deployed(Secondary, "1")
+          Deployed(FakeHipEnvironments.production.id, "1"),
+          Deployed(FakeHipEnvironments.test.id, "1")
         ))
 
         forAll {(baseApiDetail: ApiDetail) =>
@@ -128,8 +128,8 @@ class ApiDetailsControllerSpec
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[ApiDetailsView]
         val apiDeploymentStatuses = ApiDeploymentStatuses(Seq(
-          Deployed(Primary, "1"),
-          Deployed(Secondary, "1")
+          Deployed(FakeHipEnvironments.production.id, "1"),
+          Deployed(FakeHipEnvironments.test.id, "1")
         ))
         val apiTeamEmail = "team@example.com"
 
@@ -219,8 +219,8 @@ class ApiDetailsControllerSpec
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[ApiDetailsView]
         val apiDeploymentStatuses =  ApiDeploymentStatuses(Seq(
-          Deployed(Primary, "1"),
-          NotDeployed(Secondary)
+          Deployed(FakeHipEnvironments.production.id, "1"),
+          NotDeployed(FakeHipEnvironments.test.id)
         ))
         val team = Team("teamId", "teamName", LocalDateTime.now(), List.empty)
         val apiDetail = sampleApiDetail().copy(teamId = Some(team.id), platform = "HIP")
@@ -255,8 +255,8 @@ class ApiDetailsControllerSpec
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[ApiDetailsView]
         val apiDeploymentStatuses =  ApiDeploymentStatuses(Seq(
-          Deployed(Primary, "1"),
-          NotDeployed(Secondary)
+          Deployed(FakeHipEnvironments.production.id, "1"),
+          NotDeployed(FakeHipEnvironments.test.id)
         ))
         val apiDetail = sampleApiDetail().copy(teamId = Some("teamId"), platform = "HIP")
 
@@ -288,8 +288,8 @@ class ApiDetailsControllerSpec
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[ApiDetailsView]
         val apiDeploymentStatuses =  ApiDeploymentStatuses(Seq(
-          Deployed(Primary, "1"),
-          NotDeployed(Secondary)
+          Deployed(FakeHipEnvironments.production.id, "1"),
+          NotDeployed(FakeHipEnvironments.test.id)
         ))
         val apiDetail = sampleApiDetail().copy(teamId = Some("teamId"), platform = "HIP")
 
@@ -322,8 +322,8 @@ class ApiDetailsControllerSpec
       running(fixture.application) {
         val view = fixture.application.injector.instanceOf[ApiDetailsView]
         val apiDeploymentStatuses =  ApiDeploymentStatuses(Seq(
-          Unknown(Primary),
-          Unknown(Secondary)
+          Unknown(FakeHipEnvironments.production.id),
+          Unknown(FakeHipEnvironments.test.id)
         ))
         val apiDetail = sampleApiDetail().copy(teamId = Some("teamId"), platform = "HIP")
 

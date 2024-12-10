@@ -20,19 +20,20 @@ import base.SpecBase
 import config.FrontendAppConfig
 import controllers.actions.{FakeSupporter, FakeUser}
 import controllers.routes
+import fakes.FakeHipEnvironments
 import generators.ApiDetailGenerators
 import models.api.ApiDeploymentStatus.{Deployed, NotDeployed}
 import models.api.ApiDeploymentStatuses
 import models.application.{Primary, Secondary}
 import models.team.Team
 import models.user.UserModel
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{never, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.Application
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import services.ApiHubService
 import utils.HtmlValidation
 import views.html.ErrorTemplate
@@ -54,8 +55,8 @@ class MyApiDetailsControllerSpec
     val apiTeam = Team(teamId, teamName, LocalDateTime.now(), List.empty)
     val apiDetail = sampleApiDetail().copy(teamId = Some(apiTeam.id))
     val deploymentStatuses = ApiDeploymentStatuses(Seq(
-      Deployed(Primary, "1.0"),
-      NotDeployed(Secondary)
+      Deployed(FakeHipEnvironments.production.id, "1.0"),
+      NotDeployed(FakeHipEnvironments.test.id)
     ))
 
     running(fixture.application) {
@@ -88,8 +89,8 @@ class MyApiDetailsControllerSpec
     val apiTeam = Team(teamId, teamName, LocalDateTime.now(), List.empty)
     val apiDetail = sampleApiDetail().copy(teamId = Some(teamId))
     val deploymentStatuses = ApiDeploymentStatuses(Seq(
-      Deployed(Primary, "1.0"),
-      NotDeployed(Secondary)
+      Deployed(FakeHipEnvironments.production.id, "1.0"),
+      NotDeployed(FakeHipEnvironments.test.id)
     ))
 
     running(fixture.application) {

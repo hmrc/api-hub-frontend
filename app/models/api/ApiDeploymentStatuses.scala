@@ -16,23 +16,22 @@
 
 package models.api
 
-import models.application.EnvironmentName
 import play.api.libs.functional.syntax.*
 import play.api.libs.json.*
 
 sealed trait ApiDeploymentStatus {
 
-  def environmentName: EnvironmentName
+  def environmentId: String
 
 }
 
 object ApiDeploymentStatus {
 
-  case class Deployed(override val environmentName: EnvironmentName, version: String) extends ApiDeploymentStatus
+  case class Deployed(override val environmentId: String, version: String) extends ApiDeploymentStatus
 
-  case class NotDeployed(override val environmentName: EnvironmentName) extends ApiDeploymentStatus
+  case class NotDeployed(override val environmentId: String) extends ApiDeploymentStatus
 
-  case class Unknown(override val environmentName: EnvironmentName) extends ApiDeploymentStatus
+  case class Unknown(override val environmentId: String) extends ApiDeploymentStatus
 
 
   private implicit val jsonConfiguration: JsonConfiguration =
@@ -47,11 +46,11 @@ object ApiDeploymentStatus {
 
 case class ApiDeploymentStatuses(statuses: Seq[ApiDeploymentStatus]) {
 
-  def forEnvironment(environmentName: EnvironmentName): ApiDeploymentStatus = {
+  def forEnvironment(environmentId: String): ApiDeploymentStatus = {
     // Throw an error as the configuration is out of sync between FE and BE
     statuses
-      .find(_.environmentName == environmentName)
-      .getOrElse(throw new IllegalArgumentException(s"No deployment status for environment $environmentName"))
+      .find(_.environmentId == environmentId)
+      .getOrElse(throw new IllegalArgumentException(s"No deployment status for environment $environmentId"))
   }
 
   def isDeployed: Boolean = statuses.collectFirst {

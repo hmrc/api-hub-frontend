@@ -237,8 +237,8 @@ class ApiHubServiceSpec
     "must call the applications connector and return the API detail" in {
       val publisherReference = "ref123"
       val expected = ApiDeploymentStatuses(Seq(
-        Deployed(Primary, "1"),
-        Deployed(Secondary, "1")
+        Deployed(FakeHipEnvironments.production.id, "1"),
+        Deployed(FakeHipEnvironments.test.id, "1")
       ))
 
       val fixture = buildFixture()
@@ -888,7 +888,7 @@ class ApiHubServiceSpec
       val credentialScopes = (1 to 2).map(
         i =>
           CredentialScopes(
-            environmentName = Primary,
+            environmentId = FakeHipEnvironments.production.id,
             clientId = s"test-client-id-$i",
             created = LocalDateTime.now(),
             scopes = Seq(s"test-scope-$i-1", s"test-scope-$i-2")

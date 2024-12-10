@@ -16,6 +16,7 @@
 
 package models.api
 
+import fakes.FakeHipEnvironments
 import models.api.ApiDeploymentStatus.*
 import models.application.Primary
 import org.scalatest.freespec.AnyFreeSpec
@@ -29,12 +30,12 @@ class ApiDeploymentStatusSpec extends AnyFreeSpec with Matchers {
       val json =
         """
           |{
-          |  "environmentName": "primary",
+          |  "environmentId": "production",
           |  "version": "1",
           |  "_type": "Deployed"
           |}
           |""".stripMargin
-      val expected: ApiDeploymentStatus = Deployed(Primary, "1")
+      val expected: ApiDeploymentStatus = Deployed(FakeHipEnvironments.production.id, "1")
 
       val deployed = Json.parse(json).as[ApiDeploymentStatus]
 
@@ -45,11 +46,11 @@ class ApiDeploymentStatusSpec extends AnyFreeSpec with Matchers {
       val json =
         """
           |{
-          |  "environmentName": "primary",
+          |  "environmentId": "production",
           |  "_type": "NotDeployed"
           |}
           |""".stripMargin
-      val expected = NotDeployed(Primary)
+      val expected = NotDeployed(FakeHipEnvironments.production.id)
 
       val notDeployed = Json.parse(json).as[ApiDeploymentStatus]
 
@@ -60,11 +61,11 @@ class ApiDeploymentStatusSpec extends AnyFreeSpec with Matchers {
       val json =
         """
           |{
-          |  "environmentName": "primary",
+          |  "environmentId": "production",
           |  "_type": "Unknown"
           |}
           |""".stripMargin
-      val expected = Unknown(Primary)
+      val expected = Unknown(FakeHipEnvironments.production.id)
 
       val unknown = Json.parse(json).as[ApiDeploymentStatus]
 
