@@ -21,7 +21,13 @@ import play.api.libs.json.{Format, Json}
 case class Environments(
   primary:Environment,
   secondary:Environment
-)
+) {
+
+  def toCredentials: Set[Credential] = {
+    (primary.credentials ++ secondary.credentials).toSet
+  }
+
+}
 
 object Environments {
 
