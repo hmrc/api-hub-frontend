@@ -17,8 +17,11 @@
 package controllers.application
 
 import com.google.inject.{Inject, Singleton}
+import config.{HipEnvironment, HipEnvironments}
 import controllers.actions.{ApplicationAuthActionProvider, AuthorisedSupportAction, IdentifierAction}
 import models.ApiWorld
+import models.application.ApplicationLenses.*
+import models.application.Secondary
 import play.api.i18n.I18nSupport
 import play.api.libs.json.Json
 import play.api.mvc.*
@@ -34,22 +37,32 @@ class CurlCommandController @Inject()(
   isSupport: AuthorisedSupportAction,
   applicationAuth: ApplicationAuthActionProvider,
   apiHubService: ApiHubService,
-  curlCommandService: CurlCommandService
+  curlCommandService: CurlCommandService,
+  hipEnvironments: HipEnvironments
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def buildCurlCommand(id: String, apiWorld: ApiWorld): Action[AnyContent] = (identify andThen isSupport andThen applicationAuth(id, enrich = true)).async {
+  def buildCurlCommand(id: String, apiWorld: ApiWorld): Action[AnyContent] = (identify andThen isSupport andThen applicationAuth(id)).async {
     implicit request => {
-      Future.sequence(request.application.apis.map(api => apiHubService.getApiDetail(api.id))).map(_.flatten).map(apiDetails =>
-        val curlCommandResults = apiDetails.map(apiDetail => curlCommandService.buildCurlCommandsForApi(request.application, apiDetail, apiWorld))
-        val curlCommands = curlCommandResults.collect { case Right(curlCommand) => curlCommand }.flatten
-        val errors = curlCommandResults.collect { case Left(error) => error }
 
-        (curlCommands, errors) match {
-          case (Nil, Nil) => Ok(Json.arr()) // The application has no APIs 
-          case (Nil, _) => InternalServerError(Json.toJson(errors.toSet.toSeq.mkString(","))) // No curl commands were built
-          case _ => Ok(Json.toJson(curlCommands.map(_.toString))) // Some curl commands were successfully built
-        }
-      )
+      val application = request.application
+
+      val testEnvironment = hipEnvironments.forEnvironmentName(Secondary)
+
+      for {
+        maybeCredentials <- apiHubService.fetchCredentials(application.id, testEnvironment)
+        apiDetails <- Future.sequence(application.apis.map(api => apiHubService.getApiDetail(api.id))).map(_.flatten)
+      } yield (maybeCredentials, apiDetails) match
+        case (Some(credentials), apiDetails) =>
+          val curlCommandResults = apiDetails.map(apiDetail => curlCommandService.buildCurlCommandsForApi(application.setCredentials(testEnvironment, credentials), apiDetail, apiWorld))
+          val curlCommands = curlCommandResults.collect { case Right(curlCommand) => curlCommand }.flatten
+          val errors = curlCommandResults.collect { case Left(error) => error }
+
+          (curlCommands, errors) match {
+            case (Nil, Nil) => Ok(Json.arr()) // The application has no APIs
+            case (Nil, _) => InternalServerError(Json.toJson(errors.toSet.toSeq.mkString(","))) // No curl commands were built
+            case _ => Ok(Json.toJson(curlCommands.map(_.toString))) // Some curl commands were successfully built
+          }
+        case (None, _) => Ok(Json.arr()) // Couldn't get credentials
+      }
     }
-  }
 }
