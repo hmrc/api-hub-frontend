@@ -47,7 +47,6 @@ class CurlCommandController @Inject()(
       val application = request.application
 
       val testEnvironment = hipEnvironments.forEnvironmentName(Secondary)
-      val eventualMaybeCredentials = apiHubService.fetchCredentials(application.id, testEnvironment)
 
       for {
         maybeCredentials <- apiHubService.fetchCredentials(application.id, testEnvironment)
