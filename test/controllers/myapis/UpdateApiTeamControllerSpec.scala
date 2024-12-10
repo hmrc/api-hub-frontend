@@ -19,20 +19,21 @@ package controllers.myapis
 import base.SpecBase
 import controllers.actions.{ApiAuthActionProvider, FakeApiAuthActions, FakeApiDetail}
 import controllers.routes
+import fakes.FakeHipEnvironments
 import forms.myapis.UpdateApiTeamFormProvider
 import models.application.{Primary, Secondary, TeamMember}
 import models.api.ApiDeploymentStatuses
 import models.api.ApiDeploymentStatus.*
 import models.team.Team
 import models.user.UserModel
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{never, verify, when}
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import play.api.{Application => PlayApplication}
+import play.api.test.Helpers.*
+import play.api.Application as PlayApplication
 import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
 import views.html.ErrorTemplate
@@ -63,8 +64,8 @@ class UpdateApiTeamControllerSpec
         when(fixture.apiAuthActionProvider.apply(any)(any)).thenReturn(successfulApiAuthAction(FakeApiDetail))
         when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(allTeams))
         val statuses = ApiDeploymentStatuses(Seq(
-          Deployed(Primary, "1"),
-          Deployed(Secondary, "1")
+          Deployed(FakeHipEnvironments.production.id, "1"),
+          Deployed(FakeHipEnvironments.test.id, "1")
         ))
         when(fixture.apiHubService.getApiDeploymentStatuses(any)(any)).thenReturn(Future.successful(statuses))
         
@@ -94,8 +95,8 @@ class UpdateApiTeamControllerSpec
         when(fixture.apiAuthActionProvider.apply(any)(any)).thenReturn(successfulApiAuthAction(FakeApiDetail))
         when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(unorderedTeams))
         val statuses = ApiDeploymentStatuses(Seq(
-          Deployed(Primary, "1"),
-          Deployed(Secondary, "1")
+          Deployed(FakeHipEnvironments.production.id, "1"),
+          Deployed(FakeHipEnvironments.test.id, "1")
         ))
         when(fixture.apiHubService.getApiDeploymentStatuses(any)(any)).thenReturn(Future.successful(statuses))
         
@@ -118,8 +119,8 @@ class UpdateApiTeamControllerSpec
         when(fixture.apiAuthActionProvider.apply(any)(any)).thenReturn(successfulApiAuthAction(FakeApiDetail))
         when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(allTeams))
         val statuses = ApiDeploymentStatuses(Seq(
-          Deployed(Primary, "1"),
-          Deployed(Secondary, "1")
+          Deployed(FakeHipEnvironments.production.id, "1"),
+          Deployed(FakeHipEnvironments.test.id, "1")
         ))
         when(fixture.apiHubService.getApiDeploymentStatuses(any)(any)).thenReturn(Future.successful(statuses))
         
@@ -183,8 +184,8 @@ class UpdateApiTeamControllerSpec
         when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(allTeams))
         when(fixture.apiHubService.updateApiTeam(any, any)(any)).thenReturn(Future.successful(Some(())))
         val statuses = ApiDeploymentStatuses(Seq(
-          Deployed(Primary, "1"),
-          Deployed(Secondary, "1")
+          Deployed(FakeHipEnvironments.production.id, "1"),
+          Deployed(FakeHipEnvironments.test.id, "1")
         ))
         when(fixture.apiHubService.getApiDeploymentStatuses(any)(any)).thenReturn(Future.successful(statuses))
         

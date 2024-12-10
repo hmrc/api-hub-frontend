@@ -18,6 +18,7 @@ package controllers.application
 
 import base.SpecBase
 import controllers.actions.{FakeApplication, FakeSupporter}
+import fakes.FakeHipEnvironments
 import models.application.{CredentialScopes, Primary}
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -184,7 +185,7 @@ object AllScopesControllerSpec {
   private val credentialScopes = (1 to 2).map(
     i =>
       CredentialScopes(
-        environmentName = Primary,
+        environmentId = FakeHipEnvironments.production.id,
         clientId = s"test-client-id-$i",
         created = LocalDateTime.now(),
         scopes = Seq(s"test-scope-$i-1", s"test-scope-$i-2")

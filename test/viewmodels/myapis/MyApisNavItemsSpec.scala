@@ -18,6 +18,7 @@ package viewmodels.myapis
 
 import base.SpecBase
 import controllers.actions.{FakeSupporter, FakeUser}
+import fakes.FakeHipEnvironments
 import models.api.ApiDeploymentStatuses
 import models.api.ApiDeploymentStatus.*
 import models.application.{Primary, Secondary}
@@ -36,8 +37,8 @@ class MyApisNavItemsSpec extends SpecBase with Matchers with TableDrivenProperty
   "class MyApisNavItems" - {
 
     val statuses = ApiDeploymentStatuses(Seq(
-      Deployed(Primary, "1"),
-      Deployed(Secondary, "1")
+      Deployed(FakeHipEnvironments.production.id, "1"),
+      Deployed(FakeHipEnvironments.test.id, "1")
     ))
 
     "must return the correct list of nav items for a support user" in {
@@ -69,7 +70,12 @@ class MyApisNavItemsSpec extends SpecBase with Matchers with TableDrivenProperty
 
       running(playApplication) {
         implicit val implicitMessages: Messages = messages(playApplication)
-        val actual = MyApisNavItems(apiId, FakeUser, ProducerApiDetailsPage, ApiDeploymentStatuses(Seq(NotDeployed(Primary), NotDeployed(Secondary))))
+        val actual = MyApisNavItems(
+          apiId,
+          FakeUser,
+          ProducerApiDetailsPage,
+          ApiDeploymentStatuses(Seq(NotDeployed(FakeHipEnvironments.production.id), NotDeployed(FakeHipEnvironments.test.id)))
+        )
         val expected = Seq(producerApiDetailsPage(), changeOwningTeamPage(), viewApiAsConsumerPage())
 
         actual mustBe expected

@@ -19,6 +19,7 @@ package controllers.myapis
 import base.SpecBase
 import controllers.actions.{FakeSupporter, FakeUser}
 import controllers.routes
+import fakes.FakeHipEnvironments
 import generators.ApiDetailGenerators
 import models.api.ApiDeploymentStatuses
 import models.api.ApiDeploymentStatus.*
@@ -26,7 +27,7 @@ import models.application.ApplicationLenses.*
 import models.application.{Api, Application, Creator, Deleted, Primary, Secondary, TeamMember}
 import models.team.Team
 import models.user.UserModel
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
@@ -67,8 +68,8 @@ class ApiUsageControllerSpec
       when(fixture.apiHubService.getApplicationsUsingApi(eqTo(apiDetail.id), eqTo(true))(any))
         .thenReturn(Future.successful(apps))
       val statuses = ApiDeploymentStatuses(Seq(
-        Deployed(Primary, "1"),
-        Deployed(Secondary, "1")
+        Deployed(FakeHipEnvironments.production.id, "1"),
+        Deployed(FakeHipEnvironments.test.id, "1")
       ))
       when(fixture.apiHubService.getApiDeploymentStatuses(any)(any)).thenReturn(Future.successful(statuses))
       
