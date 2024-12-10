@@ -21,8 +21,6 @@ import config.{FrontendAppConfig, HipEnvironment, HipEnvironments}
 import controllers.actions.{ApplicationAuthActionProvider, IdentifierAction}
 import controllers.helpers.ErrorResultBuilder
 import models.application.*
-import models.exception.ApplicationCredentialLimitException
-import models.user.Permissions
 import models.application.ApplicationLenses.*
 import models.requests.ApplicationRequest
 import play.api.i18n.{I18nSupport, Messages}
@@ -33,7 +31,6 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.application.EnvironmentsView
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
 import scala.util.control.NonFatal
 
 class EnvironmentsController @Inject()(

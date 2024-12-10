@@ -50,11 +50,28 @@
 }
 
 
+@addCredentialFormAction = @{
+  hipEnvironment.isProductionLike match {
+    case true => controllers.application.routes.AddCredentialController.checklist(application.id)
+    case false => controllers.application.routes.AddCredentialController.addCredentialForEnvironment(application.id, hipEnvironment.id)
+  }
+}
+
 @credentialsTabContent() = {
 
     <div class="environment-block-header">
         <div class="left">
             <h2 class="govuk-heading-m">Credentials</h2>
+        </div>
+        <div class="right govuk-!-text-align-right">
+        @formHelper(action = addCredentialFormAction, Symbol("autoComplete") -> "off") {
+            @govukButton(
+                Button(
+                    classes = "govuk-button--secondary",
+                    content = Text(messages("environmentAndCredentials.addNewCredential"))
+                ).disabled(application.getCredentials(hipEnvironment).size >= 5).withId("addTestCredentialButton")
+            )
+        }
         </div>
     </div>
 
