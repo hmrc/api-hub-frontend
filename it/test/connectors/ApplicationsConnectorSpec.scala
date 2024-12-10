@@ -1705,6 +1705,81 @@ class ApplicationsConnectorSpec
       }
     }
 
+    "fetchCredentials" - {
+      "must place the correct request and return the environment credential" in {
+
+        val applicationId = "test-application-id"
+        val environment = FakeHipEnvironments.test
+
+        val credentials = (1 to 2).map(
+          i =>
+            Credential(
+              clientId = s"test-client-id-$i",
+              created = LocalDateTime.now(),
+              clientSecret = None,
+              secretFragment = None
+            )
+        )
+
+        stubFor(
+          get(urlEqualTo(s"/api-hub-applications/applications/$applicationId/environments/${environment.id}/credentials"))
+            .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
+            .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+            .willReturn(
+              aResponse()
+                .withBody(Json.toJson(credentials).toString)
+            )
+        )
+
+        buildConnector(this).fetchCredentials(applicationId, environment)(HeaderCarrier()).map {
+          result =>
+            result.value mustBe credentials
+        }
+      }
+
+      "must return None on a 404" in {
+
+        val applicationId = "test-application-id"
+        val environment = FakeHipEnvironments.test
+
+        stubFor(
+          get(urlEqualTo(s"/api-hub-applications/applications/$applicationId/environments/${environment.id}/credentials"))
+            .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
+            .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+            .willReturn(
+              aResponse()
+                .withStatus(404)
+            )
+        )
+
+        buildConnector(this).fetchCredentials(applicationId, environment)(HeaderCarrier()).map {
+          result =>
+            result mustBe None
+        }
+      }
+
+      "must recover from an error" in {
+
+        val applicationId = "test-application-id"
+        val environment = FakeHipEnvironments.test
+
+        stubFor(
+          get(urlEqualTo(s"/api-hub-applications/applications/$applicationId/environments/${environment.id}/credentials"))
+            .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
+            .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+            .willReturn(
+              aResponse()
+                .withStatus(500)
+            )
+        )
+
+        val result = buildConnector(this).fetchCredentials(applicationId, environment)(HeaderCarrier())
+        recoverToExceptionIf[UpstreamErrorResponse](result).map { e =>
+          e.statusCode mustBe INTERNAL_SERVER_ERROR
+        }
+      }
+    }
+
     "must return None when the application does not exist" in {
       val applicationId = "test-application-id"
 

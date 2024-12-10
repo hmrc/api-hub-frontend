@@ -18,6 +18,7 @@ package services
 
 import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
 import controllers.actions.FakeApplication
+import fakes.FakeHipEnvironments
 import generators.{AccessRequestGenerator, ApiDetailGenerators, EgressGenerator}
 import models.AvailableEndpoint
 import models.accessrequest.*
@@ -900,6 +901,31 @@ class ApiHubServiceSpec
       fixture.service.fetchAllScopes(applicationId)(HeaderCarrier()).map {
         result =>
           result.value mustBe credentialScopes
+      }
+    }
+  }
+
+  "fetchCredentials" - {
+    "must make the correct request to the applications connector and return the expected credentials" in {
+      val fixture = buildFixture()
+      val applicationId = "test-application-id"
+      val environment = FakeHipEnvironments.test
+      val credentials = (1 to 2).map(
+        i =>
+          Credential(
+            clientId = s"test-client-id-$i",
+            created = LocalDateTime.now(),
+            clientSecret = None,
+            secretFragment = None,
+          )
+      )
+
+      when(fixture.applicationsConnector.fetchCredentials(eqTo(applicationId), eqTo(environment))(any))
+        .thenReturn(Future.successful(Some(credentials)))
+
+      fixture.service.fetchCredentials(applicationId, environment)(HeaderCarrier()).map {
+        result =>
+          result.value mustBe credentials
       }
     }
   }

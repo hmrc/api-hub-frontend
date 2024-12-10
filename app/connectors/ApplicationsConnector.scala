@@ -611,6 +611,17 @@ class ApplicationsConnector @Inject()(
       }
   }
 
+  def fetchCredentials(applicationId: String, hipEnvironment: HipEnvironment)(implicit hc: HeaderCarrier): Future[Option[Seq[Credential]]] =
+    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/applications/$applicationId/environments/${hipEnvironment.id}/credentials")
+      .setHeader(ACCEPT -> JSON)
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Either[UpstreamErrorResponse, Seq[Credential]]]
+      .flatMap {
+        case Right(credentials) => Future.successful(Some(credentials))
+        case Left(e) if e.statusCode == NOT_FOUND => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
+
   def fixScopes(applicationId: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
     httpClient.put(url"$applicationsBaseUrl/api-hub-applications/applications/$applicationId/fix-scopes")
       .setHeader(AUTHORIZATION -> clientAuthToken)
