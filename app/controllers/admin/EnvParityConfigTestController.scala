@@ -35,25 +35,26 @@ class EnvParityConfigTestController @Inject()(
   identify: IdentifierAction,
   isSupport: AuthorisedSupportAction,
   apiHubService: ApiHubService,
-  view: EnvParityConfigTestView
-)(implicit ec: ExecutionContext, hipEnvironments: HipEnvironments) extends FrontendBaseController with I18nSupport {
+  view: EnvParityConfigTestView,
+  hipEnvironments: HipEnvironments
+)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = (identify andThen isSupport) {
     implicit request => Ok(view(request.user))
   }
   
   def fetchClientScopes(environmentName: EnvironmentName, clientId: String): Action[AnyContent] = (identify andThen isSupport).async {
-    implicit request => apiHubService.fetchClientScopes(hipEnvironments.forEnvironmentName(environmentName).get, clientId).map(_ match {
+    implicit request => apiHubService.fetchClientScopes(hipEnvironments.forEnvironmentName(environmentName), clientId).map(_ match {
       case Some(scopes) => Ok(Json.toJson(scopes))
       case None => NotFound
     })
   }
 
   def fetchEgresses(environmentName: EnvironmentName): Action[AnyContent] = (identify andThen isSupport).async {
-    implicit request => apiHubService.fetchEgresses(hipEnvironments.forEnvironmentName(environmentName).get).map(egresses => Ok(Json.toJson(egresses)))
+    implicit request => apiHubService.fetchEgresses(hipEnvironments.forEnvironmentName(environmentName)).map(egresses => Ok(Json.toJson(egresses)))
   }
 
   def fetchDeployments(environmentName: EnvironmentName): Action[AnyContent] = (identify andThen isSupport).async {
-    implicit request => apiHubService.fetchDeployments(hipEnvironments.forEnvironmentName(environmentName).get).map(deployments => Ok(Json.toJson(deployments)))
+    implicit request => apiHubService.fetchDeployments(hipEnvironments.forEnvironmentName(environmentName)).map(deployments => Ok(Json.toJson(deployments)))
   }
 }

@@ -44,8 +44,9 @@ class AddCredentialController @Inject()(
   view: AddCredentialChecklistView,
   errorResultBuilder: ErrorResultBuilder,
   apiHubService: ApiHubService,
-  successView: AddCredentialSuccessView
-)(implicit ec: ExecutionContext, hipEnvironments: HipEnvironments) extends FrontendBaseController with I18nSupport {
+  successView: AddCredentialSuccessView,
+  hipEnvironments: HipEnvironments
+)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
 
@@ -60,7 +61,7 @@ class AddCredentialController @Inject()(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, applicationId))),
         _ =>
-          apiHubService.addCredential(request.application.id, hipEnvironments.forId("production").get) flatMap {
+          apiHubService.addCredential(request.application.id, hipEnvironments.forEnvironmentName(Primary)) flatMap {
             case Right(Some(credential)) =>
               fetchApiNames(request.application).map(
                 apiNames =>
@@ -75,7 +76,7 @@ class AddCredentialController @Inject()(
 
   def addDevelopmentCredential(applicationId: String): Action[AnyContent] = (identify andThen applicationAuth(applicationId)).async {
     implicit request =>
-      apiHubService.addCredential(request.application.id, hipEnvironments.forId("test").get) flatMap {
+      apiHubService.addCredential(request.application.id, hipEnvironments.forEnvironmentName(Secondary)) flatMap {
         case Right(Some(_)) =>
           Future.successful(SeeOther(controllers.application.routes.EnvironmentAndCredentialsController.onPageLoad(request.application.id).url))
         case Right(None) => applicationNotFound(request.application)

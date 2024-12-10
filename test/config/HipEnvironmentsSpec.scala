@@ -69,15 +69,15 @@ class HipEnvironmentsSpec extends AnyFreeSpec with Matchers with TableDrivenProp
 
       hipEnvironments.environments mustBe expectedHipEnvironments
     }
-    "must retrieve the expected environments by id" in {
+    "must retrieve the expected environments by environment name" in {
       val hipEnvironments = HipEnvironmentsImpl(hipEnvironmentsConfig)
 
       forAll(Table(
-        ("environmentId", "expectedEnvironment"),
-        ("production", expectedHipEnvironments.head),
-        ("test", expectedHipEnvironments.last),
-      )) { (environmentId: String, expectedEnvironment: HipEnvironment) =>
-        hipEnvironments.forId(environmentId) mustBe Some(expectedEnvironment)
+        ("environmentName", "expectedEnvironment"),
+        (Primary, expectedHipEnvironments.head),
+        (Secondary, expectedHipEnvironments.last),
+      )) { (environmentName: EnvironmentName, expectedEnvironment: HipEnvironment) =>
+        hipEnvironments.forEnvironmentNameOptional(environmentName) mustBe Some(expectedEnvironment)
       }
     }
   }

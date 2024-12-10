@@ -39,7 +39,8 @@ class EnvironmentsController @Inject()(
   apiHubService: ApiHubService,
   errorResultBuilder: ErrorResultBuilder,
   config: FrontendAppConfig,
-)(implicit ec: ExecutionContext, hipEnvironments: HipEnvironments) extends FrontendBaseController with I18nSupport {
+  hipEnvironments: HipEnvironments
+)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(id: String, environment: String): Action[AnyContent] = (identify andThen applicationAuth(id, enrich = true)) {
     implicit request =>

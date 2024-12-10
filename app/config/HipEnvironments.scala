@@ -50,12 +50,13 @@ trait HipEnvironments {
 
   def environments: Seq[HipEnvironment]
 
-  def forId(id: String): Option[HipEnvironment] = {
-    environments.find(_.id == id)
+  def forEnvironmentNameOptional(environmentName: EnvironmentName): Option[HipEnvironment] = {
+    environments.find(_.environmentName == environmentName)
   }
 
-  def forEnvironmentName(environmentName: EnvironmentName): Option[HipEnvironment] = {
-    environments.find(_.environmentName == environmentName)
+  def forEnvironmentName(environmentName: EnvironmentName): HipEnvironment = {
+    forEnvironmentNameOptional(environmentName)
+      .getOrElse(throw new IllegalArgumentException(s"No configuration for environment $environmentName"))
   }
 
 }
