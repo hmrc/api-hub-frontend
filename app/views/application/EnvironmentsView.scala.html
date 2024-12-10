@@ -44,6 +44,12 @@
     </div>
 }
 
+@canDeleteCredentials = @{
+    credentials.size > 1 &&
+        (!hipEnvironment.isProductionLike || user.permissions.isPrivileged)
+}
+
+
 @credentialsTabContent() = {
 
     <div class="environment-block-header">
@@ -80,6 +86,13 @@
                     <strong>@messages("environments.created"):</strong>
                     <span class="utcDateTime">@ViewUtils.formatLocalDateTimeContainingUtc(credential.created)</span>
                 </p>
+                @if(canDeleteCredentials) {
+                    <div class="govuk-button-group govuk-!-margin-bottom-3">
+                        <a class="govuk-link govuk-!-margin-bottom-0" href="@controllers.application.routes.EnvironmentsController.onDeleteCredential(application.id, credential.clientId, hipEnvironment.id).url">
+                            @messages("environments.deleteCredential")
+                        </a>
+                    </div>
+                }
             </div>
         }
     }
