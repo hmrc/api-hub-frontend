@@ -17,6 +17,7 @@
 package services
 
 import com.google.inject.{Inject, Singleton}
+import config.HipEnvironment
 import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
 import models.AvailableEndpoint
 import models.accessrequest.{AccessRequest, AccessRequestRequest, AccessRequestStatus}
@@ -235,6 +236,10 @@ class ApiHubService @Inject()(
 
   def fetchDeployments(environmentName: EnvironmentName)(implicit hc: HeaderCarrier): Future[Seq[ApiDeployment]] = {
     applicationsConnector.fetchDeployments(environmentName)
+  }
+
+  def fetchCredentials(applicationId: String, hipEnvironment: HipEnvironment)(implicit hc: HeaderCarrier): Future[Option[Seq[Credential]]] = {
+    applicationsConnector.fetchCredentials(applicationId, hipEnvironment)
   }
 
 }

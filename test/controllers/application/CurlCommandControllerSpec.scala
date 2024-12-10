@@ -67,6 +67,21 @@ class CurlCommandControllerSpec extends SpecBase with MockitoSugar with TestHelp
       }
     }
 
+    "must return OK and the correct JSON for a GET from a support user when the no credentials found" in {
+      forAll(usersWhoCanSupport) {
+        user =>
+          val application = FakeApplication.copy(apis = Seq.empty)
+          val fixture = buildFixture(user, application, None)
+
+          running(fixture.playApplication) {
+            val request = FakeRequest(GET, controllers.application.routes.CurlCommandController.buildCurlCommand(FakeApplication.id, MDTP).url)
+            val result = route(fixture.playApplication, request).value
+
+            status(result) mustEqual OK
+            contentAsJson(result) mustEqual Json.arr()
+          }
+      }
+    }
     "must return OK and the correct JSON for a GET from a support user when the curl commands are generated" in {
       forAll(usersWhoCanSupport) {
         user =>
@@ -142,7 +157,7 @@ object CurlCommandControllerSpec extends SpecBase with MockitoSugar {
   private val formProvider = new AddCredentialChecklistFormProvider()
   private val form = formProvider()
 
-  private def buildFixture(userModel: UserModel = FakeUser, application: Application): Fixture = {
+  private def buildFixture(userModel: UserModel = FakeUser, application: Application, credentials: Option[Seq[Credential]] = Some(Seq.empty)): Fixture = {
     val apiHubService = mock[ApiHubService]
     val curlCommandService = mock[CurlCommandService]
 
@@ -150,6 +165,7 @@ object CurlCommandControllerSpec extends SpecBase with MockitoSugar {
     when(apiHubService.getApplication(any(), any(), any())(any()))
       .thenReturn(Future.successful(Some(application)))
 
+    when(apiHubService.fetchCredentials(any(), any())(any())).thenReturn(Future.successful(credentials))
 
     val playApplication = applicationBuilder(userAnswers = Some(emptyUserAnswers), user = userModel)
       .overrides(
