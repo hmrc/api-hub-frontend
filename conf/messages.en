@@ -233,6 +233,11 @@ environments.clientId = Client ID
 environments.clientSecret = Client secret
 environments.created = Created
 environments.noCredentials = No production credentials have been created.
+environments.deleteCredential = Revoke credential
+environments.credentialNotFound.heading = Credential not found
+environments.credentialNotFound.message = Cannot find credential with ID {0} for application {1}.
+environments.cannotDeleteLastCredential.heading = Cannot revoke last credential
+environments.cannotDeleteLastCredential.message = You cannot revoke the last credential for an application.
 
 addCredentialChecklist.title = Creating production credentials
 addCredentialChecklist.heading = Creating production credentials
