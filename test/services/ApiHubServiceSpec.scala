@@ -18,6 +18,7 @@ package services
 
 import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
 import controllers.actions.FakeApplication
+import fakes.FakeHipEnvironments
 import generators.{AccessRequestGenerator, ApiDetailGenerators, EgressGenerator}
 import models.AvailableEndpoint
 import models.accessrequest.*
@@ -39,7 +40,7 @@ import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.{EitherValues, OptionValues}
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.http.HeaderCarrier
-
+import fakes.FakeHipEnvironments
 import java.time.LocalDateTime
 import scala.concurrent.Future
 
@@ -423,10 +424,10 @@ class ApiHubServiceSpec
       val fixture = buildFixture()
       val expected = Credential("test-client-id", LocalDateTime.now(), Some("test-secret"), Some("test-fragment"))
 
-      when(fixture.applicationsConnector.addCredential(eqTo(FakeApplication.id), eqTo(Primary))(any()))
+      when(fixture.applicationsConnector.addCredential(eqTo(FakeApplication.id), eqTo(FakeHipEnvironments.production))(any()))
         .thenReturn(Future.successful(Right(Some(expected))))
 
-      fixture.service.addCredential(FakeApplication.id, Primary)(HeaderCarrier()).map {
+      fixture.service.addCredential(FakeApplication.id, FakeHipEnvironments.production)(HeaderCarrier()).map {
         actual =>
           actual mustBe Right(Some(expected))
       }
@@ -441,11 +442,11 @@ class ApiHubServiceSpec
       when(fixture.applicationsConnector.deleteCredential(any(), any(), any())(any()))
         .thenReturn(Future.successful(Right(Some(()))))
 
-      fixture.service.deleteCredential(FakeApplication.id, Primary, clientId)(HeaderCarrier()).map {
+      fixture.service.deleteCredential(FakeApplication.id, FakeHipEnvironments.production, clientId)(HeaderCarrier()).map {
         actual =>
           verify(fixture.applicationsConnector).deleteCredential(
             eqTo(FakeApplication.id),
-            eqTo(Primary),
+            eqTo(FakeHipEnvironments.production),
             eqTo(clientId))(any()
           )
 
@@ -900,6 +901,31 @@ class ApiHubServiceSpec
       fixture.service.fetchAllScopes(applicationId)(HeaderCarrier()).map {
         result =>
           result.value mustBe credentialScopes
+      }
+    }
+  }
+
+  "fetchCredentials" - {
+    "must make the correct request to the applications connector and return the expected credentials" in {
+      val fixture = buildFixture()
+      val applicationId = "test-application-id"
+      val environment = FakeHipEnvironments.test
+      val credentials = (1 to 2).map(
+        i =>
+          Credential(
+            clientId = s"test-client-id-$i",
+            created = LocalDateTime.now(),
+            clientSecret = None,
+            secretFragment = None,
+          )
+      )
+
+      when(fixture.applicationsConnector.fetchCredentials(eqTo(applicationId), eqTo(environment))(any))
+        .thenReturn(Future.successful(Some(credentials)))
+
+      fixture.service.fetchCredentials(applicationId, environment)(HeaderCarrier()).map {
+        result =>
+          result.value mustBe credentials
       }
     }
   }

@@ -35,7 +35,7 @@ import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
 import views.html.ErrorTemplate
 import views.html.application.EnvironmentAndCredentialsView
-
+import fakes.FakeHipEnvironments
 import scala.concurrent.Future
 
 class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar with TestHelpers with HtmlValidation {
@@ -125,7 +125,7 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
           redirectLocation(result) mustBe Some(expectedUrl)
           verify(fixture.apiHubService).deleteCredential(
             eqTo(application.id),
-            eqTo(Primary),
+            eqTo(FakeHipEnvironments.production),
             eqTo(clientId))(any()
           )
         }
@@ -191,7 +191,7 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
         .thenReturn(Future.successful(Some(application)))
 
       when(fixture.apiHubService.deleteCredential(any(), any(), any())(any()))
-        .thenReturn(Future.successful(Left(ApplicationCredentialLimitException.forId(FakeApplication.id, Primary))))
+        .thenReturn(Future.successful(Left(ApplicationCredentialLimitException.forId(FakeApplication.id, FakeHipEnvironments.production))))
 
       running(fixture.playApplication) {
         val url = controllers.application.routes.EnvironmentAndCredentialsController.deletePrimaryCredential(application.id, clientId) .url
@@ -237,7 +237,7 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
           redirectLocation(result) mustBe Some(expectedUrl)
           verify(fixture.apiHubService).deleteCredential(
             eqTo(application.id),
-            eqTo(Secondary),
+            eqTo(FakeHipEnvironments.test),
             eqTo(clientId))(any()
           )
         }
@@ -302,7 +302,7 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
         .thenReturn(Future.successful(Some(application)))
 
       when(fixture.apiHubService.deleteCredential(any(), any(), any())(any()))
-        .thenReturn(Future.successful(Left(ApplicationCredentialLimitException.forId(FakeApplication.id, Primary))))
+        .thenReturn(Future.successful(Left(ApplicationCredentialLimitException.forId(FakeApplication.id, FakeHipEnvironments.production))))
 
       running(fixture.playApplication) {
         val url = controllers.application.routes.EnvironmentAndCredentialsController.deleteSecondaryCredential(application.id, clientId) .url

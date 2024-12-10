@@ -20,6 +20,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.typesafe.config.ConfigFactory
 import config.FrontendAppConfig
 import connectors.ApplicationsConnectorSpec.ApplicationGetterBehaviours
+import fakes.FakeHipEnvironments
 import generators.EgressGenerator
 import models.UserEmail
 import models.accessrequest.*
@@ -324,7 +325,7 @@ class ApplicationsConnectorSpec
       val expected = Credential("test-client-id", LocalDateTime.now(), Some("test-secret"), Some("test-fragment"))
 
       stubFor(
-        post(urlEqualTo(s"/api-hub-applications/applications/${FakeApplication.id}/environments/primary/credentials"))
+        post(urlEqualTo(s"/api-hub-applications/applications/${FakeApplication.id}/environments/${FakeHipEnvironments.production.id}/credentials"))
           .withHeader("Accept", equalTo("application/json"))
           .withHeader("Authorization", equalTo("An authentication token"))
           .willReturn(
@@ -334,7 +335,7 @@ class ApplicationsConnectorSpec
           )
       )
 
-      buildConnector(this).addCredential(FakeApplication.id, Primary)(HeaderCarrier()) map {
+      buildConnector(this).addCredential(FakeApplication.id, FakeHipEnvironments.production)(HeaderCarrier()) map {
         actual =>
           actual mustBe Right(Some(expected))
       }
@@ -342,7 +343,7 @@ class ApplicationsConnectorSpec
 
     "must return None if the application was not found" in {
       stubFor(
-        post(urlEqualTo(s"/api-hub-applications/applications/${FakeApplication.id}/environments/primary/credentials"))
+        post(urlEqualTo(s"/api-hub-applications/applications/${FakeApplication.id}/environments/${FakeHipEnvironments.production.id}/credentials"))
           .withHeader("Accept", equalTo("application/json"))
           .withHeader("Authorization", equalTo("An authentication token"))
           .willReturn(
@@ -351,7 +352,7 @@ class ApplicationsConnectorSpec
           )
       )
 
-      buildConnector(this).addCredential(FakeApplication.id, Primary)(HeaderCarrier()) map {
+      buildConnector(this).addCredential(FakeApplication.id, FakeHipEnvironments.production)(HeaderCarrier()) map {
         actual =>
           actual mustBe Right(None)
       }
@@ -359,7 +360,7 @@ class ApplicationsConnectorSpec
 
     "must transform a 409 Conflict response into an ApplicationCredentialLimitException" in {
       stubFor(
-        post(urlEqualTo(s"/api-hub-applications/applications/${FakeApplication.id}/environments/primary/credentials"))
+        post(urlEqualTo(s"/api-hub-applications/applications/${FakeApplication.id}/environments/${FakeHipEnvironments.production.id}/credentials"))
           .withHeader("Accept", equalTo("application/json"))
           .withHeader("Authorization", equalTo("An authentication token"))
           .willReturn(
@@ -368,9 +369,9 @@ class ApplicationsConnectorSpec
           )
       )
 
-      buildConnector(this).addCredential(FakeApplication.id, Primary)(HeaderCarrier()) map {
+      buildConnector(this).addCredential(FakeApplication.id, FakeHipEnvironments.production)(HeaderCarrier()) map {
         actual =>
-          actual mustBe Left(ApplicationCredentialLimitException.forId(FakeApplication.id, Primary))
+          actual mustBe Left(ApplicationCredentialLimitException.forId(FakeApplication.id, FakeHipEnvironments.production))
       }
     }
   }
@@ -380,7 +381,7 @@ class ApplicationsConnectorSpec
       val clientId = "test-client-id"
 
       stubFor(
-        delete(urlEqualTo(s"/api-hub-applications/applications/${FakeApplication.id}/environments/primary/credentials/$clientId"))
+        delete(urlEqualTo(s"/api-hub-applications/applications/${FakeApplication.id}/environments/${FakeHipEnvironments.production.id}/credentials/$clientId"))
           .withHeader("Authorization", equalTo("An authentication token"))
           .willReturn(
             aResponse()
@@ -388,7 +389,7 @@ class ApplicationsConnectorSpec
           )
       )
 
-      buildConnector(this).deleteCredential(FakeApplication.id, Primary, clientId)(HeaderCarrier()) map {
+      buildConnector(this).deleteCredential(FakeApplication.id, FakeHipEnvironments.production, clientId)(HeaderCarrier()) map {
         actual =>
           actual mustBe Right(Some(()))
       }
@@ -398,14 +399,14 @@ class ApplicationsConnectorSpec
       val clientId = "test-client-id"
 
       stubFor(
-        delete(urlEqualTo(s"/api-hub-applications/applications/${FakeApplication.id}/environments/primary/credentials/$clientId"))
+        delete(urlEqualTo(s"/api-hub-applications/applications/${FakeApplication.id}/environments/${FakeHipEnvironments.production.id}/credentials/$clientId"))
           .willReturn(
             aResponse()
               .withStatus(NOT_FOUND)
           )
       )
 
-      buildConnector(this).deleteCredential(FakeApplication.id, Primary, clientId)(HeaderCarrier()) map {
+      buildConnector(this).deleteCredential(FakeApplication.id, FakeHipEnvironments.production, clientId)(HeaderCarrier()) map {
         actual =>
           actual mustBe Right(None)
       }
@@ -415,16 +416,16 @@ class ApplicationsConnectorSpec
       val clientId = "test-client-id"
 
       stubFor(
-        delete(urlEqualTo(s"/api-hub-applications/applications/${FakeApplication.id}/environments/primary/credentials/$clientId"))
+        delete(urlEqualTo(s"/api-hub-applications/applications/${FakeApplication.id}/environments/${FakeHipEnvironments.production.id}/credentials/$clientId"))
           .willReturn(
             aResponse()
               .withStatus(CONFLICT)
           )
       )
 
-      buildConnector(this).deleteCredential(FakeApplication.id, Primary, clientId)(HeaderCarrier()) map {
+      buildConnector(this).deleteCredential(FakeApplication.id, FakeHipEnvironments.production, clientId)(HeaderCarrier()) map {
         actual =>
-          actual mustBe Left(ApplicationCredentialLimitException.forId(FakeApplication.id, Primary))
+          actual mustBe Left(ApplicationCredentialLimitException.forId(FakeApplication.id, FakeHipEnvironments.production))
       }
     }
   }
@@ -1701,6 +1702,81 @@ class ApplicationsConnectorSpec
       buildConnector(this).fetchAllScopes(applicationId)(HeaderCarrier()).map {
         result =>
           result.value mustBe credentialScopes
+      }
+    }
+
+    "fetchCredentials" - {
+      "must place the correct request and return the environment credential" in {
+
+        val applicationId = "test-application-id"
+        val environment = FakeHipEnvironments.test
+
+        val credentials = (1 to 2).map(
+          i =>
+            Credential(
+              clientId = s"test-client-id-$i",
+              created = LocalDateTime.now(),
+              clientSecret = None,
+              secretFragment = None
+            )
+        )
+
+        stubFor(
+          get(urlEqualTo(s"/api-hub-applications/applications/$applicationId/environments/${environment.id}/credentials"))
+            .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
+            .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+            .willReturn(
+              aResponse()
+                .withBody(Json.toJson(credentials).toString)
+            )
+        )
+
+        buildConnector(this).fetchCredentials(applicationId, environment)(HeaderCarrier()).map {
+          result =>
+            result.value mustBe credentials
+        }
+      }
+
+      "must return None on a 404" in {
+
+        val applicationId = "test-application-id"
+        val environment = FakeHipEnvironments.test
+
+        stubFor(
+          get(urlEqualTo(s"/api-hub-applications/applications/$applicationId/environments/${environment.id}/credentials"))
+            .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
+            .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+            .willReturn(
+              aResponse()
+                .withStatus(404)
+            )
+        )
+
+        buildConnector(this).fetchCredentials(applicationId, environment)(HeaderCarrier()).map {
+          result =>
+            result mustBe None
+        }
+      }
+
+      "must recover from an error" in {
+
+        val applicationId = "test-application-id"
+        val environment = FakeHipEnvironments.test
+
+        stubFor(
+          get(urlEqualTo(s"/api-hub-applications/applications/$applicationId/environments/${environment.id}/credentials"))
+            .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
+            .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+            .willReturn(
+              aResponse()
+                .withStatus(500)
+            )
+        )
+
+        val result = buildConnector(this).fetchCredentials(applicationId, environment)(HeaderCarrier())
+        recoverToExceptionIf[UpstreamErrorResponse](result).map { e =>
+          e.statusCode mustBe INTERNAL_SERVER_ERROR
+        }
       }
     }
 

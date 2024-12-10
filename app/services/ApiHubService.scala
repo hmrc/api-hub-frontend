@@ -99,16 +99,16 @@ class ApiHubService @Inject()(
     integrationCatalogueConnector.getApis(platform)
   }
 
-  def addCredential(id: String, environmentName: EnvironmentName)(implicit hc: HeaderCarrier): Future[Either[ApplicationsException, Option[Credential]]] = {
-    applicationsConnector.addCredential(id, environmentName)
+  def addCredential(id: String, hipEnvironment: HipEnvironment)(implicit hc: HeaderCarrier): Future[Either[ApplicationsException, Option[Credential]]] = {
+    applicationsConnector.addCredential(id, hipEnvironment)
   }
 
   def deleteCredential(
                         id: String,
-                        environmentName: EnvironmentName,
+                        hipEnvironment: HipEnvironment,
                         clientId: String
                       )(implicit hc: HeaderCarrier): Future[Either[ApplicationsException, Option[Unit]]] = {
-    applicationsConnector.deleteCredential(id, environmentName, clientId)
+    applicationsConnector.deleteCredential(id, hipEnvironment, clientId)
   }
 
   def getAccessRequests(applicationId: Option[String], status: Option[AccessRequestStatus])(implicit hc: HeaderCarrier): Future[Seq[AccessRequest]] = {
@@ -222,20 +222,24 @@ class ApiHubService @Inject()(
     applicationsConnector.fetchAllScopes(applicationId)
   }
 
+  def fetchCredentials(applicationId: String, hipEnvironment: HipEnvironment)(implicit hc: HeaderCarrier): Future[Option[Seq[Credential]]] = {
+    applicationsConnector.fetchCredentials(applicationId, hipEnvironment)
+  }
+
   def fixScopes(applicationId: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
     applicationsConnector.fixScopes(applicationId)
   }
 
-  def fetchClientScopes(environmentName: EnvironmentName, clientId: String)(implicit hc: HeaderCarrier): Future[Option[Seq[ClientScope]]] = {
-    applicationsConnector.fetchClientScopes(environmentName, clientId)
+  def fetchClientScopes(hipEnvironment: HipEnvironment, clientId: String)(implicit hc: HeaderCarrier): Future[Option[Seq[ClientScope]]] = {
+    applicationsConnector.fetchClientScopes(hipEnvironment, clientId)
   }
 
-  def fetchEgresses(environmentName: EnvironmentName)(implicit hc: HeaderCarrier): Future[Seq[EgressGateway]] = {
-    applicationsConnector.fetchEgresses(environmentName)
+  def fetchEgresses(hipEnvironment: HipEnvironment)(implicit hc: HeaderCarrier): Future[Seq[EgressGateway]] = {
+    applicationsConnector.fetchEgresses(hipEnvironment)
   }
 
-  def fetchDeployments(environmentName: EnvironmentName)(implicit hc: HeaderCarrier): Future[Seq[ApiDeployment]] = {
-    applicationsConnector.fetchDeployments(environmentName)
+  def fetchDeployments(hipEnvironment: HipEnvironment)(implicit hc: HeaderCarrier): Future[Seq[ApiDeployment]] = {
+    applicationsConnector.fetchDeployments(hipEnvironment)
   }
 
   def fetchCredentials(applicationId: String, hipEnvironment: HipEnvironment)(implicit hc: HeaderCarrier): Future[Option[Seq[Credential]]] = {

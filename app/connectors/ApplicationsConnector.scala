@@ -188,34 +188,34 @@ class ApplicationsConnector @Inject()(
 
   def addCredential(
                      id: String,
-                     environmentName: EnvironmentName
+                     hipEnvironment: HipEnvironment
                    )(implicit hc:HeaderCarrier): Future[Either[ApplicationsException, Option[Credential]]] = {
     httpClient
-      .post(url"$applicationsBaseUrl/api-hub-applications/applications/$id/environments/$environmentName/credentials")
+      .post(url"$applicationsBaseUrl/api-hub-applications/applications/$id/environments/${hipEnvironment.id}/credentials")
       .setHeader((ACCEPT, JSON))
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Either[UpstreamErrorResponse, Credential]]
       .flatMap {
         case Right(credential) => Future.successful(Right(Some(credential)))
         case Left(e) if e.statusCode == 404 => Future.successful(Right(None))
-        case Left(e) if e.statusCode == 409 => Future.successful(Left(ApplicationCredentialLimitException.forId(id, environmentName)))
+        case Left(e) if e.statusCode == 409 => Future.successful(Left(ApplicationCredentialLimitException.forId(id, hipEnvironment)))
         case Left(e) => Future.failed(e)
       }
   }
 
   def deleteCredential(
                         id: String,
-                        environmentName: EnvironmentName,
+                        hipEnvironment: HipEnvironment,
                         clientId: String
                       )(implicit hc: HeaderCarrier): Future[Either[ApplicationsException, Option[Unit]]] = {
     httpClient
-      .delete(url"$applicationsBaseUrl/api-hub-applications/applications/$id/environments/$environmentName/credentials/$clientId")
+      .delete(url"$applicationsBaseUrl/api-hub-applications/applications/$id/environments/${hipEnvironment.id}/credentials/$clientId")
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Either[UpstreamErrorResponse, Unit]]
       .flatMap {
         case Right(()) => Future.successful(Right(Some(())))
         case Left(e) if e.statusCode == 404 => Future.successful(Right(None))
-        case Left(e) if e.statusCode == 409 => Future.successful(Left(ApplicationCredentialLimitException.forId(id, environmentName)))
+        case Left(e) if e.statusCode == 409 => Future.successful(Left(ApplicationCredentialLimitException.forId(id, hipEnvironment)))
         case Left(e) => Future.failed(e)
       }
   }
@@ -611,7 +611,6 @@ class ApplicationsConnector @Inject()(
       }
   }
 
-
   def fetchCredentials(applicationId: String, hipEnvironment: HipEnvironment)(implicit hc: HeaderCarrier): Future[Option[Seq[Credential]]] =
     httpClient.get(url"$applicationsBaseUrl/api-hub-applications/applications/$applicationId/environments/${hipEnvironment.id}/credentials")
       .setHeader(ACCEPT -> JSON)
@@ -622,7 +621,7 @@ class ApplicationsConnector @Inject()(
         case Left(e) if e.statusCode == NOT_FOUND => Future.successful(None)
         case Left(e) => Future.failed(e)
       }
-    
+
   def fixScopes(applicationId: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
     httpClient.put(url"$applicationsBaseUrl/api-hub-applications/applications/$applicationId/fix-scopes")
       .setHeader(AUTHORIZATION -> clientAuthToken)
@@ -634,8 +633,8 @@ class ApplicationsConnector @Inject()(
       }
   }
 
-  def fetchClientScopes(environmentName: EnvironmentName, clientId: String)(implicit hc: HeaderCarrier): Future[Option[Seq[ClientScope]]] = {
-    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/environment-parity-test/client-scopes/$environmentName/$clientId")
+  def fetchClientScopes(hipEnvironment: HipEnvironment, clientId: String)(implicit hc: HeaderCarrier): Future[Option[Seq[ClientScope]]] = {
+    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/environment-parity-test/client-scopes/${hipEnvironment.id}/$clientId")
       .setHeader(ACCEPT -> JSON)
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Either[UpstreamErrorResponse, Seq[ClientScope]]]
@@ -647,15 +646,15 @@ class ApplicationsConnector @Inject()(
 
   }
 
-  def fetchEgresses(environmentName: EnvironmentName)(implicit hc: HeaderCarrier): Future[Seq[EgressGateway]] = {
-    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/environment-parity-test/egresses/$environmentName")
+  def fetchEgresses(hipEnvironment: HipEnvironment)(implicit hc: HeaderCarrier): Future[Seq[EgressGateway]] = {
+    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/environment-parity-test/egresses/${hipEnvironment.id}")
       .setHeader(ACCEPT -> JSON)
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Seq[EgressGateway]]
   }
 
-  def fetchDeployments(environmentName: EnvironmentName)(implicit hc: HeaderCarrier): Future[Seq[ApiDeployment]] = {
-    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/environment-parity-test/deployments/$environmentName")
+  def fetchDeployments(hipEnvironment: HipEnvironment)(implicit hc: HeaderCarrier): Future[Seq[ApiDeployment]] = {
+    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/environment-parity-test/deployments/${hipEnvironment.id}")
       .setHeader(ACCEPT -> JSON)
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Seq[ApiDeployment]]
