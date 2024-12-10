@@ -22,53 +22,11 @@ import models.user.UserModel
 
 object ApplicationLenses {
 
-  val applicationEnvironments: Lens[Application, Environments] =
-    Lens[Application, Environments](
-      get = _.environments,
-      set = (application, environments) => application.copy(environments = environments)
-    )
-
-  val environmentScopes: Lens[Environment, Seq[Scope]] =
-    Lens[Environment, Seq[Scope]](
-      get = _.scopes,
-      set = (environment, scopes) => environment.copy(scopes = scopes)
-    )
-
-  val environmentCredentials: Lens[Environment, Seq[Credential]] =
-    Lens[Environment, Seq[Credential]](
+  val applicationCredentials: Lens[Application, Set[Credential]] =
+    Lens[Application, Set[Credential]](
       get = _.credentials,
-      set = (environment, credentials) => environment.copy(credentials = credentials)
+      set = (application, credentials) => application.copy(credentials = credentials)
     )
-
-  val environmentPrimary: Lens[Environments, Environment] =
-    Lens[Environments, Environment](
-      get = _.primary,
-      set = (environments, primary) => environments.copy(primary = primary)
-    )
-
-  val applicationPrimary: Lens[Application, Environment] =
-    Lens.compose(applicationEnvironments, environmentPrimary)
-
-  val applicationPrimaryScopes: Lens[Application, Seq[Scope]] =
-    Lens.compose(applicationPrimary, environmentScopes)
-
-  val applicationPrimaryCredentials: Lens[Application, Seq[Credential]] =
-    Lens.compose(applicationPrimary, environmentCredentials)
-
-  val environmentSecondary: Lens[Environments, Environment] =
-    Lens[Environments, Environment](
-      get = _.secondary,
-      set = (environments, secondary) => environments.copy(secondary = secondary)
-    )
-
-  val applicationSecondary: Lens[Application, Environment] =
-    Lens.compose(applicationEnvironments, environmentSecondary)
-
-  val applicationSecondaryScopes: Lens[Application, Seq[Scope]] =
-    Lens.compose(applicationSecondary, environmentScopes)
-
-  val applicationSecondaryCredentials: Lens[Application, Seq[Credential]] =
-    Lens.compose(applicationSecondary, environmentCredentials)
 
   val applicationTeamMembers: Lens[Application, Seq[TeamMember]] =
     Lens[Application, Seq[TeamMember]](
@@ -91,53 +49,60 @@ object ApplicationLenses {
   implicit class ApplicationLensOps(application: Application) {
 
     def setScopes(environmentName: EnvironmentName, scopes: Seq[Scope]): Application = {
-      environmentName match {
-        case Primary => applicationPrimaryScopes.set(application, scopes)
-        case Secondary => applicationSecondaryScopes.set(application, scopes)
-      }
+      application
     }
 
     def setScopes(hipEnvironment: HipEnvironment, scopes: Seq[Scope]): Application = {
       setScopes(hipEnvironment.environmentName, scopes)
     }
 
+    private def getCredentials(environmentId: String): Seq[Credential] = {
+      applicationCredentials
+        .get(application)
+        .filter(_.environmentId == environmentId)
+        .toSeq
+        .sortBy(_.created)
+    }
+
     def getCredentials(environmentName: EnvironmentName): Seq[Credential] = {
       environmentName match {
-        case Primary => applicationPrimaryCredentials.get(application)
-        case Secondary => applicationSecondaryCredentials.get(application)
+        case Primary => getCredentials(EnvironmentName.primaryEnvironmentId)
+        case Secondary => getCredentials(EnvironmentName.secondaryEnvironmentId)
       }
     }
 
     def getCredentials(hipEnvironment: HipEnvironment): Seq[Credential] = {
-      getCredentials(hipEnvironment.environmentName)
+      getCredentials(hipEnvironment.id)
     }
 
     def getMasterCredential(environmentName: EnvironmentName): Option[Credential] = {
-      environmentName match {
-        case Primary =>
-          applicationPrimaryCredentials.get(application)
-            .sortWith((a, b) => a.created.isAfter(b.created))
-            .headOption
-        case Secondary =>
-          applicationSecondaryCredentials.get(application)
-            .sortWith((a, b) => a.created.isAfter(b.created))
-            .headOption
-      }
+      getCredentials(environmentName)
+        .sortWith((a, b) => a.created.isAfter(b.created))
+        .headOption
     }
 
     def getMasterCredential(hipEnvironment: HipEnvironment): Option[Credential] = {
       getMasterCredential(hipEnvironment.environmentName)
     }
 
+    private def setCredentials(environmentId: String, credentials: Seq[Credential]): Application = {
+      applicationCredentials.set(
+        application,
+        applicationCredentials
+          .get(application)
+          .filterNot(_.environmentId == environmentId) ++ credentials.toSet
+      )
+    }
+
     def setCredentials(environmentName: EnvironmentName, credentials: Seq[Credential]): Application = {
       environmentName match {
-        case Primary => applicationPrimaryCredentials.set(application, credentials)
-        case Secondary => applicationSecondaryCredentials.set(application, credentials)
+        case Primary => setCredentials(EnvironmentName.primaryEnvironmentId, credentials)
+        case Secondary => setCredentials(EnvironmentName.secondaryEnvironmentId, credentials)
       }
     }
 
     def setCredentials(hipEnvironment: HipEnvironment, credentials: Seq[Credential]): Application = {
-      setCredentials(hipEnvironment.environmentName, credentials)
+      setCredentials(hipEnvironment.id, credentials)
     }
 
     def setTeamId(teamId: String): Application = {

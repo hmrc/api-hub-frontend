@@ -42,7 +42,7 @@
 }
 
 @clientIds(application: Application) = @{
-    Seq(application.environments.primary, application.environments.secondary).flatMap(_.credentials.map(_.clientId)).mkString(",")
+    application.credentials.map(_.clientId).mkString(",")
 }
 
 @layout(

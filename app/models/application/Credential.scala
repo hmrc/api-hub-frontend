@@ -20,7 +20,7 @@ import play.api.libs.json.{Format, Json}
 
 import java.time.LocalDateTime
 
-case class Credential(clientId: String, created: LocalDateTime, clientSecret: Option[String], secretFragment: Option[String])
+case class Credential(clientId: String, created: LocalDateTime, clientSecret: Option[String], secretFragment: Option[String], environmentId: String)
 
 object Credential {
 
