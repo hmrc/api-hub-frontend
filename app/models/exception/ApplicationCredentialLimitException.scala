@@ -16,15 +16,15 @@
 
 package models.exception
 
-import models.application.EnvironmentName
+import config.HipEnvironment
 
 //noinspection ScalaStyle
 case class ApplicationCredentialLimitException(message: String) extends ApplicationsException(message, null)
 
 object ApplicationCredentialLimitException {
 
-  def forId(id: String, environmentName: EnvironmentName): ApplicationCredentialLimitException = {
-    ApplicationCredentialLimitException(s"Application $id has reached its $environmentName credential limit.")
+  def forId(id: String, hipEnvironment: HipEnvironment): ApplicationCredentialLimitException = {
+    ApplicationCredentialLimitException(s"Application $id has reached its ${hipEnvironment.id} credential limit.")
   }
-
+  
 }
