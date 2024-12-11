@@ -80,6 +80,20 @@ class HipEnvironmentsSpec extends AnyFreeSpec with Matchers with TableDrivenProp
         hipEnvironments.forEnvironmentNameOptional(environmentName) mustBe Some(expectedEnvironment)
       }
     }
+
+    "must retrieve the expected environments from url path parameter" in {
+      val hipEnvironments = HipEnvironmentsImpl(hipEnvironmentsConfig)
+
+      forAll(Table(
+        ("parameter", "expectedEnvironment"),
+        ("primary", expectedHipEnvironments.head),
+        ("production", expectedHipEnvironments.head),
+        ("secondary", expectedHipEnvironments.last),
+        ("test", expectedHipEnvironments.last),
+      )) { (parameterValue: String, expectedEnvironment: HipEnvironment) =>
+        hipEnvironments.forUrlPathParameter(parameterValue) mustBe expectedEnvironment
+      }
+    }
   }
 
 }

@@ -59,14 +59,9 @@ trait HipEnvironments {
       .getOrElse(throw new IllegalArgumentException(s"No configuration for environment $environmentName"))
   }
 
-  def forId(environment: String): HipEnvironment = {
-    environments.find(_.id == environment)
-      .getOrElse(throw new IllegalArgumentException(s"No configuration for environment $environment"))
-  }
-
   def forUrlPathParameter(pathParameter: String): HipEnvironment =
     environments.find(hipEnvironment => hipEnvironment.environmentName.toString == pathParameter || hipEnvironment.id == pathParameter)
-      .getOrElse(throw new IllegalArgumentException(s"No configuration for environment $pathParameter")) //TODO refactor this
+      .getOrElse(throw new IllegalArgumentException(s"No configuration for environment $pathParameter"))
 
 }
 
