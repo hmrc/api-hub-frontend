@@ -7,7 +7,7 @@ GET         /apis/:id                                                           
 GET         /environment-and-credentials/:id                                        controllers.application.EnvironmentAndCredentialsController.onPageLoad(id: String)
 GET         /environments/:id/:environment                                          controllers.application.EnvironmentsController.onPageLoad(id: String, environment: String)
 
-GET         /delete-credentials/:id/client/:clientId/environment/:environmentId     controllers.application.EnvironmentsController.onDeleteCredential(id: String, clientId: String, environmentId: String)
+POST        /delete-credentials/:id/client/:clientId/environment/:environmentId     controllers.application.EnvironmentsController.onDeleteCredential(id: String, clientId: String, environmentId: String)
 
 GET         /add-credential-checklist/:id                                           controllers.application.AddCredentialController.checklist(id: String)
 POST        /add-credential-success/:id                                             controllers.application.AddCredentialController.addProductionCredential(id: String)

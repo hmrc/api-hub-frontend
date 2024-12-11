@@ -66,7 +66,7 @@ class EnvironmentsController @Inject()(
     implicit request =>
       hipEnvironments.environments.find(_.id == environmentId)
         .map { hipEnvironment =>
-          val url = s"${routes.EnvironmentsController.onPageLoad(id, environmentId).url}#${hipEnvironment.id}-credentials"
+          val url = s"${routes.EnvironmentsController.onPageLoad(id, environmentId).url}#credentials"
           deleteCredential(id, clientId, hipEnvironment, url)
         }.getOrElse(
           Future.successful(errorResultBuilder.environmentNotFound(environmentId))
@@ -90,7 +90,7 @@ class EnvironmentsController @Inject()(
     else Future.successful((applicationEnvironmentCredentials, false))
 
   private def deleteCredential(id: String, clientId: String, hipEnvironment: HipEnvironment, url: String)(implicit request: ApplicationRequest[?]) = {
-    if (!hipEnvironment.isProductionLike || request.identifierRequest.user.permissions.canSupport || request.identifierRequest.user.permissions.isPrivileged) {
+    if (!hipEnvironment.isProductionLike || request.identifierRequest.user.permissions.isPrivileged) {
       apiHubService.deleteCredential(id, hipEnvironment, clientId).map {
         case Right(Some(())) => Redirect(url)
         case Right(None) => credentialNotFound(id, clientId)

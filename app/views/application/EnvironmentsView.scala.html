@@ -87,11 +87,13 @@
                     <span class="utcDateTime">@ViewUtils.formatLocalDateTimeContainingUtc(credential.created)</span>
                 </p>
                 @if(canDeleteCredentials) {
-                    <div class="govuk-button-group govuk-!-margin-bottom-3">
-                        <a class="govuk-link govuk-!-margin-bottom-0" href="@controllers.application.routes.EnvironmentsController.onDeleteCredential(application.id, credential.clientId, hipEnvironment.id).url">
-                            @messages("environments.deleteCredential")
-                        </a>
-                    </div>
+                    @formHelper(action = controllers.application.routes.EnvironmentsController.onDeleteCredential(application.id, credential.clientId, hipEnvironment.id)) {
+                        <div class="govuk-button-group govuk-!-margin-bottom-3">
+                            @govukButton(
+                                ButtonViewModel(messages("environments.deleteCredential")).asSecondaryButton().withCssClass("govuk-!-margin-bottom-0")
+                            )
+                        </div>
+                    }
                 }
             </div>
         }
@@ -108,7 +110,7 @@
         @govukTabs(Tabs(
             items = Seq(
                 TabItem(
-                    id = Some(s"${hipEnvironment.id}-credentials"),
+                    id = Some("credentials"),
                     label = messages("applicationDetails.environments.crendentials"),
                     panel = TabPanel(
                         content = HtmlContent(credentialsTabContent())

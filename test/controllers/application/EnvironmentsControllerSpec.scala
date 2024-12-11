@@ -71,7 +71,7 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
             status(result) mustEqual OK
             contentAsString(result) mustBe view(FakeApplication, user, FakeHipEnvironments.test, credentials, false)(request, messages(fixture.playApplication)).toString
             contentAsString(result) must validateAsHtml
-            contentAsString(result) must include("""id="test-credentials"""")
+            contentAsString(result) must include("""id="credentials"""")
           }
       }
     }
@@ -140,7 +140,7 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
 
             status(result) mustEqual OK
             contentAsString(result) mustBe view(FakeApplication, user, FakeHipEnvironments.test, FakeApplication.getCredentials(FakeHipEnvironments.test), errorRetrievingCredentials = true)(request, messages(fixture.playApplication)).toString
-            contentAsString(result) must include("""id="test-credentials"""")
+            contentAsString(result) must include("""id="credentials"""")
           }
       }
     }
@@ -176,9 +176,9 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
             .thenReturn(Future.successful(Right(Some(()))))
           running(fixture.playApplication) {
             val url = controllers.application.routes.EnvironmentsController.onDeleteCredential(application.id, clientId, environment.id).url
-            val request = FakeRequest(GET, url)
+            val request = FakeRequest(POST, url)
             val result = route(fixture.playApplication, request).value
-            val expectedUrl = controllers.application.routes.EnvironmentsController.onPageLoad(application.id, environment.id).url + s"#${environment.id}-credentials"
+            val expectedUrl = controllers.application.routes.EnvironmentsController.onPageLoad(application.id, environment.id).url + "#credentials"
             status(result) mustBe SEE_OTHER
             redirectLocation(result) mustBe Some(expectedUrl)
             verify(fixture.apiHubService).deleteCredential(
@@ -197,7 +197,7 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
             .thenReturn(Future.successful(Some(application)))
           running(fixture.playApplication) {
             val url = controllers.application.routes.EnvironmentsController.onDeleteCredential(application.id, "test-client-id", FakeHipEnvironments.production.id).url
-            val request = FakeRequest(GET, url)
+            val request = FakeRequest(POST, url)
             val result = route(fixture.playApplication, request).value
             status(result) mustBe SEE_OTHER
             redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad.url)
@@ -215,7 +215,7 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
           .thenReturn(Future.successful(Right(None)))
         running(fixture.playApplication) {
           val url = controllers.application.routes.EnvironmentsController.onDeleteCredential(application.id, clientId, environment.id).url
-          val request = FakeRequest(GET, url)
+          val request = FakeRequest(POST, url)
           val result = route(fixture.playApplication, request).value
           val view = fixture.playApplication.injector.instanceOf[ErrorTemplate]
           status(result) mustBe NOT_FOUND
@@ -240,7 +240,7 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
           .thenReturn(Future.successful(Left(ApplicationCredentialLimitException.forId(FakeApplication.id, FakeHipEnvironments.production))))
         running(fixture.playApplication) {
           val url = controllers.application.routes.EnvironmentsController.onDeleteCredential(application.id, clientId, environment.id).url
-          val request = FakeRequest(GET, url)
+          val request = FakeRequest(POST, url)
           val result = route(fixture.playApplication, request).value
           val view = fixture.playApplication.injector.instanceOf[ErrorTemplate]
           status(result) mustBe BAD_REQUEST
