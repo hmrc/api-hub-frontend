@@ -78,7 +78,7 @@
                         Button(
                             classes = "govuk-button--secondary",
                             content = Text(messages("environmentAndCredentials.addNewCredential"))
-                        ).disabled(application.getCredentials(hipEnvironment).size >= 5).withId("addTestCredentialButton")
+                        ).disabled(application.getCredentials(hipEnvironment).size >= 5).withId("addCredentialButton")
                     )
                 }
             }
@@ -115,7 +115,7 @@
     } else {
         @for(credential <- credentials) {
             <div class="api-panel api-panel--small">
-                <p data-test-credential-client-id="@credential.clientId" class="govuk-body govuk-!-margin-bottom-3">
+                <p data-credential-client-id="@credential.clientId" class="govuk-body govuk-!-margin-bottom-3">
                     <strong>@messages("environments.clientId"):</strong>
                     @credential.clientId
                 </p>

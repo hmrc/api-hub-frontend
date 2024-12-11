@@ -22,6 +22,7 @@ import controllers.actions.{ApplicationAuthActionProvider, IdentifierAction}
 import controllers.helpers.ErrorResultBuilder
 import models.application.*
 import models.application.ApplicationLenses.*
+import models.exception.ApplicationCredentialLimitException
 import models.requests.ApplicationRequest
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.*
