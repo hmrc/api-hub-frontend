@@ -128,6 +128,7 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
 
             val result = route(fixture.playApplication, request).value
             val view = fixture.playApplication.injector.instanceOf[AddCredentialSuccessView]
+            val credentialsPageUrl = controllers.application.routes.EnvironmentsController.onPageLoad(FakeApplication.id, "production").url
 
             val summaryList = AddCredentialSuccessViewModel.buildSummary(
               application,
@@ -136,7 +137,7 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
             )
 
             status(result) mustBe OK
-            contentAsString(result) mustBe view(application, summaryList, Some(user), credential).toString()
+            contentAsString(result) mustBe view(application, summaryList, Some(user), credential, credentialsPageUrl).toString()
             contentAsString(result) must validateAsHtml
           }
       }
@@ -207,7 +208,7 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
         val result = route(fixture.playApplication, request).value
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe controllers.application.routes.EnvironmentAndCredentialsController.onPageLoad(FakeApplication.id).url
+        redirectLocation(result).value mustBe controllers.application.routes.EnvironmentsController.onPageLoad(FakeApplication.id, "test").url
       }
     }
 
