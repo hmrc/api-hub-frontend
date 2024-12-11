@@ -51,7 +51,7 @@ class EnvironmentsController @Inject()(
           retrieveCredentials(request.application, hipEnvironment)
             .map { case (credentials, hasFailedRetrieval) =>
                 Ok(
-                  view(request.application, request.identifierRequest.user, hipEnvironment, credentials, hasFailedRetrieval)
+                  view(request.application, request.identifierRequest.user, hipEnvironment, credentials, config.helpDocsPath, hasFailedRetrieval)
                 )
             }
         ).getOrElse(
