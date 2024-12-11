@@ -322,7 +322,7 @@ class ApplicationsConnectorSpec
 
   "ApplicationsConnector.addCredential" - {
     "must place the correct request and return the new Credential" in {
-      val expected = Credential("test-client-id", LocalDateTime.now(), Some("test-secret"), Some("test-fragment"))
+      val expected = Credential("test-client-id", LocalDateTime.now(), Some("test-secret"), Some("test-fragment"), FakeHipEnvironments.production.id)
 
       stubFor(
         post(urlEqualTo(s"/api-hub-applications/applications/${FakeApplication.id}/environments/${FakeHipEnvironments.production.id}/credentials"))
@@ -1717,7 +1717,8 @@ class ApplicationsConnectorSpec
               clientId = s"test-client-id-$i",
               created = LocalDateTime.now(),
               clientSecret = None,
-              secretFragment = None
+              secretFragment = None,
+              environmentId = environment.id
             )
         )
 
@@ -1874,8 +1875,8 @@ object ApplicationsConnectorSpec extends HttpClientV2Support {
     LocalDateTime.now(),
     None,
     Seq(TeamMember(FakeUser.email)),
-    Environments(),
-    Seq.empty
+    Seq.empty,
+    credentials = Set.empty
   )
 
   val invalidOasResponse: InvalidOasResponse = InvalidOasResponse(
