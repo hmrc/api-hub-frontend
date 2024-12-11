@@ -17,14 +17,16 @@
 package controllers.application
 
 import base.SpecBase
-import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
+import config.HipEnvironments
+import controllers.actions.*
 import controllers.routes
 import fakes.FakeHipEnvironments
 import models.application.ApplicationLenses.*
 import models.application.Credential
+import models.exception.ApplicationCredentialLimitException
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -69,7 +71,7 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
             status(result) mustEqual OK
             contentAsString(result) mustBe view(FakeApplication, user, FakeHipEnvironments.test, credentials, false)(request, messages(fixture.playApplication)).toString
             contentAsString(result) must validateAsHtml
-            contentAsString(result) must include("""id="test-credentials"""")
+            contentAsString(result) must include("""id="credentials"""")
           }
       }
     }
@@ -138,7 +140,7 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
 
             status(result) mustEqual OK
             contentAsString(result) mustBe view(FakeApplication, user, FakeHipEnvironments.test, FakeApplication.getCredentials(FakeHipEnvironments.test), errorRetrievingCredentials = true)(request, messages(fixture.playApplication)).toString
-            contentAsString(result) must include("""id="test-credentials"""")
+            contentAsString(result) must include("""id="credentials"""")
           }
       }
     }
@@ -155,6 +157,102 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad.url)
+      }
+    }
+
+    "onDeleteCredential" - {
+      "must delete the credential and redirect to the Environments page" in {
+        val clientId = "test-client-id"
+        forAll(Table(
+          ("environment", "user"),
+          (FakeHipEnvironments.test, FakeUser),
+          (FakeHipEnvironments.production, FakePrivilegedUser),
+        )) { case (environment, user) =>
+          val application = FakeApplication.addTeamMember(user.email)
+          val fixture = buildFixture(user)
+          when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))
+            .thenReturn(Future.successful(Some(application)))
+          when(fixture.apiHubService.deleteCredential(any(), any(), any())(any()))
+            .thenReturn(Future.successful(Right(Some(()))))
+          running(fixture.playApplication) {
+            val url = controllers.application.routes.EnvironmentsController.onDeleteCredential(application.id, clientId, environment.id).url
+            val request = FakeRequest(POST, url)
+            val result = route(fixture.playApplication, request).value
+            val expectedUrl = controllers.application.routes.EnvironmentsController.onPageLoad(application.id, environment.id).url + "#credentials"
+            status(result) mustBe SEE_OTHER
+            redirectLocation(result) mustBe Some(expectedUrl)
+            verify(fixture.apiHubService).deleteCredential(
+              eqTo(application.id),
+              eqTo(environment),
+              eqTo(clientId))(any()
+            )
+          }
+        }
+      }
+      "must redirect to the unauthorised page for users who cannot delete production credentials" in {
+        forAll(usersWhoCannotDeletePrimaryCredentials) { (user: UserModel) =>
+          val application = FakeApplication.addTeamMember(user.email)
+          val fixture = buildFixture(user)
+          when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))
+            .thenReturn(Future.successful(Some(application)))
+          running(fixture.playApplication) {
+            val url = controllers.application.routes.EnvironmentsController.onDeleteCredential(application.id, "test-client-id", FakeHipEnvironments.production.id).url
+            val request = FakeRequest(POST, url)
+            val result = route(fixture.playApplication, request).value
+            status(result) mustBe SEE_OTHER
+            redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad.url)
+          }
+        }
+      }
+      "must display a Not Found page when the credential does not exist" in {
+        val clientId = "test-client-id"
+        val environment = FakeHipEnvironments.production
+        val application = FakeApplication.addTeamMember(FakePrivilegedUser.email)
+        val fixture = buildFixture(FakePrivilegedUser)
+        when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))
+          .thenReturn(Future.successful(Some(application)))
+        when(fixture.apiHubService.deleteCredential(any(), any(), any())(any()))
+          .thenReturn(Future.successful(Right(None)))
+        running(fixture.playApplication) {
+          val url = controllers.application.routes.EnvironmentsController.onDeleteCredential(application.id, clientId, environment.id).url
+          val request = FakeRequest(POST, url)
+          val result = route(fixture.playApplication, request).value
+          val view = fixture.playApplication.injector.instanceOf[ErrorTemplate]
+          status(result) mustBe NOT_FOUND
+          contentAsString(result) mustBe
+            view(
+              "Page not found - 404",
+              "Credential not found",
+              s"Cannot find credential with ID $clientId for application ${application.id}."
+            )(request, messages(fixture.playApplication))
+              .toString()
+          contentAsString(result) must validateAsHtml
+        }
+      }
+      "must display a Bad Request page when the user attempts to delete the last credential" in {
+        val clientId = "test-client-id"
+        val environment = FakeHipEnvironments.production
+        val application = FakeApplication.addTeamMember(FakePrivilegedUser.email)
+        val fixture = buildFixture(FakePrivilegedUser)
+        when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))
+          .thenReturn(Future.successful(Some(application)))
+        when(fixture.apiHubService.deleteCredential(any(), any(), any())(any()))
+          .thenReturn(Future.successful(Left(ApplicationCredentialLimitException.forId(FakeApplication.id, FakeHipEnvironments.production))))
+        running(fixture.playApplication) {
+          val url = controllers.application.routes.EnvironmentsController.onDeleteCredential(application.id, clientId, environment.id).url
+          val request = FakeRequest(POST, url)
+          val result = route(fixture.playApplication, request).value
+          val view = fixture.playApplication.injector.instanceOf[ErrorTemplate]
+          status(result) mustBe BAD_REQUEST
+          contentAsString(result) mustBe
+            view(
+              "Bad request - 400",
+              "Cannot revoke last credential",
+              "You cannot revoke the last credential for an application."
+            )(request, messages(fixture.playApplication))
+              .toString()
+          contentAsString(result) must validateAsHtml
+        }
       }
     }
   }

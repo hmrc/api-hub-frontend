@@ -24,6 +24,7 @@ import models.application.*
 import models.exception.ApplicationCredentialLimitException
 import models.user.Permissions
 import models.application.ApplicationLenses.*
+import models.requests.ApplicationRequest
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.*
 import services.ApiHubService
@@ -61,6 +62,17 @@ class EnvironmentsController @Inject()(
         )
   }
 
+  def onDeleteCredential(id: String, clientId: String, environmentId: String): Action[AnyContent] = (identify andThen applicationAuth(id)).async {
+    implicit request =>
+      hipEnvironments.environments.find(_.id == environmentId)
+        .map { hipEnvironment =>
+          val url = s"${routes.EnvironmentsController.onPageLoad(id, environmentId).url}#credentials"
+          deleteCredential(id, clientId, hipEnvironment, url)
+        }.getOrElse(
+          Future.successful(errorResultBuilder.environmentNotFound(environmentId))
+        )
+  }
+
   private def retrieveCredentials(
                                    application: Application,
                                    hipEnvironment: HipEnvironment
@@ -76,5 +88,32 @@ class EnvironmentsController @Inject()(
           case NonFatal(_) => (applicationEnvironmentCredentials, true)
         }
     else Future.successful((applicationEnvironmentCredentials, false))
+
+  private def deleteCredential(id: String, clientId: String, hipEnvironment: HipEnvironment, url: String)(implicit request: ApplicationRequest[?]) = {
+    if (!hipEnvironment.isProductionLike || request.identifierRequest.user.permissions.isPrivileged) {
+      apiHubService.deleteCredential(id, hipEnvironment, clientId).map {
+        case Right(Some(())) => Redirect(url)
+        case Right(None) => credentialNotFound(id, clientId)
+        case Left(_: ApplicationCredentialLimitException) => lastCredential()
+        case Left(e) => throw e
+      }
+    } else {
+      Future.successful(Redirect(controllers.routes.UnauthorisedController.onPageLoad))
+    }
+  }
+
+  private def credentialNotFound(applicationId: String, clientId: String)(implicit request: Request[?]): Result = {
+    errorResultBuilder.notFound(
+      heading = Messages("environments.credentialNotFound.heading"),
+      message = Messages("environments.credentialNotFound.message", clientId, applicationId)
+    )
+  }
+
+  private def lastCredential()(implicit request: Request[?]): Result = {
+    errorResultBuilder.badRequest(
+      heading = Messages("environments.cannotDeleteLastCredential.heading"),
+      message = Messages("environments.cannotDeleteLastCredential.message")
+    )
+  }
 
 }
