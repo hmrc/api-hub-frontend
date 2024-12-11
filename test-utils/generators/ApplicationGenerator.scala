@@ -16,7 +16,9 @@
 
 package generators
 
-import models.application._
+import config.HipEnvironment
+import fakes.FakeHipEnvironments
+import models.application.*
 import org.scalacheck.rng.Seed
 import org.scalacheck.{Arbitrary, Gen}
 
@@ -59,10 +61,8 @@ trait ApplicationGenerator {
     } yield TeamMember(email)
   }
 
-  val scopeGenerator: Gen[Scope] = {
-    for {
-      name <- Gen.alphaStr
-    } yield Scope(name)
+  val hipEnvironmentGenerator: Gen[HipEnvironment] = {
+    Gen.oneOf(FakeHipEnvironments.environments)
   }
 
   val credentialGenerator: Gen[Credential] = {
@@ -70,21 +70,8 @@ trait ApplicationGenerator {
       clientId <- Gen.uuid
       clientSecret <- Gen.uuid
       created <- localDateTimeGenerator
-    } yield Credential(clientId.toString, created, Some(clientSecret.toString), Some(clientSecret.toString.takeRight(4)))
-  }
-
-  val environmentGenerator: Gen[Environment] = {
-    for {
-      scopes <- Gen.listOf(scopeGenerator)
-      credentials <- Gen.listOf(credentialGenerator)
-    } yield Environment(scopes, credentials)
-  }
-
-  val environmentsGenerator: Gen[Environments] = {
-    for {
-      primary <- environmentGenerator
-      secondary <- environmentGenerator
-    } yield Environments(primary,secondary)
+      hipEnvironment <- hipEnvironmentGenerator
+    } yield Credential(clientId.toString, created, Some(clientSecret.toString), Some(clientSecret.toString.takeRight(4)), hipEnvironment.id)
   }
 
   private def applicationGen: Gen[Application] = Gen.sized { _ =>
@@ -96,7 +83,7 @@ trait ApplicationGenerator {
       lastUpdated <- localDateTimeGenerator
       teamId <- teamIdGenerator
       teamMembers <- Gen.listOf(teamMemberGenerator)
-      environments <- environmentsGenerator
+      credentials <- Gen.listOf(credentialGenerator)
     } yield
       Application(
         appId,
@@ -106,8 +93,8 @@ trait ApplicationGenerator {
         lastUpdated,
         teamId,
         teamMembers,
-        environments,
-        Seq.empty
+        Seq.empty,
+        credentials = credentials.toSet
       )
   }
 

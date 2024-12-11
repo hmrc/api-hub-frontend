@@ -105,6 +105,10 @@ object ApplicationLenses {
       setCredentials(hipEnvironment.id, credentials)
     }
 
+    def setCredentials(credentials: Set[Credential]): Application = {
+      applicationCredentials.set(application, credentials)
+    }
+
     def setTeamId(teamId: String): Application = {
       application.copy(teamId = Some(teamId))
     }

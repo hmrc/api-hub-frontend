@@ -19,6 +19,7 @@ package controllers.application
 import base.SpecBase
 import controllers.actions.{FakeApplication, FakePrivilegedUser, FakeUser, FakeUserNotTeamMember}
 import controllers.routes
+import fakes.FakeHipEnvironments
 import forms.AddCredentialChecklistFormProvider
 import models.api.{ApiDetail, Live, Maintainer}
 import models.application.{Api, Application, Credential, Primary, Secondary}
@@ -111,7 +112,7 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
           )
 
           val fixture = buildFixture(user, Some(application))
-          val credential = Credential("test-client-id", LocalDateTime.now(clock), Some("test-secret"), Some("test-fragment"))
+          val credential = Credential("test-client-id", LocalDateTime.now(clock), Some("test-secret"), Some("test-fragment"), FakeHipEnvironments.production.id)
 
           when(fixture.apiHubService.addCredential(eqTo(application.id), argThat(hipEnvironment => hipEnvironment.isProductionLike))(any()))
             .thenReturn(Future.successful(Right(Some(credential))))
@@ -198,7 +199,7 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
     "must add the credential and redirect to the Environments and Credentials page" in {
       val fixture = buildFixture()
 
-      val credential = Credential("test-client-id", LocalDateTime.now(clock), Some("test-secret"), Some("test-fragment"))
+      val credential = Credential("test-client-id", LocalDateTime.now(clock), Some("test-secret"), Some("test-fragment"), FakeHipEnvironments.test.id)
 
       when(fixture.apiHubService.addCredential(eqTo(FakeApplication.id), argThat(hipEnvironment => !hipEnvironment.isProductionLike))(any()))
         .thenReturn(Future.successful(Right(Some(credential))))

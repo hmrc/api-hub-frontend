@@ -18,9 +18,11 @@ package services
 
 import base.SpecBase
 import controllers.actions.{FakeApiDetail, FakeApplication}
+import fakes.FakeHipEnvironments
 import io.swagger.v3.oas.models.servers.Server
 import models.api.{Endpoint, EndpointMethod}
-import models.application.{Api, Credential, Environment, Environments, SelectedEndpoint}
+import models.application.ApplicationLenses.ApplicationLensOps
+import models.application.{Api, Credential, SelectedEndpoint}
 import models.{CORPORATE, CurlCommand, MDTP}
 import org.mockito.ArgumentMatchers.{any, anyString}
 import org.mockito.Mockito.when
@@ -196,7 +198,7 @@ class CurlCommandServiceSpec extends SpecBase with MockitoSugar {
 
     "must return the correct curl commands if the oas file can be parsed" in {
       val service = new CurlCommandService()
-      val credential = Credential("client-id", LocalDateTime.now, Some("client-secret"), None)
+      val credential = Credential("client-id", LocalDateTime.now, Some("client-secret"), None, FakeHipEnvironments.test.id)
       val validOas =
         """
           |---
@@ -296,10 +298,7 @@ class CurlCommandServiceSpec extends SpecBase with MockitoSugar {
       ))
 
       val application = FakeApplication
-        .copy(environments = Environments(
-          primary = Environment(Seq.empty, Seq.empty),
-          secondary = Environment(Seq.empty, Seq(credential))
-        ))
+        .setCredentials(Set(credential))
         .copy(apis = Seq(
           Api(apiDetail.id, apiDetail.title, Seq(
             SelectedEndpoint("GET", "/findByColour"),

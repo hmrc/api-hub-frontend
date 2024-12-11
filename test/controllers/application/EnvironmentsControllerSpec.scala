@@ -56,6 +56,7 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
                 created = LocalDateTime.now(),
                 clientSecret = None,
                 secretFragment = None,
+                FakeHipEnvironments.test.id
               )
           )
 
