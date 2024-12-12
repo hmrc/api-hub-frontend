@@ -33,7 +33,9 @@ object ApplicationSideNavPages {
   case object DetailsPage extends SideNavPage
   case object ApisPage extends SideNavPage
   case object EnvironmentsAndCredentialsPage extends SideNavPage
-  case class EnvironmentPage(hipEnvironment: HipEnvironment) extends SideNavPage
+  case class EnvironmentPage(hipEnvironment: HipEnvironment) extends SideNavPage {
+    override def toString: String = hipEnvironment.id
+  }
   case object ManageTeamMembersPage extends SideNavPage
   case object DeleteApplicationPage extends SideNavPage
   case object ChangeOwningTeamPage extends SideNavPage

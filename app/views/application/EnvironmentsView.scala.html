@@ -133,7 +133,7 @@
                     @formHelper(action = controllers.application.routes.EnvironmentsController.onDeleteCredential(application.id, credential.clientId, hipEnvironment.id)) {
                         <div class="govuk-button-group govuk-!-margin-bottom-3">
                             @govukButton(
-                                ButtonViewModel(messages("environments.deleteCredential")).asSecondaryButton().withCssClass("govuk-!-margin-bottom-0")
+                                ButtonViewModel(messages("environments.deleteCredential")).asSecondaryButton().withCssClass("govuk-!-margin-bottom-0 hip-revoke-credential")
                             )
                         </div>
                     }
