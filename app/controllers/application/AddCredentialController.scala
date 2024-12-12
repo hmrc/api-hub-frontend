@@ -16,12 +16,13 @@
 
 package controllers.application
 
-import config.HipEnvironments
+import config.{FrontendAppConfig, HipEnvironment, HipEnvironments}
 import controllers.actions.*
 import controllers.helpers.ErrorResultBuilder
 import forms.AddCredentialChecklistFormProvider
 import models.application.{Application, Credential, Primary, Secondary}
 import models.exception.ApplicationCredentialLimitException
+import models.requests.ApplicationRequest
 import models.user.UserModel
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.*
@@ -45,7 +46,8 @@ class AddCredentialController @Inject()(
   errorResultBuilder: ErrorResultBuilder,
   apiHubService: ApiHubService,
   successView: AddCredentialSuccessView,
-  hipEnvironments: HipEnvironments
+  hipEnvironments: HipEnvironments,
+  config: FrontendAppConfig
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
@@ -55,34 +57,61 @@ class AddCredentialController @Inject()(
       Ok(view(form, applicationId))
   }
 
-  def addProductionCredential(applicationId: String): Action[AnyContent] = (identify andThen isPrivileged andThen applicationAuth(applicationId)).async {
+  def addCredentialForEnvironment(applicationId: String, environment: String): Action[AnyContent] = (identify andThen applicationAuth(applicationId)).async {
+    implicit request =>
+      hipEnvironments.forUrlPathParameter(environment) match {
+        case hipEnvironment if hipEnvironment.isProductionLike => addCredentialToProduction(hipEnvironment)
+        case hipEnvironment => addCredentialToNonProduction(hipEnvironment)
+      }
+  }
+
+  def addProductionCredential(applicationId: String): Action[AnyContent] = (identify andThen applicationAuth(applicationId)).async {
     implicit request =>
       form.bindFromRequest().fold(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, applicationId))),
-        _ =>
-          apiHubService.addCredential(request.application.id, hipEnvironments.forEnvironmentName(Primary)) flatMap {
-            case Right(Some(credential)) =>
-              fetchApiNames(request.application).map(
-                apiNames =>
-                  addCredentialSuccess(request.application, apiNames, credential, request.identifierRequest.user)
-              )
-            case Right(None) => applicationNotFound(request.application)
-            case Left(_: ApplicationCredentialLimitException) => tooManyCredentials(request.application)
-            case Left(e) => Future.successful(errorResultBuilder.internalServerError(e))
-          }
+        _ => addCredentialToProduction(hipEnvironments.forEnvironmentName(Primary))
       )
   }
 
   def addDevelopmentCredential(applicationId: String): Action[AnyContent] = (identify andThen applicationAuth(applicationId)).async {
-    implicit request =>
-      apiHubService.addCredential(request.application.id, hipEnvironments.forEnvironmentName(Secondary)) flatMap {
-        case Right(Some(_)) =>
-          Future.successful(SeeOther(controllers.application.routes.EnvironmentAndCredentialsController.onPageLoad(request.application.id).url))
-        case Right(None) => applicationNotFound(request.application)
-        case Left(_: ApplicationCredentialLimitException) => tooManyCredentials(request.application)
-        case Left(e) => Future.successful(errorResultBuilder.internalServerError(e))
-      }
+    implicit request => addCredentialToNonProduction(hipEnvironments.forEnvironmentName(Secondary))
+  }
+
+  private def addCredentialToNonProduction(hipEnvironment: HipEnvironment)(implicit request: ApplicationRequest[AnyContent]) = {
+    addCredential(
+      hipEnvironment,
+      credential => Future.successful(SeeOther(getCredentialListRoute(request.application.id, hipEnvironment).url))
+    )
+  }
+
+  private def getCredentialListRoute(applicationId: String, hipEnvironment: HipEnvironment): Call = {
+    if (config.applicationDetailsEnvironmentsLeftSideNav)
+      controllers.application.routes.EnvironmentsController.onPageLoad(applicationId, hipEnvironment.id)
+    else
+      controllers.application.routes.EnvironmentAndCredentialsController.onPageLoad(applicationId)
+  }
+
+  private def addCredentialToProduction(hipEnvironment: HipEnvironment)(implicit request: ApplicationRequest[AnyContent]) = {
+    isPrivileged.invokeBlock(
+      request.identifierRequest,
+      _ => addCredential(
+        hipEnvironment,
+        credential => fetchApiNames(request.application).map(
+          apiNames =>
+            addCredentialSuccess(request.application, apiNames, credential, request.identifierRequest.user, hipEnvironment)
+        )
+      )
+    )
+  }
+
+  private def addCredential(hipEnvironment: HipEnvironment, onSuccess: Credential => Future[Result])(implicit request: ApplicationRequest[AnyContent]) = {
+    apiHubService.addCredential(request.application.id, hipEnvironment) flatMap {
+      case Right(Some(credential)) => onSuccess(credential)
+      case Right(None) => applicationNotFound(request.application)
+      case Left(_: ApplicationCredentialLimitException) => tooManyCredentials(request.application)
+      case Left(e) => Future.successful(errorResultBuilder.internalServerError(e))
+    }
   }
 
   private def fetchApiNames(application: Application)(implicit hc: HeaderCarrier): Future[Seq[String]] = {
@@ -103,7 +132,8 @@ class AddCredentialController @Inject()(
     application: Application,
     apiNames: Seq[String],
     credential: Credential,
-    user: UserModel
+    user: UserModel,
+    hipEnvironment: HipEnvironment
   )(implicit request: Request[?]): Result = {
     val summaryList = AddCredentialSuccessViewModel.buildSummary(
       application,
@@ -111,7 +141,7 @@ class AddCredentialController @Inject()(
       credential
     )
 
-    Ok(successView(application, summaryList, Some(user), credential))
+    Ok(successView(application, summaryList, Some(user), credential, getCredentialListRoute(application.id, hipEnvironment).url))
   }
 
   private def applicationNotFound(application: Application)(implicit request: Request[?]): Future[Result] = {

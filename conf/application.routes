@@ -12,6 +12,7 @@ POST        /delete-credentials/:id/client/:clientId/environment/:environmentId 
 GET         /add-credential-checklist/:id                                           controllers.application.AddCredentialController.checklist(id: String)
 POST        /add-credential-success/:id                                             controllers.application.AddCredentialController.addProductionCredential(id: String)
 POST        /add-development-credential/:id                                         controllers.application.AddCredentialController.addDevelopmentCredential(id: String)
+POST        /add-credential/:id/:environment                            controllers.application.AddCredentialController.addCredentialForEnvironment(id: String, environment: String)
 
 GET         /request-production-access/:id/start                                    controllers.application.accessrequest.RequestProductionAccessStartController.onPageLoad(id: String)
 GET         /request-production-access/check-your-answers                           controllers.application.accessrequest.RequestProductionAccessController.onPageLoad()

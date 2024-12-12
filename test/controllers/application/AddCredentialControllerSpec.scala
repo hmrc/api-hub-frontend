@@ -23,9 +23,10 @@ import forms.AddCredentialChecklistFormProvider
 import models.api.{ApiDetail, Live, Maintainer}
 import models.application.{Api, Application, Credential, Primary, Secondary}
 import models.exception.ApplicationCredentialLimitException
-import models.user.UserModel
+import models.user.{Permissions, UserModel}
 import org.mockito.ArgumentMatchers.{any, argThat, eq as eqTo}
 import org.mockito.Mockito.{never, verify, when}
+import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.inject.bind
@@ -41,7 +42,7 @@ import views.html.application.{AddCredentialChecklistView, AddCredentialSuccessV
 import java.time.{Clock, Instant, LocalDateTime, ZoneId}
 import scala.concurrent.Future
 
-class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHelpers with HtmlValidation {
+class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHelpers with HtmlValidation with TableDrivenPropertyChecks {
 
   import AddCredentialControllerSpec._
 
@@ -128,6 +129,7 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
 
             val result = route(fixture.playApplication, request).value
             val view = fixture.playApplication.injector.instanceOf[AddCredentialSuccessView]
+            val credentialsPageUrl = controllers.application.routes.EnvironmentsController.onPageLoad(FakeApplication.id, "production").url
 
             val summaryList = AddCredentialSuccessViewModel.buildSummary(
               application,
@@ -136,7 +138,7 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
             )
 
             status(result) mustBe OK
-            contentAsString(result) mustBe view(application, summaryList, Some(user), credential).toString()
+            contentAsString(result) mustBe view(application, summaryList, Some(user), credential, credentialsPageUrl).toString()
             contentAsString(result) must validateAsHtml
           }
       }
@@ -207,7 +209,7 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
         val result = route(fixture.playApplication, request).value
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe controllers.application.routes.EnvironmentAndCredentialsController.onPageLoad(FakeApplication.id).url
+        redirectLocation(result).value mustBe controllers.application.routes.EnvironmentsController.onPageLoad(FakeApplication.id, "test").url
       }
     }
 
@@ -241,6 +243,39 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
     }
   }
 
+  "AddCredentialChecklistController.addCredentialForEnvironment" - {
+    "must give the correct response for given user and environment" in {
+      val FakeSupporterOnApplicationTeam = FakeUser.copy(permissions = Permissions(false, true, false))
+      val FakePrivilegedUserOnApplicationTeam = FakeUser.copy(permissions = Permissions(false, false, true))
+      val scenarios = Table(
+        ("user", "environment", "expected response", "redirect location"),
+        (FakeUser, "test", SEE_OTHER, Some(() => controllers.application.routes.EnvironmentsController.onPageLoad(FakeApplication.id, "test").url)),
+        (FakeUserNotTeamMember, "test", SEE_OTHER, Some(() => routes.UnauthorisedController.onPageLoad.url)),
+
+        (FakeUser, "production", SEE_OTHER, Some(() => routes.UnauthorisedController.onPageLoad.url)),
+        (FakeSupporterOnApplicationTeam, "production", SEE_OTHER, Some(() => routes.UnauthorisedController.onPageLoad.url)),
+        (FakePrivilegedUser, "production", SEE_OTHER, Some(() => routes.UnauthorisedController.onPageLoad.url)),
+        (FakePrivilegedUserOnApplicationTeam, "production", OK, None)
+      )
+
+      forAll(scenarios) { (user: UserModel, environment: String, expectedResponse: Int, redirectTo: Option[() => String]) =>
+        val fixture = buildFixture(user)
+        val credential = Credential("test-client-id", LocalDateTime.now(clock), Some("test-secret"), Some("test-fragment"))
+        when(fixture.apiHubService.addCredential(eqTo(FakeApplication.id), any())(any()))
+          .thenReturn(Future.successful(Right(Some(credential))))
+
+        running(fixture.playApplication) {
+          val request = FakeRequest(controllers.application.routes.AddCredentialController.addCredentialForEnvironment(FakeApplication.id, environment))
+          val result = route(fixture.playApplication, request).value
+          status(result) mustBe expectedResponse
+          redirectTo match {
+            case Some(urlBuilder) => redirectLocation(result).value mustBe urlBuilder()
+            case None => ()
+          }
+        }
+      }
+    }
+  }
 }
 
 object AddCredentialControllerSpec extends SpecBase with MockitoSugar {

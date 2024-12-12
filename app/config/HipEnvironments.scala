@@ -59,6 +59,10 @@ trait HipEnvironments {
       .getOrElse(throw new IllegalArgumentException(s"No configuration for environment $environmentName"))
   }
 
+  def forUrlPathParameter(pathParameter: String): HipEnvironment =
+    environments.find(hipEnvironment => hipEnvironment.environmentName.toString == pathParameter || hipEnvironment.id == pathParameter)
+      .getOrElse(throw new IllegalArgumentException(s"No configuration for environment $pathParameter"))
+
 }
 
 @Singleton
