@@ -76,7 +76,7 @@
                 @formHelper(action = addCredentialFormAction, Symbol("autoComplete") -> "off") {
                     @govukButton(
                         Button(
-                            classes = "govuk-button--secondary",
+                            classes = "govuk-button--primary",
                             content = Text(messages("environmentAndCredentials.addNewCredential"))
                         ).disabled(application.getCredentials(hipEnvironment).size >= 5).withId("addCredentialButton")
                     )
