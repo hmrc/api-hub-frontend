@@ -1835,6 +1835,48 @@ class ApplicationsConnectorSpec
     }
   }
 
+  "validateOas" - {
+    "must place the correct request and return success and not validate the oas title" in {
+      val oas = "some oas"
+      val validateTitle = false
+      val value1 = s"/api-hub-applications/oas/validate?validateTitle=$validateTitle"
+      Console.println(s"OIYAF! $value1")
+      stubFor(
+        post(urlEqualTo(value1))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .withHeader(ACCEPT, equalTo("application/json"))
+          .withRequestBody(equalTo(oas))
+          .willReturn(
+            aResponse().withStatus(200)
+          )
+      )
+
+      buildConnector(this).validateOAS(oas, validateTitle)(HeaderCarrier()).map {
+        result =>
+          result.value mustBe()
+      }
+    }
+
+    "must place the correct request and return success and validate the oas title" in {
+      val oas = "some oas"
+      val validateTitle = true
+      stubFor(
+        post(urlEqualTo(s"/api-hub-applications/oas/validate?validateTitle=$validateTitle"))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .withHeader(ACCEPT, equalTo("application/json"))
+          .withRequestBody(equalTo(oas))
+          .willReturn(
+            aResponse()
+          )
+      )
+
+      buildConnector(this).validateOAS(oas, validateTitle)(HeaderCarrier()).map {
+        result =>
+          result.value mustBe()
+      }
+    }
+  }
+
 }
 
 object ApplicationsConnectorSpec extends HttpClientV2Support {

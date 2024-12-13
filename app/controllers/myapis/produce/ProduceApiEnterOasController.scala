@@ -108,7 +108,7 @@ class ProduceApiEnterOasController @Inject()(
 
   private def validateOAS(oas: String)(implicit messagesProvider: MessagesProvider, hc: HeaderCarrier): Future[Either[String, String]] = {
     (for {
-      _ <- EitherT(applicationsConnector.validateOAS(oas)).leftMap(error => Json.prettyPrint(Json.toJson(error)))
+      _ <- EitherT(applicationsConnector.validateOAS(oas, true)).leftMap(error => Json.prettyPrint(Json.toJson(error)))
       openApiDoc <- EitherT.fromEither(OpenApiDoc.parse(oas))
       apiName <- EitherT.fromOption(openApiDoc.getApiName(), Messages("produceApiEnterOas.error.missingApiName"))
     } yield apiName).value

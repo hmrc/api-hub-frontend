@@ -118,7 +118,7 @@ class ProduceApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
     "must redirect to the next page when valid data is submitted" in {
       val fixture = buildFixture(userAnswers = Some(emptyUserAnswers))
       when(fixture.sessionRepository.set(any())).thenReturn(Future.successful(true))
-      when(fixture.applicationsConnector.validateOAS(eqTo(validOAS))(any, any))
+      when(fixture.applicationsConnector.validateOAS(eqTo(validOAS), eqTo(true))(any, any))
         .thenReturn(Future.successful(Right(())))
 
       running(fixture.application) {
