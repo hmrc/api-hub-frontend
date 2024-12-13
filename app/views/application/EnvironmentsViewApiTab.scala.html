@@ -81,26 +81,24 @@
         </div>
     </details>
 }
-@endpointScopes(scopes: Seq[String]) = {
-    <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-1"><strong>@messages("applicationApis.apis.headings.scopes"):</strong></p>
+
+@endpointNameAndScopes(endpoint: ApplicationEndpoint) = {
+    <strong class="govuk-tag govuk-tag--purple">@{endpoint.httpMethod}</strong>
+    <code class="code--header govuk-!-margin-top-2">
+        <strong class="bold-xsmall">@endpoint.path</strong>
+    </code>
+
+    <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-1">
+        <strong>@messages("applicationApis.apis.headings.scopes"):</strong>
+    </p>
+
     <ul class="api-scopes-list-inline">
-    @for(scope <- scopes) {
+    @for(scope <- endpoint.scopes) {
         <li><strong class="hip-tag--scope">@scope</strong></li>
     }
     </ul>
 }
 
-@endpointName(endpoint: ApplicationEndpoint) = {
-    <strong class="govuk-tag govuk-tag--purple">@{
-        endpoint.httpMethod
-    }</strong>
-    <code class="code--header govuk-!-margin-top-2"><strong class="bold-xsmall">@endpoint.path</strong></code>
-}
-
-@endpointNameAndScopes(endpoint: ApplicationEndpoint) = {
-    @endpointName(endpoint)
-    @endpointScopes(endpoint.scopes)
-}
 @existingApiDetails(applicationApi: ApplicationApi) = {
     <details class="hip-details hip-expander">
         <summary class="hip-details__summary">
@@ -116,6 +114,7 @@
 
         <div class="hip-details__text govuk-!-margin-top-0 govuk-!-padding-top-0">
             <h3 class="govuk-heading-s govuk-!-margin-bottom-2">@messages("environment.apis.endpoints")</h3>
+
             <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-2">
 
             @for(endpoint <- applicationApi.endpoints){
@@ -150,7 +149,7 @@
 
 <h2 class="govuk-heading-m">@messages("environment.apis.heading", viewModel.hipEnvironment.name())</h2>
 
-@if(!viewModel.hasApis) {
+@if(viewModel.noApis) {
     @noApisBanner(Html(messages("applicationApis.apis.noApis", exploreApisLink("applicationApis.apis.exploreApis"))))
 }
 

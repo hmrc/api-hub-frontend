@@ -20,7 +20,7 @@ import config.HipEnvironment
 import models.application.{Application, Credential}
 import models.user.UserModel
 
-case class CredentialsTabViewModel(credentials: Seq[Credential], applicationId: String, hipEnvironment: HipEnvironment, user: UserModel, errorRetrievingCredentials: Boolean, hasApis: Boolean, apiHubGuideUrl: String) {
+case class CredentialsTabViewModel(credentials: Seq[Credential], applicationId: String, hipEnvironment: HipEnvironment, user: UserModel, errorRetrievingCredentials: Boolean, noApis: Boolean, apiHubGuideUrl: String) {
   val userCanAddCredentials = !hipEnvironment.isProductionLike || user.permissions.isPrivileged
 
   val maxCredentialsReached = credentials.size >= 5
@@ -35,11 +35,11 @@ case class CredentialsTabViewModel(credentials: Seq[Credential], applicationId: 
   val showNoProductionCredentialsMessage = hipEnvironment.isProductionLike && credentials.isEmpty
 }
 
-case class ApiTabViewModel(applicationApis: Seq[ApplicationApi], applicationId: String, hipEnvironment: HipEnvironment, hasApis: Boolean) {
+case class ApiTabViewModel(applicationApis: Seq[ApplicationApi], applicationId: String, hipEnvironment: HipEnvironment, noApis: Boolean) {
   val showRequestProdAccessBanner = hipEnvironment.isProductionLike && applicationApis.exists(_.needsProductionAccessRequest)
 }
 
 case class EnvironmentsViewModel(application: Application, applicationApis: Seq[ApplicationApi], user: UserModel, hipEnvironment: HipEnvironment, credentials: Seq[Credential], apiHubGuideUrl: String, errorRetrievingCredentials: Boolean = false) {
-  val credentialsTabViewModel = CredentialsTabViewModel(credentials, application.id, hipEnvironment, user, errorRetrievingCredentials, !applicationApis.isEmpty, apiHubGuideUrl)
-  val apiTabViewModel = ApiTabViewModel(applicationApis, application.id, hipEnvironment, !applicationApis.isEmpty)
+  val credentialsTabViewModel = CredentialsTabViewModel(credentials, application.id, hipEnvironment, user, errorRetrievingCredentials, applicationApis.isEmpty, apiHubGuideUrl)
+  val apiTabViewModel = ApiTabViewModel(applicationApis, application.id, hipEnvironment, applicationApis.isEmpty)
 }
