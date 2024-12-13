@@ -18,7 +18,7 @@
 @import models.application._
 @import models.application.ApplicationLenses._
 @import models.user.UserModel
-@import viewmodels.application.{ApplicationNavItems, ApplicationSideNavPages}
+@import viewmodels.application._
 @import views.ViewUtils
 @import views.html.components.IconsLink
 
@@ -33,7 +33,7 @@
     applicationNavItems: ApplicationNavItems,
 )
 
-@(application: Application, user: UserModel, hipEnvironment: HipEnvironment, credentials: Seq[Credential], apiHubGuideUrl: String, errorRetrievingCredentials: Boolean = false)(implicit request: Request[?], messages: Messages)
+@(application: Application, applicationApis: Seq[ApplicationApi], user: UserModel, hipEnvironment: HipEnvironment, credentials: Seq[Credential], apiHubGuideUrl: String, errorRetrievingCredentials: Boolean = false)(implicit request: Request[?], messages: Messages)
 
 @credentialsNotRetrieved = {
     <h4 class="govuk-!-margin-0">
@@ -65,8 +65,46 @@
     !hipEnvironment.isProductionLike || user.permissions.isPrivileged
 }
 
-@credentialsTabContent() = {
+@noApisBanner(content: Html) = {
+    <div class="call-out-panel govuk-!-padding-3 govuk-!-margin-0">
+        <p class="govuk-body information-tag ">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span class="call-out-type">
+                @messages("environmentAndCredentials.test.noApis")
+            </span>
+        </p>
+        <p class="govuk-body additional-message govuk-!-margin-top-1">
+            @content
+        </p>
+    </div>
+}
 
+@requestProdAccessBanner() = {
+    <div class="call-out-panel call-out-panel__small govuk-!-margin-top-2">
+        <p class="govuk-body information-tag">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span class="call-out-type">
+                @messages("environment.apis.noAvailableInProd.heading")
+            </span>
+        </p>
+        <p class="govuk-body additional-message">
+            @messages("environment.apis.noAvailableInProd.message")
+        </p>
+        <p class="govuk-body additional-message">
+            @govukButton(
+                Button(
+                    href = Some(controllers.application.accessrequest.routes.RequestProductionAccessStartController.onPageLoad(application.id).url),
+                    content = Text(messages("applicationApis.requestProductionAccess")),
+                    id = Some("requestProductionAccessButton"),
+                    classes = "govuk-!-margin-bottom-2"
+                )
+            )
+        </p>
+
+    </div>
+}
+
+@credentialsTabContent() = {
     <div class="environment-block-header">
         <div class="left">
             <h2 class="govuk-heading-m">Credentials</h2>
@@ -86,7 +124,7 @@
     </div>
 
     @if(!canManageCredentials) {
-        <div class="call-out-panel">
+        <div class="call-out-panel govuk-!-margin-top-0 govuk-!-margin-bottom-2">
             <p class="govuk-body information-tag ">
                 <i class="fa-solid fa-triangle-exclamation"></i>
                 <span class="call-out-type">
@@ -101,12 +139,16 @@
             </p>
         </div>
     }
+
     @if(errorRetrievingCredentials) {
         @govukWarningText(WarningText(
             iconFallbackText = Some(messages("applicationDetails.environments.credentials.error")),
             content = HtmlContent(credentialsNotRetrieved),
             classes = "hip-warning-text govuk-!-padding-left-8"
         ))
+    }
+    @if(applicationApis.isEmpty) {
+      @noApisBanner(Html(messages("environmentAndCredentials.test.noApis.additional")))
     }
     @if(hipEnvironment.isProductionLike && credentials.isEmpty) {
         <p class="govuk-body">
@@ -144,6 +186,117 @@
 
 }
 
+@missingApiDetails(applicationApi: ApplicationApi) = {
+    <details class="hip-details hip-expander hip-expander__error">
+        <summary class="hip-details__summary">
+            <span class="hip-details__summary-text govuk-heading-s govuk-!-margin-bottom-0">
+                @applicationApi.apiTitle
+            </span>
+        </summary>
+
+        <div class="hip-details__text">
+            <p class="govuk-body">
+                @messages("applicationApis.apiMissing")
+            </p>
+            <p class="govuk-body">
+                <a class="govuk-link govuk-link--no-visited-state" href="@controllers.application.routes.RemoveApiController.onPageLoad(application.id, applicationApi.apiId)" data-remove-api-api-id="@applicationApi.apiId">
+                    @messages("applicationApis.removeApi")
+                </a>
+            </p>
+        </div>
+    </details>
+}
+@endpointScopes(scopes: Seq[String]) = {
+    <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-1"><strong>@messages("applicationApis.apis.headings.scopes"):</strong></p>
+    <ul class="api-scopes-list-inline">
+    @for(scope <- scopes) {
+        <li><strong class="hip-tag--scope">@scope</strong></li>
+    }
+    </ul>
+}
+
+@endpointName(endpoint: ApplicationEndpoint) = {
+    <strong class="govuk-tag govuk-tag--purple">@{
+        endpoint.httpMethod
+    }</strong>
+    <code class="code--header govuk-!-margin-top-2"><strong class="bold-xsmall">@endpoint.path</strong></code>
+}
+
+@endpointNameAndScopes(endpoint: ApplicationEndpoint) = {
+    @endpointName(endpoint)
+    @endpointScopes(endpoint.scopes)
+}
+@existingApiDetails(applicationApi: ApplicationApi) = {
+    <details class="hip-details hip-expander">
+        <summary class="hip-details__summary">
+            <span class="hip-details__summary-text govuk-heading-s govuk-!-margin-bottom-0">
+                @applicationApi.apiTitle
+            </span>
+            <span class="hip-details__summary-info govuk-body-s">
+                <a class="govuk-link govuk-link--no-visited-state" href="@routes.ApiDetailsController.onPageLoad(applicationApi.apiId)" data-api-specification-api-id="@applicationApi.apiId">
+                    @messages("applicationApis.apis.viewSpecification")
+                </a>
+            </span>
+        </summary>
+
+        <div class="hip-details__text govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <h3 class="govuk-heading-s govuk-!-margin-bottom-2">@messages("environment.apis.endpoints")</h3>
+            <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-2">
+
+            @for(endpoint <- applicationApi.endpoints){
+                @endpointNameAndScopes(endpoint)
+            }
+
+            <div class="govuk-button-group govuk-!-margin-top-5 govuk-!-margin-bottom-0">
+                @if(!applicationApi.hasPendingAccessRequest) {
+                    @govukButton(
+                        Button(
+                            href = Some(routes.AddAnApiStartController.addEndpoints(application.id, applicationApi.apiId).url),
+                            content = Text(messages("applicationApis.addEndpoints")),
+                            classes = "govuk-button--secondary"
+                        )
+                        .withAttribute("data-add-endpoints-api-id", applicationApi.apiId)
+                    )
+                }
+                <a class="govuk-link govuk-link--no-visited-state" href="@controllers.application.routes.RemoveApiController.onPageLoad(application.id, applicationApi.apiId)" data-remove-api-api-id="@applicationApi.apiId">
+                    @messages("applicationApis.removeApi")
+                </a>
+            </div>
+        </div>
+
+    </details>
+}
+
+@exploreApisLink(messageId: String) = {
+    <a href="@{routes.ExploreApisController.onPageLoad().url}" class="govuk-link govuk-link--no-visited-state">
+        @messages(messageId)
+    </a>
+}
+
+@apisTabContent() = {
+    <h2 class="govuk-heading-m">@messages("environment.apis.heading", hipEnvironment.name())</h2>
+
+    @if(applicationApis.isEmpty) {
+        @noApisBanner(Html(messages("applicationApis.apis.noApis", exploreApisLink("applicationApis.apis.exploreApis"))))
+    }
+
+    @if(hipEnvironment.isProductionLike && applicationApis.exists(_.needsProductionAccessRequest)) {
+        @requestProdAccessBanner()
+    }
+
+    <div class="hip-app-apis">
+    @for(applicationApi <- applicationApis) {
+        @if(applicationApi.isAccessibleInEnvironment(hipEnvironment)) {
+            @if(applicationApi.isMissing) {
+                @missingApiDetails(applicationApi)
+            } else {
+                @existingApiDetails(applicationApi)
+            }
+        }
+    }
+    </div>
+}
+
 @layout(pageTitle = titleNoForm(messages("environments.title")), user = Some(user), fullWidth = true, customScriptsBlock = Some(iconsLink())) {
 
     @sideNav(application.name, applicationNavItems(Some(user), application, ApplicationSideNavPages.EnvironmentPage(hipEnvironment))) {
@@ -152,6 +305,13 @@
 
         @govukTabs(Tabs(
             items = Seq(
+                TabItem(
+                    id = Some("apis"),
+                    label = messages("applicationDetails.environments.apis"),
+                    panel = TabPanel(
+                        content = HtmlContent(apisTabContent())
+                    )
+                ),
                 TabItem(
                     id = Some("credentials"),
                     label = messages("applicationDetails.environments.crendentials"),

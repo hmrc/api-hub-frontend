@@ -23,7 +23,7 @@ The following points from the GOV.UK guidance are particularly relevant to the I
 The following terms and language are specific to the Integration Hub and should be used consistently across the site:
 * the team responsible for an application or API is referred to as the 'owning team'
 * the process of adding the details of an API, application or team to the Integration Hub for the first time is referred to as 'registering' (not 'creating' or 'generating' - these things already exist, the user is just telling us about them)
-* applications, credentials and teams are 'deleted' (not removed/unregistered)
+* applications and teams are 'deleted' (not removed/unregistered)
 * users are 'removed' from teams, and APIs are 'removed' from applications (not deleted, the user or API still exists afterwards we have just removed the association)
 * we say 'your applications' and 'your APIs' to mean applications and APIs that are owned by a team of which the user is a member (no personal ownership is implied)
 * we say 'your teams' to mean teams that the user is a member of, not just teams that the user personally created

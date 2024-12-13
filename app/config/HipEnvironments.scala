@@ -27,7 +27,9 @@ case class HipEnvironment(
                            nameKey: String,                    // Key for the environment's name in messages file
                            environmentName: EnvironmentName,   // Needed to pass environment round existing code and in URL paths to backend
                            isProductionLike: Boolean
-                         )
+                         ) {
+  def name()(implicit messages: play.api.i18n.Messages): String = messages(nameKey)
+}
 
 object HipEnvironment {
 

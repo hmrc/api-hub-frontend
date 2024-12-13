@@ -16,6 +16,7 @@
 
 package viewmodels.application
 
+import config.HipEnvironment
 import models.accessrequest.{AccessRequest, Approved}
 import models.api.ApiDetailLenses.ApiDetailLensOps
 import models.api.{ApiDetail, EndpointMethod}
@@ -131,7 +132,7 @@ case class ApplicationApi(
   def availableNonProductionEndpoints: Int = endpoints.count(_.nonProductionAccess.isAccessible)
   def needsProductionAccessRequest: Boolean = !hasPendingAccessRequest && endpoints.exists(_.productionAccess == Inaccessible)
   def hasPendingAccessRequest: Boolean = pendingAccessRequestCount > 0
-
+  def isAccessibleInEnvironment(hipEnvironment: HipEnvironment): Boolean = !hipEnvironment.isProductionLike || availableProductionEndpoints > 0
 }
 
 object ApplicationApi {

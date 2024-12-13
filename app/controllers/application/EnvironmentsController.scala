@@ -19,7 +19,7 @@ package controllers.application
 import com.google.inject.Inject
 import config.{FrontendAppConfig, HipEnvironment, HipEnvironments}
 import controllers.actions.{ApplicationAuthActionProvider, IdentifierAction}
-import controllers.helpers.ErrorResultBuilder
+import controllers.helpers.{ApplicationApiBuilder, ErrorResultBuilder}
 import models.application.*
 import models.application.ApplicationLenses.*
 import models.exception.ApplicationCredentialLimitException
@@ -42,19 +42,18 @@ class EnvironmentsController @Inject()(
   apiHubService: ApiHubService,
   errorResultBuilder: ErrorResultBuilder,
   config: FrontendAppConfig,
-  hipEnvironments: HipEnvironments
+  hipEnvironments: HipEnvironments,
+  applicationApiBuilder: ApplicationApiBuilder
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(id: String, environment: String): Action[AnyContent] = (identify andThen applicationAuth(id)).async {
     implicit request =>
       hipEnvironments.environments.find(_.id == environment)
         .map(hipEnvironment =>
-          retrieveCredentials(request.application, hipEnvironment)
-            .map { case (credentials, hasFailedRetrieval) =>
-                Ok(
-                  view(request.application, request.identifierRequest.user, hipEnvironment, credentials, config.helpDocsPath, hasFailedRetrieval)
-                )
-            }
+          for {
+            (credentials, hasFailedRetrieval) <- retrieveCredentials(request.application, hipEnvironment)
+            applicationApis <- applicationApiBuilder.build(request.application)  
+          } yield Ok(view(request.application, applicationApis, request.identifierRequest.user, hipEnvironment, credentials, config.helpDocsPath, hasFailedRetrieval))
         ).getOrElse(
           Future.successful(errorResultBuilder.environmentNotFound(environment))
         )
