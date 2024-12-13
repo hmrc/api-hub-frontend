@@ -29,6 +29,7 @@ import play.api.mvc.*
 import services.ApiHubService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.application.EnvironmentsViewModel
 import views.html.application.EnvironmentsView
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -53,7 +54,7 @@ class EnvironmentsController @Inject()(
           for {
             (credentials, hasFailedRetrieval) <- retrieveCredentials(request.application, hipEnvironment)
             applicationApis <- applicationApiBuilder.build(request.application)  
-          } yield Ok(view(request.application, applicationApis, request.identifierRequest.user, hipEnvironment, credentials, config.helpDocsPath, hasFailedRetrieval))
+          } yield Ok(view(EnvironmentsViewModel(request.application, applicationApis, request.identifierRequest.user, hipEnvironment, credentials, config.helpDocsPath, hasFailedRetrieval)))
         ).getOrElse(
           Future.successful(errorResultBuilder.environmentNotFound(environment))
         )
