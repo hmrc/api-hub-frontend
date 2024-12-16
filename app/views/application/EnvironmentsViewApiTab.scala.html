@@ -61,6 +61,24 @@
     </div>
 }
 
+@pendingAccessRequestBanner() = {
+    <div class="call-out-panel call-out-panel__small govuk-!-margin-top-2">
+        <p class="govuk-body information-tag">
+            <i class="fa-solid fa-circle-exclamation warning-colour"></i>
+            <span class="call-out-type warning">
+                @messages("applicationApis.pending.heading", viewModel.pendingAccessRequestsCount)
+            </span>
+        </p>
+        <p class="govuk-body additional-message">
+            @messages("applicationApis.pending.message.1", viewModel.pendingAccessRequestsCount)
+            @messages("applicationApis.pending.message.2", viewModel.pendingAccessRequestsCount)
+        </p>
+        <p class="govuk-body additional-message">
+            <a class="govuk-link" href="@controllers.application.cancelaccessrequest.routes.CancelAccessRequestStartController.startJourney(viewModel.applicationId)">Cancel production access requests</a>
+        </p>
+    </div>
+}
+
 @missingApiDetails(applicationApi: ApplicationApi) = {
     <details class="hip-details hip-expander hip-expander__error">
         <summary class="hip-details__summary">
@@ -106,7 +124,7 @@
                 @applicationApi.apiTitle
             </span>
             <span class="hip-details__summary-info govuk-body-s">
-                <a class="govuk-link govuk-link--no-visited-state" href="@routes.ApiDetailsController.onPageLoad(applicationApi.apiId)" data-api-specification-api-id="@applicationApi.apiId">
+                <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="@routes.ApiDetailsController.onPageLoad(applicationApi.apiId)" data-api-specification-api-id="@applicationApi.apiId">
                     @messages("applicationApis.apis.viewSpecification")
                 </a>
             </span>
@@ -155,6 +173,10 @@
 
 @if(viewModel.showRequestProdAccessBanner) {
     @requestProdAccessBanner()
+}
+
+@if(viewModel.showPendingAccessRequestsBanner) {
+    @pendingAccessRequestBanner()
 }
 
 <div class="hip-app-apis">
