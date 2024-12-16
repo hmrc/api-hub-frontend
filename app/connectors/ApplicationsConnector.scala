@@ -550,8 +550,9 @@ class ApplicationsConnector @Inject()(
       .execute[ApisInProductionStatistic]
   }
 
-  def validateOAS(oas: String)
+  def validateOAS(oas: String, validateTitle: Boolean = false)
                  (implicit hc: HeaderCarrier, messagesProvider: MessagesProvider): Future[Either[InvalidOasResponse, Unit]] = httpClient.post(url"$applicationsBaseUrl/api-hub-applications/oas/validate")
+                   .transform(request => request.withQueryStringParameters("validateTitle" -> validateTitle.toString))
                    .setHeader(ACCEPT -> JSON)
                    .setHeader(CONTENT_TYPE -> "text/plain")
                    .setHeader(AUTHORIZATION -> clientAuthToken)
@@ -565,8 +566,9 @@ class ApplicationsConnector @Inject()(
                            logger.warn(s"Error while validating OAS:\n${Json.prettyPrint(Json.toJson(failure))}")
                            Left(failure)
                          }
-                       } else
+                       } else {
                          Future.failed(UpstreamErrorResponse("Unexpected response", response.status))
+                       }
                    }
 
   def listApisInProduction()(implicit hc: HeaderCarrier): Future[Seq[ApiDetailSummary]] = {
