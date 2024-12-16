@@ -18,8 +18,6 @@ package controllers.application
 
 import base.SpecBase
 import config.FrontendAppConfig
-import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
-import config.HipEnvironments
 import controllers.actions.*
 import controllers.routes
 import fakes.FakeHipEnvironments
@@ -34,10 +32,12 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import play.api.Application as PlayApplication
+import play.api.i18n.Messages
 import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
 import views.html.ErrorTemplate
 import views.html.application.EnvironmentsView
+import viewmodels.application.{ApplicationApi, EnvironmentsViewModel}
 
 import java.time.LocalDateTime
 import scala.concurrent.Future
@@ -66,13 +66,16 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
             .thenReturn(Future.successful(Some(credentials)))
 
           running(fixture.playApplication) {
-            val request = FakeRequest(GET, controllers.application.routes.EnvironmentsController.onPageLoad(FakeApplication.id, "test").url)
+            implicit val request = FakeRequest(GET, controllers.application.routes.EnvironmentsController.onPageLoad(FakeApplication.id, "test").url)
+            implicit val msgs: Messages = messages(fixture.playApplication)
             val result = route(fixture.playApplication, request).value
             val view = fixture.playApplication.injector.instanceOf[EnvironmentsView]
             val config: FrontendAppConfig = fixture.playApplication.injector.instanceOf[FrontendAppConfig]
+            val applicationApis = FakeApplication.apis.map(api => ApplicationApi(api, 0))
+            val viewModel = EnvironmentsViewModel(FakeApplication, applicationApis, user, FakeHipEnvironments.test, credentials, config.helpDocsPath, false)
 
             status(result) mustEqual OK
-            contentAsString(result) mustBe view(FakeApplication, user, FakeHipEnvironments.test, credentials, config.helpDocsPath, false)(request, messages(fixture.playApplication)).toString
+            contentAsString(result) mustBe view(viewModel).toString
             contentAsString(result) must validateAsHtml
             contentAsString(result) must include("""id="credentials"""")
           }
@@ -137,13 +140,16 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
             .thenReturn(Future.successful(Left(new Exception)))
 
           running(fixture.playApplication) {
-            val request = FakeRequest(GET, controllers.application.routes.EnvironmentsController.onPageLoad(FakeApplication.id, "test").url)
+            implicit val request = FakeRequest(GET, controllers.application.routes.EnvironmentsController.onPageLoad(FakeApplication.id, "test").url)
+            implicit val msgs: Messages = messages(fixture.playApplication)
             val result = route(fixture.playApplication, request).value
             val view = fixture.playApplication.injector.instanceOf[EnvironmentsView]
             val config: FrontendAppConfig = fixture.playApplication.injector.instanceOf[FrontendAppConfig]
+            val applicationApis = FakeApplication.apis.map(api => ApplicationApi(api, 0))
+            val viewModel = EnvironmentsViewModel(FakeApplication, applicationApis, user, FakeHipEnvironments.test, FakeApplication.getCredentials(FakeHipEnvironments.test), config.helpDocsPath, true)
 
             status(result) mustEqual OK
-            contentAsString(result) mustBe view(FakeApplication, user, FakeHipEnvironments.test, FakeApplication.getCredentials(FakeHipEnvironments.test),  config.helpDocsPath, errorRetrievingCredentials = true)(request, messages(fixture.playApplication)).toString
+            contentAsString(result) mustBe view(viewModel).toString
             contentAsString(result) must include("""id="credentials"""")
           }
       }

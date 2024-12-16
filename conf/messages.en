@@ -1113,3 +1113,10 @@ produceApiDeploymentError.return = Return to API deployment page
 produceApiEnterWiremock.title = Enter your WireMock configuration
 produceApiEnterWiremock.heading = Enter your WireMock configuration
 produceApiEnterWiremock.hint = Enter your WireMock configuration in YAML format below.
+
+environment.credentials.heading = Credentials
+
+environment.apis.heading = APIs in {0} environment
+environment.apis.endpoints = Available endpoints
+environment.apis.noAvailableInProd.heading = APIs not available in production
+environment.apis.noAvailableInProd.message = This application has APIs that are not currently available in the production environment.

@@ -14,149 +14,44 @@
  * limitations under the License.
  *@
 
-@import config.HipEnvironment
-@import models.application._
-@import models.application.ApplicationLenses._
-@import models.user.UserModel
-@import viewmodels.application.{ApplicationNavItems, ApplicationSideNavPages}
-@import views.ViewUtils
+@import views.html.application.EnvironmentsViewCredentialsTab
+@import views.html.application.EnvironmentsViewApiTab
 @import views.html.components.IconsLink
+@import viewmodels.application.{ApplicationNavItems, EnvironmentsViewModel, ApplicationSideNavPages}
+@import views.html.templates.SideNav
 
 @this(
     layout: templates.Layout,
     govukTabs: GovukTabs,
-    govukButton : GovukButton,
-    govukWarningText: GovukWarningText,
-    formHelper: FormWithCSRF,
     iconsLink: IconsLink,
-    sideNav: views.html.templates.SideNav,
+    sideNav: SideNav,
     applicationNavItems: ApplicationNavItems,
+    credentialsTab: EnvironmentsViewCredentialsTab,
+    apiTab: EnvironmentsViewApiTab
 )
 
-@(application: Application, user: UserModel, hipEnvironment: HipEnvironment, credentials: Seq[Credential], apiHubGuideUrl: String, errorRetrievingCredentials: Boolean = false)(implicit request: Request[?], messages: Messages)
+@(viewModel: EnvironmentsViewModel)(implicit request: Request[?], messages: Messages)
 
-@credentialsNotRetrieved = {
-    <h4 class="govuk-!-margin-0">
-        @messages("applicationDetails.environments.credentials.error")
-    </h4>
-    <div class="govuk-!-font-weight-regular govuk-!-margin-top-4">
-        @messages("applicationDetails.environments.credentials.error.description")
-    </div>
-}
+@layout(pageTitle = titleNoForm(messages("environments.title")), user = Some(viewModel.user), fullWidth = true, customScriptsBlock = Some(iconsLink())) {
 
-@canDeleteCredentials = @{
-    credentials.size > 1 &&
-        (!hipEnvironment.isProductionLike || user.permissions.isPrivileged)
-}
+    @sideNav(viewModel.application.name, applicationNavItems(Some(viewModel.user), viewModel.application, ApplicationSideNavPages.EnvironmentPage(viewModel.hipEnvironment))) {
 
-
-@addCredentialFormAction = @{
-  hipEnvironment.isProductionLike match {
-    case true => controllers.application.routes.AddCredentialController.checklist(application.id)
-    case false => controllers.application.routes.AddCredentialController.addCredentialForEnvironment(application.id, hipEnvironment.id)
-  }
-}
-
-@rolesGuidanceLink() = {
-    <a class="govuk-link" href="@apiHubGuideUrl/documentation/what-access-do-i-need.html#what-access-do-i-need">@messages("environmentAndCredentials.notPrivileged.additional3")</a>
-}
-
-@canManageCredentials = @{
-    !hipEnvironment.isProductionLike || user.permissions.isPrivileged
-}
-
-@credentialsTabContent() = {
-
-    <div class="environment-block-header">
-        <div class="left">
-            <h2 class="govuk-heading-m">Credentials</h2>
-        </div>
-        <div class="right govuk-!-text-align-right">
-            @if(canManageCredentials){
-                @formHelper(action = addCredentialFormAction, Symbol("autoComplete") -> "off") {
-                    @govukButton(
-                        Button(
-                            classes = "govuk-button--primary",
-                            content = Text(messages("environmentAndCredentials.addNewCredential"))
-                        ).disabled(application.getCredentials(hipEnvironment).size >= 5).withId("addCredentialButton")
-                    )
-                }
-            }
-        </div>
-    </div>
-
-    @if(!canManageCredentials) {
-        <div class="call-out-panel">
-            <p class="govuk-body information-tag ">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-                <span class="call-out-type">
-                    @messages("environmentAndCredentials.notPrivileged")
-                </span>
-            </p>
-            <p class="govuk-body additional-message">
-                @messages("environmentAndCredentials.notPrivileged.additional1")
-            </p>
-            <p class="govuk-body additional-message">
-                @Html(messages("environmentAndCredentials.notPrivileged.additional2", rolesGuidanceLink()))
-            </p>
-        </div>
-    }
-    @if(errorRetrievingCredentials) {
-        @govukWarningText(WarningText(
-            iconFallbackText = Some(messages("applicationDetails.environments.credentials.error")),
-            content = HtmlContent(credentialsNotRetrieved),
-            classes = "hip-warning-text govuk-!-padding-left-8"
-        ))
-    }
-    @if(hipEnvironment.isProductionLike && credentials.isEmpty) {
-        <p class="govuk-body">
-            @messages("environments.noCredentials")
-        </p>
-    } else {
-        @for(credential <- credentials) {
-            <div class="api-panel api-panel--small">
-                <p data-credential-client-id="@credential.clientId" class="govuk-body govuk-!-margin-bottom-3">
-                    <strong>@messages("environments.clientId"):</strong>
-                    @credential.clientId
-                </p>
-                <p class="govuk-body govuk-!-margin-bottom-3">
-                    <strong>@messages("environments.clientSecret"):</strong>
-                    @credential.clientSecret.getOrElse(
-                        credential.secretFragment.map(secret => s"****$secret").getOrElse("")
-                    )
-                </p>
-                <p class="govuk-body govuk-!-margin-bottom-3">
-                    <strong>@messages("environments.created"):</strong>
-                    <span class="utcDateTime">@ViewUtils.formatLocalDateTimeContainingUtc(credential.created)</span>
-                </p>
-                @if(canDeleteCredentials) {
-                    @formHelper(action = controllers.application.routes.EnvironmentsController.onDeleteCredential(application.id, credential.clientId, hipEnvironment.id)) {
-                        <div class="govuk-button-group govuk-!-margin-bottom-3">
-                            @govukButton(
-                                ButtonViewModel(messages("environments.deleteCredential")).asSecondaryButton().withCssClass("govuk-!-margin-bottom-0 hip-revoke-credential")
-                            )
-                        </div>
-                    }
-                }
-            </div>
-        }
-    }
-
-}
-
-@layout(pageTitle = titleNoForm(messages("environments.title")), user = Some(user), fullWidth = true, customScriptsBlock = Some(iconsLink())) {
-
-    @sideNav(application.name, applicationNavItems(Some(user), application, ApplicationSideNavPages.EnvironmentPage(hipEnvironment))) {
-
-        <h1 class="govuk-heading-l">@messages(s"site.environment.${hipEnvironment.id}")</h1>
+        <h1 class="govuk-heading-l">@messages(s"site.environment.${viewModel.hipEnvironment.id}")</h1>
 
         @govukTabs(Tabs(
             items = Seq(
                 TabItem(
+                    id = Some("apis"),
+                    label = messages("applicationDetails.environments.apis"),
+                    panel = TabPanel(
+                        content = HtmlContent(apiTab(viewModel.apiTabViewModel))
+                    )
+                ),
+                TabItem(
                     id = Some("credentials"),
                     label = messages("applicationDetails.environments.crendentials"),
                     panel = TabPanel(
-                        content = HtmlContent(credentialsTabContent())
+                        content = HtmlContent(credentialsTab(viewModel.credentialsTabViewModel))
                     )
                 ),
             )

@@ -1,0 +1,192 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import viewmodels.application.{ApiTabViewModel, ApplicationApi, ApplicationEndpoint}
+
+@this(
+    govukButton : GovukButton,
+)
+
+@(viewModel: ApiTabViewModel)(implicit request: Request[?], messages: Messages)
+
+@noApisBanner(content: Html) = {
+    <div class="call-out-panel govuk-!-padding-3 govuk-!-margin-0">
+        <p class="govuk-body information-tag ">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span class="call-out-type">
+                @messages("environmentAndCredentials.test.noApis")
+            </span>
+        </p>
+        <p class="govuk-body additional-message govuk-!-margin-top-1">
+            @content
+        </p>
+    </div>
+}
+
+@requestProdAccessBanner() = {
+    <div class="call-out-panel call-out-panel__small govuk-!-margin-top-2">
+        <p class="govuk-body information-tag">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span class="call-out-type">
+                @messages("environment.apis.noAvailableInProd.heading")
+            </span>
+        </p>
+        <p class="govuk-body additional-message">
+            @messages("environment.apis.noAvailableInProd.message")
+        </p>
+        <p class="govuk-body additional-message">
+            @govukButton(
+                Button(
+                    href = Some(controllers.application.accessrequest.routes.RequestProductionAccessStartController.onPageLoad(viewModel.applicationId).url),
+                    content = Text(messages("applicationApis.requestProductionAccess")),
+                    id = Some("requestProductionAccessButton"),
+                    classes = "govuk-!-margin-bottom-2"
+                )
+            )
+        </p>
+
+    </div>
+}
+
+@pendingAccessRequestBanner() = {
+    <div class="call-out-panel call-out-panel__small govuk-!-margin-top-2">
+        <p class="govuk-body information-tag">
+            <i class="fa-solid fa-circle-exclamation warning-colour"></i>
+            <span class="call-out-type warning">
+                @messages("applicationApis.pending.heading", viewModel.pendingAccessRequestsCount)
+            </span>
+        </p>
+        <p class="govuk-body additional-message">
+            @messages("applicationApis.pending.message.1", viewModel.pendingAccessRequestsCount)
+            @messages("applicationApis.pending.message.2", viewModel.pendingAccessRequestsCount)
+        </p>
+        <p class="govuk-body additional-message">
+            <a class="govuk-link" href="@controllers.application.cancelaccessrequest.routes.CancelAccessRequestStartController.startJourney(viewModel.applicationId)">Cancel production access requests</a>
+        </p>
+    </div>
+}
+
+@missingApiDetails(applicationApi: ApplicationApi) = {
+    <details class="hip-details hip-expander hip-expander__error">
+        <summary class="hip-details__summary">
+            <span class="hip-details__summary-text govuk-heading-s govuk-!-margin-bottom-0">
+                @applicationApi.apiTitle
+            </span>
+        </summary>
+
+        <div class="hip-details__text">
+            <p class="govuk-body">
+                @messages("applicationApis.apiMissing")
+            </p>
+            <p class="govuk-body">
+                <a class="govuk-link govuk-link--no-visited-state" href="@controllers.application.routes.RemoveApiController.onPageLoad(viewModel.applicationId, applicationApi.apiId)" data-remove-api-api-id="@applicationApi.apiId">
+                    @messages("applicationApis.removeApi")
+                </a>
+            </p>
+        </div>
+    </details>
+}
+
+@endpointNameAndScopes(endpoint: ApplicationEndpoint) = {
+    <strong class="govuk-tag govuk-tag--purple">@{endpoint.httpMethod}</strong>
+    <code class="code--header govuk-!-margin-top-2">
+        <strong class="bold-xsmall">@endpoint.path</strong>
+    </code>
+
+    <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-1">
+        <strong>@messages("applicationApis.apis.headings.scopes"):</strong>
+    </p>
+
+    <ul class="api-scopes-list-inline">
+    @for(scope <- endpoint.scopes) {
+        <li><strong class="hip-tag--scope">@scope</strong></li>
+    }
+    </ul>
+}
+
+@existingApiDetails(applicationApi: ApplicationApi) = {
+    <details class="hip-details hip-expander">
+        <summary class="hip-details__summary">
+            <span class="hip-details__summary-text govuk-heading-s govuk-!-margin-bottom-0">
+                @applicationApi.apiTitle
+            </span>
+            <span class="hip-details__summary-info govuk-body-s">
+                <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="@routes.ApiDetailsController.onPageLoad(applicationApi.apiId)" data-api-specification-api-id="@applicationApi.apiId">
+                    @messages("applicationApis.apis.viewSpecification")
+                </a>
+            </span>
+        </summary>
+
+        <div class="hip-details__text govuk-!-margin-top-0 govuk-!-padding-top-0">
+            <h3 class="govuk-heading-s govuk-!-margin-bottom-2">@messages("environment.apis.endpoints")</h3>
+
+            <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-2">
+
+            @for(endpoint <- applicationApi.endpoints){
+                @endpointNameAndScopes(endpoint)
+            }
+
+            <div class="govuk-button-group govuk-!-margin-top-5 govuk-!-margin-bottom-0">
+                @if(!applicationApi.hasPendingAccessRequest) {
+                    @govukButton(
+                        Button(
+                            href = Some(routes.AddAnApiStartController.addEndpoints(viewModel.applicationId, applicationApi.apiId).url),
+                            content = Text(messages("applicationApis.addEndpoints")),
+                            classes = "govuk-button--secondary"
+                        )
+                        .withAttribute("data-add-endpoints-api-id", applicationApi.apiId)
+                    )
+                }
+                <a class="govuk-link govuk-link--no-visited-state" href="@controllers.application.routes.RemoveApiController.onPageLoad(viewModel.applicationId, applicationApi.apiId)" data-remove-api-api-id="@applicationApi.apiId">
+                    @messages("applicationApis.removeApi")
+                </a>
+            </div>
+        </div>
+
+    </details>
+}
+
+@exploreApisLink(messageId: String) = {
+    <a href="@{routes.ExploreApisController.onPageLoad().url}" class="govuk-link govuk-link--no-visited-state">
+        @messages(messageId)
+    </a>
+}
+
+<h2 class="govuk-heading-m">@messages("environment.apis.heading", viewModel.hipEnvironment.name())</h2>
+
+@if(viewModel.noApis) {
+    @noApisBanner(Html(messages("applicationApis.apis.noApis", exploreApisLink("applicationApis.apis.exploreApis"))))
+}
+
+@if(viewModel.showRequestProdAccessBanner) {
+    @requestProdAccessBanner()
+}
+
+@if(viewModel.showPendingAccessRequestsBanner) {
+    @pendingAccessRequestBanner()
+}
+
+<div class="hip-app-apis">
+@for(applicationApi <- viewModel.applicationApis) {
+    @if(applicationApi.isAccessibleInEnvironment(viewModel.hipEnvironment)) {
+        @if(applicationApi.isMissing) {
+            @missingApiDetails(applicationApi)
+        } else {
+            @existingApiDetails(applicationApi)
+        }
+    }
+}
+</div>
