@@ -25,7 +25,7 @@ case class CredentialsTabViewModel(credentials: Seq[Credential], applicationId: 
 
   val maxCredentialsReached = credentials.size >= 5
 
-  val userCanDeleteCredentials = credentials.size > 1 && (!hipEnvironment.isProductionLike || user.permissions.isPrivileged)
+  val userCanDeleteCredentials = credentials.size > 1 && userCanAddCredentials
 
   val addCredentialFormAction = hipEnvironment.isProductionLike match {
     case true => controllers.application.routes.AddCredentialController.checklist(applicationId)

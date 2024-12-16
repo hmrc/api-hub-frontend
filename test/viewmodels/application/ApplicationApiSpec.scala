@@ -16,8 +16,10 @@
 
 package viewmodels.application
 
+import config.HipEnvironment
+import controllers.actions.FakeApiDetail
 import models.api.*
-import models.application.{Api, Scope, SelectedEndpoint}
+import models.application.{Api, Primary, Scope, Secondary, SelectedEndpoint}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
@@ -211,6 +213,65 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
       )
 
       actual mustBe expected
+    }
+
+    "isAccessibleInEnvironment" - {
+      "must return true for non-prod environments" in {
+        val applicationApi = ApplicationApi(FakeApiDetail, Seq(
+          ApplicationEndpoint(
+            httpMethod = "GET",
+            path = "/test",
+            summary = Some("test-summary"),
+            description = Some("test-description"),
+            scopes = Seq.empty,
+            productionAccess = Inaccessible,
+            nonProductionAccess = Accessible
+          ),
+        ), 0)
+
+        applicationApi.isAccessibleInEnvironment(HipEnvironment("test", 2, "nameKey", Secondary, isProductionLike = false)) mustBe true
+      }
+
+      "must return true for prod environments with available endpoints" in {
+        val applicationApi = ApplicationApi(FakeApiDetail, Seq(
+          ApplicationEndpoint(
+            httpMethod = "GET",
+            path = "/test1",
+            summary = Some("test-summary"),
+            description = Some("test-description"),
+            scopes = Seq.empty,
+            productionAccess = Inaccessible,
+            nonProductionAccess = Accessible
+          ),
+          ApplicationEndpoint(
+            httpMethod = "GET",
+            path = "/test2",
+            summary = Some("test-summary"),
+            description = Some("test-description"),
+            scopes = Seq.empty,
+            productionAccess = Accessible,
+            nonProductionAccess = Accessible
+          ),
+        ), 0)
+
+        applicationApi.isAccessibleInEnvironment(HipEnvironment("prod", 1, "nameKey", Primary, isProductionLike = true)) mustBe true
+      }
+
+      "must return false for prod environments without available endpoints" in {
+        val applicationApi = ApplicationApi(FakeApiDetail, Seq(
+          ApplicationEndpoint(
+            httpMethod = "GET",
+            path = "/test1",
+            summary = Some("test-summary"),
+            description = Some("test-description"),
+            scopes = Seq.empty,
+            productionAccess = Inaccessible,
+            nonProductionAccess = Accessible
+          ),
+        ), 0)
+
+        applicationApi.isAccessibleInEnvironment(HipEnvironment("prod", 1, "nameKey", Primary, isProductionLike = true)) mustBe false
+      }
     }
 }
 
