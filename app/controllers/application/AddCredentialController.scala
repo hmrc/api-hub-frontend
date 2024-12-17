@@ -20,7 +20,7 @@ import config.{FrontendAppConfig, HipEnvironment, HipEnvironments}
 import controllers.actions.*
 import controllers.helpers.ErrorResultBuilder
 import forms.AddCredentialChecklistFormProvider
-import models.application.{Application, Credential, Primary, Secondary}
+import models.application.{Application, Credential}
 import models.exception.ApplicationCredentialLimitException
 import models.requests.ApplicationRequest
 import models.user.UserModel
@@ -59,24 +59,24 @@ class AddCredentialController @Inject()(
 
   def addCredentialForEnvironment(applicationId: String, environment: String): Action[AnyContent] = (identify andThen applicationAuth(applicationId)).async {
     implicit request =>
-      hipEnvironments.forUrlPathParameter(environment) match {
+      hipEnvironments.forId(environment) match {
         case hipEnvironment if hipEnvironment.isProductionLike => addCredentialToProduction(hipEnvironment)
         case hipEnvironment => addCredentialToNonProduction(hipEnvironment)
       }
   }
 
-  def addProductionCredential(applicationId: String): Action[AnyContent] = (identify andThen applicationAuth(applicationId)).async {
-    implicit request =>
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, applicationId))),
-        _ => addCredentialToProduction(hipEnvironments.forEnvironmentName(Primary))
-      )
-  }
+//  def addProductionCredential(applicationId: String): Action[AnyContent] = (identify andThen applicationAuth(applicationId)).async {
+//    implicit request =>
+//      form.bindFromRequest().fold(
+//        formWithErrors =>
+//          Future.successful(BadRequest(view(formWithErrors, applicationId))),
+//        _ => addCredentialToProduction(hipEnvironments.production)
+//      )
+//  }
 
-  def addDevelopmentCredential(applicationId: String): Action[AnyContent] = (identify andThen applicationAuth(applicationId)).async {
-    implicit request => addCredentialToNonProduction(hipEnvironments.forEnvironmentName(Secondary))
-  }
+//  def addDevelopmentCredential(applicationId: String): Action[AnyContent] = (identify andThen applicationAuth(applicationId)).async {
+//    implicit request => addCredentialToNonProduction(hipEnvironments.deployment)
+//  }
 
   private def addCredentialToNonProduction(hipEnvironment: HipEnvironment)(implicit request: ApplicationRequest[AnyContent]) = {
     addCredential(

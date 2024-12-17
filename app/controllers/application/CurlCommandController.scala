@@ -17,11 +17,10 @@
 package controllers.application
 
 import com.google.inject.{Inject, Singleton}
-import config.{HipEnvironment, HipEnvironments}
+import config.HipEnvironments
 import controllers.actions.{ApplicationAuthActionProvider, AuthorisedSupportAction, IdentifierAction}
 import models.ApiWorld
 import models.application.ApplicationLenses.*
-import models.application.Secondary
 import play.api.i18n.I18nSupport
 import play.api.libs.json.Json
 import play.api.mvc.*
@@ -46,7 +45,7 @@ class CurlCommandController @Inject()(
 
       val application = request.application
 
-      val testEnvironment = hipEnvironments.forEnvironmentName(Secondary)
+      val testEnvironment = hipEnvironments.deployment
 
       for {
         maybeCredentials <- apiHubService.fetchCredentials(application.id, testEnvironment)

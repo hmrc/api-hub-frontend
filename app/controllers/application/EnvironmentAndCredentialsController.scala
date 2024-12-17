@@ -20,7 +20,6 @@ import com.google.inject.Inject
 import config.{FrontendAppConfig, HipEnvironment, HipEnvironments}
 import controllers.actions.{ApplicationAuthActionProvider, IdentifierAction}
 import controllers.helpers.ErrorResultBuilder
-import models.application.{EnvironmentName, Primary, Secondary}
 import models.exception.ApplicationCredentialLimitException
 import models.user.Permissions
 import play.api.i18n.{I18nSupport, Messages}
@@ -52,7 +51,7 @@ class EnvironmentAndCredentialsController @Inject()(
       request.identifierRequest.user.permissions match {
         case Permissions(_, true, _) | Permissions(_, _, true) =>
           val url = s"${controllers.application.routes.EnvironmentAndCredentialsController.onPageLoad(id).url}#hip-production"
-          deleteCredential(id, clientId, hipEnvironments.forEnvironmentName(Primary), url)
+          deleteCredential(id, clientId, hipEnvironments.production, url)
         case _ =>
           Future.successful(Redirect(controllers.routes.UnauthorisedController.onPageLoad))
       }
@@ -61,7 +60,7 @@ class EnvironmentAndCredentialsController @Inject()(
   def deleteSecondaryCredential(id: String, clientId: String): Action[AnyContent] = (identify andThen applicationAuth(id, enrich = true)).async {
     implicit request =>
       val url = s"${controllers.application.routes.EnvironmentAndCredentialsController.onPageLoad(id).url}#hip-development"
-      deleteCredential(id, clientId, hipEnvironments.forEnvironmentName(Secondary), url)
+      deleteCredential(id, clientId, hipEnvironments.deployment, url)
   }
 
   private def deleteCredential(id: String, clientId: String, hipEnvironment: HipEnvironment, url: String)(implicit request: Request[?]) = {

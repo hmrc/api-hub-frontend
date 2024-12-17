@@ -16,9 +16,10 @@
 
 package services
 
-import com.google.inject.Singleton
+import com.google.inject.{Inject, Singleton}
+import config.HipEnvironments
 import models.api.ApiDetail
-import models.application.{Application, Secondary}
+import models.application.Application
 import models.application.ApplicationLenses.*
 import models.curl.OpenApiDoc
 import models.{ApiWorld, CurlCommand}
@@ -28,7 +29,7 @@ import play.api.i18n.MessagesProvider
 import java.util.Base64.getEncoder
 
 @Singleton
-class CurlCommandService extends Logging {
+class CurlCommandService @Inject()(hipEnvironments: HipEnvironments) extends Logging {
 
   def buildCurlCommandsForApi(application: Application, apiDetail: ApiDetail, apiWorld: ApiWorld)
                              (implicit messagesProvider: MessagesProvider): Either[String, Seq[CurlCommand]] = {
@@ -56,7 +57,7 @@ class CurlCommandService extends Logging {
 
   private def getCommonHeaders(application: Application): Map[String,String] = {
     val maybeAuthHeader = for {
-      credential <- application.getMasterCredential(Secondary)
+      credential <- application.getMasterCredential(hipEnvironments.deployment)
       secret <- credential.clientSecret
       credentials = s"${credential.clientId}:$secret"
       encodedCredentials = getEncoder.encodeToString(credentials.getBytes)
