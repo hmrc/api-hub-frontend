@@ -18,7 +18,9 @@ package controllers.admin
 
 import base.SpecBase
 import controllers.routes
-import models.application.{Application, Creator, Environment, Environments, TeamMember, Credential}
+import fakes.FakeHipEnvironments
+import models.application.{Application, Creator, Credential, Environment, Environments, TeamMember}
+import models.application.ApplicationLenses.ApplicationLensOps
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
@@ -50,12 +52,12 @@ class ManageApplicationsControllerSpec
         val primaryClientId2 = "client-id-2"
         val secondaryClientId1 = "client-id-3"
         val secondaryClientId2 = "client-id-4"
-        val environmentsWithCredentials = Environments(
-          buildEnvironmentWithClientIds(Seq(primaryClientId1, primaryClientId2)),
-          buildEnvironmentWithClientIds(Seq(secondaryClientId1, secondaryClientId2))
-        )
+
+        val credentials = buildCredentials(Seq(primaryClientId1, primaryClientId2), FakeHipEnvironments.production.id) ++
+          buildCredentials(Seq(secondaryClientId1, secondaryClientId2), FakeHipEnvironments.test.id)
+
         val applications = Seq(
-          Application("id-1", "app-name-2", Creator(creatorEmail), Seq.empty).copy(teamMembers = Seq(TeamMember(testEmail))).copy(environments = environmentsWithCredentials),
+          Application("id-1", "app-name-2", Creator(creatorEmail), Seq.empty).copy(teamMembers = Seq(TeamMember(testEmail))).setCredentials(credentials.toSet),
           Application("id-2", "app-name-1", Creator(creatorEmail), Seq.empty).copy(teamMembers = Seq(TeamMember(testEmail)))
         )
 
@@ -106,8 +108,11 @@ class ManageApplicationsControllerSpec
     Fixture(playApplication, apiHubService)
   }
   
-  private def buildEnvironmentWithClientIds(clientIds: Seq[String]): Environment = {
-    Environment(Seq.empty, clientIds.map(id => Credential(id, LocalDateTime.now(), None, None)))
+  private def buildCredentials(clientIds: Seq[String], environmentId: String) = {
+    clientIds.map(
+      clientId =>
+        Credential(clientId, LocalDateTime.now(), None, None, environmentId)
+    )
   }
 
 }

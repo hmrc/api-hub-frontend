@@ -28,18 +28,19 @@ case class Application (
   lastUpdated: LocalDateTime,
   teamId: Option[String],
   teamMembers: Seq[TeamMember],
-  environments: Environments,
+//  environments: Environments,
   apis: Seq[Api],
   issues: Seq[String] = Seq.empty,
   deleted: Option[Deleted] = None,
   teamName: Option[String] = None,
+  credentials: Set[Credential]
 )
 
 object Application {
 
   def apply(id: String, name: String, createdBy: Creator, teamId: Option[String], teamMembers: Seq[TeamMember]): Application = {
     val now = LocalDateTime.now()
-    Application(id, name, now, createdBy, now, teamId, teamMembers, Environments(), Seq.empty)
+    Application(id, name, now, createdBy, now, teamId, teamMembers, Seq.empty, credentials = Set.empty)
   }
 
   def apply(id: String, name: String, createdBy: Creator, teamId: String): Application = {
@@ -56,7 +57,7 @@ object Application {
 
   def apply(id: String, name: String, createdBy: Creator, environments: Environments): Application = {
     val now = LocalDateTime.now()
-    Application(id, name, now, createdBy, now, None, Seq.empty, environments, Seq.empty)
+    Application(id, name, now, createdBy, now, None, Seq.empty, Seq.empty, credentials = environments.toCredentials)
   }
 
   implicit val applicationFormat: Format[Application] = Json.format[Application]
