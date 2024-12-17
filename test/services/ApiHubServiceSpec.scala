@@ -422,7 +422,7 @@ class ApiHubServiceSpec
   "addCredential" - {
     "must call the applications connector with the correct request and return the response" in {
       val fixture = buildFixture()
-      val expected = Credential("test-client-id", LocalDateTime.now(), Some("test-secret"), Some("test-fragment"))
+      val expected = Credential("test-client-id", LocalDateTime.now(), Some("test-secret"), Some("test-fragment"), FakeHipEnvironments.production.id)
 
       when(fixture.applicationsConnector.addCredential(eqTo(FakeApplication.id), eqTo(FakeHipEnvironments.production))(any()))
         .thenReturn(Future.successful(Right(Some(expected))))
@@ -917,6 +917,7 @@ class ApiHubServiceSpec
             created = LocalDateTime.now(),
             clientSecret = None,
             secretFragment = None,
+            environmentId = environment.id
           )
       )
 

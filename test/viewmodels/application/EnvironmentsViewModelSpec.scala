@@ -91,7 +91,7 @@ class EnvironmentsViewModelSpec extends AnyFreeSpec with Matchers with ScalaChec
   "EnvironmentsViewModel" - {
     def buildViewModel(credentialCount: Int, user: UserModel, hipEnvironment: HipEnvironment) = {
       val credentials = Range(0, credentialCount) map { index =>
-        Credential(s"id${index}", LocalDateTime.now(), None, None)
+        Credential(s"id$index", LocalDateTime.now(), None, None, hipEnvironment.id)
       }
       EnvironmentsViewModel(FakeApplication, Seq.empty, user, hipEnvironment, credentials, "apiHubGuideUrl").credentialsTabViewModel
     }
