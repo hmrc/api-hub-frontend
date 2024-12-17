@@ -261,7 +261,7 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
 
       forAll(scenarios) { (user: UserModel, environment: String, expectedResponse: Int, redirectTo: Option[() => String]) =>
         val fixture = buildFixture(user)
-        val credential = Credential("test-client-id", LocalDateTime.now(clock), Some("test-secret"), Some("test-fragment"))
+        val credential = Credential("test-client-id", LocalDateTime.now(clock), Some("test-secret"), Some("test-fragment"), environment)
         when(fixture.apiHubService.addCredential(eqTo(FakeApplication.id), any())(any()))
           .thenReturn(Future.successful(Right(Some(credential))))
 
