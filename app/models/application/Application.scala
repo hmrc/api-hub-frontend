@@ -28,7 +28,6 @@ case class Application (
   lastUpdated: LocalDateTime,
   teamId: Option[String],
   teamMembers: Seq[TeamMember],
-//  environments: Environments,
   apis: Seq[Api],
   issues: Seq[String] = Seq.empty,
   deleted: Option[Deleted] = None,
