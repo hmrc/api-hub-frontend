@@ -34,7 +34,7 @@ import play.api.test.Helpers.*
 import play.api.Application as PlayApplication
 import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
-import viewmodels.application.{Accessible, ApplicationApi, ApplicationEndpoint, Inaccessible}
+import viewmodels.application.{Accessible, ApplicationApi, ApplicationDetailsViewModel, ApplicationEndpoint, Inaccessible}
 import views.html.ErrorTemplate
 import views.html.application.ApplicationDetailsView
 
@@ -59,9 +59,10 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
             val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id).url)
             val result = route(fixture.playApplication, request).value
             val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
+            val viewModel = ApplicationDetailsViewModel(FakeApplication, Seq.empty, Some(user))
 
             status(result) mustEqual OK
-            contentAsString(result) mustBe view(FakeApplication, Seq.empty, Some(user))(request, messages(fixture.playApplication)).toString
+            contentAsString(result) mustBe view(viewModel)(request, messages(fixture.playApplication)).toString
             contentAsString(result) must validateAsHtml
           }
       }
@@ -86,9 +87,10 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url)
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
+        val viewModel = ApplicationDetailsViewModel(application, Seq.empty, Some(FakeUser))
 
         status(result) mustEqual OK
-        contentAsString(result) mustBe view(application, Seq.empty, Some(FakeUser))(request, messages(fixture.playApplication)).toString
+        contentAsString(result) mustBe view(viewModel)(request, messages(fixture.playApplication)).toString
         contentAsString(result) must validateAsHtml
       }
     }
@@ -128,9 +130,10 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url)
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
+        val viewModel = ApplicationDetailsViewModel(expected, Seq.empty, Some(FakeUser))
 
         status(result) mustBe OK
-        contentAsString(result) mustBe view(expected, Seq.empty, Some(FakeUser))(request, messages(fixture.playApplication)).toString
+        contentAsString(result) mustBe view(viewModel)(request, messages(fixture.playApplication)).toString
       }
     }
 
@@ -173,9 +176,10 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id).url)
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
+        val viewModel = ApplicationDetailsViewModel(application, applicationApis, Some(FakeUser))
 
         status(result) mustEqual OK
-        contentAsString(result) mustBe view(application, applicationApis, Some(FakeUser))(request, messages(fixture.playApplication)).toString
+        contentAsString(result) mustBe view(viewModel)(request, messages(fixture.playApplication)).toString
         contentAsString(result) must validateAsHtml
       }
     }
@@ -208,9 +212,10 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id).url)
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
+        val viewModel = ApplicationDetailsViewModel(application, applicationApis, Some(FakeUser))
 
         status(result) mustEqual OK
-        contentAsString(result) mustBe view(application, applicationApis, Some(FakeUser))(request, messages(fixture.playApplication)).toString
+        contentAsString(result) mustBe view(viewModel)(request, messages(fixture.playApplication)).toString
         contentAsString(result) must validateAsHtml
       }
     }
