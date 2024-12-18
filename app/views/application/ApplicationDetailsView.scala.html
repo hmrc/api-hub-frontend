@@ -16,7 +16,7 @@
 
 @import models.application._
 @import models.user.UserModel
-@import viewmodels.application.{ApplicationApi, ApplicationSideNavPages, ApplicationNavItems}
+@import viewmodels.application.{ApplicationApi, ApplicationSideNavPages, ApplicationNavItems, ApplicationDetailsViewModel}
 @import views.html.components.IconsLink
 @import views.html.components.ApplicationDetailsTable
 
@@ -29,11 +29,7 @@
     applicationNavItems: ApplicationNavItems,
 )
 
-@(application: Application, applicationApis: Seq[ApplicationApi], user: Option[UserModel])(implicit request: Request[?], messages: Messages)
-
-@pendingAccessRequestsCount = @{
-    applicationApis.map(_.pendingAccessRequestCount).sum
-}
+@(viewModel: ApplicationDetailsViewModel)(implicit request: Request[?], messages: Messages)
 
 @exploreApisLink(messageId: String) = {
     <a id="addExploreApisLink" href="@{routes.ExploreApisController.onPageLoad().url}" class="govuk-link govuk-link--no-visited-state">
@@ -42,189 +38,167 @@
 }
 
 @applicationApisLink(messageId: String) = {
-    <a href="@{controllers.application.routes.ApplicationApisController.onPageLoad(application.id).url}" class="govuk-link govuk-link--no-visited-state">
+    <a href="@{controllers.application.routes.ApplicationApisController.onPageLoad(viewModel.applicationId).url}" class="govuk-link govuk-link--no-visited-state">
         @messages(messageId)
     </a>
 }
 
-@boldNumber(number: Int) = {
-    <span class="govuk-!-font-weight-bold">@number</span>
+@applicationProblemsMessage = {
+    <div class="govuk-grid-row govuk-!-margin-bottom-0">
+        <div class="govuk-grid-column-two-thirds">
+            <h2 class="govuk-heading-m govuk-!-margin-bottom-4 govuk-!-margin-top-2">
+                @messages("applicationDetails.apis.problem")
+            </h2>
+            <p class="govuk-body">
+                @messages("applicationDetails.apis.tryAgain")
+            </p>
+        </div>
+    </div>
 }
 
-@apiName(applicationApi: ApplicationApi) = {
-    @if(applicationApi.isMissing) {
-        <i class="fa-solid fa-circle-exclamation"></i>
-        @applicationApi.apiTitle
-    } else {
-        @applicationApi.apiTitle
-    }
+@applicationApisHeading = {
+    <div class="govuk-grid-row govuk-!-margin-bottom-0">
+        <div class="govuk-grid-column-one-half">
+            <h2 class="govuk-heading-m govuk-!-margin-bottom-4 govuk-!-margin-top-2">
+            @if(viewModel.noApis) {
+                @messages("applicationDetails.apis.heading.noApis")
+            } else {
+                @messages("applicationDetails.apis.heading", viewModel.apiCount)
+            }
+            </h2>
+        </div>
+    </div>
 }
 
-@testEnv(applicationApi: ApplicationApi) = {
-    @if(applicationApi.isMissing) {
-        n/a
-    } else {
-        @Html(messages("applicationDetails.apis.endpointsAvailable", boldNumber(applicationApi.availableNonProductionEndpoints), boldNumber(applicationApi.totalEndpoints)))
-    }
+@noApisMessage = {
+    <p id="noApisMessage" class="govuk-body">
+        @Html(messages("applicationDetails.apis.noApis", exploreApisLink("applicationDetails.apis.exploreApis")))
+    </p>
 }
 
-@prodEnvCell(applicationApi: ApplicationApi) = {
-    @if(applicationApi.isMissing) {
-        n/a
-    } else {
-        @Html(messages("applicationDetails.apis.endpointsAvailable", boldNumber(applicationApi.availableProductionEndpoints), boldNumber(applicationApi.totalEndpoints)))
-    }
+@missingApiDetailsPanel = {
+    <div class="call-out-panel call-out-panel__small govuk-!-margin-top-2">
+        <p class="govuk-body information-tag">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span class="call-out-type">
+                @messages("applicationDetails.apis.missing.heading")
+            </span>
+        </p>
+
+        <p class="govuk-body additional-message">
+            @messages("applicationDetails.apis.missing.unavailable")
+        </p>
+
+        <ul class="govuk-list govuk-list--bullet">
+        @for(missingApiName <- viewModel.missingApiNames) {
+            <li>@missingApiName</li>
+        }
+        </ul>
+
+        <p class="govuk-body additional-message">
+            @Html(messages("applicationDetails.apis.missing.remove", applicationApisLink("applicationDetails.apis.page")))
+        </p>
+    </div>
 }
 
-@layout(pageTitle = titleNoForm(messages("applicationDetails.title")), user = user, fullWidth = true, customScriptsBlock = Some(iconsLink())) {
+@pendingAccessRequestsPanel = {
+    <div class="call-out-panel call-out-panel__small govuk-!-margin-top-2">
+        <p class="govuk-body information-tag">
+            <i class="fa-solid fa-circle-exclamation warning-colour"></i>
+            <span class="call-out-type warning">
+                @messages("applicationDetails.pending.heading", viewModel.pendingAccessRequestsCount)
+            </span>
+        </p>
+        <p class="govuk-body additional-message">
+            @messages("applicationDetails.pending.message.1", viewModel.pendingAccessRequestsCount)
+            @messages("applicationDetails.pending.message.2", viewModel.pendingAccessRequestsCount)
+        </p>
+        <p class="govuk-body additional-message">
+            <a id="cancelAccessRequestsLink" href="@controllers.application.cancelaccessrequest.routes.CancelAccessRequestStartController.startJourney(viewModel.applicationId)">Cancel production access requests</a>
+        </p>
+    </div>
+}
 
-    @sideNav(application.name, applicationNavItems(user, application, ApplicationSideNavPages.DetailsPage)) {
+@needsProductionAccessRequestsPanel = {
+    <div class="call-out-panel call-out-panel__small govuk-!-margin-top-2">
+        <p class="govuk-body information-tag">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span class="call-out-type">
+            @messages("applicationDetails.no.prod.access.heading")
+            </span>
+        </p>
+        <p class="govuk-body additional-message">
+        @Html(messages("applicationDetails.no.prod.access.message", applicationApisLink("applicationDetails.apis.page")))
+        </p>
+    </div>
+}
+
+@addMoreApisMessage = {
+    <p class="govuk-body">
+        @Html(messages("applicationDetails.apis.manageOrAddMore", applicationApisLink("applicationDetails.apis.appApis"), exploreApisLink("applicationDetails.apis.addMore")))
+    </p>
+}
+
+@applicationTeamInformation = {
+    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-half">
+            <h2 id="teamMembersHeading" class="govuk-heading-m govuk-!-margin-top-2">
+            @messages("applicationDetails.teamMembers.heading", viewModel.applicationTeamMemberCount)
+            </h2>
+        </div>
+    </div>
+
+    @govukTable(
+        Table(
+            caption = None,
+            head = Some(Seq(HeadCell(messages("applicationDetails.teamMembers.emailAddress")))),
+            rows = viewModel.applicationTeamMemberEmails.map(
+                email =>
+                    Seq(TableRow(
+                        content = email,
+                        attributes = Map("data-team-member-email" -> email)
+                    ))
+            )
+        )
+    )
+}
+
+@layout(pageTitle = titleNoForm(messages("applicationDetails.title")), user = viewModel.user, fullWidth = true, customScriptsBlock = Some(iconsLink())) {
+
+    @sideNav(viewModel.applicationName, applicationNavItems(viewModel.user, viewModel.application, ApplicationSideNavPages.DetailsPage)) {
 
         <h1 class="govuk-heading-l">@messages("applicationDetails.heading")</h1>
 
-        @applicationDetailsTable(application, user)
+        @applicationDetailsTable(viewModel.application, viewModel.user)
 
-        @if(!application.issues.isEmpty) {
-
-            <div class="govuk-grid-row govuk-!-margin-bottom-0">
-                <div class="govuk-grid-column-two-thirds">
-                    <h2 class="govuk-heading-m govuk-!-margin-bottom-4 govuk-!-margin-top-2">
-                        @messages("applicationDetails.apis.problem")
-                    </h2>
-                    <p class="govuk-body">
-                        @messages("applicationDetails.apis.tryAgain")
-                    </p>
-                </div>
-            </div>
+        @if(viewModel.showApplicationProblemsPanel) {
+            @applicationProblemsMessage
         } else {
-            <div class="govuk-grid-row govuk-!-margin-bottom-0">
-                <div class="govuk-grid-column-one-half">
-                    <h2 class="govuk-heading-m govuk-!-margin-bottom-4 govuk-!-margin-top-2">
-                        @if(applicationApis.isEmpty) {
-                            @messages("applicationDetails.apis.heading.noApis")
-                        } else {
-                            @messages("applicationDetails.apis.heading", applicationApis.size)
-                        }
-                    </h2>
-                </div>
-            </div>
+            @applicationApisHeading
 
-
-            @if(applicationApis.isEmpty) {
-                <p id="noApisMessage" class="govuk-body">
-                    @Html(messages("applicationDetails.apis.noApis", exploreApisLink("applicationDetails.apis.exploreApis")))
-                </p>
+            @if(viewModel.noApis) {
+                @noApisMessage
             } else {
-                @if(applicationApis.exists(_.isMissing)) {
-                    <div class="call-out-panel call-out-panel__small govuk-!-margin-top-2">
-                        <p class="govuk-body information-tag">
-                            <i class="fa-solid fa-circle-exclamation"></i>
-                            <span class="call-out-type">
-                                @messages("applicationDetails.apis.missing.heading")
-                            </span>
-                        </p>
-
-                        <p class="govuk-body additional-message">
-                            @messages("applicationDetails.apis.missing.unavailable")
-                        </p>
-
-                        <ul class="govuk-list govuk-list--bullet">
-                            @for(apiApplication <- applicationApis.filter(_.isMissing)) {
-                                <li>
-                                    @apiApplication.apiTitle
-                                </li>
-                            }
-                        </ul>
-
-                        <p class="govuk-body additional-message">
-                            @Html(messages("applicationDetails.apis.missing.remove", applicationApisLink("applicationDetails.apis.page")))
-                        </p>
-                    </div>
+                @if(viewModel.hasMissingApis) {
+                    @missingApiDetailsPanel
                 }
 
-                @if(applicationApis.exists(_.hasPendingAccessRequest)) {
-                    <div class="call-out-panel call-out-panel__small govuk-!-margin-top-2">
-                        <p class="govuk-body information-tag">
-                            <i class="fa-solid fa-circle-exclamation warning-colour"></i>
-                            <span class="call-out-type warning">
-                                @messages("applicationDetails.pending.heading", pendingAccessRequestsCount)
-                            </span>
-                        </p>
-                        <p class="govuk-body additional-message">
-                            @messages("applicationDetails.pending.message.1", pendingAccessRequestsCount)
-                            @messages("applicationDetails.pending.message.2", pendingAccessRequestsCount)
-                            <br>
-                            <br>
-                            <a id="cancelAccessRequestsLink" href="@controllers.application.cancelaccessrequest.routes.CancelAccessRequestStartController.startJourney(application.id)">Cancel production access requests</a>
-                        </p>
-                    </div>
+                @if(viewModel.hasPendingAccessRequests) {
+                    @pendingAccessRequestsPanel
                 }
 
-                @if(applicationApis.exists(_.needsProductionAccessRequest)) {
-                    <div class="call-out-panel call-out-panel__small govuk-!-margin-top-2">
-                        <p class="govuk-body information-tag">
-                            <i class="fa-solid fa-circle-exclamation"></i>
-                            <span class="call-out-type">
-                            @messages("applicationDetails.no.prod.access.heading")
-                            </span>
-                        </p>
-                        <p class="govuk-body additional-message">
-                            @Html(messages("applicationDetails.no.prod.access.message", applicationApisLink("applicationDetails.apis.page")))
-                        </p>
-                    </div>
+                @if(viewModel.needsProductionAccessRequest) {
+                    @needsProductionAccessRequestsPanel
                 }
 
-                @govukTable(
-                    Table(
-                        caption = None,
-                        head = Some(
-                            Seq(
-                                HeadCell(messages("applicationDetails.apis.apiName")),
-                                HeadCell(messages("applicationDetails.apis.testEnv")),
-                                HeadCell(messages("applicationDetails.apis.prodEnv"))
-                            )
-                        ),
-                        rows = applicationApis.map(
-                            applicationApi=>
-                                Seq(
-                                    TableRow(content = HtmlContent(apiName(applicationApi)), attributes = Map("data-api-id" -> applicationApi.apiId)),
-                                    TableRow(content = HtmlContent(testEnv(applicationApi))),
-                                    TableRow(content = HtmlContent(prodEnvCell(applicationApi)))
-                                )
-                        ),
-                        firstCellIsHeader = true
-                    )
-                )
-            <p class="govuk-body">
-                @Html(messages("applicationDetails.apis.manageOrAddMore", applicationApisLink("applicationDetails.apis.appApis"), exploreApisLink("applicationDetails.apis.addMore")))
-            </p>
+                @addMoreApisMessage
             }
         }
 
-        @if(application.teamId.isEmpty) {
-            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-
-            <div class="govuk-grid-row">
-                <div class="govuk-grid-column-one-half">
-                    <h2 id="teamMembersHeading" class="govuk-heading-m govuk-!-margin-top-2">
-                        @messages("applicationDetails.teamMembers.heading", application.teamMembers.size)
-                    </h2>
-                </div>
-            </div>
-
-            @govukTable(
-                Table(
-                    caption = None,
-                    head = Some(Seq(HeadCell(messages("applicationDetails.teamMembers.emailAddress")))),
-                    rows = application.teamMembers.map(
-                        teamMember =>
-                            Seq(TableRow(
-                                content = teamMember.email,
-                                attributes = Map("data-team-member-email" -> teamMember.email)
-                            ))
-                    )
-                )
-            )
+        @if(viewModel.notUsingGlobalTeams) {
+            @applicationTeamInformation
         }
     }
 

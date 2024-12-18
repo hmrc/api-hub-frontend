@@ -23,6 +23,7 @@ import models.application.ApplicationLenses.*
 import play.api.i18n.I18nSupport
 import play.api.mvc.*
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.application.ApplicationDetailsViewModel
 import views.html.application.ApplicationDetailsView
 
 import scala.concurrent.ExecutionContext
@@ -39,11 +40,11 @@ class ApplicationDetailsController @Inject()(
     implicit request =>
       applicationApiBuilder.build(request.application).map(
         applicationApis =>
-          Ok(view(
+          Ok(view(ApplicationDetailsViewModel(
             request.application.withSortedTeam(),
             applicationApis,
             Some(request.identifierRequest.user)
-          ))
+          )))
       )
   }
 
