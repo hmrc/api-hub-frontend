@@ -34,7 +34,7 @@
 
 @layout(pageTitle = titleNoForm(messages("allScopes.title")), user = Some(user), fullWidth = true, customScriptsBlock = Some(iconsLink())) {
 
-    @sideNav(application.name, applicationNavItems(Some(user), application, ApplicationSideNavPages.AllScopesPage)) {
+    @sideNav(application.name, applicationNavItems(Some(user), application, Some(ApplicationSideNavPages.AllScopesPage))) {
 
         <h1 class="govuk-heading-l">@messages("allScopes.heading")</h1>
 

@@ -46,7 +46,7 @@
     fullWidth = true,
     customScriptsBlock = Some(iconsLink())
 ) {
-    @sideNav(application.name, applicationNavItems(Some(user), application, ApplicationSideNavPages.ApplicationHistoryPage)) {
+    @sideNav(application.name, applicationNavItems(Some(user), application, Some(ApplicationSideNavPages.ApplicationHistoryPage))) {
 
         <h1 class="govuk-heading-l">
             @messages("applicationHistory.title")

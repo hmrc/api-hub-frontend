@@ -169,11 +169,11 @@
 
 @layout(pageTitle = titleNoForm(messages("applicationDetails.title")), user = viewModel.user, fullWidth = true, customScriptsBlock = Some(iconsLink())) {
 
-    @sideNav(viewModel.applicationName, applicationNavItems(viewModel.user, viewModel.application, ApplicationSideNavPages.DetailsPage)) {
+    @sideNav(viewModel.applicationName, applicationNavItems(viewModel.user, viewModel.application, Some(ApplicationSideNavPages.DetailsPage))) {
 
         <h1 class="govuk-heading-l">@messages("applicationDetails.heading")</h1>
 
-        @applicationDetailsTable(viewModel.application, viewModel.user)
+        @applicationDetailsTable(viewModel.application, viewModel.user, true)
 
         @if(viewModel.showApplicationProblemsPanel) {
             @applicationProblemsMessage
