@@ -21,7 +21,7 @@
 
 @this()
 
-@(application: Application, user: Option[UserModel])(implicit request: RequestHeader, messages: Messages)
+@(application: Application, user: Option[UserModel], showChangeOwningTeam: Boolean = false)(implicit request: RequestHeader, messages: Messages)
 
 @isAccessible(application: Application) = @{
     user
@@ -49,6 +49,7 @@
         <dd class="govuk-summary-list__value" id="applicationName">
             @application.name
         </dd>
+        <dd class="govuk-summary-list__actions"></dd>
     </div>
 
     <div class="govuk-summary-list__row">
@@ -58,6 +59,14 @@
         <dd class="govuk-summary-list__value" id="owningTeam">
             @teamName(application)
         </dd>
+        <dd class="govuk-summary-list__actions">
+            @if(showChangeOwningTeam) {
+                <a href="@controllers.application.routes.UpdateApplicationTeamController.onPageLoad(application.id).url" class="hip-change-link">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    @messages("site.change")
+                </a>
+            }
+        </dd>
     </div>
 
     <div class="govuk-summary-list__row">
@@ -65,6 +74,7 @@
             @messages("applicationDetailsTable.createdDate")
         </dt>
         <dd class="govuk-summary-list__value utcDateLong" id="applicationCreated">@ViewUtils.formatLocalDateTimeContainingUtc(application.created)</dd>
+        <dd class="govuk-summary-list__actions"></dd>
     </div>
 
     <div class="govuk-summary-list__row">
@@ -74,6 +84,7 @@
         <dd class="govuk-summary-list__value" id="applicationId">
             @application.id
         </dd>
+        <dd class="govuk-summary-list__actions"></dd>
     </div>
 </dl>
 

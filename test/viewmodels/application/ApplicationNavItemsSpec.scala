@@ -57,7 +57,7 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
         implicit val hipEnvironments: HipEnvironments = playApplication.injector.instanceOf[HipEnvironments]
         val applicationNavItems = playApplication.injector.instanceOf[ApplicationNavItems]
 
-        val actual = applicationNavItems(Some(FakeSupporter), FakeApplication, DetailsPage)
+        val actual = applicationNavItems(Some(FakeSupporter), FakeApplication, Some(DetailsPage))
         val expected = Seq(
           SideNavItemLeaf(
             DetailsPage,
@@ -87,12 +87,6 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
             DeleteApplicationPage,
             "Delete application",
             controllers.application.routes.DeleteApplicationConfirmationController.onPageLoad(FakeApplication.id),
-            isCurrentPage = false
-          ),
-          SideNavItemLeaf(
-            page = ChangeOwningTeamPage,
-            title = "Change owning team",
-            link = controllers.application.routes.UpdateApplicationTeamController.onPageLoad(FakeApplication.id),
             isCurrentPage = false
           ),
           SideNavItemLeaf(
@@ -139,7 +133,7 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
         implicit val hipEnvironments: HipEnvironments = playApplication.injector.instanceOf[HipEnvironments]
         val applicationNavItems = playApplication.injector.instanceOf[ApplicationNavItems]
 
-        val actual = applicationNavItems(Some(FakeSupporter), FakeApplication, DetailsPage)
+        val actual = applicationNavItems(Some(FakeSupporter), FakeApplication, Some(DetailsPage))
         val expected = Seq(
           SideNavItemLeaf(
             DetailsPage,
@@ -186,12 +180,6 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
             DeleteApplicationPage,
             "Delete application",
             controllers.application.routes.DeleteApplicationConfirmationController.onPageLoad(FakeApplication.id),
-            isCurrentPage = false
-          ),
-          SideNavItemLeaf(
-            page = ChangeOwningTeamPage,
-            title = "Change owning team",
-            link = controllers.application.routes.UpdateApplicationTeamController.onPageLoad(FakeApplication.id),
             isCurrentPage = false
           ),
           SideNavItemLeaf(
@@ -250,7 +238,7 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
         forAll(pages) {
           page =>
 
-            val actual = applicationNavItems(None, FakeApplication, page)
+            val actual = applicationNavItems(None, FakeApplication, Some(page))
               .collect { case ni: SideNavItemLeaf => ni }
               .filter(_.isCurrentPage)
               .map(_.page)
@@ -269,7 +257,7 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
         implicit val hipEnvironments: HipEnvironments = playApplication.injector.instanceOf[HipEnvironments]
         val applicationNavItems = playApplication.injector.instanceOf[ApplicationNavItems]
 
-        val actual = applicationNavItems(Some(FakeSupporter), FakeApplication.setTeamId("test-team-id"), DetailsPage)
+        val actual = applicationNavItems(Some(FakeSupporter), FakeApplication.setTeamId("test-team-id"), Some(DetailsPage))
           .collect { case ni: SideNavItemLeaf => ni }
           .filter(_.page.equals(ManageTeamMembersPage))
 
@@ -289,7 +277,7 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
           implicit val hipEnvironments: HipEnvironments = playApplication.injector.instanceOf[HipEnvironments]
           val applicationNavItems = playApplication.injector.instanceOf[ApplicationNavItems]
 
-          val actual = applicationNavItems(Some(user), FakeApplication.setTeamId("test-team-id"), DetailsPage)
+          val actual = applicationNavItems(Some(user), FakeApplication.setTeamId("test-team-id"), Some(DetailsPage))
             .collect { case ni: SideNavItemLeaf => ni }
             .filter(_.page.equals(ViewAsJsonApplicationPage))
 

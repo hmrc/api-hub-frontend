@@ -47,7 +47,7 @@
 }
 
 @layout(pageTitle = titleNoForm(messages("application.update.team.title")), user = Some(user), fullWidth = true, customScriptsBlock = Some(scripts())) {
-    @sideNav(application.name, applicationNavItems(Some(user), application, ApplicationSideNavPages.ChangeOwningTeamPage)) {
+    @sideNav(application.name, applicationNavItems(Some(user), application, None)) {
         @formHelper(action = controllers.application.routes.UpdateApplicationTeamController.onSubmit(application.id), Symbol("autoComplete") -> "off") {
             @if(form.errors.nonEmpty) {
                 @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))

@@ -34,7 +34,7 @@
 
 @layout(pageTitle = titleNoForm(messages("environments.title")), user = Some(viewModel.user), fullWidth = true, customScriptsBlock = Some(iconsLink())) {
 
-    @sideNav(viewModel.application.name, applicationNavItems(Some(viewModel.user), viewModel.application, ApplicationSideNavPages.EnvironmentPage(viewModel.hipEnvironment))) {
+    @sideNav(viewModel.application.name, applicationNavItems(Some(viewModel.user), viewModel.application, Some(ApplicationSideNavPages.EnvironmentPage(viewModel.hipEnvironment)))) {
 
         <h1 class="govuk-heading-l">@messages(s"site.environment.${viewModel.hipEnvironment.id}")</h1>
 
