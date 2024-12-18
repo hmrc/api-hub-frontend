@@ -17,7 +17,7 @@
 package viewmodels.application
 
 import controllers.actions.{FakeApplication, FakeUser}
-import models.application.{Api, Application}
+import models.application.{Api, Application, TeamMember}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 
@@ -25,6 +25,12 @@ class ApplicationDetailsViewModelSpec extends AnyFreeSpec with Matchers {
   "ApplicationDetailsViewModel" - {
     def buildApplicationApi(id: String, pendingCount: Int = 0, isMissing: Boolean = false) = {
       ApplicationApi(Api(id, id), pendingCount).copy(isMissing = isMissing)
+    }
+    def buildApplicationEndpoint() = {
+      ApplicationEndpoint("GET", "/path", None, None, Seq.empty, Accessible, Accessible)
+    }
+    def buildApplicationApiWithEndpoint(id: String, endpoint: ApplicationEndpoint) = {
+      buildApplicationApi(id).copy(endpoints = Seq(endpoint))
     }
     def buildViewModel(application: Application = FakeApplication, applicationApis: Seq[ApplicationApi] = Seq.empty) = {
       ApplicationDetailsViewModel(application, applicationApis, Some(FakeUser))
@@ -103,5 +109,44 @@ class ApplicationDetailsViewModelSpec extends AnyFreeSpec with Matchers {
         )).hasPendingAccessRequests mustBe false
       }
     }
+
+    "needsProductionAccessRequest" - {
+      "must be true when at least one API needs a production access request" in {
+        buildViewModel(applicationApis = Seq(
+          buildApplicationApiWithEndpoint("1", buildApplicationEndpoint()),
+          buildApplicationApiWithEndpoint("2", buildApplicationEndpoint().copy(productionAccess = Inaccessible)),
+          buildApplicationApiWithEndpoint("3", buildApplicationEndpoint()),
+        )).needsProductionAccessRequest mustBe true
+      }
+      "must be false when no APIs need a production access request" in {
+        buildViewModel(applicationApis = Seq(
+          buildApplicationApiWithEndpoint("1", buildApplicationEndpoint()),
+          buildApplicationApiWithEndpoint("2", buildApplicationEndpoint()),
+          buildApplicationApiWithEndpoint("3", buildApplicationEndpoint()),
+        )).needsProductionAccessRequest mustBe false
+      }
+    }
+
+    "notUsingGlobalTeams" - {
+      "must be true when there is no application team" in {
+        buildViewModel(FakeApplication.copy(teamId = None)).notUsingGlobalTeams mustBe true
+      }
+      "must be false when there is an application team" in {
+        buildViewModel(FakeApplication.copy(teamId = Some("team"))).notUsingGlobalTeams mustBe false
+      }
+    }
+
+    "applicationTeamMemberCount" - {
+      "must return the number of team members" in {
+        buildViewModel(FakeApplication.copy(teamMembers = Seq(TeamMember("a@example.com"), TeamMember("b@example.com")))).applicationTeamMemberCount mustBe 2
+      }
+    }
+
+    "applicationTeamMemberEmails" - {
+      "must return the emails of team members" in {
+        buildViewModel(FakeApplication.copy(teamMembers = Seq(TeamMember("a@example.com"), TeamMember("b@example.com")))).applicationTeamMemberEmails mustBe Seq("a@example.com", "b@example.com")
+      }
+    }
+
   }
 }
