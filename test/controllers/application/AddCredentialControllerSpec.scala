@@ -24,6 +24,7 @@ import forms.AddCredentialChecklistFormProvider
 import models.api.{ApiDetail, Live, Maintainer}
 import models.application.{Api, Application, Credential, Primary, Secondary}
 import models.exception.ApplicationCredentialLimitException
+import models.requests.IdentifierRequest
 import models.user.{Permissions, UserModel}
 import org.mockito.ArgumentMatchers.{any, argThat, eq as eqTo}
 import org.mockito.Mockito.{never, verify, when}
@@ -55,12 +56,12 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
 
           running(fixture.playApplication) {
             implicit val msgs: Messages = messages(fixture.playApplication)
-            implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, checklistRoute())
+            implicit val request: IdentifierRequest[AnyContentAsEmpty.type] = IdentifierRequest(FakeRequest(GET, checklistRoute()), user)
             val result = route(fixture.playApplication, request).value
             val view = fixture.playApplication.injector.instanceOf[AddCredentialChecklistView]
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual view(form, FakeApplication.id).toString
+            contentAsString(result) mustEqual view(form, FakeApplication.id, request.maybeUser).toString
             contentAsString(result) must validateAsHtml
           }
       }
@@ -72,7 +73,7 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
           val fixture = buildFixture(user)
 
           running(fixture.playApplication) {
-            implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, checklistRoute())
+            implicit val request: IdentifierRequest[AnyContentAsEmpty.type] = IdentifierRequest(FakeRequest(GET, checklistRoute()), FakeUser)
             val result = route(fixture.playApplication, request).value
 
             status(result) mustBe SEE_OTHER
@@ -150,15 +151,15 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
 
       running(fixture.playApplication) {
         implicit val msgs: Messages = messages(fixture.playApplication)
-        implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, addProductionCredentialRoute())
-          .withFormUrlEncodedBody()
+        implicit val request: IdentifierRequest[AnyContentAsFormUrlEncoded] = IdentifierRequest(FakeRequest(POST, addProductionCredentialRoute())
+          .withFormUrlEncodedBody(), FakeUser)
 
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[AddCredentialChecklistView]
         val formWithErrors = form.bind(Map.empty[String, String])
 
         status(result) mustBe BAD_REQUEST
-        contentAsString(result) mustEqual view(formWithErrors, FakeApplication.id).toString
+        contentAsString(result) mustEqual view(formWithErrors, FakeApplication.id, request.maybeUser).toString
         contentAsString(result) must validateAsHtml
       }
     }

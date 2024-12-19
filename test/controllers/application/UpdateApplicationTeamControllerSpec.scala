@@ -199,7 +199,8 @@ class UpdateApplicationTeamControllerSpec
                     view(
                             "Page not found - 404",
                             "Unable to change owning team for this application.",
-                            "The application or team cannot be found."
+                            "The application or team cannot be found.",
+                            Some(user)
                     )(request, messages(fixture.playApplication)).toString()
                     contentAsString(result) must validateAsHtml
                 }

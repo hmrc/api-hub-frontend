@@ -19,10 +19,13 @@ package controllers.helpers
 import com.google.inject.{Inject, Singleton}
 import models.api.ApiDetail
 import models.application.Application
+import models.requests.{IdentifierRequest, RequestWithUser}
+import RequestWithUser.*
+import models.user.UserModel
 import play.api.Logging
 import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND}
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc.{Request, Result}
+import play.api.i18n.{I18nSupport, Messages, MessagesApi, MessagesProvider}
+import play.api.mvc.{Request, RequestHeader, Result, WrappedRequest}
 import play.api.mvc.Results.{BadRequest, InternalServerError, NotFound}
 import views.html.ErrorTemplate
 
@@ -54,7 +57,7 @@ class ErrorResultBuilder @Inject()(
         BAD_REQUEST,
         title.getOrElse(Messages("global.error.badRequest400.title")),
         heading.getOrElse(Messages("global.error.badRequest400.heading")),
-        message.getOrElse(Messages("global.error.badRequest400.message"))
+        message.getOrElse(Messages("global.error.badRequest400.message")),
       )
     )
   }
@@ -170,7 +173,8 @@ class ErrorResultBuilder @Inject()(
     errorTemplate(
       title,
       heading,
-      message
+      message,
+      request.requestUser,
     )
   }
 

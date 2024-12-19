@@ -54,7 +54,7 @@ class AddCredentialController @Inject()(
 
   def checklist(applicationId: String): Action[AnyContent] = (identify andThen isPrivileged andThen applicationAuth(applicationId)) {
     implicit request =>
-      Ok(view(form, applicationId))
+      Ok(view(form, applicationId, request.maybeUser))
   }
 
   def addCredentialForEnvironment(applicationId: String, environment: String): Action[AnyContent] = (identify andThen applicationAuth(applicationId)).async {
@@ -69,7 +69,7 @@ class AddCredentialController @Inject()(
     implicit request =>
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, applicationId))),
+          Future.successful(BadRequest(view(formWithErrors, applicationId, request.maybeUser))),
         _ => addCredentialToProduction(hipEnvironments.forEnvironmentName(Primary))
       )
   }

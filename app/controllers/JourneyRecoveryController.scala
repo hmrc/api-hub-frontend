@@ -49,7 +49,7 @@ class JourneyRecoveryController @Inject()(
       }
 
       safeUrl
-        .map(url => Ok(continueView(url)))
-        .getOrElse(Ok(startAgainView()))
+        .map(url => Ok(continueView(url, request.maybeUser)))
+        .getOrElse(Ok(startAgainView(request.maybeUser)))
   }
 }

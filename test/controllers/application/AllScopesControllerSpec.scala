@@ -17,7 +17,7 @@
 package controllers.application
 
 import base.SpecBase
-import controllers.actions.{FakeApplication, FakeSupporter}
+import controllers.actions.{FakeApplication, FakeSupporter, FakeUser}
 import fakes.FakeHipEnvironments
 import models.application.{CredentialScopes, Primary}
 import models.user.UserModel
@@ -98,7 +98,8 @@ class AllScopesControllerSpec
           view(
             "Page not found - 404",
             "Application not found",
-            s"Cannot find an application with ID ${FakeApplication.id}."
+            s"Cannot find an application with ID ${FakeApplication.id}.",
+            Some(FakeSupporter)
           )(request, messages(fixture.playApplication))
             .toString()
         contentAsString(result) must validateAsHtml
@@ -157,7 +158,8 @@ class AllScopesControllerSpec
           view(
             "Page not found - 404",
             "Application not found",
-            s"Cannot find an application with ID ${FakeApplication.id}."
+            s"Cannot find an application with ID ${FakeApplication.id}.",
+            Some(FakeSupporter)
           )(request, messages(fixture.playApplication))
             .toString()
         contentAsString(result) must validateAsHtml

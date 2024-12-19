@@ -121,7 +121,8 @@ class RemoveApiControllerSpec extends SpecBase with MockitoSugar with HtmlValida
           view(
             "Page not found - 404",
             "API not found",
-            s"The API ${apiDetail.title} has not been added to the application ${applicationWithoutApis.name}."
+            s"The API ${apiDetail.title} has not been added to the application ${applicationWithoutApis.name}.",
+            Some(FakeUser)
           )(request, messages(fixture.playApplication)).toString()
 
         contentAsString(result) must validateAsHtml
@@ -148,7 +149,8 @@ class RemoveApiControllerSpec extends SpecBase with MockitoSugar with HtmlValida
           view(
             "Page not found - 404",
             "API not found",
-            s"Cannot find an API with ID ${apiDetail.id}."
+            s"Cannot find an API with ID ${apiDetail.id}.",
+            Some(FakeUser)
           )(request, messages(fixture.playApplication)).toString()
 
         contentAsString(result) must validateAsHtml
@@ -245,7 +247,8 @@ class RemoveApiControllerSpec extends SpecBase with MockitoSugar with HtmlValida
           view(
             "Page not found - 404",
             "API not found",
-            s"The API ${apiDetail.id} has not been added to the application ${applicationWithoutApis.name}."
+            s"The API ${apiDetail.id} has not been added to the application ${applicationWithoutApis.name}.",
+            Some(FakeUser)
           )(request, messages(fixture.playApplication)).toString()
 
         contentAsString(result) must validateAsHtml

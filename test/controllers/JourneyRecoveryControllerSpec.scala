@@ -17,6 +17,8 @@
 package controllers
 
 import base.SpecBase
+import controllers.actions.FakeUser
+import models.requests.IdentifierRequest
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
@@ -35,14 +37,14 @@ class JourneyRecoveryControllerSpec extends SpecBase with HtmlValidation {
 
         running(application) {
           val continueUrl = RedirectUrl("/foo")
-          val request     = FakeRequest(GET, routes.JourneyRecoveryController.onPageLoad(Some(continueUrl)).url)
+          val request     = IdentifierRequest(FakeRequest(GET, routes.JourneyRecoveryController.onPageLoad(Some(continueUrl)).url), FakeUser)
 
           val result = route(application, request).value
 
           val continueView = application.injector.instanceOf[JourneyRecoveryContinueView]
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual continueView(continueUrl.unsafeValue)(request, messages(application)).toString
+          contentAsString(result) mustEqual continueView(continueUrl.unsafeValue, request.maybeUser)(request, messages(application)).toString
           contentAsString(result) must validateAsHtml
         }
       }
@@ -56,14 +58,14 @@ class JourneyRecoveryControllerSpec extends SpecBase with HtmlValidation {
 
         running(application) {
           val continueUrl = RedirectUrl("https://foo.com")
-          val request     = FakeRequest(GET, routes.JourneyRecoveryController.onPageLoad(Some(continueUrl)).url)
+          val request     = IdentifierRequest(FakeRequest(GET, routes.JourneyRecoveryController.onPageLoad(Some(continueUrl)).url), FakeUser)
 
           val result = route(application, request).value
 
           val startAgainView = application.injector.instanceOf[JourneyRecoveryStartAgainView]
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual startAgainView()(request, messages(application)).toString
+          contentAsString(result) mustEqual startAgainView(request.maybeUser)(request, messages(application)).toString
           contentAsString(result) must validateAsHtml
         }
       }
@@ -76,14 +78,14 @@ class JourneyRecoveryControllerSpec extends SpecBase with HtmlValidation {
         val application = applicationBuilder(userAnswers = None).build()
 
         running(application) {
-          val request = FakeRequest(GET, routes.JourneyRecoveryController.onPageLoad().url)
+          val request = IdentifierRequest(FakeRequest(GET, routes.JourneyRecoveryController.onPageLoad().url), FakeUser)
 
           val result = route(application, request).value
 
           val startAgainView = application.injector.instanceOf[JourneyRecoveryStartAgainView]
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual startAgainView()(request, messages(application)).toString
+          contentAsString(result) mustEqual startAgainView(request.maybeUser)(request, messages(application)).toString
           contentAsString(result) must validateAsHtml
         }
       }
