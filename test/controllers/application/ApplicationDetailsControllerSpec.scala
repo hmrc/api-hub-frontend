@@ -59,7 +59,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
             val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id).url)
             val result = route(fixture.playApplication, request).value
             val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
-            val viewModel = ApplicationDetailsViewModel(FakeApplication, Seq.empty, Some(user))
+            val viewModel = ApplicationDetailsViewModel(FakeApplication, Seq.empty, Some(user), "production")
 
             status(result) mustEqual OK
             contentAsString(result) mustBe view(viewModel)(request, messages(fixture.playApplication)).toString
@@ -87,7 +87,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url)
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
-        val viewModel = ApplicationDetailsViewModel(application, Seq.empty, Some(FakeUser))
+        val viewModel = ApplicationDetailsViewModel(application, Seq.empty, Some(FakeUser), "production")
 
         status(result) mustEqual OK
         contentAsString(result) mustBe view(viewModel)(request, messages(fixture.playApplication)).toString
@@ -130,7 +130,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url)
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
-        val viewModel = ApplicationDetailsViewModel(expected, Seq.empty, Some(FakeUser))
+        val viewModel = ApplicationDetailsViewModel(expected, Seq.empty, Some(FakeUser), "production")
 
         status(result) mustBe OK
         contentAsString(result) mustBe view(viewModel)(request, messages(fixture.playApplication)).toString
@@ -176,7 +176,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id).url)
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
-        val viewModel = ApplicationDetailsViewModel(application, applicationApis, Some(FakeUser))
+        val viewModel = ApplicationDetailsViewModel(application, applicationApis, Some(FakeUser), "production")
 
         status(result) mustEqual OK
         contentAsString(result) mustBe view(viewModel)(request, messages(fixture.playApplication)).toString
@@ -212,7 +212,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id).url)
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
-        val viewModel = ApplicationDetailsViewModel(application, applicationApis, Some(FakeUser))
+        val viewModel = ApplicationDetailsViewModel(application, applicationApis, Some(FakeUser), "production")
 
         status(result) mustEqual OK
         contentAsString(result) mustBe view(viewModel)(request, messages(fixture.playApplication)).toString

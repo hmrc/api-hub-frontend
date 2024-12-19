@@ -45,6 +45,12 @@
     </a>
 }
 
+@prodAccessRequestLink(messageId: String) = {
+    <a href="@{controllers.application.routes.EnvironmentsController.onPageLoad(viewModel.applicationId, viewModel.productionEnvironmentId).url}" class="govuk-link govuk-link--no-visited-state">
+        @messages(messageId)
+    </a>
+}
+
 @applicationProblemsMessage = {
     <div class="govuk-grid-row govuk-!-margin-bottom-0">
         <div class="govuk-grid-column-two-thirds">
@@ -126,18 +132,18 @@
         <p class="govuk-body information-tag">
             <i class="fa-solid fa-circle-exclamation"></i>
             <span class="call-out-type">
-            @messages("applicationDetails.no.prod.access.heading")
+                @messages("applicationDetails.no.prod.access.heading")
             </span>
         </p>
         <p class="govuk-body additional-message">
-                            @Html(messages("applicationDetails.no.prod.access.message", applicationApisLink("applicationDetails.apis.page", hipEnvironments)))
+            @Html(messages("applicationDetails.no.prod.access.message", prodAccessRequestLink("applicationDetails.no.prod.access.prod")))
         </p>
     </div>
 }
 
 @addMoreApisMessage = {
     <p class="govuk-body">
-                @Html(messages("applicationDetails.apis.manageOrAddMore", applicationApisLink("applicationDetails.apis.appApis", hipEnvironments), exploreApisLink("applicationDetails.apis.addMore")))
+        @Html(messages("applicationDetails.apis.toYourApp", exploreApisLink("applicationDetails.apis.addApis"))).
     </p>
 }
 
@@ -167,6 +173,10 @@
     )
 }
 
+@apiList = {
+  <ul class="hip-application-api-list">@viewModel.allApiNames.map(name => <li>{name}</li>)</ul>
+}
+
 @layout(pageTitle = titleNoForm(messages("applicationDetails.title")), user = viewModel.user, fullWidth = true, customScriptsBlock = Some(iconsLink())) {
 
     @sideNav(viewModel.applicationName, applicationNavItems(viewModel.user, viewModel.application, Some(ApplicationSideNavPages.DetailsPage))) {
@@ -194,6 +204,8 @@
                 @if(viewModel.needsProductionAccessRequest) {
                     @needsProductionAccessRequestsPanel
                 }
+
+                @apiList
 
                 @addMoreApisMessage
             }

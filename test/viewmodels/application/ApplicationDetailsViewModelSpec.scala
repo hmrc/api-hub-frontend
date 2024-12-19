@@ -33,7 +33,7 @@ class ApplicationDetailsViewModelSpec extends AnyFreeSpec with Matchers {
       buildApplicationApi(id).copy(endpoints = Seq(endpoint))
     }
     def buildViewModel(application: Application = FakeApplication, applicationApis: Seq[ApplicationApi] = Seq.empty) = {
-      ApplicationDetailsViewModel(application, applicationApis, Some(FakeUser))
+      ApplicationDetailsViewModel(application, applicationApis, Some(FakeUser), "production")
     }
 
     "must return the correct application id" in {
@@ -73,6 +73,14 @@ class ApplicationDetailsViewModelSpec extends AnyFreeSpec with Matchers {
         buildViewModel(applicationApis = Seq(
           buildApplicationApi("a"), buildApplicationApi("b", isMissing = true), buildApplicationApi("c", isMissing = true)
         )).missingApiNames mustBe Seq("b", "c")
+      }
+    }
+
+    "allApiNames" - {
+      "must return the titles of all APIs" in {
+        buildViewModel(applicationApis = Seq(
+          buildApplicationApi("a"), buildApplicationApi("b"), buildApplicationApi("c")
+        )).allApiNames mustBe Seq("a", "b", "c")
       }
     }
 
