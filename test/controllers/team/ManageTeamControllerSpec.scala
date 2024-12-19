@@ -152,7 +152,8 @@ class ManageTeamControllerSpec extends SpecBase with MockitoSugar with TestHelpe
           view(
             "Page not found - 404",
             "Team not found",
-            s"Cannot find a team with ID $teamId."
+            s"Cannot find a team with ID $teamId.",
+            Some(FakeUser)
           )(request, messages(fixture.playApplication))
             .toString()
         contentAsString(result) must validateAsHtml

@@ -115,7 +115,8 @@ class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with Opt
           view(
             "Page not found - 404",
             "This page can’t be found",
-            "Cannot find this team member."
+            "Cannot find this team member.",
+            None
           )(request, messages(application))
             .toString()
         contentAsString(result) must validateAsHtml
@@ -136,7 +137,8 @@ class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with Opt
           view(
             "Page not found - 404",
             "This page can’t be found",
-            "Cannot find this team member."
+            "Cannot find this team member.",
+            None
           )(request, messages(application))
             .toString()
         contentAsString(result) must validateAsHtml
@@ -256,7 +258,8 @@ class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with Opt
           view(
             "Bad request - 400",
             "Bad request",
-            "Cannot delete the authenticated user."
+            "Cannot delete the authenticated user.",
+            None
           )(request, msgs)
             .toString()
 

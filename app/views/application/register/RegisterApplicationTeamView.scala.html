@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import models.requests.IdentifierRequest
 @import models.team.Team
 @import views.html.components.IconsLink
 
@@ -48,7 +49,7 @@
     </a>
 }
 
-@layout(pageTitle = title(form, messages("registerApplicationTeam.title")), customScriptsBlock = Some(iconsLink())) {
+@layout(pageTitle = title(form, messages("registerApplicationTeam.title")), customScriptsBlock = Some(iconsLink()), user = IdentifierRequest.extractUserFromRequest(request)) {
 
     @formHelper(action = controllers.application.register.routes.RegisterApplicationTeamController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 

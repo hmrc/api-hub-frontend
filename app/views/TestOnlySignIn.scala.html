@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import models.requests.IdentifierRequest
 @import scala.collection.immutable.List
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
@@ -32,7 +33,7 @@
 
 @(form: Form[TestOnlySignInData])(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = messages("fake-sign-in.title.lbl") + " – " + messages("site.service_name")) {
+@layout(pageTitle = messages("fake-sign-in.title.lbl") + " – " + messages("site.service_name"), user = IdentifierRequest.extractUserFromRequest(request)) {
     <h1 class="govuk-heading-xl">@messages("fake-sign-in.header.lbl")</h1>
     <div class="">
         @formWithCSRF(action = TestOnlySignInController.submit()) {

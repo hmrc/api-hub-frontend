@@ -18,17 +18,17 @@ package controllers.myapis
 
 import base.SpecBase
 import connectors.ApplicationsConnector
-import controllers.actions.{FakeApiDetail, FakeSupporter}
+import controllers.actions.{FakeApiDetail, FakeSupporter, FakeUser}
 import models.deployment.{Error, FailuresResponse, InvalidOasResponse, SuccessfulDeploymentsResponse}
 import models.user.UserModel
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{never, verify, when}
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import play.api.{Application => PlayApplication}
+import play.api.test.Helpers.*
+import play.api.Application as PlayApplication
 import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
 import views.html.ErrorTemplate
@@ -78,7 +78,9 @@ class SimpleApiPromotionControllerSpec
         contentAsString(result) mustBe view(
           "Page not found - 404",
           "API not found",
-          s"Cannot find an API with ID ${FakeApiDetail.id}.")(request, messages(fixture.playApplication)).toString()
+          s"Cannot find an API with ID ${FakeApiDetail.id}.",
+          Some(FakeSupporter)
+        )(request, messages(fixture.playApplication)).toString()
         contentAsString(result) must validateAsHtml
       }
     }
@@ -170,7 +172,9 @@ class SimpleApiPromotionControllerSpec
         contentAsString(result) mustBe view(
           "Page not found - 404",
           "API not found",
-          s"Cannot find an API with ID ${FakeApiDetail.id}.")(request, messages(fixture.playApplication)).toString()
+          s"Cannot find an API with ID ${FakeApiDetail.id}.",
+          Some(FakeSupporter)
+        )(request, messages(fixture.playApplication)).toString()
         contentAsString(result) must validateAsHtml
       }
     }
@@ -190,7 +194,9 @@ class SimpleApiPromotionControllerSpec
         contentAsString(result) mustBe view(
           "Page not found - 404",
           "API not found",
-          s"The API ${FakeApiDetail.title} has not been deployed to HIP.")(request, messages(fixture.playApplication)).toString()
+          s"The API ${FakeApiDetail.title} has not been deployed to HIP.",
+          Some(FakeSupporter)
+        )(request, messages(fixture.playApplication)).toString()
         contentAsString(result) must validateAsHtml
       }
     }

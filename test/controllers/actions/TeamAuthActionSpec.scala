@@ -88,7 +88,8 @@ class TeamAuthActionSpec extends SpecBase with Matchers with MockitoSugar {
           view(
             "Page not found - 404",
             "Team not found",
-            s"Cannot find a team with ID $teamId."
+            s"Cannot find a team with ID $teamId.",
+            Some(FakeUser)
           )(FakeRequest(), messages(fixture.playApplication))
             .toString()
       }

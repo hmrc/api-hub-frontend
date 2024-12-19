@@ -18,13 +18,15 @@ package controllers
 
 import base.SpecBase
 import controllers.TestConnectivityControllerSpec.buildFixture
+import controllers.actions.FakeUser
+import models.requests.IdentifierRequest
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import play.api.{Application => PlayApplication}
+import play.api.test.Helpers.*
+import play.api.Application as PlayApplication
 import repositories.SessionRepository
 import services.ApiHubService
 import utils.HtmlValidation
@@ -45,7 +47,7 @@ class TestConnectivityControllerSpec extends SpecBase with MockitoSugar with Htm
         when(fixture.mockApiHubService.testConnectivity()(any()))
           .thenReturn(Future.successful(expected))
 
-        val request = FakeRequest(GET, routes.TestConnectivityController.onPageLoad().url)
+        val request = IdentifierRequest(FakeRequest(GET, routes.TestConnectivityController.onPageLoad().url), FakeUser)
 
         val result = route(fixture.application, request).value
 

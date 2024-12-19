@@ -14,6 +14,8 @@
  * limitations under the License.
  *@
 
+@import models.requests.IdentifierRequest
+
 @this(
     layout: templates.Layout,
     govukButton: GovukButton
@@ -21,7 +23,7 @@
 
 @()(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("journeyRecovery.startAgain.title"))) {
+@layout(pageTitle = titleNoForm(messages("journeyRecovery.startAgain.title")), user = IdentifierRequest.extractUserFromRequest(request)) {
 
     <h1 class="govuk-heading-xl">@messages("journeyRecovery.startAgain.heading")</h1>
 

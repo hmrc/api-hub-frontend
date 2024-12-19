@@ -99,7 +99,8 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
           view(
             "Page not found - 404",
             "Application not found",
-            s"Cannot find an application with ID ${FakeApplication.id}."
+            s"Cannot find an application with ID ${FakeApplication.id}.",
+            Some(FakeUser)
           )(request, messages(fixture.playApplication))
             .toString()
         contentAsString(result) must validateAsHtml

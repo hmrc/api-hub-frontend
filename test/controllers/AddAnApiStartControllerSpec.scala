@@ -143,7 +143,8 @@ class AddAnApiStartControllerSpec extends SpecBase with MockitoSugar with HtmlVa
           view(
             "Page not found - 404",
             "API not found",
-            s"Cannot find an API with ID ${apiDetail.id}."
+            s"Cannot find an API with ID ${apiDetail.id}.",
+            Some(FakeUser)
           )(request, messages(fixture.application))
             .toString()
 

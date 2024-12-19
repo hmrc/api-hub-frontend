@@ -19,10 +19,11 @@ package controllers.helpers
 import com.google.inject.{Inject, Singleton}
 import models.api.ApiDetail
 import models.application.Application
+import models.requests.IdentifierRequest
 import play.api.Logging
 import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND}
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc.{Request, Result}
+import play.api.mvc.{Request, Result, WrappedRequest}
 import play.api.mvc.Results.{BadRequest, InternalServerError, NotFound}
 import views.html.ErrorTemplate
 
@@ -170,7 +171,8 @@ class ErrorResultBuilder @Inject()(
     errorTemplate(
       title,
       heading,
-      message
+      message,
+      IdentifierRequest.extractUserFromRequest(request)
     )
   }
 
