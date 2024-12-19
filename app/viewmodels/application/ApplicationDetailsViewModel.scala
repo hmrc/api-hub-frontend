@@ -16,16 +16,18 @@
 
 package viewmodels.application
 
+import config.HipEnvironment
 import models.application.Application
 import models.user.UserModel
 
-case class ApplicationDetailsViewModel(application: Application, applicationApis: Seq[ApplicationApi], user: Option[UserModel]) {
+case class ApplicationDetailsViewModel(application: Application, applicationApis: Seq[ApplicationApi], user: Option[UserModel], productionEnvironmentId: String) {
   val applicationId = application.id
   val applicationName = application.name
   val showApplicationProblemsPanel = application.issues.nonEmpty
   val apiCount = applicationApis.size
   val noApis = apiCount == 0
   val missingApiNames: Seq[String] = applicationApis.filter(_.isMissing).map(_.apiTitle)
+  val allApiNames = applicationApis.map(_.apiTitle)
   val hasMissingApis = missingApiNames.nonEmpty
   val pendingAccessRequestsCount = applicationApis.map(_.pendingAccessRequestCount).sum
   val hasPendingAccessRequests = pendingAccessRequestsCount > 0

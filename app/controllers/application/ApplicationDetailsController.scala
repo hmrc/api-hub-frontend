@@ -17,6 +17,7 @@
 package controllers.application
 
 import com.google.inject.Inject
+import config.HipEnvironments
 import controllers.actions.{ApplicationAuthActionProvider, IdentifierAction}
 import controllers.helpers.ApplicationApiBuilder
 import models.application.ApplicationLenses.*
@@ -34,6 +35,7 @@ class ApplicationDetailsController @Inject()(
   applicationAuth: ApplicationAuthActionProvider,
   view: ApplicationDetailsView,
   applicationApiBuilder: ApplicationApiBuilder,
+  hipEnvironments: HipEnvironments
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id)).async {
@@ -43,7 +45,8 @@ class ApplicationDetailsController @Inject()(
           Ok(view(ApplicationDetailsViewModel(
             request.application.withSortedTeam(),
             applicationApis,
-            Some(request.identifierRequest.user)
+            Some(request.identifierRequest.user),
+            hipEnvironments.productionHipEnvironment.id
           )))
       )
   }
