@@ -19,18 +19,6 @@ package models.requests
 import models.user.UserModel
 import play.api.mvc.{Request, RequestHeader, WrappedRequest}
 
-case class IdentifierRequest[A] (request: Request[A], user: UserModel) extends WrappedRequest[A](request)
-
-object IdentifierRequest {
-  def extractUserFromRequest(request: RequestHeader): Option[UserModel] =
-    request match {
-      case request: IdentifierRequest[?] => Some(request.user)
-      case request: OptionalDataRequest[?] => Some(request.user)
-      case request: WrappedRequest[?] =>
-        request.body match {
-          case body: RequestHeader => extractUserFromRequest(body)
-          case _ => None
-        }
-      case _ => None
-    }
+case class IdentifierRequest[A] (request: Request[A], user: UserModel) extends RequestWithUser[A](request) {
+  override def maybeUser: Option[UserModel] = Some(user)
 }

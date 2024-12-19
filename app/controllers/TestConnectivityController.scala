@@ -36,7 +36,7 @@ class TestConnectivityController @Inject()(
   def onPageLoad: Action[AnyContent] = identify.async {
     implicit request => {
       apiHubService.testConnectivity().map(
-        responseText => Ok(view(responseText))
+        responseText => Ok(view(responseText, request.maybeUser))
       )}
   }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import models.requests.IdentifierRequest
+@import models.user.UserModel
 
 @this(
         layout: templates.Layout,
@@ -22,13 +22,13 @@
         govukTextarea: GovukTextarea
 )
 
-@(connectivityResult: String)(implicit request: Request[?], messages: Messages)
+@(connectivityResult: String, user: Option[UserModel])(implicit request: Request[?], messages: Messages)
 
 
 @layout(
     pageTitle    = titleNoForm(messages("testConnectivity.title")),
     showBackLink = false,
-    user = IdentifierRequest.extractUserFromRequest(request)
+    user = user
 ) {
 
     <h1 class="govuk-heading-xl">@messages("testConnectivity.heading")</h1>

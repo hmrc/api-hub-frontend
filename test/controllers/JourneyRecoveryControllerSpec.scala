@@ -44,7 +44,7 @@ class JourneyRecoveryControllerSpec extends SpecBase with HtmlValidation {
           val continueView = application.injector.instanceOf[JourneyRecoveryContinueView]
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual continueView(continueUrl.unsafeValue)(request, messages(application)).toString
+          contentAsString(result) mustEqual continueView(continueUrl.unsafeValue, request.maybeUser)(request, messages(application)).toString
           contentAsString(result) must validateAsHtml
         }
       }
@@ -65,7 +65,7 @@ class JourneyRecoveryControllerSpec extends SpecBase with HtmlValidation {
           val startAgainView = application.injector.instanceOf[JourneyRecoveryStartAgainView]
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual startAgainView()(request, messages(application)).toString
+          contentAsString(result) mustEqual startAgainView(request.maybeUser)(request, messages(application)).toString
           contentAsString(result) must validateAsHtml
         }
       }
@@ -85,7 +85,7 @@ class JourneyRecoveryControllerSpec extends SpecBase with HtmlValidation {
           val startAgainView = application.injector.instanceOf[JourneyRecoveryStartAgainView]
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual startAgainView()(request, messages(application)).toString
+          contentAsString(result) mustEqual startAgainView(request.maybeUser)(request, messages(application)).toString
           contentAsString(result) must validateAsHtml
         }
       }

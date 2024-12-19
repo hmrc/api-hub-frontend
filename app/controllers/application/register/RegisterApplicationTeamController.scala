@@ -81,7 +81,7 @@ class RegisterApplicationTeamController @Inject()(
   private def buildView(mode: Mode, form: Form[String], status: Status)(implicit request: DataRequest[AnyContent]) = {
     apiHubService.findTeams(Some(request.user.email)).map(
       teams =>
-        status(view(form, mode, teams.sortBy(_.name.toLowerCase())))
+        status(view(form, mode, teams.sortBy(_.name.toLowerCase()), request.maybeUser))
     )
   }
 

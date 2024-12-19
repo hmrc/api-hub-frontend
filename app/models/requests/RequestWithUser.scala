@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,20 @@
 
 package models.requests
 
-import models.application.Application
 import models.user.UserModel
-import play.api.mvc.WrappedRequest
+import play.api.i18n.MessagesProvider
+import play.api.mvc.{Request, RequestHeader, WrappedRequest}
 
-case class ApplicationRequest[A](identifierRequest: IdentifierRequest[A],
-                                 application: Application
-                                ) extends RequestWithUser[A](identifierRequest) {
-  override def maybeUser: Option[UserModel] = identifierRequest.maybeUser
+abstract class RequestWithUser[T](request: Request[T]) extends WrappedRequest[T](request) {
+
+    def maybeUser: Option[UserModel]
+}
+
+object RequestWithUser {
+    extension (request: RequestHeader)
+        def requestUser: Option[UserModel] =
+            request match {
+                case r:RequestWithUser[?] => r.maybeUser
+                case _ => None
+            }
 }

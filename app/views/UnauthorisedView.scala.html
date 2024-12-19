@@ -14,8 +14,6 @@
  * limitations under the License.
  *@
 
-@import models.requests.IdentifierRequest
-
 @this(
     layout: templates.Layout
 )
@@ -25,7 +23,6 @@
 @layout(
     pageTitle = titleNoForm(messages("unauthorised.title")),
     timeout   = false,
-    user = IdentifierRequest.extractUserFromRequest(request)
 ) {
 
     <h1 class="govuk-heading-xl">@messages("unauthorised.heading")</h1>

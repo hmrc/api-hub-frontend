@@ -123,7 +123,8 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
           view(
             "Page not found - 404",
             "Environment not found",
-            s"Cannot find environment badEnvironment."
+            s"Cannot find environment badEnvironment.",
+            Some(FakeUser)
           )(request, messages(fixture.playApplication))
             .toString()
         contentAsString(result) must validateAsHtml
@@ -235,7 +236,8 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
             view(
               "Page not found - 404",
               "Credential not found",
-              s"Cannot find credential with ID $clientId for application ${application.id}."
+              s"Cannot find credential with ID $clientId for application ${application.id}.",
+              Some(FakePrivilegedUser)
             )(request, messages(fixture.playApplication))
               .toString()
           contentAsString(result) must validateAsHtml
@@ -260,7 +262,8 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
             view(
               "Bad request - 400",
               "Cannot revoke last credential",
-              "You cannot revoke the last credential for an application."
+              "You cannot revoke the last credential for an application.",
+              Some(FakePrivilegedUser)
             )(request, messages(fixture.playApplication))
               .toString()
           contentAsString(result) must validateAsHtml

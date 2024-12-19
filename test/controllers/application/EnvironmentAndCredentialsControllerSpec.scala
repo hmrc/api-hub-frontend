@@ -174,7 +174,8 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
           view(
             "Page not found - 404",
             "Credential not found",
-            s"Cannot find credential with ID $clientId for application ${application.id}."
+            s"Cannot find credential with ID $clientId for application ${application.id}.",
+            Some(FakePrivilegedUser)
           )(request, messages(fixture.playApplication))
             .toString()
 
@@ -205,7 +206,8 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
           view(
             "Bad request - 400",
             "Cannot revoke last credential",
-            "You cannot revoke the last credential for an application."
+            "You cannot revoke the last credential for an application.",
+            Some(FakePrivilegedUser)
           )(request, messages(fixture.playApplication))
             .toString()
 
@@ -285,7 +287,8 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
           view(
             "Page not found - 404",
             "Credential not found",
-            s"Cannot find credential with ID $clientId for application ${application.id}."
+            s"Cannot find credential with ID $clientId for application ${application.id}.",
+            Some(FakePrivilegedUser)
           )(request, messages(fixture.playApplication))
             .toString()
 
@@ -316,7 +319,8 @@ class EnvironmentAndCredentialsControllerSpec extends SpecBase with MockitoSugar
           view(
             "Bad request - 400",
             "Cannot revoke last credential",
-            "You cannot revoke the last credential for an application."
+            "You cannot revoke the last credential for an application.",
+            Some(FakePrivilegedUser)
           )(request, messages(fixture.playApplication))
             .toString()
 

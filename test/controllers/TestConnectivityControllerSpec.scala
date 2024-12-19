@@ -55,7 +55,7 @@ class TestConnectivityControllerSpec extends SpecBase with MockitoSugar with Htm
 
         status(result) mustEqual OK
 
-        contentAsString(result) mustEqual view(expected)(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(expected, request.maybeUser)(request, messages(fixture.application)).toString
         contentAsString(result) must validateAsHtml
       }
     }

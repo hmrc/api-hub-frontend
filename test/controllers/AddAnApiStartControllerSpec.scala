@@ -22,16 +22,17 @@ import generators.ApiDetailGenerators
 import models.api.{Endpoint, EndpointMethod}
 import models.application.{Api, SelectedEndpoint}
 import models.{AddAnApi, AddEndpoints, UserAnswers}
-import models.application.ApplicationLenses._
+import models.application.ApplicationLenses.*
+import models.requests.IdentifierRequest
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.{AddAnApiApiPage, AddAnApiContextPage, AddAnApiSelectApplicationPage, AddAnApiSelectEndpointsPage}
 import play.api.Application
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.AddAnApiSessionRepository
 import services.ApiHubService
 import utils.HtmlValidation
