@@ -1003,3 +1003,9 @@ header {
         font-size: 1rem;
     }
 }
+
+.govuk-summary-list__actions {
+    .govuk-button.govuk-link {
+        color: govuk-colour("white");
+    }
+}
