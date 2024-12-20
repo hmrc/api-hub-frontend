@@ -21,7 +21,6 @@ import controllers.actions.FakeUser
 import controllers.routes
 import forms.application.register.RegisterApplicationTeamFormProvider
 import generators.TeamGenerator
-import models.requests.IdentifierRequest
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -59,14 +58,14 @@ class RegisterApplicationTeamControllerSpec extends SpecBase with MockitoSugar w
       when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(teams))
 
       running(fixture.playApplication) {
-        val request = IdentifierRequest(FakeRequest(GET, registerApplicationTeamRoute), FakeUser)
+        val request = FakeRequest(GET, registerApplicationTeamRoute)
 
         val result = route(fixture.playApplication, request).value
 
         val view = fixture.playApplication.injector.instanceOf[RegisterApplicationTeamView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, teams.sortBy(_.name.toLowerCase), request.maybeUser)(request, messages(fixture.playApplication)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, teams.sortBy(_.name.toLowerCase), Some(FakeUser))(request, messages(fixture.playApplication)).toString
         contentAsString(result) must validateAsHtml
         verify(fixture.apiHubService).findTeams(eqTo(Some(FakeUser.email)))(any)
       }
@@ -81,14 +80,14 @@ class RegisterApplicationTeamControllerSpec extends SpecBase with MockitoSugar w
       when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(teams))
 
       running(fixture.playApplication) {
-        val request = IdentifierRequest(FakeRequest(GET, registerApplicationTeamRoute), FakeUser)
+        val request = FakeRequest(GET, registerApplicationTeamRoute)
 
         val view = fixture.playApplication.injector.instanceOf[RegisterApplicationTeamView]
 
         val result = route(fixture.playApplication, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(team.id), NormalMode, teams.sortBy(_.name.toLowerCase), request.maybeUser)(request, messages(fixture.playApplication)).toString
+        contentAsString(result) mustEqual view(form.fill(team.id), NormalMode, teams.sortBy(_.name.toLowerCase), Some(FakeUser))(request, messages(fixture.playApplication)).toString
         contentAsString(result) must validateAsHtml
       }
     }
@@ -120,16 +119,15 @@ class RegisterApplicationTeamControllerSpec extends SpecBase with MockitoSugar w
       when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(teams))
 
       running(fixture.playApplication) {
-        val request =
-          IdentifierRequest(FakeRequest(POST, registerApplicationTeamRoute)
-            .withFormUrlEncodedBody(("value", "")), FakeUser)
+        val request = FakeRequest(POST, registerApplicationTeamRoute)
+            .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
         val view = fixture.playApplication.injector.instanceOf[RegisterApplicationTeamView]
         val result = route(fixture.playApplication, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, teams.sortBy(_.name.toLowerCase), request.maybeUser)(request, messages(fixture.playApplication)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, teams.sortBy(_.name.toLowerCase), Some(FakeUser))(request, messages(fixture.playApplication)).toString
         contentAsString(result) must validateAsHtml
       }
     }

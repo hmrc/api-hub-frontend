@@ -23,7 +23,6 @@ import models.api.{Endpoint, EndpointMethod}
 import models.application.{Api, SelectedEndpoint}
 import models.{AddAnApi, AddEndpoints, UserAnswers}
 import models.application.ApplicationLenses.*
-import models.requests.IdentifierRequest
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}

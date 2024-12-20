@@ -16,6 +16,8 @@
 
 package controllers
 
+import controllers.actions.OptionalIdentifierAction
+
 import javax.inject.Inject
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -24,10 +26,11 @@ import views.html.UnauthorisedView
 
 class UnauthorisedController @Inject()(
                                         val controllerComponents: MessagesControllerComponents,
-                                        view: UnauthorisedView
+                                        view: UnauthorisedView,
+                                        optionallyIdentified: OptionalIdentifierAction,
                                       ) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = Action { implicit request =>
-    Forbidden(view())
+  def onPageLoad: Action[AnyContent] = optionallyIdentified { implicit request =>
+    Forbidden(view(request.user))
   }
 }

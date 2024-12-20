@@ -14,15 +14,18 @@
  * limitations under the License.
  *@
 
+@import models.user.UserModel
+
 @this(
     layout: templates.Layout
 )
 
-@()(implicit request: Request[?], messages: Messages)
+@(user: Option[UserModel])(implicit request: Request[?], messages: Messages)
 
 @layout(
     pageTitle = titleNoForm(messages("unauthorised.title")),
     timeout   = false,
+    user = user
 ) {
 
     <h1 class="govuk-heading-xl">@messages("unauthorised.heading")</h1>

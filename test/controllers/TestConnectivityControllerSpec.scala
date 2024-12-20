@@ -19,7 +19,6 @@ package controllers
 import base.SpecBase
 import controllers.TestConnectivityControllerSpec.buildFixture
 import controllers.actions.FakeUser
-import models.requests.IdentifierRequest
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -47,7 +46,7 @@ class TestConnectivityControllerSpec extends SpecBase with MockitoSugar with Htm
         when(fixture.mockApiHubService.testConnectivity()(any()))
           .thenReturn(Future.successful(expected))
 
-        val request = IdentifierRequest(FakeRequest(GET, routes.TestConnectivityController.onPageLoad().url), FakeUser)
+        val request = FakeRequest(GET, routes.TestConnectivityController.onPageLoad().url)
 
         val result = route(fixture.application, request).value
 
@@ -55,7 +54,7 @@ class TestConnectivityControllerSpec extends SpecBase with MockitoSugar with Htm
 
         status(result) mustEqual OK
 
-        contentAsString(result) mustEqual view(expected, request.maybeUser)(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(expected, Some(FakeUser))(request, messages(fixture.application)).toString
         contentAsString(result) must validateAsHtml
       }
     }
