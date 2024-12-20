@@ -129,7 +129,8 @@ class AccessRequestControllerSpec
             view(
               "Page not found - 404",
               "Production access request not found",
-              s"Cannot find a production access request with ID $accessRequestId."
+              s"Cannot find a production access request with ID $accessRequestId.",
+              Some(user)
             )(request, messages(fixture.application))
               .toString()
           contentAsString(result) must validateAsHtml
@@ -155,7 +156,8 @@ class AccessRequestControllerSpec
             view(
               "Page not found - 404",
               "Application not found",
-              s"Cannot find an application with ID ${accessRequest.applicationId}."
+              s"Cannot find an application with ID ${accessRequest.applicationId}.",
+              Some(user)
             )(request, messages(fixture.application))
               .toString()
           contentAsString(result) must validateAsHtml

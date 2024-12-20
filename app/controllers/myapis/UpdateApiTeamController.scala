@@ -21,7 +21,7 @@ import controllers.actions.{ApiAuthActionProvider, IdentifierAction}
 import controllers.helpers.ErrorResultBuilder
 import forms.myapis.UpdateApiTeamFormProvider
 import models.api.ApiDeploymentStatuses
-import models.requests.ApiRequest
+import models.requests.{ApiRequest, BaseRequest}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.*
@@ -73,7 +73,7 @@ class UpdateApiTeamController @Inject()(
       )
   }
 
-  private def somethingNotFound()(implicit request: Request[?]): Result = {
+  private def somethingNotFound()(implicit request: BaseRequest[?]): Result = {
     errorResultBuilder.notFound(
       heading = Messages("myApis.update.team.something.not.found.heading"),
       message = Messages("myApis.update.team.something.not.found.message")

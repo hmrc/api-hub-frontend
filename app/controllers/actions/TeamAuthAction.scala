@@ -19,9 +19,9 @@ package controllers.actions
 import com.google.inject.{Inject, Singleton}
 import controllers.helpers.ErrorResultBuilder
 import controllers.routes
-import models.requests.{IdentifierRequest, TeamRequest}
+import models.requests.{BaseRequest, IdentifierRequest, TeamRequest}
 import models.team.Team
-import models.team.TeamLenses._
+import models.team.TeamLenses.*
 import models.user.UserModel
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.Results.Redirect
@@ -49,7 +49,7 @@ class TeamAuthActionProviderImpl @Inject()(
   override def apply(teamId: String)(implicit ec: ExecutionContext): TeamAuthAction = {
     new TeamAuthAction with FrontendHeaderCarrierProvider {
       override protected def refine[A](identifierRequest: IdentifierRequest[A]): Future[Either[Result, TeamRequest[A]]] = {
-        implicit val request: Request[?] = identifierRequest
+        implicit val request: BaseRequest[?] = identifierRequest
 
         apiHubService.findTeamById(teamId) map {
           case Some(team) =>

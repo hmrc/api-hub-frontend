@@ -167,7 +167,8 @@ class UpdateApiStartControllerSpec extends SpecBase with MockitoSugar with Table
           view(
             "Page not found - 404",
             "API not found",
-            s"Cannot find an API with ID id."
+            s"Cannot find an API with ID id.",
+            Some(FakeUser)
           )(request, messages(fixture.application))
             .toString()
 
@@ -191,8 +192,9 @@ class UpdateApiStartControllerSpec extends SpecBase with MockitoSugar with Table
         contentAsString(result) mustBe view(
           "Page not found - 404",
           "API not found",
-          s"The API ${FakeApiDetail.title} has not been deployed to HIP.")
-          (request, messages(fixture.application)).toString()
+          s"The API ${FakeApiDetail.title} has not been deployed to HIP.",
+          Some(FakeUser)
+        )(request, messages(fixture.application)).toString()
 
         contentAsString(result) must validateAsHtml
       }

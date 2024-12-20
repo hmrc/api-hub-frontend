@@ -223,7 +223,8 @@ class UpdateApiTeamControllerSpec
             view(
               "Page not found - 404",
               "Unable to change owning team for this API.",
-              "The API or team cannot be found."
+              "The API or team cannot be found.",
+              Some(user)
             )(request, messages(fixture.playApplication))
               .toString()
           contentAsString(result) must validateAsHtml

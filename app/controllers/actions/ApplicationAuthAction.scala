@@ -20,10 +20,10 @@ import com.google.inject.{Inject, Singleton}
 import controllers.helpers.ErrorResultBuilder
 import controllers.routes
 import models.application.Application
-import models.requests.{ApplicationRequest, IdentifierRequest}
+import models.requests.{ApplicationRequest, BaseRequest, IdentifierRequest}
 import models.user.UserModel
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc.Results._
+import play.api.mvc.Results.*
 import play.api.mvc.{ActionRefiner, Request, Result}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider
@@ -48,7 +48,7 @@ class ApplicationAuthActionProviderImpl @Inject()(
   def apply(applicationId: String, enrich: Boolean = false, includeDeleted: Boolean = false)(implicit ec: ExecutionContext): ApplicationAuthAction = {
     new ApplicationAuthAction with FrontendHeaderCarrierProvider {
       override protected def refine[A](identifierRequest: IdentifierRequest[A]): Future[Either[Result, ApplicationRequest[A]]] = {
-        implicit val request: Request[?] = identifierRequest
+        implicit val request: BaseRequest[?] = identifierRequest
 
         apiHubService.getApplication(applicationId, enrich, includeDeleted) map {
           case Some(application) =>

@@ -20,9 +20,9 @@ import com.google.inject.{Inject, Singleton}
 import controllers.actions.{ApplicationAuthActionProvider, IdentifierAction}
 import controllers.helpers.ErrorResultBuilder
 import forms.AddTeamMemberDetailsFormProvider
-import models.application.ApplicationLenses._
+import models.application.ApplicationLenses.*
 import models.application.TeamMember
-import models.requests.ApplicationRequest
+import models.requests.{ApplicationRequest, BaseRequest}
 import play.api.data.{Form, FormError}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
@@ -66,7 +66,7 @@ class AddTeamMemberController @Inject()(
       )
   }
 
-  private def addTeamMember(id: String, teamMember: TeamMember)(implicit request: Request[?]) = {
+  private def addTeamMember(id: String, teamMember: TeamMember)(implicit request: BaseRequest[?]) = {
     apiHubService.addTeamMember(id, teamMember).map {
       case Some(_) => Redirect(routes.ManageTeamMembersController.onPageLoad(id))
       case _ => applicationNotFound(id)
@@ -77,7 +77,7 @@ class AddTeamMemberController @Inject()(
     Future.successful(BadRequest(view(formWithErrors, routes.AddTeamMemberController.onSubmit(id), request.identifierRequest.user)))
   }
 
-  private def applicationNotFound(id: String)(implicit request: Request[?]): Result = {
+  private def applicationNotFound(id: String)(implicit request: BaseRequest[?]): Result = {
     errorResultBuilder.notFound(
       heading = Messages("site.applicationNotFoundHeading"),
       message = Messages("site.applicationNotFoundMessage", id)

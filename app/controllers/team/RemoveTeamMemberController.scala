@@ -17,17 +17,18 @@
 package controllers.team
 
 import config.CryptoProvider
-import controllers.actions._
+import controllers.actions.*
 import controllers.helpers.ErrorResultBuilder
 import pages.CreateTeamMembersPage
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc._
+import play.api.mvc.*
 import repositories.CreateTeamSessionRepository
 import services.ApiHubService
 import uk.gov.hmrc.crypto.Crypted
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.team.{RemoveTeamMemberConfirmationView, RemoveTeamMemberSuccessView}
 import forms.YesNoFormProvider
+import models.requests.BaseRequest
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -109,16 +110,16 @@ class RemoveTeamMemberController @Inject()(override val messagesApi: MessagesApi
     crypto.decrypt(Crypted(encrypted)).value
   }
 
-  private def teamMemberNotFound()(implicit request: Request[?]): Future[Result] = {
+  private def teamMemberNotFound()(implicit request: BaseRequest[?]): Future[Result] = {
     Future.successful(
       errorResultBuilder.notFound(Messages("addTeamMemberDetails.notFound"))
     )
   }
 
-  private def teamMemberToRemoveNotFound()(implicit request: Request[?]): Result =
+  private def teamMemberToRemoveNotFound()(implicit request: BaseRequest[?]): Result =
     errorResultBuilder.notFound(Messages("manageTeam.teamMembers.removeTeamMember.notFound"))
 
-  private def teamMemberToRemoveSameAsUser()(implicit request: Request[?]): Future[Result] =
+  private def teamMemberToRemoveSameAsUser()(implicit request: BaseRequest[?]): Future[Result] =
     Future.successful(
       errorResultBuilder.badRequest(Messages("manageTeam.teamMembers.removeTeamMember.cantDeleteAuthenticatedUser"))
     )

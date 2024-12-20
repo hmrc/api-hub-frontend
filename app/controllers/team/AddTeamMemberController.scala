@@ -21,12 +21,12 @@ import controllers.actions.{IdentifierAction, TeamAuthActionProvider}
 import controllers.helpers.ErrorResultBuilder
 import forms.AddTeamMemberDetailsFormProvider
 import models.application.TeamMember
-import models.requests.TeamRequest
-import models.team.TeamLenses._
+import models.requests.{BaseRequest, TeamRequest}
+import models.team.TeamLenses.*
 import models.user.UserModel
 import play.api.data.{Form, FormError}
 import play.api.i18n.{I18nSupport, Messages}
-import play.api.mvc._
+import play.api.mvc.*
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.AddTeamMemberDetailsView
@@ -71,14 +71,14 @@ class AddTeamMemberController @Inject()(
     Future.successful(BadRequest(view(formWithErrors, controllers.team.routes.AddTeamMemberController.onSubmit(id), request.identifierRequest.user)))
   }
 
-  private def addTeamMember(id: String, teamMember: TeamMember, user: UserModel)(implicit request: Request[?]) = {
+  private def addTeamMember(id: String, teamMember: TeamMember, user: UserModel)(implicit request: BaseRequest[?]) = {
     apiHubService.addTeamMemberToTeam(id, teamMember).map {
       case Some(_) => Ok(successView(user))
       case _ => teamNotFound(id)
     }
   }
 
-  private def teamNotFound(id: String)(implicit request: Request[?]): Result = {
+  private def teamNotFound(id: String)(implicit request: BaseRequest[?]): Result = {
     errorResultBuilder.notFound(
       heading = Messages("site.teamNotFoundHeading"),
       message = Messages("site.teamNotFoundMessage", id)

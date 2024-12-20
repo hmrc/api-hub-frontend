@@ -19,12 +19,12 @@ package controllers
 import controllers.actions.{ApplicationAuthActionProvider, IdentifierAction}
 import controllers.helpers.ErrorResultBuilder
 import models.api.ApiDetail
-import models.requests.IdentifierRequest
+import models.requests.{BaseRequest, IdentifierRequest}
 import models.{AddAnApi, AddAnApiContext, AddEndpoints, AvailableEndpoints, NormalMode, UserAnswers}
 import navigation.Navigator
 import pages.{AddAnApiApiPage, AddAnApiContextPage, AddAnApiSelectApplicationPage, AddAnApiSelectEndpointsPage}
 import play.api.i18n.{I18nSupport, Messages}
-import play.api.mvc._
+import play.api.mvc.*
 import repositories.AddAnApiSessionRepository
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -67,7 +67,7 @@ class AddAnApiStartController @Inject()(
       }
   }
 
-  private def fetchApiDetail(apiId: String)(implicit request: Request[?]): Future[Either[Result, ApiDetail]] = {
+  private def fetchApiDetail(apiId: String)(implicit request: BaseRequest[?]): Future[Either[Result, ApiDetail]] = {
     apiHubService.getApiDetail(apiId).map {
       case Some(apiDetail) => Right(apiDetail)
       case _ => Left(apiNotFound(apiId))
@@ -90,7 +90,7 @@ class AddAnApiStartController @Inject()(
     } yield Redirect(navigator.nextPage(AddAnApiApiPage, NormalMode, userAnswers))
   }
 
-  private def apiNotFound(apiId: String)(implicit request: Request[?]): Result = {
+  private def apiNotFound(apiId: String)(implicit request: BaseRequest[?]): Result = {
     errorResultBuilder.notFound(
       Messages("site.apiNotFound.heading"),
       Messages("site.apiNotFound.message", apiId)

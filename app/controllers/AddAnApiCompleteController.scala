@@ -20,10 +20,11 @@ import controllers.actions.{AddAnApiCheckContextActionProvider, AddAnApiDataRetr
 import controllers.helpers.ErrorResultBuilder
 import models.api.ApiDetail
 import models.application.Application
+import models.requests.BaseRequest
 import models.{AddAnApiContext, ApiPolicyConditionsDeclaration, AvailableEndpoints, CheckMode, UserAnswers}
 import pages.{AddAnApiApiPage, AddAnApiSelectApplicationPage, AddAnApiSelectEndpointsPage, ApiPolicyConditionsDeclarationPage}
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc._
+import play.api.mvc.*
 import repositories.AddAnApiSessionRepository
 import services.ApiHubService
 import uk.gov.hmrc.http.UpstreamErrorResponse
@@ -106,14 +107,14 @@ class AddAnApiCompleteController @Inject()(
     }
   }
 
-  private def applicationNotFound(applicationId: String)(implicit request: Request[?]): Result = {
+  private def applicationNotFound(applicationId: String)(implicit request: BaseRequest[?]): Result = {
     errorResultBuilder.notFound(
       heading = Messages("site.applicationNotFoundHeading"),
       message = Messages("site.applicationNotFoundMessage", applicationId)
     )
   }
 
-  private def badGateway(t: Throwable)(implicit request: Request[?]): Result = {
+  private def badGateway(t: Throwable)(implicit request: BaseRequest[?]): Result = {
     errorResultBuilder.internalServerError(Messages("addAnApiComplete.failed"), t)
   }
 

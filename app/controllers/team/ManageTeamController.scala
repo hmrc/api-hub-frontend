@@ -21,6 +21,7 @@ import config.CryptoProvider
 import controllers.actions.{IdentifierAction, TeamAuthActionProvider}
 import controllers.helpers.ErrorResultBuilder
 import models.application.Application
+import models.requests.BaseRequest
 import models.team.TeamLenses._
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
@@ -52,7 +53,7 @@ class ManageTeamController @Inject()(
       }
   }
 
-  private def fetchApplication(applicationId: Option[String])(implicit request: Request[?]): Future[Either[Result, Option[Application]]] = {
+  private def fetchApplication(applicationId: Option[String])(implicit request: BaseRequest[?]): Future[Either[Result, Option[Application]]] = {
     applicationId match {
       case Some(id) => apiHubService.getApplication(id, false).map{
         case Some(application) => Right(Some(application))

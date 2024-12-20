@@ -17,9 +17,12 @@
 package models.requests
 
 import models.team.Team
+import models.user.UserModel
 import play.api.mvc.WrappedRequest
 
 case class TeamRequest[A](
   identifierRequest: IdentifierRequest[A],
   team: Team
-) extends WrappedRequest[A](identifierRequest)
+) extends BaseRequest[A](identifierRequest) {
+  override def maybeUser: Option[UserModel] = identifierRequest.maybeUser
+}

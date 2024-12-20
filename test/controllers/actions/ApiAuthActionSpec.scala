@@ -55,7 +55,8 @@ class ApiAuthActionSpec extends SpecBase with Matchers with MockitoSugar {
           view(
             "Page not found - 404",
             "API not found",
-            s"Cannot find an API with ID ${FakeApiDetail.id}."
+            s"Cannot find an API with ID ${FakeApiDetail.id}.",
+            Some(FakeUser)
           )(FakeRequest(), messages(fixture.playApplication)).toString()
       }
     }
