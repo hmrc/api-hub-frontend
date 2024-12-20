@@ -58,13 +58,7 @@ class ApplicationNavItems @Inject()(config: FrontendAppConfig, hipEnvironments: 
         link = controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id),
         isCurrentPage = currentPage == DetailsPage
       )),
-      Some(SideNavItemLeaf(
-        page = ApisPage,
-        title = messages("applicationNav.page.applicationApis"),
-        link = controllers.application.routes.ApplicationApisController.onPageLoad(application.id),
-        isCurrentPage = currentPage == ApisPage
-      )),
-      Option.when(config.applicationDetailsEnvironmentsLeftSideNav)(
+      Some(
           SideNavItemBranch(
             title = messages("applicationNav.page.environments"),
             sideNavItems = hipEnvironments.environments.map { hipEnvironment =>
@@ -78,12 +72,7 @@ class ApplicationNavItems @Inject()(config: FrontendAppConfig, hipEnvironments: 
             }
           )
       ),
-        Some(SideNavItemLeaf(
-          page = EnvironmentsAndCredentialsPage,
-          title = messages("applicationNav.page.environmentsAndCredentials"),
-          link = controllers.application.routes.EnvironmentAndCredentialsController.onPageLoad(application.id),
-          isCurrentPage = currentPage == EnvironmentsAndCredentialsPage
-        )),
+
       if (!application.isTeamMigrated) {
         Some(SideNavItemLeaf(
           page = ManageTeamMembersPage,

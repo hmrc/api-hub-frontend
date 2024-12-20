@@ -65,31 +65,11 @@ class AddCredentialController @Inject()(
       }
   }
 
-  def addProductionCredential(applicationId: String): Action[AnyContent] = (identify andThen applicationAuth(applicationId)).async {
-    implicit request =>
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, applicationId))),
-        _ => addCredentialToProduction(hipEnvironments.forEnvironmentName(Primary))
-      )
-  }
-
-  def addDevelopmentCredential(applicationId: String): Action[AnyContent] = (identify andThen applicationAuth(applicationId)).async {
-    implicit request => addCredentialToNonProduction(hipEnvironments.forEnvironmentName(Secondary))
-  }
-
   private def addCredentialToNonProduction(hipEnvironment: HipEnvironment)(implicit request: ApplicationRequest[AnyContent]) = {
     addCredential(
       hipEnvironment,
-      credential => Future.successful(SeeOther(getCredentialListRoute(request.application.id, hipEnvironment).url))
+      credential => Future.successful(SeeOther(controllers.application.routes.EnvironmentsController.onPageLoad(request.application.id, hipEnvironment.id).url))
     )
-  }
-
-  private def getCredentialListRoute(applicationId: String, hipEnvironment: HipEnvironment): Call = {
-    if (config.applicationDetailsEnvironmentsLeftSideNav)
-      controllers.application.routes.EnvironmentsController.onPageLoad(applicationId, hipEnvironment.id)
-    else
-      controllers.application.routes.EnvironmentAndCredentialsController.onPageLoad(applicationId)
   }
 
   private def addCredentialToProduction(hipEnvironment: HipEnvironment)(implicit request: ApplicationRequest[AnyContent]) = {
@@ -141,7 +121,7 @@ class AddCredentialController @Inject()(
       credential
     )
 
-    Ok(successView(application, summaryList, Some(user), credential, getCredentialListRoute(application.id, hipEnvironment).url))
+    Ok(successView(application, summaryList, Some(user), credential, controllers.application.routes.EnvironmentsController.onPageLoad(application.id, hipEnvironment.id).url))
   }
 
   private def applicationNotFound(application: Application)(implicit request: Request[?]): Future[Result] = {
@@ -154,7 +134,7 @@ class AddCredentialController @Inject()(
   }
 
   private def tooManyCredentials(application: Application)(implicit request: Request[?]): Future[Result] = {
-    val linkUrl = controllers.application.routes.EnvironmentAndCredentialsController.onPageLoad(application.id).url
+    val linkUrl = controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url
     val link = s"<a class=\"govuk-link govuk-link--no-visited-state\" href=\"$linkUrl\">${application.name}</a>"
 
     Future.successful(
