@@ -65,6 +65,8 @@ trait HipEnvironments {
     environments.find(hipEnvironment => hipEnvironment.environmentName.toString == pathParameter || hipEnvironment.id == pathParameter)
       .getOrElse(throw new IllegalArgumentException(s"No configuration for environment $pathParameter"))
 
+  def productionHipEnvironment: HipEnvironment = environments.find(_.isProductionLike)
+    .getOrElse(throw new IllegalArgumentException("No production environment configured"))
 }
 
 @Singleton
