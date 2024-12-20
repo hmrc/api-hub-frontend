@@ -23,6 +23,6 @@ import play.api.mvc.WrappedRequest
 case class TeamRequest[A](
   identifierRequest: IdentifierRequest[A],
   team: Team
-) extends RequestWithUser[A](identifierRequest) {
+) extends BaseRequest[A](identifierRequest) {
   override def maybeUser: Option[UserModel] = identifierRequest.maybeUser
 }

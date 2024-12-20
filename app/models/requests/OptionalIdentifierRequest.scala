@@ -19,6 +19,6 @@ package models.requests
 import models.user.UserModel
 import play.api.mvc.{Request, WrappedRequest}
 
-case class OptionalIdentifierRequest[A] (request: Request[A], user: Option[UserModel]) extends RequestWithUser[A](request) {
+case class OptionalIdentifierRequest[A] (request: Request[A], user: Option[UserModel]) extends BaseRequest[A](request) {
   override def maybeUser: Option[UserModel] = user
 }

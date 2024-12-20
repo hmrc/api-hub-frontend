@@ -19,8 +19,8 @@ package controllers.helpers
 import com.google.inject.{Inject, Singleton}
 import models.api.ApiDetail
 import models.application.Application
-import models.requests.{IdentifierRequest, RequestWithUser}
-import RequestWithUser.*
+import models.requests.{IdentifierRequest, BaseRequest}
+import BaseRequest.*
 import models.user.UserModel
 import play.api.Logging
 import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND}

@@ -20,6 +20,6 @@ import models.api.ApiDetail
 import models.user.UserModel
 import play.api.mvc.WrappedRequest
 
-case class ApiRequest[A](identifierRequest: IdentifierRequest[A], apiDetails: ApiDetail) extends RequestWithUser[A](identifierRequest) {
+case class ApiRequest[A](identifierRequest: IdentifierRequest[A], apiDetails: ApiDetail) extends BaseRequest[A](identifierRequest) {
   override def maybeUser: Option[UserModel] = identifierRequest.maybeUser
 }

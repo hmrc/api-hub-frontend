@@ -20,16 +20,16 @@ import models.user.UserModel
 import play.api.i18n.MessagesProvider
 import play.api.mvc.{Request, RequestHeader, WrappedRequest}
 
-abstract class RequestWithUser[T](request: Request[T]) extends WrappedRequest[T](request) {
+abstract class BaseRequest[T](request: Request[T]) extends WrappedRequest[T](request) {
 
     def maybeUser: Option[UserModel]
 }
 
-object RequestWithUser {
+object BaseRequest {
     extension (request: RequestHeader)
         def requestUser: Option[UserModel] =
             request match {
-                case r:RequestWithUser[?] => r.maybeUser
+                case r:BaseRequest[?] => r.maybeUser
                 case _ => None
             }
 }

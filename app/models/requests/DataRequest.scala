@@ -20,10 +20,10 @@ import play.api.mvc.{Request, WrappedRequest}
 import models.UserAnswers
 import models.user.UserModel
 
-case class OptionalDataRequest[A] (request: Request[A], user: UserModel, userAnswers: Option[UserAnswers]) extends RequestWithUser[A](request) {
+case class OptionalDataRequest[A] (request: Request[A], user: UserModel, userAnswers: Option[UserAnswers]) extends BaseRequest[A](request) {
   override def maybeUser: Option[UserModel] = Some(user)
 }
 
-case class DataRequest[A] (request: Request[A], user: UserModel, userAnswers: UserAnswers) extends RequestWithUser[A](request) {
+case class DataRequest[A] (request: Request[A], user: UserModel, userAnswers: UserAnswers) extends BaseRequest[A](request) {
   override def maybeUser: Option[UserModel] = Some(user)
 }
