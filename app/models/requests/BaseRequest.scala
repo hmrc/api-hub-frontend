@@ -24,12 +24,3 @@ abstract class BaseRequest[T](request: Request[T]) extends WrappedRequest[T](req
 
     def maybeUser: Option[UserModel]
 }
-
-object BaseRequest {
-    extension (request: RequestHeader)
-        def requestUser: Option[UserModel] =
-            request match {
-                case r:BaseRequest[?] => r.maybeUser
-                case _ => None
-            }
-}

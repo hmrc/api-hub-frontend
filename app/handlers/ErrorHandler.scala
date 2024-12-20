@@ -17,7 +17,7 @@
 package handlers
 
 import javax.inject.{Inject, Singleton}
-import models.requests.BaseRequest.*
+import models.requests.BaseRequest
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Request, RequestHeader}
 import play.twirl.api.Html
@@ -32,5 +32,11 @@ class ErrorHandler @Inject()(
                               view: ErrorTemplate
                             )(implicit val ec: ExecutionContext) extends FrontendErrorHandler with I18nSupport {
   override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit request: RequestHeader): Future[Html] =
-    Future.successful(view(pageTitle, heading, message, request.requestUser))
+    Future.successful(view(pageTitle, heading, message, requestUser()))
+    
+  private def requestUser()(implicit requestHeader: RequestHeader) =
+    requestHeader match {
+      case r: BaseRequest[?] => r.maybeUser
+      case _ => None
+    }
 }

@@ -18,6 +18,7 @@ package controllers.helpers
 
 import models.accessrequest.AccessRequest
 import models.application.Application
+import models.requests.BaseRequest
 import play.api.mvc.{Request, Result}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -30,14 +31,14 @@ trait Fetching {
   def errorResultBuilder: ErrorResultBuilder
   def apiHubService: ApiHubService
 
-  def fetchAccessRequestOrNotFound(accessRequestId: String)(implicit request: Request[?], ec: ExecutionContext): Future[Either[Result, AccessRequest]] = {
+  def fetchAccessRequestOrNotFound(accessRequestId: String)(implicit request: BaseRequest[?], ec: ExecutionContext): Future[Either[Result, AccessRequest]] = {
     apiHubService.getAccessRequest(accessRequestId).map {
       case Some(accessRequest) => Right(accessRequest)
       case None => Left(errorResultBuilder.accessRequestNotFound(accessRequestId))
     }
   }
 
-  def fetchApplicationOrNotFound(applicationId: String, enrich: Boolean = false, includeDeleted: Boolean = false)(implicit request: Request[?], ec: ExecutionContext): Future[Either[Result, Application]] = {
+  def fetchApplicationOrNotFound(applicationId: String, enrich: Boolean = false, includeDeleted: Boolean = false)(implicit request: BaseRequest[?], ec: ExecutionContext): Future[Either[Result, Application]] = {
     apiHubService.getApplication(applicationId, enrich, includeDeleted).map {
       case Some(application) => Right(application)
       case None => Left(errorResultBuilder.applicationNotFound(applicationId))

@@ -16,11 +16,11 @@
 
 package controllers.application.register
 
-import controllers.actions._
+import controllers.actions.*
 import controllers.helpers.ErrorResultBuilder
 import forms.application.register.RegisterApplicationTeamFormProvider
 import models.Mode
-import models.requests.DataRequest
+import models.requests.{BaseRequest, DataRequest}
 import navigation.Navigator
 import pages.application.register.RegisterApplicationTeamPage
 import play.api.data.Form
@@ -85,13 +85,13 @@ class RegisterApplicationTeamController @Inject()(
     )
   }
 
-  private def noEmail()(implicit request: Request[?]): Future[Result] = {
+  private def noEmail()(implicit request: BaseRequest[?]): Future[Result] = {
     Future.successful(
       errorResultBuilder.internalServerError(Messages("site.noEmail"))
     )
   }
 
-  private def teamNotFound(teamId: String)(implicit request: Request[?]): Future[Result] = {
+  private def teamNotFound(teamId: String)(implicit request: BaseRequest[?]): Future[Result] = {
     Future.successful(errorResultBuilder.teamNotFound(teamId))
   }
 

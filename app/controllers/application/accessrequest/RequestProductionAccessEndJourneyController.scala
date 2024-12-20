@@ -22,7 +22,7 @@ import controllers.helpers.ErrorResultBuilder
 import models.{CheckMode, UserAnswers}
 import models.accessrequest.{AccessRequestApi, AccessRequestEndpoint, AccessRequestRequest}
 import models.application.Application
-import models.requests.DataRequest
+import models.requests.{BaseRequest, DataRequest}
 import pages.application.accessrequest.{ProvideSupportingInformationPage, RequestProductionAccessApisPage, RequestProductionAccessApplicationPage, RequestProductionAccessPage, RequestProductionAccessSelectApisPage}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.*
@@ -110,7 +110,7 @@ class RequestProductionAccessEndJourneyController @Inject()(
     }
   }
 
-  private def badGateway(t: Throwable)(implicit request: Request[?]): Result = {
+  private def badGateway(t: Throwable)(implicit request: BaseRequest[?]): Result = {
     errorResultBuilder.internalServerError(Messages("addAnApiComplete.failed"), t)
   }
 

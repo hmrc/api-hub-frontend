@@ -22,6 +22,7 @@ import controllers.actions.{ApplicationAuthActionProvider, IdentifierAction}
 import controllers.helpers.ErrorResultBuilder
 import models.application.{EnvironmentName, Primary, Secondary}
 import models.exception.ApplicationCredentialLimitException
+import models.requests.BaseRequest
 import models.user.Permissions
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.*
@@ -64,7 +65,7 @@ class EnvironmentAndCredentialsController @Inject()(
       deleteCredential(id, clientId, hipEnvironments.forEnvironmentName(Secondary), url)
   }
 
-  private def deleteCredential(id: String, clientId: String, hipEnvironment: HipEnvironment, url: String)(implicit request: Request[?]) = {
+  private def deleteCredential(id: String, clientId: String, hipEnvironment: HipEnvironment, url: String)(implicit request: BaseRequest[?]) = {
     apiHubService.deleteCredential(id, hipEnvironment, clientId).map {
       case Right(Some(())) => Redirect(url)
       case Right(None) => credentialNotFound(id, clientId)
@@ -73,14 +74,14 @@ class EnvironmentAndCredentialsController @Inject()(
     }
   }
 
-  private def credentialNotFound(applicationId: String, clientId: String)(implicit request: Request[?]): Result = {
+  private def credentialNotFound(applicationId: String, clientId: String)(implicit request: BaseRequest[?]): Result = {
     errorResultBuilder.notFound(
       heading = Messages("environmentAndCredentials.credentialNotFound.heading"),
       message = Messages("environmentAndCredentials.credentialNotFound.message", clientId, applicationId)
     )
   }
 
-  private def lastCredential()(implicit request: Request[?]): Result = {
+  private def lastCredential()(implicit request: BaseRequest[?]): Result = {
     errorResultBuilder.badRequest(
       heading = Messages("environmentAndCredentials.cannotDeleteLastCredential.heading"),
       message = Messages("environmentAndCredentials.cannotDeleteLastCredential.message")

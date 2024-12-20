@@ -23,6 +23,7 @@ import generators.ApiDetailGenerators
 import models.api.ApiDetail
 import models.application.ApplicationLenses.ApplicationLensOps
 import models.application.{Api, Application, Secondary}
+import models.requests.IdentifierRequest
 import models.{AddAnApi, Mode, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -105,7 +106,7 @@ class AddAnApiSelectApplicationControllerSpec extends SpecBase with MockitoSugar
         .thenReturn(Future.successful(applications))
 
       running(fixture.application) {
-        val request = FakeRequest(GET, routes.AddAnApiSelectApplicationController.onPageLoad(NormalMode).url)
+        val request = IdentifierRequest(FakeRequest(GET, routes.AddAnApiSelectApplicationController.onPageLoad(NormalMode).url), FakeUser)
         val result = route(fixture.application, request).value
         val view = buildView(fixture.application, request, form, NormalMode, apiDetail, Seq.empty, applications)
 
