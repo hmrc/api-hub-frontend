@@ -61,7 +61,7 @@ class Navigator @Inject()() {
     //TODO: bring back with wiremock
     // case ProduceApiReviewNameDescriptionPage => _ => controllers.myapis.produce.routes.ProduceApiHowToAddWiremockController.onPageLoad(NormalMode)
     //TODO: remove when bringing back wiremock
-    case ProduceApiReviewNameDescriptionPage => _ => controllers.myapis.produce.routes.ProduceApiAddPrefixesController.onPageLoad(NormalMode)
+    case ProduceApiReviewNameDescriptionPage => _ => controllers.myapis.produce.routes.ProduceApiEgressAvailabilityController.onPageLoad()
     case ProduceApiEnterWiremockPage => _ => controllers.myapis.produce.routes.ProduceApiAddPrefixesController.onPageLoad(NormalMode)
     case ProduceApiAddPrefixesPage => produceApiAddPrefixNextPage(NormalMode)
     case ProduceApiEgressPrefixesPage => _ => controllers.myapis.produce.routes.ProduceApiHodController.onPageLoad(NormalMode)
