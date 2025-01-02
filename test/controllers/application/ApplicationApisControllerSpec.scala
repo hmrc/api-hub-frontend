@@ -81,6 +81,7 @@ class ApplicationApisControllerSpec extends SpecBase with MockitoSugar with Test
         apiStatus = Live,
         reviewedDate = Instant.now(),
         platform = "HIP",
+        lastUpdated = Instant.now(),
         maintainer = Maintainer("name", "#slack", List.empty)
       )
 

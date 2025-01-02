@@ -79,7 +79,8 @@ class AddAnApiCheckYourAnswersControllerSpec extends SpecBase with SummaryListFl
         Live,
         reviewedDate = Instant.now(),
         platform = "API_PLATFORM",
-        maintainer = Maintainer("name", "#slack", List.empty)
+        maintainer = Maintainer("name", "#slack", List.empty),
+        lastUpdated = Instant.now()
       )
 
       val userAnswers = emptyUserAnswers

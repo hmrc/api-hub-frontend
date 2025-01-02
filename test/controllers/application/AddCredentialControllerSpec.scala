@@ -99,9 +99,9 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
       forAll(privilegedTeamMemberAndSupporterTable) {
         user =>
           val api1 = ApiDetail("test-api-1", "pubRef1", "test-api-name-1", "", "", Seq.empty, None, "", Live,
-            reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
+            reviewedDate = Instant.now(), platform = "HIP", lastUpdated = Instant.now(), maintainer = Maintainer("name", "#slack", List.empty))
           val api2 = ApiDetail("test-api-2", "pubRef2", "test-api-name-2", "", "", Seq.empty, None, "", Live,
-            reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
+            reviewedDate = Instant.now(), platform = "HIP", lastUpdated = Instant.now(), maintainer = Maintainer("name", "#slack", List.empty))
           val apiNames = Seq(api1.title, api2.title)
 
           val application = FakeApplication.copy(
