@@ -41,7 +41,7 @@ class ProduceApiEgressAvailabilityController @Inject()(
     implicit request =>
       answer match {
         case "yes" => Redirect(controllers.myapis.produce.routes.ProduceApiEgressSelectionController.onPageLoad())
-        case "no" => Redirect(controllers.myapis.produce.routes.ProduceApiEgressPrefixesController.onPageLoad(NormalMode))
+        case "no" => Redirect(controllers.myapis.produce.routes.ProduceApiAddPrefixesController.onPageLoad(NormalMode))
       }
 
   }

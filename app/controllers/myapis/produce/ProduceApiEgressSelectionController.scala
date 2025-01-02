@@ -38,7 +38,7 @@ class ProduceApiEgressSelectionController @Inject()(
   }
 
   def onSubmit(): Action[AnyContent] = identify {
-    implicit request => Redirect(controllers.myapis.produce.routes.ProduceApiEgressPrefixesController.onPageLoad(NormalMode))
+    implicit request => Redirect(controllers.myapis.produce.routes.ProduceApiAddPrefixesController.onPageLoad(NormalMode))
   }
 
 }
