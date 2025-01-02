@@ -33,7 +33,15 @@ class ErrorHandler @Inject()(
                             )(implicit val ec: ExecutionContext) extends FrontendErrorHandler with I18nSupport {
   override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit request: RequestHeader): Future[Html] =
     Future.successful(view(pageTitle, heading, message, requestUser()))
-    
+
+  override def notFoundTemplate(implicit request: RequestHeader): Future[Html] =
+    Future.successful(view(
+      "global.error.pageNotFound404.title",
+      "global.error.pageNotFound404.heading",
+      "global.error.pageNotFound404.message",
+      requestUser()
+    ))
+
   private def requestUser()(implicit requestHeader: RequestHeader) =
     requestHeader match {
       case r: BaseRequest[?] => r.maybeUser
