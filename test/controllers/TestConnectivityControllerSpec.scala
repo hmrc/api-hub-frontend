@@ -18,13 +18,14 @@ package controllers
 
 import base.SpecBase
 import controllers.TestConnectivityControllerSpec.buildFixture
+import controllers.actions.FakeUser
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import play.api.{Application => PlayApplication}
+import play.api.test.Helpers.*
+import play.api.Application as PlayApplication
 import repositories.SessionRepository
 import services.ApiHubService
 import utils.HtmlValidation
@@ -53,7 +54,7 @@ class TestConnectivityControllerSpec extends SpecBase with MockitoSugar with Htm
 
         status(result) mustEqual OK
 
-        contentAsString(result) mustEqual view(expected)(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(expected, Some(FakeUser))(request, messages(fixture.application)).toString
         contentAsString(result) must validateAsHtml
       }
     }

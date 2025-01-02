@@ -137,7 +137,8 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation with M
           view(
             "Page not found - 404",
             "Application not found",
-            s"Cannot find an application with ID ${FakeApplication.id}."
+            s"Cannot find an application with ID ${FakeApplication.id}.",
+            Some(FakeUser)
           )(request, messages(fixture.application))
             .toString()
         contentAsString(result) must validateAsHtml
@@ -233,7 +234,8 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation with M
         contentAsString(result) mustBe view.apply(
           pageTitle = "Sorry, there is a problem with the service - 500",
           heading = "Sorry, there is a problem with the service",
-          message = "You should check this application's details before trying again as it is possible that this action was partially successful."
+          message = "You should check this application's details before trying again as it is possible that this action was partially successful.",
+          Some(FakeUser)
         )(request, messages(fixture.application))
           .toString()
         contentAsString(result) must validateAsHtml

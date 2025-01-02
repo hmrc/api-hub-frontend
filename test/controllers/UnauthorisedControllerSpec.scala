@@ -17,8 +17,11 @@
 package controllers
 
 import base.SpecBase
+import controllers.actions.{FakeOptionalIdentifierAction, FakeUser, OptionalIdentifierAction, OptionalUserProvider, OptionalUserProviderImpl}
+import models.requests.OptionalIdentifierRequest
+import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import utils.HtmlValidation
 import views.html.UnauthorisedView
 
@@ -28,7 +31,14 @@ class UnauthorisedControllerSpec extends SpecBase with HtmlValidation {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(
+        userAnswers = Some(emptyUserAnswers),
+        user = FakeUser
+      ).overrides(
+          bind[OptionalUserProvider].toInstance(OptionalUserProviderImpl(Some(FakeUser))),
+          bind[OptionalIdentifierAction].to(classOf[FakeOptionalIdentifierAction])
+        )
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, routes.UnauthorisedController.onPageLoad.url)
@@ -38,7 +48,7 @@ class UnauthorisedControllerSpec extends SpecBase with HtmlValidation {
         val view = application.injector.instanceOf[UnauthorisedView]
 
         status(result) mustEqual FORBIDDEN
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        contentAsString(result) mustEqual view(Some(FakeUser))(request, messages(application)).toString
         contentAsString(result) must validateAsHtml
       }
     }

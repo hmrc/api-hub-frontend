@@ -17,7 +17,7 @@
 package controllers.admin
 
 import base.SpecBase
-import controllers.actions.{FakeApplication, FakeApprover}
+import controllers.actions.{FakeApplication, FakeApprover, FakeUser}
 import controllers.routes
 import forms.admin.ApprovalDecisionFormProvider
 import generators.AccessRequestGenerator
@@ -93,7 +93,8 @@ class AccessRequestControllerSpec
           view(
             "Page not found - 404",
             "Production access request not found",
-            s"Cannot find a production access request with ID $id."
+            s"Cannot find a production access request with ID $id.",
+            Some(FakeApprover)
           ).toString()
         contentAsString(result) must validateAsHtml
       }
@@ -118,7 +119,8 @@ class AccessRequestControllerSpec
           view(
             "Page not found - 404",
             "Application not found",
-            s"Cannot find an application with ID ${accessRequest.applicationId}."
+            s"Cannot find an application with ID ${accessRequest.applicationId}.",
+            Some(FakeApprover)
           ).toString()
       }
     }

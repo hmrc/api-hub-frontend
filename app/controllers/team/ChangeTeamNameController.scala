@@ -20,7 +20,7 @@ import controllers.actions._
 import controllers.helpers.ErrorResultBuilder
 import forms.ChangeTeamNameFormProvider
 import models.exception.TeamNameNotUniqueException
-import models.requests.TeamRequest
+import models.requests.{BaseRequest, TeamRequest}
 import models.user.UserModel
 import play.api.data.{Form, FormError}
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
@@ -71,7 +71,7 @@ class ChangeTeamNameController @Inject()(
     Future.successful(BadRequest(view(formWithErrors, controllers.team.routes.ChangeTeamNameController.onSubmit(id), request.identifierRequest.user)))
   }
 
-  private def changeTeamName(id: String, name: String, user: UserModel, form: Form[String])(implicit request: Request[?]) = {
+  private def changeTeamName(id: String, name: String, user: UserModel, form: Form[String])(implicit request: BaseRequest[?]) = {
     apiHubService.changeTeamName(id, name).map {
       case Right(_) => Ok(successView(user))
       case Left(_: TeamNameNotUniqueException) => nameNotUnique(form.fill(name), id, user)
@@ -79,7 +79,7 @@ class ChangeTeamNameController @Inject()(
     }
   }
 
-  private def teamNotFound(id: String)(implicit request: Request[?]): Result = {
+  private def teamNotFound(id: String)(implicit request: BaseRequest[?]): Result = {
     errorResultBuilder.notFound(
       heading = Messages("site.teamNotFoundHeading"),
       message = Messages("site.teamNotFoundMessage", id)

@@ -14,18 +14,21 @@
  * limitations under the License.
  *@
 
+@import models.user.UserModel
+
 @this(
         layout: templates.Layout,
         govukButton: GovukButton,
         govukTextarea: GovukTextarea
 )
 
-@(connectivityResult: String)(implicit request: Request[?], messages: Messages)
+@(connectivityResult: String, user: Option[UserModel])(implicit request: Request[?], messages: Messages)
 
 
 @layout(
     pageTitle    = titleNoForm(messages("testConnectivity.title")),
-    showBackLink = false
+    showBackLink = false,
+    user = user
 ) {
 
     <h1 class="govuk-heading-xl">@messages("testConnectivity.heading")</h1>

@@ -18,6 +18,7 @@ package controllers.team
 
 import base.SpecBase
 import config.CryptoProvider
+import controllers.actions.FakeUser
 import forms.YesNoFormProvider
 import models.UserAnswers
 import models.application.TeamMember
@@ -28,13 +29,13 @@ import org.mockito.Mockito.{never, verify, when}
 import org.scalatest.{OptionValues, TryValues}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.CreateTeamMembersPage
-import play.api.{Application => PlayApplication}
+import play.api.Application as PlayApplication
 import play.api.data.FormError
 import play.api.i18n.Messages
 import play.api.inject
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.CreateTeamSessionRepository
 import services.ApiHubService
 import uk.gov.hmrc.crypto.SymmetricCryptoFactory
@@ -115,7 +116,8 @@ class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with Opt
           view(
             "Page not found - 404",
             "This page can’t be found",
-            "Cannot find this team member."
+            "Cannot find this team member.",
+            Some(FakeUser)
           )(request, messages(application))
             .toString()
         contentAsString(result) must validateAsHtml
@@ -136,7 +138,8 @@ class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with Opt
           view(
             "Page not found - 404",
             "This page can’t be found",
-            "Cannot find this team member."
+            "Cannot find this team member.",
+            Some(FakeUser)
           )(request, messages(application))
             .toString()
         contentAsString(result) must validateAsHtml
@@ -256,7 +259,8 @@ class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with Opt
           view(
             "Bad request - 400",
             "Bad request",
-            "Cannot delete the authenticated user."
+            "Cannot delete the authenticated user.",
+            Some(user)
           )(request, msgs)
             .toString()
 
@@ -352,7 +356,8 @@ class RemoveTeamMemberControllerSpec extends SpecBase with MockitoSugar with Opt
           view(
             "Page not found - 404",
             "This page can’t be found",
-            "Cannot find this team member."
+            "Cannot find this team member.",
+            Some(user)
           )(request, msgs)
             .toString()
 

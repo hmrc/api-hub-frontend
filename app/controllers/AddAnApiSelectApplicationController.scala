@@ -21,13 +21,13 @@ import controllers.helpers.ErrorResultBuilder
 import forms.AddAnApiSelectApplicationFormProvider
 import models.api.ApiDetail
 import models.application.Application
-import models.requests.DataRequest
+import models.requests.{BaseRequest, DataRequest}
 import models.{AddAnApi, Mode}
 import navigation.Navigator
 import pages.{AddAnApiApiPage, AddAnApiSelectApplicationPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc._
+import play.api.mvc.*
 import repositories.AddAnApiSessionRepository
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -101,7 +101,7 @@ class AddAnApiSelectApplicationController @Inject()(
     }
   }
 
-  private def applicationNotFound(applicationId: String)(implicit request: Request[?]): Future[Result] = {
+  private def applicationNotFound(applicationId: String)(implicit request: BaseRequest[?]): Future[Result] = {
     Future.successful(
       errorResultBuilder.notFound(
         heading = Messages("site.applicationNotFoundHeading"),
