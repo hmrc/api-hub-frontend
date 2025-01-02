@@ -14,26 +14,72 @@
  * limitations under the License.
  *@
 
-@import models.api._
+@import models.api.*
+@import models.api.ApiDeploymentStatus.*
 @import models.user.UserModel
-@import views.html.components.ApiDeployments
+@import views.html.components.IconsLink
 @import viewmodels.myapis.{MyApisNavPages, MyApisNavItems}
 
 @this(
         layout: templates.Layout,
         govukButton: GovukButton,
         govukSummaryList: GovukSummaryList,
-        apiDeployments: ApiDeployments,
         sideNav: views.html.templates.SideNav,
+        iconsLink: IconsLink,
 )
 
 @(apiDetail: ApiDetail, deploymentStatuses: ApiDeploymentStatuses, user: UserModel, supportEmailAddress: String, teamName: Option[String])(implicit request: Request[?], messages: Messages)
+
+@teamContent(team: String, teamId: String) = {
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <a class="govuk-link govuk-link--no-visited-state" href=@controllers.team.routes.ManageTeamController.onPageLoad(apiDetail.teamId.get).url >
+                @team
+            </a>
+        </div>
+        <div class="govuk-grid-column-one-third">
+            <a class="govuk-link govuk-link--no-visited-state govuk-!-margin-right-0" href=@controllers.myapis.routes.UpdateApiTeamController.onPageLoad(apiDetail.id).url target="_blank">
+                <i class="fa-solid fa-edit"></i> @messages("site.change")
+            </a>
+        </div>
+    </div>
+}
+
+@maybeTeamContent() = @{
+    (teamName, apiDetail.teamId) match {
+        case (Some(team), Some(teamId)) =>
+            teamContent(team, teamId)
+        case _ => Html(messages("apiDetails.details.notSpecified"))
+    }
+}
 
 @supportEmailLink() = {
     <a href="mailto:@supportEmailAddress" class="govuk-link">@supportEmailAddress</a>
 }
 
-@layout(pageTitle = titleNoForm(messages("myApis.details.title")), user = Some(user), fullWidth = true) {
+@showDeployedVersion(deploymentStatus: ApiDeploymentStatus) = @{deploymentStatus match {
+        case Deployed(_, version) => version
+        case _ => ""
+    }
+}
+
+@deploymentStatusSummary(deploymentStatus: ApiDeploymentStatus) = @{
+    SummaryListRow(
+        key = Key(
+            content = Text(messages(s"apiDeployments.environment.${deploymentStatus.environmentId}"))
+        ),
+        value = Value(
+            content = HtmlContent(s"""
+                <div class="apiStatusContainer">
+                    ${showDeployedVersion(deploymentStatus).toString}
+                </div>
+            """),
+            classes = "govuk-!-padding-right-4 govuk-!-text-align-centre"
+        ),
+    )
+}
+
+@layout(pageTitle = titleNoForm(messages("myApis.details.title")), user = Some(user), fullWidth = true, customScriptsBlock = Some(iconsLink())) {
     @sideNav(apiDetail.title, MyApisNavItems(apiDetail.id, user, MyApisNavPages.ProducerApiDetailsPage, deploymentStatuses)) {
         <h1 id="details" class="govuk-heading-l">@messages("myApis.details.title")</h1>
 
@@ -52,9 +98,27 @@
                         content = Text(messages("myApis.details.team"))
                     ),
                     value = Value(
-                        content = Text(teamName.getOrElse(messages("apiDetails.details.notSpecified")))
+                        content = HtmlContent(maybeTeamContent())
                     ),
-                ))))
+                ),
+                SummaryListRow(
+                    key = Key(
+                        content = Text(messages("site.publisherReference"))
+                    ),
+                    value = Value(
+                        content = Text(apiDetail.publisherReference)
+                    ),
+                ),
+                SummaryListRow(
+                    key = Key(
+                        content = Text(messages("site.createdDate"))
+                    ),
+                    value = Value(
+                        content = HtmlContent(s"""<span class="utcDateLong">${apiDetail.lastUpdated}</span>""")
+                    ),
+                ).withCssClass("utcDateLong")))
+            .withCssClass("govuk-summary-list--no-border hip-summary-list__compact")
+        )
 
         <div class="call-out-panel">
         @if(user.permissions.canSupport && deploymentStatuses.isDeployed) {
@@ -71,6 +135,25 @@
         }
         </div>
 
-        @apiDeployments(deploymentStatuses)
+        <div class="apiDeploymentStatuses">
+            <h2 class="govuk-heading-m">
+                @messages("apiDeployments.heading")
+            </h2>
+
+            @govukSummaryList(
+                SummaryList(
+                    rows = Seq(
+                        SummaryListRow(
+                            key = Key(
+                                content = Text(messages("site.environment"))
+                            ),
+                        value = Value(
+                            content = Text(messages("site.version")),
+                            classes = "govuk-!-font-weight-bold govuk-!-text-align-centre"
+                        ),
+                    )) ++ deploymentStatuses.statuses.map(deploymentStatusSummary)
+                )
+            )
+        </div>
     }
 }

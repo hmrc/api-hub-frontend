@@ -94,6 +94,155 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
     }
   }
 
+  "AddCredentialChecklistController.addProductionCredential" - {
+    "must return the Add Credential Success view when valid data is submitted by a a privileged user who is a team member or supporter" in {
+      forAll(privilegedTeamMemberAndSupporterTable) {
+        user =>
+          val api1 = ApiDetail("test-api-1", "pubRef1", "test-api-name-1", "", "", Seq.empty, None, "", Live,
+            reviewedDate = Instant.now(), platform = "HIP", lastUpdated = Instant.now(), maintainer = Maintainer("name", "#slack", List.empty))
+          val api2 = ApiDetail("test-api-2", "pubRef2", "test-api-name-2", "", "", Seq.empty, None, "", Live,
+            reviewedDate = Instant.now(), platform = "HIP", lastUpdated = Instant.now(), maintainer = Maintainer("name", "#slack", List.empty))
+          val apiNames = Seq(api1.title, api2.title)
+
+          val application = FakeApplication.copy(
+            apis = Seq(
+              Api(api1.id, api1.title, Seq.empty),
+              Api(api2.id, api2.title, Seq.empty)
+            )
+          )
+
+          val fixture = buildFixture(user, Some(application))
+          val credential = Credential("test-client-id", LocalDateTime.now(clock), Some("test-secret"), Some("test-fragment"), FakeHipEnvironments.production.id)
+
+          when(fixture.apiHubService.addCredential(eqTo(application.id), argThat(hipEnvironment => hipEnvironment.isProductionLike))(any()))
+            .thenReturn(Future.successful(Right(Some(credential))))
+
+          when(fixture.apiHubService.getApiDetail(eqTo(api1.id))(any()))
+            .thenReturn(Future.successful(Some(api1)))
+
+          when(fixture.apiHubService.getApiDetail(eqTo(api2.id))(any()))
+            .thenReturn(Future.successful(Some(api2)))
+
+          running(fixture.playApplication) {
+            implicit val msgs: Messages = messages(fixture.playApplication)
+            implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, addProductionCredentialRoute())
+              .withFormUrlEncodedBody(("value[0]", "confirm"))
+
+            val result = route(fixture.playApplication, request).value
+            val view = fixture.playApplication.injector.instanceOf[AddCredentialSuccessView]
+            val credentialsPageUrl = controllers.application.routes.EnvironmentsController.onPageLoad(FakeApplication.id, "production").url
+
+            val summaryList = AddCredentialSuccessViewModel.buildSummary(
+              application,
+              apiNames,
+              credential
+            )
+
+            status(result) mustBe OK
+            contentAsString(result) mustBe view(application, summaryList, Some(user), credential, credentialsPageUrl).toString()
+            contentAsString(result) must validateAsHtml
+          }
+      }
+    }
+
+    "must return a Bad Request and errors when invalid data is submitted" in {
+      val fixture = buildFixture(FakeUser.copy(permissions = FakeUser.permissions.copy(isPrivileged = true)))
+
+      running(fixture.playApplication) {
+        implicit val msgs: Messages = messages(fixture.playApplication)
+        implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, addProductionCredentialRoute())
+          .withFormUrlEncodedBody()
+
+        val result = route(fixture.playApplication, request).value
+        val view = fixture.playApplication.injector.instanceOf[AddCredentialChecklistView]
+        val formWithErrors = form.bind(Map.empty[String, String])
+
+        status(result) mustBe BAD_REQUEST
+        contentAsString(result) mustEqual view(formWithErrors, FakeApplication.id, Some(FakeUser)).toString
+        contentAsString(result) must validateAsHtml
+      }
+    }
+
+    "must redirect to Unauthorised page for a POST when the user is a privileged user but not a team member or support" in {
+      val fixture = buildFixture(FakePrivilegedUser)
+
+      running(fixture.playApplication) {
+        implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, addProductionCredentialRoute())
+          .withFormUrlEncodedBody(("value[0]", "confirm"))
+
+        val result = route(fixture.playApplication, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustEqual routes.UnauthorisedController.onPageLoad.url
+      }
+    }
+
+    "must return 400 Bad Request when the credential limit has been exceeded" in {
+      val fixture = buildFixture(FakeUser.copy(permissions = FakeUser.permissions.copy(isPrivileged = true)))
+
+      when(fixture.apiHubService.addCredential(any(), any())(any()))
+        .thenReturn(Future.successful(Left(ApplicationCredentialLimitException("test-message"))))
+
+      running(fixture.playApplication) {
+        implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, addProductionCredentialRoute())
+          .withFormUrlEncodedBody(("value[0]", "confirm"))
+
+        val result = route(fixture.playApplication, request).value
+
+        status(result) mustBe BAD_REQUEST
+        contentAsString(result) must validateAsHtml
+      }
+    }
+  }
+
+  "AddCredentialChecklistController.addDevelopmentCredential" - {
+    "must add the credential and redirect to the Environments and Credentials page" in {
+      val fixture = buildFixture()
+
+      val credential = Credential("test-client-id", LocalDateTime.now(clock), Some("test-secret"), Some("test-fragment"), FakeHipEnvironments.test.id)
+
+      when(fixture.apiHubService.addCredential(eqTo(FakeApplication.id), argThat(hipEnvironment => !hipEnvironment.isProductionLike))(any()))
+        .thenReturn(Future.successful(Right(Some(credential))))
+
+      running(fixture.playApplication) {
+        implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(POST, addDevelopmentCredentialRoute())
+
+        val result = route(fixture.playApplication, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe controllers.application.routes.EnvironmentsController.onPageLoad(FakeApplication.id, "test").url
+      }
+    }
+
+    "must redirect to Unauthorised page for a POST when user is not a team member or supporter" in {
+      val fixture = buildFixture(FakeUserNotTeamMember)
+
+      running(fixture.playApplication) {
+        implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(POST, addDevelopmentCredentialRoute())
+
+        val result = route(fixture.playApplication, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe routes.UnauthorisedController.onPageLoad.url
+      }
+    }
+
+    "must return 400 Bad Request when the credential limit has been exceeded" in {
+      val fixture = buildFixture()
+
+      when(fixture.apiHubService.addCredential(any(), any())(any()))
+        .thenReturn(Future.successful(Left(ApplicationCredentialLimitException("test-message"))))
+
+      running(fixture.playApplication) {
+        implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(POST, addDevelopmentCredentialRoute())
+
+        val result = route(fixture.playApplication, request).value
+
+        status(result) mustBe BAD_REQUEST
+        contentAsString(result) must validateAsHtml
+      }
+    }
+  }
 
   "AddCredentialChecklistController.addCredentialForEnvironment" - {
     "must give the correct response for given user and environment" in {
@@ -136,6 +285,155 @@ object AddCredentialControllerSpec extends SpecBase with MockitoSugar {
 
   private val clock: Clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
   private def checklistRoute() = controllers.application.routes.AddCredentialController.checklist(FakeApplication.id).url
+  "AddCredentialChecklistController.addProductionCredential" - {
+    "must return the Add Credential Success view when valid data is submitted by a a privileged user who is a team member or supporter" in {
+      forAll(privilegedTeamMemberAndSupporterTable) {
+        user =>
+          val api1 = ApiDetail("test-api-1", "pubRef1", "test-api-name-1", "", "", Seq.empty, None, "", Live,
+            reviewedDate = Instant.now(), platform = "HIP", lastUpdated = Instant.now(), maintainer = Maintainer("name", "#slack", List.empty))
+          val api2 = ApiDetail("test-api-2", "pubRef2", "test-api-name-2", "", "", Seq.empty, None, "", Live,
+            reviewedDate = Instant.now(), platform = "HIP", lastUpdated = Instant.now(), maintainer = Maintainer("name", "#slack", List.empty))
+          val apiNames = Seq(api1.title, api2.title)
+
+          val application = FakeApplication.copy(
+            apis = Seq(
+              Api(api1.id, api1.title, Seq.empty),
+              Api(api2.id, api2.title, Seq.empty)
+            )
+          )
+
+          val fixture = buildFixture(user, Some(application))
+          val credential = Credential("test-client-id", LocalDateTime.now(clock), Some("test-secret"), Some("test-fragment"), FakeHipEnvironments.production.id)
+
+          when(fixture.apiHubService.addCredential(eqTo(application.id), argThat(hipEnvironment => hipEnvironment.isProductionLike))(any()))
+            .thenReturn(Future.successful(Right(Some(credential))))
+
+          when(fixture.apiHubService.getApiDetail(eqTo(api1.id))(any()))
+            .thenReturn(Future.successful(Some(api1)))
+
+          when(fixture.apiHubService.getApiDetail(eqTo(api2.id))(any()))
+            .thenReturn(Future.successful(Some(api2)))
+
+          running(fixture.playApplication) {
+            implicit val msgs: Messages = messages(fixture.playApplication)
+            implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, addProductionCredentialRoute())
+              .withFormUrlEncodedBody(("value[0]", "confirm"))
+
+            val result = route(fixture.playApplication, request).value
+            val view = fixture.playApplication.injector.instanceOf[AddCredentialSuccessView]
+            val credentialsPageUrl = controllers.application.routes.EnvironmentsController.onPageLoad(FakeApplication.id, "production").url
+
+            val summaryList = AddCredentialSuccessViewModel.buildSummary(
+              application,
+              apiNames,
+              credential
+            )
+
+            status(result) mustBe OK
+            contentAsString(result) mustBe view(application, summaryList, Some(user), credential, credentialsPageUrl).toString()
+            contentAsString(result) must validateAsHtml
+          }
+      }
+    }
+
+    "must return a Bad Request and errors when invalid data is submitted" in {
+      val fixture = buildFixture(FakeUser.copy(permissions = FakeUser.permissions.copy(isPrivileged = true)))
+
+      running(fixture.playApplication) {
+        implicit val msgs: Messages = messages(fixture.playApplication)
+        implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, addProductionCredentialRoute())
+          .withFormUrlEncodedBody()
+
+        val result = route(fixture.playApplication, request).value
+        val view = fixture.playApplication.injector.instanceOf[AddCredentialChecklistView]
+        val formWithErrors = form.bind(Map.empty[String, String])
+
+        status(result) mustBe BAD_REQUEST
+        contentAsString(result) mustEqual view(formWithErrors, FakeApplication.id, Some(FakeUser)).toString
+        contentAsString(result) must validateAsHtml
+      }
+    }
+
+    "must redirect to Unauthorised page for a POST when the user is a privileged user but not a team member or support" in {
+      val fixture = buildFixture(FakePrivilegedUser)
+
+      running(fixture.playApplication) {
+        implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, addProductionCredentialRoute())
+          .withFormUrlEncodedBody(("value[0]", "confirm"))
+
+        val result = route(fixture.playApplication, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustEqual routes.UnauthorisedController.onPageLoad.url
+      }
+    }
+
+    "must return 400 Bad Request when the credential limit has been exceeded" in {
+      val fixture = buildFixture(FakeUser.copy(permissions = FakeUser.permissions.copy(isPrivileged = true)))
+
+      when(fixture.apiHubService.addCredential(any(), any())(any()))
+        .thenReturn(Future.successful(Left(ApplicationCredentialLimitException("test-message"))))
+
+      running(fixture.playApplication) {
+        implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, addProductionCredentialRoute())
+          .withFormUrlEncodedBody(("value[0]", "confirm"))
+
+        val result = route(fixture.playApplication, request).value
+
+        status(result) mustBe BAD_REQUEST
+        contentAsString(result) must validateAsHtml
+      }
+    }
+  }
+
+  "AddCredentialChecklistController.addDevelopmentCredential" - {
+    "must add the credential and redirect to the Environments and Credentials page" in {
+      val fixture = buildFixture()
+
+      val credential = Credential("test-client-id", LocalDateTime.now(clock), Some("test-secret"), Some("test-fragment"), FakeHipEnvironments.test.id)
+
+      when(fixture.apiHubService.addCredential(eqTo(FakeApplication.id), argThat(hipEnvironment => !hipEnvironment.isProductionLike))(any()))
+        .thenReturn(Future.successful(Right(Some(credential))))
+
+      running(fixture.playApplication) {
+        implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(POST, addDevelopmentCredentialRoute())
+
+        val result = route(fixture.playApplication, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe controllers.application.routes.EnvironmentsController.onPageLoad(FakeApplication.id, "test").url
+      }
+    }
+
+    "must redirect to Unauthorised page for a POST when user is not a team member or supporter" in {
+      val fixture = buildFixture(FakeUserNotTeamMember)
+
+      running(fixture.playApplication) {
+        implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(POST, addDevelopmentCredentialRoute())
+
+        val result = route(fixture.playApplication, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe routes.UnauthorisedController.onPageLoad.url
+      }
+    }
+
+    "must return 400 Bad Request when the credential limit has been exceeded" in {
+      val fixture = buildFixture()
+
+      when(fixture.apiHubService.addCredential(any(), any())(any()))
+        .thenReturn(Future.successful(Left(ApplicationCredentialLimitException("test-message"))))
+
+      running(fixture.playApplication) {
+        implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(POST, addDevelopmentCredentialRoute())
+
+        val result = route(fixture.playApplication, request).value
+
+        status(result) mustBe BAD_REQUEST
+        contentAsString(result) must validateAsHtml
+      }
+    }
+  }
   private val formProvider = new AddCredentialChecklistFormProvider()
   private val form = formProvider()
 

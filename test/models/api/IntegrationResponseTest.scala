@@ -47,7 +47,8 @@ class IntegrationResponseTest extends AnyFreeSpec with Matchers {
           |      "platform": "HIP",
           |      "hods": [],
           |      "publisherReference": "ref1",
-          |      "openApiSpecification": "oas"
+          |      "openApiSpecification": "oas",
+          |      "lastUpdated": "2024-10-10T09:56:23.385+0000"
           |    },
           |    {
           |      "maintainer": {
@@ -65,7 +66,8 @@ class IntegrationResponseTest extends AnyFreeSpec with Matchers {
           |      "platform": "HIP",
           |      "hods": [],
           |      "publisherReference": "ref2",
-          |      "openApiSpecification": "oas"
+          |      "openApiSpecification": "oas",
+          |      "lastUpdated": "2024-10-10T09:56:23.385+0000"
           |    },
           |    {
           |      "maintainer": {
@@ -83,7 +85,8 @@ class IntegrationResponseTest extends AnyFreeSpec with Matchers {
           |      "platform": "HIP",
           |      "hods": [],
           |      "publisherReference": "ref3",
-          |      "openApiSpecification": "oas"
+          |      "openApiSpecification": "oas",
+          |      "lastUpdated": "2024-10-10T09:56:23.385+0000"
           |    },
           |    {
           |      "maintainer": {
@@ -101,7 +104,8 @@ class IntegrationResponseTest extends AnyFreeSpec with Matchers {
           |      "platform": "HIP",
           |      "hods": [],
           |      "publisherReference": "ref4",
-          |      "openApiSpecification": "oas"
+          |      "openApiSpecification": "oas",
+          |      "lastUpdated": "2024-10-10T09:56:23.385+0000"
           |    }
           |  ]
           |}

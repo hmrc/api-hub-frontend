@@ -155,6 +155,7 @@ object RequestProductionAccessStartControllerSpec {
     apiStatus = Live,
     reviewedDate = Instant.now(),
     platform = "HIP",
+    lastUpdated = Instant.now(),
     maintainer = Maintainer("name", "#slack", List.empty)
   )
 

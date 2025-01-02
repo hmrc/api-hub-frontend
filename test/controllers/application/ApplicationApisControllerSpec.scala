@@ -21,9 +21,8 @@ import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
 import controllers.routes
 import models.accessrequest.Pending
 import models.api.{ApiDetail, Endpoint, EndpointMethod, Live, Maintainer}
-import models.application.{Api, Scope, Secondary, SelectedEndpoint, TeamMember}
 import models.application.ApplicationLenses.ApplicationLensOps
-import models.team.Team
+import models.application.{Api, Scope, Secondary, SelectedEndpoint}
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
@@ -36,14 +35,14 @@ import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
 import viewmodels.application.{Accessible, ApplicationApi, ApplicationEndpoint, Inaccessible}
 import views.html.ErrorTemplate
-import views.html.application.ApplicationDetailsView
+import views.html.application.ApplicationApisView
 
-import java.time.{Instant, LocalDateTime}
+import java.time.Instant
 import scala.concurrent.Future
 
-class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with TestHelpers with HtmlValidation{
+class ApplicationApisControllerSpec extends SpecBase with MockitoSugar with TestHelpers with HtmlValidation {
 
-  "ApplicationDetails Controller" - {
+  "ApplicationApisController" - {
     "must return OK and the correct view for a GET for a team member or supporter" in {
       forAll(teamMemberAndSupporterTable) {
         (user: UserModel) =>
@@ -56,9 +55,9 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
             .thenReturn(Future.successful(Seq.empty))
 
           running(fixture.playApplication) {
-            val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id).url)
+            val request = FakeRequest(GET, controllers.application.routes.ApplicationApisController.onPageLoad(FakeApplication.id).url)
             val result = route(fixture.playApplication, request).value
-            val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
+            val view = fixture.playApplication.injector.instanceOf[ApplicationApisView]
 
             status(result) mustEqual OK
             contentAsString(result) mustBe view(FakeApplication, Seq.empty, Some(user))(request, messages(fixture.playApplication)).toString
@@ -67,74 +66,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
       }
     }
 
-    "must return OK and the correct view for a GET when the application has a global team" in {
-      val fixture = buildFixture()
-
-      val team = Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email)))
-      val application = FakeApplication.setTeamId(team.id).setTeamName(team.name)
-
-      when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false), eqTo(false))(any()))
-        .thenReturn(Future.successful(Some(application)))
-
-      when(fixture.apiHubService.getAccessRequests(eqTo(Some(application.id)), eqTo(None))(any()))
-        .thenReturn(Future.successful(Seq.empty))
-
-      when(fixture.apiHubService.findTeamById(eqTo(team.id))(any))
-        .thenReturn(Future.successful(Some(team)))
-
-      running(fixture.playApplication) {
-        val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url)
-        val result = route(fixture.playApplication, request).value
-        val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
-
-        status(result) mustEqual OK
-        contentAsString(result) mustBe view(application, Seq.empty, Some(FakeUser))(request, messages(fixture.playApplication)).toString
-        contentAsString(result) must validateAsHtml
-      }
-    }
-
-    "must sort the application's team members alphabetically" in {
-      val application = FakeApplication.copy(
-        teamMembers = Seq(
-          TeamMember(email = FakeUser.email),
-          TeamMember(email = "cc@hmrc.gov.uk"),
-          TeamMember(email = "ab@hmrc.gov.uk"),
-          TeamMember(email = "aa@hmrc.gov.uk"),
-          TeamMember(email = "Zb@hmrc.gov.uk"),
-          TeamMember(email = "za@hmrc.gov.uk")
-        )
-      )
-
-      val expected = FakeApplication.copy(
-        teamMembers = Seq(
-          TeamMember(email = "aa@hmrc.gov.uk"),
-          TeamMember(email = "ab@hmrc.gov.uk"),
-          TeamMember(email = "cc@hmrc.gov.uk"),
-          TeamMember(email = FakeUser.email),
-          TeamMember(email = "za@hmrc.gov.uk"),
-          TeamMember(email = "Zb@hmrc.gov.uk")
-        )
-      )
-
-      val fixture = buildFixture()
-
-      when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))
-        .thenReturn(Future.successful(Some(application)))
-
-      when(fixture.apiHubService.getAccessRequests(eqTo(Some(application.id)), eqTo(None))(any()))
-        .thenReturn(Future.successful(Seq.empty))
-
-      running(fixture.playApplication) {
-        val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url)
-        val result = route(fixture.playApplication, request).value
-        val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
-
-        status(result) mustBe OK
-        contentAsString(result) mustBe view(expected, Seq.empty, Some(FakeUser))(request, messages(fixture.playApplication)).toString
-      }
-    }
-
-    "must return the correct view when the application has APIs added" in {
+    "must return the correct view when the applications has APIs" in {
       val fixture = buildFixture()
 
       val apiDetail = ApiDetail(
@@ -164,51 +96,16 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
       when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false), eqTo(false))(any()))
         .thenReturn(Future.successful(Some(application)))
 
-      when(fixture.apiHubService.getAccessRequests(eqTo(Some(application.id)), eqTo(None))(any()))
+      when(fixture.apiHubService.getAccessRequests(eqTo(Some(FakeApplication.id)), eqTo(None))(any()))
         .thenReturn(Future.successful(Seq.empty))
 
       when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))
 
       running(fixture.playApplication) {
-        val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id).url)
+        val request = FakeRequest(GET, controllers.application.routes.ApplicationApisController.onPageLoad(application.id).url)
         val result = route(fixture.playApplication, request).value
-        val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
-
-        status(result) mustEqual OK
-        contentAsString(result) mustBe view(application, applicationApis, Some(FakeUser))(request, messages(fixture.playApplication)).toString
-        contentAsString(result) must validateAsHtml
-      }
-    }
-
-    "must return the correct view when the APIs are missing" in {
-      val fixture = buildFixture()
-      val apiId = "test-id"
-      val apiTitle = "test-title"
-
-      val api = Api(apiId, apiTitle, Seq(SelectedEndpoint("GET", "/test")))
-
-      val application = FakeApplication
-        .addApi(api)
-        .setScopes(Secondary, Seq(Scope("test-scope")))
-
-      val applicationApis = Seq(
-        ApplicationApi(api, 0)
-      )
-
-      when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false), eqTo(false))(any()))
-        .thenReturn(Future.successful(Some(application)))
-
-      when(fixture.apiHubService.getAccessRequests(eqTo(Some(application.id)), eqTo(None))(any()))
-        .thenReturn(Future.successful(Seq.empty))
-
-      when(fixture.apiHubService.getApiDetail(eqTo(apiId))(any()))
-        .thenReturn(Future.successful(None))
-
-      running(fixture.playApplication) {
-        val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id).url)
-        val result = route(fixture.playApplication, request).value
-        val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
+        val view = fixture.playApplication.injector.instanceOf[ApplicationApisView]
 
         status(result) mustEqual OK
         contentAsString(result) mustBe view(application, applicationApis, Some(FakeUser))(request, messages(fixture.playApplication)).toString
@@ -223,7 +120,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         .thenReturn(Future.successful(None))
 
       running(fixture.playApplication) {
-        val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id).url)
+        val request = FakeRequest(GET, controllers.application.routes.ApplicationApisController.onPageLoad(FakeApplication.id).url)
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[ErrorTemplate]
 
@@ -247,7 +144,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         .thenReturn(Future.successful(Some(FakeApplication)))
 
       running(fixture.playApplication) {
-        val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id).url)
+        val request = FakeRequest(GET, controllers.application.routes.ApplicationApisController.onPageLoad(FakeApplication.id).url)
         val result = route(fixture.playApplication, request).value
 
         status(result) mustEqual SEE_OTHER

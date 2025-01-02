@@ -90,13 +90,13 @@ class MyApisControllerSpec
       val view = fixture.application.injector.instanceOf[MyApisView]
 
       val zebras = ApiDetail("id1", "ref1", "zebras", "zebras api", "1.0.0", Seq.empty, None, "oas", Live,
-        reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
+        reviewedDate = Instant.now(), platform = "HIP", lastUpdated = Instant.now(), maintainer = Maintainer("name", "#slack", List.empty))
       val molluscs = ApiDetail("id2", "ref2", "MOLLUSCS", "molluscs api", "1.0.0", Seq.empty, None, "oas", Live,
-        reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
+        reviewedDate = Instant.now(), platform = "HIP", lastUpdated = Instant.now(), maintainer = Maintainer("name", "#slack", List.empty))
       val aardvarks = ApiDetail("id3", "ref3", "aardvarks", "aardvarks api", "1.0.0", Seq.empty, None, "oas", Live,
-        reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
+        reviewedDate = Instant.now(), platform = "HIP", lastUpdated = Instant.now(), maintainer = Maintainer("name", "#slack", List.empty))
       val pigeons = ApiDetail("id4", "ref4", "PIGEONS", "pigeons api", "1.0.0", Seq.empty, None, "oas", Live,
-        reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
+        reviewedDate = Instant.now(), platform = "HIP", lastUpdated = Instant.now(), maintainer = Maintainer("name", "#slack", List.empty))
 
       when(fixture.apiHubService.getUserApis(any)(any, any))
         .thenReturn(Future.successful(Seq(molluscs, zebras, aardvarks, pigeons)))

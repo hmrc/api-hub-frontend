@@ -66,6 +66,7 @@ trait ApiDetailGenerators {
       subDomain <- Gen.oneOf(domain.subDomains)
       hods <- Gen.listOfN(size/ listSizeQuota, sensiblySizedAlphaNumStr).suchThat(_.nonEmpty)
       reviewedDate <- Gen.const(Instant.now().truncatedTo(ChronoUnit.SECONDS))
+      lastUpdated <- Gen.const(Instant.now().truncatedTo(ChronoUnit.SECONDS))
       platform <- sensiblySizedAlphaNumStr
       maintainerName <- sensiblySizedAlphaNumStr
       maintainerSlack <- sensiblySizedAlphaNumStr
@@ -85,6 +86,7 @@ trait ApiDetailGenerators {
       hods = hods,
       reviewedDate = reviewedDate,
       platform = platform,
+      lastUpdated = lastUpdated,
       maintainer = Maintainer(maintainerName, s"#$maintainerSlack", List.empty),
       apiType = Some(apiType)
     )
