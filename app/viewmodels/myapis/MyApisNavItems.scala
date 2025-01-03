@@ -53,13 +53,15 @@ object MyApisNavItems {
           ))
         } else {
           None
-        }) ++ Seq (
-      SideNavItemLeaf(
-        page = ChangeOwningTeamPage,
-        title = messages("myApis.update.team.title"),
-        link = controllers.myapis.routes.UpdateApiTeamController.onPageLoad(apiId),
-        isCurrentPage = currentPage == ChangeOwningTeamPage
-      ),
+        }) ++
+      Option.when(user.permissions.canSupport) {
+        SideNavItemLeaf(
+          page = ApiUsagePage,
+          title = messages("myApis.usage.link"),
+          link = controllers.myapis.routes.ApiUsageController.onPageLoad(apiId),
+          isCurrentPage = currentPage == ApiUsagePage
+        )
+      } :+
       SideNavItemLeaf(
         page = ViewApiAsConsumerPage,
         title = messages("myApis.viewApiAsConsumer.title"),
@@ -67,17 +69,5 @@ object MyApisNavItems {
         isCurrentPage = currentPage == ViewApiAsConsumerPage,
         opensInNewTab = true
       )
-    ) ++ (
-      if (user.permissions.canSupport) {
-        Some(SideNavItemLeaf(
-          page = ApiUsagePage,
-          title = messages("myApis.usage.link"),
-          link = controllers.myapis.routes.ApiUsageController.onPageLoad(apiId),
-          isCurrentPage = currentPage == ApiUsagePage
-        ))
-      } else {
-        None
-      }
-    )
   }
 }

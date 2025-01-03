@@ -37,5 +37,6 @@ object FakeApiDetail extends ApiDetail(
   Seq("hod1"),
   Instant.now(),
   "HIP",
-  Maintainer("name", "#slack", List.empty)
+  Maintainer("name", "#slack", List.empty),
+  Instant.now()
 )

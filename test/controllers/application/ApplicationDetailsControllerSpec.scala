@@ -149,6 +149,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         apiStatus = Live,
         reviewedDate = Instant.now(),
         platform = "HIP",
+        lastUpdated = Instant.now(),
         maintainer = Maintainer("name", "#slack", List.empty)
       )
 

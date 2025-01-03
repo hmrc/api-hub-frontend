@@ -47,7 +47,7 @@ class MyApisNavItemsSpec extends SpecBase with Matchers with TableDrivenProperty
       running(playApplication) {
         implicit val implicitMessages: Messages = messages(playApplication)
         val actual = MyApisNavItems(apiId, FakeSupporter, ProducerApiDetailsPage, statuses)
-        val expected = Seq(producerApiDetailsPage(), updateApiPage(), changeOwningTeamPage(), viewApiAsConsumerPage(), apiUsagePage())
+        val expected = Seq(producerApiDetailsPage(), updateApiPage(), apiUsagePage(), viewApiAsConsumerPage())
 
         actual mustBe expected
       }
@@ -59,7 +59,7 @@ class MyApisNavItemsSpec extends SpecBase with Matchers with TableDrivenProperty
       running(playApplication) {
         implicit val implicitMessages: Messages = messages(playApplication)
         val actual = MyApisNavItems(apiId, FakeUser, ProducerApiDetailsPage, statuses)
-        val expected = Seq(producerApiDetailsPage(), updateApiPage(), changeOwningTeamPage(), viewApiAsConsumerPage())
+        val expected = Seq(producerApiDetailsPage(), updateApiPage(), viewApiAsConsumerPage())
 
         actual mustBe expected
       }
@@ -76,7 +76,7 @@ class MyApisNavItemsSpec extends SpecBase with Matchers with TableDrivenProperty
           ProducerApiDetailsPage,
           ApiDeploymentStatuses(Seq(NotDeployed(FakeHipEnvironments.production.id), NotDeployed(FakeHipEnvironments.test.id)))
         )
-        val expected = Seq(producerApiDetailsPage(), changeOwningTeamPage(), viewApiAsConsumerPage())
+        val expected = Seq(producerApiDetailsPage(), viewApiAsConsumerPage())
 
         actual mustBe expected
       }
@@ -87,7 +87,6 @@ class MyApisNavItemsSpec extends SpecBase with Matchers with TableDrivenProperty
         "Page",
         ProducerApiDetailsPage,
         UpdateApiPage,
-        ChangeOwningTeamPage,
         ApiUsagePage
       )
 
@@ -129,15 +128,6 @@ object MyApisNavItemsSpec {
       page = UpdateApiPage,
       title = "Update API",
       link = controllers.myapis.routes.SimpleApiRedeploymentController.onPageLoad(apiId),
-      isCurrentPage = false
-    )
-  }
-
-  private def changeOwningTeamPage(): SideNavItem = {
-    SideNavItemLeaf(
-      page = ChangeOwningTeamPage,
-      title = "Change owning team",
-      link = controllers.myapis.routes.UpdateApiTeamController.onPageLoad(apiId),
       isCurrentPage = false
     )
   }
