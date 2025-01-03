@@ -61,7 +61,8 @@ class Navigator @Inject()() {
     //TODO: bring back with wiremock
     // case ProduceApiReviewNameDescriptionPage => _ => controllers.myapis.produce.routes.ProduceApiHowToAddWiremockController.onPageLoad(NormalMode)
     //TODO: remove when bringing back wiremock
-    case ProduceApiReviewNameDescriptionPage => _ => controllers.myapis.produce.routes.ProduceApiEgressAvailabilityController.onPageLoad()
+    case ProduceApiReviewNameDescriptionPage => _ => controllers.myapis.produce.routes.ProduceApiEgressAvailabilityController.onPageLoad(NormalMode)
+    case ProduceApiEgressAvailabilityPage => produceApiEgressAvailabilityNextPage(NormalMode)
     case ProduceApiEnterWiremockPage => _ => controllers.myapis.produce.routes.ProduceApiAddPrefixesController.onPageLoad(NormalMode)
     case ProduceApiAddPrefixesPage => produceApiAddPrefixNextPage(NormalMode)
     case ProduceApiEgressPrefixesPage => _ => controllers.myapis.produce.routes.ProduceApiHodController.onPageLoad(NormalMode)
@@ -178,6 +179,14 @@ class Navigator @Inject()() {
       case (_, Some(true)) => controllers.myapis.produce.routes.ProduceApiEgressPrefixesController.onPageLoad(mode)
       case (NormalMode, Some(false)) => controllers.myapis.produce.routes.ProduceApiHodController.onPageLoad(mode)
       case (CheckMode, Some(false)) => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
+      case _ => routes.JourneyRecoveryController.onPageLoad()
+    }
+  }
+
+  private def produceApiEgressAvailabilityNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
+    userAnswers.get(ProduceApiEgressAvailabilityPage) match {
+      case Some(true) => controllers.myapis.produce.routes.ProduceApiEgressSelectionController.onPageLoad()
+      case Some(false) => controllers.myapis.produce.routes.ProduceApiAddPrefixesController.onPageLoad(mode)
       case _ => routes.JourneyRecoveryController.onPageLoad()
     }
   }

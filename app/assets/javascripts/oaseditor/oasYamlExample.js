@@ -1,6 +1,6 @@
 export const exampleOasYaml = `openapi: 3.0.3
 info:
-  title: NPS Interface Specification to validate a P800 Reference.
+  title: Validate a P800 Reference.
   description: |-
     # Usage Terms
     These interfaces are business-critical interfaces for HMRC and DWP, supporting thousands of staff - all consumption, or change in consumption levels, should be registered and fully approved (see Registered Consumers below).
