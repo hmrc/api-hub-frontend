@@ -1116,6 +1116,9 @@ produceApiEnterWiremock.hint = Enter your WireMock configuration in YAML format 
 
 produceApiEgressAvailability.title = Is the Egress for your API available?
 produceApiEgressAvailability.heading = Is the Egress for your API available?
+produceApiEgressAvailability.hint = If there is an existing egress gateway configured to point to your API''s HoD/Backend or target service then answer ''Yes'', otherwise answer ''No''. {0}.
+produceApiEgressAvailability.hint.guidance = Guidance for Egress
+produceApiEgressAvailability.error.required = Select an answer
 
 produceApiEgressSelection.title = Select the Egress for your API
 produceApiEgressSelection.heading = Select the Egress for your API

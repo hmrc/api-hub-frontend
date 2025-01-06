@@ -15,25 +15,35 @@
  *@
 
 @import models.user.UserModel
+@import viewmodels.myapis.produce.ProduceApiEgressAvailabilityViewModel
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukButton: GovukButton,
+    govukRadios : GovukRadios,
+    govukErrorSummary: GovukErrorSummary,
+    newTabLink: components.NewTabLink,
 )
 
-@(userModel: UserModel)(implicit request: Request[?], messages: Messages)
+@(form: Form[?], viewModel: ProduceApiEgressAvailabilityViewModel, userModel: UserModel)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("produceApiEgressAvailability.title")), user = Some(userModel)) {
-    <h1 class="govuk-heading-l">@messages("produceApiEgressAvailability.heading")</h1>
-    @formHelper(action = controllers.myapis.produce.routes.ProduceApiEgressAvailabilityController.onSubmit("yes")) {
+@layout(pageTitle = title(form, messages("produceApiEgressAvailability.title")), user = Some(userModel)) {
+    @formHelper(action = viewModel.formAction) {
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
+        }
+
+        @govukRadios(
+            RadiosViewModel.yesNo(
+                field = form("value"),
+                legend = LegendViewModel(messages("produceApiEgressAvailability.heading")).asPageHeading()
+            ).withHint(Hint(content = HtmlContent(messages("produceApiEgressAvailability.hint", newTabLink(viewModel.apiHubGuideUrl + "/documentation/how-do-i-produce.apis.html#deployment", messages("produceApiEgressAvailability.hint.guidance"))))))
+        )
+
         @govukButton(
-            ButtonViewModel("Yes")
+            ButtonViewModel(messages("site.continue"))
         )
     }
-    @formHelper(action = controllers.myapis.produce.routes.ProduceApiEgressAvailabilityController.onSubmit("no")) {
-        @govukButton(
-            ButtonViewModel("No")
-        )
-    }
+
 }

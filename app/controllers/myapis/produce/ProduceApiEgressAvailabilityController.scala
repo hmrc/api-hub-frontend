@@ -16,33 +16,66 @@
 
 package controllers.myapis.produce
 
+import config.FrontendAppConfig
 import controllers.actions.*
 import models.{Mode, NormalMode}
+import pages.myapis.produce.ProduceApiEgressAvailabilityPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.ProduceApiSessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.myapis.produce.ProduceApiEgressAvailabilityView
+import forms.myapis.produce.ProduceApiEgressAvailabilityFormProvider
+import navigation.Navigator
+import viewmodels.myapis.produce.ProduceApiEgressAvailabilityViewModel
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class ProduceApiEgressAvailabilityController @Inject()(
                                                         override val messagesApi: MessagesApi,
+                                                        sessionRepository: ProduceApiSessionRepository,
                                                         identify: IdentifierAction,
+                                                        getData: ProduceApiDataRetrievalAction,
+                                                        requireData: DataRequiredAction,
+                                                        navigator: Navigator,
                                                         val controllerComponents: MessagesControllerComponents,
-                                                        view: ProduceApiEgressAvailabilityView
+                                                        formProvider: ProduceApiEgressAvailabilityFormProvider,
+                                                        view: ProduceApiEgressAvailabilityView,
+                                                        config: FrontendAppConfig
                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = identify {
-    implicit request => Ok(view(request.user))
+  private val form = formProvider()
+
+  private def viewModel(mode: Mode) = ProduceApiEgressAvailabilityViewModel(
+    config.helpDocsPath,
+    routes.ProduceApiEgressAvailabilityController.onSubmit(mode)
+  )
+
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+    implicit request =>
+
+      val preparedForm = request.userAnswers.get(ProduceApiEgressAvailabilityPage) match {
+        case None => form
+        case Some(value) => form.fill(value)
+      }
+
+      Ok(view(preparedForm, viewModel(mode), request.user))
   }
 
-  def onSubmit(answer: String): Action[AnyContent] = identify {
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      answer match {
-        case "yes" => Redirect(controllers.myapis.produce.routes.ProduceApiEgressSelectionController.onPageLoad())
-        case "no" => Redirect(controllers.myapis.produce.routes.ProduceApiAddPrefixesController.onPageLoad(NormalMode))
-      }
+
+      form.bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, viewModel(mode), request.user))),
+
+        value =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(ProduceApiEgressAvailabilityPage, value))
+            _              <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(navigator.nextPage(ProduceApiEgressAvailabilityPage, mode, updatedAnswers))
+      )
 
   }
 

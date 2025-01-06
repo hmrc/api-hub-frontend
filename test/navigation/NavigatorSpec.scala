@@ -145,7 +145,15 @@ class NavigatorSpec extends SpecBase with TryValues {
         //        }
         // TODO: remove when bringing back with Wiremock
         "must go from the API review page to the Egress Availability page" in {
-          navigator.nextPage(ProduceApiReviewNameDescriptionPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiEgressAvailabilityController.onPageLoad()
+          navigator.nextPage(ProduceApiReviewNameDescriptionPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiEgressAvailabilityController.onPageLoad(NormalMode)
+        }
+        "must go from the Egress Availability page to the Do You Want to Configure Prefixes page if user answered No" in {
+          val userAnswers = emptyUserAnswers.set(ProduceApiEgressAvailabilityPage, false).get
+          navigator.nextPage(ProduceApiEgressAvailabilityPage, NormalMode, userAnswers) mustBe controllers.myapis.produce.routes.ProduceApiAddPrefixesController.onPageLoad(NormalMode)
+        }
+        "must go from the Egress Availability page to the Egress Selection page if user answered Yes" in {
+          val userAnswers = emptyUserAnswers.set(ProduceApiEgressAvailabilityPage, true).get
+          navigator.nextPage(ProduceApiEgressAvailabilityPage, NormalMode, userAnswers) mustBe controllers.myapis.produce.routes.ProduceApiEgressSelectionController.onPageLoad()
         }
         "must go from the Add Prefixes page to the Enter Prefixes page if user answered Yes" in {
           val userAnswers = emptyUserAnswers.set(ProduceApiAddPrefixesPage, true).get
