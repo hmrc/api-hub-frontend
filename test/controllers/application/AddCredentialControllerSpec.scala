@@ -60,7 +60,7 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
             val view = fixture.playApplication.injector.instanceOf[AddCredentialChecklistView]
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual view(form, FakeApplication.id).toString
+            contentAsString(result) mustEqual view(form, FakeApplication.id, Some(user)).toString
             contentAsString(result) must validateAsHtml
           }
       }

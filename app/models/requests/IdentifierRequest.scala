@@ -17,6 +17,8 @@
 package models.requests
 
 import models.user.UserModel
-import play.api.mvc.{Request, WrappedRequest}
+import play.api.mvc.{Request, RequestHeader, WrappedRequest}
 
-case class IdentifierRequest[A] (request: Request[A], user: UserModel) extends WrappedRequest[A](request)
+case class IdentifierRequest[A] (request: Request[A], user: UserModel) extends BaseRequest[A](request) {
+  override def maybeUser: Option[UserModel] = Some(user)
+}

@@ -139,8 +139,21 @@ class NavigatorSpec extends SpecBase with TryValues {
         "must go from the Enter a short description page to the API review page" in {
           navigator.nextPage(ProduceApiShortDescriptionPage, NormalMode, emptyUserAnswers.set(ProduceApiShortDescriptionPage, "short description").get) mustBe controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onPageLoad(NormalMode)
         }
-        "must go from the API review page to the Define Wiremock page" in {
-          navigator.nextPage(ProduceApiReviewNameDescriptionPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiHowToAddWiremockController.onPageLoad(NormalMode)
+        // TODO: bring back with Wiremock
+        //        "must go from the API review page to the Define Wiremock page" in {
+        //          navigator.nextPage(ProduceApiReviewNameDescriptionPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiHowToAddWiremockController.onPageLoad(NormalMode)
+        //        }
+        // TODO: remove when bringing back with Wiremock
+        "must go from the API review page to the Egress Availability page" in {
+          navigator.nextPage(ProduceApiReviewNameDescriptionPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiEgressAvailabilityController.onPageLoad(NormalMode)
+        }
+        "must go from the Egress Availability page to the Do You Want to Configure Prefixes page if user answered No" in {
+          val userAnswers = emptyUserAnswers.set(ProduceApiEgressAvailabilityPage, false).get
+          navigator.nextPage(ProduceApiEgressAvailabilityPage, NormalMode, userAnswers) mustBe controllers.myapis.produce.routes.ProduceApiAddPrefixesController.onPageLoad(NormalMode)
+        }
+        "must go from the Egress Availability page to the Egress Selection page if user answered Yes" in {
+          val userAnswers = emptyUserAnswers.set(ProduceApiEgressAvailabilityPage, true).get
+          navigator.nextPage(ProduceApiEgressAvailabilityPage, NormalMode, userAnswers) mustBe controllers.myapis.produce.routes.ProduceApiEgressSelectionController.onPageLoad()
         }
         "must go from the Add Prefixes page to the Enter Prefixes page if user answered Yes" in {
           val userAnswers = emptyUserAnswers.set(ProduceApiAddPrefixesPage, true).get
@@ -191,8 +204,13 @@ class NavigatorSpec extends SpecBase with TryValues {
         "must go from the Review a short description page to the API review page" in {
           navigator.nextPage(UpdateApiShortDescriptionPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiReviewNameDescriptionController.onPageLoad(NormalMode)
         }
-        "must go from the API review page to the Define Wiremock page" in {
-          navigator.nextPage(UpdateApiReviewNameDescriptionPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiHowToAddWiremockController.onPageLoad(NormalMode)
+        // TODO: bring back with Wiremock
+        //        "must go from the API review page to the Define Wiremock page" in {
+        //          navigator.nextPage(UpdateApiReviewNameDescriptionPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiHowToAddWiremockController.onPageLoad(NormalMode)
+        //        }
+        // TODO: remove when bringing back with Wiremock
+        "must go from the API review page to the Add Prefixes page" in {
+          navigator.nextPage(UpdateApiReviewNameDescriptionPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiAddPrefixesController.onPageLoad(NormalMode)
         }
         "must go from the Add Prefixes page to the HoDs page if user answered No" in {
           val userAnswers = emptyUserAnswers.set(UpdateApiAddPrefixesPage, false).get

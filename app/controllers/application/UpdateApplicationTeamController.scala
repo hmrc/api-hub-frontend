@@ -21,7 +21,7 @@ import com.google.inject.{Inject, Singleton}
 import controllers.actions.{ApplicationAuthActionProvider, IdentifierAction}
 import controllers.helpers.ErrorResultBuilder
 import forms.application.UpdateApplicationTeamFormProvider
-import models.requests.ApplicationRequest
+import models.requests.{ApplicationRequest, BaseRequest}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.*
@@ -71,7 +71,7 @@ class UpdateApplicationTeamController @Inject()(
       )
   }
 
-  private def somethingNotFound()(implicit request: Request[?]): Result = {
+  private def somethingNotFound()(implicit request: BaseRequest[?]): Result = {
     errorResultBuilder.notFound(
       heading = Messages("application.update.team.something.not.found.heading"),
       message = Messages("application.update.team.something.not.found.message")

@@ -19,12 +19,13 @@ package controllers.actions
 import com.google.inject.{Inject, Singleton}
 import controllers.helpers.ErrorResultBuilder
 import controllers.routes
-import models.requests.{ApiRequest, IdentifierRequest}
+import models.requests.{ApiRequest, BaseRequest, IdentifierRequest}
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc.Results._
+import play.api.mvc.Results.*
 import play.api.mvc.{ActionRefiner, Request, Result}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider
+
 import scala.concurrent.{ExecutionContext, Future}
 
 trait ApiAuthAction extends ActionRefiner[IdentifierRequest, ApiRequest]
@@ -43,7 +44,7 @@ class ApiAuthActionProviderImpl @Inject()(
   def apply(apiId: String)(implicit ec: ExecutionContext): ApiAuthAction = {
     new ApiAuthAction with FrontendHeaderCarrierProvider {
       override protected def refine[A](identifierRequest: IdentifierRequest[A]): Future[Either[Result, ApiRequest[A]]] = {
-        implicit val request: Request[?] = identifierRequest
+        implicit val request: BaseRequest[?] = identifierRequest
 
         apiHubService.getApiDetail(apiId).flatMap {
           case Some(apiDetail) if identifierRequest.user.permissions.canSupport =>

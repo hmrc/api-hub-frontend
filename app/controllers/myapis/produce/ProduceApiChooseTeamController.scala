@@ -20,7 +20,7 @@ import controllers.actions.*
 import controllers.helpers.ErrorResultBuilder
 import forms.myapis.produce.ProduceApiChooseTeamFormProvider
 import models.Mode
-import models.requests.DataRequest
+import models.requests.{BaseRequest, DataRequest}
 import navigation.Navigator
 import pages.myapis.produce.ProduceApiChooseTeamPage
 import play.api.data.Form
@@ -48,7 +48,7 @@ class ProduceApiChooseTeamController @Inject()(
                                         errorResultBuilder: ErrorResultBuilder
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form = formProvider()
+  private val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
@@ -86,7 +86,7 @@ class ProduceApiChooseTeamController @Inject()(
         status(view(form, mode, teams.sortBy(_.name.toLowerCase()), request.user))
     )
   }
-  private def teamNotFound(teamId: String)(implicit request: Request[?]): Future[Result] = {
+  private def teamNotFound(teamId: String)(implicit request: BaseRequest[?]): Future[Result] = {
     Future.successful(errorResultBuilder.teamNotFound(teamId))
   }
 }

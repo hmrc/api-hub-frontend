@@ -50,6 +50,14 @@ POST    /produce/review-name-description                    controllers.myapis.p
 GET     /produce/change-review-name-description             controllers.myapis.produce.ProduceApiReviewNameDescriptionController.onPageLoad(mode: Mode = CheckMode)
 POST    /produce/change-review-name-description             controllers.myapis.produce.ProduceApiReviewNameDescriptionController.onSubmit(mode: Mode = CheckMode)
 
+GET     /produce/egress-availability                        controllers.myapis.produce.ProduceApiEgressAvailabilityController.onPageLoad(mode: Mode = NormalMode)
+POST    /produce/egress-availability                        controllers.myapis.produce.ProduceApiEgressAvailabilityController.onSubmit(mode: Mode = NormalMode)
+GET     /produce/change-egress-availability                 controllers.myapis.produce.ProduceApiEgressAvailabilityController.onPageLoad(mode: Mode = CheckMode)
+POST    /produce/change-egress-availability                 controllers.myapis.produce.ProduceApiEgressAvailabilityController.onSubmit(mode: Mode = CheckMode)
+
+GET     /produce/egress-selection                           controllers.myapis.produce.ProduceApiEgressSelectionController.onPageLoad()
+POST    /produce/egress-selection                           controllers.myapis.produce.ProduceApiEgressSelectionController.onSubmit()
+
 GET     /produce/how-to-add-wiremock                        controllers.myapis.produce.ProduceApiHowToAddWiremockController.onPageLoad(mode: Mode = NormalMode)
 POST    /produce/how-to-add-wiremock                        controllers.myapis.produce.ProduceApiHowToAddWiremockController.onSubmit(mode: Mode = NormalMode)
 GET     /produce/change-how-to-add-wiremock                 controllers.myapis.produce.ProduceApiHowToAddWiremockController.onPageLoad(mode: Mode = CheckMode)

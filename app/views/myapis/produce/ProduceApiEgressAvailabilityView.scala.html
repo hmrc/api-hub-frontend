@@ -1,0 +1,49 @@
+@*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.user.UserModel
+@import viewmodels.myapis.produce.ProduceApiEgressAvailabilityViewModel
+
+@this(
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukButton: GovukButton,
+    govukRadios : GovukRadios,
+    govukErrorSummary: GovukErrorSummary,
+    newTabLink: components.NewTabLink,
+)
+
+@(form: Form[?], viewModel: ProduceApiEgressAvailabilityViewModel, userModel: UserModel)(implicit request: Request[?], messages: Messages)
+
+@layout(pageTitle = title(form, messages("produceApiEgressAvailability.title")), user = Some(userModel)) {
+    @formHelper(action = viewModel.formAction) {
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
+        }
+
+        @govukRadios(
+            RadiosViewModel.yesNo(
+                field = form("value"),
+                legend = LegendViewModel(messages("produceApiEgressAvailability.heading")).asPageHeading()
+            ).withHint(Hint(content = HtmlContent(messages("produceApiEgressAvailability.hint", newTabLink(viewModel.apiHubGuideUrl + "/documentation/how-do-i-produce.apis.html#deployment", messages("produceApiEgressAvailability.hint.guidance"))))))
+        )
+
+        @govukButton(
+            ButtonViewModel(messages("site.continue"))
+        )
+    }
+
+}

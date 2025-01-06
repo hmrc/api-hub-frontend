@@ -21,7 +21,7 @@ import controllers.actions.{CancelAccessRequestDataRetrievalAction, DataRequired
 import controllers.helpers.ErrorResultBuilder
 import models.accessrequest.AccessRequest
 import models.application.Application
-import models.requests.DataRequest
+import models.requests.{BaseRequest, DataRequest}
 import models.user.UserModel
 import models.{CheckMode, UserAnswers}
 import pages.application.cancelaccessrequest.{CancelAccessRequestApplicationPage, CancelAccessRequestConfirmPage, CancelAccessRequestPendingPage, CancelAccessRequestSelectApiPage}
@@ -110,7 +110,7 @@ class CancelAccessRequestEndJourneyController @Inject()(
     }
   }
 
-  private def badGateway(t: Throwable)(implicit request: Request[?]): Result = {
+  private def badGateway(t: Throwable)(implicit request: BaseRequest[?]): Result = {
     errorResultBuilder.internalServerError(Messages("addAnApiComplete.failed"), t)
   }
 

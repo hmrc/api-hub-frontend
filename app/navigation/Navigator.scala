@@ -58,7 +58,11 @@ class Navigator @Inject()() {
     case ProduceApiEnterOasPage => _ => controllers.myapis.produce.routes.ProduceApiShortDescriptionController.onPageLoad(NormalMode)
     case ProduceApiHowToCreatePage => produceApiHowToCreateNextPage(NormalMode)
     case ProduceApiShortDescriptionPage => _ => controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onPageLoad(NormalMode)
-    case ProduceApiReviewNameDescriptionPage => _ => controllers.myapis.produce.routes.ProduceApiHowToAddWiremockController.onPageLoad(NormalMode)
+    //TODO: bring back with wiremock
+    // case ProduceApiReviewNameDescriptionPage => _ => controllers.myapis.produce.routes.ProduceApiHowToAddWiremockController.onPageLoad(NormalMode)
+    //TODO: remove when bringing back wiremock
+    case ProduceApiReviewNameDescriptionPage => _ => controllers.myapis.produce.routes.ProduceApiEgressAvailabilityController.onPageLoad(NormalMode)
+    case ProduceApiEgressAvailabilityPage => produceApiEgressAvailabilityNextPage(NormalMode)
     case ProduceApiEnterWiremockPage => _ => controllers.myapis.produce.routes.ProduceApiAddPrefixesController.onPageLoad(NormalMode)
     case ProduceApiAddPrefixesPage => produceApiAddPrefixNextPage(NormalMode)
     case ProduceApiEgressPrefixesPage => _ => controllers.myapis.produce.routes.ProduceApiHodController.onPageLoad(NormalMode)
@@ -77,7 +81,10 @@ class Navigator @Inject()() {
     case UpdateApiUploadWiremockPage => _ => controllers.myapis.update.routes.UpdateApiEnterWiremockController.onPageLoadWithUploadedWiremock(NormalMode)
     case UpdateApiAddPrefixesPage => updateApiAddPrefixNextPage(NormalMode)
     case UpdateApiHowToUpdatePage => updateApiHowToUpdateNextPage(NormalMode)
-    case UpdateApiReviewNameDescriptionPage => _ => controllers.myapis.update.routes.UpdateApiHowToAddWiremockController.onPageLoad(NormalMode)
+    //TODO: bring back with wiremock
+    // case UpdateApiReviewNameDescriptionPage => _ => controllers.myapis.update.routes.UpdateApiHowToAddWiremockController.onPageLoad(NormalMode)
+    //TODO: remove when bringing back wiremock
+    case UpdateApiReviewNameDescriptionPage => _ => controllers.myapis.update.routes.UpdateApiAddPrefixesController.onPageLoad(NormalMode)
     case UpdateApiHowToAddWiremockPage => updateApiHowToAddWiremockNextPage(NormalMode)
     case UpdateApiEnterWiremockPage => _ => controllers.myapis.update.routes.UpdateApiAddPrefixesController.onPageLoad(NormalMode)
     case UpdateApiHodPage => _ => controllers.myapis.update.routes.UpdateApiDomainController.onPageLoad(NormalMode)
@@ -172,6 +179,14 @@ class Navigator @Inject()() {
       case (_, Some(true)) => controllers.myapis.produce.routes.ProduceApiEgressPrefixesController.onPageLoad(mode)
       case (NormalMode, Some(false)) => controllers.myapis.produce.routes.ProduceApiHodController.onPageLoad(mode)
       case (CheckMode, Some(false)) => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
+      case _ => routes.JourneyRecoveryController.onPageLoad()
+    }
+  }
+
+  private def produceApiEgressAvailabilityNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
+    userAnswers.get(ProduceApiEgressAvailabilityPage) match {
+      case Some(true) => controllers.myapis.produce.routes.ProduceApiEgressSelectionController.onPageLoad()
+      case Some(false) => controllers.myapis.produce.routes.ProduceApiAddPrefixesController.onPageLoad(mode)
       case _ => routes.JourneyRecoveryController.onPageLoad()
     }
   }

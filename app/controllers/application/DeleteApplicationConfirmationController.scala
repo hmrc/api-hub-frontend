@@ -21,14 +21,15 @@ import controllers.actions.{ApplicationAuthActionProvider, IdentifierAction}
 import controllers.helpers.ErrorResultBuilder
 import forms.ConfirmationFormProvider
 import models.application.Application
+import models.requests.BaseRequest
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
 import services.ApiHubService
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.govuk.summarylist._
-import viewmodels.implicits._
+import viewmodels.govuk.summarylist.*
+import viewmodels.implicits.*
 import views.html.application.{DeleteApplicationConfirmationView, DeleteApplicationSuccessView}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -75,7 +76,7 @@ class DeleteApplicationConfirmationController @Inject()(
     )
   }
 
-  private def applicationNotFound(applicationId: String)(implicit request: Request[?]): Result = {
+  private def applicationNotFound(applicationId: String)(implicit request: BaseRequest[?]): Result = {
     errorResultBuilder.notFound(
       heading = Messages("site.applicationNotFoundHeading"),
       message = Messages("site.applicationNotFoundMessage", applicationId)

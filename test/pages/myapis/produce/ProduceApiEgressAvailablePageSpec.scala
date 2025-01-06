@@ -1,5 +1,5 @@
-@*
- * Copyright 2023 HM Revenue & Customs
+/*
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,22 +12,21 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import models.user.UserModel
+package pages.myapis.produce
 
-@this(
-    layout: templates.Layout
-)
+import pages.behaviours.PageBehaviours
+import pages.myapis.produce.ProduceApiEgressAvailabilityPage
 
-@(user: Option[UserModel])(implicit request: Request[?], messages: Messages)
+class ProduceApiEgressAvailablePageSpec extends PageBehaviours {
 
-@layout(
-    pageTitle = titleNoForm(messages("unauthorised.title")),
-    timeout   = false,
-    user = user
-) {
+  "ProduceApiDomainPage" - {
 
-    <h1 class="govuk-heading-xl">@messages("unauthorised.heading")</h1>
+    beRetrievable[Boolean](ProduceApiEgressAvailabilityPage)
 
+    beSettable[Boolean](ProduceApiEgressAvailabilityPage)
+
+    beRemovable[Boolean](ProduceApiEgressAvailabilityPage)
+  }
 }

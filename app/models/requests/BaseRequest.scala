@@ -1,5 +1,5 @@
-@*
- * Copyright 2023 HM Revenue & Customs
+/*
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,22 +12,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import models.user.UserModel
+package models.requests
 
-@this(
-    layout: templates.Layout
-)
+import models.user.UserModel
+import play.api.i18n.MessagesProvider
+import play.api.mvc.{Request, RequestHeader, WrappedRequest}
 
-@(user: Option[UserModel])(implicit request: Request[?], messages: Messages)
+abstract class BaseRequest[T](request: Request[T]) extends WrappedRequest[T](request) {
 
-@layout(
-    pageTitle = titleNoForm(messages("unauthorised.title")),
-    timeout   = false,
-    user = user
-) {
-
-    <h1 class="govuk-heading-xl">@messages("unauthorised.heading")</h1>
-
+    def maybeUser: Option[UserModel]
 }

@@ -17,18 +17,18 @@
 package controllers.admin
 
 import base.SpecBase
-import controllers.actions.FakeApplication
+import controllers.actions.{FakeApplication, FakeUser}
 import controllers.routes
 import generators.AccessRequestGenerator
-import models.application._
+import models.application.*
 import models.user.UserModel
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import play.api.{Application => PlayApplication}
+import play.api.test.Helpers.*
+import play.api.Application as PlayApplication
 import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
 import views.html.ErrorTemplate
@@ -109,7 +109,8 @@ class DeletedApplicationDetailsControllerSpec extends SpecBase with MockitoSugar
               view(
                 "Page not found - 404",
                 "Application not found",
-                s"Cannot find an application with ID ${FakeApplication.id}."
+                s"Cannot find an application with ID ${FakeApplication.id}.",
+                Some(user)
               )(request, messages(fixture.playApplication))
                 .toString()
             contentAsString(result) must validateAsHtml

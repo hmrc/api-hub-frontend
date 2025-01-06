@@ -87,7 +87,8 @@ class ApplicationAuthActionSpec extends SpecBase with Matchers with MockitoSugar
           view(
             "Page not found - 404",
             "Application not found",
-            s"Cannot find an application with ID ${FakeApplication.id}."
+            s"Cannot find an application with ID ${FakeApplication.id}.",
+            Some(FakeUser)
           )(FakeRequest(), messages(fixture.playApplication))
             .toString()
       }

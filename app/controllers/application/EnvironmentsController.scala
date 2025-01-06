@@ -23,7 +23,7 @@ import controllers.helpers.{ApplicationApiBuilder, ErrorResultBuilder}
 import models.application.*
 import models.application.ApplicationLenses.*
 import models.exception.ApplicationCredentialLimitException
-import models.requests.ApplicationRequest
+import models.requests.{ApplicationRequest, BaseRequest}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.*
 import services.ApiHubService
@@ -100,14 +100,14 @@ class EnvironmentsController @Inject()(
     }
   }
 
-  private def credentialNotFound(applicationId: String, clientId: String)(implicit request: Request[?]): Result = {
+  private def credentialNotFound(applicationId: String, clientId: String)(implicit request: BaseRequest[?]): Result = {
     errorResultBuilder.notFound(
       heading = Messages("environments.credentialNotFound.heading"),
       message = Messages("environments.credentialNotFound.message", clientId, applicationId)
     )
   }
 
-  private def lastCredential()(implicit request: Request[?]): Result = {
+  private def lastCredential()(implicit request: BaseRequest[?]): Result = {
     errorResultBuilder.badRequest(
       heading = Messages("environments.cannotDeleteLastCredential.heading"),
       message = Messages("environments.cannotDeleteLastCredential.message")

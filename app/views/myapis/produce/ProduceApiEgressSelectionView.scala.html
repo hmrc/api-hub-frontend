@@ -1,5 +1,5 @@
 @*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,17 +17,18 @@
 @import models.user.UserModel
 
 @this(
-    layout: templates.Layout
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukButton: GovukButton,
 )
 
-@(user: Option[UserModel])(implicit request: Request[?], messages: Messages)
+@(userModel: UserModel)(implicit request: Request[?], messages: Messages)
 
-@layout(
-    pageTitle = titleNoForm(messages("unauthorised.title")),
-    timeout   = false,
-    user = user
-) {
-
-    <h1 class="govuk-heading-xl">@messages("unauthorised.heading")</h1>
-
+@layout(pageTitle = titleNoForm(messages("produceApiEgressSelection.title")), user = Some(userModel)) {
+    <h1 class="govuk-heading-l">@messages("produceApiEgressSelection.heading")</h1>
+    @formHelper(action = controllers.myapis.produce.routes.ProduceApiEgressSelectionController.onSubmit()) {
+        @govukButton(
+            ButtonViewModel("Continue")
+        )
+    }
 }
