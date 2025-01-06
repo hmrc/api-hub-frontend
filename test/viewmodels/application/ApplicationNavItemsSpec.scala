@@ -129,11 +129,15 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
       val pages = Table(
         "page",
         DetailsPage,
+        EnvironmentPage(FakeHipEnvironments.test),
+        EnvironmentPage(FakeHipEnvironments.production),
         ManageTeamMembersPage,
         DeleteApplicationPage
       )
 
-      val playApplication = applicationBuilder(None).build()
+      val playApplication = applicationBuilder(
+        None
+      ).build()
 
       running(playApplication) {
         implicit val implicitMessages: Messages = messages(playApplication)
@@ -191,6 +195,7 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
         }
       }
     }
+
   }
 
 }
