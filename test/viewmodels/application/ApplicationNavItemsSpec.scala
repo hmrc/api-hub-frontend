@@ -39,17 +39,7 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
 
   "ApplicationNavItems" - {
     "must return the correct list of nav items" in {
-      val config = Configuration(ConfigFactory.parseString(
-        """
-          |features {
-          |  application-details-environments-left-side-nav: true
-          |}
-          |""".stripMargin
-      ))
-      val playApplication = applicationBuilder(
-        None,
-        testConfiguration = config
-      ).build()
+      val playApplication = applicationBuilder().build()
 
       running(playApplication) {
         implicit val implicitMessages: Messages = messages(playApplication)
@@ -129,15 +119,11 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
       val pages = Table(
         "page",
         DetailsPage,
-        EnvironmentPage(FakeHipEnvironments.test),
-        EnvironmentPage(FakeHipEnvironments.production),
         ManageTeamMembersPage,
         DeleteApplicationPage
       )
 
-      val playApplication = applicationBuilder(
-        None
-      ).build()
+      val playApplication = applicationBuilder().build()
 
       running(playApplication) {
         implicit val implicitMessages: Messages = messages(playApplication)
@@ -159,7 +145,7 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
     }
 
     "must not return the Manage team members item for applications with a global team" in {
-      val playApplication = applicationBuilder(None).build()
+      val playApplication = applicationBuilder().build()
 
       running(playApplication) {
         implicit val implicitMessages: Messages = messages(playApplication)
@@ -179,7 +165,7 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
       val supportPages = Set(ViewAsJsonApplicationPage, AllScopesPage)
 
       forAll(usersWhoCannotSupport) { (user: UserModel) =>
-        val playApplication = applicationBuilder(None).build()
+        val playApplication = applicationBuilder().build()
 
         running(playApplication) {
           implicit val implicitMessages: Messages = messages(playApplication)
@@ -191,11 +177,9 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
             .collect { case ni: SideNavItemLeaf => ni }
             .filter(_.page.equals(ViewAsJsonApplicationPage))
 
-          forAll (actual) {page => supportPages must not contain page.page}
+          forAll(actual) { page => supportPages must not contain page.page }
         }
       }
     }
-
   }
-
 }
