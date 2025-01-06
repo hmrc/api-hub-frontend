@@ -69,7 +69,6 @@ case class ApiDetail(
   reviewedDate: Instant,
   platform: String,
   maintainer: Maintainer,
-  lastUpdated: Instant,
   apiType: Option[ApiType] = None,
 ) {
 
@@ -106,7 +105,6 @@ object ApiDetail {
       ~ (__ \ "reviewedDate").read[Instant]
       ~ (__ \ "platform").read[String]
       ~ (__ \ "maintainer").read[Maintainer]
-      ~ (__ \ "lastUpdated").read[Instant]
       ~ (__ \ "apiType").readNullable[ApiType]
     )(ApiDetail.apply)
   val formatApiDetailSummary: OFormat[ApiDetail] = OFormat[ApiDetail](

@@ -41,7 +41,6 @@ class AvailableEndpointsSpec extends AnyFreeSpec with Matchers with TableDrivenP
     apiStatus = Live,
     reviewedDate = Instant.now(),
     platform = "HIP",
-    lastUpdated = Instant.now(),
     maintainer = Maintainer("test-name", "test-slack"),
   )
 

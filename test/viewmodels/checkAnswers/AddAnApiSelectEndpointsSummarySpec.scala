@@ -62,7 +62,6 @@ class AddAnApiSelectEndpointsSummarySpec extends AnyFreeSpec with Matchers with 
     Live,
     reviewedDate = Instant.now(),
     platform = "API_PLATFORM",
-    lastUpdated = Instant.now(),
     maintainer = Maintainer("name", "#slack", List.empty)
   )
 
