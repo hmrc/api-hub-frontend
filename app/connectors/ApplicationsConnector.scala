@@ -550,9 +550,8 @@ class ApplicationsConnector @Inject()(
       .execute[ApisInProductionStatistic]
   }
 
-  def validateOAS(oas: String, validateTitle: Boolean = false)
+  def validateOAS(oas: String)
                  (implicit hc: HeaderCarrier, messagesProvider: MessagesProvider): Future[Either[InvalidOasResponse, Unit]] = httpClient.post(url"$applicationsBaseUrl/api-hub-applications/oas/validate")
-                   .transform(request => request.withQueryStringParameters("validateTitle" -> validateTitle.toString))
                    .setHeader(ACCEPT -> JSON)
                    .setHeader(CONTENT_TYPE -> "text/plain")
                    .setHeader(AUTHORIZATION -> clientAuthToken)

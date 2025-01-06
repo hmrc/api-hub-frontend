@@ -120,7 +120,7 @@ class UpdateApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
     "must redirect to the next page when valid data is submitted" in {
       val fixture = buildFixture(userAnswers = Some(emptyUserAnswers))
       when(fixture.sessionRepository.set(any())).thenReturn(Future.successful(true))
-      when(fixture.applicationsConnector.validateOAS(eqTo(validOAS), eqTo(false))(any, any))
+      when(fixture.applicationsConnector.validateOAS(eqTo(validOAS))(any, any))
         .thenReturn(Future.successful(Right(())))
 
       running(fixture.application) {
@@ -141,7 +141,7 @@ class UpdateApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
       val errorMessage = "Unable to parse the OAS document, errorMessage"
       val invalidResponse = InvalidOasResponse(FailuresResponse("400", errorMessage, None))
       val fixture = buildFixture(userAnswers = Some(emptyUserAnswers))
-      when(fixture.applicationsConnector.validateOAS(eqTo(invalidOAS), eqTo(false))(any, any))
+      when(fixture.applicationsConnector.validateOAS(eqTo(invalidOAS))(any, any))
         .thenReturn(Future.successful(Left(
           invalidResponse
         )))
@@ -198,7 +198,7 @@ class UpdateApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
       val userAnswers = emptyUserAnswers.set(UpdateApiUploadOasPage, oasModel).success.value
       val fixture = buildFixture(userAnswers = Some(userAnswers))
 
-      when(fixture.applicationsConnector.validateOAS(eqTo(oasModel.fileContents), eqTo(false))(any, any))
+      when(fixture.applicationsConnector.validateOAS(eqTo(oasModel.fileContents))(any, any))
         .thenReturn(Future.successful(Right(())))
 
       running(fixture.application) {
@@ -222,7 +222,7 @@ class UpdateApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
 
       val fixture = buildFixture(userAnswers = Some(userAnswers))
 
-      when(fixture.applicationsConnector.validateOAS(eqTo(validOASEdited), eqTo(false))(any, any))
+      when(fixture.applicationsConnector.validateOAS(eqTo(validOASEdited))(any, any))
         .thenReturn(Future.successful(Right(())))
 
       running(fixture.application) {
@@ -243,7 +243,7 @@ class UpdateApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
       val fixture = buildFixture(userAnswers = Some(userAnswers))
       val invalidResponse = InvalidOasResponse(FailuresResponse("400", "nope", None))
 
-      when(fixture.applicationsConnector.validateOAS(any(), any())(any, any)).thenReturn(Future.successful(Left(invalidResponse)))
+      when(fixture.applicationsConnector.validateOAS(any())(any, any)).thenReturn(Future.successful(Left(invalidResponse)))
 
       running(fixture.application) {
         val request = FakeRequest(GET, controllers.myapis.update.routes.UpdateApiEnterOasController.onPageLoadWithUploadedOas(NormalMode).url)
