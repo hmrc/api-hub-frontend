@@ -39,17 +39,7 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
 
   "ApplicationNavItems" - {
     "must return the correct list of nav items" in {
-      val config = Configuration(ConfigFactory.parseString(
-        """
-          |features {
-          |  application-details-environments-left-side-nav: false
-          |}
-          |""".stripMargin
-      ))
-      val playApplication = applicationBuilder(
-        None,
-        testConfiguration = config
-      ).build()
+      val playApplication = applicationBuilder().build()
 
       running(playApplication) {
         implicit val implicitMessages: Messages = messages(playApplication)
@@ -64,94 +54,6 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
             "Application details",
             controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id),
             isCurrentPage = true
-          ),
-          SideNavItemLeaf(
-            ApisPage,
-            "Application APIs",
-            controllers.application.routes.ApplicationApisController.onPageLoad(FakeApplication.id),
-            isCurrentPage = false
-          ),
-          SideNavItemLeaf(
-            EnvironmentsAndCredentialsPage,
-            "Environments and credentials",
-            controllers.application.routes.EnvironmentAndCredentialsController.onPageLoad(FakeApplication.id),
-            isCurrentPage = false
-          ),
-          SideNavItemLeaf(
-            ManageTeamMembersPage,
-            "Manage team members",
-            controllers.application.routes.ManageTeamMembersController.onPageLoad(FakeApplication.id),
-            isCurrentPage = false
-          ),
-          SideNavItemLeaf(
-            DeleteApplicationPage,
-            "Delete application",
-            controllers.application.routes.DeleteApplicationConfirmationController.onPageLoad(FakeApplication.id),
-            isCurrentPage = false
-          ),
-          SideNavItemLeaf(
-            page = ChangeOwningTeamPage,
-            title = "Change owning team",
-            link = controllers.application.routes.UpdateApplicationTeamController.onPageLoad(FakeApplication.id),
-            isCurrentPage = false
-          ),
-          SideNavItemLeaf(
-            page = ApplicationHistoryPage,
-            title = "Application history",
-            link = controllers.application.routes.ApplicationAccessRequestsController.onPageLoad(FakeApplication.id),
-            isCurrentPage = false
-          ),
-          SideNavItemLeaf(
-            page = ViewAsJsonApplicationPage,
-            title = "View as JSON",
-            link = controllers.application.routes.ApplicationSupportController.onPageLoad(FakeApplication.id),
-            isCurrentPage = false,
-            opensInNewTab = true
-          ),
-          SideNavItemLeaf(
-            page = AllScopesPage,
-            title = "All scopes",
-            link = controllers.application.routes.AllScopesController.onPageLoad(FakeApplication.id),
-            isCurrentPage = false
-          )
-        )
-
-        actual mustBe expected
-      }
-    }
-
-    "must return the correct list of nav items when the environments flag is true" in {
-      val config = Configuration(ConfigFactory.parseString(
-        """
-          |features {
-          |  application-details-environments-left-side-nav: true
-          |}
-          |""".stripMargin
-      ))
-      val playApplication = applicationBuilder(
-        None,
-        testConfiguration = config
-      ).build()
-
-      running(playApplication) {
-        implicit val implicitMessages: Messages = messages(playApplication)
-        implicit val config: FrontendAppConfig = playApplication.injector.instanceOf[FrontendAppConfig]
-        implicit val hipEnvironments: HipEnvironments = playApplication.injector.instanceOf[HipEnvironments]
-        val applicationNavItems = playApplication.injector.instanceOf[ApplicationNavItems]
-
-        val actual = applicationNavItems(Some(FakeSupporter), FakeApplication, DetailsPage)
-        val expected = Seq(
-          SideNavItemLeaf(
-            DetailsPage,
-            "Application details",
-            controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id),
-            isCurrentPage = true
-          ),
-          SideNavItemLeaf(
-            ApisPage,
-            "Application APIs",
-            controllers.application.routes.ApplicationApisController.onPageLoad(FakeApplication.id),
-            isCurrentPage = false
           ),
           SideNavItemBranch(
             title = "Environments",
@@ -169,12 +71,6 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
                 isCurrentPage = false,
               ),
             )
-          ),
-          SideNavItemLeaf(
-            EnvironmentsAndCredentialsPage,
-            "Environments and credentials",
-            controllers.application.routes.EnvironmentAndCredentialsController.onPageLoad(FakeApplication.id),
-            isCurrentPage = false
           ),
           SideNavItemLeaf(
             ManageTeamMembersPage,
@@ -223,23 +119,11 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
       val pages = Table(
         "page",
         DetailsPage,
-        ApisPage,
-        EnvironmentsAndCredentialsPage,
         ManageTeamMembersPage,
         DeleteApplicationPage
       )
 
-      val config = Configuration(ConfigFactory.parseString(
-        """
-          |features {
-          |  application-details-environments-left-side-nav: false
-          |}
-          |""".stripMargin
-      ))
-      val playApplication = applicationBuilder(
-        None,
-        testConfiguration = config
-      ).build()
+      val playApplication = applicationBuilder().build()
 
       running(playApplication) {
         implicit val implicitMessages: Messages = messages(playApplication)
@@ -261,7 +145,7 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
     }
 
     "must not return the Manage team members item for applications with a global team" in {
-      val playApplication = applicationBuilder(None).build()
+      val playApplication = applicationBuilder().build()
 
       running(playApplication) {
         implicit val implicitMessages: Messages = messages(playApplication)
@@ -281,7 +165,7 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
       val supportPages = Set(ViewAsJsonApplicationPage, AllScopesPage)
 
       forAll(usersWhoCannotSupport) { (user: UserModel) =>
-        val playApplication = applicationBuilder(None).build()
+        val playApplication = applicationBuilder().build()
 
         running(playApplication) {
           implicit val implicitMessages: Messages = messages(playApplication)
@@ -293,11 +177,9 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
             .collect { case ni: SideNavItemLeaf => ni }
             .filter(_.page.equals(ViewAsJsonApplicationPage))
 
-          forAll (actual) {page => supportPages must not contain page.page}
+          forAll(actual) { page => supportPages must not contain page.page }
         }
       }
     }
-
   }
-
 }

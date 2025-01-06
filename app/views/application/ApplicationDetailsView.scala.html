@@ -19,14 +19,16 @@
 @import viewmodels.application.{ApplicationApi, ApplicationSideNavPages, ApplicationNavItems}
 @import views.html.components.IconsLink
 @import views.html.components.ApplicationDetailsTable
+@import config.HipEnvironments
 
 @this(
-    layout: templates.Layout,
-    govukTable: GovukTable,
-    iconsLink: IconsLink,
-    applicationDetailsTable: ApplicationDetailsTable,
-    sideNav: views.html.templates.SideNav,
-    applicationNavItems: ApplicationNavItems,
+layout: templates.Layout,
+govukTable: GovukTable,
+iconsLink: IconsLink,
+applicationDetailsTable: ApplicationDetailsTable,
+sideNav: views.html.templates.SideNav,
+applicationNavItems: ApplicationNavItems,
+hipEnvironments: HipEnvironments
 )
 
 @(application: Application, applicationApis: Seq[ApplicationApi], user: Option[UserModel])(implicit request: Request[?], messages: Messages)
@@ -41,8 +43,8 @@
     </a>
 }
 
-@applicationApisLink(messageId: String) = {
-    <a href="@{controllers.application.routes.ApplicationApisController.onPageLoad(application.id).url}" class="govuk-link govuk-link--no-visited-state">
+@applicationApisLink(messageId: String, hipEnvironments: HipEnvironments) = {
+    <a href="@{controllers.application.routes.EnvironmentsController.onPageLoad(application.id, hipEnvironments.productionHipEnvironment.id).url}" class="govuk-link govuk-link--no-visited-state">
         @messages(messageId)
     </a>
 }
@@ -137,7 +139,7 @@
                         </ul>
 
                         <p class="govuk-body additional-message">
-                            @Html(messages("applicationDetails.apis.missing.remove", applicationApisLink("applicationDetails.apis.page")))
+                            @Html(messages("applicationDetails.apis.missing.remove", applicationApisLink("applicationDetails.apis.page", hipEnvironments)))
                         </p>
                     </div>
                 }
@@ -169,7 +171,7 @@
                             </span>
                         </p>
                         <p class="govuk-body additional-message">
-                            @Html(messages("applicationDetails.no.prod.access.message", applicationApisLink("applicationDetails.apis.page")))
+                            @Html(messages("applicationDetails.no.prod.access.message", applicationApisLink("applicationDetails.apis.page", hipEnvironments)))
                         </p>
                     </div>
                 }
@@ -196,7 +198,7 @@
                     )
                 )
             <p class="govuk-body">
-                @Html(messages("applicationDetails.apis.manageOrAddMore", applicationApisLink("applicationDetails.apis.appApis"), exploreApisLink("applicationDetails.apis.addMore")))
+                @Html(messages("applicationDetails.apis.manageOrAddMore", applicationApisLink("applicationDetails.apis.appApis", hipEnvironments), exploreApisLink("applicationDetails.apis.addMore")))
             </p>
             }
         }
