@@ -124,6 +124,73 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
         actual mustBe expected
       }
     }
+
+    "must select the correct current page" in {
+      val pages = Table(
+        "page",
+        DetailsPage,
+        ManageTeamMembersPage,
+        DeleteApplicationPage
+      )
+
+      val playApplication = applicationBuilder(None).build()
+
+      running(playApplication) {
+        implicit val implicitMessages: Messages = messages(playApplication)
+        implicit val config: FrontendAppConfig = playApplication.injector.instanceOf[FrontendAppConfig]
+        implicit val hipEnvironments: HipEnvironments = playApplication.injector.instanceOf[HipEnvironments]
+        val applicationNavItems = playApplication.injector.instanceOf[ApplicationNavItems]
+
+        forAll(pages) {
+          page =>
+
+            val actual = applicationNavItems(None, FakeApplication, page)
+              .collect { case ni: SideNavItemLeaf => ni }
+              .filter(_.isCurrentPage)
+              .map(_.page)
+
+            actual mustBe Seq(page)
+        }
+      }
+    }
+
+    "must not return the Manage team members item for applications with a global team" in {
+      val playApplication = applicationBuilder(None).build()
+
+      running(playApplication) {
+        implicit val implicitMessages: Messages = messages(playApplication)
+        implicit val config: FrontendAppConfig = playApplication.injector.instanceOf[FrontendAppConfig]
+        implicit val hipEnvironments: HipEnvironments = playApplication.injector.instanceOf[HipEnvironments]
+        val applicationNavItems = playApplication.injector.instanceOf[ApplicationNavItems]
+
+        val actual = applicationNavItems(Some(FakeSupporter), FakeApplication.setTeamId("test-team-id"), DetailsPage)
+          .collect { case ni: SideNavItemLeaf => ni }
+          .filter(_.page.equals(ManageTeamMembersPage))
+
+        actual mustBe empty
+      }
+    }
+
+    "must not display support-only items for non-support users" in {
+      val supportPages = Set(ViewAsJsonApplicationPage, AllScopesPage)
+
+      forAll(usersWhoCannotSupport) { (user: UserModel) =>
+        val playApplication = applicationBuilder(None).build()
+
+        running(playApplication) {
+          implicit val implicitMessages: Messages = messages(playApplication)
+          implicit val config: FrontendAppConfig = playApplication.injector.instanceOf[FrontendAppConfig]
+          implicit val hipEnvironments: HipEnvironments = playApplication.injector.instanceOf[HipEnvironments]
+          val applicationNavItems = playApplication.injector.instanceOf[ApplicationNavItems]
+
+          val actual = applicationNavItems(Some(user), FakeApplication.setTeamId("test-team-id"), DetailsPage)
+            .collect { case ni: SideNavItemLeaf => ni }
+            .filter(_.page.equals(ViewAsJsonApplicationPage))
+
+          forAll (actual) {page => supportPages must not contain page.page}
+        }
+      }
+    }
   }
 
 }
