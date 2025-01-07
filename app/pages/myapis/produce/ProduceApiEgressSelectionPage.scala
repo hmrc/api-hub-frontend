@@ -14,28 +14,15 @@
  * limitations under the License.
  */
 
-package models.deployment
+package pages.myapis.produce
 
-import play.api.libs.json.{Format, Json}
+import models.myapis.produce.ProduceApiEgressPrefixes
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-case class DeploymentsRequest(
-  lineOfBusiness: String,
-  name: String,
-  description: String,
-  egress: String,
-  teamId: String,
-  oas: String,
-  passthrough: Boolean,
-  status: String,
-  domain: String,
-  subDomain: String,
-  hods: Seq[String],
-  prefixesToRemove: Seq[String],
-  egressMappings: Option[Seq[EgressMapping]]
-)
+case object ProduceApiEgressSelectionPage extends QuestionPage[String] {
 
-object DeploymentsRequest {
+  override def path: JsPath = JsPath \ toString
 
-  implicit val formatDeploymentsRequest: Format[DeploymentsRequest] = Json.format[DeploymentsRequest]
-
+  override def toString: String = "produceApiEgressSelection"
 }

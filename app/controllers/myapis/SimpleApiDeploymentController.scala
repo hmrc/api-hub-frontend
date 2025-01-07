@@ -93,6 +93,7 @@ object SimpleApiDeploymentController {
         "lineOfBusiness" -> text("Enter a line of business"),
         "name" -> text("Enter a name"),
         "description" -> text("Enter a description"),
+        "egress" -> text("Enter an egress"),
         "teamId" -> text("Select a team"),
         "oas" -> text("Enter the OAS"),
         "passthrough" -> Forms.default(boolean(), false),

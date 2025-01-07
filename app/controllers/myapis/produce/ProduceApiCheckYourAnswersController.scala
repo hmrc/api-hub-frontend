@@ -86,6 +86,7 @@ class ProduceApiCheckYourAnswersController @Inject()(
     for {
       apiTitle <- validateApiTile(request.userAnswers)
       shortDescription <- validateShortDescription(request.userAnswers)
+      egress = request.userAnswers.get(ProduceApiEgressSelectionPage)
       team <- validateTeam(request.userAnswers)
       oas <- validateOas(request.userAnswers)
       passthrough <- validatePassthrough(request.userAnswers, request.user.permissions.canSupport)
@@ -97,6 +98,7 @@ class ProduceApiCheckYourAnswersController @Inject()(
       lineOfBusiness = "apim",
       name = ProduceApiCheckYourAnswersController.formatAsKebabCase(apiTitle),
       description = shortDescription,
+      egress = egress.getOrElse("null-egress"),
       teamId = team.id,
       oas = oas,
       passthrough = passthrough,
@@ -174,12 +176,13 @@ class ProduceApiCheckYourAnswersController @Inject()(
     }
   }
 
-  private def summaryListRows(userAnswers: UserAnswers)(implicit messages: Messages) =
+  private def summaryListRows(userAnswers: UserAnswers)(implicit messages: Messages): Seq[SummaryListRow] =
     Seq(
       ProduceApiChooseTeamSummary.row(userAnswers),
       ProduceApiEnterOasSummary.row(userAnswers),
       ProduceApiNameSummary.row(userAnswers),
       ProduceApiShortDescriptionSummary.row(userAnswers),
+      ProduceApiEgressSummary.row(userAnswers),
       ProduceApiEgressPrefixesSummary.row(userAnswers),
       ProduceApiHodSummary.row(userAnswers, hods),
       ProduceApiDomainSummary.row(userAnswers, domains),
