@@ -30,12 +30,16 @@
 
 @(apiDetail: ApiDetail, deploymentStatuses: ApiDeploymentStatuses, user: UserModel, supportEmailAddress: String, teamName: Option[String])(implicit request: Request[?], messages: Messages)
 
-@teamContent(team: String, teamId: String) = {
+@teamContent = {
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <a class="govuk-link govuk-link--no-visited-state" href=@controllers.team.routes.ManageTeamController.onPageLoad(apiDetail.teamId.get).url >
-                @team
-            </a>
+            @{(teamName, apiDetail.teamId) match {
+                case (Some(team), Some(teamId)) =>
+                    Html(s"""<a class="govuk-link govuk-link--no-visited-state" href="${controllers.team.routes.ManageTeamController.onPageLoad(teamId).url}">
+                        $team
+                    </a>""")
+                case _ => messages("apiDetails.details.notSpecified")
+            }}
         </div>
         <div class="govuk-grid-column-one-third">
             <a class="govuk-link govuk-link--no-visited-state govuk-!-margin-right-0" href=@controllers.myapis.routes.UpdateApiTeamController.onPageLoad(apiDetail.id).url target="_blank">
@@ -43,14 +47,6 @@
             </a>
         </div>
     </div>
-}
-
-@maybeTeamContent() = @{
-    (teamName, apiDetail.teamId) match {
-        case (Some(team), Some(teamId)) =>
-            teamContent(team, teamId)
-        case _ => Html(messages("apiDetails.details.notSpecified"))
-    }
 }
 
 @supportEmailLink() = {
@@ -98,7 +94,7 @@
                         content = Text(messages("myApis.details.team"))
                     ),
                     value = Value(
-                        content = HtmlContent(maybeTeamContent())
+                        content = HtmlContent(teamContent)
                     ),
                 ),
                 SummaryListRow(
