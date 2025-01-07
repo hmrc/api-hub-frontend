@@ -17,12 +17,14 @@
 package controllers.application
 
 import com.google.inject.Inject
+import config.HipEnvironments
 import controllers.actions.{ApplicationAuthActionProvider, IdentifierAction}
 import controllers.helpers.ApplicationApiBuilder
 import models.application.ApplicationLenses.*
 import play.api.i18n.I18nSupport
 import play.api.mvc.*
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.application.ApplicationDetailsViewModel
 import views.html.application.ApplicationDetailsView
 
 import scala.concurrent.ExecutionContext
@@ -33,17 +35,19 @@ class ApplicationDetailsController @Inject()(
   applicationAuth: ApplicationAuthActionProvider,
   view: ApplicationDetailsView,
   applicationApiBuilder: ApplicationApiBuilder,
+  hipEnvironments: HipEnvironments
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id)).async {
     implicit request =>
       applicationApiBuilder.build(request.application).map(
         applicationApis =>
-          Ok(view(
+          Ok(view(ApplicationDetailsViewModel(
             request.application.withSortedTeam(),
             applicationApis,
-            Some(request.identifierRequest.user)
-          ))
+            Some(request.identifierRequest.user),
+            hipEnvironments.productionHipEnvironment.id
+          )))
       )
   }
 

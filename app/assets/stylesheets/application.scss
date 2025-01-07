@@ -1009,3 +1009,14 @@ header {
         color: govuk-colour("white");
     }
 }
+
+.hip-change-link {
+    @extend .govuk-link;
+    @extend .govuk-link--no-visited-state;
+    font-size: 1rem;
+}
+
+.hip-application-api-list {
+    margin-top: 0;
+    @include govuk-font-size($size: 19);
+}
