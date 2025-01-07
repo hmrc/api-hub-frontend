@@ -153,7 +153,10 @@ class NavigatorSpec extends SpecBase with TryValues {
         }
         "must go from the Egress Availability page to the Egress Selection page if user answered Yes" in {
           val userAnswers = emptyUserAnswers.set(ProduceApiEgressAvailabilityPage, true).get
-          navigator.nextPage(ProduceApiEgressAvailabilityPage, NormalMode, userAnswers) mustBe controllers.myapis.produce.routes.ProduceApiEgressSelectionController.onPageLoad()
+          navigator.nextPage(ProduceApiEgressAvailabilityPage, NormalMode, userAnswers) mustBe controllers.myapis.produce.routes.ProduceApiEgressSelectionController.onPageLoad(NormalMode)
+        }
+        "must go from the Select Egress page to the Add Prefixes page" in {
+          navigator.nextPage(ProduceApiEgressSelectionPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiAddPrefixesController.onPageLoad(NormalMode)
         }
         "must go from the Add Prefixes page to the Enter Prefixes page if user answered Yes" in {
           val userAnswers = emptyUserAnswers.set(ProduceApiAddPrefixesPage, true).get

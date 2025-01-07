@@ -14,28 +14,26 @@
  * limitations under the License.
  */
 
-package models.deployment
+package forms.myapis.produce
 
-import play.api.libs.json.{Format, Json}
+import forms.behaviours.StringFieldBehaviours
+import play.api.data.FormError
 
-case class DeploymentsRequest(
-  lineOfBusiness: String,
-  name: String,
-  description: String,
-  egress: String,
-  teamId: String,
-  oas: String,
-  passthrough: Boolean,
-  status: String,
-  domain: String,
-  subDomain: String,
-  hods: Seq[String],
-  prefixesToRemove: Seq[String],
-  egressMappings: Option[Seq[EgressMapping]]
-)
+class ProduceApiEgressSelectionFormProviderSpec extends StringFieldBehaviours {
 
-object DeploymentsRequest {
+  private val requiredKey = "myApis.produce.selectegress.error.required"
+  private val maxLength = 100
 
-  implicit val formatDeploymentsRequest: Format[DeploymentsRequest] = Json.format[DeploymentsRequest]
+  private val form = new ProduceApiEgressSelectionForm()()
 
+  ".selectEgress" - {
+
+    val fieldName = "selectEgress"
+
+    behave like mandatoryField(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
+    )
+  }
 }

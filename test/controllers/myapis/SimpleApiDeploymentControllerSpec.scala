@@ -81,6 +81,7 @@ class SimpleApiDeploymentControllerSpec
       )
 
       when(fixture.applicationsConnector.generateDeployment(any)(any)).thenReturn(Future.successful(response))
+      when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(teams))
 
       running(fixture.playApplication) {
         val request = FakeRequest(controllers.myapis.routes.SimpleApiDeploymentController.onSubmit())
@@ -112,6 +113,7 @@ class SimpleApiDeploymentControllerSpec
         .appended("prefixesToRemove" -> "")
 
       when(fixture.applicationsConnector.generateDeployment(any)(any)).thenReturn(Future.successful(response))
+      when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(teams))
 
       running(fixture.playApplication) {
         val request = FakeRequest(controllers.myapis.routes.SimpleApiDeploymentController.onSubmit())
@@ -137,6 +139,7 @@ class SimpleApiDeploymentControllerSpec
       )
 
       when(fixture.applicationsConnector.generateDeployment(any)(any)).thenReturn(Future.successful(response))
+      when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(teams))
 
       running(fixture.playApplication) {
         val request = FakeRequest(controllers.myapis.routes.SimpleApiDeploymentController.onSubmit())
@@ -253,6 +256,7 @@ object SimpleApiDeploymentControllerSpec {
   val prefix1 = "test-prefix-1"
   val prefix2 = "test-prefix-2"
   val prefix3 = "test-prefix-3"
+  val egress = "test-egress"
   val egressMappingPrefix1 = "test-egress-mapping-prefix-1"
   val egressMappingEgressPrefix1 = "test-egress-mapping-egress-prefix-1"
   val egressMappingPrefix2 = "test-egress-mapping-prefix-2"
@@ -262,6 +266,7 @@ object SimpleApiDeploymentControllerSpec {
     lineOfBusiness = "test-line-of-business",
     name = "test-name",
     description = "test-description",
+    egress = egress,
     teamId = "test-team-id",
     oas = "test-oas",
     passthrough = false,
@@ -289,6 +294,7 @@ object SimpleApiDeploymentControllerSpec {
     "hods[]" -> hod1,
     "hods[]" -> hod2,
     "prefixesToRemove" -> s"$prefix1 \n $prefix2  \r\n$prefix3",    // Deliberate mix of UNIX and Windows newlines with surplus whitespace
+    "egress" -> egress,
     "egressMappings" -> s"  $egressMappingPrefix1,$egressMappingEgressPrefix1 \n $egressMappingPrefix2,$egressMappingEgressPrefix2 \r\n  "
   )
 

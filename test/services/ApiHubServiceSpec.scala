@@ -858,6 +858,7 @@ class ApiHubServiceSpec
         lineOfBusiness = "test-line-of-business",
         name = name,
         description = "test-description",
+        egress = "test-egress",
         teamId = "test-team-id",
         oas = "test-oas",
         passthrough = false,

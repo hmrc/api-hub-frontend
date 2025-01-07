@@ -14,28 +14,8 @@
  * limitations under the License.
  */
 
-package models.deployment
+package viewmodels.myapis.produce
 
-import play.api.libs.json.{Format, Json}
+import play.api.mvc.Call
 
-case class DeploymentsRequest(
-  lineOfBusiness: String,
-  name: String,
-  description: String,
-  egress: String,
-  teamId: String,
-  oas: String,
-  passthrough: Boolean,
-  status: String,
-  domain: String,
-  subDomain: String,
-  hods: Seq[String],
-  prefixesToRemove: Seq[String],
-  egressMappings: Option[Seq[EgressMapping]]
-)
-
-object DeploymentsRequest {
-
-  implicit val formatDeploymentsRequest: Format[DeploymentsRequest] = Json.format[DeploymentsRequest]
-
-}
+case class ProduceApiEgressSelectionViewModel(formAction: Call, returnUrl: String)

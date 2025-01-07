@@ -15,20 +15,78 @@
  *@
 
 @import models.user.UserModel
+@import models.api.EgressGateway
+@import viewmodels.myapis.produce.ProduceApiEgressSelectionViewModel
+@import views.html.components.IconsLink
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukButton: GovukButton,
+    govukErrorSummary: GovukErrorSummary,
+    govukSelect: GovukSelect,
+    govukRadios: GovukRadios,
+    newTabLink: components.NewTabLink,
+    iconsLink: IconsLink
 )
 
-@(userModel: UserModel)(implicit request: Request[?], messages: Messages)
+@(form: Form[?], userModel: UserModel, guidesUrl: String, egressGateways: Seq[EgressGateway], viewModel: ProduceApiEgressSelectionViewModel)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("produceApiEgressSelection.title")), user = Some(userModel)) {
-    <h1 class="govuk-heading-l">@messages("produceApiEgressSelection.heading")</h1>
-    @formHelper(action = controllers.myapis.produce.routes.ProduceApiEgressSelectionController.onSubmit()) {
-        @govukButton(
-            ButtonViewModel("Continue")
+@helpDocsUrlEgress = @{
+    s"$guidesUrl/documentation/how-do-i-produce.apis.html#deployment"
+}
+
+@helpDocsUrlEgressPrefix = @{
+    s"$guidesUrl/documentation/how-do-i-produce.apis.html#defining-an-egress-prefix"
+}
+
+@egressHint= {
+    @messages("myApis.produce.selectegress.body")
+    @newTabLink(helpDocsUrlEgress, messages("myApis.produce.selectegress.body.link")).
+
+    <div class="call-out-panel govuk-!-margin-top-6 govuk-body information--general-tag govuk-!-margin-bottom-2">
+        <h3 class="govuk-heading-s">
+            <i class="fa-solid fa-circle-info govuk-!-margin-right-2"></i>
+            @messages("myApis.produce.selectegress.hint.heading")
+        </h3>
+        <span class="govuk-!-margin-left-6">
+            @returnLink
+        </span>
+    </div>
+}
+
+@returnLink = {
+    @Html(messages("myApis.produce.selectegress.hint.body",
+        s"""<a class="govuk-link govuk-link--no-visited-state" href=${viewModel.returnUrl}>
+            ${messages("myApis.produce.selectegress.hint.link")}
+        </a>"""
+    ))
+}
+
+@layout(pageTitle = title(form, messages("myApis.produce.selectegress.title")), user = Some(userModel), customScriptsBlock = Some(iconsLink())) {
+
+    @formHelper(action = viewModel.formAction) {
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form))
+        }
+
+        @govukSelect(
+            SelectViewModel(
+                field = form("selectEgress"),
+                items = SelectItemViewModel(
+                        value = "",
+                        text = messages("myApis.produce.selectegress.unassigned")
+                    ) +: egressGateways.map(egressGateway =>
+                        SelectItemViewModel(
+                            value = egressGateway.id,
+                            text = egressGateway.friendlyName
+                        )
+                    ),
+                label = LabelViewModel(HtmlContent(messages("myApis.produce.selectegress.heading"))).asPageHeading()
+            ).withHint(Hint(content = HtmlContent(egressHint)))
         )
+
+        @govukButton(ButtonViewModel(messages("site.continue")))
     }
 }

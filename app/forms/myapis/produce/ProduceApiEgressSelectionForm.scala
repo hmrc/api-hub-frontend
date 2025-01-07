@@ -14,28 +14,16 @@
  * limitations under the License.
  */
 
-package models.deployment
+package forms.myapis.produce
 
-import play.api.libs.json.{Format, Json}
+import forms.mappings.Mappings
+import play.api.data.Form
 
-case class DeploymentsRequest(
-  lineOfBusiness: String,
-  name: String,
-  description: String,
-  egress: String,
-  teamId: String,
-  oas: String,
-  passthrough: Boolean,
-  status: String,
-  domain: String,
-  subDomain: String,
-  hods: Seq[String],
-  prefixesToRemove: Seq[String],
-  egressMappings: Option[Seq[EgressMapping]]
-)
+import javax.inject.Inject
 
-object DeploymentsRequest {
+class ProduceApiEgressSelectionForm @Inject() extends Mappings {
 
-  implicit val formatDeploymentsRequest: Format[DeploymentsRequest] = Json.format[DeploymentsRequest]
-
+  def apply(): Form[String] = Form(
+      "selectEgress" -> text("myApis.produce.selectegress.error.required")
+  )
 }

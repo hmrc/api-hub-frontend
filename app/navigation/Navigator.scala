@@ -71,6 +71,7 @@ class Navigator @Inject()() {
     case ProduceApiStatusPage => produceApiStatusNextPage(NormalMode)
     case ProduceApiPassthroughPage => _ => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
     case ProduceApiHowToAddWiremockPage => produceApiHowToAddWiremockNextPage(NormalMode)
+    case ProduceApiEgressSelectionPage => _ => controllers.myapis.produce.routes.ProduceApiAddPrefixesController.onPageLoad(NormalMode)
     case CancelAccessRequestStartPage => _ => controllers.application.cancelaccessrequest.routes.CancelAccessRequestSelectApiController.onPageLoad(NormalMode)
     case CancelAccessRequestSelectApiPage => _ => controllers.application.cancelaccessrequest.routes.CancelAccessRequestConfirmController.onPageLoad(NormalMode)
     case CancelAccessRequestConfirmPage => cancelAccessRequestConfirmNextPage(NormalMode)
@@ -108,6 +109,7 @@ class Navigator @Inject()() {
     case ProduceApiReviewNameDescriptionPage => _ => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
     case ProduceApiEnterWiremockPage => _ => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
     case ProduceApiAddPrefixesPage => produceApiAddPrefixNextPage(CheckMode)
+    case ProduceApiEgressSelectionPage => _ => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
     case ProduceApiEgressPrefixesPage => _ => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
     case ProduceApiHodPage => _ => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
     case ProduceApiDomainPage => _ => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
@@ -185,7 +187,7 @@ class Navigator @Inject()() {
 
   private def produceApiEgressAvailabilityNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
     userAnswers.get(ProduceApiEgressAvailabilityPage) match {
-      case Some(true) => controllers.myapis.produce.routes.ProduceApiEgressSelectionController.onPageLoad()
+      case Some(true) => controllers.myapis.produce.routes.ProduceApiEgressSelectionController.onPageLoad(mode)
       case Some(false) => controllers.myapis.produce.routes.ProduceApiAddPrefixesController.onPageLoad(mode)
       case _ => routes.JourneyRecoveryController.onPageLoad()
     }

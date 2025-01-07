@@ -19,6 +19,7 @@ package controllers.myapis
 import base.SpecBase
 import connectors.ApplicationsConnector
 import controllers.actions.{ApiAuthActionProvider, FakeApiAuthActions, FakeApiDetail, FakeUser}
+import controllers.myapis.SimpleApiDeploymentControllerSpec.teams
 import controllers.myapis.SimpleApiRedeploymentController.RedeploymentRequestFormProvider
 import fakes.{FakeDomains, FakeHods}
 import models.deployment.*
@@ -115,6 +116,7 @@ class SimpleApiRedeploymentControllerSpec
 
       when(fixture.apiAuthActionProvider.apply(any)(any)).thenReturn(successfulApiAuthAction(FakeApiDetail))
       when(fixture.applicationsConnector.updateDeployment(any, any)(any)).thenReturn(Future.successful(Some(response)))
+      when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(teams))
 
       running(fixture.playApplication) {
         val request = FakeRequest(controllers.myapis.routes.SimpleApiRedeploymentController.onSubmit(FakeApiDetail.id))
