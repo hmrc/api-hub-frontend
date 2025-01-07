@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,29 +16,78 @@
 
 package controllers.myapis.produce
 
+import config.FrontendAppConfig
 import controllers.actions.*
-import models.{Mode, NormalMode}
+import forms.myapis.produce.ProduceApiEgressSelectionForm
+import models.{Mode, UserAnswers}
+import models.myapis.produce.ProduceApiChooseEgress
+import models.requests.DataRequest
+import navigation.Navigator
+import pages.myapis.produce.{ProduceApiEgressPrefixesPage, ProduceApiEgressSelectionPage}
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.ProduceApiSessionRepository
+import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.myapis.produce.ProduceApiEgressSelectionViewModel
 import views.html.myapis.produce.ProduceApiEgressSelectionView
 
+import scala.util.{Success, Try}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class ProduceApiEgressSelectionController @Inject()(
-                                                     override val messagesApi: MessagesApi,
-                                                     identify: IdentifierAction,
-                                                     val controllerComponents: MessagesControllerComponents,
-                                                     view: ProduceApiEgressSelectionView
-                                                   )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                            override val messagesApi: MessagesApi,
+                                            identify: IdentifierAction,
+                                            getData: ProduceApiDataRetrievalAction,
+                                            requireData: DataRequiredAction,
+                                            val controllerComponents: MessagesControllerComponents,
+                                            view: ProduceApiEgressSelectionView,
+                                            config: FrontendAppConfig,
+                                            formProvider: ProduceApiEgressSelectionForm,
+                                            produceApiSessionRepository: ProduceApiSessionRepository,
+                                            apiHubService: ApiHubService,
+                                            navigator: Navigator
+                                          )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = identify {
-    implicit request => Ok(view(request.user))
+  private val form = formProvider()
+
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request =>
+
+      val preparedForm = request.userAnswers.get(ProduceApiEgressSelectionPage) match {
+        case None => form
+        case Some(egressChoices) => form.fill(egressChoices)
+      }
+
+      buildView(mode, preparedForm, Ok)
+
   }
 
-  def onSubmit(): Action[AnyContent] = identify {
-    implicit request => Redirect(controllers.myapis.produce.routes.ProduceApiAddPrefixesController.onPageLoad(NormalMode))
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request => {
+      form.bindFromRequest().fold(
+        formWithErrors => buildView(mode, formWithErrors, BadRequest),
+
+        egressChoices =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(ProduceApiEgressSelectionPage, egressChoices))
+            _ <- produceApiSessionRepository.set(updatedAnswers)
+          } yield Redirect(navigator.nextPage(ProduceApiEgressSelectionPage, mode, updatedAnswers))
+      )
+    }
+  }
+
+  private def buildView(mode: Mode, form: Form[String], status: Status)(implicit request: DataRequest[AnyContent]) = {
+    val viewModel = ProduceApiEgressSelectionViewModel(
+      controllers.myapis.produce.routes.ProduceApiEgressSelectionController.onSubmit(mode),
+      controllers.myapis.produce.routes.ProduceApiEgressAvailabilityController.onPageLoad(mode).url,
+    )
+    apiHubService.listEgressGateways().map(
+      egressGateways =>
+        status(view(form, request.user, config.helpDocsPath, egressGateways, viewModel))
+    )
   }
 
 }
