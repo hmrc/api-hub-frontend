@@ -157,7 +157,6 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
 
       val application = FakeApplication
         .addApi(Api(apiDetail.id, apiDetail.title, Seq(SelectedEndpoint("GET", "/test"))))
-//        .setScopes(Secondary, Seq(Scope("test-scope")))
 
       val applicationApis = Seq(
         ApplicationApi(apiDetail, Seq(ApplicationEndpoint("GET", "/test", None, None, Seq("test-scope"), Inaccessible, Accessible)), 0)
@@ -193,7 +192,6 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
 
       val application = FakeApplication
         .addApi(api)
-//        .setScopes(Secondary, Seq(Scope("test-scope")))
 
       val applicationApis = Seq(
         ApplicationApi(api, 0)
