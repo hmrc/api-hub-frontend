@@ -66,7 +66,7 @@ class HipEnvironmentsSpec extends AnyFreeSpec with Matchers with TableDrivenProp
 
       hipEnvironments.environments mustBe expectedHipEnvironments
     }
-    "must retrieve the expected environments by environment name" in {
+    "must retrieve the expected environments by environment id" in {
       val hipEnvironments = HipEnvironmentsImpl(hipEnvironmentsConfig)
 
       forAll(Table(
@@ -89,6 +89,19 @@ class HipEnvironmentsSpec extends AnyFreeSpec with Matchers with TableDrivenProp
         hipEnvironments.forUrlPathParameter(parameterValue) mustBe expectedEnvironment
       }
     }
+
+    "must try and find the production environment" in {
+      val hipEnvironments = HipEnvironmentsImpl(hipEnvironmentsConfig)
+
+      hipEnvironments.productionHipEnvironment.id mustBe "production"
+    }
+
+    "must try and find the 'deployment' environment" in {
+      val hipEnvironments = HipEnvironmentsImpl(hipEnvironmentsConfig)
+
+      hipEnvironments.deploymentHipEnvironment.id mustBe "test"
+    }
+
   }
 
 }

@@ -65,7 +65,7 @@ trait HipEnvironments {
   def productionHipEnvironment: HipEnvironment = environments.find(_.isProductionLike)
     .getOrElse(throw new IllegalArgumentException("No production environment configured"))
 
-  def deploymentHipEnvironment: HipEnvironment = environments.sortBy(_.rank).reverse.head
+  def deploymentHipEnvironment: HipEnvironment = environments.maxBy(_.rank)
 
 }
 
