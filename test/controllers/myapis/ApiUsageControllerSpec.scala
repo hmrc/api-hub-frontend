@@ -24,7 +24,7 @@ import generators.ApiDetailGenerators
 import models.api.ApiDeploymentStatuses
 import models.api.ApiDeploymentStatus.*
 import models.application.ApplicationLenses.*
-import models.application.{Api, Application, Creator, Deleted, Primary, Secondary, TeamMember}
+import models.application.{Api, Application, Creator, Deleted, TeamMember}
 import models.team.Team
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}

@@ -24,7 +24,6 @@ import fakes.FakeHipEnvironments
 import generators.ApiDetailGenerators
 import models.api.ApiDeploymentStatus.{Deployed, NotDeployed}
 import models.api.ApiDeploymentStatuses
-import models.application.{Primary, Secondary}
 import models.team.Team
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}

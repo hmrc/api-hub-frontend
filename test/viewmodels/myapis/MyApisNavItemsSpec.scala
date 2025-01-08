@@ -21,7 +21,6 @@ import controllers.actions.{FakeSupporter, FakeUser}
 import fakes.FakeHipEnvironments
 import models.api.ApiDeploymentStatuses
 import models.api.ApiDeploymentStatus.*
-import models.application.{Primary, Secondary}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages

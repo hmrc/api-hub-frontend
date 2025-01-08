@@ -18,7 +18,6 @@ package config
 
 import com.typesafe.config.ConfigFactory
 import fakes.FakeEmailDomains
-import models.application.{EnvironmentName, Primary, Secondary}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
@@ -51,14 +50,12 @@ class HipEnvironmentsSpec extends AnyFreeSpec with Matchers with TableDrivenProp
       id = "production",
       rank = 1,
       nameKey = "hipEnvironment.production.name",
-      environmentName = Primary,
       isProductionLike = true
     ),
     HipEnvironment(
       id = "test",
       rank = 2,
       nameKey = "hipEnvironment.test.name",
-      environmentName = Secondary,
       isProductionLike = false
     ),
   )
@@ -74,10 +71,10 @@ class HipEnvironmentsSpec extends AnyFreeSpec with Matchers with TableDrivenProp
 
       forAll(Table(
         ("environmentName", "expectedEnvironment"),
-        (Primary, expectedHipEnvironments.head),
-        (Secondary, expectedHipEnvironments.last),
-      )) { (environmentName: EnvironmentName, expectedEnvironment: HipEnvironment) =>
-        hipEnvironments.forEnvironmentNameOptional(environmentName) mustBe Some(expectedEnvironment)
+        ("production", expectedHipEnvironments.head),
+        ("test", expectedHipEnvironments.last),
+      )) { (environmentId: String, expectedEnvironment: HipEnvironment) =>
+        hipEnvironments.forEnvironmentIdOptional(environmentId) mustBe Some(expectedEnvironment)
       }
     }
 
@@ -86,9 +83,7 @@ class HipEnvironmentsSpec extends AnyFreeSpec with Matchers with TableDrivenProp
 
       forAll(Table(
         ("parameter", "expectedEnvironment"),
-        ("primary", expectedHipEnvironments.head),
         ("production", expectedHipEnvironments.head),
-        ("secondary", expectedHipEnvironments.last),
         ("test", expectedHipEnvironments.last),
       )) { (parameterValue: String, expectedEnvironment: HipEnvironment) =>
         hipEnvironments.forUrlPathParameter(parameterValue) mustBe expectedEnvironment

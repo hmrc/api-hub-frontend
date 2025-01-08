@@ -17,6 +17,7 @@
 package services
 
 import base.SpecBase
+import config.HipEnvironmentsImpl
 import controllers.actions.{FakeApiDetail, FakeApplication}
 import fakes.FakeHipEnvironments
 import io.swagger.v3.oas.models.servers.Server
@@ -41,7 +42,7 @@ class CurlCommandServiceSpec extends SpecBase with MockitoSugar {
 
   "CurlCommandService.buildCurlCommandsForApi" - {
     "must return an error if the oas file cannot be parsed" in {
-      val service = new CurlCommandService()
+      val service = new CurlCommandService(FakeHipEnvironments)
       val application = FakeApplication
       val apiDetail = FakeApiDetail.copy(openApiSpecification = "not valid")
       val apiWorld = CORPORATE
@@ -55,7 +56,7 @@ class CurlCommandServiceSpec extends SpecBase with MockitoSugar {
     }
 
     "must return the correct curl command for a minimal valid oas file" in {
-      val service = new CurlCommandService()
+      val service = new CurlCommandService(FakeHipEnvironments)
       val application = FakeApplication.copy(apis = Seq(Api("id", "title", Seq(SelectedEndpoint("GET", "/get_it")))))
       val minimalValidOas =
         """
@@ -84,7 +85,7 @@ class CurlCommandServiceSpec extends SpecBase with MockitoSugar {
     }
 
     "must parse a request body when content is provided" in {
-      val service = new CurlCommandService()
+      val service = new CurlCommandService(FakeHipEnvironments)
       val application = FakeApplication.copy(apis = Seq(Api("id", "title", Seq(SelectedEndpoint("POST", "/post_it")))))
       val minimalValidOas =
         """
@@ -142,7 +143,7 @@ class CurlCommandServiceSpec extends SpecBase with MockitoSugar {
     }
 
     "must parse a request body from $ref when the content is not provided" in {
-      val service = new CurlCommandService()
+      val service = new CurlCommandService(FakeHipEnvironments)
       val application = FakeApplication.copy(apis = Seq(Api("id", "title", Seq(SelectedEndpoint("POST", "/post_it")))))
       val minimalValidOas =
         """
@@ -197,7 +198,7 @@ class CurlCommandServiceSpec extends SpecBase with MockitoSugar {
     }
 
     "must return the correct curl commands if the oas file can be parsed" in {
-      val service = new CurlCommandService()
+      val service = new CurlCommandService(FakeHipEnvironments)
       val credential = Credential("client-id", LocalDateTime.now, Some("client-secret"), None, FakeHipEnvironments.test.id)
       val validOas =
         """

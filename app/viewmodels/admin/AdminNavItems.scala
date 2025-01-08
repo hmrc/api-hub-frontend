@@ -91,12 +91,6 @@ object AdminNavItems {
           link = controllers.admin.routes.StatisticsController.onPageLoad(),
           isCurrentPage = currentPage == StatisticsPage
         ),
-        SideNavItemLeaf(
-          page = EnvParityConfigTestPage,
-          title = messages("envParityConfigTest.title"),
-          link = controllers.admin.routes.EnvParityConfigTestController.onPageLoad(),
-          isCurrentPage = currentPage == EnvParityConfigTestPage
-        ),
         accessRequestsNavItem
       )
     }

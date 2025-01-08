@@ -17,7 +17,6 @@
 package fakes
 
 import config.{HipEnvironment, HipEnvironments}
-import models.application.{Primary, Secondary}
 
 object FakeHipEnvironments extends HipEnvironments {
 
@@ -25,7 +24,6 @@ object FakeHipEnvironments extends HipEnvironments {
     id = "production",
     rank = 1,
     nameKey = "hipEnvironment.production.name",
-    environmentName = Primary,
     isProductionLike = true
   )
 
@@ -33,7 +31,6 @@ object FakeHipEnvironments extends HipEnvironments {
     id = "test",
     rank = 2,
     nameKey = "hipEnvironment.test.name",
-    environmentName = Secondary,
     isProductionLike = false
   )
 

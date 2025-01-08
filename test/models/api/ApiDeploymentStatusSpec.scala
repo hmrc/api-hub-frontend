@@ -18,7 +18,6 @@ package models.api
 
 import fakes.FakeHipEnvironments
 import models.api.ApiDeploymentStatus.*
-import models.application.Primary
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.libs.json.Json

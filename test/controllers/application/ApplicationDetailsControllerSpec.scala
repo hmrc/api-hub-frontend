@@ -21,7 +21,7 @@ import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
 import controllers.routes
 import models.accessrequest.Pending
 import models.api.{ApiDetail, Endpoint, EndpointMethod, Live, Maintainer}
-import models.application.{Api, Scope, Secondary, SelectedEndpoint, TeamMember}
+import models.application.{Api, Scope, SelectedEndpoint, TeamMember}
 import models.application.ApplicationLenses.ApplicationLensOps
 import models.team.Team
 import models.user.UserModel
@@ -157,7 +157,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
 
       val application = FakeApplication
         .addApi(Api(apiDetail.id, apiDetail.title, Seq(SelectedEndpoint("GET", "/test"))))
-        .setScopes(Secondary, Seq(Scope("test-scope")))
+//        .setScopes(Secondary, Seq(Scope("test-scope")))
 
       val applicationApis = Seq(
         ApplicationApi(apiDetail, Seq(ApplicationEndpoint("GET", "/test", None, None, Seq("test-scope"), Inaccessible, Accessible)), 0)
@@ -193,7 +193,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
 
       val application = FakeApplication
         .addApi(api)
-        .setScopes(Secondary, Seq(Scope("test-scope")))
+//        .setScopes(Secondary, Seq(Scope("test-scope")))
 
       val applicationApis = Seq(
         ApplicationApi(api, 0)

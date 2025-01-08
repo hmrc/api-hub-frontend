@@ -258,7 +258,6 @@ object RequestProductionAccessEndJourneyControllerSpec extends OptionValues{
   private val anApplication =
     FakeApplication
       .addApi(Api(applicationApi.apiId, applicationApi.apiTitle, Seq(SelectedEndpoint("GET", "/test"), SelectedEndpoint("POST", "/anothertest"))))
-      .setScopes(Secondary, Seq(Scope("test-scope")))
 
   private def buildApplicationApi(apiId: Int, endpointAccesses: Seq[ApplicationEndpointAccess]): ApplicationApi = {
     ApplicationApi(

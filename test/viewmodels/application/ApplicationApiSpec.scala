@@ -19,7 +19,7 @@ package viewmodels.application
 import config.HipEnvironment
 import controllers.actions.FakeApiDetail
 import models.api.*
-import models.application.{Api, Primary, Scope, Secondary, SelectedEndpoint}
+import models.application.{Api, Scope, SelectedEndpoint}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
@@ -229,7 +229,7 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
           ),
         ), 0)
 
-        applicationApi.isAccessibleInEnvironment(HipEnvironment("test", 2, "nameKey", Secondary, isProductionLike = false)) mustBe true
+        applicationApi.isAccessibleInEnvironment(HipEnvironment("test", 2, "nameKey", isProductionLike = false)) mustBe true
       }
 
       "must return true for prod environments with available endpoints" in {
@@ -254,7 +254,7 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
           ),
         ), 0)
 
-        applicationApi.isAccessibleInEnvironment(HipEnvironment("prod", 1, "nameKey", Primary, isProductionLike = true)) mustBe true
+        applicationApi.isAccessibleInEnvironment(HipEnvironment("prod", 1, "nameKey", isProductionLike = true)) mustBe true
       }
 
       "must return false for prod environments without available endpoints" in {
@@ -270,7 +270,7 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
           ),
         ), 0)
 
-        applicationApi.isAccessibleInEnvironment(HipEnvironment("prod", 1, "nameKey", Primary, isProductionLike = true)) mustBe false
+        applicationApi.isAccessibleInEnvironment(HipEnvironment("prod", 1, "nameKey", isProductionLike = true)) mustBe false
       }
     }
 }

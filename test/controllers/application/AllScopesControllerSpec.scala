@@ -19,7 +19,7 @@ package controllers.application
 import base.SpecBase
 import controllers.actions.{FakeApplication, FakeSupporter, FakeUser}
 import fakes.FakeHipEnvironments
-import models.application.{CredentialScopes, Primary}
+import models.application.{CredentialScopes}
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when

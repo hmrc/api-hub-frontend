@@ -23,7 +23,6 @@ import fakes.{FakeDomains, FakeHipEnvironments, FakeHods, FakePlatforms}
 import generators.ApiDetailGenerators
 import models.api.ApiDeploymentStatus.*
 import models.api.{ApiDeploymentStatuses, ApiDetail, ContactInfo, ContactInformation, PlatformContact}
-import models.application.{Primary, Secondary}
 import models.team.Team
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
