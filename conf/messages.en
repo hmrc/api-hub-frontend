@@ -42,7 +42,6 @@ site.signedIn = Signed in as {0} via {1}
 site.environment = Environment
 site.environment.dev = Development environment
 site.environment.test = Test environment
-site.environment.deployment = Deployment environment
 site.environment.preprod = Pre-Production environment
 site.environment.production = Production environment
 site.viewFullErrorResponse = View full error response
