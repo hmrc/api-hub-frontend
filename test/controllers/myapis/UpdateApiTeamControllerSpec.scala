@@ -21,7 +21,7 @@ import controllers.actions.{ApiAuthActionProvider, FakeApiAuthActions, FakeApiDe
 import controllers.routes
 import fakes.FakeHipEnvironments
 import forms.myapis.UpdateApiTeamFormProvider
-import models.application.{Primary, Secondary, TeamMember}
+import models.application.TeamMember
 import models.api.ApiDeploymentStatuses
 import models.api.ApiDeploymentStatus.*
 import models.team.Team

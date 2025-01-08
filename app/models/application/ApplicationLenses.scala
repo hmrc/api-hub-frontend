@@ -48,14 +48,6 @@ object ApplicationLenses {
 
   implicit class ApplicationLensOps(application: Application) {
 
-    def setScopes(environmentName: EnvironmentName, scopes: Seq[Scope]): Application = {
-      application
-    }
-
-    def setScopes(hipEnvironment: HipEnvironment, scopes: Seq[Scope]): Application = {
-      setScopes(hipEnvironment.environmentName, scopes)
-    }
-
     private def getCredentials(environmentId: String): Seq[Credential] = {
       applicationCredentials
         .get(application)
@@ -64,25 +56,14 @@ object ApplicationLenses {
         .sortBy(_.created)
     }
 
-    def getCredentials(environmentName: EnvironmentName): Seq[Credential] = {
-      environmentName match {
-        case Primary => getCredentials(EnvironmentName.primaryEnvironmentId)
-        case Secondary => getCredentials(EnvironmentName.secondaryEnvironmentId)
-      }
-    }
-
     def getCredentials(hipEnvironment: HipEnvironment): Seq[Credential] = {
       getCredentials(hipEnvironment.id)
     }
 
-    def getMasterCredential(environmentName: EnvironmentName): Option[Credential] = {
-      getCredentials(environmentName)
+    def getMasterCredential(hipEnvironment: HipEnvironment): Option[Credential] = {
+      getCredentials(hipEnvironment)
         .sortWith((a, b) => a.created.isAfter(b.created))
         .headOption
-    }
-
-    def getMasterCredential(hipEnvironment: HipEnvironment): Option[Credential] = {
-      getMasterCredential(hipEnvironment.environmentName)
     }
 
     private def setCredentials(environmentId: String, credentials: Seq[Credential]): Application = {
@@ -92,13 +73,6 @@ object ApplicationLenses {
           .get(application)
           .filterNot(_.environmentId == environmentId) ++ credentials.toSet
       )
-    }
-
-    def setCredentials(environmentName: EnvironmentName, credentials: Seq[Credential]): Application = {
-      environmentName match {
-        case Primary => setCredentials(EnvironmentName.primaryEnvironmentId, credentials)
-        case Secondary => setCredentials(EnvironmentName.secondaryEnvironmentId, credentials)
-      }
     }
 
     def setCredentials(hipEnvironment: HipEnvironment, credentials: Seq[Credential]): Application = {

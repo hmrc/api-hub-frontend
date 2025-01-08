@@ -17,8 +17,10 @@
 package controllers.application
 
 import base.SpecBase
+import config.HipEnvironments
 import controllers.actions.{FakeApiDetail, FakeApplication, FakeUser}
 import controllers.routes
+import fakes.FakeHipEnvironments
 import play.api.i18n.{Messages, MessagesProvider}
 import forms.AddCredentialChecklistFormProvider
 import io.swagger.v3.oas.models.servers.Server

@@ -161,7 +161,6 @@ object RequestProductionAccessStartControllerSpec {
   private val application =
     FakeApplication
       .addApi(Api(apiDetail.id, apiDetail.title, Seq(SelectedEndpoint("GET", "/test"))))
-      .setScopes(Secondary, Seq(Scope("test-scope")))
 
   private val applicationApi = ApplicationApi(
     apiDetail = apiDetail,

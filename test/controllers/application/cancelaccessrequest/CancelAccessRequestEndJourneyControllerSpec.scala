@@ -152,7 +152,6 @@ object CancelAccessRequestEndJourneyControllerSpec extends OptionValues{
   private val anApplication =
     FakeApplication
       .addApi(anApi)
-      .setScopes(Secondary, Seq(Scope("test-scope")))
 
   private val anAccessRequest = AccessRequest(
     "test-access-request-id",

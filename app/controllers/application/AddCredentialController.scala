@@ -20,7 +20,7 @@ import config.{FrontendAppConfig, HipEnvironment, HipEnvironments}
 import controllers.actions.*
 import controllers.helpers.ErrorResultBuilder
 import forms.AddCredentialChecklistFormProvider
-import models.application.{Application, Credential, Primary, Secondary}
+import models.application.{Application, Credential}
 import models.exception.ApplicationCredentialLimitException
 import models.requests.{ApplicationRequest, BaseRequest}
 import models.user.UserModel

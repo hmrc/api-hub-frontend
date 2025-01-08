@@ -137,7 +137,6 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
 
     val application = FakeApplication
       .addApi(Api(apiDetail.id, apiDetail.title, Seq(SelectedEndpoint("GET", "/test"))))
-      .setScopes(Secondary, Seq(Scope("test-scope")))
 
     application
   }

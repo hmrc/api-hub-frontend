@@ -63,7 +63,7 @@ class ApplicationLensesSpec extends LensBehaviours {
       "must" - {
         behave like applicationCredentialsGetterFunction(
           applicationCredentials,
-          application => ApplicationLensOps(application).getCredentials(Primary).toSet,
+          application => ApplicationLensOps(application).getCredentials(FakeHipEnvironments.production).toSet,
           FakeHipEnvironments.production.id
         )
       }
@@ -71,7 +71,7 @@ class ApplicationLensesSpec extends LensBehaviours {
       "must also" - {
         behave like applicationCredentialsGetterFunction(
           applicationCredentials,
-          application => ApplicationLensOps(application).getCredentials(Secondary).toSet,
+          application => ApplicationLensOps(application).getCredentials(FakeHipEnvironments.test).toSet,
           FakeHipEnvironments.test.id
         )
       }
@@ -81,7 +81,7 @@ class ApplicationLensesSpec extends LensBehaviours {
       "must" - {
         behave like applicationCredentialsSetterFunction(
           applicationCredentials,
-          (application, credentials) => ApplicationLensOps(application).setCredentials(Primary, credentials.toSeq),
+          (application, credentials) => ApplicationLensOps(application).setCredentials(FakeHipEnvironments.production, credentials.toSeq),
           FakeHipEnvironments.production.id
         )
       }
@@ -89,7 +89,7 @@ class ApplicationLensesSpec extends LensBehaviours {
       "must also" - {
         behave like applicationCredentialsSetterFunction(
           applicationCredentials,
-          (application, credentials) => ApplicationLensOps(application).setCredentials(Secondary, credentials.toSeq),
+          (application, credentials) => ApplicationLensOps(application).setCredentials(FakeHipEnvironments.test, credentials.toSeq),
           FakeHipEnvironments.test.id
         )
       }
@@ -102,9 +102,9 @@ class ApplicationLensesSpec extends LensBehaviours {
         val credential2 = randomCredential(FakeHipEnvironments.production.id).copy(created = LocalDateTime.now().minusDays(2))
 
         val application = testApplication
-          .setCredentials(Primary, Seq(credential1, master, credential2))
+          .setCredentials(FakeHipEnvironments.production, Seq(credential1, master, credential2))
 
-        application.getMasterCredential(Primary) mustBe Some(master)
+        application.getMasterCredential(FakeHipEnvironments.production) mustBe Some(master)
       }
 
       "must return the most recently created secondary credential" in {
@@ -113,9 +113,9 @@ class ApplicationLensesSpec extends LensBehaviours {
         val credential2 = randomCredential(FakeHipEnvironments.test.id).copy(created = LocalDateTime.now().minusDays(2))
 
         val application = testApplication
-          .setCredentials(Secondary, Seq(credential1, master, credential2))
+          .setCredentials(FakeHipEnvironments.test, Seq(credential1, master, credential2))
 
-        application.getMasterCredential(Secondary) mustBe Some(master)
+        application.getMasterCredential(FakeHipEnvironments.test) mustBe Some(master)
       }
     }
 

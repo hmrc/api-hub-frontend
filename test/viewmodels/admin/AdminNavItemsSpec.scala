@@ -45,7 +45,6 @@ class AdminNavItemsSpec extends SpecBase with Matchers with TableDrivenPropertyC
           getUsersNavItem(),
           configurationNavItem(),
           statisticsNavItem(),
-          envParityConfigTestNavItem(),
           accessRequestsNavItem()
         )
 
@@ -163,15 +162,6 @@ object AdminNavItemsSpec {
       page = StatisticsPage,
       title = "Hub stats",
       link = controllers.admin.routes.StatisticsController.onPageLoad(),
-      isCurrentPage = false
-    )
-  }
-
-  private def envParityConfigTestNavItem(): SideNavItem = {
-    SideNavItemLeaf(
-      page = EnvParityConfigTestPage,
-      title = "Env parity config",
-      link = controllers.admin.routes.EnvParityConfigTestController.onPageLoad(),
       isCurrentPage = false
     )
   }

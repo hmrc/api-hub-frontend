@@ -18,14 +18,12 @@ package config
 
 import com.google.inject.{Inject, Singleton}
 import com.typesafe.config.Config
-import models.application.EnvironmentName
 import play.api.{ConfigLoader, Configuration}
 
 case class HipEnvironment(
                            id: String,
                            rank: Int,                          // 1 is production
                            nameKey: String,                    // Key for the environment's name in messages file
-                           environmentName: EnvironmentName,   // Needed to pass environment round existing code and in URL paths to backend
                            isProductionLike: Boolean
                          ) {
   def name()(implicit messages: play.api.i18n.Messages): String = messages(nameKey)
@@ -41,7 +39,6 @@ object HipEnvironment {
         id = config.getString("id"),
         rank = config.getInt("rank"),
         nameKey = config.getString("nameKey"),
-        environmentName = EnvironmentName.enumerable.withName(config.getString("environmentName")).getOrElse(throw new IllegalArgumentException()),
         isProductionLike = config.getBoolean("isProductionLike")
       )
     }
@@ -52,21 +49,24 @@ trait HipEnvironments {
 
   def environments: Seq[HipEnvironment]
 
-  def forEnvironmentNameOptional(environmentName: EnvironmentName): Option[HipEnvironment] = {
-    environments.find(_.environmentName == environmentName)
+  def forEnvironmentIdOptional(environmentId: String): Option[HipEnvironment] = {
+    environments.find(_.id == environmentId)
   }
 
-  def forEnvironmentName(environmentName: EnvironmentName): HipEnvironment = {
-    forEnvironmentNameOptional(environmentName)
-      .getOrElse(throw new IllegalArgumentException(s"No configuration for environment $environmentName"))
+  def forEnvironmentId(environmentId: String): HipEnvironment = {
+    forEnvironmentIdOptional(environmentId)
+      .getOrElse(throw new IllegalArgumentException(s"No configuration for environment id $environmentId"))
   }
 
   def forUrlPathParameter(pathParameter: String): HipEnvironment =
-    environments.find(hipEnvironment => hipEnvironment.environmentName.toString == pathParameter || hipEnvironment.id == pathParameter)
+    environments.find(hipEnvironment => hipEnvironment.id == pathParameter)
       .getOrElse(throw new IllegalArgumentException(s"No configuration for environment $pathParameter"))
 
   def productionHipEnvironment: HipEnvironment = environments.find(_.isProductionLike)
     .getOrElse(throw new IllegalArgumentException("No production environment configured"))
+
+  def deploymentHipEnvironment: HipEnvironment = environments.maxBy(_.rank)
+
 }
 
 @Singleton

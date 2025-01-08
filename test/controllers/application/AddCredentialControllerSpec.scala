@@ -22,7 +22,7 @@ import controllers.routes
 import fakes.FakeHipEnvironments
 import forms.AddCredentialChecklistFormProvider
 import models.api.{ApiDetail, Live, Maintainer}
-import models.application.{Api, Application, Credential, Primary, Secondary}
+import models.application.{Api, Application, Credential}
 import models.exception.ApplicationCredentialLimitException
 import models.user.{Permissions, UserModel}
 import org.mockito.ArgumentMatchers.{any, argThat, eq as eqTo}

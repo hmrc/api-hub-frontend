@@ -21,7 +21,6 @@ import config.{HipEnvironment, HipEnvironments}
 import controllers.actions.{ApplicationAuthActionProvider, AuthorisedSupportAction, IdentifierAction}
 import models.ApiWorld
 import models.application.ApplicationLenses.*
-import models.application.Secondary
 import play.api.i18n.I18nSupport
 import play.api.libs.json.Json
 import play.api.mvc.*
@@ -32,21 +31,21 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class CurlCommandController @Inject()(
-  val controllerComponents: MessagesControllerComponents,
-  identify: IdentifierAction,
-  isSupport: AuthorisedSupportAction,
-  applicationAuth: ApplicationAuthActionProvider,
-  apiHubService: ApiHubService,
-  curlCommandService: CurlCommandService,
-  hipEnvironments: HipEnvironments
-)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                       val controllerComponents: MessagesControllerComponents,
+                                       identify: IdentifierAction,
+                                       isSupport: AuthorisedSupportAction,
+                                       applicationAuth: ApplicationAuthActionProvider,
+                                       apiHubService: ApiHubService,
+                                       curlCommandService: CurlCommandService,
+                                       hipEnvironments: HipEnvironments
+                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def buildCurlCommand(id: String, apiWorld: ApiWorld): Action[AnyContent] = (identify andThen isSupport andThen applicationAuth(id)).async {
     implicit request => {
 
       val application = request.application
 
-      val testEnvironment = hipEnvironments.forEnvironmentName(Secondary)
+      val testEnvironment = hipEnvironments.deploymentHipEnvironment
 
       for {
         maybeCredentials <- apiHubService.fetchCredentials(application.id, testEnvironment)
@@ -63,6 +62,6 @@ class CurlCommandController @Inject()(
             case _ => Ok(Json.toJson(curlCommands.map(_.toString))) // Some curl commands were successfully built
           }
         case (None, _) => Ok(Json.arr()) // Couldn't get credentials
-      }
     }
+  }
 }
