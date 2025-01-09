@@ -70,4 +70,10 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val maxWiremockUploadSizeMb: Int = configuration.get[Int]("maxWiremockUploadSizeMb")
   val wiremockUploadValidExtensions: Set[String] = configuration.get[Seq[String]]("wiremockUploadValidExtensions").toSet
 
+  val dashboardApplicationsToShow: Int = configuration.get[Int]("dashboardApplicationsToShow")
+  val dashboardTeamsToShow: Int = configuration.get[Int]("dashboardTeamsToShow")
+  val dashboardApisToShow: Int = configuration.get[Int]("dashboardApisToShow")
+
+  val showApisOnDashboard: Boolean = configuration.getOptional[Boolean]("features.showApisOnDashboard").getOrElse(false)
+
 }

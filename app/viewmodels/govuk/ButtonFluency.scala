@@ -73,6 +73,15 @@ trait ButtonFluency {
     def asSecondaryButton(): Button =
       withCssClass("govuk-button--secondary")
 
+    def asSecondaryButton(secondary: Boolean): Button = {
+      if (secondary) {
+        asSecondaryButton()
+      }
+      else {
+        button
+      }
+    }
+
     def asWarningButton(): Button =
       withCssClass("govuk-button--warning")
   }

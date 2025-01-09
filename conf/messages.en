@@ -96,6 +96,13 @@ dashboard.teams.createAnother = Register another team
 dashboard.teams.viewAll = View all your teams
 dashboard.teams.teamMembers = Team members: {0}
 dashboard.teams.created = Registered:
+dashboard.apis.title.none = Created APIs
+dashboard.apis.title.one = 1 Created API
+dashboard.apis.title.many = {0} Created APIs
+dashboard.apis.createFirst = Create an API
+dashboard.apis.createAnother = Create another API
+dashboard.apis.none = You have not created any APIs
+dashboard.apis.viewAll = View all your APIs
 
 applications.title = Your applications
 applications.heading = Your applications

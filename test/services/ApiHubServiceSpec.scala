@@ -22,11 +22,11 @@ import fakes.FakeHipEnvironments
 import generators.{AccessRequestGenerator, ApiDetailGenerators, EgressGenerator}
 import models.AvailableEndpoint
 import models.accessrequest.*
+import models.api.ApiDeploymentStatus.*
 import models.api.ApiDetailLensesSpec.sampleApiDetailSummary
 import models.api.{ApiDeploymentStatuses, ContactInfo, EndpointMethod, PlatformContact}
-import models.api.ApiDeploymentStatus.*
-import models.application.ApplicationLenses.*
 import models.application.*
+import models.application.ApplicationLenses.*
 import models.deployment.{DeploymentDetails, DeploymentsRequest, EgressMapping, SuccessfulDeploymentsResponse}
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
 import models.stats.ApisInProductionStatistic
@@ -40,7 +40,7 @@ import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.{EitherValues, OptionValues}
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.http.HeaderCarrier
-import fakes.FakeHipEnvironments
+
 import java.time.LocalDateTime
 import scala.concurrent.Future
 
@@ -326,7 +326,7 @@ class ApiHubServiceSpec
       when(fixture.integrationCatalogueConnector.filterApis(eqTo(Seq("teamId1")))(any()))
         .thenReturn(Future.successful(expected))
 
-      fixture.service.getUserApis(TeamMember(email))(HeaderCarrier(), executionContext) map {
+      fixture.service.getUserApis(TeamMember(email))(HeaderCarrier()) map {
         actual => {
           verify(fixture.applicationsConnector).findTeams(eqTo(Some(email)))(any())
           verify(fixture.integrationCatalogueConnector).filterApis(eqTo(Seq("teamId1")))(any())
@@ -343,7 +343,7 @@ class ApiHubServiceSpec
       when(fixture.applicationsConnector.findTeams(eqTo(Some(email)))(any()))
         .thenReturn(Future.successful(Seq.empty))
 
-      fixture.service.getUserApis(TeamMember(email))(HeaderCarrier(), executionContext) map {
+      fixture.service.getUserApis(TeamMember(email))(HeaderCarrier()) map {
         actual => {
           verify(fixture.applicationsConnector).findTeams(eqTo(Some(email)))(any())
           verifyNoInteractions(fixture.integrationCatalogueConnector)

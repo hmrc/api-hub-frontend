@@ -28,7 +28,7 @@ import models.exception.ApplicationsException
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
 import models.stats.ApisInProductionStatistic
 import models.team.{NewTeam, Team}
-import models.user.UserContactDetails
+import models.user.{UserContactDetails, UserModel}
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -36,9 +36,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ApiHubService @Inject()(
-                               applicationsConnector: ApplicationsConnector,
-                               integrationCatalogueConnector: IntegrationCatalogueConnector
-                             ) extends Logging {
+  applicationsConnector: ApplicationsConnector,
+  integrationCatalogueConnector: IntegrationCatalogueConnector
+)(implicit ec: ExecutionContext) extends Logging {
 
   def registerApplication(newApplication: NewApplication)(implicit hc: HeaderCarrier): Future[Application] = {
     logger.debug(s"Registering application named '${newApplication.name}', created by user with email '${newApplication.createdBy.email}''")
@@ -168,7 +168,11 @@ class ApiHubService @Inject()(
     applicationsConnector.removeTeamMemberFromTeam(id, teamMember)
   }
 
-  def getUserApis(teamMember: TeamMember)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[ApiDetail]] = {
+  def getUserApis(user: UserModel)(implicit hc: HeaderCarrier): Future[Seq[ApiDetail]] = {
+    getUserApis(TeamMember(user.email))
+  }
+
+  def getUserApis(teamMember: TeamMember)(implicit hc: HeaderCarrier): Future[Seq[ApiDetail]] = {
     findTeams(Some(teamMember.email)) flatMap {
       case teams if teams.nonEmpty => integrationCatalogueConnector.filterApis(teams.map(_.id))
       case _ => Future.successful(Seq.empty)
