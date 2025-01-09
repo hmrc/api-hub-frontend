@@ -22,15 +22,15 @@ import controllers.routes
 import forms.myapis.produce.ProduceApiEgressAvailabilityFormProvider
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.ArgumentMatchers.{any, argThat}
+import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.myapis.produce.ProduceApiEgressAvailabilityPage
+import pages.myapis.produce.{ProduceApiEgressAvailabilityPage, ProduceApiEgressSelectionPage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import repositories.SessionRepository
+import repositories.ProduceApiSessionRepository
 import utils.TestHelpers
 import viewmodels.myapis.produce.ProduceApiEgressAvailabilityViewModel
 import views.html.myapis.produce.ProduceApiEgressAvailabilityView
@@ -84,13 +84,13 @@ class ProduceApiEgressAvailabilityControllerSpec extends SpecBase with MockitoSu
     }
 
     "must redirect to the next page when valid data is submitted" in {
-      val mockSessionRepository = mock[SessionRepository]
+      val mockSessionRepository = mock[ProduceApiSessionRepository]
 
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers)).overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[ProduceApiSessionRepository].toInstance(mockSessionRepository)
           )
           .build()
 
@@ -100,6 +100,30 @@ class ProduceApiEgressAvailabilityControllerSpec extends SpecBase with MockitoSu
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual onwardRoute.url
+      }
+    }
+
+    "must clear previous egress answer if user selects 'No'" in {
+      val mockSessionRepository = mock[ProduceApiSessionRepository]
+      val userAnswersWithEgress = emptyUserAnswers.set(ProduceApiEgressSelectionPage, "my egress").success.value
+
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswersWithEgress)).overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[ProduceApiSessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(POST, produceApiEgressAvailabilityRoute).withFormUrlEncodedBody(("value", "false"))
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        verify(mockSessionRepository).set(argThat { (userAnswers: UserAnswers) =>
+          userAnswers.get(ProduceApiEgressSelectionPage).isEmpty
+        })
       }
     }
 

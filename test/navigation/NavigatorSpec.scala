@@ -319,6 +319,15 @@ class NavigatorSpec extends SpecBase with TryValues {
         "must go from the Preview Name/Description page to the Check Your Answers page" in {
           navigator.nextPage(ProduceApiReviewNameDescriptionPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
         }
+        "must go from the Egress Availability page to the Check Your Answers page if the user selects 'No'" in {
+          val userAnswers = emptyUserAnswers.set(ProduceApiEgressAvailabilityPage, false).get
+          navigator.nextPage(ProduceApiEgressAvailabilityPage, CheckMode, userAnswers) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
+        }
+        "must go from the Egress Availability page to the Egress Selection page if the user selects 'Yes'" in {
+          val userAnswers = emptyUserAnswers.set(ProduceApiEgressAvailabilityPage, true).get
+          navigator.nextPage(ProduceApiEgressAvailabilityPage, CheckMode, userAnswers) mustBe controllers.myapis.produce.routes.ProduceApiEgressSelectionController.onPageLoad(CheckMode)
+        }
+
         "must go from the Wiremock Editor page to the Check Your Answers page" in {
           navigator.nextPage(ProduceApiEnterWiremockPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
         }
