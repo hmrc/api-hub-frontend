@@ -67,7 +67,7 @@ class SimpleApiDeploymentController @Inject()(
             .map {
               case response: SuccessfulDeploymentsResponse =>
                 logger.info(s"Successful deployments response${System.lineSeparator()}${Json.prettyPrint(Json.toJson(response))}")
-                Ok(deploymentSuccessView(request.user, response))
+                Ok(deploymentSuccessView(request.user, response.id, deploymentsRequest.name))
               case response: InvalidOasResponse =>
                 logger.info(s"Invalid OAS deployments response${System.lineSeparator()}${Json.prettyPrint(Json.toJson(response))}")
                 BadRequest(deploymentFailureView(request.user, response.failure, controllers.myapis.routes.SimpleApiDeploymentController.onPageLoad().url))

@@ -15,36 +15,54 @@
  *@
 
 @import models.user.UserModel
-@import models.deployment.SuccessfulDeploymentsResponse
 @import play.api.libs.json.Json
 
 @this(
-layout: templates.Layout,
-govukButton: GovukButton,
-govukPanel: GovukPanel
+    layout: templates.Layout,
+    govukPanel: GovukPanel,
+    govukTable: GovukTable,
 )
 
-@(user: UserModel, successResponse: SuccessfulDeploymentsResponse)(implicit request: Request[?], messages: Messages)
+@(user: UserModel, publisherReference: String, apiName: String)(implicit request: Request[?], messages: Messages)
 
 
-@layout(pageTitle = titleNoForm(messages("api.deployment.success.title")), showBackLink = false, user = Some(user)) {
+@layout(pageTitle = titleNoForm(messages("api.deployment.success")), showBackLink = false, user = Some(user)) {
 
     @govukPanel(Panel(
-        classes = "govuk-!-margin-bottom-9",
-        title = Text(messages("api.deployment.success"))
+        classes = "govuk-!-margin-bottom-9 govuk-panel--warning hip-panel--secondary-success",
+        title = Text(messages("api.deployment.success.panel.title")),
+        content = Text(messages("api.deployment.success.panel.content")),
     ))
-    <details class="govuk-details">
-        <summary class="govuk-details__summary">
-            <span class="govuk-details__summary-text">
-                @messages("api.deployment.success.viewDetails")
-            </span>
-        </summary>
-        <div class="govuk-details__text">
-            <pre class="code--block">@{Json.prettyPrint(Json.toJson(successResponse))}</pre>
-        </div>
-    </details>
-    <br>
-    @govukButton(
-        ButtonViewModel(messages("api.deployment.success.continue")).asLink(routes.IndexController.onPageLoad.url)
+    @govukTable(
+        Table(
+            caption = None,
+            head = None,
+            rows =
+            Seq(
+                Seq(
+                    TableRow(
+                        content = messages("site.apiName"),
+                        classes = "govuk-!-font-weight-bold"
+                    ),
+                    TableRow(content = apiName)
+                ),Seq(
+                    TableRow(
+                        content = messages("site.publisherReference"),
+                        classes = "govuk-!-font-weight-bold"
+                    ),
+                    TableRow(content = publisherReference)
+                )
+            )
+        )
     )
+    <h2 class="govuk-heading-m">
+        @messages("api.deployment.success.body.heading")
+    </h2>
+    <p class="govuk-body">
+        @Html(messages("api.deployment.success.body.p", s"""
+            <a class="govuk-link--no-visited-state" href=${controllers.routes.IndexController.onPageLoad.url}>
+                ${messages("site.dashboard").toLowerCase}
+            </a>"""
+        ))
+    </p>
 }

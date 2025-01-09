@@ -18,7 +18,7 @@ package controllers.myapis
 
 import base.SpecBase
 import connectors.ApplicationsConnector
-import controllers.actions.FakeUser
+import controllers.actions.{FakeApiDetail, FakeUser}
 import controllers.myapis.SimpleApiDeploymentController.DeploymentsRequestFormProvider
 import fakes.{FakeDomains, FakeHods}
 import models.application.TeamMember
@@ -91,7 +91,7 @@ class SimpleApiDeploymentControllerSpec
         val view = fixture.playApplication.injector.instanceOf[DeploymentSuccessView]
 
         status(result) mustBe OK
-        contentAsString(result) mustBe view(FakeUser, response)(request, messages(fixture.playApplication)).toString()
+        contentAsString(result) mustBe view(FakeUser, response.id, deploymentsRequest.name)(request, messages(fixture.playApplication)).toString()
         contentAsString(result) must validateAsHtml
 
         verify(fixture.applicationsConnector).generateDeployment(eqTo(deploymentsRequest))(any)

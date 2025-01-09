@@ -51,6 +51,7 @@ site.message = Message
 site.publisherReference = Publisher reference
 site.createdDate = Created date
 site.version = Version
+site.apiName = API name
 
 date.day = Day
 date.month = Month
@@ -713,9 +714,11 @@ manageTeams.teams.created = Registered
 manageTeams.filter.title = Teams
 manageTeams.filter.placeholder = Search for team by name, ID or email
 
-api.deployment.success.title = Your API deployment request has been accepted.
-api.deployment.success = Your API deployment request has been accepted.
-api.deployment.success.continue = Continue to dashboard
+api.deployment.success.title = API has been validated successfully
+api.deployment.success.panel.title = API has been validated successfully
+api.deployment.success.panel.content = Deployment of the API is in progress
+api.deployment.success.body.heading = What you can do now
+api.deployment.success.body.p = You can now continue to view your deployed APIs page, your API will be available on your {0}.
 api.deployment.success.viewDetails = View full success response
 api.deployment.failure.title = There was an error processing your deployment request
 api.deployment.failure = There was an error processing your deployment request
@@ -802,7 +805,7 @@ myApis.produce.selectegress.prefixes.body.hint = If you need to remove or change
 myApis.produce.selectegress.prefixes.body.link = Guidance for Egress prefixes
 myApis.produce.selectegress.error.required = You must select an egress for your API
 myApis.produce.selectegress.unassigned = Select an egress
-myApis.produce.selectegress.cya.label = Egress
+myApis.produce.selectegress.cya.label = Selected Egress
 myApis.produce.selectegress.change.hidden = Egress
 myApis.produce.egressprefix.error.required = You must state whether you wish to configure path prefixes for your API
 

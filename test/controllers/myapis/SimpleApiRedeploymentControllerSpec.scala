@@ -125,7 +125,7 @@ class SimpleApiRedeploymentControllerSpec
         val view = fixture.playApplication.injector.instanceOf[DeploymentSuccessView]
 
         status(result) mustBe OK
-        contentAsString(result) mustBe view(FakeUser, response)(request, messages(fixture.playApplication)).toString()
+        contentAsString(result) mustBe view(FakeUser, response.id, FakeApiDetail.title)(request, messages(fixture.playApplication)).toString()
         contentAsString(result) must validateAsHtml
 
         verify(fixture.apiAuthActionProvider).apply(eqTo(FakeApiDetail.id))(any)

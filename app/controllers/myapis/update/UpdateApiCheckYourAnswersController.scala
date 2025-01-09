@@ -43,11 +43,6 @@ class UpdateApiCheckYourAnswersController @Inject()(
   }
 
   def onSubmit(): Action[AnyContent] = identify {
-    implicit request => Ok(successView(request.user, SuccessfulDeploymentsResponse(
-      id = "id",
-      version = "1.0.0",
-      mergeRequestIid = 12345,
-      uri = "uri.com"
-    )))
+    implicit request => Ok(successView(request.user, "publisher-reference", "name"))
   }
 }

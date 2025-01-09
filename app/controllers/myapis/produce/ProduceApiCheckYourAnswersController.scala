@@ -62,16 +62,25 @@ class ProduceApiCheckYourAnswersController @Inject()(
   def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       validate(request).fold(
-        call => Future.successful(Redirect(call)),
-        apiHubService.generateDeployment(_).flatMap {
+        call => Future.successful(Redirect(call)), {
+        case (apiTitle, deployment) => apiHubService.generateDeployment(deployment).flatMap {
           case response: SuccessfulDeploymentsResponse =>
             produceApiSessionRepository.clear(request.user.userId)
               .map(_ =>
-                Ok(successView(request.user, response))
+                Redirect(
+                  controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onSuccess(
+                    apiTitle, response.id
+                  )
+                )
               )
           case InvalidOasResponse(failure) =>
             Future.successful(BadRequest(errorView(request.user, failure)))
-        })
+        }})
+  }
+
+  def onSuccess(apiName: String, publisherReference: String): Action[AnyContent] = identify {
+    implicit request =>
+      Ok(successView(request.user, publisherReference, apiName))
   }
 
   def onCancel(): Action[AnyContent] = identify.async {
@@ -82,11 +91,11 @@ class ProduceApiCheckYourAnswersController @Inject()(
         )
   }
 
-  private def validate(request: DataRequest[?]): Either[Call, DeploymentsRequest] =
+  private def validate(request: DataRequest[?]): Either[Call, (String, DeploymentsRequest)] =
     for {
       apiTitle <- validateApiTile(request.userAnswers)
       shortDescription <- validateShortDescription(request.userAnswers)
-      egress = request.userAnswers.get(ProduceApiEgressSelectionPage)
+      egress <- validateEgress(request.userAnswers)
       team <- validateTeam(request.userAnswers)
       oas <- validateOas(request.userAnswers)
       passthrough <- validatePassthrough(request.userAnswers, request.user.permissions.canSupport)
@@ -94,23 +103,24 @@ class ProduceApiCheckYourAnswersController @Inject()(
       domainSubdomain <- validateDomainSubdomain(request.userAnswers)
       hods <- validateHods(request.userAnswers)
       egressPrefixes <- validateEgressPrefixes(request.userAnswers)
-    } yield DeploymentsRequest(
-      lineOfBusiness = "apim",
-      name = ProduceApiCheckYourAnswersController.formatAsKebabCase(apiTitle),
-      description = shortDescription,
-      egress = egress.getOrElse("null-egress"),
-      teamId = team.id,
-      oas = oas,
-      passthrough = passthrough,
-      status = apiStatus.toString,
-      domain = domainSubdomain.domain,
-      subDomain = domainSubdomain.subDomain,
-      hods = hods.toSeq,
-      prefixesToRemove = egressPrefixes.prefixes,
-      egressMappings = Some(egressPrefixes.getMappings.map(m =>
-        EgressMapping(m.existing, m.replacement)
-      )),
-    )
+      deployment = DeploymentsRequest(
+        lineOfBusiness = "apim",
+        name = ProduceApiCheckYourAnswersController.formatAsKebabCase(apiTitle),
+        description = shortDescription,
+        egress = egress,
+        teamId = team.id,
+        oas = oas,
+        passthrough = passthrough,
+        status = apiStatus.toString,
+        domain = domainSubdomain.domain,
+        subDomain = domainSubdomain.subDomain,
+        hods = hods.toSeq,
+        prefixesToRemove = egressPrefixes.prefixes,
+        egressMappings = Some(egressPrefixes.getMappings.map(m =>
+          EgressMapping(m.existing, m.replacement)
+        )),
+      )
+    } yield (apiTitle, deployment)
 
   private def validateApiTile(userAnswers: UserAnswers): Either[Call, String] = {
     userAnswers.get(ProduceApiEnterApiTitlePage) match {
@@ -137,6 +147,15 @@ class ProduceApiCheckYourAnswersController @Inject()(
     userAnswers.get(ProduceApiShortDescriptionPage) match {
       case Some(description) => Right(description)
       case None => Left(routes.ProduceApiShortDescriptionController.onPageLoad(CheckMode))
+    }
+  }
+
+  private def validateEgress(userAnswers: UserAnswers): Either[Call, String] = {
+    (userAnswers.get(ProduceApiEgressAvailabilityPage), userAnswers.get(ProduceApiEgressSelectionPage)) match {
+      case (Some(true), Some(egress)) => Right(egress)
+      case (Some(true), None) => Left(routes.ProduceApiEgressSelectionController.onPageLoad(CheckMode))
+      case (Some(false), _) => Right("null-egress")
+      case (None, _) => Left(routes.ProduceApiEgressAvailabilityController.onPageLoad(CheckMode))
     }
   }
 

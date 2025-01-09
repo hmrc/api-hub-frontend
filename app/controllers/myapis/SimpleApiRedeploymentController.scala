@@ -81,7 +81,7 @@ class SimpleApiRedeploymentController @Inject()(
         formWithErrors => Future.successful(showView(BAD_REQUEST, formWithErrors)),
         redeploymentRequest => applicationsConnector.updateDeployment(request.apiDetails.publisherReference, redeploymentRequest).map {
           case Some(response: SuccessfulDeploymentsResponse) =>
-            Ok(successView(request.identifierRequest.user, response))
+            Ok(successView(request.identifierRequest.user, response.id, request.apiDetails.title))
           case Some(response: InvalidOasResponse) =>
             BadRequest(failureView(request.identifierRequest.user, response.failure, controllers.myapis.routes.SimpleApiRedeploymentController.onPageLoad(id).url))
           case None =>
