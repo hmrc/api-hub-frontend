@@ -16,12 +16,14 @@
 
 package controllers
 
+import config.FrontendAppConfig
 import controllers.actions.IdentifierAction
 import play.api.Logging
 import play.api.i18n.I18nSupport
-import play.api.mvc._
+import play.api.mvc.*
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.DashboardViewModel
 import views.html.IndexView
 
 import javax.inject.Inject
@@ -31,7 +33,8 @@ class IndexController @Inject()(
                                  val controllerComponents: MessagesControllerComponents,
                                  identify: IdentifierAction,
                                  view: IndexView,
-                                 apiHubService: ApiHubService
+                                 apiHubService: ApiHubService,
+                                 frontendAppConfig: FrontendAppConfig
                                )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   def onPageLoad: Action[AnyContent] = identify.async { implicit request =>
@@ -41,12 +44,9 @@ class IndexController @Inject()(
     for {
       userApps <- apiHubService.getApplications(Some(request.user.email), false)
       userTeams <- apiHubService.findTeams(Some(request.user.email))
+      userApis <- apiHubService.getUserApis(request.user)
     } yield Ok(view(
-        userApps.sortBy(_.created).reverse.take(maxApplicationsToShow),
-        userApps.size,
-        userTeams.sortBy(_.created).reverse.take(maxTeamsToShow),
-        userTeams.size,
-        Some(request.user)
+          DashboardViewModel(frontendAppConfig, userApps, userTeams, userApis, request.user)
     ))
   }
 

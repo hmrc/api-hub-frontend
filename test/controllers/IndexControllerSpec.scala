@@ -17,24 +17,28 @@
 package controllers
 
 import base.SpecBase
-import controllers.IndexControllerSpec.buildFixture
+import config.FrontendAppConfig
+import controllers.IndexControllerSpec.{buildFixture, buildViewModel}
 import controllers.actions.FakeUser
-import generators.TeamGenerator
+import generators.{ApiDetailGenerators, TeamGenerator}
+import models.api.ApiDetail
 import models.application.{Application, Creator, TeamMember}
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
-import org.mockito.Mockito.when
+import models.team.Team
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.{framework, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import play.api.{Application => PlayApplication}
+import play.api.test.Helpers.*
+import play.api.Application as PlayApplication
 import services.ApiHubService
 import utils.HtmlValidation
+import viewmodels.DashboardViewModel
 import views.html.IndexView
 
 import scala.concurrent.Future
 
-class IndexControllerSpec extends SpecBase with MockitoSugar with TeamGenerator with HtmlValidation {
+class IndexControllerSpec extends SpecBase with MockitoSugar with TeamGenerator with ApiDetailGenerators with HtmlValidation {
 
   "Index Controller" - {
 
@@ -46,6 +50,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with TeamGenerator 
         Application("id-2", "app-name-2", Creator(creatorEmail), Seq.empty).copy(teamMembers = Seq(TeamMember(testEmail)))
       )
       val teams = Seq(sampleTeam(), sampleTeam())
+      val apis = Seq(sampleApiDetail(), sampleApiDetail())
 
       val fixture = buildFixture()
 
@@ -55,6 +60,8 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with TeamGenerator 
           .thenReturn(Future.successful(applications))
         when(fixture.mockApiHubService.findTeams(eqTo(Some(testEmail)))(any()))
           .thenReturn(Future.successful(teams))
+        when(fixture.mockApiHubService.getUserApis(eqTo(FakeUser))(any))
+          .thenReturn(Future.successful(apis))
 
         val request = FakeRequest(GET, routes.IndexController.onPageLoad.url)
 
@@ -66,7 +73,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with TeamGenerator 
 
         val sortedApplications = applications.sortBy(_.created).reverse
         val sortedTeams = teams.sortBy(_.created).reverse
-        contentAsString(result) mustEqual view(sortedApplications, applications.size, sortedTeams, teams.size, Some(FakeUser))(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(buildViewModel(fixture.application, applications, teams, apis))(request, messages(fixture.application)).toString
         contentAsString(result) must validateAsHtml
       }
     }
@@ -75,6 +82,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with TeamGenerator 
       val testEmail = "test-email"
       val applications = Seq.empty
       val teams = Seq.empty
+      val apis = Seq.empty
 
       val fixture = buildFixture()
 
@@ -84,6 +92,8 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with TeamGenerator 
           .thenReturn(Future.successful(applications))
         when(fixture.mockApiHubService.findTeams(eqTo(Some(testEmail)))(any()))
           .thenReturn(Future.successful(teams))
+        when(fixture.mockApiHubService.getUserApis(eqTo(FakeUser))(any))
+          .thenReturn(Future.successful(apis))
 
         val request = FakeRequest(GET, routes.IndexController.onPageLoad.url)
 
@@ -93,7 +103,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with TeamGenerator 
 
         status(result) mustEqual OK
 
-        contentAsString(result) mustEqual view(applications, 0, teams, 0, Some(FakeUser))(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(buildViewModel(fixture.application, applications, teams, apis))(request, messages(fixture.application)).toString
         contentAsString(result) must validateAsHtml
       }
     }
@@ -118,6 +128,16 @@ object IndexControllerSpec extends SpecBase with MockitoSugar {
         )
         .build()
     Fixture(application, mockApiHubService)
+  }
+
+  def buildViewModel(application: PlayApplication, applications: Seq[Application], teams: Seq[Team], apis: Seq[ApiDetail]): DashboardViewModel = {
+    new DashboardViewModel(
+      frontendAppConfig = application.injector.instanceOf[FrontendAppConfig],
+      applications = applications,
+      teams = teams,
+      apis = apis,
+      user = FakeUser
+    )
   }
 
 }
