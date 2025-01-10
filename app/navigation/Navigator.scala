@@ -107,6 +107,7 @@ class Navigator @Inject()() {
     case ProduceApiEnterOasPage => _ => controllers.myapis.produce.routes.ProduceApiShortDescriptionController.onPageLoad(CheckMode)
     case ProduceApiShortDescriptionPage => _ => controllers.myapis.produce.routes.ProduceApiReviewNameDescriptionController.onPageLoad(CheckMode)
     case ProduceApiReviewNameDescriptionPage => _ => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
+    case ProduceApiEgressAvailabilityPage => produceApiEgressAvailabilityNextPage(CheckMode)
     case ProduceApiEnterWiremockPage => _ => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
     case ProduceApiAddPrefixesPage => produceApiAddPrefixNextPage(CheckMode)
     case ProduceApiEgressSelectionPage => _ => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
@@ -186,9 +187,10 @@ class Navigator @Inject()() {
   }
 
   private def produceApiEgressAvailabilityNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
-    userAnswers.get(ProduceApiEgressAvailabilityPage) match {
-      case Some(true) => controllers.myapis.produce.routes.ProduceApiEgressSelectionController.onPageLoad(mode)
-      case Some(false) => controllers.myapis.produce.routes.ProduceApiAddPrefixesController.onPageLoad(mode)
+    (mode, userAnswers.get(ProduceApiEgressAvailabilityPage)) match {
+      case (_, Some(true)) => controllers.myapis.produce.routes.ProduceApiEgressSelectionController.onPageLoad(mode)
+      case (NormalMode, Some(false)) => controllers.myapis.produce.routes.ProduceApiAddPrefixesController.onPageLoad(mode)
+      case (CheckMode, Some(false)) => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
       case _ => routes.JourneyRecoveryController.onPageLoad()
     }
   }

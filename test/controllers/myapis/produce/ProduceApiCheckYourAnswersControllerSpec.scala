@@ -57,6 +57,8 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
     .set(ProduceApiEnterOasPage, "oas").success.value
     .set(ProduceApiEnterApiTitlePage, "api name").success.value
     .set(ProduceApiShortDescriptionPage, "api description").success.value
+    .set(ProduceApiEgressAvailabilityPage, true).success.value
+    .set(ProduceApiEgressSelectionPage, "my egress").success.value
     .set(ProduceApiEgressPrefixesPage, ProduceApiEgressPrefixes(Seq("/prefix"), Seq("/existing->/replacement"))).success.value
     .set(ProduceApiHodPage, Set("hod1")).success.value
     .set(ProduceApiDomainPage, ProduceApiDomainSubdomain("domain", "subdomain")).success.value
@@ -68,6 +70,8 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
     ProduceApiEnterOasSummary.row(fullyPopulatedUserAnswers),
     ProduceApiNameSummary.row(fullyPopulatedUserAnswers),
     ProduceApiShortDescriptionSummary.row(fullyPopulatedUserAnswers),
+    ProduceApiEgressAvailabilitySummary.row(fullyPopulatedUserAnswers),
+    ProduceApiEgressSummary.row(fullyPopulatedUserAnswers),
     ProduceApiEgressPrefixesSummary.row(fullyPopulatedUserAnswers),
     ProduceApiHodSummary.row(fullyPopulatedUserAnswers, FakeHods),
     ProduceApiDomainSummary.row(fullyPopulatedUserAnswers, FakeDomains),

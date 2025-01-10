@@ -18,8 +18,8 @@ package controllers.myapis.produce
 
 import config.FrontendAppConfig
 import controllers.actions.*
-import models.{Mode, NormalMode}
-import pages.myapis.produce.ProduceApiEgressAvailabilityPage
+import models.Mode
+import pages.myapis.produce.{ProduceApiEgressAvailabilityPage, ProduceApiEgressSelectionPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.ProduceApiSessionRepository
@@ -73,6 +73,11 @@ class ProduceApiEgressAvailabilityController @Inject()(
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(ProduceApiEgressAvailabilityPage, value))
+            updatedAnswers <- if (!value) {
+              Future.fromTry(updatedAnswers.remove(ProduceApiEgressSelectionPage))
+            } else {
+              Future.successful(updatedAnswers)
+            }
             _              <- sessionRepository.set(updatedAnswers)
           } yield Redirect(navigator.nextPage(ProduceApiEgressAvailabilityPage, mode, updatedAnswers))
       )

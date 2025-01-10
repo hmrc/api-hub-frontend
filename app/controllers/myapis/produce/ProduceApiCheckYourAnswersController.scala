@@ -182,6 +182,7 @@ class ProduceApiCheckYourAnswersController @Inject()(
       ProduceApiEnterOasSummary.row(userAnswers),
       ProduceApiNameSummary.row(userAnswers),
       ProduceApiShortDescriptionSummary.row(userAnswers),
+      ProduceApiEgressAvailabilitySummary.row(userAnswers),
       ProduceApiEgressSummary.row(userAnswers),
       ProduceApiEgressPrefixesSummary.row(userAnswers),
       ProduceApiHodSummary.row(userAnswers, hods),
