@@ -17,7 +17,7 @@
 package viewmodels.myapis
 
 import base.SpecBase
-import controllers.actions.{FakeSupporter, FakeUser}
+import controllers.actions.{FakeApiDetail, FakeSupporter, FakeUser}
 import fakes.FakeHipEnvironments
 import models.api.ApiDeploymentStatuses
 import models.api.ApiDeploymentStatus.*
@@ -45,7 +45,7 @@ class MyApisNavItemsSpec extends SpecBase with Matchers with TableDrivenProperty
 
       running(playApplication) {
         implicit val implicitMessages: Messages = messages(playApplication)
-        val actual = MyApisNavItems(apiId, FakeSupporter, ProducerApiDetailsPage, statuses)
+        val actual = MyApisNavItems(apiDetail, FakeSupporter, ProducerApiDetailsPage, statuses, FakeHipEnvironments)
         val expected = Seq(producerApiDetailsPage(), updateApiPage(), apiUsagePage(), viewApiAsConsumerPage())
 
         actual mustBe expected
@@ -57,7 +57,7 @@ class MyApisNavItemsSpec extends SpecBase with Matchers with TableDrivenProperty
       
       running(playApplication) {
         implicit val implicitMessages: Messages = messages(playApplication)
-        val actual = MyApisNavItems(apiId, FakeUser, ProducerApiDetailsPage, statuses)
+        val actual = MyApisNavItems(apiDetail, FakeUser, ProducerApiDetailsPage, statuses, FakeHipEnvironments)
         val expected = Seq(producerApiDetailsPage(), updateApiPage(), viewApiAsConsumerPage())
 
         actual mustBe expected
@@ -70,12 +70,43 @@ class MyApisNavItemsSpec extends SpecBase with Matchers with TableDrivenProperty
       running(playApplication) {
         implicit val implicitMessages: Messages = messages(playApplication)
         val actual = MyApisNavItems(
-          apiId,
+          apiDetail,
           FakeUser,
           ProducerApiDetailsPage,
-          ApiDeploymentStatuses(Seq(NotDeployed(FakeHipEnvironments.production.id), NotDeployed(FakeHipEnvironments.test.id)))
+          ApiDeploymentStatuses(Seq(NotDeployed(FakeHipEnvironments.production.id), NotDeployed(FakeHipEnvironments.test.id))),
+          FakeHipEnvironments
         )
         val expected = Seq(producerApiDetailsPage(), viewApiAsConsumerPage())
+
+        actual mustBe expected
+      }
+    }
+
+    "must return the correct list of nav items for an api not deployed to test" in {
+      val playApplication = applicationBuilder(None).build()
+
+      running(playApplication) {
+        implicit val implicitMessages: Messages = messages(playApplication)
+        val actual = MyApisNavItems(
+          apiDetail,
+          FakeUser,
+          ProducerApiDetailsPage,
+          ApiDeploymentStatuses(Seq(Deployed(FakeHipEnvironments.production.id, "1"), NotDeployed(FakeHipEnvironments.test.id))),
+          FakeHipEnvironments
+        )
+        val expected = Seq(producerApiDetailsPage(), viewApiAsConsumerPage())
+
+        actual mustBe expected
+      }
+    }
+
+    "must return the correct list of nav items for a non-hip api" in {
+      val playApplication = applicationBuilder(None).build()
+
+      running(playApplication) {
+        implicit val implicitMessages: Messages = messages(playApplication)
+        val actual = MyApisNavItems(apiDetail.copy(platform = "not hip"), FakeSupporter, ProducerApiDetailsPage, statuses, FakeHipEnvironments)
+        val expected = Seq(producerApiDetailsPage(), apiUsagePage(), viewApiAsConsumerPage())
 
         actual mustBe expected
       }
@@ -96,7 +127,7 @@ class MyApisNavItemsSpec extends SpecBase with Matchers with TableDrivenProperty
 
         forAll(pages) {
           page =>
-            val actual = MyApisNavItems(apiId, FakeSupporter, page, statuses)
+            val actual = MyApisNavItems(apiDetail, FakeSupporter, page, statuses, FakeHipEnvironments)
               .collect { case ni: SideNavItemLeaf => ni }
               .filter(_.isCurrentPage)
               .map(_.page)
@@ -111,13 +142,13 @@ class MyApisNavItemsSpec extends SpecBase with Matchers with TableDrivenProperty
 }
 
 object MyApisNavItemsSpec {
-  val apiId = "apiId"
+  val apiDetail = FakeApiDetail
 
   private def producerApiDetailsPage(): SideNavItem = {
     SideNavItemLeaf(
       page = ProducerApiDetailsPage,
       title = "API details",
-      link = controllers.myapis.routes.MyApiDetailsController.onPageLoad(apiId),
+      link = controllers.myapis.routes.MyApiDetailsController.onPageLoad(apiDetail.id),
       isCurrentPage = true
     )
   }
@@ -126,7 +157,7 @@ object MyApisNavItemsSpec {
     SideNavItemLeaf(
       page = UpdateApiPage,
       title = "Update API",
-      link = controllers.myapis.routes.SimpleApiRedeploymentController.onPageLoad(apiId),
+      link = controllers.myapis.update.routes.UpdateApiStartController.startProduceApi(apiDetail.id),
       isCurrentPage = false
     )
   }
@@ -135,7 +166,7 @@ object MyApisNavItemsSpec {
     SideNavItemLeaf(
       page = ViewApiAsConsumerPage,
       title = "View API as consumer",
-      link = controllers.routes.ApiDetailsController.onPageLoad(apiId),
+      link = controllers.routes.ApiDetailsController.onPageLoad(apiDetail.id),
       isCurrentPage = false,
       opensInNewTab = true
     )
@@ -145,7 +176,7 @@ object MyApisNavItemsSpec {
     SideNavItemLeaf(
       page = ApiUsagePage,
       title = "View API usage",
-      link = controllers.myapis.routes.ApiUsageController.onPageLoad(apiId),
+      link = controllers.myapis.routes.ApiUsageController.onPageLoad(apiDetail.id),
       isCurrentPage = false
     )
   }

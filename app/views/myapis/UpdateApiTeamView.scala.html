@@ -22,6 +22,7 @@
 @import views.ViewUtils
 @import models.api.ApiDeploymentStatuses
 @import views.html.components.TeamSelection
+@import config.HipEnvironments
 
 @this(
     layout: templates.Layout,
@@ -33,6 +34,7 @@
     iconsLink: IconsLink,
     teamSelection: TeamSelection,
     sideNav: views.html.templates.SideNav,
+    hipEnvironments: HipEnvironments
 )
 
 @(form: Form[?], apiDetail: ApiDetail, owningTeam: Option[Team], teams: Seq[Team], userModel: UserModel, deploymentStatuses: ApiDeploymentStatuses)(implicit request: Request[?], messages: Messages)
@@ -46,7 +48,7 @@
 }
 
 @layout(pageTitle = titleNoForm(messages("myApis.update.team.title")), user = Some(userModel), fullWidth = true, customScriptsBlock = Some(scripts())) {
-    @sideNav(apiDetail.title, MyApisNavItems(apiDetail.id, userModel, MyApisNavPages.ChangeOwningTeamPage, deploymentStatuses)) {
+    @sideNav(apiDetail.title, MyApisNavItems(apiDetail, userModel, MyApisNavPages.ChangeOwningTeamPage, deploymentStatuses, hipEnvironments)) {
         @formHelper(action = controllers.myapis.routes.UpdateApiTeamController.onSubmit(apiDetail.id), Symbol("autoComplete") -> "off") {
             @if(form.errors.nonEmpty) {
                 @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))

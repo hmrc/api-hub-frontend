@@ -16,11 +16,12 @@
 
 package viewmodels.myapis
 
-import models.api.ApiDeploymentStatuses
+import models.api.{ApiDeploymentStatus, ApiDeploymentStatuses, ApiDetail}
 import models.user.UserModel
 import play.api.i18n.Messages
 import viewmodels.{SideNavItem, SideNavPage}
 import SideNavItem.SideNavItemLeaf
+import config.HipEnvironments
 
 object MyApisNavPages {
 
@@ -35,20 +36,29 @@ object MyApisNavPages {
 object MyApisNavItems {
 
   import MyApisNavPages._
+  
+  private def canUpdateApi(apiDetail: ApiDetail, deploymentStatuses: ApiDeploymentStatuses, hipEnvironments: HipEnvironments): Boolean = {
+    val isDeployedToTest = deploymentStatuses.statuses.collectFirst {
+      case ApiDeploymentStatus.Deployed(environmentId, _) if environmentId == hipEnvironments.deploymentHipEnvironment.id => true
+    }.getOrElse(false)
 
-  def apply(apiId: String, user: UserModel, currentPage: SideNavPage, apiDeploymentStatuses: ApiDeploymentStatuses)(implicit messages: Messages): Seq[SideNavItem] = {
+    val isHipApi = apiDetail.isSelfServe
+    isHipApi && isDeployedToTest
+  }
+
+  def apply(apiDetail: ApiDetail, user: UserModel, currentPage: SideNavPage, apiDeploymentStatuses: ApiDeploymentStatuses, hipEnvironments: HipEnvironments)(implicit messages: Messages): Seq[SideNavItem] = {
     Seq(
       SideNavItemLeaf(
         page = ProducerApiDetailsPage,
         title = messages("myApis.details.title"),
-        link = controllers.myapis.routes.MyApiDetailsController.onPageLoad(apiId),
+        link = controllers.myapis.routes.MyApiDetailsController.onPageLoad(apiDetail.id),
         isCurrentPage = currentPage == ProducerApiDetailsPage
       )) ++ (
-        if (apiDeploymentStatuses.isDeployed) {
+        if (canUpdateApi(apiDetail, apiDeploymentStatuses, hipEnvironments)) {
           Some(SideNavItemLeaf(
             page = UpdateApiPage,
             title = messages("myApis.update.title"),
-            link = controllers.myapis.routes.SimpleApiRedeploymentController.onPageLoad(apiId),
+            link = controllers.myapis.update.routes.UpdateApiStartController.startProduceApi(apiDetail.id),
             isCurrentPage = currentPage == UpdateApiPage
           ))
         } else {
@@ -58,14 +68,14 @@ object MyApisNavItems {
         SideNavItemLeaf(
           page = ApiUsagePage,
           title = messages("myApis.usage.link"),
-          link = controllers.myapis.routes.ApiUsageController.onPageLoad(apiId),
+          link = controllers.myapis.routes.ApiUsageController.onPageLoad(apiDetail.id),
           isCurrentPage = currentPage == ApiUsagePage
         )
       } :+
       SideNavItemLeaf(
         page = ViewApiAsConsumerPage,
         title = messages("myApis.viewApiAsConsumer.title"),
-        link = controllers.routes.ApiDetailsController.onPageLoad(apiId),
+        link = controllers.routes.ApiDetailsController.onPageLoad(apiDetail.id),
         isCurrentPage = currentPage == ViewApiAsConsumerPage,
         opensInNewTab = true
       )
