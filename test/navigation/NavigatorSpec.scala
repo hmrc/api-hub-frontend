@@ -212,8 +212,19 @@ class NavigatorSpec extends SpecBase with TryValues {
         //          navigator.nextPage(UpdateApiReviewNameDescriptionPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiHowToAddWiremockController.onPageLoad(NormalMode)
         //        }
         // TODO: remove when bringing back with Wiremock
-        "must go from the API review page to the Add Prefixes page" in {
-          navigator.nextPage(UpdateApiReviewNameDescriptionPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiAddPrefixesController.onPageLoad(NormalMode)
+        "must go from the API review page to the Egress Availability page" in {
+          navigator.nextPage(UpdateApiReviewNameDescriptionPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiEgressAvailabilityController.onPageLoad(NormalMode)
+        }
+        "must go from the Egress Availability page to the Do You Want to Configure Prefixes page if user answered No" in {
+          val userAnswers = emptyUserAnswers.set(UpdateApiEgressAvailabilityPage, false).get
+          navigator.nextPage(UpdateApiEgressAvailabilityPage, NormalMode, userAnswers) mustBe controllers.myapis.update.routes.UpdateApiAddPrefixesController.onPageLoad(NormalMode)
+        }
+        "must go from the Egress Availability page to the Egress Selection page if user answered Yes" in {
+          val userAnswers = emptyUserAnswers.set(UpdateApiEgressAvailabilityPage, true).get
+          navigator.nextPage(UpdateApiEgressAvailabilityPage, NormalMode, userAnswers) mustBe controllers.myapis.update.routes.UpdateApiEgressSelectionController.onPageLoad(NormalMode)
+        }
+        "must go from the Select Egress page to the Add Prefixes page" in {
+          navigator.nextPage(UpdateApiEgressSelectionPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiAddPrefixesController.onPageLoad(NormalMode)
         }
         "must go from the Add Prefixes page to the HoDs page if user answered No" in {
           val userAnswers = emptyUserAnswers.set(UpdateApiAddPrefixesPage, false).get

@@ -151,6 +151,16 @@ POST    /update/review-name-description                     controllers.myapis.u
 GET     /update/change-review-name-description              controllers.myapis.update.UpdateApiReviewNameDescriptionController.onPageLoad(mode: Mode = CheckMode)
 POST    /update/change-review-name-description              controllers.myapis.update.UpdateApiReviewNameDescriptionController.onSubmit(mode: Mode = CheckMode)
 
+GET     /update/egress-availability                        controllers.myapis.update.UpdateApiEgressAvailabilityController.onPageLoad(mode: Mode = NormalMode)
+POST    /update/egress-availability                        controllers.myapis.update.UpdateApiEgressAvailabilityController.onSubmit(mode: Mode = NormalMode)
+GET     /update/change-egress-availability                 controllers.myapis.update.UpdateApiEgressAvailabilityController.onPageLoad(mode: Mode = CheckMode)
+POST    /update/change-egress-availability                 controllers.myapis.update.UpdateApiEgressAvailabilityController.onSubmit(mode: Mode = CheckMode)
+
+GET     /update/egress-selection                           controllers.myapis.update.UpdateApiEgressSelectionController.onPageLoad(mode: Mode = NormalMode)
+POST    /update/egress-selection                           controllers.myapis.update.UpdateApiEgressSelectionController.onSubmit(mode: Mode = NormalMode)
+GET     /update/change-egress-selection                    controllers.myapis.update.UpdateApiEgressSelectionController.onPageLoad(mode: Mode = CheckMode)
+POST    /update/change-egress-selection                    controllers.myapis.update.UpdateApiEgressSelectionController.onSubmit(mode: Mode = CheckMode)
+
 GET     /update/how-to-add-wiremock                        controllers.myapis.update.UpdateApiHowToAddWiremockController.onPageLoad(mode: Mode = NormalMode)
 POST    /update/how-to-add-wiremock                        controllers.myapis.update.UpdateApiHowToAddWiremockController.onSubmit(mode: Mode = NormalMode)
 GET     /update/change-how-to-add-wiremock                 controllers.myapis.update.UpdateApiHowToAddWiremockController.onPageLoad(mode: Mode = CheckMode)
