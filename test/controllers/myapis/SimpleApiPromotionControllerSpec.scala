@@ -123,7 +123,7 @@ class SimpleApiPromotionControllerSpec
           val view = fixture.playApplication.injector.instanceOf[DeploymentSuccessView]
 
           status(result) mustBe OK
-          contentAsString(result) mustBe view(user, response)(request, messages(fixture.playApplication)).toString()
+          contentAsString(result) mustBe view(user, response.id, FakeApiDetail.title)(request, messages(fixture.playApplication)).toString()
           contentAsString(result) must validateAsHtml
 
           verify(fixture.apiHubService).getApiDetail(eqTo(FakeApiDetail.id))(any)

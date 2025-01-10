@@ -56,7 +56,7 @@ class SimpleApiPromotionController @Inject()(
         case Some(apiDetail) =>
           applicationsConnector.promoteToProduction(apiDetail.publisherReference).map {
             case Some(response: SuccessfulDeploymentsResponse) =>
-              Ok(successView(request.user, response))
+              Ok(successView(request.user, response.id, apiDetail.title))
             case Some(response: InvalidOasResponse) =>
               BadRequest(
                 failureView(

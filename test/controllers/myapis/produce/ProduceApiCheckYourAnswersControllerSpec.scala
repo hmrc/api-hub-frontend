@@ -57,12 +57,12 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
     .set(ProduceApiEnterOasPage, "oas").success.value
     .set(ProduceApiEnterApiTitlePage, "api name").success.value
     .set(ProduceApiShortDescriptionPage, "api description").success.value
-    .set(ProduceApiEgressAvailabilityPage, true).success.value
-    .set(ProduceApiEgressSelectionPage, "my egress").success.value
     .set(ProduceApiEgressPrefixesPage, ProduceApiEgressPrefixes(Seq("/prefix"), Seq("/existing->/replacement"))).success.value
     .set(ProduceApiHodPage, Set("hod1")).success.value
     .set(ProduceApiDomainPage, ProduceApiDomainSubdomain("domain", "subdomain")).success.value
     .set(ProduceApiStatusPage, Alpha).success.value
+    .set(ProduceApiEgressSelectionPage, "egress").success.value
+    .set(ProduceApiEgressAvailabilityPage, true).success.value
     .set(ProduceApiPassthroughPage, true).success.value
 
   private def summaryList()(implicit msg: Messages) = SummaryListViewModel(Seq(
@@ -125,8 +125,16 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
 
         val result = route(fixture.application, request).value
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(FakeUser, response.asInstanceOf[SuccessfulDeploymentsResponse])(request, messages(fixture.application)).toString
+        val successRoute = controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onSuccess("api name", "id").url
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result) mustBe Some(successRoute)
+
+        val successPageRequest = FakeRequest(GET, successRoute)
+
+        val successResult =  route(fixture.application, successPageRequest).value
+
+        contentAsString(successResult) mustEqual view(FakeUser, "id", "api name")(successPageRequest, messages(fixture.application)).toString
         verify(fixture.sessionRepository).clear(FakeUser.userId)
       }
     }
@@ -192,6 +200,8 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
         (ProduceApiDomainPage, nonSupportUser, produceApiRoutes.ProduceApiDomainController.onPageLoad(CheckMode).url),
         (ProduceApiStatusPage, nonSupportUser, produceApiRoutes.ProduceApiStatusController.onPageLoad(CheckMode).url),
         (ProduceApiPassthroughPage, supportUser, produceApiRoutes.ProduceApiPassthroughController.onPageLoad(CheckMode).url),
+        (ProduceApiEgressSelectionPage, supportUser, produceApiRoutes.ProduceApiEgressSelectionController.onPageLoad(CheckMode).url),
+        (ProduceApiEgressAvailabilityPage, supportUser, produceApiRoutes.ProduceApiEgressAvailabilityController.onPageLoad(CheckMode).url),
       )){ case (userAnswerToRemove: QuestionPage[?], user: UserModel, expectedLocation: String) =>
         val fixture = buildFixture(
           Some(fullyPopulatedUserAnswers.remove(userAnswerToRemove).get),
