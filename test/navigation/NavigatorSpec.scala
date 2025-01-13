@@ -230,6 +230,9 @@ class NavigatorSpec extends SpecBase with TryValues {
           val userAnswers = emptyUserAnswers.set(UpdateApiAddPrefixesPage, false).get
           navigator.nextPage(UpdateApiAddPrefixesPage, NormalMode, userAnswers) mustBe controllers.myapis.update.routes.UpdateApiHodController.onPageLoad(NormalMode)
         }
+        "must go from the Prefixes page to the HoDs page" in {
+          navigator.nextPage(UpdateApiEgressPrefixesPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiHodController.onPageLoad(NormalMode)
+        }
         "must go from the Define Wiremock page to the WireMock editor page" in {
           navigator.nextPage(UpdateApiHowToAddWiremockPage, NormalMode, emptyUserAnswers.set[ProduceApiHowToAddWiremock](UpdateApiHowToAddWiremockPage, ProduceApiHowToAddWiremock.Editor).get) mustBe controllers.myapis.update.routes.UpdateApiEnterWiremockController.onPageLoad(NormalMode)
         }

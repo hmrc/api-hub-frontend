@@ -34,6 +34,7 @@ import repositories.SessionRepository
 import forms.myapis.produce.ProduceApiEgressPrefixesFormProvider
 import pages.myapis.produce.ProduceApiEgressPrefixesPage
 import models.myapis.produce.ProduceApiEgressPrefixes
+import viewmodels.myapis.produce.ProduceApiEgressPrefixesViewModel
 
 import scala.concurrent.Future
 import views.html.myapis.produce.ProduceApiEgressPrefixesView
@@ -68,11 +69,12 @@ class ProduceApiEgressPrefixesControllerSpec extends SpecBase with MockitoSugar 
         val request = FakeRequest(GET, produceApiEgressPrefixesRoute)
 
         val view = application.injector.instanceOf[ProduceApiEgressPrefixesView]
+        val viewModel = ProduceApiEgressPrefixesViewModel("produceApiEgressPrefix.heading", controllers.myapis.produce.routes.ProduceApiEgressPrefixesController.onSubmit(NormalMode))
         val config = application.injector.instanceOf[FrontendAppConfig]
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, user, config.helpDocsPath)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, viewModel, user, config.helpDocsPath)(request, messages(application)).toString
       }
     }
 
@@ -84,12 +86,13 @@ class ProduceApiEgressPrefixesControllerSpec extends SpecBase with MockitoSugar 
         val request = FakeRequest(GET, produceApiEgressPrefixesRoute)
 
         val view = application.injector.instanceOf[ProduceApiEgressPrefixesView]
+        val viewModel = ProduceApiEgressPrefixesViewModel("produceApiEgressPrefix.heading", controllers.myapis.produce.routes.ProduceApiEgressPrefixesController.onSubmit(NormalMode))
         val config = application.injector.instanceOf[FrontendAppConfig]
         val model = ProduceApiEgressPrefixes(Seq("/prefix"), Seq("/a->/b"))
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(model), NormalMode, user, config.helpDocsPath)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(model), viewModel, user, config.helpDocsPath)(request, messages(application)).toString
       }
     }
 
@@ -131,11 +134,12 @@ class ProduceApiEgressPrefixesControllerSpec extends SpecBase with MockitoSugar 
         val boundForm = form.bindFromRequest(Map("prefixes[]" -> Seq("asdf")))
 
         val view = application.injector.instanceOf[ProduceApiEgressPrefixesView]
+        val viewModel = ProduceApiEgressPrefixesViewModel("produceApiEgressPrefix.heading", controllers.myapis.produce.routes.ProduceApiEgressPrefixesController.onSubmit(NormalMode))
         val config = application.injector.instanceOf[FrontendAppConfig]
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, user, config.helpDocsPath)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, viewModel, user, config.helpDocsPath)(request, messages(application)).toString
       }
     }
 

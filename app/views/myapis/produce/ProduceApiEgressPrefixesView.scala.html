@@ -18,6 +18,7 @@
 @import views.html.helper.CSPNonce
 @import views.ViewUtils
 @import models.myapis.produce.ProduceApiEgressPrefixes
+@import viewmodels.myapis.produce.ProduceApiEgressPrefixesViewModel
 
 @this(
         layout: templates.Layout,
@@ -31,7 +32,7 @@
         govukErrorSummary: GovukErrorSummary,
 )
 
-@(form: Form[ProduceApiEgressPrefixes], mode: Mode, userModel: UserModel, apiHubGuideUrl: String)(implicit request: Request[?], messages: Messages)
+@(form: Form[ProduceApiEgressPrefixes], viewModel: ProduceApiEgressPrefixesViewModel, userModel: UserModel, apiHubGuideUrl: String)(implicit request: Request[?], messages: Messages)
 
 @scripts() = {
     <script src='@routes.Assets.versioned("javascripts/produceApiEgressPrefixes.js")' type="module" @{CSPNonce.attr}></script>
@@ -160,7 +161,7 @@
         @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))
     }
 
-    <h1 class="govuk-heading-l">@messages("produceApiEgressPrefix.heading")</h1>
+    <h1 class="govuk-heading-l">@messages(viewModel.headingMessageKey)</h1>
 
     <p class="govuk-body">
     @Html(messages("produceApiEgressPrefix.hint.guidance",
@@ -190,7 +191,7 @@
         html = mappingsSection()
     ).withCssClass("govuk-!-margin-top-4 govuk-!-margin-bottom-4"))
 
-    @formHelper(action = controllers.myapis.produce.routes.ProduceApiEgressPrefixesController.onSubmit(mode)) {
+    @formHelper(action = viewModel.formAction) {
         <div id="formFields" data-message-enter-value="@messages("error.required")" data-message-forward-slash="@messages("produceApiEgressPrefix.error.startWithSlash")">
             @for(previousValue <- form.value) {
                 @for(prefix <- previousValue.prefixes) {

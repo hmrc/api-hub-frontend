@@ -183,6 +183,11 @@ POST    /update/add-prefixes                               controllers.myapis.up
 GET     /update/change-add-prefixes                        controllers.myapis.update.UpdateApiAddPrefixesController.onPageLoad(mode: Mode = CheckMode)
 POST    /update/change-add-prefixes                        controllers.myapis.update.UpdateApiAddPrefixesController.onSubmit(mode: Mode = CheckMode)
 
+GET     /update/egress-prefixes                            controllers.myapis.update.UpdateApiEgressPrefixesController.onPageLoad(mode: Mode = NormalMode)
+POST    /update/egress-prefixes                            controllers.myapis.update.UpdateApiEgressPrefixesController.onSubmit(mode: Mode = NormalMode)
+GET     /update/change-egress-prefixes                     controllers.myapis.update.UpdateApiEgressPrefixesController.onPageLoad(mode: Mode = CheckMode)
+POST    /update/change-egress-prefixes                     controllers.myapis.update.UpdateApiEgressPrefixesController.onSubmit(mode: Mode = CheckMode)
+
 GET     /update/hod                                         controllers.myapis.update.UpdateApiHodController.onPageLoad(mode: Mode = NormalMode)
 POST    /update/hod                                         controllers.myapis.update.UpdateApiHodController.onSubmit(mode: Mode = NormalMode)
 GET     /update/change-hod                                  controllers.myapis.update.UpdateApiHodController.onPageLoad(mode: Mode = CheckMode)
