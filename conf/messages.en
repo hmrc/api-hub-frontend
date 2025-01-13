@@ -1069,6 +1069,7 @@ produceApiEgressPrefix.checkYourAnswersValue.mapping = Replace {0} with {1}
 produceApiCheckYourAnswers.title = Review the details of your API
 produceApiCheckYourAnswers.heading = Review the details of your API
 produceApiCheckYourAnswers.description = Review the details of your API before starting the deployment.
+produceApiCheckYourAnswers.button = Deploy API
 
 allScopes.title = All scopes
 allScopes.heading = All scopes

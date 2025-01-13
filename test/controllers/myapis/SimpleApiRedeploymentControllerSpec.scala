@@ -83,7 +83,8 @@ class SimpleApiRedeploymentControllerSpec
         subDomain = Some(redeploymentRequest.subDomain),
         hods = Some(redeploymentRequest.hods),
         egressMappings = redeploymentRequest.egressMappings,
-        prefixesToRemove = Some(redeploymentRequest.prefixesToRemove)
+        prefixesToRemove = Some(redeploymentRequest.prefixesToRemove),
+        egress = None,
       )
 
       when(fixture.apiAuthActionProvider.apply(any)(any)).thenReturn(successfulApiAuthAction(FakeApiDetail))

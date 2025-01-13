@@ -68,6 +68,8 @@ class UpdateApiStartController @Inject()(
           }
           updatedAnswers <- updateOptionalAnswer(updatedAnswers, UpdateApiDomainPage, domainSubdomain)
           updatedAnswers <- updateOptionalAnswer(updatedAnswers, UpdateApiHodPage, deploymentDetails.hods.map(_.toSet))
+          updatedAnswers <- updateAnswer(updatedAnswers, UpdateApiEgressAvailabilityPage, deploymentDetails.egress.exists(_ != "null-egress"))
+          updatedAnswers <- updateOptionalAnswer(updatedAnswers, UpdateApiEgressSelectionPage, deploymentDetails.egress.collect { case egress if egress != "null-egress" => egress })
           egressMappings = deploymentDetails.egressMappings.map(_.map(em =>
             ProduceApiEgressPrefixMapping(em.egressPrefix, em.prefix).toString
           ))
