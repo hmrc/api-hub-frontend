@@ -85,7 +85,9 @@ class Navigator @Inject()() {
     //TODO: bring back with wiremock
     // case UpdateApiReviewNameDescriptionPage => _ => controllers.myapis.update.routes.UpdateApiHowToAddWiremockController.onPageLoad(NormalMode)
     //TODO: remove when bringing back wiremock
-    case UpdateApiReviewNameDescriptionPage => _ => controllers.myapis.update.routes.UpdateApiAddPrefixesController.onPageLoad(NormalMode)
+    case UpdateApiReviewNameDescriptionPage => _ => controllers.myapis.update.routes.UpdateApiEgressAvailabilityController.onPageLoad(NormalMode)
+    case UpdateApiEgressAvailabilityPage => updateApiEgressAvailabilityNextPage(NormalMode)
+    case UpdateApiEgressSelectionPage => _ => controllers.myapis.update.routes.UpdateApiAddPrefixesController.onPageLoad(NormalMode)
     case UpdateApiHowToAddWiremockPage => updateApiHowToAddWiremockNextPage(NormalMode)
     case UpdateApiEnterWiremockPage => _ => controllers.myapis.update.routes.UpdateApiAddPrefixesController.onPageLoad(NormalMode)
     case UpdateApiHodPage => _ => controllers.myapis.update.routes.UpdateApiDomainController.onPageLoad(NormalMode)
@@ -231,6 +233,15 @@ class Navigator @Inject()() {
     (mode, userAnswers.get(UpdateApiHowToAddWiremockPage)) match {
       case (_, Some(ProduceApiHowToAddWiremock.Editor)) => controllers.myapis.update.routes.UpdateApiEnterWiremockController.onPageLoad(mode)
       case (_, Some(ProduceApiHowToAddWiremock.Upload)) => controllers.myapis.update.routes.UpdateApiUploadWiremockController.onPageLoad(mode)
+      case _ => routes.JourneyRecoveryController.onPageLoad()
+    }
+  }
+
+  private def updateApiEgressAvailabilityNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
+    (mode, userAnswers.get(UpdateApiEgressAvailabilityPage)) match {
+      case (_, Some(true)) => controllers.myapis.update.routes.UpdateApiEgressSelectionController.onPageLoad(mode)
+      case (NormalMode, Some(false)) => controllers.myapis.update.routes.UpdateApiAddPrefixesController.onPageLoad(mode)
+      case (CheckMode, Some(false)) => controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onPageLoad()
       case _ => routes.JourneyRecoveryController.onPageLoad()
     }
   }

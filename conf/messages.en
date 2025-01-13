@@ -809,6 +809,8 @@ myApis.produce.selectegress.cya.label = Selected Egress
 myApis.produce.selectegress.change.hidden = Egress
 myApis.produce.egressprefix.error.required = You must state whether you wish to configure path prefixes for your API
 
+myApis.update.selectegress.title = Review the Egress for your API
+
 applicationDetailsTable.applicationName = Name
 applicationDetailsTable.owningTeam = Owning team
 applicationDetailsTable.noTeam = Not specified
