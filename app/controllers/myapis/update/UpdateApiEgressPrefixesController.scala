@@ -14,33 +14,32 @@
  * limitations under the License.
  */
 
-package controllers.myapis.produce
+package controllers.myapis.update
 
 import config.FrontendAppConfig
 import controllers.actions.*
+import forms.myapis.produce.ProduceApiEgressPrefixesFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.myapis.produce.ProduceApiEgressPrefixesPage
+import pages.myapis.update.UpdateApiEgressPrefixesPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.ProduceApiSessionRepository
+import repositories.UpdateApiSessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.myapis.produce.ProduceApiEgressPrefixesView
-import forms.myapis.produce.ProduceApiEgressPrefixesFormProvider
-import scala.concurrent.Future
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
-import models.myapis.produce.ProduceApiEgressPrefixes
+import scala.concurrent.{ExecutionContext, Future}
 import play.api.data.Form
 import viewmodels.myapis.produce.ProduceApiEgressPrefixesViewModel
 import models.requests.DataRequest
+import models.myapis.produce.ProduceApiEgressPrefixes
 
-class ProduceApiEgressPrefixesController @Inject()(
+class UpdateApiEgressPrefixesController @Inject()(
                                                     override val messagesApi: MessagesApi,
-                                                    produceApiSessionRepository: ProduceApiSessionRepository,
+                                                    updateApiSessionRepository: UpdateApiSessionRepository,
                                                     navigator: Navigator,
                                                     identify: IdentifierAction,
-                                                    getData: ProduceApiDataRetrievalAction,
+                                                    getData: UpdateApiDataRetrievalAction,
                                                     requireData: DataRequiredAction,
                                                     formProvider: ProduceApiEgressPrefixesFormProvider,
                                                     val controllerComponents: MessagesControllerComponents,
@@ -53,7 +52,7 @@ class ProduceApiEgressPrefixesController @Inject()(
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(ProduceApiEgressPrefixesPage) match {
+      val preparedForm = request.userAnswers.get(UpdateApiEgressPrefixesPage) match {
         case None => form
         case Some(value) => form.fill(value)
       }
@@ -69,14 +68,14 @@ class ProduceApiEgressPrefixesController @Inject()(
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(ProduceApiEgressPrefixesPage, value))
-            _              <- produceApiSessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(ProduceApiEgressPrefixesPage, mode, updatedAnswers))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(UpdateApiEgressPrefixesPage, value))
+            _              <- updateApiSessionRepository.set(updatedAnswers)
+          } yield Redirect(navigator.nextPage(UpdateApiEgressPrefixesPage, mode, updatedAnswers))
       )
   }
 
   private def buildView(form: Form[ProduceApiEgressPrefixes], mode: Mode)(implicit request: DataRequest[AnyContent]) = {
-    view(form, ProduceApiEgressPrefixesViewModel("produceApiEgressPrefix.heading", routes.ProduceApiEgressPrefixesController.onSubmit(mode)), request.user, config.helpDocsPath)
+    view(form, ProduceApiEgressPrefixesViewModel("updateApiEgressPrefix.heading", routes.UpdateApiEgressPrefixesController.onSubmit(mode)), request.user, config.helpDocsPath)
   }
 
 }

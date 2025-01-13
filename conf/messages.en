@@ -1101,6 +1101,7 @@ updateApiEnterOas.warning = You must not change the title/name of the API.
 updateApiStatus.title = Review the API status
 
 updateApiHod.title = Review the HOD/backend for your API
+updateApiEgressPrefix.heading = Review prefix configuration
 
 hipEnvironment.production.name = Production
 hipEnvironment.test.name = Test

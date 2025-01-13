@@ -14,32 +14,32 @@
  * limitations under the License.
  */
 
-package controllers.myapis.produce
+package controllers.myapis.update
 
 import base.SpecBase
 import config.FrontendAppConfig
 import controllers.actions.FakeUser
 import controllers.routes
+import forms.myapis.produce.ProduceApiEgressPrefixesFormProvider
+import models.myapis.produce.ProduceApiEgressPrefixes
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
+import pages.myapis.update.UpdateApiEgressPrefixesPage
 import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import forms.myapis.produce.ProduceApiEgressPrefixesFormProvider
-import pages.myapis.produce.ProduceApiEgressPrefixesPage
-import models.myapis.produce.ProduceApiEgressPrefixes
 import viewmodels.myapis.produce.ProduceApiEgressPrefixesViewModel
-
-import scala.concurrent.Future
 import views.html.myapis.produce.ProduceApiEgressPrefixesView
 
-class ProduceApiEgressPrefixesControllerSpec extends SpecBase with MockitoSugar {
+import scala.concurrent.Future
+
+class UpdateApiEgressPrefixesControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute = Call("GET", "/foo")
 
@@ -47,29 +47,29 @@ class ProduceApiEgressPrefixesControllerSpec extends SpecBase with MockitoSugar 
   val form = formProvider()
   val user = FakeUser
 
-  lazy val produceApiEgressPrefixesRoute = controllers.myapis.produce.routes.ProduceApiEgressPrefixesController.onPageLoad(NormalMode).url
+  lazy val updateApiEgressPrefixesRoute = controllers.myapis.update.routes.UpdateApiEgressPrefixesController.onPageLoad(NormalMode).url
 
   val userAnswers = UserAnswers(
     userAnswersId,
     Json.obj(
-      ProduceApiEgressPrefixesPage.toString -> Json.obj(
+      UpdateApiEgressPrefixesPage.toString -> Json.obj(
         "prefixes" -> Seq("/prefix"),
         "mappings" -> Seq("/a->/b")
       )
     )
   )
 
-  "ProduceApiEgressPrefixes Controller" - {
+  "UpdateApiEgressPrefixes Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, produceApiEgressPrefixesRoute)
+        val request = FakeRequest(GET, updateApiEgressPrefixesRoute)
 
         val view = application.injector.instanceOf[ProduceApiEgressPrefixesView]
-        val viewModel = ProduceApiEgressPrefixesViewModel("produceApiEgressPrefix.heading", controllers.myapis.produce.routes.ProduceApiEgressPrefixesController.onSubmit(NormalMode))
+        val viewModel = ProduceApiEgressPrefixesViewModel("updateApiEgressPrefix.heading", controllers.myapis.update.routes.UpdateApiEgressPrefixesController.onSubmit(NormalMode))
         val config = application.injector.instanceOf[FrontendAppConfig]
         val result = route(application, request).value
 
@@ -83,10 +83,10 @@ class ProduceApiEgressPrefixesControllerSpec extends SpecBase with MockitoSugar 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, produceApiEgressPrefixesRoute)
+        val request = FakeRequest(GET, updateApiEgressPrefixesRoute)
 
         val view = application.injector.instanceOf[ProduceApiEgressPrefixesView]
-        val viewModel = ProduceApiEgressPrefixesViewModel("produceApiEgressPrefix.heading", controllers.myapis.produce.routes.ProduceApiEgressPrefixesController.onSubmit(NormalMode))
+        val viewModel = ProduceApiEgressPrefixesViewModel("updateApiEgressPrefix.heading", controllers.myapis.update.routes.UpdateApiEgressPrefixesController.onSubmit(NormalMode))
         val config = application.injector.instanceOf[FrontendAppConfig]
         val model = ProduceApiEgressPrefixes(Seq("/prefix"), Seq("/a->/b"))
         val result = route(application, request).value
@@ -112,7 +112,7 @@ class ProduceApiEgressPrefixesControllerSpec extends SpecBase with MockitoSugar 
 
       running(application) {
         val request =
-          FakeRequest(POST, produceApiEgressPrefixesRoute)
+          FakeRequest(POST, updateApiEgressPrefixesRoute)
             .withFormUrlEncodedBody(("prefixes", "value 1"), ("mappings", "value 2"))
 
         val result = route(application, request).value
@@ -128,13 +128,13 @@ class ProduceApiEgressPrefixesControllerSpec extends SpecBase with MockitoSugar 
 
       running(application) {
         val request =
-          FakeRequest(POST, produceApiEgressPrefixesRoute)
+          FakeRequest(POST, updateApiEgressPrefixesRoute)
             .withFormUrlEncodedBody(("prefixes[]", "asdf"))
 
         val boundForm = form.bindFromRequest(Map("prefixes[]" -> Seq("asdf")))
 
         val view = application.injector.instanceOf[ProduceApiEgressPrefixesView]
-        val viewModel = ProduceApiEgressPrefixesViewModel("produceApiEgressPrefix.heading", controllers.myapis.produce.routes.ProduceApiEgressPrefixesController.onSubmit(NormalMode))
+        val viewModel = ProduceApiEgressPrefixesViewModel("updateApiEgressPrefix.heading", controllers.myapis.update.routes.UpdateApiEgressPrefixesController.onSubmit(NormalMode))
         val config = application.injector.instanceOf[FrontendAppConfig]
         val result = route(application, request).value
 
@@ -148,7 +148,7 @@ class ProduceApiEgressPrefixesControllerSpec extends SpecBase with MockitoSugar 
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, produceApiEgressPrefixesRoute)
+        val request = FakeRequest(GET, updateApiEgressPrefixesRoute)
 
         val result = route(application, request).value
 
@@ -163,7 +163,7 @@ class ProduceApiEgressPrefixesControllerSpec extends SpecBase with MockitoSugar 
 
       running(application) {
         val request =
-          FakeRequest(POST, produceApiEgressPrefixesRoute)
+          FakeRequest(POST, updateApiEgressPrefixesRoute)
             .withFormUrlEncodedBody(("prefixes", "value 1"), ("mappings", "value 2"))
 
         val result = route(application, request).value
