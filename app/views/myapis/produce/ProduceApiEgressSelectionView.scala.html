@@ -63,7 +63,7 @@
     ))
 }
 
-@layout(pageTitle = title(form, messages("myApis.produce.selectegress.title")), user = Some(userModel), customScriptsBlock = Some(iconsLink())) {
+@layout(pageTitle = title(form, messages(viewModel.titleMessageKey)), user = Some(userModel), customScriptsBlock = Some(iconsLink())) {
 
     @formHelper(action = viewModel.formAction) {
 
@@ -83,7 +83,7 @@
                             text = egressGateway.friendlyName
                         )
                     ),
-                label = LabelViewModel(HtmlContent(messages("myApis.produce.selectegress.heading"))).asPageHeading()
+                label = LabelViewModel(HtmlContent(messages(viewModel.titleMessageKey))).asPageHeading()
             ).withHint(Hint(content = HtmlContent(egressHint)))
         )
 

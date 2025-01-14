@@ -32,7 +32,7 @@ import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import repositories.ProduceApiSessionRepository
+import repositories.UpdateApiSessionRepository
 import viewmodels.myapis.produce.ProduceApiAddPrefixesViewModel
 import views.html.myapis.produce.ProduceApiAddPrefixesView
 
@@ -87,15 +87,15 @@ class UpdateApiAddPrefixesControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to the next page when valid data is submitted" in {
 
-      val mockProduceApiSessionRepository = mock[ProduceApiSessionRepository]
+      val mockRepository = mock[UpdateApiSessionRepository]
 
-      when(mockProduceApiSessionRepository.set(any())).thenReturn(Future.successful(true))
+      when(mockRepository.set(any())).thenReturn(Future.successful(true))
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[ProduceApiSessionRepository].toInstance(mockProduceApiSessionRepository)
+            bind[UpdateApiSessionRepository].toInstance(mockRepository)
           )
           .build()
 
