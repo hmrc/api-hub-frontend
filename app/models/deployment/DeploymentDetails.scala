@@ -27,10 +27,13 @@ case class DeploymentDetails (
   egressMappings: Option[Seq[EgressMapping]],
   prefixesToRemove: Option[Seq[String]],
   egress: Option[String]
-)
+) {
+  val egressWithFallBack: String = egress.getOrElse(DeploymentDetails.egressFallback)
+  val hasEgress: Boolean = egressWithFallBack == DeploymentDetails.egressFallback
+}
 
 object DeploymentDetails {
-
+  val egressFallback: String = "null-egress"
   implicit val formatDeploymentDetails: Format[DeploymentDetails] = Json.format[DeploymentDetails]
 
 }
