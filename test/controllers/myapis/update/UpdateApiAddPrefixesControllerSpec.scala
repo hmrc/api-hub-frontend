@@ -32,7 +32,7 @@ import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import repositories.ProduceApiSessionRepository
+import repositories.UpdateApiSessionRepository
 import viewmodels.myapis.produce.ProduceApiAddPrefixesViewModel
 import views.html.myapis.produce.ProduceApiAddPrefixesView
 
@@ -42,7 +42,7 @@ class UpdateApiAddPrefixesControllerSpec extends SpecBase with MockitoSugar {
 
   private def onwardRoute = Call("GET", "/foo")
 
-  private lazy val produceApiAddPrefixesRoute = updateApiRoutes.UpdateApiAddPrefixesController.onPageLoad(NormalMode).url
+  private lazy val updateApiAddPrefixesRoute = updateApiRoutes.UpdateApiAddPrefixesController.onPageLoad(NormalMode).url
 
   private val formProvider = new ProduceApiAddPrefixesFormProvider()
   private val form = formProvider()
@@ -55,7 +55,7 @@ class UpdateApiAddPrefixesControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, produceApiAddPrefixesRoute)
+        val request = FakeRequest(GET, updateApiAddPrefixesRoute)
 
         val result = route(application, request).value
 
@@ -74,7 +74,7 @@ class UpdateApiAddPrefixesControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, produceApiAddPrefixesRoute)
+        val request = FakeRequest(GET, updateApiAddPrefixesRoute)
 
         val view = application.injector.instanceOf[ProduceApiAddPrefixesView]
         val viewModel = ProduceApiAddPrefixesViewModel(updateApiRoutes.UpdateApiAddPrefixesController.onSubmit(NormalMode))
@@ -87,21 +87,21 @@ class UpdateApiAddPrefixesControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to the next page when valid data is submitted" in {
 
-      val mockProduceApiSessionRepository = mock[ProduceApiSessionRepository]
+      val mockUpdateApiSessionRepository = mock[UpdateApiSessionRepository]
 
-      when(mockProduceApiSessionRepository.set(any())).thenReturn(Future.successful(true))
+      when(mockUpdateApiSessionRepository.set(any())).thenReturn(Future.successful(true))
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[ProduceApiSessionRepository].toInstance(mockProduceApiSessionRepository)
+            bind[UpdateApiSessionRepository].toInstance(mockUpdateApiSessionRepository)
           )
           .build()
 
       running(application) {
         val request =
-          FakeRequest(POST, produceApiAddPrefixesRoute)
+          FakeRequest(POST, updateApiAddPrefixesRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
@@ -117,7 +117,7 @@ class UpdateApiAddPrefixesControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, produceApiAddPrefixesRoute)
+          FakeRequest(POST, updateApiAddPrefixesRoute)
             .withFormUrlEncodedBody(("value", "invalid value"))
 
         val boundForm = form.bind(Map("value" -> "invalid value"))
@@ -136,7 +136,7 @@ class UpdateApiAddPrefixesControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, produceApiAddPrefixesRoute)
+        val request = FakeRequest(GET, updateApiAddPrefixesRoute)
 
         val result = route(application, request).value
 
@@ -151,7 +151,7 @@ class UpdateApiAddPrefixesControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, produceApiAddPrefixesRoute)
+          FakeRequest(POST, updateApiAddPrefixesRoute)
             .withFormUrlEncodedBody(("value", Alpha.toString))
 
         val result = route(application, request).value
