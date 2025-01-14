@@ -902,6 +902,10 @@ produceApiBeforeYouStart.relatedContent.generatingProductionCredentials = Creati
 produceApiBeforeYouStart.relatedContent.producingApis = Producing APIs
 produceApiBeforeYouStart.relatedContent.consumingApis = Consuming APIs
 
+updateApiBeforeYouStart.title = Update an API
+updateApiBeforeYouStart.creationProcess.heading = API update process
+updateApiBeforeYouStart.creationProcess.content = The API update process is as follows
+
 relatedContent.header = Related content
 
 configuration.title = API configuration
