@@ -31,7 +31,7 @@ import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import repositories.ProduceApiSessionRepository
+import repositories.UpdateApiSessionRepository
 import services.ApiHubService
 import utils.HtmlValidation
 import viewmodels.myapis.produce.ProduceApiEgressSelectionViewModel
@@ -126,17 +126,17 @@ class UpdateApiEgressSelectionControllerSpec extends SpecBase with MockitoSugar 
   private case class Fixture(
                               application: PlayApplication,
                               apiHubService: ApiHubService,
-                              sessionRepository: ProduceApiSessionRepository
+                              sessionRepository: UpdateApiSessionRepository
                             )
 
   private def buildFixture(userAnswers: Option[UserAnswers]): Fixture = {
     val apiHubService = mock[ApiHubService]
-    val sessionRepository = mock[ProduceApiSessionRepository]
+    val sessionRepository = mock[UpdateApiSessionRepository]
 
     val playApplication = applicationBuilder(userAnswers)
       .overrides(
         bind[ApiHubService].toInstance(apiHubService),
-        bind[ProduceApiSessionRepository].toInstance(sessionRepository),
+        bind[UpdateApiSessionRepository].toInstance(sessionRepository),
         bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
       )
       .build()
