@@ -20,7 +20,7 @@ import config.{Domains, Hods}
 import controllers.actions.*
 import models.{CheckMode, UserAnswers}
 import models.api.ApiStatus
-import models.deployment.{DeploymentsRequest, DeploymentsResponse, EgressMapping, FailuresResponse, InvalidOasResponse, SuccessfulDeploymentsResponse}
+import models.deployment.{DeploymentDetails, DeploymentsRequest, DeploymentsResponse, EgressMapping, FailuresResponse, InvalidOasResponse, SuccessfulDeploymentsResponse}
 import models.myapis.produce.{ProduceApiChooseEgress, ProduceApiDomainSubdomain, ProduceApiEgressPrefixes}
 import models.requests.DataRequest
 import models.team.Team
@@ -154,7 +154,7 @@ class ProduceApiCheckYourAnswersController @Inject()(
     (userAnswers.get(ProduceApiEgressAvailabilityPage), userAnswers.get(ProduceApiEgressSelectionPage)) match {
       case (Some(true), Some(egress)) => Right(egress)
       case (Some(true), None) => Left(routes.ProduceApiEgressSelectionController.onPageLoad(CheckMode))
-      case (Some(false), _) => Right("null-egress")
+      case (Some(false), _) => Right(DeploymentDetails.egressFallback)
       case (None, _) => Left(routes.ProduceApiEgressAvailabilityController.onPageLoad(CheckMode))
     }
   }

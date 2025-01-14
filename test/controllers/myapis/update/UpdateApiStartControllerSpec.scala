@@ -28,7 +28,7 @@ import models.team.Team
 import models.user.UserModel
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.{verify, when}
+import org.mockito.Mockito.{atMostOnce, verify, when}
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatestplus.mockito.MockitoSugar
 import pages.QuestionPage
@@ -60,6 +60,7 @@ class UpdateApiStartControllerSpec extends SpecBase with MockitoSugar with Table
         hods = None,
         egressMappings = None,
         prefixesToRemove = None,
+        egress = None,
       )
       def initialUserAnswers(deploymentDetails: DeploymentDetails) = UserAnswers(
           id = FakeUser.userId,
@@ -125,7 +126,7 @@ class UpdateApiStartControllerSpec extends SpecBase with MockitoSugar with Table
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe Some(nextPage.url)
-          verify(fixture.sessionRepository).set(eqTo(expectedUserAnswers))
+          verify(fixture.sessionRepository, atMostOnce()).set(eqTo(expectedUserAnswers))
         }
       }
     }
@@ -141,6 +142,7 @@ class UpdateApiStartControllerSpec extends SpecBase with MockitoSugar with Table
           hods = None,
           egressMappings = None,
           prefixesToRemove = None,
+          egress = None,
         ))))
       when(fixture.sessionRepository.set(any())).thenReturn(Future.successful(true))
 

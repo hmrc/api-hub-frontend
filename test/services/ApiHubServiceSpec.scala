@@ -264,7 +264,8 @@ class ApiHubServiceSpec
         subDomain = Some("test-dub-domain"),
         hods = Some(Seq("test-backend-1", "test-backend-2")),
         egressMappings = Some(Seq(EgressMapping("prefix", "egress-prefix"))),
-        prefixesToRemove = Some(Seq("test-prefix-1", "test-prefix-2"))
+        prefixesToRemove = Some(Seq("test-prefix-1", "test-prefix-2")),
+        egress = Some("test-egress"),
       )
 
       val fixture = buildFixture()
