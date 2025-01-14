@@ -29,7 +29,7 @@ case class DeploymentDetails (
   egress: Option[String]
 ) {
   val egressWithFallBack: String = egress.getOrElse(DeploymentDetails.egressFallback)
-  val hasEgress: Boolean = egressWithFallBack == DeploymentDetails.egressFallback
+  val hasEgress: Boolean = egressWithFallBack != DeploymentDetails.egressFallback
 }
 
 object DeploymentDetails {
