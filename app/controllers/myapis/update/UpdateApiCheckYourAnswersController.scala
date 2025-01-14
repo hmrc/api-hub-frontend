@@ -25,8 +25,8 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.myapis.DeploymentSuccessView
-import views.html.myapis.update.UpdateApiCheckYourAnswersView
-
+import views.html.myapis.produce.ProduceApiCheckYourAnswersView
+import viewmodels.govuk.all.SummaryListViewModel
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -34,12 +34,12 @@ class UpdateApiCheckYourAnswersController @Inject()(
                                         override val messagesApi: MessagesApi,
                                         identify: IdentifierAction,
                                         val controllerComponents: MessagesControllerComponents,
-                                        view: UpdateApiCheckYourAnswersView,
+                                        view: ProduceApiCheckYourAnswersView,
                                         successView: DeploymentSuccessView
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = identify {
-    implicit request =>  Ok(view(request.user))
+    implicit request =>  Ok(view(SummaryListViewModel(Seq.empty), request.user, None))
   }
 
   def onSubmit(): Action[AnyContent] = identify {

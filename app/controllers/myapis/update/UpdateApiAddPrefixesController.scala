@@ -27,7 +27,7 @@ import pages.myapis.update.UpdateApiAddPrefixesPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.ProduceApiSessionRepository
+import repositories.UpdateApiSessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.myapis.produce.ProduceApiAddPrefixesViewModel
 import views.html.myapis.produce.ProduceApiAddPrefixesView
@@ -38,10 +38,10 @@ import scala.concurrent.{ExecutionContext, Future}
 class UpdateApiAddPrefixesController @Inject()(
                                                 override val messagesApi: MessagesApi,
                                                 config: FrontendAppConfig,
-                                                sessionRepository: ProduceApiSessionRepository,
+                                                sessionRepository: UpdateApiSessionRepository,
                                                 navigator: Navigator,
                                                 identify: IdentifierAction,
-                                                getData: ProduceApiDataRetrievalAction,
+                                                getData: UpdateApiDataRetrievalAction,
                                                 requireData: DataRequiredAction,
                                                 val controllerComponents: MessagesControllerComponents,
                                                 formProvider: ProduceApiAddPrefixesFormProvider,

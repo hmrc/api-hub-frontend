@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.myapis.produce
-
+package controllers.myapis.update
 
 import base.SpecBase
 import controllers.actions.FakeUser
@@ -26,13 +25,13 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.{any, argThat}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.myapis.produce.ProduceApiEgressSelectionPage
+import pages.myapis.update.UpdateApiEgressSelectionPage
 import play.api.Application as PlayApplication
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import repositories.ProduceApiSessionRepository
+import repositories.UpdateApiSessionRepository
 import services.ApiHubService
 import utils.HtmlValidation
 import viewmodels.myapis.produce.ProduceApiEgressSelectionViewModel
@@ -40,16 +39,16 @@ import views.html.myapis.produce.ProduceApiEgressSelectionView
 
 import scala.concurrent.Future
 
-class ProduceApiEgressSelectionControllerSpec extends SpecBase with MockitoSugar with EgressGenerator with HtmlValidation {
+class UpdateApiEgressSelectionControllerSpec extends SpecBase with MockitoSugar with EgressGenerator with HtmlValidation {
 
   private def onwardRoute = Call("GET", "/foo")
 
   private val formProvider = ProduceApiEgressSelectionForm()
   private val form = formProvider()
 
-  private lazy val produceApiEgressSelectionRoute = controllers.myapis.produce.routes.ProduceApiEgressSelectionController.onPageLoad(NormalMode).url
+  private lazy val updateApiEgressSelectionRoute = controllers.myapis.update.routes.UpdateApiEgressSelectionController.onPageLoad(NormalMode).url
 
-  "ProduceApiEgressSelection Controller" - {
+  "UpdateApiEgressSelection Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
@@ -58,14 +57,14 @@ class ProduceApiEgressSelectionControllerSpec extends SpecBase with MockitoSugar
       when(fixture.apiHubService.listEgressGateways()(any)).thenReturn(Future.successful(egressGateways))
 
       running(fixture.application) {
-        val request = FakeRequest(GET, produceApiEgressSelectionRoute)
+        val request = FakeRequest(GET, updateApiEgressSelectionRoute)
 
         val result = route(fixture.application, request).value
 
         val viewModel = ProduceApiEgressSelectionViewModel(
-          "myApis.produce.selectegress.title",
-          controllers.myapis.produce.routes.ProduceApiEgressSelectionController.onSubmit(NormalMode),
-          controllers.myapis.produce.routes.ProduceApiEgressAvailabilityController.onPageLoad(NormalMode).url,
+          "myApis.update.selectegress.title",
+          controllers.myapis.update.routes.UpdateApiEgressSelectionController.onSubmit(NormalMode),
+          controllers.myapis.update.routes.UpdateApiEgressAvailabilityController.onPageLoad(NormalMode).url,
         )
         val view = fixture.application.injector.instanceOf[ProduceApiEgressSelectionView]
 
@@ -80,18 +79,18 @@ class ProduceApiEgressSelectionControllerSpec extends SpecBase with MockitoSugar
       val egressGateways = sampleEgressGateways()
 
       val chooseEgress = egressGateways.head.id
-      val userAnswers = UserAnswers(userAnswersId).set(ProduceApiEgressSelectionPage, chooseEgress).success.value
+      val userAnswers = UserAnswers(userAnswersId).set(UpdateApiEgressSelectionPage, chooseEgress).success.value
 
       val fixture = buildFixture(userAnswers = Some(userAnswers))
       when(fixture.apiHubService.listEgressGateways()(any)).thenReturn(Future.successful(egressGateways))
 
       running(fixture.application) {
-        val request = FakeRequest(GET, produceApiEgressSelectionRoute)
+        val request = FakeRequest(GET, updateApiEgressSelectionRoute)
 
         val viewModel = ProduceApiEgressSelectionViewModel(
-          "myApis.produce.selectegress.title",
-          controllers.myapis.produce.routes.ProduceApiEgressSelectionController.onSubmit(NormalMode),
-          controllers.myapis.produce.routes.ProduceApiEgressAvailabilityController.onPageLoad(NormalMode).url,
+          "myApis.update.selectegress.title",
+          controllers.myapis.update.routes.UpdateApiEgressSelectionController.onSubmit(NormalMode),
+          controllers.myapis.update.routes.UpdateApiEgressAvailabilityController.onPageLoad(NormalMode).url,
         )
         val view = fixture.application.injector.instanceOf[ProduceApiEgressSelectionView]
 
@@ -113,7 +112,7 @@ class ProduceApiEgressSelectionControllerSpec extends SpecBase with MockitoSugar
 
       running(fixture.application) {
         val request =
-          FakeRequest(POST, produceApiEgressSelectionRoute)
+          FakeRequest(POST, updateApiEgressSelectionRoute)
             .withFormUrlEncodedBody(("selectEgress", egressGateways.head.id))
 
         val result = route(fixture.application, request).value
@@ -127,17 +126,17 @@ class ProduceApiEgressSelectionControllerSpec extends SpecBase with MockitoSugar
   private case class Fixture(
                               application: PlayApplication,
                               apiHubService: ApiHubService,
-                              sessionRepository: ProduceApiSessionRepository
+                              sessionRepository: UpdateApiSessionRepository
                             )
 
   private def buildFixture(userAnswers: Option[UserAnswers]): Fixture = {
     val apiHubService = mock[ApiHubService]
-    val sessionRepository = mock[ProduceApiSessionRepository]
+    val sessionRepository = mock[UpdateApiSessionRepository]
 
     val playApplication = applicationBuilder(userAnswers)
       .overrides(
         bind[ApiHubService].toInstance(apiHubService),
-        bind[ProduceApiSessionRepository].toInstance(sessionRepository),
+        bind[UpdateApiSessionRepository].toInstance(sessionRepository),
         bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
       )
       .build()

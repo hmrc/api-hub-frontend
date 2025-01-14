@@ -18,4 +18,4 @@ package viewmodels.myapis.produce
 
 import play.api.mvc.Call
 
-case class ProduceApiEgressSelectionViewModel(formAction: Call, returnUrl: String)
+case class ProduceApiEgressSelectionViewModel(titleMessageKey: String, formAction: Call, returnUrl: String)
