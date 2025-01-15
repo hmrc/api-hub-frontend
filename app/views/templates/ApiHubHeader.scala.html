@@ -15,9 +15,11 @@
  *@
 
 @import models.user.UserModel
+@import config.FrontendAppConfig
 
 @this(
-    govukBackLink: GovukBackLink
+    govukBackLink: GovukBackLink,
+    appConfig: FrontendAppConfig
 )
 
 @(
@@ -106,6 +108,11 @@
             <li>
                 <a id="exploreApisLink" data-header-link-name="exploreApis" class="govuk-link govuk-link--no-visited-state @active("exploreApis")" href="@routes.ExploreApisController.onPageLoad().url">
                     @messages("exploreApis.link.text")
+                </a>
+            </li>
+            <li>
+                <a id="exploreFileTransfersLink" data-header-link-name="exploreFileTransfers" class="govuk-link govuk-link--no-visited-state" href="/sdes-catalogue/file-types">
+                    @messages("exploreFileTransfers.link.text")
                 </a>
             </li>
             <li>
