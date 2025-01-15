@@ -395,6 +395,8 @@ exploreApis.search.howto.heading2 = Exclude a term
 exploreApis.search.howto.content2 = To exclude a word from your search results, you can use a hyphen. For example, to find all APIs containing "personal" but not "tax", use the following:
 exploreApis.search.howto.example2 = personal -tax
 
+exploreFileTransfers.link.text = Explore file transfers
+
 support.link.text = Get support
 support.title = Get support
 support.heading = Get support
