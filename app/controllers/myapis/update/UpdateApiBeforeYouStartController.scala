@@ -48,8 +48,8 @@ class UpdateApiBeforeYouStartController @Inject()(
         nextPageUrl,
         buildRelatedContentLinks(),
         "updateApiBeforeYouStart.heading",
-        "updateApiBeforeYouStart.creationProcess.heading",
-        "updateApiBeforeYouStart.creationProcess.content"
+        "updateApiBeforeYouStart.updateProcess.heading",
+        "updateApiBeforeYouStart.updateProcess.content"
       )
       Ok(view(request.user, viewModel))
   }
