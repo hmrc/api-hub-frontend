@@ -16,6 +16,7 @@
 
 @import models.user.UserModel
 @import viewmodels.RelatedContentLink
+@import viewmodels.myapis.produce.ProduceApiBeforeYouStartViewModel
 @import views.html.components.RelatedContent
 
 @this(
@@ -24,21 +25,21 @@
     relatedContent: RelatedContent
 )
 
-@(nextPageUrl: String, relatedContentLinks: Seq[RelatedContentLink], user: UserModel)(implicit request: Request[?], messages: Messages)
+@(user: UserModel, viewModel: ProduceApiBeforeYouStartViewModel)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("produceApiBeforeYouStart.title")), user = Some(user), fullWidth = true) {
+@layout(pageTitle = titleNoForm(messages(viewModel.mainTitle)), user = Some(user), fullWidth = true) {
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <h1 class="govuk-heading-l">@messages("produceApiBeforeYouStart.heading")</h1>
+            <h1 class="govuk-heading-l">@messages(viewModel.mainTitle)</h1>
 
             <h2 class="govuk-heading-m">@messages("produceApiBeforeYouStart.beforeYouStart.heading")</h2>
 
             <p class="govuk-body">@messages("produceApiBeforeYouStart.beforeYouStart.content")</p>
 
-            <h2 class="govuk-heading-m">@messages("produceApiBeforeYouStart.creationProcess.heading")</h2>
+            <h2 class="govuk-heading-m">@messages(viewModel.processTitle)</h2>
 
-            <p class="govuk-body">@messages("produceApiBeforeYouStart.creationProcess.content")</p>
+            <p class="govuk-body">@messages(viewModel.processHint)</p>
 
             <ol class="govuk-list govuk-list--number">
                 <li>@messages("produceApiBeforeYouStart.creationProcess.list.1")</li>
@@ -51,7 +52,7 @@
             @govukButton(
                 Button(
                     id = Some("getStartedButton"),
-                    href = Some(nextPageUrl),
+                    href = Some(viewModel.nextPageUrl),
                     content = Text(messages("produceApiBeforeYouStart.getStarted"))
                 )
             )
@@ -59,7 +60,7 @@
         </div>
 
         <div class="govuk-grid-column-one-third ">
-            @relatedContent(relatedContentLinks)
+            @relatedContent(viewModel.relatedContentLinks)
         </div>
     </div>
 

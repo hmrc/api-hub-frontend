@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package controllers.myapis.produce
+package controllers.myapis.update
 
 import config.FrontendAppConfig
 import controllers.actions.*
 import models.NormalMode
 import navigation.Navigator
-import pages.myapis.produce.ProduceApiBeforeYouStartPage
+import pages.myapis.update.UpdateApiBeforeYouStartPage
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -30,10 +30,10 @@ import views.html.myapis.produce.ProduceApiBeforeYouStartView
 
 import javax.inject.Inject
 
-class ProduceApiBeforeYouStartController @Inject()(
+class UpdateApiBeforeYouStartController @Inject()(
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
-  getData: ProduceApiDataRetrievalAction,
+  getData: UpdateApiDataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: ProduceApiBeforeYouStartView,
@@ -43,13 +43,13 @@ class ProduceApiBeforeYouStartController @Inject()(
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
-      val nextPageUrl = navigator.nextPage(ProduceApiBeforeYouStartPage, NormalMode, request.userAnswers).url
+      val nextPageUrl = navigator.nextPage(UpdateApiBeforeYouStartPage, NormalMode, request.userAnswers).url
       val viewModel = ProduceApiBeforeYouStartViewModel(
         nextPageUrl,
         buildRelatedContentLinks(),
-        "produceApiBeforeYouStart.heading",
-        "produceApiBeforeYouStart.creationProcess.heading",
-        "produceApiBeforeYouStart.creationProcess.content"
+        "updateApiBeforeYouStart.heading",
+        "updateApiBeforeYouStart.creationProcess.heading",
+        "updateApiBeforeYouStart.creationProcess.content"
       )
       Ok(view(request.user, viewModel))
   }

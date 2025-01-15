@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.myapis.produce
+package controllers.myapis.update
 
 import base.SpecBase
 import controllers.actions.FakeUser
@@ -28,25 +28,25 @@ import viewmodels.RelatedContentLink
 import viewmodels.myapis.produce.ProduceApiBeforeYouStartViewModel
 import views.html.myapis.produce.ProduceApiBeforeYouStartView
 
-class ProduceApiBeforeYouStartControllerSpec extends SpecBase with HtmlValidation {
+class UpdateApiBeforeYouStartControllerSpec extends SpecBase with HtmlValidation {
 
-  import ProduceApiBeforeYouStartControllerSpec.*
+  import UpdateApiBeforeYouStartControllerSpec.*
 
   private val nextPage = controllers.routes.IndexController.onPageLoad
 
-  "ProduceApiBeforeYouStart Controller" - {
+  "UpdateApiBeforeYouStart Controller" - {
     "must return OK and the correct view for a GET" in {
       val fixture = buildFixture()
 
       running(fixture.application) {
-        val request = FakeRequest(controllers.myapis.produce.routes.ProduceApiBeforeYouStartController.onPageLoad())
+        val request = FakeRequest(controllers.myapis.update.routes.UpdateApiBeforeYouStartController.onPageLoad())
         val result = route(fixture.application, request).value
         val viewModel = ProduceApiBeforeYouStartViewModel(
           nextPage.url,
           relatedContentLinks,
-          "produceApiBeforeYouStart.heading",
-          "produceApiBeforeYouStart.creationProcess.heading",
-          "produceApiBeforeYouStart.creationProcess.content"
+          "updateApiBeforeYouStart.heading",
+          "updateApiBeforeYouStart.creationProcess.heading",
+          "updateApiBeforeYouStart.creationProcess.content"
         )
         val view = fixture.application.injector.instanceOf[ProduceApiBeforeYouStartView]
         val nextPageUrl = nextPage.url
@@ -72,7 +72,7 @@ class ProduceApiBeforeYouStartControllerSpec extends SpecBase with HtmlValidatio
 
 }
 
-object ProduceApiBeforeYouStartControllerSpec {
+object UpdateApiBeforeYouStartControllerSpec {
 
   private val relatedContentLinks: Seq[RelatedContentLink] = Seq(
     RelatedContentLink(
