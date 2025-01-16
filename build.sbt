@@ -6,6 +6,7 @@ import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 import scala.sys.process._
 
 lazy val appName: String = "api-hub-frontend"
+lazy val jsClean = taskKey[Unit]("jsClean")
 lazy val jsTest = taskKey[Unit]("jsTest")
 lazy val jsHint = taskKey[Unit]("jsHint")
 
@@ -68,14 +69,22 @@ lazy val root = (project in file("."))
     Assets / pipelineStages := Seq(concat),
     Global / excludeLintKeys += update / evictionWarningOptions,
     scalacOptions ++= Seq("-deprecation", "-feature"),
-    jsTest := {
-      val exitCode = ("npm ci" #&& "npm test").!
+    jsClean := {
+      val exitCode = "npm ci".!
       if (exitCode != 0) {
-        throw new MessageOnlyException("npm install and test failed")
+        throw new MessageOnlyException("npm ci failed")
+      }
+    },
+    jsTest := {
+      jsClean.value
+      val exitCode = "npm test".!
+      if (exitCode != 0) {
+        throw new MessageOnlyException("npm test failed")
       }
     },
     jsHint := {
-      val exitCode = ("npm ci" #&& "npm run jshint").!
+      jsClean.value
+      val exitCode = "npm run jshint".!
       if (exitCode != 0) {
         throw new MessageOnlyException("jsHint checks failed")
       }
