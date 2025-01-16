@@ -33,6 +33,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.myapis.produce.*
 import viewmodels.govuk.all.SummaryListViewModel
+import viewmodels.myapis.produce.ProduceApiCheckYourAnswersViewModel
 import views.html.myapis.DeploymentSuccessView
 import views.html.myapis.produce.{ProduceApiCheckYourAnswersView, ProduceApiDeploymentErrorView}
 
@@ -56,7 +57,11 @@ class ProduceApiCheckYourAnswersController @Inject()(
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
-      Ok(view(SummaryListViewModel(summaryListRows(request.userAnswers)), request.user))
+      Ok(view(
+        SummaryListViewModel(summaryListRows(request.userAnswers)),
+        request.user,
+        ProduceApiCheckYourAnswersViewModel(controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onSubmit())
+      ))
   }
 
   def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData).async {

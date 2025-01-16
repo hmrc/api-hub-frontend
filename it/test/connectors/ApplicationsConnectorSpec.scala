@@ -934,7 +934,8 @@ class ApplicationsConnectorSpec
         subDomain = "test-subdomain",
         hods = Seq("test-hod"),
         prefixesToRemove = Seq("test-prefix-1", "test-prefix-2"),
-        egressMappings = Some(Seq(EgressMapping("prefix", "egress-prefix")))
+        egressMappings = Some(Seq(EgressMapping("prefix", "egress-prefix"))),
+        egress = "test-egress",
       )
 
       val response = SuccessfulDeploymentsResponse("test-id", "1.0.0", 102, "test-url")
@@ -968,7 +969,8 @@ class ApplicationsConnectorSpec
         subDomain = "test-subdomain",
         hods = Seq("test-hod"),
         prefixesToRemove = Seq("test-prefix-1", "test-prefix-2"),
-        egressMappings = Some(Seq(EgressMapping("prefix", "egress-prefix")))
+        egressMappings = Some(Seq(EgressMapping("prefix", "egress-prefix"))),
+        egress = "test-egress",
       )
 
       stubFor(
@@ -997,7 +999,8 @@ class ApplicationsConnectorSpec
         subDomain = "test-subdomain",
         hods = Seq("test-hod"),
         prefixesToRemove = Seq("test-prefix-1", "test-prefix-2"),
-        egressMappings = Some(Seq(EgressMapping("prefix", "egress-prefix")))
+        egressMappings = Some(Seq(EgressMapping("prefix", "egress-prefix"))),
+        egress = "test-egress",
       )
 
       stubFor(

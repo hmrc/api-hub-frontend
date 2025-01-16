@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers.myapis.produce
+package viewmodels.checkAnswers.myapis.update
 
-import controllers.myapis.produce.routes
+import controllers.myapis.update.routes
 import models.{CheckMode, UserAnswers}
-import pages.myapis.produce.{ProduceApiChooseTeamPage, ProduceApiEgressSelectionPage}
+import pages.myapis.update.UpdateApiEgressAvailabilityPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
@@ -26,18 +26,18 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object ProduceApiEgressSummary {
+object UpdateApiEgressAvailabilitySummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(ProduceApiEgressSelectionPage).map(egress =>
+    answers.get(UpdateApiEgressAvailabilityPage).map(available =>
       SummaryListRowViewModel(
-        key = "myApis.produce.selectegress.cya.label",
+        key = "produceApiEgressAvailability.cya.label",
         value = ValueViewModel(
-          HtmlContent(HtmlFormat.escape(egress))
+          if (available) "site.yes" else "site.no"
         ),
         actions = Seq(
-          ActionItemViewModel("site.change", routes.ProduceApiEgressSelectionController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("produceApiEgressSelection.change.hidden"))
+          ActionItemViewModel("site.change", routes.UpdateApiEgressAvailabilityController.onPageLoad(CheckMode).url)
+            .withVisuallyHiddenText(messages("produceApiEgressAvailability.change.hidden"))
         )
       )
     )

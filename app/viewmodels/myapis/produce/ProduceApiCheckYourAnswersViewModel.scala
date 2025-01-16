@@ -14,24 +14,8 @@
  * limitations under the License.
  */
 
-package models.deployment
+package viewmodels.myapis.produce
 
-import play.api.libs.json.{Format, Json}
+import play.api.mvc.Call
 
-case class RedeploymentRequest(
-  description: String,
-  oas: String,
-  status: String,
-  domain: String,
-  subDomain: String,
-  hods: Seq[String],
-  prefixesToRemove: Seq[String],
-  egressMappings: Option[Seq[EgressMapping]],
-  egress: String,
-)
-
-object RedeploymentRequest {
-
-  implicit val formatRedeploymentRequest: Format[RedeploymentRequest] = Json.format[RedeploymentRequest]
-
-}
+case class ProduceApiCheckYourAnswersViewModel(formAction: Call)

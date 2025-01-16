@@ -23,7 +23,7 @@ import models.AvailableEndpoint
 import models.accessrequest.{AccessRequest, AccessRequestRequest, AccessRequestStatus}
 import models.api.{ApiDeployment, ApiDeploymentStatuses, ApiDetail, ApiDetailSummary, EgressGateway, PlatformContact}
 import models.application.*
-import models.deployment.{DeploymentDetails, DeploymentsRequest, DeploymentsResponse, FailuresResponse, InvalidOasResponse}
+import models.deployment.{DeploymentDetails, DeploymentsRequest, DeploymentsResponse, FailuresResponse, InvalidOasResponse, RedeploymentRequest}
 import models.exception.ApplicationsException
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
 import models.stats.ApisInProductionStatistic
@@ -191,6 +191,9 @@ class ApiHubService @Inject()(
   def getUserContactDetails()(implicit hc: HeaderCarrier): Future[Seq[UserContactDetails]] = {
     applicationsConnector.getUserContactDetails()
   }
+
+  def updateDeployment(publisherRef: String,  redeploymentRequest: RedeploymentRequest)(implicit hc: HeaderCarrier): Future[Option[DeploymentsResponse]] =
+    applicationsConnector.updateDeployment(publisherRef, redeploymentRequest)
 
   def updateApiTeam(apiId: String, maybeTeamId: Option[String])(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
     maybeTeamId match
