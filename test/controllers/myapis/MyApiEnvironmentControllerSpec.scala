@@ -138,6 +138,30 @@ class MyApiEnvironmentControllerSpec
       )(request, messages(fixture.application)).toString()
       contentAsString(result) must validateAsHtml
     }
+  }  
+  
+  "must return Not Found if the environment does not exist" in {
+    val fixture = buildFixture(FakeSupporter)
+    val missingEnvironment = "nope"
+    val apiDetail = sampleApiDetail()
+    
+    running(fixture.application) {
+      val view = fixture.application.injector.instanceOf[ErrorTemplate]
+
+      when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any)).thenReturn(Future.successful(Some(apiDetail)))
+      
+      val request = FakeRequest(GET, controllers.myapis.routes.MyApiEnvironmentController.onPageLoad(apiDetail.id, missingEnvironment).url)
+      val result = route(fixture.application, request).value
+
+      status(result) mustBe NOT_FOUND
+      contentAsString(result) mustBe view(
+        "Page not found - 404",
+        "Environment not found",
+        s"Cannot find environment $missingEnvironment.",
+        Some(FakeSupporter)
+      )(request, messages(fixture.application)).toString()
+      contentAsString(result) must validateAsHtml
+    }
   }
 
   private case class Fixture(apiHubService: ApiHubService, application: Application)

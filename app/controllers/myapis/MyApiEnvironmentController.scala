@@ -43,9 +43,14 @@ class MyApiEnvironmentController @Inject()(
 
   def onPageLoad(id: String, environment: String): Action[AnyContent] = (identify andThen apiAuth(id)) async {
     implicit request =>
-      for {
-        deploymentStatuses <- apiHubService.getApiDeploymentStatuses(request.apiDetails.publisherReference)
-      } yield Ok(view(request.apiDetails, hipEnvironments.forEnvironmentId(environment), request.identifierRequest.user, deploymentStatuses))
+        hipEnvironments.forEnvironmentIdOptional(environment)
+          .map(hipEnvironment =>
+            for {
+              deploymentStatuses <- apiHubService.getApiDeploymentStatuses(request.apiDetails.publisherReference)
+            } yield Ok(view(request.apiDetails, hipEnvironment, request.identifierRequest.user, deploymentStatuses))
+          ).getOrElse(
+            Future.successful(errorResultBuilder.environmentNotFound(environment))
+          )
   }
 
 }
