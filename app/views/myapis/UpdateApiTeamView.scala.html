@@ -34,7 +34,8 @@
     iconsLink: IconsLink,
     teamSelection: TeamSelection,
     sideNav: views.html.templates.SideNav,
-    hipEnvironments: HipEnvironments
+    hipEnvironments: HipEnvironments,
+    myApisNavItems: MyApisNavItems
 )
 
 @(form: Form[?], apiDetail: ApiDetail, owningTeam: Option[Team], teams: Seq[Team], userModel: UserModel, deploymentStatuses: ApiDeploymentStatuses)(implicit request: Request[?], messages: Messages)
@@ -48,7 +49,7 @@
 }
 
 @layout(pageTitle = titleNoForm(messages("myApis.update.team.title")), user = Some(userModel), fullWidth = true, customScriptsBlock = Some(scripts())) {
-    @sideNav(apiDetail.title, MyApisNavItems(apiDetail, userModel, MyApisNavPages.ChangeOwningTeamPage, deploymentStatuses, hipEnvironments)) {
+    @sideNav(apiDetail.title, myApisNavItems(apiDetail, userModel, MyApisNavPages.ChangeOwningTeamPage, deploymentStatuses)) {
         @formHelper(action = controllers.myapis.routes.UpdateApiTeamController.onSubmit(apiDetail.id), Symbol("autoComplete") -> "off") {
             @if(form.errors.nonEmpty) {
                 @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))

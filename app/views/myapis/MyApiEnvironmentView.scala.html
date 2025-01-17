@@ -1,0 +1,36 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.api.*
+@import models.api.ApiDeploymentStatus.*
+@import models.user.UserModel
+@import views.html.components.IconsLink
+@import viewmodels.myapis.{MyApisNavPages, MyApisNavItems}
+@import config.HipEnvironment
+
+@this(
+        layout: templates.Layout,
+        sideNav: views.html.templates.SideNav,
+        myApisNavItems: MyApisNavItems
+)
+
+@(apiDetail: ApiDetail, environment: HipEnvironment, userModel: UserModel, deploymentStatuses: ApiDeploymentStatuses)(implicit request: Request[?], messages: Messages)
+
+@layout(pageTitle = titleNoForm(messages("myApis.details.title")), user = Some(userModel), fullWidth = true) {
+    @sideNav(apiDetail.title, myApisNavItems(apiDetail, userModel, MyApisNavPages.EnvironmentPage(environment), deploymentStatuses)) {
+        <h1 id="details" class="govuk-heading-l">@environment.id</h1>
+    }
+}
