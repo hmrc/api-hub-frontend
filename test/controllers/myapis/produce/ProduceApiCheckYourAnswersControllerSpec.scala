@@ -43,8 +43,8 @@ import services.ApiHubService
 import viewmodels.checkAnswers.myapis.produce.*
 import views.html.myapis.produce.{ProduceApiCheckYourAnswersView, ProduceApiDeploymentErrorView}
 import viewmodels.govuk.all.SummaryListViewModel
-import viewmodels.myapis.ProduceApiDeploymentErrorViewModel
-import viewmodels.myapis.produce.ProduceApiCheckYourAnswersViewModel
+import viewmodels.myapis.produce
+import viewmodels.myapis.produce.{ProduceApiCheckYourAnswersViewModel, ProduceApiDeploymentErrorViewModel}
 import views.html.myapis.DeploymentSuccessView
 
 import java.time.LocalDateTime
@@ -54,7 +54,7 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
 
   private lazy val produceApiCheckYourAnswersRoute = controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
   private lazy val produceApiCancelRoute = controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onCancel()
-  private lazy val viewModel = ProduceApiDeploymentErrorViewModel(produceApiCancelRoute, produceApiCheckYourAnswersRoute)
+  private lazy val viewModel = produce.ProduceApiDeploymentErrorViewModel(produceApiCancelRoute, produceApiCheckYourAnswersRoute)
 
   private val fullyPopulatedUserAnswers = UserAnswers(userAnswersId)
     .set(ProduceApiChooseTeamPage, Team("id", "name", LocalDateTime.now(), Seq.empty)).success.value

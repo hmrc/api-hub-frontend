@@ -18,12 +18,12 @@ package controllers.myapis.produce
 
 import config.{Domains, Hods}
 import controllers.actions.*
-import models.{CheckMode, UserAnswers}
 import models.api.ApiStatus
 import models.deployment.{DeploymentDetails, DeploymentsRequest, DeploymentsResponse, EgressMapping, FailuresResponse, InvalidOasResponse, SuccessfulDeploymentsResponse}
 import models.myapis.produce.{ProduceApiChooseEgress, ProduceApiDomainSubdomain, ProduceApiEgressPrefixes}
 import models.requests.DataRequest
 import models.team.Team
+import models.{CheckMode, UserAnswers}
 import pages.myapis.produce.*
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.*
@@ -33,8 +33,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.myapis.produce.*
 import viewmodels.govuk.all.SummaryListViewModel
-import viewmodels.myapis.ProduceApiDeploymentErrorViewModel
-import viewmodels.myapis.produce.ProduceApiCheckYourAnswersViewModel
+import viewmodels.myapis.produce.{ProduceApiCheckYourAnswersViewModel, ProduceApiDeploymentErrorViewModel}
 import views.html.myapis.DeploymentSuccessView
 import views.html.myapis.produce.{ProduceApiCheckYourAnswersView, ProduceApiDeploymentErrorView}
 

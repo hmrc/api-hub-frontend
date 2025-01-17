@@ -42,11 +42,12 @@ import repositories.{SessionRepository, UpdateApiSessionRepository}
 import services.ApiHubService
 import viewmodels.checkAnswers.myapis.update.*
 import viewmodels.govuk.all.SummaryListViewModel
-import viewmodels.myapis.produce.ProduceApiCheckYourAnswersViewModel
+import viewmodels.myapis.produce
+import viewmodels.myapis.produce.{ProduceApiCheckYourAnswersViewModel, ProduceApiDeploymentErrorViewModel}
 import views.html.ErrorTemplate
 import views.html.myapis.DeploymentSuccessView
 import views.html.myapis.produce.{ProduceApiCheckYourAnswersView, ProduceApiDeploymentErrorView}
-import viewmodels.myapis.ProduceApiDeploymentErrorViewModel
+
 import java.time.LocalDateTime
 import scala.concurrent.Future
 
@@ -54,7 +55,7 @@ class UpdateApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar
 
   private lazy val updateApiCheckYourAnswersRoute = controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onPageLoad()
   private lazy val updateApiCancelRoute = controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onCancel()
-  private lazy val errorViewModel = ProduceApiDeploymentErrorViewModel(updateApiCancelRoute, updateApiCheckYourAnswersRoute)
+  private lazy val errorViewModel = produce.ProduceApiDeploymentErrorViewModel(updateApiCancelRoute, updateApiCheckYourAnswersRoute)
 
   private val fullyPopulatedUserAnswers = UserAnswers(userAnswersId)
     .set(UpdateApiApiPage, FakeApiDetail).success.value
