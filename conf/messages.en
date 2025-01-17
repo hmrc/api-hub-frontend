@@ -353,6 +353,7 @@ apiDetails.nonSelfServe.info1 = This API is not available for self-service.
 apiDetails.nonSelfServe.info2 = If you require further information, including how to consume this API, contact the
 apiDetails.contact.frontdoor = front door team
 apiDetails.contact.hub = Integration Hub support team
+apiDetails.teamNotFound = This API is not bound to any team.
 
 apiDeployments.heading = API Status
 apiDeployments.status.deployed = Deployed
@@ -1148,6 +1149,9 @@ produceApiEgressAvailability.cya.label = Is egress available?
 
 produceApiEgressSelection.title = Select the Egress for your API
 produceApiEgressSelection.heading = Select the Egress for your API
+produceApiEgressSelection.change.hidden = ProduceApiEgressSelection
+
+updateApiEgressSelection.change.hidden = UpdateApiEgressSelection
 
 environment.credentials.heading = Credentials
 

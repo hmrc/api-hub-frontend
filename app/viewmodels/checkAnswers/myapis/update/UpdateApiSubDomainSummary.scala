@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers.myapis.produce
+package viewmodels.checkAnswers.myapis.update
 
-import controllers.myapis.produce.routes
+import config.Domains
+import controllers.myapis.update.routes
 import models.{CheckMode, UserAnswers}
-import pages.myapis.produce.{ProduceApiChooseTeamPage, ProduceApiEgressSelectionPage}
+import pages.myapis.update.UpdateApiDomainPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
@@ -26,19 +27,21 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object ProduceApiEgressSummary {
+object UpdateApiSubDomainSummary  {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(ProduceApiEgressSelectionPage).map(egress =>
-      SummaryListRowViewModel(
-        key = "myApis.produce.selectegress.cya.label",
-        value = ValueViewModel(
-          HtmlContent(HtmlFormat.escape(egress))
-        ),
-        actions = Seq(
-          ActionItemViewModel("site.change", routes.ProduceApiEgressSelectionController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("produceApiEgressSelection.change.hidden"))
+  def row(answers: UserAnswers, domains: Domains)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(UpdateApiDomainPage).map {
+      answer =>
+
+        val value = ValueViewModel(
+          HtmlContent(
+            domains.getSubDomainDescription(answer.domain, answer.subDomain)
+          )
         )
-      )
-    )
+
+        SummaryListRowViewModel(
+          key     = "produceApiDomain.checkYourAnswersLabel.2",
+          value   = value
+        )
+    }
 }

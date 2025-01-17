@@ -20,9 +20,9 @@ import com.google.inject.{Inject, Singleton}
 import config.{Domains, Hods}
 import connectors.ApplicationsConnector
 import controllers.actions.{ApiAuthActionProvider, IdentifierAction}
-import controllers.myapis.SimpleApiDeploymentController.{optionalTextToSeq, allContainExactlyOneComma, transformFromEgressMappings, transformFromPrefixesToRemove, transformToEgressMappings, transformToPrefixesToRemove}
+import controllers.myapis.SimpleApiDeploymentController.{allContainExactlyOneComma, optionalTextToSeq, transformFromEgressMappings, transformFromPrefixesToRemove, transformToEgressMappings, transformToPrefixesToRemove}
 import forms.mappings.Mappings
-import models.deployment.{EgressMapping, InvalidOasResponse, RedeploymentRequest, SuccessfulDeploymentsResponse}
+import models.deployment.{DeploymentDetails, EgressMapping, InvalidOasResponse, RedeploymentRequest, SuccessfulDeploymentsResponse}
 import models.requests.ApiRequest
 import play.api.data.{Form, Forms}
 import play.api.data.Forms.{mapping, optional}
@@ -65,7 +65,8 @@ class SimpleApiRedeploymentController @Inject()(
               subDomain = deploymentDetails.subDomain.getOrElse(""),
               hods = deploymentDetails.hods.getOrElse(Seq.empty),
               prefixesToRemove = deploymentDetails.prefixesToRemove.getOrElse(Seq.empty),
-              egressMappings = deploymentDetails.egressMappings
+              egressMappings = deploymentDetails.egressMappings,
+              egress = deploymentDetails.egress
             )
           )
 
@@ -113,8 +114,8 @@ object SimpleApiRedeploymentController {
             .transform[Seq[String]](transformToPrefixesToRemove, transformFromPrefixesToRemove),
           "egressMappings" -> optional(text())
             .verifying("Each Egress Prefix Mapping must contain exactly one comma", optionalTextToSeq andThen allContainExactlyOneComma)
-            .transform[Option[Seq[EgressMapping]]](transformToEgressMappings, transformFromEgressMappings)
-
+            .transform[Option[Seq[EgressMapping]]](transformToEgressMappings, transformFromEgressMappings),
+          "egress" -> optional(text())
         )(RedeploymentRequest.apply)(o => Some(Tuple.fromProductTyped(o)))
       )
 
