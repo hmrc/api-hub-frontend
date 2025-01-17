@@ -18,15 +18,15 @@ package controllers.myapis.produce
 
 import base.SpecBase
 import controllers.actions.FakeUser
-import controllers.routes
 import controllers.myapis.produce.routes as produceApiRoutes
+import controllers.routes
 import fakes.{FakeDomains, FakeHods}
 import models.api.Alpha
 import models.deployment.*
-import models.{CheckMode, UserAnswers}
-import models.user.{Permissions, UserModel}
-import models.team.Team
 import models.myapis.produce.*
+import models.team.Team
+import models.user.{Permissions, UserModel}
+import models.{CheckMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.prop.TableDrivenPropertyChecks
@@ -34,17 +34,17 @@ import org.scalatestplus.mockito.MockitoSugar
 import pages.QuestionPage
 import pages.myapis.produce.*
 import play.api.Application as PlayApplication
-import play.api.inject.bind
 import play.api.i18n.Messages
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import repositories.{ProduceApiSessionRepository, SessionRepository}
+import repositories.ProduceApiSessionRepository
 import services.ApiHubService
 import viewmodels.checkAnswers.myapis.produce.*
-import views.html.myapis.produce.{ProduceApiCheckYourAnswersView, ProduceApiDeploymentErrorView}
 import viewmodels.govuk.all.SummaryListViewModel
 import viewmodels.myapis.produce.ProduceApiCheckYourAnswersViewModel
 import views.html.myapis.DeploymentSuccessView
+import views.html.myapis.produce.{ProduceApiCheckYourAnswersView, ProduceApiDeploymentErrorView}
 
 import java.time.LocalDateTime
 import scala.concurrent.Future
