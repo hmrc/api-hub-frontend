@@ -149,11 +149,11 @@ class UpdateApiCheckYourAnswersController @Inject()(
     }
   }
 
-  private def validateEgress(userAnswers: UserAnswers): Either[Call, String] = {
+  private def validateEgress(userAnswers: UserAnswers): Either[Call, Option[String]] = {
     (userAnswers.get(UpdateApiEgressAvailabilityPage), userAnswers.get(UpdateApiEgressSelectionPage)) match {
-      case (Some(true), Some(egress)) => Right(egress)
+      case (Some(true), Some(egress)) => Right(Some(egress))
       case (Some(true), None) => Left(routes.UpdateApiEgressSelectionController.onPageLoad(CheckMode))
-      case (Some(false), _) => Right(DeploymentDetails.egressFallback)
+      case (Some(false), _) => Right(None)
       case (None, _) => Left(routes.UpdateApiEgressAvailabilityController.onPageLoad(CheckMode))
     }
   }

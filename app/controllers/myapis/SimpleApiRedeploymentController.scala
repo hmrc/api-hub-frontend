@@ -66,7 +66,7 @@ class SimpleApiRedeploymentController @Inject()(
               hods = deploymentDetails.hods.getOrElse(Seq.empty),
               prefixesToRemove = deploymentDetails.prefixesToRemove.getOrElse(Seq.empty),
               egressMappings = deploymentDetails.egressMappings,
-              egress = deploymentDetails.egressWithFallBack
+              egress = deploymentDetails.egress
             )
           )
 
@@ -115,7 +115,7 @@ object SimpleApiRedeploymentController {
           "egressMappings" -> optional(text())
             .verifying("Each Egress Prefix Mapping must contain exactly one comma", optionalTextToSeq andThen allContainExactlyOneComma)
             .transform[Option[Seq[EgressMapping]]](transformToEgressMappings, transformFromEgressMappings),
-          "egress" -> Forms.default(text(), DeploymentDetails.egressFallback)
+          "egress" -> optional(text())
         )(RedeploymentRequest.apply)(o => Some(Tuple.fromProductTyped(o)))
       )
 

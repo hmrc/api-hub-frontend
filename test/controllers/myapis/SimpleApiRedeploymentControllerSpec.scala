@@ -281,7 +281,7 @@ object SimpleApiRedeploymentControllerSpec extends OptionValues {
       EgressMapping(egressMappingPrefix1, egressMappingEgressPrefix1),
       EgressMapping(egressMappingPrefix2, egressMappingEgressPrefix2)
     )),
-    egress = DeploymentDetails.egressFallback
+    egress = None
   )
 
   private val validForm = Seq(

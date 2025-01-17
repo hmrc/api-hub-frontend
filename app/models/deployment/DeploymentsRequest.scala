@@ -22,7 +22,7 @@ case class DeploymentsRequest(
   lineOfBusiness: String,
   name: String,
   description: String,
-  egress: String,
+  egress: Option[String],
   teamId: String,
   oas: String,
   passthrough: Boolean,

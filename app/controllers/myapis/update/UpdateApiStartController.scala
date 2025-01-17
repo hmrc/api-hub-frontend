@@ -73,7 +73,7 @@ class UpdateApiStartController @Inject()(
           updatedAnswers <- updateOptionalAnswer(updatedAnswers, UpdateApiDomainPage, domainSubdomain)
           updatedAnswers <- updateOptionalAnswer(updatedAnswers, UpdateApiHodPage, deploymentDetails.hods.map(_.toSet))
           updatedAnswers <- updateAnswer(updatedAnswers, UpdateApiEgressAvailabilityPage, deploymentDetails.hasEgress)
-          updatedAnswers <- updateOptionalAnswer(updatedAnswers, UpdateApiEgressSelectionPage, Option.when(deploymentDetails.hasEgress)(deploymentDetails.egressWithFallBack))
+          updatedAnswers <- updateOptionalAnswer(updatedAnswers, UpdateApiEgressSelectionPage, Option.when(deploymentDetails.hasEgress)(deploymentDetails.egress).flatten)
           egressMappings = deploymentDetails.egressMappings.map(_.map(em =>
             ProduceApiEgressPrefixMapping(em.egressPrefix, em.prefix).toString
           ))
