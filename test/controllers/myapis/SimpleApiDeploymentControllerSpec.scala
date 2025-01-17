@@ -266,7 +266,7 @@ object SimpleApiDeploymentControllerSpec {
     lineOfBusiness = "test-line-of-business",
     name = "test-name",
     description = "test-description",
-    egress = egress,
+    egress = Some(egress),
     teamId = "test-team-id",
     oas = "test-oas",
     passthrough = false,

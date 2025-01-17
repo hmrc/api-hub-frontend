@@ -26,7 +26,8 @@ case class RedeploymentRequest(
   subDomain: String,
   hods: Seq[String],
   prefixesToRemove: Seq[String],
-  egressMappings: Option[Seq[EgressMapping]]
+  egressMappings: Option[Seq[EgressMapping]],
+  egress: Option[String],
 )
 
 object RedeploymentRequest {

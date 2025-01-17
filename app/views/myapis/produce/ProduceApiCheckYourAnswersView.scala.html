@@ -18,6 +18,7 @@
 @import models.deployment.{Error, FailuresResponse}
 @import models.user.UserModel
 @import models.myapis.produce.ProduceApiHowToCreate
+@import viewmodels.myapis.produce.ProduceApiCheckYourAnswersViewModel
 
 @this(
     layout: templates.Layout,
@@ -27,7 +28,7 @@
     govukErrorSummary: GovukErrorSummary,
 )
 
-@(summaryList: SummaryList, userModel: UserModel, maybeFailuresResponse: Option[FailuresResponse] = None)(implicit request: Request[?], messages: Messages)
+@(summaryList: SummaryList, userModel: UserModel, viewModel: ProduceApiCheckYourAnswersViewModel, maybeFailuresResponse: Option[FailuresResponse] = None)(implicit request: Request[?], messages: Messages)
 
 @error(failuresResponse: FailuresResponse) = @{
     ErrorLink(
@@ -53,7 +54,7 @@
 
     @govukSummaryList(summaryList)
 
-    @formHelper(action = controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onSubmit()) {
+    @formHelper(action = viewModel.formAction) {
         @govukButton(
             ButtonViewModel(messages("produceApiCheckYourAnswers.button"))
         )
