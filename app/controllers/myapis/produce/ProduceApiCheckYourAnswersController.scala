@@ -33,6 +33,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.myapis.produce.*
 import viewmodels.govuk.all.SummaryListViewModel
+import viewmodels.myapis.ProduceApiDeploymentErrorViewModel
 import views.html.myapis.DeploymentSuccessView
 import views.html.myapis.produce.{ProduceApiCheckYourAnswersView, ProduceApiDeploymentErrorView}
 
@@ -54,6 +55,11 @@ class ProduceApiCheckYourAnswersController @Inject()(
                                                       apiHubService: ApiHubService,
                                            )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
+  val viewModel = ProduceApiDeploymentErrorViewModel(
+    controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onCancel(),
+    controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
+  )
+
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
       Ok(view(SummaryListViewModel(summaryListRows(request.userAnswers)), request.user))
@@ -74,7 +80,7 @@ class ProduceApiCheckYourAnswersController @Inject()(
                 )
               )
           case InvalidOasResponse(failure) =>
-            Future.successful(BadRequest(errorView(request.user, failure)))
+            Future.successful(BadRequest(errorView(request.user, failure, viewModel)))
         }})
   }
 

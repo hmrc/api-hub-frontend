@@ -44,6 +44,8 @@ object MyApisNavItems {
 
     val isHipApi = apiDetail.isSelfServe
     isHipApi && isDeployedToTest
+
+    true
   }
 
   def apply(apiDetail: ApiDetail, user: UserModel, currentPage: SideNavPage, apiDeploymentStatuses: ApiDeploymentStatuses, hipEnvironments: HipEnvironments)(implicit messages: Messages): Seq[SideNavItem] = {

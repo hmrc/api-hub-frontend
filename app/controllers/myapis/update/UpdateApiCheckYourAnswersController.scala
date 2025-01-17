@@ -29,6 +29,7 @@ import views.html.myapis.produce.ProduceApiCheckYourAnswersView
 import viewmodels.govuk.all.SummaryListViewModel
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import viewmodels.myapis.ProduceApiDeploymentErrorViewModel
 
 class UpdateApiCheckYourAnswersController @Inject()(
                                         override val messagesApi: MessagesApi,
@@ -38,11 +39,22 @@ class UpdateApiCheckYourAnswersController @Inject()(
                                         successView: DeploymentSuccessView
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
+  val viewModel = ProduceApiDeploymentErrorViewModel(
+    controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onCancel(),
+    controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onPageLoad()
+  )
+
   def onPageLoad(): Action[AnyContent] = identify {
     implicit request =>  Ok(view(SummaryListViewModel(Seq.empty), request.user, None))
   }
 
   def onSubmit(): Action[AnyContent] = identify {
     implicit request => Ok(successView(request.user, "publisher-reference", "name"))
+  }
+
+  def onCancel(): Action[AnyContent] = identify.async {
+    implicit request =>
+      Future.successful(Redirect(controllers.routes.IndexController.onPageLoad))
+
   }
 }
