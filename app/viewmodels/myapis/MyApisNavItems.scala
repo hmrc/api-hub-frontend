@@ -20,8 +20,10 @@ import models.api.{ApiDeploymentStatus, ApiDeploymentStatuses, ApiDetail}
 import models.user.UserModel
 import play.api.i18n.Messages
 import viewmodels.{SideNavItem, SideNavPage}
-import SideNavItem.SideNavItemLeaf
-import config.HipEnvironments
+import SideNavItem.{SideNavItemBranch, SideNavItemLeaf}
+import config.{HipEnvironment, HipEnvironments}
+
+import javax.inject.{Inject, Singleton}
 
 object MyApisNavPages {
 
@@ -30,10 +32,14 @@ object MyApisNavPages {
   case object ChangeOwningTeamPage extends SideNavPage
   case object ApiUsagePage extends SideNavPage
   case object ViewApiAsConsumerPage extends SideNavPage
+  case class EnvironmentPage(hipEnvironment: HipEnvironment) extends SideNavPage {
+    override def toString: String = hipEnvironment.id
+  }
 
 }
 
-object MyApisNavItems {
+@Singleton
+class MyApisNavItems @Inject()(hipEnvironments: HipEnvironments) {
 
   import MyApisNavPages._
   
@@ -46,24 +52,38 @@ object MyApisNavItems {
     isHipApi && isDeployedToTest
   }
 
-  def apply(apiDetail: ApiDetail, user: UserModel, currentPage: SideNavPage, apiDeploymentStatuses: ApiDeploymentStatuses, hipEnvironments: HipEnvironments)(implicit messages: Messages): Seq[SideNavItem] = {
+  def apply(apiDetail: ApiDetail, user: UserModel, currentPage: SideNavPage, apiDeploymentStatuses: ApiDeploymentStatuses)(implicit messages: Messages): Seq[SideNavItem] = {
     Seq(
-      SideNavItemLeaf(
-        page = ProducerApiDetailsPage,
-        title = messages("myApis.details.title"),
-        link = controllers.myapis.routes.MyApiDetailsController.onPageLoad(apiDetail.id),
-        isCurrentPage = currentPage == ProducerApiDetailsPage
-      )) ++ (
-        if (canUpdateApi(apiDetail, apiDeploymentStatuses, hipEnvironments)) {
-          Some(SideNavItemLeaf(
-            page = UpdateApiPage,
-            title = messages("myApis.update.title"),
-            link = controllers.myapis.update.routes.UpdateApiStartController.startProduceApi(apiDetail.id),
-            isCurrentPage = currentPage == UpdateApiPage
-          ))
-        } else {
-          None
-        }) ++
+      Some(
+        SideNavItemLeaf(
+          page = ProducerApiDetailsPage,
+          title = messages("myApis.details.title"),
+          link = controllers.myapis.routes.MyApiDetailsController.onPageLoad(apiDetail.id),
+          isCurrentPage = currentPage == ProducerApiDetailsPage
+        )
+      ),
+      Option.when(canUpdateApi(apiDetail, apiDeploymentStatuses, hipEnvironments)) {
+        SideNavItemLeaf(
+          page = UpdateApiPage,
+          title = messages("myApis.update.title"),
+          link = controllers.myapis.update.routes.UpdateApiStartController.startProduceApi(apiDetail.id),
+          isCurrentPage = currentPage == UpdateApiPage
+        )
+      },
+      Some(
+        SideNavItemBranch(
+          title = messages("applicationNav.page.environments"),
+          sideNavItems = hipEnvironments.environments.map { hipEnvironment =>
+            val environmentPage = EnvironmentPage(hipEnvironment)
+            SideNavItemLeaf(
+              page = environmentPage,
+              title = messages(s"site.environment.${hipEnvironment.id}"),
+              link = controllers.myapis.routes.MyApiEnvironmentController.onPageLoad(apiDetail.id, hipEnvironment.id),
+              isCurrentPage = currentPage == environmentPage,
+            )
+          }
+        )
+      ),
       Option.when(user.permissions.canSupport) {
         SideNavItemLeaf(
           page = ApiUsagePage,
@@ -71,13 +91,16 @@ object MyApisNavItems {
           link = controllers.myapis.routes.ApiUsageController.onPageLoad(apiDetail.id),
           isCurrentPage = currentPage == ApiUsagePage
         )
-      } :+
-      SideNavItemLeaf(
-        page = ViewApiAsConsumerPage,
-        title = messages("myApis.viewApiAsConsumer.title"),
-        link = controllers.routes.ApiDetailsController.onPageLoad(apiDetail.id),
-        isCurrentPage = currentPage == ViewApiAsConsumerPage,
-        opensInNewTab = true
+      },
+      Some(
+        SideNavItemLeaf(
+          page = ViewApiAsConsumerPage,
+          title = messages("myApis.viewApiAsConsumer.title"),
+          link = controllers.routes.ApiDetailsController.onPageLoad(apiDetail.id),
+          isCurrentPage = currentPage == ViewApiAsConsumerPage,
+          opensInNewTab = true
+        )
       )
+    ).flatten
   }
 }

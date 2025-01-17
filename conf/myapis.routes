@@ -8,6 +8,8 @@ GET     /all                                                controllers.myapis.M
 
 GET     /:id                                                controllers.myapis.MyApiDetailsController.onPageLoad(id: String)
 
+GET     /environments/:id/:environment                      controllers.myapis.MyApiEnvironmentController.onPageLoad(id: String, environment: String)
+
 GET     /usage/:apiId                                       controllers.myapis.ApiUsageController.onPageLoad(apiId: String)
 
 GET     /update-team/:apiId                                 controllers.myapis.UpdateApiTeamController.onPageLoad(apiId: String)

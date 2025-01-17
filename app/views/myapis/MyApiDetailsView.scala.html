@@ -19,7 +19,6 @@
 @import models.user.UserModel
 @import views.html.components.IconsLink
 @import viewmodels.myapis.{MyApisNavPages, MyApisNavItems}
-@import config.HipEnvironments
 
 @this(
         layout: templates.Layout,
@@ -27,7 +26,7 @@
         govukSummaryList: GovukSummaryList,
         sideNav: views.html.templates.SideNav,
         iconsLink: IconsLink,
-        hipEnvironments: HipEnvironments
+        myApisNavItems: MyApisNavItems
 )
 
 @(apiDetail: ApiDetail, deploymentStatuses: ApiDeploymentStatuses, user: UserModel, supportEmailAddress: String, teamName: Option[String])(implicit request: Request[?], messages: Messages)
@@ -78,7 +77,7 @@
 }
 
 @layout(pageTitle = titleNoForm(messages("myApis.details.title")), user = Some(user), fullWidth = true, customScriptsBlock = Some(iconsLink())) {
-    @sideNav(apiDetail.title, MyApisNavItems(apiDetail, user, MyApisNavPages.ProducerApiDetailsPage, deploymentStatuses, hipEnvironments)) {
+    @sideNav(apiDetail.title, myApisNavItems(apiDetail, user, MyApisNavPages.ProducerApiDetailsPage, deploymentStatuses)) {
         <h1 id="details" class="govuk-heading-l">@messages("myApis.details.title")</h1>
 
         @govukSummaryList(SummaryList(
