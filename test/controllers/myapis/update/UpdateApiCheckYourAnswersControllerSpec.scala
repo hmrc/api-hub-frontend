@@ -46,13 +46,15 @@ import viewmodels.myapis.produce.ProduceApiCheckYourAnswersViewModel
 import views.html.ErrorTemplate
 import views.html.myapis.DeploymentSuccessView
 import views.html.myapis.produce.{ProduceApiCheckYourAnswersView, ProduceApiDeploymentErrorView}
-
+import viewmodels.myapis.ProduceApiDeploymentErrorViewModel
 import java.time.LocalDateTime
 import scala.concurrent.Future
 
 class UpdateApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with TableDrivenPropertyChecks {
 
-  private lazy val updateApiCheckYourAnswersRoute = controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onPageLoad().url
+  private lazy val updateApiCheckYourAnswersRoute = controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onPageLoad()
+  private lazy val updateApiCancelRoute = controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onCancel()
+  private lazy val errorViewModel = ProduceApiDeploymentErrorViewModel(updateApiCancelRoute, updateApiCheckYourAnswersRoute)
 
   private val fullyPopulatedUserAnswers = UserAnswers(userAnswersId)
     .set(UpdateApiApiPage, FakeApiDetail).success.value
@@ -84,7 +86,7 @@ class UpdateApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar
       implicit val msgs: Messages = messages(fixture.application)
       
       running(fixture.application) {
-        val request = FakeRequest(GET, updateApiCheckYourAnswersRoute)
+        val request = FakeRequest(GET, updateApiCheckYourAnswersRoute.url)
         val result = route(fixture.application, request).value
         val viewModel = ProduceApiCheckYourAnswersViewModel(
           controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onSubmit()
@@ -102,7 +104,7 @@ class UpdateApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar
       val fixture = buildFixture(None)
 
       running(fixture.application) {
-        val request = FakeRequest(GET, updateApiCheckYourAnswersRoute)
+        val request = FakeRequest(GET, updateApiCheckYourAnswersRoute.url)
 
         val result = route(fixture.application, request).value
 
@@ -122,7 +124,7 @@ class UpdateApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar
       when(fixture.sessionRepository.clear(FakeUser.userId)).thenReturn(Future.successful(true))
 
       running(fixture.application) {
-        val request = FakeRequest(POST, updateApiCheckYourAnswersRoute)
+        val request = FakeRequest(POST, updateApiCheckYourAnswersRoute.url)
 
         val result = route(fixture.application, request).value
 
@@ -151,13 +153,13 @@ class UpdateApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar
         .thenReturn(Future.successful[Option[DeploymentsResponse]](Some(response)))
 
       running(fixture.application) {
-        val request = FakeRequest(POST, updateApiCheckYourAnswersRoute)
+        val request = FakeRequest(POST, updateApiCheckYourAnswersRoute.url)
         implicit val msgs: Messages = messages(fixture.application)
 
         val result = route(fixture.application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(FakeUser, response.failure)(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(FakeUser, response.failure, errorViewModel)(request, messages(fixture.application)).toString
       }
     }
 
@@ -172,7 +174,7 @@ class UpdateApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar
         .thenReturn(Future.successful(None))
 
       running(fixture.application) {
-        val request = FakeRequest(POST, updateApiCheckYourAnswersRoute)
+        val request = FakeRequest(POST, updateApiCheckYourAnswersRoute.url)
         implicit val msgs: Messages = messages(fixture.application)
 
         val result = route(fixture.application, request).value
@@ -236,7 +238,7 @@ class UpdateApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar
         when(fixture.apiHubService.updateDeployment(any, any)(any))
           .thenReturn(Future.successful(Some(response)))
 
-        val request = FakeRequest(POST, updateApiCheckYourAnswersRoute)
+        val request = FakeRequest(POST, updateApiCheckYourAnswersRoute.url)
 
         val result = route(fixture.application, request).value
 

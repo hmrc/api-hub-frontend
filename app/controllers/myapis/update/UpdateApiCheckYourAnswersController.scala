@@ -59,7 +59,7 @@ class UpdateApiCheckYourAnswersController @Inject()(
                                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
 
-  val viewModel = ProduceApiDeploymentErrorViewModel(
+  val errorViewModel = ProduceApiDeploymentErrorViewModel(
     controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onCancel(),
     controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onPageLoad()
   )
@@ -89,7 +89,7 @@ class UpdateApiCheckYourAnswersController @Inject()(
                   )
                 )
             case Some(InvalidOasResponse(failure)) =>
-              Future.successful(BadRequest(errorView(request.user, failure)))
+              Future.successful(BadRequest(errorView(request.user, failure, errorViewModel)))
             case None =>
               Future.successful(errorResultBuilder.apiNotFound(publisherReference))
           }
