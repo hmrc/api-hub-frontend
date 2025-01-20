@@ -56,7 +56,7 @@
 
 @showDeployedVersion(deploymentStatus: ApiDeploymentStatus) = @{deploymentStatus match {
         case Deployed(_, version) => version
-        case _ => ""
+        case _ => messages("apiDeployments.status.notDeployed")
     }
 }
 
