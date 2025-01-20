@@ -245,13 +245,11 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
         .thenReturn(Future.successful(true))
 
       running(fixture.application) {
-        val request = FakeRequest(POST, produceApiCheckYourAnswersRoute)
+        val request = FakeRequest(controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onSubmit())
         val result = route(fixture.application, request).value
 
-        val successRoute = controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onSuccess("api name", "id").url
-
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result) mustBe Some(successRoute)
+        redirectLocation(result) mustBe Some(controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onSuccess("api name", "id").url)
       }
     }
 
@@ -271,13 +269,11 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
         .thenReturn(Future.successful(true))
 
       running(fixture.application) {
-        val request = FakeRequest(POST, produceApiCheckYourAnswersRoute)
+        val request = FakeRequest(controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onSubmit())
         val result = route(fixture.application, request).value
 
-        val successRoute = controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onSuccess("api name", "id").url
-
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result) mustBe Some(successRoute)
+        redirectLocation(result) mustBe Some(controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onSuccess("api name", "id").url)
       }
     }
 
