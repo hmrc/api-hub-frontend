@@ -43,7 +43,8 @@ import services.ApiHubService
 import viewmodels.checkAnswers.myapis.produce.*
 import views.html.myapis.produce.{ProduceApiCheckYourAnswersView, ProduceApiDeploymentErrorView}
 import viewmodels.govuk.all.SummaryListViewModel
-import viewmodels.myapis.produce.ProduceApiCheckYourAnswersViewModel
+import viewmodels.myapis.produce
+import viewmodels.myapis.produce.{ProduceApiCheckYourAnswersViewModel, ProduceApiDeploymentErrorViewModel}
 import views.html.myapis.DeploymentSuccessView
 
 import java.time.LocalDateTime
@@ -51,7 +52,9 @@ import scala.concurrent.Future
 
 class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with TableDrivenPropertyChecks {
 
-  private lazy val produceApiCheckYourAnswersRoute = controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad().url
+  private lazy val produceApiCheckYourAnswersRoute = controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
+  private lazy val produceApiCancelRoute = controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onCancel()
+  private lazy val viewModel = produce.ProduceApiDeploymentErrorViewModel(produceApiCancelRoute, produceApiCheckYourAnswersRoute)
 
   private val fullyPopulatedUserAnswers = UserAnswers(userAnswersId)
     .set(ProduceApiChooseTeamPage, Team("id", "name", LocalDateTime.now(), Seq.empty)).success.value
@@ -87,7 +90,7 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       implicit val msgs: Messages = messages(fixture.application)
       
       running(fixture.application) {
-        val request = FakeRequest(GET, produceApiCheckYourAnswersRoute)
+        val request = FakeRequest(GET, produceApiCheckYourAnswersRoute.url)
         val result = route(fixture.application, request).value
         val viewModel = ProduceApiCheckYourAnswersViewModel(
           controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onSubmit()
@@ -105,7 +108,7 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       val fixture = buildFixture(None)
 
       running(fixture.application) {
-        val request = FakeRequest(GET, produceApiCheckYourAnswersRoute)
+        val request = FakeRequest(GET, produceApiCheckYourAnswersRoute.url)
 
         val result = route(fixture.application, request).value
 
@@ -125,7 +128,7 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       when(fixture.sessionRepository.clear(FakeUser.userId)).thenReturn(Future.successful(true))
 
       running(fixture.application) {
-        val request = FakeRequest(POST, produceApiCheckYourAnswersRoute)
+        val request = FakeRequest(POST, produceApiCheckYourAnswersRoute.url)
 
         val result = route(fixture.application, request).value
 
@@ -154,13 +157,13 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
         .thenReturn(Future.successful[DeploymentsResponse](response))
 
       running(fixture.application) {
-        val request = FakeRequest(POST, produceApiCheckYourAnswersRoute)
+        val request = FakeRequest(POST, produceApiCheckYourAnswersRoute.url)
         implicit val msgs: Messages = messages(fixture.application)
 
         val result = route(fixture.application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(FakeUser, response.failure)(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(FakeUser, response.failure, viewModel)(request, messages(fixture.application)).toString
       }
     }
 
@@ -215,7 +218,7 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
         when(fixture.apiHubService.generateDeployment(any)(any))
           .thenReturn(Future.successful(response))
 
-        val request = FakeRequest(POST, produceApiCheckYourAnswersRoute)
+        val request = FakeRequest(POST, produceApiCheckYourAnswersRoute.url)
 
         val result = route(fixture.application, request).value
 
