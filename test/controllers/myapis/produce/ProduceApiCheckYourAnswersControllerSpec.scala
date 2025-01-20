@@ -58,6 +58,7 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
     .set(ProduceApiEnterOasPage, "oas").success.value
     .set(ProduceApiEnterApiTitlePage, "api name").success.value
     .set(ProduceApiShortDescriptionPage, "api description").success.value
+    .set(ProduceApiAddPrefixesPage, true).success.value
     .set(ProduceApiEgressPrefixesPage, ProduceApiEgressPrefixes(Seq("/prefix"), Seq("/existing->/replacement"))).success.value
     .set(ProduceApiHodPage, Set("hod1")).success.value
     .set(ProduceApiDomainPage, ProduceApiDomainSubdomain("domain", "subdomain")).success.value
@@ -199,6 +200,7 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
         (ProduceApiEnterOasPage, nonSupportUser, produceApiRoutes.ProduceApiEnterOasController.onPageLoad(CheckMode).url),
         (ProduceApiEnterApiTitlePage, nonSupportUser, routes.JourneyRecoveryController.onPageLoad().url),
         (ProduceApiShortDescriptionPage, nonSupportUser, produceApiRoutes.ProduceApiShortDescriptionController.onPageLoad(CheckMode).url),
+        (ProduceApiAddPrefixesPage, nonSupportUser, produceApiRoutes.ProduceApiAddPrefixesController.onPageLoad(CheckMode).url),
         (ProduceApiEgressPrefixesPage, nonSupportUser, produceApiRoutes.ProduceApiEgressPrefixesController.onPageLoad(CheckMode).url),
         (ProduceApiHodPage, nonSupportUser, produceApiRoutes.ProduceApiHodController.onPageLoad(CheckMode).url),
         (ProduceApiDomainPage, nonSupportUser, produceApiRoutes.ProduceApiDomainController.onPageLoad(CheckMode).url),
@@ -221,6 +223,58 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual expectedLocation
+      }
+    }
+
+    "does not require egress prefixes when add prefixes is false" in {
+      val userAnswers = fullyPopulatedUserAnswers
+        .set(ProduceApiAddPrefixesPage, false).success.value
+        .remove(ProduceApiEgressPrefixesPage).success.value
+
+      val response: DeploymentsResponse = SuccessfulDeploymentsResponse("id", "1.0.0", 1, "uri.com")
+
+      val fixture = buildFixture(userAnswers = Some(userAnswers))
+
+      when(fixture.apiHubService.generateDeployment(any)(any))
+        .thenReturn(Future.successful(response))
+
+      when(fixture.sessionRepository.clear(FakeUser.userId))
+        .thenReturn(Future.successful(true))
+
+      running(fixture.application) {
+        val request = FakeRequest(POST, produceApiCheckYourAnswersRoute)
+        val result = route(fixture.application, request).value
+
+        val successRoute = controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onSuccess("api name", "id").url
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result) mustBe Some(successRoute)
+      }
+    }
+
+    "does not require an egress when one is not available" in {
+      val userAnswers = fullyPopulatedUserAnswers
+        .set(ProduceApiEgressAvailabilityPage, false).success.value
+        .remove(ProduceApiEgressSelectionPage).success.value
+
+      val response: DeploymentsResponse = SuccessfulDeploymentsResponse("id", "1.0.0", 1, "uri.com")
+
+      val fixture = buildFixture(userAnswers = Some(userAnswers))
+
+      when(fixture.apiHubService.generateDeployment(any)(any))
+        .thenReturn(Future.successful(response))
+
+      when(fixture.sessionRepository.clear(FakeUser.userId))
+        .thenReturn(Future.successful(true))
+
+      running(fixture.application) {
+        val request = FakeRequest(POST, produceApiCheckYourAnswersRoute)
+        val result = route(fixture.application, request).value
+
+        val successRoute = controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onSuccess("api name", "id").url
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result) mustBe Some(successRoute)
       }
     }
 
