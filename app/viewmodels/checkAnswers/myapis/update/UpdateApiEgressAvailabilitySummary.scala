@@ -29,16 +29,17 @@ import viewmodels.implicits.*
 object UpdateApiEgressAvailabilitySummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(UpdateApiEgressAvailabilityPage).map(available =>
-      SummaryListRowViewModel(
-        key = "produceApiEgressAvailability.cya.label",
-        value = ValueViewModel(
-          if (available) "site.yes" else "site.no"
-        ),
-        actions = Seq(
-          ActionItemViewModel("site.change", routes.UpdateApiEgressAvailabilityController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("produceApiEgressAvailability.change.hidden"))
-        )
-      )
-    )
+    answers.get(UpdateApiEgressAvailabilityPage) flatMap {
+      case false =>
+        Some(SummaryListRowViewModel(
+          key = "produceApiEgressAvailability.cya.label",
+          value = ValueViewModel("site.no"),
+          actions = Seq(
+            ActionItemViewModel("site.change", routes.UpdateApiEgressAvailabilityController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("produceApiEgressAvailability.change.hidden"))
+          )
+        ))
+      case _ => None
+    }
+
 }

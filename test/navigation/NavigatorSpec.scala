@@ -385,6 +385,14 @@ class NavigatorSpec extends SpecBase with TryValues {
         "must go from the Upload OAS page to the OAS editor page" in {
           navigator.nextPage(UpdateApiUploadOasPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiEnterOasController.onPageLoadWithUploadedOas(CheckMode)
         }
+        "must go from the Egress Availability page to the Egress Selection page if user answered Yes" in {
+          val userAnswers = emptyUserAnswers.set(UpdateApiEgressAvailabilityPage, true).get
+          navigator.nextPage(UpdateApiEgressAvailabilityPage, CheckMode, userAnswers) mustBe controllers.myapis.update.routes.UpdateApiEgressSelectionController.onPageLoad(CheckMode)
+        }
+        "must go from the Egress Availability page to the User Answers page if user answered No" in {
+          val userAnswers = emptyUserAnswers.set(UpdateApiEgressAvailabilityPage, false).get
+          navigator.nextPage(UpdateApiEgressAvailabilityPage, CheckMode, userAnswers) mustBe controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onPageLoad()
+        }
         "must go from the Add Prefixes page to the Check Your Answers page if user answered No" in {
           val userAnswers = emptyUserAnswers.set(UpdateApiAddPrefixesPage, false).get
           navigator.nextPage(UpdateApiAddPrefixesPage, CheckMode, userAnswers) mustBe controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onPageLoad()

@@ -85,7 +85,7 @@ class Navigator @Inject()() {
     case UpdateApiHowToUpdatePage => updateApiHowToUpdateNextPage(NormalMode)
     case UpdateApiReviewNameDescriptionPage => updateApiReviewNameDescriptionNextPage(NormalMode)
     case UpdateApiEgressAvailabilityPage => updateApiEgressAvailabilityNextPage(NormalMode)
-    case UpdateApiEgressSelectionPage => updateApiEgressSelectionNextPage(NormalMode) 
+    case UpdateApiEgressSelectionPage => updateApiEgressSelectionNextPage(NormalMode)
     case UpdateApiHowToAddWiremockPage => updateApiHowToAddWiremockNextPage(NormalMode)
     case UpdateApiEnterWiremockPage => _ => controllers.myapis.update.routes.UpdateApiAddPrefixesController.onPageLoad(NormalMode)
     case UpdateApiEgressPrefixesPage => _ => controllers.myapis.update.routes.UpdateApiHodController.onPageLoad(NormalMode)
@@ -121,6 +121,7 @@ class Navigator @Inject()() {
     case UpdateApiAddPrefixesPage => updateApiAddPrefixNextPage(CheckMode)
     case UpdateApiUploadWiremockPage => _ => controllers.myapis.update.routes.UpdateApiEnterWiremockController.onPageLoadWithUploadedWiremock(CheckMode)
     case UpdateApiReviewNameDescriptionPage => updateApiReviewNameDescriptionNextPage(CheckMode)
+    case UpdateApiEgressAvailabilityPage => updateApiEgressAvailabilityNextPage(CheckMode)
     case UpdateApiEgressSelectionPage => updateApiEgressSelectionNextPage(CheckMode)
     case _ => _ => routes.IndexController.onPageLoad
   }
@@ -240,7 +241,7 @@ class Navigator @Inject()() {
   private def updateApiReviewNameDescriptionNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
     (mode, userAnswers.get(UpdateApiEgressAvailabilityPage)) match {
       case (NormalMode, Some(true)) => controllers.myapis.update.routes.UpdateApiEgressSelectionController.onPageLoad(mode)
-      case (NormalMode, Some(false)) => controllers.myapis.update.routes.UpdateApiEgressAvailabilityController.onPageLoad(mode)
+      case (NormalMode, _) => controllers.myapis.update.routes.UpdateApiEgressAvailabilityController.onPageLoad(mode)
       case (CheckMode, _) => controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onPageLoad()
       case _ => routes.JourneyRecoveryController.onPageLoad()
     }
@@ -258,7 +259,7 @@ class Navigator @Inject()() {
   private def updateApiEgressSelectionNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
     (mode, userAnswers.get(UpdateApiAddPrefixesPage)) match {
       case (NormalMode, Some(true)) => controllers.myapis.update.routes.UpdateApiEgressPrefixesController.onPageLoad(mode)
-      case (NormalMode, Some(false)) => controllers.myapis.update.routes.UpdateApiAddPrefixesController.onPageLoad(mode)
+      case (NormalMode, _) => controllers.myapis.update.routes.UpdateApiAddPrefixesController.onPageLoad(mode)
       case (CheckMode, _) => controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onPageLoad()
       case _ => routes.JourneyRecoveryController.onPageLoad()
     }
