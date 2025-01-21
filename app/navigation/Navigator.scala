@@ -118,11 +118,17 @@ class Navigator @Inject()() {
     case ProduceApiStatusPage => _ => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
     case ProduceApiPassthroughPage => _ => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
     case UpdateApiUploadOasPage => _ => controllers.myapis.update.routes.UpdateApiEnterOasController.onPageLoadWithUploadedOas(CheckMode)
+    case UpdateApiEnterOasPage => _ => controllers.myapis.update.routes.UpdateApiShortDescriptionController.onPageLoad(CheckMode)
+    case UpdateApiShortDescriptionPage => _ => controllers.myapis.update.routes.UpdateApiReviewNameDescriptionController.onPageLoad(CheckMode)
+    case UpdateApiReviewNameDescriptionPage => updateApiReviewNameDescriptionNextPage(CheckMode)
     case UpdateApiAddPrefixesPage => updateApiAddPrefixNextPage(CheckMode)
     case UpdateApiUploadWiremockPage => _ => controllers.myapis.update.routes.UpdateApiEnterWiremockController.onPageLoadWithUploadedWiremock(CheckMode)
-    case UpdateApiReviewNameDescriptionPage => updateApiReviewNameDescriptionNextPage(CheckMode)
     case UpdateApiEgressAvailabilityPage => updateApiEgressAvailabilityNextPage(CheckMode)
     case UpdateApiEgressSelectionPage => updateApiEgressSelectionNextPage(CheckMode)
+    case UpdateApiEgressPrefixesPage => _ => controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onPageLoad()
+    case UpdateApiHodPage => _ => controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onPageLoad()
+    case UpdateApiDomainPage => _ => controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onPageLoad()
+    case UpdateApiStatusPage => _ => controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onPageLoad()
     case _ => _ => routes.IndexController.onPageLoad
   }
 

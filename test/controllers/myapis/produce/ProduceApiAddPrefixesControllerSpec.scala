@@ -22,12 +22,13 @@ import controllers.myapis.produce.routes as produceApiRoutes
 import controllers.routes
 import forms.myapis.produce.ProduceApiAddPrefixesFormProvider
 import models.api.Alpha
+import models.myapis.produce.ProduceApiEgressPrefixes
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.ArgumentMatchers.{any, argThat}
+import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.myapis.produce.ProduceApiAddPrefixesPage
+import pages.myapis.produce.{ProduceApiAddPrefixesPage, ProduceApiEgressPrefixesPage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -111,6 +112,30 @@ class ProduceApiAddPrefixesControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must clear previous prefixes answer if user selects 'No'" in {
+      val mockSessionRepository = mock[ProduceApiSessionRepository]
+      val userAnswersWithPrefixes = emptyUserAnswers.set(ProduceApiEgressPrefixesPage, ProduceApiEgressPrefixes(Seq.empty, Seq.empty)).success.value
+
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswersWithPrefixes)).overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[ProduceApiSessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(POST, produceApiAddPrefixesRoute).withFormUrlEncodedBody(("value", "false"))
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        verify(mockSessionRepository).set(argThat { (userAnswers: UserAnswers) =>
+          userAnswers.get(ProduceApiEgressPrefixesPage).isEmpty
+        })
+      }
+    }
+    
     "must return a Bad Request and errors when invalid data is submitted" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()

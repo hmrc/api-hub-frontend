@@ -385,6 +385,15 @@ class NavigatorSpec extends SpecBase with TryValues {
         "must go from the Upload OAS page to the OAS editor page" in {
           navigator.nextPage(UpdateApiUploadOasPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiEnterOasController.onPageLoadWithUploadedOas(CheckMode)
         }
+        "must go from the OAS editor page to the description page" in {
+          navigator.nextPage(UpdateApiEnterOasPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiShortDescriptionController.onPageLoad(CheckMode)
+        }
+        "must go from the description page to the review page" in {
+          navigator.nextPage(UpdateApiShortDescriptionPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiReviewNameDescriptionController.onPageLoad(CheckMode)
+        }
+        "must go from the review page to the CYA page" in {
+          navigator.nextPage(UpdateApiReviewNameDescriptionPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onPageLoad()
+        }
         "must go from the Egress Availability page to the Egress Selection page if user answered Yes" in {
           val userAnswers = emptyUserAnswers.set(UpdateApiEgressAvailabilityPage, true).get
           navigator.nextPage(UpdateApiEgressAvailabilityPage, CheckMode, userAnswers) mustBe controllers.myapis.update.routes.UpdateApiEgressSelectionController.onPageLoad(CheckMode)
@@ -396,6 +405,18 @@ class NavigatorSpec extends SpecBase with TryValues {
         "must go from the Add Prefixes page to the Check Your Answers page if user answered No" in {
           val userAnswers = emptyUserAnswers.set(UpdateApiAddPrefixesPage, false).get
           navigator.nextPage(UpdateApiAddPrefixesPage, CheckMode, userAnswers) mustBe controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onPageLoad()
+        }
+        "must go from the prefixes page to the CYA page" in {
+          navigator.nextPage(UpdateApiEgressPrefixesPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onPageLoad()
+        }
+        "must go from the HoD page to the CYA page" in {
+          navigator.nextPage(UpdateApiHodPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onPageLoad()
+        }
+        "must go from the Domains page to the CYA page" in {
+          navigator.nextPage(UpdateApiDomainPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onPageLoad()
+        }
+        "must go from the Status page to the CYA page" in {
+          navigator.nextPage(UpdateApiStatusPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onPageLoad()
         }
 
       }

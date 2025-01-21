@@ -23,7 +23,7 @@ import forms.myapis.produce.ProduceApiAddPrefixesFormProvider
 import models.Mode
 import models.requests.DataRequest
 import navigation.Navigator
-import pages.myapis.update.UpdateApiAddPrefixesPage
+import pages.myapis.update.{UpdateApiAddPrefixesPage, UpdateApiEgressPrefixesPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -70,6 +70,11 @@ class UpdateApiAddPrefixesController @Inject()(
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(UpdateApiAddPrefixesPage, value))
+            updatedAnswers <- if (!value) {
+              Future.fromTry(updatedAnswers.remove(UpdateApiEgressPrefixesPage))
+            } else {
+              Future.successful(updatedAnswers)
+            }
             _ <- sessionRepository.set(updatedAnswers)
           } yield Redirect(navigator.nextPage(UpdateApiAddPrefixesPage, mode, updatedAnswers))
       )

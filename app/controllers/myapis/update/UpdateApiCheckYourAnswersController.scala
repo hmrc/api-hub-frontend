@@ -24,6 +24,7 @@ import models.deployment.*
 import models.myapis.produce.{ProduceApiChooseEgress, ProduceApiDomainSubdomain, ProduceApiEgressPrefixes}
 import models.requests.DataRequest
 import models.team.Team
+import models.user.UserModel
 import models.{CheckMode, UserAnswers}
 import pages.myapis.update.*
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
@@ -66,7 +67,7 @@ class UpdateApiCheckYourAnswersController @Inject()(
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
       Ok(view(
-        SummaryListViewModel(summaryListRows(request.userAnswers)),
+        SummaryListViewModel(summaryListRows(request.userAnswers, request.user)),
         request.user,
         ProduceApiCheckYourAnswersViewModel(controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onSubmit())
       ))
@@ -192,7 +193,7 @@ class UpdateApiCheckYourAnswersController @Inject()(
     }
   }
 
-  private def summaryListRows(userAnswers: UserAnswers)(implicit messages: Messages): Seq[SummaryListRow] =
+  private def summaryListRows(userAnswers: UserAnswers, userModel: UserModel)(implicit messages: Messages): Seq[SummaryListRow] =
     Seq(
       UpdateApiEnterOasSummary.row(userAnswers),
       UpdateApiNameSummary.row(userAnswers),
@@ -203,5 +204,6 @@ class UpdateApiCheckYourAnswersController @Inject()(
       UpdateApiHodSummary.row(userAnswers, hods),
       UpdateApiDomainSummary.row(userAnswers, domains),
       UpdateApiSubDomainSummary.row(userAnswers, domains),
+      UpdateApiStatusSummary.row(userAnswers, userModel),
     ).flatten
 }

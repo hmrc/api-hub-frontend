@@ -22,7 +22,7 @@ import forms.myapis.produce.ProduceApiAddPrefixesFormProvider
 import models.Mode
 import models.requests.DataRequest
 import navigation.Navigator
-import pages.myapis.produce.ProduceApiAddPrefixesPage
+import pages.myapis.produce.{ProduceApiAddPrefixesPage, ProduceApiEgressPrefixesPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -70,6 +70,11 @@ class ProduceApiAddPrefixesController @Inject()(
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(ProduceApiAddPrefixesPage, value))
+            updatedAnswers <- if (!value) {
+              Future.fromTry(updatedAnswers.remove(ProduceApiEgressPrefixesPage))
+            } else {
+              Future.successful(updatedAnswers)
+            }
             _ <- sessionRepository.set(updatedAnswers)
           } yield Redirect(navigator.nextPage(ProduceApiAddPrefixesPage, mode, updatedAnswers))
       )
