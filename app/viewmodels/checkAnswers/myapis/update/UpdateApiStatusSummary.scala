@@ -29,19 +29,19 @@ import viewmodels.implicits.*
 object UpdateApiStatusSummary  {
 
   def row(answers: UserAnswers, user: UserModel)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(UpdateApiStatusPage).map {
-      answer =>
-        val value = ValueViewModel(
-          HtmlContent(answer.toString)
-        )
-
-        SummaryListRowViewModel(
-          key     = "produceApiStatus.checkYourAnswersLabel",
-          value   = value,
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.UpdateApiReviewApiStatusController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("produceApiStatus.change.hidden"))
+      answers.get(UpdateApiStatusPage).filter(_ => user.permissions.canSupport).map {
+        answer =>
+          val value = ValueViewModel(
+            HtmlContent(answer.toString)
           )
-        )
-    }
+
+          SummaryListRowViewModel(
+            key     = "produceApiStatus.checkYourAnswersLabel",
+            value   = value,
+            actions = Seq(
+              ActionItemViewModel("site.change", routes.UpdateApiReviewApiStatusController.onPageLoad(CheckMode).url)
+                .withVisuallyHiddenText(messages("produceApiStatus.change.hidden"))
+            )
+          )
+      }
 }

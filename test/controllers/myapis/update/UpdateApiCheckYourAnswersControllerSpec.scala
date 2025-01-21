@@ -17,7 +17,7 @@
 package controllers.myapis.update
 
 import base.SpecBase
-import controllers.actions.{FakeApiDetail, FakeUser}
+import controllers.actions.{FakeApiDetail, FakeSupporter, FakeUser}
 import controllers.myapis.update.routes as updateApiRoutes
 import controllers.routes
 import fakes.{FakeDomains, FakeHods}
@@ -82,7 +82,7 @@ class UpdateApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar
   ).flatten)
 
   "UpdateApiCheckYourAnswersController" - {
-    "must return OK and the correct view for a GET" in {
+    "must return OK and the correct view for a GET for a non-support user" in {
       val fixture = buildFixture(Some(fullyPopulatedUserAnswers))
       implicit val msgs: Messages = messages(fixture.application)
       
@@ -98,6 +98,25 @@ class UpdateApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual view(expectedSummaryList, FakeUser, viewModel)(request, messages(fixture.application)).toString
+      }
+    }
+    
+    "must return OK and the correct view for a GET for a support user" in {
+      val fixture = buildFixture(Some(fullyPopulatedUserAnswers), userModel = Some(FakeSupporter))
+      implicit val msgs: Messages = messages(fixture.application)
+      
+      running(fixture.application) {
+        val request = FakeRequest(GET, updateApiCheckYourAnswersRoute)
+        val result = route(fixture.application, request).value
+        val viewModel = ProduceApiCheckYourAnswersViewModel(
+          controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onSubmit()
+        )
+        val view = fixture.application.injector.instanceOf[ProduceApiCheckYourAnswersView]
+        val expectedSummaryList = summaryList().copy(rows = summaryList().rows :+ UpdateApiStatusSummary.row(fullyPopulatedUserAnswers, FakeSupporter).get)
+        
+        status(result) mustEqual OK
+
+        contentAsString(result) mustEqual view(expectedSummaryList, FakeSupporter, viewModel)(request, messages(fixture.application)).toString
       }
     }
 
