@@ -106,7 +106,7 @@ class UpdateApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar
       implicit val msgs: Messages = messages(fixture.application)
       
       running(fixture.application) {
-        val request = FakeRequest(GET, updateApiCheckYourAnswersRoute)
+        val request = FakeRequest(GET, updateApiCheckYourAnswersRoute.url)
         val result = route(fixture.application, request).value
         val viewModel = ProduceApiCheckYourAnswersViewModel(
           controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onSubmit()
