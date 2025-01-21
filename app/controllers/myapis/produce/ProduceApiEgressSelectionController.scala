@@ -84,6 +84,7 @@ class ProduceApiEgressSelectionController @Inject()(
       "myApis.produce.selectegress.title",
       controllers.myapis.produce.routes.ProduceApiEgressSelectionController.onSubmit(mode),
       controllers.myapis.produce.routes.ProduceApiEgressAvailabilityController.onPageLoad(mode).url,
+      true
     )
     apiHubService.listEgressGateways().map(
       egressGateways =>

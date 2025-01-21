@@ -82,6 +82,7 @@ class UpdateApiEgressSelectionController @Inject()(
       "myApis.update.selectegress.title",
       controllers.myapis.update.routes.UpdateApiEgressSelectionController.onSubmit(mode),
       controllers.myapis.update.routes.UpdateApiEgressAvailabilityController.onPageLoad(mode).url,
+      false
     )
     apiHubService.listEgressGateways().map(
       egressGateways =>
