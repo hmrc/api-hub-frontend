@@ -222,11 +222,7 @@ class ApplicationsConnectorSpec
 
   "ApplicationsConnector.getApplication" - {
     "must" - {
-      behave like successfulApplicationGetter(true, false)
-    }
-
-    "must" - {
-      behave like successfulApplicationGetter(false, false)
+      behave like successfulApplicationGetter(false)
     }
 
     "must return none when application is not found" in {
