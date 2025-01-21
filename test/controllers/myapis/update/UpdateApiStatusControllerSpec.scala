@@ -39,17 +39,17 @@ import views.html.myapis.produce.ProduceApiStatusView
 
 import scala.concurrent.Future
 
-class UpdateApiReviewApiStatusControllerSpec extends SpecBase with MockitoSugar {
+class UpdateApiStatusControllerSpec extends SpecBase with MockitoSugar {
 
   private def onwardRoute = Call("GET", "/foo")
 
-  private lazy val updateApiRoute = updateApiRoutes.UpdateApiReviewApiStatusController.onPageLoad(NormalMode).url
+  private lazy val updateApiRoute = updateApiRoutes.UpdateApiStatusController.onPageLoad(NormalMode).url
 
   private val formProvider = new ProduceApiStatusFormProvider()
   private val form = formProvider()
   private val viewModel = ProduceApiStatusViewModel(
     "updateApiStatus.title",
-    updateApiRoutes.UpdateApiReviewApiStatusController.onSubmit(NormalMode)
+    updateApiRoutes.UpdateApiStatusController.onSubmit(NormalMode)
   )
   private val supportUser = FakeUser.copy(permissions = Permissions(false, true, false))
 

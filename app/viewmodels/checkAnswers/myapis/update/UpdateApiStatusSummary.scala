@@ -39,7 +39,7 @@ object UpdateApiStatusSummary  {
             key     = "produceApiStatus.checkYourAnswersLabel",
             value   = value,
             actions = Seq(
-              ActionItemViewModel("site.change", routes.UpdateApiReviewApiStatusController.onPageLoad(CheckMode).url)
+              ActionItemViewModel("site.change", routes.UpdateApiStatusController.onPageLoad(CheckMode).url)
                 .withVisuallyHiddenText(messages("produceApiStatus.change.hidden"))
             )
           )

@@ -257,7 +257,7 @@ class NavigatorSpec extends SpecBase with TryValues {
           navigator.nextPage(UpdateApiHodPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiDomainController.onPageLoad(NormalMode)
         }
         "must go from the Domains page to the API status page" in {
-          navigator.nextPage(UpdateApiDomainPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiReviewApiStatusController.onPageLoad(NormalMode)
+          navigator.nextPage(UpdateApiDomainPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiStatusController.onPageLoad(NormalMode)
         }
         "must go from the Review the API Status page to the Check your answers page" in {
           navigator.nextPage(UpdateApiStatusPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onPageLoad()

@@ -31,7 +31,7 @@ import views.html.myapis.produce.ProduceApiStatusView
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class UpdateApiReviewApiStatusController @Inject()(
+class UpdateApiStatusController @Inject()(
                                             override val messagesApi: MessagesApi,
                                             sessionRepository: UpdateApiSessionRepository,
                                             navigator: Navigator,
@@ -47,7 +47,7 @@ class UpdateApiReviewApiStatusController @Inject()(
   private def viewModel(mode: Mode) =
     ProduceApiStatusViewModel(
       "updateApiStatus.title",
-      controllers.myapis.update.routes.UpdateApiReviewApiStatusController.onSubmit(mode)
+      controllers.myapis.update.routes.UpdateApiStatusController.onSubmit(mode)
     )
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
