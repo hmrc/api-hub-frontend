@@ -47,7 +47,7 @@ class DeletedApplicationDetailsControllerSpec extends SpecBase with MockitoSugar
           val deletedApplication = FakeApplication.copy(deleted = Some(Deleted(LocalDateTime.now, "delete@example.com")))
           val accessRequests = Seq(sampleAccessRequest())
 
-          when(fixture.apiHubService.getApplication(eqTo(deletedApplication.id), eqTo(false), eqTo(true))(any()))
+          when(fixture.apiHubService.getApplication(eqTo(deletedApplication.id), eqTo(true))(any()))
             .thenReturn(Future.successful(Some(deletedApplication)))
 
           when(fixture.apiHubService.getAccessRequests(eqTo(Some(deletedApplication.id)), eqTo(None))(any()))
@@ -73,7 +73,7 @@ class DeletedApplicationDetailsControllerSpec extends SpecBase with MockitoSugar
           val unsortedAccessRequests = Seq(sampleAccessRequest())
           val sortedAccessRequests = unsortedAccessRequests.sortBy(_.requested).reverse
 
-          when(fixture.apiHubService.getApplication(eqTo(deletedApplication.id), eqTo(false), eqTo(true))(any()))
+          when(fixture.apiHubService.getApplication(eqTo(deletedApplication.id), eqTo(true))(any()))
             .thenReturn(Future.successful(Some(deletedApplication)))
 
           when(fixture.apiHubService.getAccessRequests(eqTo(Some(deletedApplication.id)), eqTo(None))(any()))
@@ -96,7 +96,7 @@ class DeletedApplicationDetailsControllerSpec extends SpecBase with MockitoSugar
         (user: UserModel) =>
           val fixture = buildFixture(user)
 
-          when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), any(), any())(any()))
+          when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), any())(any()))
             .thenReturn(Future.successful(None))
 
           running(fixture.playApplication) {
@@ -123,7 +123,7 @@ class DeletedApplicationDetailsControllerSpec extends SpecBase with MockitoSugar
         (user: UserModel) =>
           val fixture = buildFixture(userModel = user)
 
-          when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false), eqTo(true))(any()))
+          when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(true))(any()))
             .thenReturn(Future.successful(Some(FakeApplication)))
 
           running(fixture.playApplication) {

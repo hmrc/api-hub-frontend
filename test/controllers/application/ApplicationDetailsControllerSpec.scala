@@ -49,7 +49,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         (user: UserModel) =>
           val fixture = buildFixture(userModel = user)
 
-          when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false), eqTo(false))(any()))
+          when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false))(any()))
             .thenReturn(Future.successful(Some(FakeApplication)))
 
           when(fixture.apiHubService.getAccessRequests(eqTo(Some(FakeApplication.id)), eqTo(None))(any()))
@@ -74,7 +74,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
       val team = Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email)))
       val application = FakeApplication.setTeamId(team.id).setTeamName(team.name)
 
-      when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false), eqTo(false))(any()))
+      when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false))(any()))
         .thenReturn(Future.successful(Some(application)))
 
       when(fixture.apiHubService.getAccessRequests(eqTo(Some(application.id)), eqTo(None))(any()))
@@ -120,7 +120,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
 
       val fixture = buildFixture()
 
-      when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))
+      when(fixture.apiHubService.getApplication(eqTo(application.id), any())(any()))
         .thenReturn(Future.successful(Some(application)))
 
       when(fixture.apiHubService.getAccessRequests(eqTo(Some(application.id)), eqTo(None))(any()))
@@ -162,7 +162,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         ApplicationApi(apiDetail, Seq(ApplicationEndpoint("GET", "/test", None, None, Seq("test-scope"), Inaccessible, Accessible)), 0)
       )
 
-      when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false), eqTo(false))(any()))
+      when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false))(any()))
         .thenReturn(Future.successful(Some(application)))
 
       when(fixture.apiHubService.getAccessRequests(eqTo(Some(application.id)), eqTo(None))(any()))
@@ -197,7 +197,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         ApplicationApi(api, 0)
       )
 
-      when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false), eqTo(false))(any()))
+      when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false))(any()))
         .thenReturn(Future.successful(Some(application)))
 
       when(fixture.apiHubService.getAccessRequests(eqTo(Some(application.id)), eqTo(None))(any()))
@@ -221,7 +221,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
     "must return 404 Not Found when the application does not exist" in {
       val fixture = buildFixture()
 
-      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), any(), any())(any()))
+      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), any())(any()))
         .thenReturn(Future.successful(None))
 
       running(fixture.playApplication) {
@@ -245,7 +245,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
     "must redirect to Unauthorised page for a GET when user is not a team member or supporter" in {
       val fixture = buildFixture(userModel = FakeUserNotTeamMember)
 
-      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false), eqTo(false))(any()))
+      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false))(any()))
         .thenReturn(Future.successful(Some(FakeApplication)))
 
       running(fixture.playApplication) {

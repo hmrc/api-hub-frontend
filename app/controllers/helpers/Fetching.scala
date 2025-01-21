@@ -38,8 +38,8 @@ trait Fetching {
     }
   }
 
-  def fetchApplicationOrNotFound(applicationId: String, enrich: Boolean = false, includeDeleted: Boolean = false)(implicit request: BaseRequest[?], ec: ExecutionContext): Future[Either[Result, Application]] = {
-    apiHubService.getApplication(applicationId, enrich, includeDeleted).map {
+  def fetchApplicationOrNotFound(applicationId: String, includeDeleted: Boolean = false)(implicit request: BaseRequest[?], ec: ExecutionContext): Future[Either[Result, Application]] = {
+    apiHubService.getApplication(applicationId, includeDeleted).map {
       case Some(application) => Right(application)
       case None => Left(errorResultBuilder.applicationNotFound(applicationId))
     }

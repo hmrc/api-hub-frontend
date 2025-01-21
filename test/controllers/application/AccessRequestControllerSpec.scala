@@ -58,7 +58,7 @@ class AccessRequestControllerSpec
         val accessRequest = sampleAccessRequest(application.id).copy(status = Pending)
 
         when(fixture.apiHubService.getAccessRequest(any)(any)).thenReturn(Future.successful(Some(accessRequest)))
-        when(fixture.apiHubService.getApplication(any, any, any)(any)).thenReturn(Future.successful(Some(application)))
+        when(fixture.apiHubService.getApplication(any, any)(any)).thenReturn(Future.successful(Some(application)))
 
         running(fixture.application) {
           val request = FakeRequest(controllers.application.routes.AccessRequestController.onPageLoad(accessRequest.id))
@@ -73,7 +73,7 @@ class AccessRequestControllerSpec
           content must include("cancelAccessRequestLink")
 
           verify(fixture.apiHubService).getAccessRequest(eqTo(accessRequest.id))(any)
-          verify(fixture.apiHubService).getApplication(eqTo(application.id), eqTo(false), eqTo(false))(any)
+          verify(fixture.apiHubService).getApplication(eqTo(application.id), eqTo(false))(any)
         }
       }
     }
@@ -91,7 +91,7 @@ class AccessRequestControllerSpec
           val accessRequest = sampleAccessRequest(application.id).copy(status = accessRequestStatus)
 
           when(fixture.apiHubService.getAccessRequest(any)(any)).thenReturn(Future.successful(Some(accessRequest)))
-          when(fixture.apiHubService.getApplication(any, any, any)(any)).thenReturn(Future.successful(Some(application)))
+          when(fixture.apiHubService.getApplication(any, any)(any)).thenReturn(Future.successful(Some(application)))
 
           running(fixture.application) {
             val request = FakeRequest(controllers.application.routes.AccessRequestController.onPageLoad(accessRequest.id))
@@ -106,7 +106,7 @@ class AccessRequestControllerSpec
             content must not include ("cancelAccessRequestLink")
 
             verify(fixture.apiHubService).getAccessRequest(eqTo(accessRequest.id))(any)
-            verify(fixture.apiHubService).getApplication(eqTo(application.id), eqTo(false), eqTo(false))(any)
+            verify(fixture.apiHubService).getApplication(eqTo(application.id), eqTo(false))(any)
           }
         }
       }
@@ -144,7 +144,7 @@ class AccessRequestControllerSpec
         val accessRequest = sampleAccessRequest()
 
         when(fixture.apiHubService.getAccessRequest(any)(any)).thenReturn(Future.successful(Some(accessRequest)))
-        when(fixture.apiHubService.getApplication(any, any, any)(any)).thenReturn(Future.successful(None))
+        when(fixture.apiHubService.getApplication(any, any)(any)).thenReturn(Future.successful(None))
 
         running(fixture.application) {
           val request = FakeRequest(controllers.application.routes.AccessRequestController.onPageLoad(accessRequest.id))

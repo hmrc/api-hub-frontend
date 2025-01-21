@@ -34,7 +34,7 @@ trait ApplicationAuthAction extends ActionRefiner[IdentifierRequest, Application
 
 trait ApplicationAuthActionProvider {
 
-  def apply(applicationId: String, enrich: Boolean = false, includeDeleted: Boolean = false)(implicit ec: ExecutionContext): ApplicationAuthAction
+  def apply(applicationId: String, includeDeleted: Boolean = false)(implicit ec: ExecutionContext): ApplicationAuthAction
 
 }
 
@@ -45,12 +45,12 @@ class ApplicationAuthActionProviderImpl @Inject()(
   override val messagesApi: MessagesApi
 ) extends ApplicationAuthActionProvider with I18nSupport {
 
-  def apply(applicationId: String, enrich: Boolean = false, includeDeleted: Boolean = false)(implicit ec: ExecutionContext): ApplicationAuthAction = {
+  def apply(applicationId: String, includeDeleted: Boolean = false)(implicit ec: ExecutionContext): ApplicationAuthAction = {
     new ApplicationAuthAction with FrontendHeaderCarrierProvider {
       override protected def refine[A](identifierRequest: IdentifierRequest[A]): Future[Either[Result, ApplicationRequest[A]]] = {
         implicit val request: BaseRequest[?] = identifierRequest
 
-        apiHubService.getApplication(applicationId, enrich, includeDeleted) map {
+        apiHubService.getApplication(applicationId, includeDeleted) map {
           case Some(application) =>
             if (identifierRequest.user.permissions.canSupport || isTeamMember(application, identifierRequest.user)) {
                 Right(ApplicationRequest(identifierRequest, application))

@@ -74,7 +74,7 @@ class ManageTeamControllerSpec extends SpecBase with MockitoSugar with TestHelpe
       val team = Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email)))
 
       when(fixture.apiHubService.findTeamById(any)(any)).thenReturn(Future.successful(Some(team)))
-      when(fixture.apiHubService.getApplication(any, any, any)(any)).thenReturn(Future.successful(Some(FakeApplication)))
+      when(fixture.apiHubService.getApplication(any, any)(any)).thenReturn(Future.successful(Some(FakeApplication)))
 
       running(fixture.playApplication) {
         val request = FakeRequest(controllers.team.routes.ManageTeamController.onPageLoad(team.id, Some(FakeApplication.id)))
@@ -88,7 +88,7 @@ class ManageTeamControllerSpec extends SpecBase with MockitoSugar with TestHelpe
         contentAsString(result) must validateAsHtml
 
         verify(fixture.apiHubService).findTeamById(eqTo(team.id))(any)
-        verify(fixture.apiHubService).getApplication(eqTo(FakeApplication.id), eqTo(false), eqTo(false))(any)
+        verify(fixture.apiHubService).getApplication(eqTo(FakeApplication.id), eqTo(false))(any)
       }
     }
 
@@ -166,7 +166,7 @@ class ManageTeamControllerSpec extends SpecBase with MockitoSugar with TestHelpe
       val team = Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email)))
 
       when(fixture.apiHubService.findTeamById(any)(any)).thenReturn(Future.successful(Some(team)))
-      when(fixture.apiHubService.getApplication(any, any, any)(any)).thenReturn(Future.successful(None))
+      when(fixture.apiHubService.getApplication(any, any)(any)).thenReturn(Future.successful(None))
 
       running(fixture.playApplication) {
         val request = FakeRequest(controllers.team.routes.ManageTeamController.onPageLoad(team.id, Some(FakeApplication.id)))

@@ -49,7 +49,7 @@ class RequestProductionAccessStartControllerSpec extends SpecBase with MockitoSu
     "must initiate user answers with the application and persist this in the session repository" in {
       val fixture = buildFixture()
 
-      when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))
+      when(fixture.apiHubService.getApplication(eqTo(application.id), any())(any()))
         .thenReturn(Future.successful(Some(application)))
 
       when(fixture.applicationApiBuilder.build(eqTo(application))(any))
@@ -76,7 +76,7 @@ class RequestProductionAccessStartControllerSpec extends SpecBase with MockitoSu
     "must redirect to the next page" in {
       val fixture = buildFixture()
 
-      when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))
+      when(fixture.apiHubService.getApplication(eqTo(application.id), any())(any()))
         .thenReturn(Future.successful(Some(application)))
 
       when(fixture.applicationApiBuilder.build(eqTo(application))(any))
@@ -97,7 +97,7 @@ class RequestProductionAccessStartControllerSpec extends SpecBase with MockitoSu
       val fixture = buildFixture(FakeUserNotTeamMember)
       val application: Application = FakeApplication
 
-      when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))
+      when(fixture.apiHubService.getApplication(eqTo(application.id), any())(any()))
         .thenReturn(Future.successful(Some(application)))
 
       running(fixture.playApplication) {

@@ -48,7 +48,7 @@ class ApplicationAccessRequestsControllerSpec
 
         val accessRequests = Seq(sampleAccessRequest())
         when(fixture.apiHubService.getAccessRequests(eqTo(Some(FakeApplication.id)), any())(any())).thenReturn(Future.successful(accessRequests))
-        when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), any(), any())(any())).thenReturn(Future.successful(Some(FakeApplication)))
+        when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), any())(any())).thenReturn(Future.successful(Some(FakeApplication)))
 
         running(fixture.playApplication) {
           implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, controllers.application.routes.ApplicationAccessRequestsController.onPageLoad(FakeApplication.id).url)
@@ -118,7 +118,7 @@ class ApplicationAccessRequestsControllerSpec
       val fixture = buildFixture(FakeSupporter)
 
       when(fixture.apiHubService.getAccessRequests(any(), any())(any())).thenReturn(Future.successful(accessRequests))
-      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), any(), any())(any())).thenReturn(Future.successful(Some(FakeApplication)))
+      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), any())(any())).thenReturn(Future.successful(Some(FakeApplication)))
 
       running(fixture.playApplication) {
         implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, controllers.application.routes.ApplicationAccessRequestsController.onPageLoad(FakeApplication.id).url)

@@ -60,7 +60,7 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
               )
           )
 
-          when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false), eqTo(false))(any()))
+          when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false))(any()))
             .thenReturn(Future.successful(Some(FakeApplication)))
 
           when(fixture.apiHubService.fetchCredentials(eqTo(FakeApplication.id), eqTo(FakeHipEnvironments.test))(any()))
@@ -86,7 +86,7 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
     "must return 404 Not Found when the application does not exist" in {
       val fixture = buildFixture()
 
-      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), any(), any())(any()))
+      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), any())(any()))
         .thenReturn(Future.successful(None))
 
       running(fixture.playApplication) {
@@ -110,7 +110,7 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
     "must return 404 Not Found when the environment does not exist" in {
       val fixture = buildFixture()
 
-      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false), eqTo(false))(any()))
+      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false))(any()))
         .thenReturn(Future.successful(Some(FakeApplication)))
 
       running(fixture.playApplication) {
@@ -136,7 +136,7 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
         (user: UserModel) =>
           val fixture = buildFixture(userModel = user)
 
-          when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false), eqTo(false))(any()))
+          when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false))(any()))
             .thenReturn(Future.successful(Some(FakeApplication)))
 
           when(fixture.apiHubService.fetchCredentials(eqTo(FakeApplication.id), eqTo(FakeHipEnvironments.test))(any()))
@@ -161,7 +161,7 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
     "must redirect to Unauthorised page for a GET when user is not a team member or supporter" in {
       val fixture = buildFixture(userModel = FakeUserNotTeamMember)
 
-      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false), eqTo(false))(any()))
+      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false))(any()))
         .thenReturn(Future.successful(Some(FakeApplication)))
 
       running(fixture.playApplication) {
@@ -183,7 +183,7 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
         )) { case (environment, user) =>
           val application = FakeApplication.addTeamMember(user.email)
           val fixture = buildFixture(user)
-          when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))
+          when(fixture.apiHubService.getApplication(eqTo(application.id), any())(any()))
             .thenReturn(Future.successful(Some(application)))
           when(fixture.apiHubService.deleteCredential(any(), any(), any())(any()))
             .thenReturn(Future.successful(Right(Some(()))))
@@ -206,7 +206,7 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
         forAll(usersWhoCannotDeletePrimaryCredentials) { (user: UserModel) =>
           val application = FakeApplication.addTeamMember(user.email)
           val fixture = buildFixture(user)
-          when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))
+          when(fixture.apiHubService.getApplication(eqTo(application.id), any())(any()))
             .thenReturn(Future.successful(Some(application)))
           running(fixture.playApplication) {
             val url = controllers.application.routes.EnvironmentsController.onDeleteCredential(application.id, "test-client-id", FakeHipEnvironments.production.id).url
@@ -222,7 +222,7 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
         val environment = FakeHipEnvironments.production
         val application = FakeApplication.addTeamMember(FakePrivilegedUser.email)
         val fixture = buildFixture(FakePrivilegedUser)
-        when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))
+        when(fixture.apiHubService.getApplication(eqTo(application.id), any())(any()))
           .thenReturn(Future.successful(Some(application)))
         when(fixture.apiHubService.deleteCredential(any(), any(), any())(any()))
           .thenReturn(Future.successful(Right(None)))
@@ -248,7 +248,7 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
         val environment = FakeHipEnvironments.production
         val application = FakeApplication.addTeamMember(FakePrivilegedUser.email)
         val fixture = buildFixture(FakePrivilegedUser)
-        when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))
+        when(fixture.apiHubService.getApplication(eqTo(application.id), any())(any()))
           .thenReturn(Future.successful(Some(application)))
         when(fixture.apiHubService.deleteCredential(any(), any(), any())(any()))
           .thenReturn(Future.successful(Left(ApplicationCredentialLimitException.forId(FakeApplication.id, FakeHipEnvironments.production))))

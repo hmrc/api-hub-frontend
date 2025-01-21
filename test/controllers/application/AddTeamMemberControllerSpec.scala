@@ -55,7 +55,7 @@ class AddTeamMemberControllerSpec
         (user: UserModel) =>
           val fixture = buildFixture(userModel = user)
 
-          when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false), eqTo(false))(any))
+          when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false))(any))
             .thenReturn(Future.successful(Some(FakeApplication)))
 
           running(fixture.playApplication) {
@@ -73,7 +73,7 @@ class AddTeamMemberControllerSpec
     "must redirect to Unauthorised page for a GET when user is not a team member or supporter" in {
       val fixture = buildFixture(userModel = FakeUserNotTeamMember)
 
-      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false), eqTo(false))(any))
+      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false))(any))
         .thenReturn(Future.successful(Some(FakeApplication)))
 
       running(fixture.playApplication) {
@@ -92,7 +92,7 @@ class AddTeamMemberControllerSpec
 
           val email = "test.email@hmrc.gov.uk"
 
-          when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false), eqTo(false))(any))
+          when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false))(any))
             .thenReturn(Future.successful(Some(FakeApplication)))
 
           when(fixture.apiHubService.addTeamMember(any, any)(any))
@@ -113,7 +113,7 @@ class AddTeamMemberControllerSpec
     "must return a Bad Request and errors when invalid data is submitted" in {
       val fixture = buildFixture()
 
-      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false), eqTo(false))(any))
+      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false))(any))
         .thenReturn(Future.successful(Some(FakeApplication)))
 
       running(fixture.playApplication) {
@@ -134,7 +134,7 @@ class AddTeamMemberControllerSpec
       val email = "test.email@hmrc.gov.uk"
       val application = FakeApplication.addTeamMember(email)
 
-      when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false), eqTo(false))(any))
+      when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false))(any))
         .thenReturn(Future.successful(Some(application)))
 
       running(fixture.playApplication) {
@@ -157,7 +157,7 @@ class AddTeamMemberControllerSpec
 
       val email = "test.email@hmrc.gov.uk"
 
-      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false), eqTo(false))(any))
+      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false))(any))
         .thenReturn(Future.successful(Some(FakeApplication)))
 
       running(fixture.playApplication) {

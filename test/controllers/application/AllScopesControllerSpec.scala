@@ -50,7 +50,7 @@ class AllScopesControllerSpec
       forAll(usersWhoCanSupport) { (user: UserModel) =>
         val fixture = buildFixture(user)
 
-        when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false), eqTo(false))(any))
+        when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false))(any))
           .thenReturn(Future.successful(Some(FakeApplication)))
 
         when(fixture.apiHubService.fetchAllScopes(eqTo(FakeApplication.id))(any))
@@ -85,7 +85,7 @@ class AllScopesControllerSpec
     "must return 404 Not Found when the application does not exist" in {
       val fixture = buildFixture(FakeSupporter)
 
-      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false), eqTo(false))(any))
+      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false))(any))
         .thenReturn(Future.successful(None))
 
       running(fixture.playApplication) {
@@ -112,7 +112,7 @@ class AllScopesControllerSpec
       forAll(usersWhoCanSupport) { (user: UserModel) =>
         val fixture = buildFixture(user)
 
-        when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false), eqTo(false))(any))
+        when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false))(any))
           .thenReturn(Future.successful(Some(FakeApplication)))
 
         when(fixture.apiHubService.fixScopes(eqTo(FakeApplication.id))(any))
@@ -145,7 +145,7 @@ class AllScopesControllerSpec
     "must return 404 Not Found when the application does not exist" in {
       val fixture = buildFixture(FakeSupporter)
 
-      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false), eqTo(false))(any))
+      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false))(any))
         .thenReturn(Future.successful(None))
 
       running(fixture.playApplication) {

@@ -57,7 +57,7 @@ class ProvideSupportingInformationControllerSpec extends SpecBase with MockitoSu
           val userAnswers = buildUserAnswers(application)
           val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
 
-          when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), any(), any())(any()))
+          when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), any())(any()))
             .thenReturn(Future.successful(Some(application)))
 
           running(fixture.application) {
@@ -79,7 +79,7 @@ class ProvideSupportingInformationControllerSpec extends SpecBase with MockitoSu
           val userAnswers = buildUserAnswers(application).set(ProvideSupportingInformationPage, "blah").toOption.value
           val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
 
-          when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), any(), any())(any()))
+          when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), any())(any()))
             .thenReturn(Future.successful(Some(application)))
 
           running(fixture.application) {
@@ -102,7 +102,7 @@ class ProvideSupportingInformationControllerSpec extends SpecBase with MockitoSu
           val userAnswers = buildUserAnswers(application)
           val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
 
-          when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), any(), any())(any()))
+          when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), any())(any()))
             .thenReturn(Future.successful(Some(application)))
 
           running(fixture.application) {

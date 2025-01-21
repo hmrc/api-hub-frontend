@@ -164,7 +164,7 @@ object CurlCommandControllerSpec extends SpecBase with MockitoSugar {
     val curlCommandService = mock[CurlCommandService]
 
 
-    when(apiHubService.getApplication(any(), any(), any())(any()))
+    when(apiHubService.getApplication(any(), any())(any()))
       .thenReturn(Future.successful(Some(application)))
 
     when(apiHubService.fetchCredentials(any(), any())(any())).thenReturn(Future.successful(credentials))

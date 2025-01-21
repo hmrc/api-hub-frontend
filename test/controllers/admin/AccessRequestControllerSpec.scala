@@ -55,7 +55,7 @@ class AccessRequestControllerSpec
         val accessRequest = sampleAccessRequest()
 
         when(fixture.apiHubService.getAccessRequest(any())(any())).thenReturn(Future.successful(Some(accessRequest)))
-        when(fixture.apiHubService.getApplication(any(), eqTo(false), eqTo(true))(any())).thenReturn(Future.successful(Some(FakeApplication)))
+        when(fixture.apiHubService.getApplication(any(), eqTo(true))(any())).thenReturn(Future.successful(Some(FakeApplication)))
 
         running(fixture.playApplication) {
           val url = controllers.admin.routes.AccessRequestController.onPageLoad(accessRequest.id).url
@@ -70,7 +70,7 @@ class AccessRequestControllerSpec
           contentAsString(result) must validateAsHtml
 
           verify(fixture.apiHubService).getAccessRequest(eqTo(accessRequest.id))(any())
-          verify(fixture.apiHubService).getApplication(eqTo(accessRequest.applicationId), eqTo(false), eqTo(true))(any())
+          verify(fixture.apiHubService).getApplication(eqTo(accessRequest.applicationId), eqTo(true))(any())
         }
       }
     }
@@ -105,7 +105,7 @@ class AccessRequestControllerSpec
       val accessRequest = sampleAccessRequest()
 
       when(fixture.apiHubService.getAccessRequest(any())(any())).thenReturn(Future.successful(Some(accessRequest)))
-      when(fixture.apiHubService.getApplication(any(), eqTo(false), eqTo(true))(any())).thenReturn(Future.successful(None))
+      when(fixture.apiHubService.getApplication(any(), eqTo(true))(any())).thenReturn(Future.successful(None))
 
       running(fixture.playApplication) {
         val url = controllers.admin.routes.AccessRequestController.onPageLoad(accessRequest.id).url
@@ -190,7 +190,7 @@ class AccessRequestControllerSpec
       val accessRequest = sampleAccessRequest()
 
       when(fixture.apiHubService.getAccessRequest(any())(any())).thenReturn(Future.successful(Some(accessRequest)))
-      when(fixture.apiHubService.getApplication(any(), eqTo(false), eqTo(true))(any())).thenReturn(Future.successful(Some(FakeApplication)))
+      when(fixture.apiHubService.getApplication(any(), eqTo(true))(any())).thenReturn(Future.successful(Some(FakeApplication)))
 
       running(fixture.playApplication) {
         implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
@@ -214,7 +214,7 @@ class AccessRequestControllerSpec
       val accessRequest = sampleAccessRequest()
 
       when(fixture.apiHubService.getAccessRequest(any())(any())).thenReturn(Future.successful(Some(accessRequest)))
-      when(fixture.apiHubService.getApplication(any(), eqTo(false), eqTo(true))(any())).thenReturn(Future.successful(Some(FakeApplication)))
+      when(fixture.apiHubService.getApplication(any(), eqTo(true))(any())).thenReturn(Future.successful(Some(FakeApplication)))
 
       running(fixture.playApplication) {
         implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =

@@ -58,7 +58,7 @@ class UpdateApplicationTeamControllerSpec
         "must return 200 Ok and the correct view for a support user" in {
             forAll(usersWhoCanSupport) { user =>
                 val fixture = buildFixture(user)
-                when(fixture.applicationAuthActionProvider.apply(any, eqTo(false), eqTo(true))(any)).thenReturn(successfulApplicationAuthAction(FakeApplication))
+                when(fixture.applicationAuthActionProvider.apply(any, eqTo(true))(any)).thenReturn(successfulApplicationAuthAction(FakeApplication))
                 when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(allTeams))
 
                 running(fixture.playApplication) {
@@ -83,7 +83,7 @@ class UpdateApplicationTeamControllerSpec
                 )
                 val orderedTeams = unorderedTeams.sortBy(_.name.toLowerCase())
                 val fixture = buildFixture(user)
-                when(fixture.applicationAuthActionProvider.apply(any, eqTo(false), eqTo(true))(any)).thenReturn(successfulApplicationAuthAction(FakeApplication))
+                when(fixture.applicationAuthActionProvider.apply(any, eqTo(true))(any)).thenReturn(successfulApplicationAuthAction(FakeApplication))
                 when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(unorderedTeams))
 
                 running(fixture.playApplication) {
@@ -102,7 +102,7 @@ class UpdateApplicationTeamControllerSpec
         "must return 200 Ok and the correct view for a non-support user who is on the API team" in {
             forAll(usersWhoCannotSupport) { user =>
                 val fixture = buildFixture(user)
-                when(fixture.applicationAuthActionProvider.apply(any, eqTo(false), eqTo(true))(any)).thenReturn(successfulApplicationAuthAction(FakeApplication))
+                when(fixture.applicationAuthActionProvider.apply(any, eqTo(true))(any)).thenReturn(successfulApplicationAuthAction(FakeApplication))
                 when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(allTeams))
 
                 running(fixture.playApplication) {
@@ -121,7 +121,7 @@ class UpdateApplicationTeamControllerSpec
         "must redirect to Unauthorised page for a non-support user not on the api team" in {
             forAll(usersWhoCannotSupport) { user =>
                 val fixture = buildFixture(user)
-                when(fixture.applicationAuthActionProvider.apply(any, eqTo(false), eqTo(true))(any)).thenReturn(unauthorisedApplicationAuthAction())
+                when(fixture.applicationAuthActionProvider.apply(any, eqTo(true))(any)).thenReturn(unauthorisedApplicationAuthAction())
                 when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(allTeams))
 
                 running(fixture.playApplication) {
@@ -139,7 +139,7 @@ class UpdateApplicationTeamControllerSpec
         "must return 200 Ok and the correct view for a support user when a team has been selected" in {
             forAll(usersWhoCanSupport) { user =>
                 val fixture = buildFixture(user)
-                when(fixture.applicationAuthActionProvider.apply(any, eqTo(false), eqTo(true))(any)).thenReturn(successfulApplicationAuthAction(FakeApplication))
+                when(fixture.applicationAuthActionProvider.apply(any, eqTo(true))(any)).thenReturn(successfulApplicationAuthAction(FakeApplication))
                 when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(allTeams))
                 when(fixture.apiHubService.updateApplicationTeam(any, any)(any)).thenReturn(Future.successful(Some(())))
 
@@ -161,7 +161,7 @@ class UpdateApplicationTeamControllerSpec
         "must return 400 when a team has not been selected" in {
             forAll(usersWhoCanSupport) { user =>
                 val fixture = buildFixture(user)
-                when(fixture.applicationAuthActionProvider.apply(any, eqTo(false), eqTo(true))(any)).thenReturn(successfulApplicationAuthAction(FakeApplication))
+                when(fixture.applicationAuthActionProvider.apply(any, eqTo(true))(any)).thenReturn(successfulApplicationAuthAction(FakeApplication))
                 when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(allTeams))
                 when(fixture.apiHubService.updateApplicationTeam(any, any)(any)).thenReturn(Future.successful(Some(())))
 
@@ -184,7 +184,7 @@ class UpdateApplicationTeamControllerSpec
             forAll(usersWhoCanSupport) { user =>
                 val fixture = buildFixture(user)
 
-                when(fixture.applicationAuthActionProvider.apply(any, eqTo(false), eqTo(true))(any)).thenReturn(successfulApplicationAuthAction(FakeApplication))
+                when(fixture.applicationAuthActionProvider.apply(any, eqTo(true))(any)).thenReturn(successfulApplicationAuthAction(FakeApplication))
                 when(fixture.apiHubService.findTeams(any)(any)).thenReturn(Future.successful(allTeams))
                 when(fixture.apiHubService.updateApplicationTeam(any, any)(any)).thenReturn(Future.successful(None))
 
