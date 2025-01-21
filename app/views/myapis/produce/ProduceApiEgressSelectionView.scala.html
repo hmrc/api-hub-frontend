@@ -44,15 +44,17 @@
     @messages("myApis.produce.selectegress.body")
     @newTabLink(helpDocsUrlEgress, messages("myApis.produce.selectegress.body.link")).
 
-    <div class="call-out-panel govuk-!-margin-top-6 govuk-body information--general-tag govuk-!-margin-bottom-2">
-        <h3 class="govuk-heading-s">
-            <i class="fa-solid fa-circle-info govuk-!-margin-right-2"></i>
-            @messages("myApis.produce.selectegress.hint.heading")
-        </h3>
-        <span class="govuk-!-margin-left-6">
+    @if(viewModel.showNotListedMessage) {
+        <div class="call-out-panel govuk-!-margin-top-6 govuk-body information--general-tag govuk-!-margin-bottom-2">
+            <h3 class="govuk-heading-s">
+                <i class="fa-solid fa-circle-info govuk-!-margin-right-2"></i>
+                @messages("myApis.produce.selectegress.hint.heading")
+            </h3>
+            <span class="govuk-!-margin-left-6">
             @returnLink
-        </span>
-    </div>
+            </span>
+        </div>
+    }
 }
 
 @returnLink = {

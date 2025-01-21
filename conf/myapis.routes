@@ -208,10 +208,10 @@ POST    /update/cancel                                      controllers.myapis.u
 
 GET     /udpate/success                                     controllers.myapis.update.UpdateApiCheckYourAnswersController.onSuccess(apiName: String, publisherReference: String)
 
-GET     /update/api-status                                  controllers.myapis.update.UpdateApiReviewApiStatusController.onPageLoad(mode: Mode = NormalMode)
-POST    /update/api-status                                  controllers.myapis.update.UpdateApiReviewApiStatusController.onSubmit(mode: Mode = NormalMode)
-GET     /update/change-api-status                           controllers.myapis.update.UpdateApiReviewApiStatusController.onPageLoad(mode: Mode = CheckMode)
-POST    /update/change-api-status                           controllers.myapis.update.UpdateApiReviewApiStatusController.onSubmit(mode: Mode = CheckMode)
+GET     /update/api-status                                  controllers.myapis.update.UpdateApiStatusController.onPageLoad(mode: Mode = NormalMode)
+POST    /update/api-status                                  controllers.myapis.update.UpdateApiStatusController.onSubmit(mode: Mode = NormalMode)
+GET     /update/change-api-status                           controllers.myapis.update.UpdateApiStatusController.onPageLoad(mode: Mode = CheckMode)
+POST    /update/change-api-status                           controllers.myapis.update.UpdateApiStatusController.onSubmit(mode: Mode = CheckMode)
 
 GET     /update/:id                                         controllers.myapis.SimpleApiRedeploymentController.onPageLoad(id: String)
 POST    /update/:id                                         controllers.myapis.SimpleApiRedeploymentController.onSubmit(id: String)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,29 +17,31 @@
 package viewmodels.checkAnswers.myapis.update
 
 import controllers.myapis.update.routes
+import models.user.UserModel
 import models.{CheckMode, UserAnswers}
-import pages.myapis.update.UpdateApiEgressAvailabilityPage
+import pages.myapis.update.UpdateApiStatusPage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object UpdateApiEgressAvailabilitySummary {
+object UpdateApiStatusSummary  {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(UpdateApiEgressAvailabilityPage) flatMap {
-      case false =>
-        Some(SummaryListRowViewModel(
-          key = "produceApiEgressAvailability.cya.label",
-          value = ValueViewModel("site.no"),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.UpdateApiEgressAvailabilityController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("produceApiEgressAvailability.change.hidden"))
+  def row(answers: UserAnswers, user: UserModel)(implicit messages: Messages): Option[SummaryListRow] =
+      answers.get(UpdateApiStatusPage).filter(_ => user.permissions.canSupport).map {
+        answer =>
+          val value = ValueViewModel(
+            HtmlContent(answer.toString)
           )
-        ))
-      case _ => None
-    }
 
+          SummaryListRowViewModel(
+            key     = "produceApiStatus.checkYourAnswersLabel",
+            value   = value,
+            actions = Seq(
+              ActionItemViewModel("site.change", routes.UpdateApiStatusController.onPageLoad(CheckMode).url)
+                .withVisuallyHiddenText(messages("produceApiStatus.change.hidden"))
+            )
+          )
+      }
 }

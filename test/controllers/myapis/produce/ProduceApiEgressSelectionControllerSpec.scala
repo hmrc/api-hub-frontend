@@ -66,6 +66,7 @@ class ProduceApiEgressSelectionControllerSpec extends SpecBase with MockitoSugar
           "myApis.produce.selectegress.title",
           controllers.myapis.produce.routes.ProduceApiEgressSelectionController.onSubmit(NormalMode),
           controllers.myapis.produce.routes.ProduceApiEgressAvailabilityController.onPageLoad(NormalMode).url,
+          true
         )
         val view = fixture.application.injector.instanceOf[ProduceApiEgressSelectionView]
 
@@ -92,6 +93,7 @@ class ProduceApiEgressSelectionControllerSpec extends SpecBase with MockitoSugar
           "myApis.produce.selectegress.title",
           controllers.myapis.produce.routes.ProduceApiEgressSelectionController.onSubmit(NormalMode),
           controllers.myapis.produce.routes.ProduceApiEgressAvailabilityController.onPageLoad(NormalMode).url,
+          true
         )
         val view = fixture.application.injector.instanceOf[ProduceApiEgressSelectionView]
 
