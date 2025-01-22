@@ -34,7 +34,7 @@ class ManageTeamMembersController @Inject()(
   view: ManageTeamMembersView
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id, enrich = false)).async {
+  def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id)).async {
     implicit request =>
       Future.successful(Ok(view(request.application.withSortedTeam(), request.identifierRequest.user)))
   }

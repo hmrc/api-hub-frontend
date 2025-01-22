@@ -83,7 +83,7 @@ class AddAnApiStartControllerSpec extends SpecBase with MockitoSugar with HtmlVa
           Api(apiDetail.id, apiDetail.title, Seq(SelectedEndpoint("GET", "/test-path-1")))
         )
 
-      when(fixture.apiHubService.getApplication(eqTo(application.id), any(), any())(any()))
+      when(fixture.apiHubService.getApplication(eqTo(application.id), any())(any()))
         .thenReturn(Future.successful(Some(application)))
       when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
         .thenReturn(Future.successful(Some(apiDetail)))

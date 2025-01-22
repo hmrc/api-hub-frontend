@@ -43,7 +43,7 @@ class ManageTeamMembersControllerSpec extends SpecBase with MockitoSugar with Te
         (user: UserModel) =>
           val fixture = buildFixture(userModel = user)
 
-          when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false), eqTo(false))(any))
+          when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false))(any))
             .thenReturn(Future.successful(Some(FakeApplication)))
 
           running(fixture.playApplication) {
@@ -83,7 +83,7 @@ class ManageTeamMembersControllerSpec extends SpecBase with MockitoSugar with Te
 
       val fixture = buildFixture()
 
-      when(fixture.apiHubService.getApplication(eqTo(application.id), any, any)(any))
+      when(fixture.apiHubService.getApplication(eqTo(application.id), any)(any))
         .thenReturn(Future.successful(Some(application)))
 
       running(fixture.playApplication) {
@@ -99,7 +99,7 @@ class ManageTeamMembersControllerSpec extends SpecBase with MockitoSugar with Te
     "must return 404 Not Found when the application does not exist" in {
       val fixture = buildFixture()
 
-      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), any, any)(any))
+      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), any)(any))
         .thenReturn(Future.successful(None))
 
       running(fixture.playApplication) {
@@ -123,7 +123,7 @@ class ManageTeamMembersControllerSpec extends SpecBase with MockitoSugar with Te
     "must redirect to Unauthorised page for a GET when user is not a team member or supporter" in {
       val fixture = buildFixture(userModel = FakeUserNotTeamMember)
 
-      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false), eqTo(false))(any))
+      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false))(any))
         .thenReturn(Future.successful(Some(FakeApplication)))
 
       running(fixture.playApplication) {

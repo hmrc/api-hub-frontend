@@ -40,7 +40,7 @@ class ApplicationAuthActionSpec extends SpecBase with Matchers with MockitoSugar
     "must grant a user access to an application when they are in the team" in {
       val fixture = buildFixture()
 
-      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false), eqTo(false))(any()))
+      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false))(any()))
         .thenReturn(Future.successful(Some(FakeApplication)))
 
       val result = fixture.provider.apply(FakeApplication.id).invokeBlock(buildRequest(), buildInvokeBlock())
@@ -51,7 +51,7 @@ class ApplicationAuthActionSpec extends SpecBase with Matchers with MockitoSugar
       val fixture = buildFixture()
       val application = FakeApplication.copy(teamMembers = Seq.empty)
 
-      when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false), eqTo(false))(any()))
+      when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false))(any()))
         .thenReturn(Future.successful(Some(application)))
 
       val result = fixture.provider.apply(application.id).invokeBlock(buildRequest(FakeSupporter), buildInvokeBlock())
@@ -62,7 +62,7 @@ class ApplicationAuthActionSpec extends SpecBase with Matchers with MockitoSugar
       val fixture = buildFixture()
       val application = FakeApplication.copy(teamMembers = Seq.empty)
 
-      when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false), eqTo(false))(any()))
+      when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false))(any()))
         .thenReturn(Future.successful(Some(application)))
 
       val result = fixture.provider.apply(application.id).invokeBlock(buildRequest(), buildInvokeBlock())
@@ -73,7 +73,7 @@ class ApplicationAuthActionSpec extends SpecBase with Matchers with MockitoSugar
     "must return Not Found with a suitable message when the application does not exist" in {
       val fixture = buildFixture()
 
-      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false), eqTo(false))(any()))
+      when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false))(any()))
         .thenReturn(Future.successful(None))
 
       running(fixture.playApplication) {

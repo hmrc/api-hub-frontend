@@ -45,12 +45,12 @@ class AddTeamMemberController @Inject()(
 
   private val form = formProvider()
 
-  def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id, enrich = false)).async {
+  def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id)).async {
     implicit request =>
       Future.successful(Ok(view(form, routes.AddTeamMemberController.onSubmit(id), request.identifierRequest.user)))
   }
 
-  def onSubmit(id: String): Action[AnyContent] = (identify andThen applicationAuth(id, enrich = false)).async {
+  def onSubmit(id: String): Action[AnyContent] = (identify andThen applicationAuth(id)).async {
     implicit request =>
       form.bindFromRequest().fold(
         formWithErrors =>

@@ -35,7 +35,7 @@ class DeletedApplicationDetailsController @Inject()(
   apiHubService: ApiHubService
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(id: String): Action[AnyContent] = (identify andThen isSupport andThen applicationAuth(id, false, true)).async {
+  def onPageLoad(id: String): Action[AnyContent] = (identify andThen isSupport andThen applicationAuth(id, true)).async {
     implicit request =>
       apiHubService.getAccessRequests(Some(request.application.id), None).map {
         accessRequests =>

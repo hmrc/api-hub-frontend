@@ -46,7 +46,7 @@ class ApplicationSupportControllerSpec
       forAll(usersWhoCanSupport) { (user: UserModel) =>
         val fixture = buildFixture(user)
 
-        when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false), eqTo(true))(any))
+        when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(true))(any))
           .thenReturn(Future.successful(Some(application)))
 
         running(fixture.playApplication) {

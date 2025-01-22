@@ -58,7 +58,7 @@ class DeletedApplicationAccessRequestControllerSpec
         val accessRequest = sampleAccessRequest(application.id)
 
         when(fixture.apiHubService.getAccessRequest(any)(any)).thenReturn(Future.successful(Some(accessRequest)))
-        when(fixture.apiHubService.getApplication(any, any, any)(any)).thenReturn(Future.successful(Some(application)))
+        when(fixture.apiHubService.getApplication(any, any)(any)).thenReturn(Future.successful(Some(application)))
 
         running(fixture.application) {
           val request = FakeRequest(controllers.admin.routes.DeletedApplicationAccessRequestController.onPageLoad(accessRequest.id))
@@ -70,7 +70,7 @@ class DeletedApplicationAccessRequestControllerSpec
           contentAsString(result) must validateAsHtml
 
           verify(fixture.apiHubService).getAccessRequest(eqTo(accessRequest.id))(any)
-          verify(fixture.apiHubService).getApplication(eqTo(application.id), eqTo(false), eqTo(true))(any)
+          verify(fixture.apiHubService).getApplication(eqTo(application.id), eqTo(true))(any)
         }
       }
     }
@@ -121,7 +121,7 @@ class DeletedApplicationAccessRequestControllerSpec
         val accessRequest = sampleAccessRequest()
 
         when(fixture.apiHubService.getAccessRequest(any)(any)).thenReturn(Future.successful(Some(accessRequest)))
-        when(fixture.apiHubService.getApplication(any, any, any)(any)).thenReturn(Future.successful(None))
+        when(fixture.apiHubService.getApplication(any, any)(any)).thenReturn(Future.successful(None))
 
         running(fixture.application) {
           val request = FakeRequest(controllers.admin.routes.DeletedApplicationAccessRequestController.onPageLoad(accessRequest.id))

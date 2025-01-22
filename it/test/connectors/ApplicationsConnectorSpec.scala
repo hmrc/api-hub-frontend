@@ -222,11 +222,7 @@ class ApplicationsConnectorSpec
 
   "ApplicationsConnector.getApplication" - {
     "must" - {
-      behave like successfulApplicationGetter(true, false)
-    }
-
-    "must" - {
-      behave like successfulApplicationGetter(false, false)
+      behave like successfulApplicationGetter(false)
     }
 
     "must return none when application is not found" in {
@@ -238,7 +234,7 @@ class ApplicationsConnectorSpec
           )
       )
 
-      buildConnector(this).getApplication("id-1", enrich = true, includeDeleted = false)(HeaderCarrier()) map {
+      buildConnector(this).getApplication("id-1", includeDeleted = false)(HeaderCarrier()) map {
         actual =>
           actual mustBe None
       }
@@ -1915,8 +1911,8 @@ object ApplicationsConnectorSpec extends HttpClientV2Support {
 
   trait ApplicationGetterBehaviours extends AsyncFreeSpec with Matchers with WireMockSupport {
 
-    def successfulApplicationGetter(enrich: Boolean, includeDeleted: Boolean): Unit = {
-      s"must place the correct request and return the application when enrich = $enrich" in {
+    def successfulApplicationGetter(includeDeleted: Boolean): Unit = {
+      s"must place the correct request and return the application" in {
         val api = Api("api_id", "api_title", Seq(SelectedEndpoint("GET", "/foo/bar")))
         val applicationWithApis = Application(
           "id-1",
@@ -1928,7 +1924,7 @@ object ApplicationsConnectorSpec extends HttpClientV2Support {
         val expectedJson = toJsonString(applicationWithApis)
 
         stubFor(
-          get(urlEqualTo(s"/api-hub-applications/applications/id-1?enrich=$enrich&includeDeleted=$includeDeleted"))
+          get(urlEqualTo(s"/api-hub-applications/applications/id-1?includeDeleted=$includeDeleted"))
             .withHeader("Accept", equalTo("application/json"))
             .withHeader("Authorization", equalTo("An authentication token"))
             .willReturn(
@@ -1937,7 +1933,7 @@ object ApplicationsConnectorSpec extends HttpClientV2Support {
             )
         )
 
-        buildConnector(this).getApplication("id-1", enrich, includeDeleted)(HeaderCarrier()) map {
+        buildConnector(this).getApplication("id-1", includeDeleted)(HeaderCarrier()) map {
           actual =>
             actual mustBe Some(applicationWithApis)
         }

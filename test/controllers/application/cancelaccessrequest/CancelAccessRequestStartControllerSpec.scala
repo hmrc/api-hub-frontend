@@ -150,7 +150,7 @@ class CancelAccessRequestStartControllerSpec extends SpecBase with MockitoSugar 
     val accessRequests = sampleAccessRequests()
 
     when(sessionRepository.set(any)).thenReturn(Future.successful(true))
-    when(apiHubService.getApplication(any, any, any)(any)).thenReturn(Future.successful(Some(FakeApplication)))
+    when(apiHubService.getApplication(any, any)(any)).thenReturn(Future.successful(Some(FakeApplication)))
     when(apiHubService.getAccessRequests(any, any)(any)).thenReturn(Future.successful(accessRequests))
     when(navigator.nextPage(any, any, any)).thenReturn(onwardRoute)
 
