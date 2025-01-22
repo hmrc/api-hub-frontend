@@ -19,7 +19,7 @@ package controllers.admin
 import base.SpecBase
 import controllers.routes
 import fakes.FakeHipEnvironments
-import models.application.{Application, Creator, Credential, Environment, Environments, TeamMember}
+import models.application.{Application, Creator, Credential, TeamMember}
 import models.application.ApplicationLenses.ApplicationLensOps
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}

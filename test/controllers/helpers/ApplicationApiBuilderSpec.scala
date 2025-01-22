@@ -22,7 +22,7 @@ import models.accessrequest.{AccessRequest, AccessRequestEndpoint, AccessRequest
 import models.api.*
 import models.api.ApiDetailLenses.ApiDetailLensOps
 import models.application.ApplicationLenses.ApplicationLensOps
-import models.application.{Api, Scope, SelectedEndpoint}
+import models.application.{Api, SelectedEndpoint}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -274,14 +274,6 @@ object ApplicationApiBuilderSpec {
       platform = "HIP",
       maintainer = Maintainer("name", "#slack", List.empty)
     )
-
-  private def scope(name: String): Scope = {
-    Scope(name)
-  }
-
-  private def scopes(name: String *): Seq[Scope] = {
-    name.map(scope)
-  }
 
   private def buildAccessRequest(applicationId: String, api: Api, apiDetail: ApiDetail, status: AccessRequestStatus): AccessRequest = {
     AccessRequest(

@@ -192,15 +192,6 @@ object ApplicationLensesSpec {
     )
   }
 
-  private def randomScopes(): Seq[Scope] =
-    (0 to Random.nextInt(5))
-      .map(_ => randomScope())
-
-  private def randomScope(): Scope =
-    Scope(
-      name = s"test-scope${randomString()}"
-    )
-
   private def randomTeamMember(): TeamMember =
     TeamMember(email = randomString())
 

@@ -54,11 +54,6 @@ object Application {
     apply(id, newApplication.name, newApplication.createdBy, newApplication.teamId, newApplication.teamMembers)
   }
 
-  def apply(id: String, name: String, createdBy: Creator, environments: Environments): Application = {
-    val now = LocalDateTime.now()
-    Application(id, name, now, createdBy, now, None, Seq.empty, Seq.empty, credentials = environments.toCredentials)
-  }
-
   implicit val applicationFormat: Format[Application] = Json.format[Application]
 
 }

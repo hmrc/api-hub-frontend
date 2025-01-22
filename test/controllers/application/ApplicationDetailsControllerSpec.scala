@@ -21,7 +21,7 @@ import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
 import controllers.routes
 import models.accessrequest.Pending
 import models.api.{ApiDetail, Endpoint, EndpointMethod, Live, Maintainer}
-import models.application.{Api, Scope, SelectedEndpoint, TeamMember}
+import models.application.{Api, SelectedEndpoint, TeamMember}
 import models.application.ApplicationLenses.ApplicationLensOps
 import models.team.Team
 import models.user.UserModel
