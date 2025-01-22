@@ -19,7 +19,7 @@ package viewmodels.application
 import config.HipEnvironment
 import controllers.actions.FakeApiDetail
 import models.api.*
-import models.application.{Api, Scope, SelectedEndpoint}
+import models.application.{Api, SelectedEndpoint}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
@@ -280,13 +280,5 @@ object ApplicationApiSpec {
   private val testScope1 = "test-scope-1"
   private val testScope2 = "test-scope-2"
   private val testScope3 = "test-scope-3"
-
-  private def scope(name: String): Scope = {
-    Scope(name)
-  }
-
-  private def scopes(name: String *): Seq[Scope] = {
-    name.map(scope)
-  }
-
+  
 }
