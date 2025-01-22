@@ -52,6 +52,7 @@
 @radioSubDomains(domain: Domain) = @{
     domain.subDomains.map(subDomain =>
             RadioItem(
+                id = Some(s"subDomain-${subDomain.code.replace(".","_")}"),
                 content = Text(subDomain.description),
                 value = Some(subDomain.code)
             )
