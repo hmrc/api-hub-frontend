@@ -814,6 +814,10 @@ myApis.produce.egressprefix.error.required = You must state whether you wish to 
 
 myApis.update.selectegress.title = Review the Egress for your API
 
+myApis.environment.title = Deployed API
+myApis.environment.notDeployed.message = This API has not been deployed to this environment. To deploy the API to this environment the following steps are required:
+myApis.environment.notDeployed.action = Promote a version from another environment
+
 applicationDetailsTable.applicationName = Name
 applicationDetailsTable.owningTeam = Owning team
 applicationDetailsTable.noTeam = Not specified
