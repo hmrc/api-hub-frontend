@@ -817,6 +817,7 @@ myApis.update.selectegress.title = Review the Egress for your API
 myApis.environment.title = Deployed API
 myApis.environment.notDeployed.message = This API has not been deployed to this environment. To deploy the API to this environment the following steps are required:
 myApis.environment.notDeployed.action = Promote a version from another environment
+myApis.environment.version = API version
 
 applicationDetailsTable.applicationName = Name
 applicationDetailsTable.owningTeam = Owning team

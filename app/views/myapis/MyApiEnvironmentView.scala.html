@@ -26,6 +26,7 @@
         sideNav: views.html.templates.SideNav,
         myApisNavItems: MyApisNavItems,
         govukTabs: GovukTabs,
+        govukSummaryList: GovukSummaryList,
 )
 
 @(apiDetail: ApiDetail, environment: HipEnvironment, userModel: UserModel, deploymentStatuses: ApiDeploymentStatuses)(implicit request: Request[?], messages: Messages)
@@ -41,7 +42,17 @@
 }
 
 @isDeployedContent(version: String) = {
-    @version deployed
+    <h3 class="govuk-heading-m">@messages("myApis.environment.title")</h3>
+    @govukSummaryList(
+        SummaryList(
+            rows = Seq(
+                SummaryListRow(
+                    key = Key(messages("myApis.environment.version")),
+                    value = Value(HtmlContent(version))
+                )
+            )
+        )
+    )
 }
 
 @tabContent() = @{
