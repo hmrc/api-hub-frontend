@@ -24,13 +24,46 @@
 @this(
         layout: templates.Layout,
         sideNav: views.html.templates.SideNav,
-        myApisNavItems: MyApisNavItems
+        myApisNavItems: MyApisNavItems,
+        govukTabs: GovukTabs,
 )
 
 @(apiDetail: ApiDetail, environment: HipEnvironment, userModel: UserModel, deploymentStatuses: ApiDeploymentStatuses)(implicit request: Request[?], messages: Messages)
 
+@notDeployedContent() = {
+    <h3 class="govuk-heading-m">@messages("myApis.environment.title")</h3>
+    <p class="govuk-body">
+        @messages("myApis.environment.notDeployed.message")
+    </p>
+    <ul>
+        <li>@messages("myApis.environment.notDeployed.action")</li>
+    </ul>
+}
+
+@isDeployedContent(version: String) = {
+    @version deployed
+}
+
+@tabContent() = @{
+    deploymentStatuses.forEnvironment(environment.id) match {
+        case Deployed(_, version) => isDeployedContent(version)
+        case _ => notDeployedContent()
+    }
+}
+
 @layout(pageTitle = titleNoForm(messages("myApis.details.title")), user = Some(userModel), fullWidth = true) {
     @sideNav(apiDetail.title, myApisNavItems(apiDetail, userModel, MyApisNavPages.EnvironmentPage(environment), deploymentStatuses)) {
-        <h1 id="details" class="govuk-heading-l">@environment.id</h1>
+        <h1 id="details" class="govuk-heading-l">@messages(environment.nameKey) @messages("site.environment")</h1>
+
+        @govukTabs(Tabs(
+            items = Seq(
+                TabItem(
+                    label = messages("myApis.environment.title"),
+                    panel = TabPanel(
+                        content = HtmlContent(tabContent())
+                    )
+                )
+            )
+        ))
     }
 }
