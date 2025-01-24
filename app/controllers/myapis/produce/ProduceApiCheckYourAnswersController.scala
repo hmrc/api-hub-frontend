@@ -55,7 +55,7 @@ class ProduceApiCheckYourAnswersController @Inject()(
                                                       apiHubService: ApiHubService,
                                            )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val viewModel = ProduceApiDeploymentErrorViewModel(
+  private lazy val viewModel = ProduceApiDeploymentErrorViewModel(
     controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onCancel(),
     controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
   )
