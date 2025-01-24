@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,25 +14,18 @@
  * limitations under the License.
  */
 
-package models.deployment
+package models.requests
 
 import play.api.libs.json.{Format, Json}
 
-case class DeploymentDetails (
-  description: Option[String],
-  status: Option[String],
-  domain: Option[String],
-  subDomain: Option[String],
-  hods: Option[Seq[String]],
-  egressMappings: Option[Seq[EgressMapping]],
-  prefixesToRemove: Option[Seq[String]],
-  egress: Option[String]
-) {
-  val hasEgress: Boolean = egress.exists(_ != DeploymentDetails.egressFallback)
-}
+case class PromotionRequest(
+                             environmentFrom: String,
+                             environmentTo: String,
+                             egress: String,
+                           )
 
-object DeploymentDetails {
-  val egressFallback: String = "null-egress"
-  implicit val formatDeploymentDetails: Format[DeploymentDetails] = Json.format[DeploymentDetails]
+object PromotionRequest {
+
+  implicit val formatRedeploymentRequest: Format[PromotionRequest] = Json.format[PromotionRequest]
 
 }

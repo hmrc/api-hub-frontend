@@ -123,6 +123,19 @@ class ApiHubService @Inject()(
     applicationsConnector.approveAccessRequest(id, decidedBy)
   }
 
+  def promoteAPI(
+                  publisherRef: String,
+                  deploymentFrom: HipEnvironment,
+                  deploymentTo: HipEnvironment,
+                  egress: String
+                )(implicit hc: HeaderCarrier): Future[Option[DeploymentsResponse]] =
+    applicationsConnector.promoteAPI(
+      publisherRef,
+      deploymentFrom,
+      deploymentTo,
+      egress,
+    )
+
   def cancelAccessRequest(id: String, cancelledBy: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
     applicationsConnector.cancelAccessRequest(id, cancelledBy)
   }

@@ -115,7 +115,7 @@ class SimpleApiPromotionControllerSpec
         val fixture = buildFixture(user)
 
         when(fixture.apiHubService.getApiDetail(any)(any)).thenReturn(Future.successful(Some(FakeApiDetail)))
-        when(fixture.applicationsConnector.promoteToProduction(any)(any)).thenReturn(Future.successful(Some(response)))
+        when(fixture.apiHubService.promoteAPI(any, any, any, any)(any)).thenReturn(Future.successful(Some(response)))
 
         running(fixture.playApplication) {
           val request = FakeRequest(controllers.myapis.routes.SimpleApiPromotionController.onSubmit(FakeApiDetail.id))
@@ -127,7 +127,7 @@ class SimpleApiPromotionControllerSpec
           contentAsString(result) must validateAsHtml
 
           verify(fixture.apiHubService).getApiDetail(eqTo(FakeApiDetail.id))(any)
-          verify(fixture.applicationsConnector).promoteToProduction(eqTo(FakeApiDetail.publisherReference))(any)
+          verify(fixture.apiHubService).promoteAPI(eqTo(FakeApiDetail.publisherReference), any, any, any)(any)
         }
       }
     }
@@ -144,7 +144,7 @@ class SimpleApiPromotionControllerSpec
       )
 
       when(fixture.apiHubService.getApiDetail(any)(any)).thenReturn(Future.successful(Some(FakeApiDetail)))
-      when(fixture.applicationsConnector.promoteToProduction(any)(any)).thenReturn(Future.successful(Some(response)))
+      when(fixture.apiHubService.promoteAPI(any, any, any, any)(any)).thenReturn(Future.successful(Some(response)))
 
       running(fixture.playApplication) {
         val request = FakeRequest(controllers.myapis.routes.SimpleApiPromotionController.onSubmit(FakeApiDetail.id))
@@ -183,7 +183,7 @@ class SimpleApiPromotionControllerSpec
       val fixture = buildFixture(FakeSupporter)
 
       when(fixture.apiHubService.getApiDetail(any)(any)).thenReturn(Future.successful(Some(FakeApiDetail)))
-      when(fixture.applicationsConnector.promoteToProduction(any)(any)).thenReturn(Future.successful(None))
+      when(fixture.apiHubService.promoteAPI(any, any, any, any)(any)).thenReturn(Future.successful(None))
 
       running(fixture.playApplication) {
         val request = FakeRequest(controllers.myapis.routes.SimpleApiPromotionController.onSubmit(FakeApiDetail.id))
@@ -213,7 +213,7 @@ class SimpleApiPromotionControllerSpec
           redirectLocation(result) mustBe Some(controllers.routes.UnauthorisedController.onPageLoad.url)
 
           verify(fixture.apiHubService, never).getApiDetail(any)(any)
-          verify(fixture.applicationsConnector, never).promoteToProduction(any)(any)
+          verify(fixture.apiHubService, never).promoteAPI(any, any, any, any)(any)
         }
       }
     }
