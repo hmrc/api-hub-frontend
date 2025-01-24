@@ -59,7 +59,7 @@ class UpdateApiCheckYourAnswersController @Inject()(
                                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
 
-  val errorViewModel = ProduceApiDeploymentErrorViewModel(
+  private lazy val errorViewModel = ProduceApiDeploymentErrorViewModel(
     controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onCancel(),
     controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onPageLoad()
   )
