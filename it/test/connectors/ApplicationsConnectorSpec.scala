@@ -1029,7 +1029,7 @@ class ApplicationsConnectorSpec
           )
       )
 
-      buildConnector(this).promoteToProduction(publisherRef)(HeaderCarrier()).map {
+      buildConnector(this).promoteAPI(publisherRef, FakeHipEnvironments.test, FakeHipEnvironments.production, "test-egress")(HeaderCarrier()).map {
         result =>
           result.value mustBe response
       }
@@ -1049,7 +1049,7 @@ class ApplicationsConnectorSpec
           )
       )
 
-      buildConnector(this).promoteToProduction(publisherRef)(HeaderCarrier()).map {
+      buildConnector(this).promoteAPI(publisherRef, FakeHipEnvironments.test, FakeHipEnvironments.production, "test-egress")(HeaderCarrier()).map {
         result =>
           result.value mustBe invalidOasResponse
       }
@@ -1068,7 +1068,7 @@ class ApplicationsConnectorSpec
           )
       )
 
-      buildConnector(this).promoteToProduction(publisherRef)(HeaderCarrier()).map {
+      buildConnector(this).promoteAPI(publisherRef, FakeHipEnvironments.test, FakeHipEnvironments.production, "test-egress")(HeaderCarrier()).map {
         result =>
           result mustBe None
       }

@@ -17,10 +17,10 @@
 package controllers.myapis
 
 import com.google.inject.{Inject, Singleton}
-import connectors.ApplicationsConnector
+import config.HipEnvironments
 import controllers.actions.{AuthorisedSupportAction, IdentifierAction}
 import controllers.helpers.ErrorResultBuilder
-import models.deployment.{InvalidOasResponse, SuccessfulDeploymentsResponse}
+import models.deployment.{DeploymentDetails, InvalidOasResponse, SuccessfulDeploymentsResponse}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
@@ -39,7 +39,7 @@ class SimpleApiPromotionController @Inject()(
   successView: DeploymentSuccessView,
   failureView: DeploymentFailureView,
   errorResultBuilder: ErrorResultBuilder,
-  applicationsConnector: ApplicationsConnector
+  hipEnvironments: HipEnvironments
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(id: String): Action[AnyContent] = (identify andThen isSupport).async {
@@ -54,7 +54,12 @@ class SimpleApiPromotionController @Inject()(
     implicit request =>
       apiHubService.getApiDetail(id).flatMap {
         case Some(apiDetail) =>
-          applicationsConnector.promoteToProduction(apiDetail.publisherReference).map {
+          apiHubService.promoteAPI(
+            apiDetail.publisherReference,
+            hipEnvironments.deploymentHipEnvironment,
+            hipEnvironments.productionHipEnvironment,
+            DeploymentDetails.egressFallback
+          ).map {
             case Some(response: SuccessfulDeploymentsResponse) =>
               Ok(successView(request.user, response.id, apiDetail.title))
             case Some(response: InvalidOasResponse) =>

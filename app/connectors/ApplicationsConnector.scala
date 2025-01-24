@@ -25,7 +25,7 @@ import models.api.{ApiDeployment, ApiDeploymentStatuses, ApiDetailSummary, Egres
 import models.application.*
 import models.deployment.*
 import models.exception.{ApplicationCredentialLimitException, ApplicationsException, TeamNameNotUniqueException}
-import models.requests.{AddApiRequest, ChangeTeamNameRequest, TeamMemberRequest}
+import models.requests.{AddApiRequest, ChangeTeamNameRequest, PromotionRequest, TeamMemberRequest}
 import models.stats.ApisInProductionStatistic
 import models.team.{NewTeam, Team}
 import models.user.UserContactDetails
@@ -366,10 +366,20 @@ class ApplicationsConnector @Inject()(
       }
   }
 
-  def promoteToProduction(publisherRef: String)(implicit hc: HeaderCarrier): Future[Option[DeploymentsResponse]] = {
+  def promoteAPI(
+                  publisherRef: String,
+                  deploymentFrom: HipEnvironment,
+                  deploymentTo: HipEnvironment,
+                  egress: String
+                )(implicit hc: HeaderCarrier): Future[Option[DeploymentsResponse]] = {
     httpClient.put(url"$applicationsBaseUrl/api-hub-applications/deployments/$publisherRef/promote")
       .setHeader(ACCEPT -> JSON)
       .setHeader(AUTHORIZATION -> clientAuthToken)
+      .withBody(Json.toJson(PromotionRequest(
+        deploymentFrom.id,
+        deploymentTo.id,
+        egress,
+      )))
       .execute[HttpResponse]
       .flatMap {
         response =>
