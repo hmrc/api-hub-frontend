@@ -835,11 +835,12 @@ class ApiHubServiceSpec
   "listEgressGateways" - {
     "must make the correct request to the applications connector and return the egress gateways" in {
       val fixture = buildFixture()
+      val environment = FakeHipEnvironments.production
 
       val egressGateways = sampleEgressGateways()
-      when(fixture.applicationsConnector.listEgressGateways()(any)).thenReturn(Future.successful(egressGateways))
+      when(fixture.applicationsConnector.listEgressGateways(eqTo(environment))(any)).thenReturn(Future.successful(egressGateways))
 
-      fixture.service.listEgressGateways()(HeaderCarrier()).map {
+      fixture.service.listEgressGateways(environment)(HeaderCarrier()).map {
         result =>
           result mustBe egressGateways
       }

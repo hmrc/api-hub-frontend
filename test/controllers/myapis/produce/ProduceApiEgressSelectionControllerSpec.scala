@@ -19,11 +19,12 @@ package controllers.myapis.produce
 
 import base.SpecBase
 import controllers.actions.FakeUser
+import fakes.FakeHipEnvironments
 import forms.myapis.produce.ProduceApiEgressSelectionForm
 import generators.EgressGenerator
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.{any, argThat}
+import org.mockito.ArgumentMatchers.{any, argThat, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.myapis.produce.ProduceApiEgressSelectionPage
@@ -55,7 +56,7 @@ class ProduceApiEgressSelectionControllerSpec extends SpecBase with MockitoSugar
 
       val egressGateways = sampleEgressGateways()
       val fixture = buildFixture(userAnswers = Some(emptyUserAnswers))
-      when(fixture.apiHubService.listEgressGateways()(any)).thenReturn(Future.successful(egressGateways))
+      when(fixture.apiHubService.listEgressGateways(eqTo(FakeHipEnvironments.deploymentHipEnvironment))(any)).thenReturn(Future.successful(egressGateways))
 
       running(fixture.application) {
         val request = FakeRequest(GET, produceApiEgressSelectionRoute)
@@ -84,7 +85,7 @@ class ProduceApiEgressSelectionControllerSpec extends SpecBase with MockitoSugar
       val userAnswers = UserAnswers(userAnswersId).set(ProduceApiEgressSelectionPage, chooseEgress).success.value
 
       val fixture = buildFixture(userAnswers = Some(userAnswers))
-      when(fixture.apiHubService.listEgressGateways()(any)).thenReturn(Future.successful(egressGateways))
+      when(fixture.apiHubService.listEgressGateways(eqTo(FakeHipEnvironments.deploymentHipEnvironment))(any)).thenReturn(Future.successful(egressGateways))
 
       running(fixture.application) {
         val request = FakeRequest(GET, produceApiEgressSelectionRoute)
@@ -111,7 +112,7 @@ class ProduceApiEgressSelectionControllerSpec extends SpecBase with MockitoSugar
       val fixture = buildFixture(userAnswers = Some(emptyUserAnswers))
       when(fixture.sessionRepository.set(any())).thenReturn(Future.successful(true))
 
-      when(fixture.apiHubService.listEgressGateways()(any)).thenReturn(Future.successful(egressGateways))
+      when(fixture.apiHubService.listEgressGateways(eqTo(FakeHipEnvironments.deploymentHipEnvironment))(any)).thenReturn(Future.successful(egressGateways))
 
       running(fixture.application) {
         val request =

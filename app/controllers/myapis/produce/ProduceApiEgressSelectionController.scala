@@ -16,7 +16,7 @@
 
 package controllers.myapis.produce
 
-import config.FrontendAppConfig
+import config.{FrontendAppConfig, HipEnvironments}
 import controllers.actions.*
 import forms.myapis.produce.ProduceApiEgressSelectionForm
 import models.{Mode, UserAnswers}
@@ -48,7 +48,8 @@ class ProduceApiEgressSelectionController @Inject()(
                                             formProvider: ProduceApiEgressSelectionForm,
                                             produceApiSessionRepository: ProduceApiSessionRepository,
                                             apiHubService: ApiHubService,
-                                            navigator: Navigator
+                                            navigator: Navigator,
+                                            hipEnvironments: HipEnvironments
                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
@@ -86,7 +87,7 @@ class ProduceApiEgressSelectionController @Inject()(
       controllers.myapis.produce.routes.ProduceApiEgressAvailabilityController.onPageLoad(mode).url,
       true
     )
-    apiHubService.listEgressGateways().map(
+    apiHubService.listEgressGateways(hipEnvironments.deploymentHipEnvironment).map(
       egressGateways =>
         status(view(form, request.user, config.helpDocsPath, egressGateways, viewModel))
     )
