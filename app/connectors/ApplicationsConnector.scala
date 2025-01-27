@@ -593,8 +593,8 @@ class ApplicationsConnector @Inject()(
     .map(invalidOasResponse => Future.successful(invalidOasResponse))
     .getOrElse(Future.failed(UpstreamErrorResponse("Bad request", response.status)))
 
-  def listEgressGateways()(implicit hc: HeaderCarrier): Future[Seq[EgressGateway]] = {
-    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/egresses/gateways")
+  def listEgressGateways(hipEnvironment: HipEnvironment)(implicit hc: HeaderCarrier): Future[Seq[EgressGateway]] = {
+    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/egresses/gateways/${hipEnvironment.id}")
       .setHeader(ACCEPT -> JSON)
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Seq[EgressGateway]]

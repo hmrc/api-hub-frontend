@@ -16,7 +16,7 @@
 
 package controllers.myapis.update
 
-import config.FrontendAppConfig
+import config.{FrontendAppConfig, HipEnvironments}
 import controllers.actions.*
 import forms.myapis.produce.ProduceApiEgressSelectionForm
 import models.Mode
@@ -46,7 +46,8 @@ class UpdateApiEgressSelectionController @Inject()(
                                                     formProvider: ProduceApiEgressSelectionForm,
                                                     sessionRepository: UpdateApiSessionRepository,
                                                     apiHubService: ApiHubService,
-                                                    navigator: Navigator
+                                                    navigator: Navigator,
+                                                    hipEnvironments: HipEnvironments
                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
@@ -84,7 +85,7 @@ class UpdateApiEgressSelectionController @Inject()(
       controllers.myapis.update.routes.UpdateApiEgressAvailabilityController.onPageLoad(mode).url,
       false
     )
-    apiHubService.listEgressGateways().map(
+    apiHubService.listEgressGateways(hipEnvironments.deploymentHipEnvironment).map(
       egressGateways =>
         status(view(form, request.user, config.helpDocsPath, egressGateways, viewModel))
     )

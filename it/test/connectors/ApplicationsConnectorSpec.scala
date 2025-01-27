@@ -1657,9 +1657,10 @@ class ApplicationsConnectorSpec
   "listEgressGateways" - {
     "must place the correct request and return a Seq[EgressGateway]" in {
       val egressGateways = sampleEgressGateways()
+      val environment = FakeHipEnvironments.production
 
       stubFor(
-        get(urlEqualTo("/api-hub-applications/egresses/gateways"))
+        get(urlEqualTo(s"/api-hub-applications/egresses/gateways/${environment.id}"))
           .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
           .withHeader(AUTHORIZATION, equalTo("An authentication token"))
           .willReturn(
@@ -1668,7 +1669,7 @@ class ApplicationsConnectorSpec
           )
       )
 
-      buildConnector(this).listEgressGateways()(HeaderCarrier()).map {
+      buildConnector(this).listEgressGateways(environment)(HeaderCarrier()).map {
         result =>
           result mustBe egressGateways
       }

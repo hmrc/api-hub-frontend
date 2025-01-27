@@ -221,8 +221,8 @@ class ApiHubService @Inject()(
     applicationsConnector.listApisInProduction()
   }
 
-  def listEgressGateways()(implicit hc: HeaderCarrier): Future[Seq[EgressGateway]] = {
-    applicationsConnector.listEgressGateways()
+  def listEgressGateways(hipEnvironment: HipEnvironment)(implicit hc: HeaderCarrier): Future[Seq[EgressGateway]] = {
+    applicationsConnector.listEgressGateways(hipEnvironment)
   }
 
   def fetchAllScopes(applicationId: String)(implicit hc: HeaderCarrier): Future[Option[Seq[CredentialScopes]]] = {
