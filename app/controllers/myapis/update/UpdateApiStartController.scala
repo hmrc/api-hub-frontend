@@ -82,6 +82,7 @@ class UpdateApiStartController @Inject()(
             case (Some(mappings), Some(prefixes)) => Some(ProduceApiEgressPrefixes(prefixes, mappings))
             case _ => None
           }
+          updatedAnswers <- updateAnswer(updatedAnswers, UpdateApiAddPrefixesPage, egressPrefixesMappings.exists(!_.isEmpty))
           updatedAnswers <- updateOptionalAnswer(updatedAnswers, UpdateApiEgressPrefixesPage, egressPrefixesMappings)
           response <- sessionRepository.set(updatedAnswers)
           result = Redirect(navigator.nextPage(UpdateApiStartPage, NormalMode, updatedAnswers))
