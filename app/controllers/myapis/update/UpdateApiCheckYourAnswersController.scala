@@ -119,7 +119,8 @@ class UpdateApiCheckYourAnswersController @Inject()(
       apiStatus <- validateApiStatus(request.userAnswers)
       domainSubdomain <- validateDomainSubdomain(request.userAnswers)
       hods <- validateHods(request.userAnswers)
-      egressPrefixes <- validateEgressPrefixes(request.userAnswers)
+      addPrefixes <- validateAddPrefixes(request.userAnswers)
+      egressPrefixes <- validateEgressPrefixes(request.userAnswers, addPrefixes)
       redeployment = RedeploymentRequest(
         description = shortDescription,
         egress = egress,
@@ -128,8 +129,8 @@ class UpdateApiCheckYourAnswersController @Inject()(
         domain = domainSubdomain.domain,
         subDomain = domainSubdomain.subDomain,
         hods = hods.toSeq,
-        prefixesToRemove = egressPrefixes.prefixes,
-        egressMappings = Some(egressPrefixes.getMappings.map(m =>
+        prefixesToRemove = egressPrefixes.map(_.prefixes).getOrElse(Seq.empty),
+        egressMappings = egressPrefixes.map(_.getMappings.map(m =>
           EgressMapping(m.existing, m.replacement)
         )),
       )
@@ -156,6 +157,12 @@ class UpdateApiCheckYourAnswersController @Inject()(
     }
   }
 
+  private def validateAddPrefixes(userAnswers: UserAnswers): Either[Call, Boolean] = {
+    userAnswers.get(UpdateApiAddPrefixesPage) match
+      case Some(addPrefixes) => Right(addPrefixes)
+      case None => Left(routes.UpdateApiAddPrefixesController.onPageLoad(CheckMode))
+  }
+  
   private def validateEgress(userAnswers: UserAnswers): Either[Call, Option[String]] = {
     (userAnswers.get(UpdateApiEgressAvailabilityPage), userAnswers.get(UpdateApiEgressSelectionPage)) match {
       case (Some(true), Some(egress)) => Right(Some(egress))
@@ -165,10 +172,15 @@ class UpdateApiCheckYourAnswersController @Inject()(
     }
   }
 
-  private def validateEgressPrefixes(userAnswers: UserAnswers): Either[Call, ProduceApiEgressPrefixes] = {
-    userAnswers.get(UpdateApiEgressPrefixesPage) match {
-      case Some(egressPrefixes) => Right(egressPrefixes)
-      case None => Left(routes.UpdateApiEgressPrefixesController.onPageLoad(CheckMode))
+  private def validateEgressPrefixes(userAnswers: UserAnswers, addPrefixes: Boolean): Either[Call, Option[ProduceApiEgressPrefixes]] = {
+    if (addPrefixes) {
+      userAnswers.get(UpdateApiEgressPrefixesPage) match {
+        case Some(egressPrefixes) => Right(Some(egressPrefixes))
+        case None => Left(routes.UpdateApiEgressPrefixesController.onPageLoad(CheckMode))
+      }
+    }
+    else {
+      Right(None)
     }
   }
 
