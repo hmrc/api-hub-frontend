@@ -818,6 +818,9 @@ myApis.environment.title = Deployed API
 myApis.environment.notDeployed.message = This API has not been deployed to this environment. To deploy the API to this environment the following steps are required:
 myApis.environment.notDeployed.action = Promote a version from another environment
 myApis.environment.version = API version
+myApis.environment.promoteTo = Promote to {0} environment
+myApis.environment.promotingTo = Promoting to the {0} environment
+myApis.environment.promoteFinish = Finish
 
 applicationDetailsTable.applicationName = Name
 applicationDetailsTable.owningTeam = Owning team

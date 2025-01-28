@@ -9,6 +9,12 @@ GET     /all                                                controllers.myapis.M
 GET     /:id                                                controllers.myapis.MyApiDetailsController.onPageLoad(id: String)
 
 GET     /environments/:id/:environment                      controllers.myapis.MyApiEnvironmentController.onPageLoad(id: String, environment: String)
+POST    /environments/:id/:environment                      controllers.myapis.MyApiEnvironmentController.onSubmit(id: String, environment: String)
+
+GET     /environments/:id/:environment/set-egress           controllers.myapis.promote.MyApiSetEgressController.onPageLoad(id: String, environment: String)
+POST    /environments/:id/:environment/set-egress           controllers.myapis.promote.MyApiSetEgressController.onSubmit(id: String, environment: String)
+
+GET     /environments/:id/:environment/promote-success      controllers.myapis.promote.MyApiPromoteSuccessController.onPageLoad(id: String, environment: String)
 
 GET     /usage/:apiId                                       controllers.myapis.ApiUsageController.onPageLoad(apiId: String)
 

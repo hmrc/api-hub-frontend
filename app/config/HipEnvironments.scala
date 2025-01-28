@@ -67,6 +67,9 @@ trait HipEnvironments {
 
   def deploymentHipEnvironment: HipEnvironment = environments.maxBy(_.rank)
 
+  def promotionEnvironment(environment: HipEnvironment): Option[HipEnvironment] = {
+    environments.filter(_.rank < environment.rank).maxByOption(_.rank)
+  }
 }
 
 @Singleton
