@@ -1117,6 +1117,7 @@ updateApiHod.title = Review the HOD/backend for your API
 updateApiEgressPrefix.heading = Review prefix configuration
 
 hipEnvironment.production.name = Production
+hipEnvironment.preprod.name = Pre-Production
 hipEnvironment.test.name = Test
 
 produceApiHowToAddWiremock.title = WireMock configuration for your API
