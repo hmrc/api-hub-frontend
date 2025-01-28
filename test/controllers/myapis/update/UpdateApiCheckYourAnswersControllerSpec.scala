@@ -62,6 +62,7 @@ class UpdateApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar
     .set(UpdateApiEnterOasPage, "oas").success.value
     .set(UpdateApiEnterApiTitlePage, "title").success.value
     .set(UpdateApiShortDescriptionPage, "api description").success.value
+    .set(UpdateApiAddPrefixesPage, true).success.value
     .set(UpdateApiEgressPrefixesPage, ProduceApiEgressPrefixes(Seq("/prefix"), Seq("/existing->/replacement"))).success.value
     .set(UpdateApiHodPage, Set("hod1")).success.value
     .set(UpdateApiDomainPage, ProduceApiDomainSubdomain("domain", "subdomain")).success.value
@@ -244,6 +245,7 @@ class UpdateApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar
         ("userAnswerToRemove", "user", "expectedLocation"),
         (UpdateApiEnterOasPage, nonSupportUser, updateApiRoutes.UpdateApiEnterOasController.onPageLoad(CheckMode).url),
         (UpdateApiShortDescriptionPage, nonSupportUser, updateApiRoutes.UpdateApiShortDescriptionController.onPageLoad(CheckMode).url),
+        (UpdateApiAddPrefixesPage, nonSupportUser, updateApiRoutes.UpdateApiAddPrefixesController.onPageLoad(CheckMode).url),
         (UpdateApiEgressPrefixesPage, nonSupportUser, updateApiRoutes.UpdateApiEgressPrefixesController.onPageLoad(CheckMode).url),
         (UpdateApiHodPage, nonSupportUser, updateApiRoutes.UpdateApiHodController.onPageLoad(CheckMode).url),
         (UpdateApiDomainPage, nonSupportUser, updateApiRoutes.UpdateApiDomainController.onPageLoad(CheckMode).url),
