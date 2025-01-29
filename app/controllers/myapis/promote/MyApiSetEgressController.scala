@@ -14,48 +14,42 @@
  * limitations under the License.
  */
 
-package controllers.myapis
+package controllers.myapis.promote
 
-import cats.implicits.toTraverseOps
 import com.google.inject.{Inject, Singleton}
 import config.{FrontendAppConfig, HipEnvironments}
 import controllers.actions.{ApiAuthActionProvider, IdentifierAction}
 import controllers.helpers.ErrorResultBuilder
-import play.api.i18n.{I18nSupport, Messages}
+import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.myapis.MyApiEnvironmentView
-
-import scala.concurrent.{ExecutionContext, Future}
+import views.html.myapis.promote.MyApiSetEgressView
+import scala.concurrent.ExecutionContext
 
 @Singleton
-class MyApiEnvironmentController @Inject()(
+class MyApiSetEgressController @Inject()(
   override val controllerComponents: MessagesControllerComponents,
-  view: MyApiEnvironmentView,
+  view: MyApiSetEgressView,
   identify: IdentifierAction,
   config: FrontendAppConfig,
   apiAuth: ApiAuthActionProvider,
   errorResultBuilder: ErrorResultBuilder,
-  apiHubService: ApiHubService,
   hipEnvironments: HipEnvironments
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(id: String, environment: String): Action[AnyContent] = (identify andThen apiAuth(id)) async {
+  def onPageLoad(id: String, environment: String): Action[AnyContent] = (identify andThen apiAuth(id))  {
     implicit request =>
-        hipEnvironments.forEnvironmentIdOptional(environment)
-          .map(hipEnvironment =>
-            for {
-              deploymentStatuses <- apiHubService.getApiDeploymentStatuses(request.apiDetails.publisherReference)
-            } yield Ok(view(request.apiDetails, hipEnvironment, hipEnvironments.promotionEnvironment(hipEnvironment), request.identifierRequest.user, deploymentStatuses))
-          ).getOrElse(
-            Future.successful(errorResultBuilder.environmentNotFound(environment))
-          )
+      (for {
+        fromEnvironment <- hipEnvironments.forEnvironmentIdOptional(environment)
+        toEnvironment <- hipEnvironments.promotionEnvironment(fromEnvironment)
+      } yield Ok(view(request.apiDetails, fromEnvironment, toEnvironment, request.identifierRequest.user))).getOrElse(
+        errorResultBuilder.environmentNotFound(environment)
+      )
   }
 
   def onSubmit(id: String, environment: String): Action[AnyContent] = (identify andThen apiAuth(id)) {
     implicit request =>
-      Redirect(controllers.myapis.promote.routes.MyApiSetEgressController.onPageLoad(id, environment))
+      Redirect(controllers.myapis.promote.routes.MyApiPromoteSuccessController.onPageLoad(id, environment))
   }
 
 }

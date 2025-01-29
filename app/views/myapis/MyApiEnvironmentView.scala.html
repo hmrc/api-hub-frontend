@@ -27,9 +27,11 @@
         myApisNavItems: MyApisNavItems,
         govukTabs: GovukTabs,
         govukSummaryList: GovukSummaryList,
+        govukButton: GovukButton,
+        formHelper: FormWithCSRF,
 )
 
-@(apiDetail: ApiDetail, environment: HipEnvironment, userModel: UserModel, deploymentStatuses: ApiDeploymentStatuses)(implicit request: Request[?], messages: Messages)
+@(apiDetail: ApiDetail, environment: HipEnvironment, promoteToEnvironment: Option[HipEnvironment], userModel: UserModel, deploymentStatuses: ApiDeploymentStatuses)(implicit request: Request[?], messages: Messages)
 
 @notDeployedContent() = {
     <h3 class="govuk-heading-m">@messages("myApis.environment.title")</h3>
@@ -53,6 +55,16 @@
             )
         )
     )
+    @for(promoteEnvironment <- promoteToEnvironment) {
+        @formHelper(action = controllers.myapis.routes.MyApiEnvironmentController.onSubmit(apiDetail.id, environment.id)) {
+            @govukButton(
+                Button(
+                    content = Text(messages("myApis.environment.promoteTo", messages(promoteEnvironment.nameKey))),
+                    id = Some("promoteApi")
+                )
+            )
+        }
+    }
 }
 
 @tabContent() = @{

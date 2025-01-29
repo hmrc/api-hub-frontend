@@ -72,9 +72,8 @@ class MyApiEnvironmentControllerSpec
       val request = FakeRequest(GET, controllers.myapis.routes.MyApiEnvironmentController.onPageLoad(apiDetail.id, FakeHipEnvironments.test.id).url)
       val result = route(fixture.application, request).value
 
-      val r = status(result) 
-//      status(result) mustBe OK
-      contentAsString(result) mustBe view(apiDetail, FakeHipEnvironments.test, FakeUser, deploymentStatuses)(request, messages(fixture.application)).toString()
+      status(result) mustBe OK
+      contentAsString(result) mustBe view(apiDetail, FakeHipEnvironments.test, Some(FakeHipEnvironments.production), FakeUser, deploymentStatuses)(request, messages(fixture.application)).toString()
       contentAsString(result) must validateAsHtml
     }
   }
@@ -97,7 +96,7 @@ class MyApiEnvironmentControllerSpec
       val result = route(fixture.application, request).value
 
       status(result) mustBe OK
-      contentAsString(result) mustBe view(apiDetail, FakeHipEnvironments.test, FakeSupporter, deploymentStatuses)(request, messages(fixture.application)).toString()
+      contentAsString(result) mustBe view(apiDetail, FakeHipEnvironments.test, Some(FakeHipEnvironments.production), FakeSupporter, deploymentStatuses)(request, messages(fixture.application)).toString()
       contentAsString(result) must validateAsHtml
     }
   }

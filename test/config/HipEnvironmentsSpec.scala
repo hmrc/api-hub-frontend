@@ -102,6 +102,55 @@ class HipEnvironmentsSpec extends AnyFreeSpec with Matchers with TableDrivenProp
       hipEnvironments.deploymentHipEnvironment.id mustBe "test"
     }
 
+    "promotionEnvironment" - {
+      val hipMultiEnvironmentsConfig = Configuration.apply(ConfigFactory.parseString("""
+         |hipEnvironments = {
+         |    test = {
+         |        id = "test",
+         |        rank = 3,
+         |        nameKey = "hipEnvironment.test.name",
+         |        isProductionLike = false
+         |    },
+         |    production = {
+         |        id = "production",
+         |        rank = 1,
+         |        nameKey = "hipEnvironment.production.name",
+         |        isProductionLike = true
+         |    },
+         |    dev = {
+         |        id = "dev",
+         |        rank = 4,
+         |        nameKey = "hipEnvironment.dev.name",
+         |        isProductionLike = false
+         |    },
+         |    preprod = {
+         |        id = "preprod",
+         |        rank = 2,
+         |        nameKey = "hipEnvironment.preprod.name",
+         |        isProductionLike = false
+         |    }
+         |}
+         |""".stripMargin))
+        val hipMultiEnvironments = HipEnvironmentsImpl(hipMultiEnvironmentsConfig)
+        val prodEnvironment = hipMultiEnvironments.forEnvironmentId("production")
+        val preprodEnvironment = hipMultiEnvironments.forEnvironmentId("preprod")
+        val testEnvironment = hipMultiEnvironments.forEnvironmentId("test")
+        val devEnvironment = hipMultiEnvironments.forEnvironmentId("dev")
+
+      "production has no promotion environment" in {
+        hipMultiEnvironments.promotionEnvironment(prodEnvironment) mustBe None
+      }
+      "pre-production promotes to production" in {
+        hipMultiEnvironments.promotionEnvironment(preprodEnvironment) mustBe Some(prodEnvironment)
+      }
+      "test promotes to pre-production" in {
+        hipMultiEnvironments.promotionEnvironment(testEnvironment) mustBe Some(preprodEnvironment)
+      }
+      "dev promotes to test" in {
+        hipMultiEnvironments.promotionEnvironment(devEnvironment) mustBe Some(testEnvironment)
+      }
+    }
+
   }
 
 }
