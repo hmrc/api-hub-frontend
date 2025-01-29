@@ -727,7 +727,7 @@ api.deployment.failure.title = There was an error processing your deployment req
 api.deployment.failure = There was an error processing your deployment request
 api.deployment.failure.message = Review the details of the processing error below
 api.deployment.failure.warning = Review the processing errors
-api.deployment.failure.continue = Return to API deployment page
+api.deployment.failure.continue = Review the details of your API page
 api.deployment.failure.contact = You can try to redeploy your API. If this error continues contact {0}
 api.deployment.failure.contact.support = support
 
