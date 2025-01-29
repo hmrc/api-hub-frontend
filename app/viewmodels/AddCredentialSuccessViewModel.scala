@@ -66,7 +66,7 @@ object AddCredentialSuccessViewModel {
   private def environmentNameRow()(implicit messages: Messages): SummaryListRow = {
     SummaryListRowViewModel(
       key     = "addCredentialSuccess.environment",
-      value   = ValueViewModel(HtmlFormat.escape(messages("addCredentialSuccess.production")).toString),
+      value   = ValueViewModel(HtmlFormat.escape(messages("site.environment.production")).toString),
       actions = Seq.empty
     )
   }

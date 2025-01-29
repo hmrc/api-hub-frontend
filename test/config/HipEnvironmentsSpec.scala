@@ -31,14 +31,14 @@ class HipEnvironmentsSpec extends AnyFreeSpec with Matchers with TableDrivenProp
       |    production = {
       |        id = "production",
       |        rank = 1,
-      |        nameKey = "hipEnvironment.production.name",
+      |        nameKey = "site.environment.production",
       |        environmentName = "primary",
       |        isProductionLike = true
       |    },
       |    test = {
       |        id = "test",
       |        rank = 2,
-      |        nameKey = "hipEnvironment.test.name",
+      |        nameKey = "site.environment.test",
       |        environmentName = "secondary",
       |        isProductionLike = false
       |    }
@@ -49,13 +49,13 @@ class HipEnvironmentsSpec extends AnyFreeSpec with Matchers with TableDrivenProp
     HipEnvironment(
       id = "production",
       rank = 1,
-      nameKey = "hipEnvironment.production.name",
+      nameKey = "site.environment.production",
       isProductionLike = true
     ),
     HipEnvironment(
       id = "test",
       rank = 2,
-      nameKey = "hipEnvironment.test.name",
+      nameKey = "site.environment.test",
       isProductionLike = false
     ),
   )
@@ -108,25 +108,25 @@ class HipEnvironmentsSpec extends AnyFreeSpec with Matchers with TableDrivenProp
          |    test = {
          |        id = "test",
          |        rank = 3,
-         |        nameKey = "hipEnvironment.test.name",
+         |        nameKey = "site.environment.test",
          |        isProductionLike = false
          |    },
          |    production = {
          |        id = "production",
          |        rank = 1,
-         |        nameKey = "hipEnvironment.production.name",
+         |        nameKey = "site.environment.production",
          |        isProductionLike = true
          |    },
          |    dev = {
          |        id = "dev",
          |        rank = 4,
-         |        nameKey = "hipEnvironment.dev.name",
+         |        nameKey = "site.environment.dev",
          |        isProductionLike = false
          |    },
          |    preprod = {
          |        id = "preprod",
          |        rank = 2,
-         |        nameKey = "hipEnvironment.preprod.name",
+         |        nameKey = "site.environment.preprod",
          |        isProductionLike = false
          |    }
          |}

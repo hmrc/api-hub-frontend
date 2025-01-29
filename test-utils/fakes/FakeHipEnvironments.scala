@@ -23,14 +23,14 @@ object FakeHipEnvironments extends HipEnvironments {
   val production: HipEnvironment = HipEnvironment(
     id = "production",
     rank = 1,
-    nameKey = "hipEnvironment.production.name",
+    nameKey = "site.environment.production",
     isProductionLike = true
   )
 
   val test: HipEnvironment = HipEnvironment(
     id = "test",
     rank = 2,
-    nameKey = "hipEnvironment.test.name",
+    nameKey = "site.environment.test",
     isProductionLike = false
   )
 

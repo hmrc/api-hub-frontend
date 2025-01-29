@@ -63,7 +63,7 @@
 @deploymentStatusSummary(deploymentStatus: ApiDeploymentStatus) = @{
     SummaryListRow(
         key = Key(
-            content = Text(messages(s"apiDeployments.environment.${deploymentStatus.environmentId}"))
+            content = Text(messages(s"site.environment.${deploymentStatus.environmentId}"))
         ),
         value = Value(
             content = HtmlContent(s"""
