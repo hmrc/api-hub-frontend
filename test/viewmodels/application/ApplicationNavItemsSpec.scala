@@ -59,15 +59,15 @@ class ApplicationNavItemsSpec extends SpecBase with Matchers with TestHelpers wi
             title = "Environments",
             sideNavItems = Seq(
               SideNavItemLeaf(
-                page = EnvironmentPage(FakeHipEnvironments.production),
-                title = "Production environment",
-                link = controllers.application.routes.EnvironmentsController.onPageLoad(FakeApplication.id, FakeHipEnvironments.production.id),
+                page = EnvironmentPage(FakeHipEnvironments.test),
+                title = "Test",
+                link = controllers.application.routes.EnvironmentsController.onPageLoad(FakeApplication.id, FakeHipEnvironments.test.id),
                 isCurrentPage = false,
               ),
               SideNavItemLeaf(
-                page = EnvironmentPage(FakeHipEnvironments.test),
-                title = "Test environment",
-                link = controllers.application.routes.EnvironmentsController.onPageLoad(FakeApplication.id, FakeHipEnvironments.test.id),
+                page = EnvironmentPage(FakeHipEnvironments.production),
+                title = "Production",
+                link = controllers.application.routes.EnvironmentsController.onPageLoad(FakeApplication.id, FakeHipEnvironments.production.id),
                 isCurrentPage = false,
               )
             )

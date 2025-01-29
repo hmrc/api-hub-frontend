@@ -60,7 +60,7 @@ class ApplicationNavItems @Inject()(config: FrontendAppConfig, hipEnvironments: 
       Some(
           SideNavItemBranch(
             title = messages("applicationNav.page.environments"),
-            sideNavItems = hipEnvironments.environments.map { hipEnvironment =>
+            sideNavItems = hipEnvironments.environments.reverse.map { hipEnvironment =>
               val environmentPage = EnvironmentPage(hipEnvironment)
               SideNavItemLeaf(
                 page = environmentPage,

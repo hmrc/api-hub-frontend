@@ -179,17 +179,17 @@ object MyApisNavItemsSpec {
       title = "Environments",
       sideNavItems = Seq(
         SideNavItemLeaf(
+          page = EnvironmentPage(FakeHipEnvironments.test),
+          title = "Test",
+          link = controllers.myapis.routes.MyApiEnvironmentController.onPageLoad(apiDetail.id, "test"),
+          isCurrentPage = false
+        ),
+        SideNavItemLeaf(
           page = EnvironmentPage(FakeHipEnvironments.production),
-          title = "Production environment",
+          title = "Production",
           link = controllers.myapis.routes.MyApiEnvironmentController.onPageLoad(apiDetail.id, "production"),
           isCurrentPage = false,
         ),
-        SideNavItemLeaf(
-          page = EnvironmentPage(FakeHipEnvironments.test),
-          title = "Test environment",
-          link = controllers.myapis.routes.MyApiEnvironmentController.onPageLoad(apiDetail.id, "test"),
-          isCurrentPage = false
-        )
       )
     )
   }
