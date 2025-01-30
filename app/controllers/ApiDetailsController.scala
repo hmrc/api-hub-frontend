@@ -17,7 +17,7 @@
 package controllers
 
 import com.google.inject.{Inject, Singleton}
-import config.{Domains, FrontendAppConfig, Hods, Platforms}
+import config.{Domains, FrontendAppConfig, HipEnvironments, Hods, Platforms}
 import controllers.actions.OptionalIdentifierAction
 import controllers.helpers.ErrorResultBuilder
 import models.api.ApiDetail
@@ -41,7 +41,8 @@ class ApiDetailsController @Inject()(
   domains: Domains,
   hods: Hods,
   platforms: Platforms,
-  frontendAppConfig: FrontendAppConfig
+  frontendAppConfig: FrontendAppConfig,
+  hipEnvironments: HipEnvironments
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(id: String): Action[AnyContent] = optionallyIdentified.async {
@@ -63,6 +64,7 @@ class ApiDetailsController @Inject()(
   private def processSelfServeApiDetail(apiDetail: ApiDetail)(implicit request: OptionalIdentifierRequest[?]) = {
     for {
       apiDeploymentStatuses <- apiHubService.getApiDeploymentStatuses(apiDetail.publisherReference)
+        .map(_.sortStatusesWithHipEnvironments(hipEnvironments))
       maybeTeamName <- getTeamNameForApi(apiDetail.teamId)
     } yield
         Ok(view(

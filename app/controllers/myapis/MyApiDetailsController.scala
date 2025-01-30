@@ -16,6 +16,7 @@
 
 package controllers.myapis
 
+import config.HipEnvironments
 import cats.implicits.toTraverseOps
 import com.google.inject.{Inject, Singleton}
 import config.FrontendAppConfig
@@ -37,12 +38,14 @@ class MyApiDetailsController @Inject()(
   config: FrontendAppConfig,
   apiAuth: ApiAuthActionProvider,
   errorResultBuilder: ErrorResultBuilder,
-  apiHubService: ApiHubService
+  apiHubService: ApiHubService,
+  hipEnvironments: HipEnvironments
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(id: String): Action[AnyContent] = (identify andThen apiAuth(id)) async {
     implicit request => for {
       deploymentStatuses <- apiHubService.getApiDeploymentStatuses(request.apiDetails.publisherReference)
+        .map(_.sortStatusesWithHipEnvironments(hipEnvironments))
       maybeTeam <- request.apiDetails.teamId.fold(Future.successful(None))(apiHubService.findTeamById)
       teamName = maybeTeam.map(_.name).orElse(Some(Messages("apiDetails.details.team.error")))
     } yield
