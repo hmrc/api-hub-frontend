@@ -809,6 +809,13 @@ myApis.environment.version = API version
 myApis.environment.promoteTo = Promote to {0} environment
 myApis.environment.promotingTo = Promoting to the {0} environment
 myApis.environment.promoteFinish = Finish
+myApis.promote.setegress.message = To promote to {0} you must set the egress for this environment
+myApis.promote.setegress.version = Version to be promoted
+myApis.promote.setegress.apiversion = API version
+myApis.promote.setegress.hint = Set egress for {0}
+myApis.promote.setegress.select = Select an egress
+myApis.promote.setegress.deploy = Promote to {0} environment
+myApis.promote.setegress.error.required = Select an egress for the environment
 
 applicationDetailsTable.applicationName = Name
 applicationDetailsTable.owningTeam = Owning team

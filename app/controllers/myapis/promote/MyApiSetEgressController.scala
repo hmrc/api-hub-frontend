@@ -20,11 +20,18 @@ import com.google.inject.{Inject, Singleton}
 import config.{FrontendAppConfig, HipEnvironments}
 import controllers.actions.{ApiAuthActionProvider, IdentifierAction}
 import controllers.helpers.ErrorResultBuilder
+import forms.myapis.promote.MyApiSetEgressForm
+import models.api.ApiDetail
+import models.requests.ApiRequest
+import play.api.data.Form
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.myapis.promote.MyApiSetEgressViewModel
 import views.html.myapis.promote.MyApiSetEgressView
-import scala.concurrent.ExecutionContext
+import services.ApiHubService
+
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class MyApiSetEgressController @Inject()(
@@ -34,22 +41,38 @@ class MyApiSetEgressController @Inject()(
   config: FrontendAppConfig,
   apiAuth: ApiAuthActionProvider,
   errorResultBuilder: ErrorResultBuilder,
-  hipEnvironments: HipEnvironments
+  hipEnvironments: HipEnvironments,
+  apiHubService: ApiHubService,
+  formProvider: MyApiSetEgressForm
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+  private val form = formProvider()
 
-  def onPageLoad(id: String, environment: String): Action[AnyContent] = (identify andThen apiAuth(id))  {
+  def onPageLoad(id: String, environment: String): Action[AnyContent] = (identify andThen apiAuth(id)).async  {
     implicit request =>
-      (for {
-        fromEnvironment <- hipEnvironments.forEnvironmentIdOptional(environment)
-        toEnvironment <- hipEnvironments.promotionEnvironment(fromEnvironment)
-      } yield Ok(view(request.apiDetails, fromEnvironment, toEnvironment, request.identifierRequest.user))).getOrElse(
-        errorResultBuilder.environmentNotFound(environment)
-      )
+      buildView(form, request.apiDetails, environment)
   }
 
-  def onSubmit(id: String, environment: String): Action[AnyContent] = (identify andThen apiAuth(id)) {
-    implicit request =>
-      Redirect(controllers.myapis.promote.routes.MyApiPromoteSuccessController.onPageLoad(id, environment))
+  def onSubmit(id: String, environment: String): Action[AnyContent] = (identify andThen apiAuth(id)).async {
+    implicit request => {
+      form.bindFromRequest().fold(
+        formWithErrors => buildView(formWithErrors, request.apiDetails, environment),
+        egress =>
+          Future.successful(Redirect(controllers.myapis.promote.routes.MyApiPromoteSuccessController.onPageLoad(id, environment)))
+      )
+    }
+  }
+
+  private def buildView(form: Form[?], apiDetail: ApiDetail, environment: String)(implicit request: ApiRequest[AnyContent]) = {
+    (for {
+      fromEnvironment <- hipEnvironments.forEnvironmentIdOptional(environment)
+      toEnvironment <- hipEnvironments.promotionEnvironment(fromEnvironment)
+    } yield for {
+      egresses <- apiHubService.listEgressGateways(toEnvironment)
+      deploymentStatuses <- apiHubService.getApiDeploymentStatuses(apiDetail.publisherReference)
+      viewModel = MyApiSetEgressViewModel(apiDetail, fromEnvironment, toEnvironment, request.maybeUser, egresses, deploymentStatuses)
+    } yield Ok(view(form, viewModel))).getOrElse(
+      Future.successful(errorResultBuilder.environmentNotFound(environment))
+    )
   }
 
 }
