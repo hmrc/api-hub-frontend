@@ -23,6 +23,7 @@ import forms.myapis.produce.ProduceApiEgressSelectionForm
 import generators.EgressGenerator
 import models.api.ApiDeploymentStatus.Deployed
 import models.api.ApiDeploymentStatuses
+import models.deployment.{FailuresResponse, InvalidOasResponse, SuccessfulDeploymentsResponse}
 import models.team.Team
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
@@ -35,6 +36,7 @@ import play.api.test.Helpers.*
 import services.ApiHubService
 import utils.HtmlValidation
 import viewmodels.myapis.promote.MyApiSetEgressViewModel
+import views.html.ErrorTemplate
 import views.html.myapis.promote.MyApiSetEgressView
 
 import java.time.LocalDateTime
@@ -110,12 +112,40 @@ class MyApiSetEgressControllerSpec extends SpecBase with MockitoSugar with Egres
       running(fixture.application) {
         when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any)).thenReturn(Future.successful(Some(apiDetail)))
         when(fixture.apiHubService.findTeams(eqTo(Some(FakeUser.email)))(any)).thenReturn(Future.successful(List(apiTeam)))
+        when(fixture.apiHubService.promoteAPI(eqTo(apiDetail.publisherReference), any, any, any)(any)).thenReturn(
+          Future.successful(Some(SuccessfulDeploymentsResponse(apiDetail.id, "1.0", 1, ""))))
         val url = controllers.myapis.promote.routes.MyApiSetEgressController.onSubmit(apiDetail.id, FakeHipEnvironments.deploymentHipEnvironment.id).url
         val request = FakeRequest(POST, url).withFormUrlEncodedBody("egress" -> "egressId")
         val result = route(fixture.application, request).value
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.MyApiPromoteSuccessController.onPageLoad(apiDetail.id, FakeHipEnvironments.deploymentHipEnvironment.id).url)
+      }
+    }
+
+    "must show error page if promotion fails" in {
+      val fixture = buildFixture()
+      val apiDetail = FakeApiDetail
+
+      running(fixture.application) {
+        when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any)).thenReturn(Future.successful(Some(apiDetail)))
+        when(fixture.apiHubService.findTeams(eqTo(Some(FakeUser.email)))(any)).thenReturn(Future.successful(List(apiTeam)))
+        when(fixture.apiHubService.promoteAPI(eqTo(apiDetail.publisherReference), any, any, any)(any)).thenReturn(
+          Future.successful(Some(InvalidOasResponse(FailuresResponse("err", "err", None)))))
+        val url = controllers.myapis.promote.routes.MyApiSetEgressController.onSubmit(apiDetail.id, FakeHipEnvironments.deploymentHipEnvironment.id).url
+        val request = FakeRequest(POST, url).withFormUrlEncodedBody("egress" -> "egressId")
+        val result = route(fixture.application, request).value
+        val view = fixture.application.injector.instanceOf[ErrorTemplate]
+
+        status(result) mustBe INTERNAL_SERVER_ERROR
+        contentAsString(result) mustBe view.apply(
+            pageTitle = "Sorry, there is a problem with the service - 500",
+            heading = "Sorry, there is a problem with the service",
+            message = "Try again later.",
+            Some(FakeUser)
+          )(request, messages(fixture.application))
+          .toString()
+        contentAsString(result) must validateAsHtml
       }
     }
   }
