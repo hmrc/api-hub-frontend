@@ -16,6 +16,7 @@
 
 package models.api
 
+import config.HipEnvironments
 import play.api.libs.functional.syntax.*
 import play.api.libs.json.*
 
@@ -51,6 +52,14 @@ case class ApiDeploymentStatuses(statuses: Seq[ApiDeploymentStatus]) {
     statuses
       .find(_.environmentId == environmentId)
       .getOrElse(throw new IllegalArgumentException(s"No deployment status for environment $environmentId"))
+  }
+
+  def sortStatusesWithHipEnvironments(hipEnvironments: HipEnvironments): ApiDeploymentStatuses = {
+    val sortedStatuses = statuses.map(status =>
+      (hipEnvironments.forEnvironmentId(status.environmentId), status)
+    ).sortBy { case (hipEnvironment, _) => hipEnvironment.rank }(Ordering[Int].reverse)
+      .map { case (_, status) => status }
+    copy(statuses = sortedStatuses)
   }
 
   def isDeployed: Boolean = statuses.collectFirst {

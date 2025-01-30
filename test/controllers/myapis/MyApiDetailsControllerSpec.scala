@@ -54,8 +54,8 @@ class MyApiDetailsControllerSpec
     val apiTeam = Team(teamId, teamName, LocalDateTime.now(), List.empty)
     val apiDetail = sampleApiDetail().copy(teamId = Some(apiTeam.id))
     val deploymentStatuses = ApiDeploymentStatuses(Seq(
+      NotDeployed(FakeHipEnvironments.test.id),
       Deployed(FakeHipEnvironments.production.id, "1.0"),
-      NotDeployed(FakeHipEnvironments.test.id)
     ))
 
     running(fixture.application) {
@@ -88,8 +88,8 @@ class MyApiDetailsControllerSpec
     val apiTeam = Team(teamId, teamName, LocalDateTime.now(), List.empty)
     val apiDetail = sampleApiDetail().copy(teamId = Some(teamId))
     val deploymentStatuses = ApiDeploymentStatuses(Seq(
+      NotDeployed(FakeHipEnvironments.test.id),
       Deployed(FakeHipEnvironments.production.id, "1.0"),
-      NotDeployed(FakeHipEnvironments.test.id)
     ))
 
     running(fixture.application) {
