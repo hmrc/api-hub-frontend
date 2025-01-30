@@ -18,25 +18,74 @@
 @import models.user.UserModel
 @import views.html.components.IconsLink
 @import config.HipEnvironment
+@import viewmodels.myapis.promote.MyApiSetEgressViewModel
 
 @this(
         layout: templates.Layout,
         sideNav: views.html.templates.SideNav,
         govukButton: GovukButton,
+        govukSelect: GovukSelect,
+        govukSummaryList: GovukSummaryList,
+        govukErrorSummary: GovukErrorSummary,
         formHelper: FormWithCSRF,
 )
 
-@(apiDetail: ApiDetail, environment: HipEnvironment, promoteToEnvironment: HipEnvironment, userModel: UserModel)(implicit request: Request[?], messages: Messages)
+@(form: Form[?], viewModel: MyApiSetEgressViewModel)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("myApis.environment.promoteTo", messages(promoteToEnvironment.nameKey))), user = Some(userModel), fullWidth = true) {
-    <h1 id="details" class="govuk-heading-l">@messages("myApis.environment.promoteTo", messages(promoteToEnvironment.nameKey))</h1>
+@layout(pageTitle = titleNoForm(messages("myApis.environment.promoteTo", viewModel.promotionEnvironmentName)), user = viewModel.userModel) {
+    <h1 id="details" class="govuk-heading-l">@messages("myApis.environment.promoteTo", viewModel.promotionEnvironmentName)</h1>
 
-    @formHelper(action = controllers.myapis.promote.routes.MyApiSetEgressController.onSubmit(apiDetail.id, environment.id)) {
-        @govukButton(
-            Button(
-                content = Text(messages("myApis.environment.promoteTo", messages(promoteToEnvironment.nameKey))),
-                id = Some("promoteApi")
+    @if(form.errors.nonEmpty) {
+        @govukErrorSummary(ErrorSummaryViewModel(form))
+    }
+
+    <p class="govuk-body">@messages("myApis.promote.setegress.message", viewModel.promotionEnvironmentName)</p>
+
+    <p class="govuk-body govuk-!-font-weight-bold">@messages("myApis.promote.setegress.version")</p>
+
+    @govukSummaryList(
+        SummaryList(
+            rows = Seq(
+                SummaryListRow(
+                    key = Key(messages("myApis.promote.setegress.apiversion")),
+                    value = Value(Text(viewModel.apiVersion))
+                )
             )
         )
+    )
+
+    @formHelper(action = controllers.myapis.promote.routes.MyApiSetEgressController.onSubmit(viewModel.apiDetail.id, viewModel.environment.id)) {
+        @govukSelect(
+            SelectViewModel(
+                field = form("egress"),
+                items = SelectItemViewModel(
+                    value = "",
+                    text = messages("myApis.promote.setegress.select")
+                ) +: viewModel.egressGateways.map(egressGateway =>
+                    SelectItemViewModel(
+                        value = egressGateway.id,
+                        text = egressGateway.friendlyName
+                    )
+                ),
+                label = LabelViewModel(HtmlContent(messages("myApis.promote.setegress.hint", viewModel.promotionEnvironmentName))).withCssClass("govuk-!-font-weight-bold"),
+            )
+        )
+
+        <div class="govuk-button-group">
+            @govukButton(
+                Button(
+                    content = Text(messages("myApis.environment.promoteTo", viewModel.promotionEnvironmentName)),
+                    id = Some("promoteApi")
+                )
+            )
+
+            @govukButton(
+                Button(
+                    content = Text(messages("site.cancel")),
+                    id = Some("cancel"),
+                    href = Some(controllers.myapis.routes.MyApiEnvironmentController.onPageLoad(viewModel.apiDetail.id, viewModel.environment.id).url)
+                ).asSecondaryButton()
+            )
+        </div>
     }
 }
