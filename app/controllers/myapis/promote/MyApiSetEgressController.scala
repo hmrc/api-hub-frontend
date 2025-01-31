@@ -22,6 +22,7 @@ import controllers.actions.{ApiAuthActionProvider, IdentifierAction}
 import controllers.helpers.ErrorResultBuilder
 import forms.myapis.promote.MyApiSetEgressForm
 import models.api.ApiDetail
+import models.deployment.{InvalidOasResponse, SuccessfulDeploymentsResponse}
 import models.requests.ApiRequest
 import play.api.data.Form
 import play.api.i18n.I18nSupport
@@ -57,7 +58,18 @@ class MyApiSetEgressController @Inject()(
       form.bindFromRequest().fold(
         formWithErrors => buildView(formWithErrors, request.apiDetails, environment),
         egress =>
-          Future.successful(Redirect(controllers.myapis.promote.routes.MyApiPromoteSuccessController.onPageLoad(id, environment)))
+          (for {
+            fromEnvironment <- hipEnvironments.forEnvironmentIdOptional(environment)
+            toEnvironment <- hipEnvironments.promotionEnvironment(fromEnvironment)
+          } yield apiHubService.promoteAPI(request.apiDetails.publisherReference, fromEnvironment, toEnvironment, egress)
+            .map(maybeResponse => maybeResponse match {
+              case Some(SuccessfulDeploymentsResponse(_,_,_,_)) => Redirect(controllers.myapis.promote.routes.MyApiPromoteSuccessController.onPageLoad(id, environment))
+              case Some(InvalidOasResponse(failure)) => errorResultBuilder.internalServerError(failure.reason)
+              case _ => errorResultBuilder.internalServerError("Failed to promote API")
+            })
+          ).getOrElse(
+            Future.successful(errorResultBuilder.environmentNotFound(environment))
+          )
       )
     }
   }
