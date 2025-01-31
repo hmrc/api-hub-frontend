@@ -68,7 +68,7 @@ class AddCredentialController @Inject()(
   private def addCredentialToNonProduction(hipEnvironment: HipEnvironment)(implicit request: ApplicationRequest[AnyContent]) = {
     addCredential(
       hipEnvironment,
-      credential => Future.successful(SeeOther(controllers.application.routes.EnvironmentsController.onPageLoad(request.application.id, hipEnvironment.id).url))
+      credential => Future.successful(SeeOther(controllers.application.routes.EnvironmentsController.onPageLoad(request.application.id, hipEnvironment.id).url + "#credentials"))
     )
   }
 
@@ -121,7 +121,7 @@ class AddCredentialController @Inject()(
       credential
     )
 
-    Ok(successView(application, summaryList, Some(user), credential, controllers.application.routes.EnvironmentsController.onPageLoad(application.id, hipEnvironment.id).url))
+    Ok(successView(application, summaryList, Some(user), credential, controllers.application.routes.EnvironmentsController.onPageLoad(application.id, hipEnvironment.id).url + "#credentials"))
   }
 
   private def applicationNotFound(application: Application)(implicit request: BaseRequest[?]): Future[Result] = {
