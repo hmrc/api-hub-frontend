@@ -101,7 +101,7 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
       val FakePrivilegedUserOnApplicationTeam = FakeUser.copy(permissions = Permissions(false, false, true))
       val scenarios = Table(
         ("user", "environment", "expected response", "redirect location"),
-        (FakeUser, "test", SEE_OTHER, Some(() => controllers.application.routes.EnvironmentsController.onPageLoad(FakeApplication.id, "test").url)),
+        (FakeUser, "test", SEE_OTHER, Some(() => controllers.application.routes.EnvironmentsController.onPageLoad(FakeApplication.id, "test").url + "#credentials")),
         (FakeUserNotTeamMember, "test", SEE_OTHER, Some(() => routes.UnauthorisedController.onPageLoad.url)),
 
         (FakeUser, "production", SEE_OTHER, Some(() => routes.UnauthorisedController.onPageLoad.url)),
