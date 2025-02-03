@@ -556,6 +556,12 @@ table.govuk-table {
             padding: govuk-spacing(4) govuk-spacing(5) govuk-spacing(5);
             color: $mid-blue;
             cursor: pointer;
+            div {
+                display: inline-flex;
+                gap: 1rem;
+                width: 100%;
+                max-width: calc(100% - 20px);
+            }
         }
         .hip-details__summary-text {
             color: $mid-blue;
@@ -573,6 +579,7 @@ table.govuk-table {
         .hip-details__summary-info {
             float: right;
             margin-top: govuk-spacing(1);
+            white-space: nowrap;
         }
 
         @media (min-width: 40.0625em) {
