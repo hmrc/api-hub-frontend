@@ -120,14 +120,16 @@
 @existingApiDetails(applicationApi: ApplicationApi) = {
     <details class="hip-details hip-expander">
         <summary class="hip-details__summary">
-            <span class="hip-details__summary-text govuk-heading-s govuk-!-margin-bottom-0">
-                @applicationApi.apiTitle
-            </span>
-            <span class="hip-details__summary-info govuk-body-s">
-                <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="@routes.ApiDetailsController.onPageLoad(applicationApi.apiId)" data-api-specification-api-id="@applicationApi.apiId">
-                    @messages("applicationApis.apis.viewSpecification")
-                </a>
-            </span>
+            <div>
+                <span class="hip-details__summary-text govuk-heading-s govuk-!-margin-bottom-0">
+                    @applicationApi.apiTitle
+                </span>
+                <span class="hip-details__summary-info govuk-body-s">
+                    <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="@routes.ApiDetailsController.onPageLoad(applicationApi.apiId)" data-api-specification-api-id="@applicationApi.apiId">
+                        @messages("applicationApis.apis.viewSpecification")
+                    </a>
+                </span>
+            </div>
         </summary>
 
         <div class="hip-details__text govuk-!-margin-top-0 govuk-!-padding-top-0">
