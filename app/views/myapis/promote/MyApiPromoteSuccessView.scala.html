@@ -14,28 +14,101 @@
  * limitations under the License.
  *@
 
-@import models.api.*
+@import models.api.ApiDetail
 @import models.user.UserModel
-@import views.html.components.IconsLink
 @import config.HipEnvironment
 
 @this(
-        layout: templates.Layout,
-        sideNav: views.html.templates.SideNav,
-        govukButton: GovukButton,
-        formHelper: FormWithCSRF,
+    layout: templates.Layout,
+    govukPanel: GovukPanel,
+    govukTable: GovukTable
 )
 
-@(apiDetail: ApiDetail, promoteToEnvironment: HipEnvironment, userModel: UserModel)(implicit request: Request[?], messages: Messages)
+@(apiDetail: ApiDetail, environmentFrom: HipEnvironment, environmentTo: HipEnvironment, userModel: UserModel)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("myApis.environment.promotingTo", messages(promoteToEnvironment.nameKey))), user = Some(userModel), fullWidth = true) {
-    <h1 id="details" class="govuk-heading-l">@messages("myApis.environment.promotingTo", messages(promoteToEnvironment.nameKey))</h1>
+@successPanel() = {
 
-    @govukButton(
-        Button(
-            content = Text(messages("myApis.environment.promoteFinish")),
-            id = Some("finished"),
-            href = Some(controllers.myapis.routes.MyApiDetailsController.onPageLoad(apiDetail.id).url)
+    @govukPanel(Panel(
+        classes = "govuk-!-margin-bottom-9 govuk-panel--warning hip-panel--secondary-success",
+        title = Text(messages("myApiPromoteSuccessView.title"))
+    ))
+
+}
+
+@deploymentAttributesTable() = {
+
+    @govukTable(
+        Table(
+            caption = None,
+            head = None,
+            rows = Seq(
+                Seq(
+                    TableRow(
+                        content = messages("site.apiName"),
+                        classes = "govuk-!-font-weight-bold"
+                    ),
+                    TableRow(content = apiDetail.title)
+                ),
+                Seq(
+                    TableRow(
+                        content = messages("site.publisherReference"),
+                        classes = "govuk-!-font-weight-bold"
+                    ),
+                    TableRow(content = apiDetail.publisherReference)
+                ),
+                Seq(
+                    TableRow(
+                        content = messages("site.version"),
+                        classes = "govuk-!-font-weight-bold"
+                    ),
+                    TableRow(content = apiDetail.version)
+                ),
+                Seq(
+                    TableRow(
+                        content = messages("myApiPromoteSuccessView.label.deployingFrom"),
+                        classes = "govuk-!-font-weight-bold"
+                    ),
+                    TableRow(content = messages(environmentFrom.nameKey))
+                ),
+                Seq(
+                    TableRow(
+                        content = messages("myApiPromoteSuccessView.label.deployingTo"),
+                        classes = "govuk-!-font-weight-bold"
+                    ),
+                    TableRow(content = messages(environmentTo.nameKey))
+                )
+            )
         )
     )
+
+}
+
+@whatYouCanDoNow() = {
+
+    <h2 class="govuk-heading-m">
+        @messages("myApiPromoteSuccessView.whatYouCanDo.title")
+    </h2>
+
+    <p class="govuk-body">
+        @Html(messages("myApiPromoteSuccessView.whatYouCanDo.text", apiDetailLink()))
+    </p>
+
+}
+
+@apiDetailLink() = {
+
+    <a class="govuk-link--no-visited-state" href="@controllers.myapis.routes.MyApiDetailsController.onPageLoad(apiDetail.id).url">
+        @messages("myApiPromoteSuccessView.whatYouCanDo.linkText")
+    </a>
+
+}
+
+@layout(pageTitle = titleNoForm(messages("myApiPromoteSuccessView.title")), user = Some(userModel), showBackLink = false) {
+
+    @successPanel()
+
+    @deploymentAttributesTable()
+
+    @whatYouCanDoNow()
+
 }

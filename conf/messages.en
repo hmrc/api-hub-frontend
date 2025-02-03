@@ -807,8 +807,7 @@ myApis.environment.notDeployed.message = This API has not been deployed to this 
 myApis.environment.notDeployed.action = Promote a version from another environment
 myApis.environment.version = API version
 myApis.environment.promoteTo = Promote to {0} environment
-myApis.environment.promotingTo = Promoting to the {0} environment
-myApis.environment.promoteFinish = Finish
+
 myApis.promote.setegress.message = To promote to {0} you must set the egress for this environment
 myApis.promote.setegress.version = Version to be promoted
 myApis.promote.setegress.apiversion = API version
@@ -1159,3 +1158,10 @@ environment.apis.heading = APIs in {0} environment
 environment.apis.endpoints = Available endpoints
 environment.apis.noAvailableInProd.heading = APIs not available in production
 environment.apis.noAvailableInProd.message = This application has APIs that are not currently available in the production environment.
+
+myApiPromoteSuccessView.title = API promotion has been initiated
+myApiPromoteSuccessView.label.deployingFrom = Deploying from
+myApiPromoteSuccessView.label.deployingTo = Deploying to
+myApiPromoteSuccessView.whatYouCanDo.title = What you can do now
+myApiPromoteSuccessView.whatYouCanDo.text = You can now check the status of your promotion to the relevant environment in the {0}.
+myApiPromoteSuccessView.whatYouCanDo.linkText = API details page

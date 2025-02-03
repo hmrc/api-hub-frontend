@@ -43,7 +43,7 @@ class MyApiPromoteSuccessController @Inject()(
       (for {
         fromEnvironment <- hipEnvironments.forEnvironmentIdOptional(environment)
         toEnvironment <- hipEnvironments.promotionEnvironment(fromEnvironment)
-      } yield Ok(view(request.apiDetails, toEnvironment, request.identifierRequest.user))).getOrElse(
+      } yield Ok(view(request.apiDetails, fromEnvironment, toEnvironment, request.identifierRequest.user))).getOrElse(
         errorResultBuilder.environmentNotFound(environment)
       )
   }
