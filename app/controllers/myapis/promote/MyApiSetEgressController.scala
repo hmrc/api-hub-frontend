@@ -29,7 +29,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.myapis.promote.MyApiSetEgressViewModel
-import views.html.myapis.promote.MyApiSetEgressView
+import views.html.myapis.promote.{MyApiPromoteSuccessView, MyApiSetEgressView}
 import services.ApiHubService
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -44,7 +44,8 @@ class MyApiSetEgressController @Inject()(
   errorResultBuilder: ErrorResultBuilder,
   hipEnvironments: HipEnvironments,
   apiHubService: ApiHubService,
-  formProvider: MyApiSetEgressForm
+  formProvider: MyApiSetEgressForm,
+  successView: MyApiPromoteSuccessView
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
   private val form = formProvider()
 
@@ -62,11 +63,11 @@ class MyApiSetEgressController @Inject()(
             fromEnvironment <- hipEnvironments.forEnvironmentIdOptional(environment)
             toEnvironment <- hipEnvironments.promotionEnvironment(fromEnvironment)
           } yield apiHubService.promoteAPI(request.apiDetails.publisherReference, fromEnvironment, toEnvironment, egress)
-            .map(maybeResponse => maybeResponse match {
-              case Some(SuccessfulDeploymentsResponse(_,_,_,_)) => Redirect(controllers.myapis.promote.routes.MyApiPromoteSuccessController.onPageLoad(id, environment))
+            .map {
+              case Some(SuccessfulDeploymentsResponse(_,_,_,_)) => Ok(successView(request.apiDetails, fromEnvironment, toEnvironment, request.identifierRequest.user))
               case Some(InvalidOasResponse(failure)) => errorResultBuilder.internalServerError(failure.reason)
               case _ => errorResultBuilder.internalServerError("Failed to promote API")
-            })
+            }
           ).getOrElse(
             Future.successful(errorResultBuilder.environmentNotFound(environment))
           )

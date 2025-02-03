@@ -14,8 +14,6 @@ POST    /environments/:id/:environment                      controllers.myapis.M
 GET     /environments/:id/:environment/set-egress           controllers.myapis.promote.MyApiSetEgressController.onPageLoad(id: String, environment: String)
 POST    /environments/:id/:environment/set-egress           controllers.myapis.promote.MyApiSetEgressController.onSubmit(id: String, environment: String)
 
-GET     /environments/:id/:environment/promote-success      controllers.myapis.promote.MyApiPromoteSuccessController.onPageLoad(id: String, environment: String)
-
 GET     /usage/:apiId                                       controllers.myapis.ApiUsageController.onPageLoad(apiId: String)
 
 GET     /update-team/:apiId                                 controllers.myapis.UpdateApiTeamController.onPageLoad(apiId: String)

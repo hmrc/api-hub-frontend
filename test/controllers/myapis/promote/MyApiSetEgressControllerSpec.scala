@@ -37,7 +37,7 @@ import services.ApiHubService
 import utils.HtmlValidation
 import viewmodels.myapis.promote.MyApiSetEgressViewModel
 import views.html.ErrorTemplate
-import views.html.myapis.promote.MyApiSetEgressView
+import views.html.myapis.promote.{MyApiPromoteSuccessView, MyApiSetEgressView}
 
 import java.time.LocalDateTime
 import scala.concurrent.Future
@@ -105,21 +105,29 @@ class MyApiSetEgressControllerSpec extends SpecBase with MockitoSugar with Egres
       }
     }
 
-    "must redirect to correct location after form is submitted" in {
+    "must return success view after form is submitted" in {
       val fixture = buildFixture()
       val apiDetail = FakeApiDetail
+      val fromEnvironment = FakeHipEnvironments.deploymentHipEnvironment
+      val toEnvironment = FakeHipEnvironments.promotionEnvironment(fromEnvironment).value
 
       running(fixture.application) {
         when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any)).thenReturn(Future.successful(Some(apiDetail)))
         when(fixture.apiHubService.findTeams(eqTo(Some(FakeUser.email)))(any)).thenReturn(Future.successful(List(apiTeam)))
         when(fixture.apiHubService.promoteAPI(eqTo(apiDetail.publisherReference), any, any, any)(any)).thenReturn(
           Future.successful(Some(SuccessfulDeploymentsResponse(apiDetail.id, "1.0", 1, ""))))
-        val url = controllers.myapis.promote.routes.MyApiSetEgressController.onSubmit(apiDetail.id, FakeHipEnvironments.deploymentHipEnvironment.id).url
+        val url = controllers.myapis.promote.routes.MyApiSetEgressController.onSubmit(apiDetail.id, fromEnvironment.id).url
         val request = FakeRequest(POST, url).withFormUrlEncodedBody("egress" -> "egressId")
         val result = route(fixture.application, request).value
+        val view = fixture.application.injector.instanceOf[MyApiPromoteSuccessView]
 
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.MyApiPromoteSuccessController.onPageLoad(apiDetail.id, FakeHipEnvironments.deploymentHipEnvironment.id).url)
+        status(result) mustBe OK
+        contentAsString(result) mustBe view(
+          apiDetail,
+          fromEnvironment,
+          toEnvironment,
+          FakeUser
+        )(request, messages(fixture.application)).toString
       }
     }
 
