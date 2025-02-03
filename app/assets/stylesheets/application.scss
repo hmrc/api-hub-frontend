@@ -564,6 +564,7 @@ table.govuk-table {
             }
         }
         .hip-details__summary-text {
+            flex: 1;
             color: $mid-blue;
             cursor: pointer;
             display: inline-block;
