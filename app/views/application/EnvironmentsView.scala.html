@@ -36,7 +36,7 @@
 
     @sideNav(viewModel.application.name, applicationNavItems(Some(viewModel.user), viewModel.application, Some(ApplicationSideNavPages.EnvironmentPage(viewModel.hipEnvironment)))) {
 
-        <h1 class="govuk-heading-l">@messages(s"site.environment.${viewModel.hipEnvironment.id}")</h1>
+        <h1 class="govuk-heading-l">@messages(viewModel.hipEnvironment.nameKey) @messages("site.environment")</h1>
 
         @govukTabs(Tabs(
             items = Seq(
