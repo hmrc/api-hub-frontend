@@ -345,7 +345,7 @@ class ApiDetailsControllerSpec
         status(result) mustBe OK
         contentAsString(result) mustBe view(apiDetail, None, apiView)(request, messages(fixture.application)).toString()
         contentAsString(result) must validateAsHtml
-        contentAsString(result) must include("Unable to retrieve the API status at the moment. Please try again later.")
+        contentAsString(result) must include("Unable to retrieve the API status at the moment. Try again later.")
       }
     }
   }

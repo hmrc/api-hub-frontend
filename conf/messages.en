@@ -350,7 +350,7 @@ apiDetails.teamNotFound = This API is not bound to any team.
 apiDeployments.heading = API Status
 apiDeployments.status.deployed = Deployed
 apiDeployments.status.notDeployed = Not deployed
-apiDeployments.status.unknown = Unable to retrieve the API status at the moment. Please try again later.
+apiDeployments.status.unknown = Unable to retrieve the API status at the moment. Try again later.
 apiDeployments.versionPrefix = Version
 
 exploreApis.title = Explore APIs

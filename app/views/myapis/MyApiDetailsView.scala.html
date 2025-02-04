@@ -15,18 +15,19 @@
  *@
 
 @import models.api.*
-@import models.api.ApiDeploymentStatus.*
 @import models.user.UserModel
+@import views.html.components.ApiDeployments
 @import views.html.components.IconsLink
 @import viewmodels.myapis.{MyApisNavPages, MyApisNavItems}
 
 @this(
-        layout: templates.Layout,
-        govukButton: GovukButton,
-        govukSummaryList: GovukSummaryList,
-        sideNav: views.html.templates.SideNav,
-        iconsLink: IconsLink,
-        myApisNavItems: MyApisNavItems
+    layout: templates.Layout,
+    govukButton: GovukButton,
+    govukSummaryList: GovukSummaryList,
+    sideNav: views.html.templates.SideNav,
+    iconsLink: IconsLink,
+    myApisNavItems: MyApisNavItems,
+    apiDeployments: ApiDeployments
 )
 
 @(apiDetail: ApiDetail, deploymentStatuses: ApiDeploymentStatuses, user: UserModel, supportEmailAddress: String, teamName: Option[String])(implicit request: Request[?], messages: Messages)
@@ -52,28 +53,6 @@
 
 @supportEmailLink() = {
     <a href="mailto:@supportEmailAddress" class="govuk-link">@supportEmailAddress</a>
-}
-
-@showDeployedVersion(deploymentStatus: ApiDeploymentStatus) = @{deploymentStatus match {
-        case Deployed(_, version) => version
-        case _ => messages("apiDeployments.status.notDeployed")
-    }
-}
-
-@deploymentStatusSummary(deploymentStatus: ApiDeploymentStatus) = @{
-    SummaryListRow(
-        key = Key(
-            content = Text(messages(s"site.environment.${deploymentStatus.environmentId}"))
-        ),
-        value = Value(
-            content = HtmlContent(s"""
-                <div class="apiStatusContainer">
-                    ${showDeployedVersion(deploymentStatus).toString}
-                </div>
-            """),
-            classes = "govuk-!-padding-right-4 govuk-!-text-align-centre"
-        ),
-    )
 }
 
 @layout(pageTitle = titleNoForm(messages("myApis.details.title")), user = Some(user), fullWidth = true, customScriptsBlock = Some(iconsLink())) {
@@ -124,25 +103,7 @@
         }
         </div>
 
-        <div class="apiDeploymentStatuses">
-            <h2 class="govuk-heading-m">
-                @messages("apiDeployments.heading")
-            </h2>
+        @apiDeployments(deploymentStatuses)
 
-            @govukSummaryList(
-                SummaryList(
-                    rows = Seq(
-                        SummaryListRow(
-                            key = Key(
-                                content = Text(messages("site.environment"))
-                            ),
-                        value = Value(
-                            content = Text(messages("site.version")),
-                            classes = "govuk-!-font-weight-bold govuk-!-text-align-centre"
-                        ),
-                    )) ++ deploymentStatuses.statuses.map(deploymentStatusSummary)
-                )
-            )
-        </div>
     }
 }
