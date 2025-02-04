@@ -644,31 +644,4 @@ class ApplicationsConnector @Inject()(
       }
   }
 
-  def fetchClientScopes(hipEnvironment: HipEnvironment, clientId: String)(implicit hc: HeaderCarrier): Future[Option[Seq[ClientScope]]] = {
-    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/environment-parity-test/client-scopes/${hipEnvironment.id}/$clientId")
-      .setHeader(ACCEPT -> JSON)
-      .setHeader(AUTHORIZATION -> clientAuthToken)
-      .execute[Either[UpstreamErrorResponse, Seq[ClientScope]]]
-      .flatMap {
-        case Right(scopes) => Future.successful(Some(scopes))
-        case Left(e) if e.statusCode == NOT_FOUND => Future.successful(None)
-        case Left(e) => Future.failed(e)
-      }
-
-  }
-
-  def fetchEgresses(hipEnvironment: HipEnvironment)(implicit hc: HeaderCarrier): Future[Seq[EgressGateway]] = {
-    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/environment-parity-test/egresses/${hipEnvironment.id}")
-      .setHeader(ACCEPT -> JSON)
-      .setHeader(AUTHORIZATION -> clientAuthToken)
-      .execute[Seq[EgressGateway]]
-  }
-
-  def fetchDeployments(hipEnvironment: HipEnvironment)(implicit hc: HeaderCarrier): Future[Seq[ApiDeployment]] = {
-    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/environment-parity-test/deployments/${hipEnvironment.id}")
-      .setHeader(ACCEPT -> JSON)
-      .setHeader(AUTHORIZATION -> clientAuthToken)
-      .execute[Seq[ApiDeployment]]
-  }
-
 }
