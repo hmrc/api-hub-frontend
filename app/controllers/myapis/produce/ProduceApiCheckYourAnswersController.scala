@@ -33,6 +33,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.myapis.produce.*
 import viewmodels.govuk.all.SummaryListViewModel
+import viewmodels.myapis.DeploymentSuccessViewModel
 import viewmodels.myapis.produce.{ProduceApiCheckYourAnswersViewModel, ProduceApiDeploymentErrorViewModel}
 import views.html.myapis.DeploymentSuccessView
 import views.html.myapis.produce.{ProduceApiCheckYourAnswersView, ProduceApiDeploymentErrorView}
@@ -55,7 +56,7 @@ class ProduceApiCheckYourAnswersController @Inject()(
                                                       apiHubService: ApiHubService,
                                            )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  private lazy val viewModel = ProduceApiDeploymentErrorViewModel(
+  private lazy val failureViewModel = ProduceApiDeploymentErrorViewModel(
     controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onCancel(),
     controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
   )
@@ -84,13 +85,19 @@ class ProduceApiCheckYourAnswersController @Inject()(
                 )
               )
           case InvalidOasResponse(failure) =>
-            Future.successful(BadRequest(errorView(request.user, failure, viewModel)))
+            Future.successful(BadRequest(errorView(request.user, failure, failureViewModel)))
         }})
   }
 
   def onSuccess(apiName: String, publisherReference: String): Action[AnyContent] = identify {
     implicit request =>
-      Ok(successView(request.user, publisherReference, apiName))
+      Ok(successView(DeploymentSuccessViewModel(
+        request.user, 
+        publisherReference, 
+        apiName, 
+        "api.deployment.success.feedback.create.heading", 
+        "api.deployment.success.feedback.create.message"
+      )))
   }
 
   def onCancel(): Action[AnyContent] = identify.async {

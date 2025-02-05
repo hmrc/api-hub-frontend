@@ -31,6 +31,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.myapis.DeploymentSuccessViewModel
 import views.html.myapis.{DeploymentFailureView, DeploymentSuccessView, SimpleApiDeploymentView}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -67,7 +68,13 @@ class SimpleApiDeploymentController @Inject()(
             .map {
               case response: SuccessfulDeploymentsResponse =>
                 logger.info(s"Successful deployments response${System.lineSeparator()}${Json.prettyPrint(Json.toJson(response))}")
-                Ok(deploymentSuccessView(request.user, response.id, deploymentsRequest.name))
+                Ok(deploymentSuccessView(DeploymentSuccessViewModel(
+                  request.user,
+                  response.id,
+                  deploymentsRequest.name,
+                  "api.deployment.success.feedback.create.heading",
+                  "api.deployment.success.feedback.create.message"
+                )))
               case response: InvalidOasResponse =>
                 logger.info(s"Invalid OAS deployments response${System.lineSeparator()}${Json.prettyPrint(Json.toJson(response))}")
                 BadRequest(deploymentFailureView(request.user, response.failure, controllers.myapis.routes.SimpleApiDeploymentController.onPageLoad().url))

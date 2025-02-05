@@ -23,6 +23,8 @@ case class ProduceApiBeforeYouStartViewModel(
                                               nextPageUrl: String,
                                               relatedContentLinks: Seq[RelatedContentLink],
                                               mainTitle: String,
+                                              mainContent: String,
                                               processTitle: String,
-                                              processHint: String
+                                              processHint: String,
+                                              steps: Seq[String]
                                             )

@@ -31,6 +31,7 @@ import play.api.test.Helpers.*
 import play.api.Application as PlayApplication
 import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
+import viewmodels.myapis.DeploymentSuccessViewModel
 import views.html.ErrorTemplate
 import views.html.myapis.{DeploymentFailureView, DeploymentSuccessView, SimpleApiPromotionView}
 
@@ -121,9 +122,16 @@ class SimpleApiPromotionControllerSpec
           val request = FakeRequest(controllers.myapis.routes.SimpleApiPromotionController.onSubmit(FakeApiDetail.id))
           val result = route(fixture.playApplication, request).value
           val view = fixture.playApplication.injector.instanceOf[DeploymentSuccessView]
+          val viewModel = DeploymentSuccessViewModel(
+            user,
+            response.id,
+            FakeApiDetail.title,
+            "api.deployment.success.feedback.create.heading",
+            "api.deployment.success.feedback.create.message"
+          )
 
           status(result) mustBe OK
-          contentAsString(result) mustBe view(user, response.id, FakeApiDetail.title)(request, messages(fixture.playApplication)).toString()
+          contentAsString(result) mustBe view(viewModel)(request, messages(fixture.playApplication)).toString()
           contentAsString(result) must validateAsHtml
 
           verify(fixture.apiHubService).getApiDetail(eqTo(FakeApiDetail.id))(any)

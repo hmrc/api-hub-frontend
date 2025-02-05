@@ -56,7 +56,7 @@ class UpdateApiEnterOasController @Inject()(
     title = "updateApiEnterOas.title",
     heading = "updateApiEnterOas.heading",
     formAction = routes.UpdateApiEnterOasController.onSubmit(mode),
-    warning = Some("updateApiEnterOas.warning"),
+    hint = "updateApiEnterOas.hint",
     populateExample = false,
   )
 

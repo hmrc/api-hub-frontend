@@ -81,6 +81,7 @@ class ProduceApiHowToCreateController @Inject()(
       "myApis.produce.howtocreate.title",
       "myApis.produce.howtocreate.heading",
       None,
+      "produce",
       controllers.myapis.produce.routes.ProduceApiHowToCreateController.onSubmit(mode))
     view(form, viewModel, user)
   }

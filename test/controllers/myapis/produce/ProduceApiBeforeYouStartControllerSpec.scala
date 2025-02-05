@@ -45,8 +45,15 @@ class ProduceApiBeforeYouStartControllerSpec extends SpecBase with HtmlValidatio
           nextPage.url,
           relatedContentLinks,
           "produceApiBeforeYouStart.heading",
+          "produceApiBeforeYouStart.beforeYouStart.content",
           "produceApiBeforeYouStart.creationProcess.heading",
-          "produceApiBeforeYouStart.creationProcess.content"
+          "produceApiBeforeYouStart.creationProcess.content",
+          Seq(
+            "produceApiBeforeYouStart.creationProcess.list.1",
+            "produceApiBeforeYouStart.creationProcess.list.2",
+            "produceApiBeforeYouStart.creationProcess.list.3",
+            "produceApiBeforeYouStart.creationProcess.list.4",
+          )
         )
         val view = fixture.application.injector.instanceOf[ProduceApiBeforeYouStartView]
         val nextPageUrl = nextPage.url

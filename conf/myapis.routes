@@ -210,7 +210,7 @@ GET     /update/check-your-answers                          controllers.myapis.u
 POST    /update/check-your-answers                          controllers.myapis.update.UpdateApiCheckYourAnswersController.onSubmit()
 POST    /update/cancel                                      controllers.myapis.update.UpdateApiCheckYourAnswersController.onCancel()
 
-GET     /udpate/success                                     controllers.myapis.update.UpdateApiCheckYourAnswersController.onSuccess(apiName: String, publisherReference: String)
+GET     /update/success                                     controllers.myapis.update.UpdateApiCheckYourAnswersController.onSuccess(apiName: String, publisherReference: String)
 
 GET     /update/api-status                                  controllers.myapis.update.UpdateApiStatusController.onPageLoad(mode: Mode = NormalMode)
 POST    /update/api-status                                  controllers.myapis.update.UpdateApiStatusController.onSubmit(mode: Mode = NormalMode)

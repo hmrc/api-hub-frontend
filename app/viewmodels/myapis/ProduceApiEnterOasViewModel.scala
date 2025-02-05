@@ -22,6 +22,6 @@ case class ProduceApiEnterOasViewModel(
                                         title: String,
                                         heading: String,
                                         formAction: Call,
-                                        warning: Option[String] = None,
+                                        hint: String,
                                         populateExample: Boolean = true
                                       )

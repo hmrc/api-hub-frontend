@@ -16,13 +16,12 @@
 
 package viewmodels.myapis
 
-import play.api.mvc.Call
+import models.user.UserModel
 
-case class UpdateApiHowToUpdateViewBannerModel(bannerTitle: String, bannerContent: String )
-
-case class ProduceApiHowToCreateViewModel(
-                                           headingKey: String,
-                                           titleKey: String,
-                                           bannerModel: Option[UpdateApiHowToUpdateViewBannerModel],
-                                           journey: String,
-                                           formAction: Call)
+case class DeploymentSuccessViewModel(
+    user: UserModel,
+    publisherReference: String,
+    apiName: String,
+    feedbackTitle: String,
+    feedbackMessage: String
+)

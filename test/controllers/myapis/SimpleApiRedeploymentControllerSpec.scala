@@ -37,6 +37,7 @@ import play.api.test.Helpers.*
 import play.api.Application as PlayApplication
 import services.ApiHubService
 import utils.HtmlValidation
+import viewmodels.myapis.DeploymentSuccessViewModel
 import views.html.myapis.{DeploymentFailureView, DeploymentSuccessView, SimpleApiRedeploymentView}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -124,9 +125,16 @@ class SimpleApiRedeploymentControllerSpec
           .withFormUrlEncodedBody(validForm*)
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[DeploymentSuccessView]
+        val viewModel = DeploymentSuccessViewModel(
+          FakeUser,
+          response.id,
+          FakeApiDetail.title,
+          "api.deployment.success.feedback.update.heading",
+          "api.deployment.success.feedback.update.message"
+        )
 
         status(result) mustBe OK
-        contentAsString(result) mustBe view(FakeUser, response.id, FakeApiDetail.title)(request, messages(fixture.playApplication)).toString()
+        contentAsString(result) mustBe view(viewModel)(request, messages(fixture.playApplication)).toString()
         contentAsString(result) must validateAsHtml
 
         verify(fixture.apiAuthActionProvider).apply(eqTo(FakeApiDetail.id))(any)

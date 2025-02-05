@@ -53,7 +53,8 @@ class ProduceApiEnterOasController @Inject()(
   private def viewModel(mode: Mode) = ProduceApiEnterOasViewModel(
     title = "produceApiEnterOas.title",
     heading = "produceApiEnterOas.heading",
-    formAction = routes.ProduceApiEnterOasController.onSubmit(mode)
+    formAction = routes.ProduceApiEnterOasController.onSubmit(mode),
+    hint = "produceApiEnterOas.hint"
   )
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {

@@ -35,6 +35,7 @@ import play.api.test.Helpers.*
 import play.api.Application as PlayApplication
 import services.ApiHubService
 import utils.HtmlValidation
+import viewmodels.myapis.DeploymentSuccessViewModel
 import views.html.myapis.{DeploymentFailureView, DeploymentSuccessView, SimpleApiDeploymentView}
 
 import java.time.LocalDateTime
@@ -89,9 +90,15 @@ class SimpleApiDeploymentControllerSpec
         val result = route(fixture.playApplication, request).value
 
         val view = fixture.playApplication.injector.instanceOf[DeploymentSuccessView]
-
+        val viewModel = DeploymentSuccessViewModel(
+          FakeUser,
+          response.id,
+          deploymentsRequest.name,
+          "api.deployment.success.feedback.create.heading",
+          "api.deployment.success.feedback.create.message"
+        )
         status(result) mustBe OK
-        contentAsString(result) mustBe view(FakeUser, response.id, deploymentsRequest.name)(request, messages(fixture.playApplication)).toString()
+        contentAsString(result) mustBe view(viewModel)(request, messages(fixture.playApplication)).toString()
         contentAsString(result) must validateAsHtml
 
         verify(fixture.applicationsConnector).generateDeployment(eqTo(deploymentsRequest))(any)

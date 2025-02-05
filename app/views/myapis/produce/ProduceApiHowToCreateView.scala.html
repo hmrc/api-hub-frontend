@@ -61,7 +61,7 @@
             RadiosViewModel(
                 field  = form("value"),
                 legend = LegendViewModel(HtmlContent(headingAndBanner())),
-                items  = ProduceApiHowToCreate.options
+                items  = ProduceApiHowToCreate.options(viewModel.journey)
             )
         )
 

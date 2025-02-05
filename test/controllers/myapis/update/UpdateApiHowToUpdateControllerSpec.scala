@@ -53,6 +53,7 @@ class UpdateApiHowToUpdateControllerSpec extends SpecBase with MockitoSugar {
     "myApis.update.howtoupdate.title",
     "myApis.update.howtoupdate.heading",
     Some(UpdateApiHowToUpdateViewBannerModel("myApis.update.howtoupdate.banner.title","myApis.update.howtoupdate.banner.content")),
+    "update",
     controllers.myapis.update.routes.UpdateApiHowToUpdateController.onSubmit(NormalMode))
 
   val apiDetail = sampleApiDetail()

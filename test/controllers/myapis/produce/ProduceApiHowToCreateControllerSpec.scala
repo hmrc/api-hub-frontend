@@ -49,6 +49,7 @@ class ProduceApiHowToCreateControllerSpec extends SpecBase with MockitoSugar {
     "myApis.produce.howtocreate.title",
     "myApis.produce.howtocreate.heading",
     None,
+    "produce",
     controllers.myapis.produce.routes.ProduceApiHowToCreateController.onSubmit(NormalMode))
 
   "ProduceApiHowToCreate Controller" - {

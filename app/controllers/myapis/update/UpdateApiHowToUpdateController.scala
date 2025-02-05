@@ -83,6 +83,7 @@ class UpdateApiHowToUpdateController @Inject()(
       "myApis.update.howtoupdate.title",
       "myApis.update.howtoupdate.heading",
       Some(UpdateApiHowToUpdateViewBannerModel("myApis.update.howtoupdate.banner.title", "myApis.update.howtoupdate.banner.content")),
+      "update",
       controllers.myapis.update.routes.UpdateApiHowToUpdateController.onSubmit(mode))
 
     request.userAnswers.get(UpdateApiApiPage) match {

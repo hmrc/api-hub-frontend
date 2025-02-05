@@ -30,6 +30,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.myapis.DeploymentSuccessViewModel
 import views.html.myapis.{DeploymentFailureView, DeploymentSuccessView, SimpleApiRedeploymentView}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -82,7 +83,13 @@ class SimpleApiRedeploymentController @Inject()(
         formWithErrors => Future.successful(showView(BAD_REQUEST, formWithErrors)),
         redeploymentRequest => applicationsConnector.updateDeployment(request.apiDetails.publisherReference, redeploymentRequest).map {
           case Some(response: SuccessfulDeploymentsResponse) =>
-            Ok(successView(request.identifierRequest.user, response.id, request.apiDetails.title))
+            Ok(successView(DeploymentSuccessViewModel(
+              request.identifierRequest.user,
+              response.id,
+              request.apiDetails.title,
+              "api.deployment.success.feedback.update.heading",
+              "api.deployment.success.feedback.update.message"
+            )))
           case Some(response: InvalidOasResponse) =>
             BadRequest(failureView(request.identifierRequest.user, response.failure, controllers.myapis.routes.SimpleApiRedeploymentController.onPageLoad(id).url))
           case None =>
