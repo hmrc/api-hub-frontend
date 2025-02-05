@@ -44,13 +44,9 @@
         <h1 class="govuk-heading-l">@messages(viewModel.heading)</h1>
 
         @if(form("value").value.isEmpty) {
-            <p class="govuk-hint">@messages("produceApiEnterOas.hint")</p>
+            <p class="govuk-hint">@messages(viewModel.hint)</p>
         }
-
-        @for(warning <- viewModel.warning){
-            <p class="govuk-hint">@messages(warning)</p>
-        }
-
+      
         @codeEditor("oas", "value", form("value").value, viewModel.populateExample)
 
         @govukButton(

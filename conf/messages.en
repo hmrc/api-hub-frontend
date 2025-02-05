@@ -1120,6 +1120,7 @@ produceApiUploadWiremock.fileInfo = Only Wiremock files in YAML format are accep
 updateApiEnterOas.title = Update your OpenAPI Specification
 updateApiEnterOas.heading = Update your OpenAPI Specification
 updateApiEnterOas.warning = You must not change the title/name of the API.
+updateApiEnterOas.hint = Paste the OAS YAML for your API into the editor below. Follow best practices such as giving a clear overall description of the API, adding descriptions for each endpoint, providing lists of error response messages, and showing the response that is to be expected from a successful request.
 
 updateApiStatus.title = Review the API status
 

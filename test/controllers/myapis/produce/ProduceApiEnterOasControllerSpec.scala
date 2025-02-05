@@ -51,6 +51,7 @@ class ProduceApiEnterOasControllerSpec extends SpecBase with MockitoSugar {
     "produceApiEnterOas.title",
     "produceApiEnterOas.heading",
     controllers.myapis.produce.routes.ProduceApiEnterOasController.onSubmit(NormalMode),
+    "produceApiEnterOas.hint"
   )
 
   private val validOAS =
