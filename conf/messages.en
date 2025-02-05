@@ -711,6 +711,12 @@ api.deployment.success.panel.content = Deployment of the API is in progress
 api.deployment.success.body.heading = What you can do now
 api.deployment.success.body.p = You can now continue to view your deployed APIs page, your API will be available on your {0}.
 api.deployment.success.viewDetails = View full success response
+api.deployment.success.feedback.link = Let us know your experience
+api.deployment.success.feedback.create.heading = How was your API creation experience?
+api.deployment.success.feedback.create.message = We want to know how you found the process of creating your API, to help us improve the service.
+api.deployment.success.feedback.update.heading = How was your API update experience?
+api.deployment.success.feedback.update.message = We want to know how you found the process of updating your API, to help us improve the service.
+
 api.deployment.failure.title = There was an error processing your deployment request
 api.deployment.failure = There was an error processing your deployment request
 api.deployment.failure.message = Review the details of the processing error below
@@ -800,6 +806,10 @@ myApis.produce.selectegress.cya.label = Selected Egress
 myApis.produce.selectegress.change.hidden = Egress
 myApis.produce.egressprefix.error.required = You must state whether you wish to configure path prefixes for your API
 
+myApis.update.howtocreate.upload = Upload an OAS file
+myApis.update.howtocreate.editor = Copy and paste into the graphical OpenAPI Specification Editor
+myApis.update.howtocreate.upload.hint = If you already have an OAS file you can upload this file to begin registering your API
+myApis.update.howtocreate.editor.hint = If you do not have an OpenAPI Specification file you can copy and paste into the graphical OAS editor
 myApis.update.selectegress.title = Review the Egress for your API
 
 myApis.environment.title = Deployed API
@@ -891,25 +901,28 @@ produceApiEnterOas.error.missingApiName = Provide an API name in the OAS documen
 produceApiEnterOas.change.hidden = OAS
 produceApiEnterOas.checkYourAnswersValue = OAS document
 
-produceApiBeforeYouStart.title = Register an API
-produceApiBeforeYouStart.heading = Register an API
-produceApiBeforeYouStart.beforeYouStart.heading = Before you start
-produceApiBeforeYouStart.beforeYouStart.content = If you plan to register an API you will need your OpenAPI Specification (OAS) file, however if you want to test a hello world API you will not need anything.
-produceApiBeforeYouStart.creationProcess.heading = API registration process
-produceApiBeforeYouStart.creationProcess.content = The API registration process is as follows
-produceApiBeforeYouStart.creationProcess.list.1 = Select the owning team
-produceApiBeforeYouStart.creationProcess.list.2 = Provide your OAS file
-produceApiBeforeYouStart.creationProcess.list.3 = Choose an API name
-produceApiBeforeYouStart.creationProcess.list.4 = Wait for deployment to complete
-produceApiBeforeYouStart.creationProcess.list.5 = Test the API using credentials and the provided endpoint
+produceApiBeforeYouStart.title = Create an API
+produceApiBeforeYouStart.heading = Create an API
+produceApiBeforeYouStart.beforeYouStart.content = You can deploy a simple API using this service, the simple API will then be available to API consumers after deployment.
+produceApiBeforeYouStart.creationProcess.heading = API creation process
+produceApiBeforeYouStart.creationProcess.content = To create an API the following steps will typically be followed:
+produceApiBeforeYouStart.creationProcess.list.1 = Provide OpenAPI Specification (OAS)
+produceApiBeforeYouStart.creationProcess.list.2 = Provide egress information (if your egress is not available your API would only be available in the test environment initially)
+produceApiBeforeYouStart.creationProcess.list.3 = Provide prefix configuration if needed
+produceApiBeforeYouStart.creationProcess.list.4 = Provide metadata to help consumers identify your API
 produceApiBeforeYouStart.getStarted = Get started
 produceApiBeforeYouStart.relatedContent.generatingProductionCredentials = Creating production credentials
 produceApiBeforeYouStart.relatedContent.producingApis = Producing APIs
 produceApiBeforeYouStart.relatedContent.consumingApis = Consuming APIs
 
 updateApiBeforeYouStart.heading = Update an API
+updateApiBeforeYouStart.beforeYouStart.content = You can make updates to a simple API using this service.
 updateApiBeforeYouStart.updateProcess.heading = API update process
-updateApiBeforeYouStart.updateProcess.content = The API update process is as follows
+updateApiBeforeYouStart.updateProcess.content = To update an API the following steps will typically be followed:
+updateApiBeforeYouStart.creationProcess.list.1 = Provide updated OpenAPI Specification (OAS)
+updateApiBeforeYouStart.creationProcess.list.2 = Provide updated egress information (if your egress is not available your API would only be available in the test environment initially)
+updateApiBeforeYouStart.creationProcess.list.3 = Provide updated prefix configuration if needed
+updateApiBeforeYouStart.creationProcess.list.4 = Provide updated metadata to help consumers identify your API
 
 relatedContent.header = Related content
 
@@ -1140,7 +1153,7 @@ produceApiEnterWiremock.hint = Enter your WireMock configuration in YAML format 
 
 produceApiEgressAvailability.title = Is the Egress for your API available?
 produceApiEgressAvailability.heading = Is the Egress for your API available?
-produceApiEgressAvailability.hint = If there is an existing egress gateway configured to point to your API''s HoD/Backend or target service then answer ''Yes'', otherwise answer ''No''. {0}.
+produceApiEgressAvailability.hint = For more Egress information please follow this link {0}.
 produceApiEgressAvailability.hint.guidance = Guidance for Egress
 produceApiEgressAvailability.error.required = Select an answer
 produceApiEgressAvailability.change.hidden = ProduceApiEgressAvailability

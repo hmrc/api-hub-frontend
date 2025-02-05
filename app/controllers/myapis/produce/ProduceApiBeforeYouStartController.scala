@@ -48,8 +48,10 @@ class ProduceApiBeforeYouStartController @Inject()(
         nextPageUrl,
         buildRelatedContentLinks(),
         "produceApiBeforeYouStart.heading",
+        "produceApiBeforeYouStart.beforeYouStart.content",
         "produceApiBeforeYouStart.creationProcess.heading",
-        "produceApiBeforeYouStart.creationProcess.content"
+        "produceApiBeforeYouStart.creationProcess.content",
+        Seq.range(1,5).map(i => s"produceApiBeforeYouStart.creationProcess.list.$i")
       )
       Ok(view(request.user, viewModel))
   }

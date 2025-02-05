@@ -16,17 +16,20 @@
 
 @import models.user.UserModel
 @import play.api.libs.json.Json
+@import viewmodels.myapis.DeploymentSuccessViewModel
+@import config.FrontendAppConfig
 
 @this(
     layout: templates.Layout,
     govukPanel: GovukPanel,
     govukTable: GovukTable,
+    newTabLink: components.NewTabLink,
+    appConfig: FrontendAppConfig,
 )
 
-@(user: UserModel, publisherReference: String, apiName: String)(implicit request: Request[?], messages: Messages)
+@(viewModel: DeploymentSuccessViewModel)(implicit request: Request[?], messages: Messages)
 
-
-@layout(pageTitle = titleNoForm(messages("api.deployment.success")), showBackLink = false, user = Some(user)) {
+@layout(pageTitle = titleNoForm(messages("api.deployment.success.title")), showBackLink = false, user = Some(viewModel.user)) {
 
     @govukPanel(Panel(
         classes = "govuk-!-margin-bottom-9 govuk-panel--warning hip-panel--secondary-success",
@@ -44,17 +47,25 @@
                         content = messages("site.apiName"),
                         classes = "govuk-!-font-weight-bold"
                     ),
-                    TableRow(content = apiName)
+                    TableRow(content = viewModel.apiName)
                 ),Seq(
                     TableRow(
                         content = messages("site.publisherReference"),
                         classes = "govuk-!-font-weight-bold"
                     ),
-                    TableRow(content = publisherReference)
+                    TableRow(content = viewModel.publisherReference)
                 )
             )
         )
     )
+    <h2 class="govuk-heading-m">
+        @messages(viewModel.feedbackTitle)
+    </h2>
+    <p class="govuk-body">
+        @messages(viewModel.feedbackMessage)
+        @newTabLink(appConfig.feedbackLink, messages("api.deployment.success.feedback.link"), appendNewTabText=false)
+    </p>
+
     <h2 class="govuk-heading-m">
         @messages("api.deployment.success.body.heading")
     </h2>

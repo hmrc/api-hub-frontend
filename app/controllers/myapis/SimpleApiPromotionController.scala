@@ -25,6 +25,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.myapis.DeploymentSuccessViewModel
 import views.html.myapis.{DeploymentFailureView, DeploymentSuccessView, SimpleApiPromotionView}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -61,7 +62,13 @@ class SimpleApiPromotionController @Inject()(
             DeploymentDetails.egressFallback
           ).map {
             case Some(response: SuccessfulDeploymentsResponse) =>
-              Ok(successView(request.user, response.id, apiDetail.title))
+              Ok(successView(DeploymentSuccessViewModel(
+                request.user,
+                response.id,
+                apiDetail.title,
+                "api.deployment.success.feedback.create.heading",
+                "api.deployment.success.feedback.create.message"
+              )))
             case Some(response: InvalidOasResponse) =>
               BadRequest(
                 failureView(

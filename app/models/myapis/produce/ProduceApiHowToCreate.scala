@@ -33,13 +33,13 @@ object ProduceApiHowToCreate extends Enumerable.Implicits {
     Upload, Editor
   )
 
-  def options(implicit messages: Messages): Seq[RadioItem] = values.zipWithIndex.map {
+  def options(journey: String)(implicit messages: Messages): Seq[RadioItem] = values.zipWithIndex.map {
     case (value, index) =>
       RadioItem(
-        content = Text(messages(s"myApis.produce.howtocreate.${value.toString}")),
+        content = Text(messages(s"myApis.${journey}.howtocreate.${value.toString}")),
         value   = Some(value.toString),
         id      = Some(s"value_$index"),
-        hint = Some(Hint(content = Text(messages(s"myApis.produce.howtocreate.${value.toString}.hint"))))
+        hint = Some(Hint(content = Text(messages(s"myApis.${journey}.howtocreate.${value.toString}.hint"))))
       )
   }
 

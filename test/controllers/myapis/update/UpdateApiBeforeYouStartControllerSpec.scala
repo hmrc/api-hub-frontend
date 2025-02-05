@@ -45,8 +45,15 @@ class UpdateApiBeforeYouStartControllerSpec extends SpecBase with HtmlValidation
           nextPage.url,
           relatedContentLinks,
           "updateApiBeforeYouStart.heading",
+          "updateApiBeforeYouStart.beforeYouStart.content",
           "updateApiBeforeYouStart.updateProcess.heading",
-          "updateApiBeforeYouStart.updateProcess.content"
+          "updateApiBeforeYouStart.updateProcess.content",
+          Seq(
+            "updateApiBeforeYouStart.creationProcess.list.1",
+            "updateApiBeforeYouStart.creationProcess.list.2",
+            "updateApiBeforeYouStart.creationProcess.list.3",
+            "updateApiBeforeYouStart.creationProcess.list.4"
+          )
         )
         val view = fixture.application.injector.instanceOf[ProduceApiBeforeYouStartView]
         val nextPageUrl = nextPage.url

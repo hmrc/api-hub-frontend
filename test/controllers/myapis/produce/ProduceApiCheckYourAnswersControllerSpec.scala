@@ -42,7 +42,7 @@ import repositories.ProduceApiSessionRepository
 import services.ApiHubService
 import viewmodels.checkAnswers.myapis.produce.*
 import viewmodels.govuk.all.SummaryListViewModel
-import viewmodels.myapis.produce
+import viewmodels.myapis.{DeploymentSuccessViewModel, produce}
 import viewmodels.myapis.produce.{ProduceApiCheckYourAnswersViewModel, ProduceApiDeploymentErrorViewModel}
 import views.html.myapis.DeploymentSuccessView
 import views.html.myapis.produce.{ProduceApiCheckYourAnswersView, ProduceApiDeploymentErrorView}
@@ -141,8 +141,15 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
         val successPageRequest = FakeRequest(GET, successRoute)
 
         val successResult =  route(fixture.application, successPageRequest).value
+        val viewModel = DeploymentSuccessViewModel(
+          FakeUser,
+          "id",
+          "api name",
+          "api.deployment.success.feedback.create.heading",
+          "api.deployment.success.feedback.create.message"
+        )
 
-        contentAsString(successResult) mustEqual view(FakeUser, "id", "api name")(successPageRequest, messages(fixture.application)).toString
+        contentAsString(successResult) mustEqual view(viewModel)(successPageRequest, messages(fixture.application)).toString
         verify(fixture.sessionRepository).clear(FakeUser.userId)
       }
     }

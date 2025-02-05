@@ -33,20 +33,16 @@
         <div class="govuk-grid-column-two-thirds">
             <h1 class="govuk-heading-l">@messages(viewModel.mainTitle)</h1>
 
-            <h2 class="govuk-heading-m">@messages("produceApiBeforeYouStart.beforeYouStart.heading")</h2>
-
-            <p class="govuk-body">@messages("produceApiBeforeYouStart.beforeYouStart.content")</p>
+            <p class="govuk-body">@messages(viewModel.mainContent)</p>
 
             <h2 class="govuk-heading-m">@messages(viewModel.processTitle)</h2>
 
             <p class="govuk-body">@messages(viewModel.processHint)</p>
 
             <ol class="govuk-list govuk-list--number">
-                <li>@messages("produceApiBeforeYouStart.creationProcess.list.1")</li>
-                <li>@messages("produceApiBeforeYouStart.creationProcess.list.2")</li>
-                <li>@messages("produceApiBeforeYouStart.creationProcess.list.3")</li>
-                <li>@messages("produceApiBeforeYouStart.creationProcess.list.4")</li>
-                <li>@messages("produceApiBeforeYouStart.creationProcess.list.5")</li>
+                @for(messageKey <- viewModel.steps) {
+                    <li>@messages(messageKey)</li>
+                }
             </ol>
 
             @govukButton(

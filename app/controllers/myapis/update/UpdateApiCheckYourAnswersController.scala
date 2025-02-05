@@ -35,6 +35,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.myapis.update.*
 import viewmodels.govuk.all.SummaryListViewModel
+import viewmodels.myapis.DeploymentSuccessViewModel
 import viewmodels.myapis.produce.{ProduceApiCheckYourAnswersViewModel, ProduceApiDeploymentErrorViewModel}
 import views.html.myapis.DeploymentSuccessView
 import views.html.myapis.produce.{ProduceApiCheckYourAnswersView, ProduceApiDeploymentErrorView}
@@ -99,7 +100,13 @@ class UpdateApiCheckYourAnswersController @Inject()(
 
   def onSuccess(apiName: String, publisherReference: String): Action[AnyContent] = identify {
     implicit request =>
-      Ok(successView(request.user, publisherReference, apiName))
+      Ok(successView(DeploymentSuccessViewModel(
+        request.user,
+        publisherReference,
+        apiName,
+        "api.deployment.success.feedback.update.heading",
+        "api.deployment.success.feedback.update.message"
+      )))
   }
 
   def onCancel(): Action[AnyContent] = identify.async {

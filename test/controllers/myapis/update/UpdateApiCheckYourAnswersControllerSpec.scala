@@ -42,7 +42,7 @@ import repositories.{SessionRepository, UpdateApiSessionRepository}
 import services.ApiHubService
 import viewmodels.checkAnswers.myapis.update.*
 import viewmodels.govuk.all.SummaryListViewModel
-import viewmodels.myapis.produce
+import viewmodels.myapis.{DeploymentSuccessViewModel, produce}
 import viewmodels.myapis.produce.{ProduceApiCheckYourAnswersViewModel, ProduceApiDeploymentErrorViewModel}
 import views.html.ErrorTemplate
 import views.html.myapis.DeploymentSuccessView
@@ -157,8 +157,15 @@ class UpdateApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar
         val successPageRequest = FakeRequest(GET, successRoute)
 
         val successResult =  route(fixture.application, successPageRequest).value
+        val viewModel = DeploymentSuccessViewModel(
+          FakeUser,
+          "pubRef", 
+          "title",
+          "api.deployment.success.feedback.update.heading",
+          "api.deployment.success.feedback.update.message"
+        )
 
-        contentAsString(successResult) mustEqual view(FakeUser, "pubRef", "title")(successPageRequest, messages(fixture.application)).toString
+        contentAsString(successResult) mustEqual view(viewModel)(successPageRequest, messages(fixture.application)).toString
         verify(fixture.sessionRepository).clear(FakeUser.userId)
       }
     }
