@@ -59,6 +59,18 @@ class IntegrationCatalogueConnector @Inject()(
     }
   }
 
+  def getApiDetailForPublishReference(publisherReference: String)(implicit hc: HeaderCarrier): Future[Option[ApiDetail]] = {
+    httpClient.get(url"$integrationCatalogueBaseUrl/integration-catalogue/integrations/publisher-reference/$publisherReference")
+      .setHeader((ACCEPT, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Either[UpstreamErrorResponse, ApiDetail]]
+      .flatMap {
+        case Right(apiDetail) => Future.successful(Some(apiDetail))
+        case Left(e) if e.statusCode == NOT_FOUND => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
+  }
+
   def getApis(platformFilter: Option[String])(implicit hc: HeaderCarrier): Future[Seq[ApiDetailSummary]] = {
     queryApis(platformFilter.map(f => Seq(("platformFilter", f))).toSeq.flatten)
   }

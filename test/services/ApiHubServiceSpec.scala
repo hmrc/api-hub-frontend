@@ -45,7 +45,8 @@ import java.time.LocalDateTime
 import scala.concurrent.Future
 
 class ApiHubServiceSpec
-  extends OptionValues
+  extends AsyncFreeSpec
+    with OptionValues
     with EitherValues
     with ApplicationGetterBehaviours
     with ApiDetailGenerators
@@ -229,6 +230,22 @@ class ApiHubServiceSpec
     }
   }
 
+  "getApiDetailForPublishReference" - {
+    "must call the integration catalogue connector and return the API detail" in {
+      val expected = sampleApiDetail()
+
+      val fixture = buildFixture()
+
+      when(fixture.integrationCatalogueConnector.getApiDetailForPublishReference(eqTo(expected.publisherReference))(any()))
+        .thenReturn(Future.successful(Some(expected)))
+
+      fixture.service.getApiDetailForPublishReference(expected.publisherReference)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe Some(expected)
+      }
+    }
+  }
+
   "getApiDeploymentStatuses" - {
     "must call the applications connector and return the API detail" in {
       val publisherReference = "ref123"
@@ -245,6 +262,24 @@ class ApiHubServiceSpec
       fixture.service.getApiDeploymentStatuses(publisherReference)(HeaderCarrier()) map {
         actual =>
           actual mustBe expected
+      }
+    }
+  }
+
+  "getApiDeploymentStatus" - {
+    "must call the applications connector and return the API detail" in {
+      val fixture = buildFixture()
+      val hipEnvironment = FakeHipEnvironments.production
+      val publisherReference = "ref123"
+      val expected = Deployed(hipEnvironment.id, "1.0.1")
+
+      when(fixture.applicationsConnector.getApiDeploymentStatus(any, any)(any))
+        .thenReturn(Future.successful(expected))
+
+      fixture.applicationsConnector.getApiDeploymentStatus(hipEnvironment, publisherReference)(HeaderCarrier()).map {
+        result =>
+          verify(fixture.applicationsConnector).getApiDeploymentStatus(eqTo(hipEnvironment), eqTo(publisherReference))(any)
+          result mustBe expected
       }
     }
   }
@@ -940,6 +975,22 @@ class ApiHubServiceSpec
 
       fixture.service.fixScopes(applicationId)(HeaderCarrier()).map {
         result =>
+          result.value mustBe ()
+      }
+    }
+  }
+
+  "forcePublish" - {
+    "must make the correct request to the applications connector and return the result" in {
+      val fixture = buildFixture()
+      val publisherReference = "test-publisher-reference"
+
+      when(fixture.applicationsConnector.forcePublish(any)(any))
+        .thenReturn(Future.successful(Some(())))
+
+      fixture.service.forcePublish(publisherReference)(HeaderCarrier()).map {
+        result =>
+          verify(fixture.applicationsConnector).forcePublish(eqTo(publisherReference))(any)
           result.value mustBe ()
       }
     }
