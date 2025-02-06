@@ -191,7 +191,7 @@ applicationDetails.pending.heading = {0} Outstanding production access requests
 applicationDetails.pending.message.1 = There are a total of {0} outstanding production access requests for this application.
 applicationDetails.pending.message.2 = When a decision is made for your production request for APIs you will be notified by email.
 applicationDetails.no.prod.access.heading = APIs not available in production
-applicationDetails.no.prod.access.message = This application has APIs that are not currently available in the {0}.
+applicationDetails.no.prod.access.message = This application has APIs that are not currently accessible in the {0} environment.
 
 applicationApis.title = Application APIs
 applicationApis.heading = Manage application APIs
