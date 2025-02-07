@@ -24,7 +24,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers.running
 import viewmodels.SideNavItem
 import SideNavItem.SideNavItemLeaf
-import viewmodels.admin.AdminSideNavPages.{AccessRequestsPage, ConfigurationPage, EnvParityConfigTestPage, GetUsersPage, ManageApisPage, ManageApplicationsPage, ManageTeamsPage, StatisticsPage, TeamMigrationPage}
+import viewmodels.admin.AdminSideNavPages.{AccessRequestsPage, ConfigurationPage, ForcePublishPage, GetUsersPage, ManageApisPage, ManageApplicationsPage, ManageTeamsPage, StatisticsPage, TeamMigrationPage}
 
 class AdminNavItemsSpec extends SpecBase with Matchers with TableDrivenPropertyChecks {
 
@@ -45,6 +45,7 @@ class AdminNavItemsSpec extends SpecBase with Matchers with TableDrivenPropertyC
           getUsersNavItem(),
           configurationNavItem(),
           statisticsNavItem(),
+          forcePublishNavItem(),
           accessRequestsNavItem()
         )
 
@@ -162,6 +163,15 @@ object AdminNavItemsSpec {
       page = StatisticsPage,
       title = "Hub stats",
       link = controllers.admin.routes.StatisticsController.onPageLoad(),
+      isCurrentPage = false
+    )
+  }
+
+  private def forcePublishNavItem(): SideNavItem = {
+    SideNavItemLeaf(
+      page = ForcePublishPage,
+      title = "Check publish status",
+      link = controllers.admin.routes.ForcePublishController.onPageLoad(),
       isCurrentPage = false
     )
   }

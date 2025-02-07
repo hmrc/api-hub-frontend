@@ -31,7 +31,7 @@ object AdminSideNavPages {
   case object TeamMigrationPage extends SideNavPage
   case object ConfigurationPage extends SideNavPage
   case object StatisticsPage extends SideNavPage
-  case object EnvParityConfigTestPage extends SideNavPage
+  case object ForcePublishPage extends SideNavPage
 
 }
 
@@ -90,6 +90,12 @@ object AdminNavItems {
           title = messages("statistics.menuTitle"),
           link = controllers.admin.routes.StatisticsController.onPageLoad(),
           isCurrentPage = currentPage == StatisticsPage
+        ),
+        SideNavItemLeaf(
+          page = ForcePublishPage,
+          title = messages("forcePublish.menuTitle"),
+          link = controllers.admin.routes.ForcePublishController.onPageLoad(),
+          isCurrentPage = currentPage == ForcePublishPage
         ),
         accessRequestsNavItem
       )

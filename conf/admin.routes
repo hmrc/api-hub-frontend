@@ -12,3 +12,7 @@ GET         /configuration                                                      
 GET         /statistics                                                             controllers.admin.StatisticsController.onPageLoad()
 GET         /statistics/apis-in-production                                          controllers.admin.StatisticsController.apisInProduction()
 GET         /statistics/list-apis-in-production                                     controllers.admin.StatisticsController.listApisInProduction()
+GET         /force-publish                                                          controllers.admin.ForcePublishController.onPageLoad()
+POST        /force-publish                                                          controllers.admin.ForcePublishController.onSubmit()
+GET         /force-publish/:publisherReference                                      controllers.admin.ForcePublishController.showVersionComparison(publisherReference: String)
+POST        /force-publish/:publisherReference                                      controllers.admin.ForcePublishController.forcePublish(publisherReference: String)

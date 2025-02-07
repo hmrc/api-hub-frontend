@@ -1,0 +1,124 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.user.UserModel
+@import viewmodels.admin.{AdminNavItems, AdminSideNavPages, ForcePublishViewModel}
+
+@this(
+    layout: templates.Layout,
+    sideNav: views.html.templates.SideNav,
+    formHelper: FormWithCSRF,
+    govukButton: GovukButton,
+    govukInput: GovukInput,
+    govukErrorSummary: GovukErrorSummary,
+    govukTable : GovukTable
+)
+
+@(viewModel: ForcePublishViewModel)(implicit request: Request[?], messages: Messages)
+
+@heading() = {
+
+    <h1 class="govuk-heading-m">@messages("forcePublish.pageTitle")</h1>
+
+}
+
+@publisherReferenceSection() = {
+
+    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-bottom-5">
+
+    @formHelper(action = controllers.admin.routes.ForcePublishController.onSubmit()) {
+        @if(viewModel.form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(viewModel.form))
+        }
+
+        @govukInput(
+            InputViewModel(
+                field = viewModel.form("value"),
+                label = LabelViewModel(messages("forcePublish.publisherReferenceInput.text"))
+                    .withCssClass("govuk-label")
+                    .withCssClass("govuk-label--m")
+            )
+        )
+
+        @govukButton(
+            ButtonViewModel(messages("forcePublish.checkStatusButton.text"))
+                .withId("checkStatusButton")
+                .preventingDoubleClick()
+        )
+    }
+
+}
+
+@versionComparisonSection() = {
+
+    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-bottom-5">
+
+    @govukTable(
+        Table(
+            caption = Some(messages("forcePublish.versionComparison.caption")),
+            captionClasses = "govuk-table__caption--m",
+            head = Some(
+                Seq(
+                    HeadCell(
+                        content = Text(messages("forcePublish.versionComparison.headCell.deployedVersion", "Test"))
+                    ),
+                    HeadCell(
+                        content = Text(messages("forcePublish.versionComparison.headCell.catalogueVersion"))
+                    )
+                )
+            ),
+            rows = Seq(
+                Seq(
+                    TableRow(
+                        content = Text(viewModel.deployedVersionText)
+                    ),
+                    TableRow(
+                        content = Text(viewModel.catalogueVersionText)
+                    )
+                )
+            )
+        )
+    )
+
+    @if(viewModel.canForcePublish) {
+        @for(publisherReference <- viewModel.publisherReference) {
+            @formHelper(action = controllers.admin.routes.ForcePublishController.forcePublish(publisherReference)) {
+                @govukButton(
+                    ButtonViewModel(messages("forcePublish.forcePublishButton.text"))
+                        .withId("forcePublishButton")
+                        .preventingDoubleClick()
+                        .asSecondaryButton()
+                )
+            }
+        }
+    }
+
+}
+
+@layout(pageTitle = titleNoForm(messages("forcePublish.pageTitle")), user = Some(viewModel.user), fullWidth = true) {
+
+    @sideNav(messages("manageApplications.admin"), AdminNavItems(viewModel.user, AdminSideNavPages.ForcePublishPage)) {
+
+        @heading()
+
+        @publisherReferenceSection()
+
+        @if(viewModel.hasVersionComparison) {
+            @versionComparisonSection()
+        }
+    }
+
+}

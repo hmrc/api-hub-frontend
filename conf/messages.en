@@ -1179,3 +1179,21 @@ myApiPromoteSuccessView.label.deployingTo = Deploying to
 myApiPromoteSuccessView.whatYouCanDo.title = What you can do now
 myApiPromoteSuccessView.whatYouCanDo.text = You can now check the status of your promotion to the relevant environment in the {0}.
 myApiPromoteSuccessView.whatYouCanDo.linkText = API details page
+
+forcePublish.pageTitle = Check published status of an API
+forcePublish.menuTitle = Check publish status
+forcePublish.publisherReferenceInput.text = Enter the API publisher reference
+forcePublish.publisherReferenceInput.required = Enter a publisher reference
+forcePublish.checkStatusButton.text = Check published status
+forcePublish.versionComparison.caption = Version comparison
+forcePublish.versionComparison.headCell.deployedVersion = {0} environment
+forcePublish.versionComparison.headCell.catalogueVersion = API catalogue
+forcePublish.versionComparison.version.notDeployed = Not deployed
+forcePublish.versionComparison.version.unknown = Unknown
+forcePublish.forcePublishButton.text = Publish API to catalogue
+forcePublish.apiNotFound.heading = This deployment was not found in APIM
+forcePublish.apiNotFound.message = Could not find a deployment or OAS document in APIM for publisher reference {0}.
+
+forcePublishSuccess.pageTitle = API published successfully
+forcePublishSuccess.guidance.heading = What you can do now
+forcePublishSuccess.guidance.content = Return to {0}.
