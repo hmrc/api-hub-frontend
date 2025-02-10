@@ -1193,6 +1193,7 @@ forcePublish.versionComparison.version.unknown = Unknown
 forcePublish.forcePublishButton.text = Publish API to catalogue
 forcePublish.apiNotFound.heading = This deployment was not found in APIM
 forcePublish.apiNotFound.message = Could not find a deployment or OAS document in APIM for publisher reference {0}.
+forcePublish.cannotPublish = This API cannot be published as it is not deployed.
 
 forcePublishSuccess.pageTitle = API published successfully
 forcePublishSuccess.guidance.heading = What you can do now
