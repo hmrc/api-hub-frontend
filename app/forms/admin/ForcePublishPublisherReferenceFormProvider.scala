@@ -18,14 +18,28 @@ package forms.admin
 
 import forms.mappings.Mappings
 import play.api.data.Form
+import play.api.data.validation.{Constraint, Invalid, Valid}
 
 import javax.inject.Inject
+import scala.util.matching.Regex
 
 class ForcePublishPublisherReferenceFormProvider @Inject() extends Mappings {
 
   def apply(): Form[String] =
     Form(
-      "value" -> text("forcePublish.publisherReferenceInput.required")
+      "value" -> text("forcePublish.publisherReferenceInput.error.required").verifying(publisherReferenceConstraint)
     )
+
+  private val publisherReferenceRegex: Regex = """^[a-z0-9\-]+$""".r
+
+  private val publisherReferenceConstraint: Constraint[String] = Constraint[String] {
+    value =>
+      if (publisherReferenceRegex.matches(value)) {
+        Valid
+      }
+      else {
+        Invalid("forcePublish.publisherReferenceInput.error.invalid")
+      }
+  }
 
 }

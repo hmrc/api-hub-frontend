@@ -80,7 +80,7 @@ class ForcePublishViewModelSpec extends AnyFreeSpec with Matchers with TableDriv
       val tests = Table(
         ("version", "expected"),
         (Some(catalogueVersion), catalogueVersion),
-        (None, "forcePublish.versionComparison.version.notDeployed")
+        (None, "forcePublish.versionComparison.version.notPublished")
       )
 
       forAll(tests) {(version: Option[String], expected: String) =>

@@ -17,11 +17,14 @@
 package forms.admin
 
 import forms.behaviours.StringFieldBehaviours
+import org.scalacheck.Gen
 import play.api.data.FormError
 
 class ForcePublishPublisherReferenceFormProviderSpec extends StringFieldBehaviours {
 
-  val requiredKey = "forcePublish.publisherReferenceInput.required"
+  val requiredKey = "forcePublish.publisherReferenceInput.error.required"
+  val invalidKey = "forcePublish.publisherReferenceInput.error.invalid"
+
   val form = new ForcePublishPublisherReferenceFormProvider()()
 
   ".value" - {
@@ -31,13 +34,20 @@ class ForcePublishPublisherReferenceFormProviderSpec extends StringFieldBehaviou
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      nonEmptyString
+      Gen.nonEmptyStringOf(Gen.oneOf(Gen.alphaLowerChar, Gen.numChar, Gen.const('-')))
     )
 
     behave like mandatoryField(
       form,
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
+    )
+
+    behave like fieldThatRejectsInvalidData(
+      form,
+      fieldName,
+      invalidKey,
+      Gen.oneOf(Seq("UPPER-CASE", "invalid-char-*", "no spaces"))
     )
 
   }

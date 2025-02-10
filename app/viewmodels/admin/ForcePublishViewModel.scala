@@ -41,7 +41,7 @@ case class ForcePublishViewModel(
   }
 
   def catalogueVersionText(implicit messages: Messages): String = {
-    catalogueVersion.getOrElse(messages("forcePublish.versionComparison.version.notDeployed"))
+    catalogueVersion.getOrElse(messages("forcePublish.versionComparison.version.notPublished"))
   }
 
   def canForcePublish: Boolean = {
