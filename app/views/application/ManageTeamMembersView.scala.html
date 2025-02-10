@@ -33,8 +33,9 @@
         </div>
         <div class="govuk-grid-column-one-third govuk-!-text-align-right">
             @govukButton(Button(
-            content = messages("manageTeamMembers.addTeamMember"),
-            href = Some(controllers.application.routes.AddTeamMemberController.onPageLoad(application.id).url)
+                content = messages("manageTeamMembers.addTeamMember"),
+                href = Some(controllers.application.routes.AddTeamMemberController.onPageLoad(application.id).url),
+                preventDoubleClick = Some(true)
             ))
         </div>
     </div>
@@ -53,7 +54,8 @@
     @govukButton(Button(
         classes = "govuk-button--secondary govuk-!-margin-top-6",
         content = messages("manageTeamMembers.returnTo", application.name),
-        href = Some(controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url)
+        href = Some(controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url),
+        preventDoubleClick = Some(true)
     ))
 
 }

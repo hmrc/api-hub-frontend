@@ -51,7 +51,8 @@
                 Button(
                     href = Some(controllers.team.routes.CreateTeamStartController.startCreateTeam().url),
                     content = Text(messages("manageMyTeams.addNewTeam")),
-                    classes = "hip-no-stretch"
+                    classes = "hip-no-stretch",
+                    preventDoubleClick = Some(true)
                 ).withId("addNewTeamButton")
             )
         </div>

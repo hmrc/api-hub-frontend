@@ -69,11 +69,13 @@
             @govukButton(
                 ButtonViewModel(messages("apiPolicyConditionsDeclarationPage.button.accept"))
                     .withId("acceptAndContinueButton")
+                    .preventingDoubleClick()
             )
             @govukButton(
                 ButtonViewModel(content = messages("apiPolicyConditionsDeclarationPage.button.cancel"))
                     .asSecondaryButton()
                     .asLink(routes.ApiDetailsController.onPageLoad(apiDetail.id).url)
+                    .preventingDoubleClick()
             )
         </div>
 

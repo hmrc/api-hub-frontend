@@ -50,7 +50,7 @@
         @codeEditor("oas", "value", form("value").value, viewModel.populateExample)
 
         @govukButton(
-            ButtonViewModel(messages("site.continue"))
+            ButtonViewModel(messages("site.continue")).preventingDoubleClick()
         )
     }
 }

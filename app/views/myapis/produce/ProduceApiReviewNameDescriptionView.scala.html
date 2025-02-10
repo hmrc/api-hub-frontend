@@ -101,17 +101,19 @@
 
         <div class="govuk-button-group">
             @govukButton(
-                ButtonViewModel(messages("site.continue"))
+                ButtonViewModel(messages("site.continue")).preventingDoubleClick()
             )
             @govukButton(
                 ButtonViewModel(messages("produceApiReviewNameDescription.changeDescription"))
                     .asSecondaryButton()
                     .asLink(viewModel.changeDescriptionAction)
+                    .preventingDoubleClick()
             )
             @govukButton(
                 ButtonViewModel(messages("produceApiReviewNameDescription.changeName"))
                     .asSecondaryButton()
                     .asLink(viewModel.changeNameAction)
+                    .preventingDoubleClick()
             )
         </div>
     }

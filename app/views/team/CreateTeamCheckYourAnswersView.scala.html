@@ -53,7 +53,7 @@
 
     @formHelper(action = controllers.team.routes.CreateTeamController.onSubmit()) {
         @govukButton(
-            ButtonViewModel(messages("createTeamCheckYourAnswers.createTeam")).withId("createTeamButton")
+            ButtonViewModel(messages("createTeamCheckYourAnswers.createTeam")).withId("createTeamButton").preventingDoubleClick()
         )
     }
 

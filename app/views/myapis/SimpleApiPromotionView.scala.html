@@ -54,13 +54,14 @@
     @formHelper(action = controllers.myapis.routes.SimpleApiPromotionController.onSubmit(apiDetail.id)) {
         <div class="govuk-button-group">
             @govukButton(
-                ButtonViewModel(content = Text(messages("myApis.promotion.deploy")))
+                ButtonViewModel(content = Text(messages("myApis.promotion.deploy"))).preventingDoubleClick()
             )
 
             @govukButton(
                 ButtonViewModel(content = Text(messages("site.cancel")))
                     .asSecondaryButton()
                     .asLink(controllers.myapis.routes.MyApiDetailsController.onPageLoad(apiDetail.id).url)
+                    .preventingDoubleClick()
             )
         </div>
     }

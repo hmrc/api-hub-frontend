@@ -33,6 +33,7 @@
         @govukButton(
             ButtonViewModel(messages("site.continue"))
                 .asLink(continueUrl)
+                .preventingDoubleClick()
         )
     </p>
 }

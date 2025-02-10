@@ -96,7 +96,10 @@
         </div>
         <div class="govuk-grid-column-one-half govuk-!-padding-top-6">
             @govukButton(
-                ButtonViewModel(messages("produceApiEgressPrefix.prefixes.button")).withId("addPrefix").asSecondaryButton()
+                ButtonViewModel(messages("produceApiEgressPrefix.prefixes.button"))
+                    .withId("addPrefix")
+                    .asSecondaryButton()
+                    .preventingDoubleClick()
             )
         </div>
     </div>
@@ -136,7 +139,10 @@
     )
 
     @govukButton(
-        ButtonViewModel(messages("produceApiEgressPrefix.mappings.button")).withId("addMapping").asSecondaryButton()
+        ButtonViewModel(messages("produceApiEgressPrefix.mappings.button"))
+            .withId("addMapping")
+            .asSecondaryButton()
+            .preventingDoubleClick()
     )
 
     @govukTable(Table(
@@ -204,7 +210,7 @@
         </div>
 
         @govukButton(
-            ButtonViewModel(messages("site.continue"))
+            ButtonViewModel(messages("site.continue")).preventingDoubleClick()
         )
     }
 }

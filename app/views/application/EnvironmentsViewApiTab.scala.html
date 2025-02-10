@@ -53,7 +53,8 @@
                     href = Some(controllers.application.accessrequest.routes.RequestProductionAccessStartController.onPageLoad(viewModel.applicationId).url),
                     content = Text(messages("applicationApis.requestProductionAccess")),
                     id = Some("requestProductionAccessButton"),
-                    classes = "govuk-!-margin-bottom-2"
+                    classes = "govuk-!-margin-bottom-2",
+                    preventDoubleClick = Some(true)
                 )
             )
         </p>
@@ -147,7 +148,8 @@
                         Button(
                             href = Some(routes.AddAnApiStartController.addEndpoints(viewModel.applicationId, applicationApi.apiId).url),
                             content = Text(messages("applicationApis.addEndpoints")),
-                            classes = "govuk-button--secondary"
+                            classes = "govuk-button--secondary",
+                            preventDoubleClick = Some(true)
                         )
                         .withAttribute("data-add-endpoints-api-id", applicationApi.apiId)
                     )

@@ -60,7 +60,8 @@
             @govukButton(
                 Button(
                     content = Text(messages("myApis.environment.promoteTo", messages(promoteEnvironment.nameKey))),
-                    id = Some("promoteApi")
+                    id = Some("promoteApi"),
+                    preventDoubleClick = Some(true)
                 )
             )
         }

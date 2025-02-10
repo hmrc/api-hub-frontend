@@ -45,7 +45,7 @@
         )
 
         @govukButton(
-            ButtonViewModel(messages("site.continue")).withId("continueButton")
+            ButtonViewModel(messages("site.continue")).withId("continueButton").preventingDoubleClick()
         )
     }
 }

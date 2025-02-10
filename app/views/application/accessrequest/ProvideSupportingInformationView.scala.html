@@ -54,7 +54,9 @@
         ))
 
         @govukButton(
-            ButtonViewModel(messages("provideSupportingInformation.continue")).withId("continueButton")
+            ButtonViewModel(messages("provideSupportingInformation.continue"))
+                .withId("continueButton")
+                .preventingDoubleClick()
         )
     }
 }

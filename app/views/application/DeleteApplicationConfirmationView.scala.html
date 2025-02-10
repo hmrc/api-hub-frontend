@@ -61,16 +61,18 @@
 
         <div class="govuk-button-group">
             @govukButton(
-            ButtonViewModel(messages("deleteApplicationConfirmation.accept"))
-            .asWarningButton()
-            .withId("acceptAndContinueButton")
+                ButtonViewModel(messages("deleteApplicationConfirmation.accept"))
+                    .asWarningButton()
+                    .withId("acceptAndContinueButton")
+                    .preventingDoubleClick()
             )
 
             @govukButton(
-            ButtonViewModel(content = messages("site.cancel"))
-            .asSecondaryButton()
-            .asLink(controllers.application.routes.ApplicationDetailsController.onPageLoad(applicationId).url)
-            .withId("cancelButton")
+                ButtonViewModel(content = messages("site.cancel"))
+                    .asSecondaryButton()
+                    .asLink(controllers.application.routes.ApplicationDetailsController.onPageLoad(applicationId).url)
+                    .withId("cancelButton")
+                    .preventingDoubleClick()
             )
         </div>
     }

@@ -37,7 +37,9 @@
 
     @formHelper(action = controllers.application.register.routes.RegisterApplicationController.register()) {
         @govukButton(
-            ButtonViewModel(messages("registerApplicationCheckYourAnswers.registerApplication")).withId("registerApplicationButton")
+            ButtonViewModel(messages("registerApplicationCheckYourAnswers.registerApplication"))
+                .withId("registerApplicationButton")
+                .preventingDoubleClick()
         )
     }
 

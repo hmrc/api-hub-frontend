@@ -42,6 +42,7 @@
                         ButtonViewModel(messages("site.continue"))
                             .asLink(ldapSignInUrl)
                             .withId("signInViaLdapButton")
+                            .preventingDoubleClick()
                     )
                 </p>
             </div>
@@ -55,6 +56,7 @@
                         ButtonViewModel(messages("site.continue"))
                             .asLink(strideSignInUrl)
                             .withId("signInViaStrideButton")
+                            .preventingDoubleClick()
                     )
                 </p>
 

@@ -75,7 +75,8 @@
             @govukButton(
                 Button(
                     content = Text(messages("myApis.environment.promoteTo", viewModel.promotionEnvironmentName)),
-                    id = Some("promoteApi")
+                    id = Some("promoteApi"),
+                    preventDoubleClick = Some(true)
                 )
             )
 
@@ -83,7 +84,8 @@
                 Button(
                     content = Text(messages("site.cancel")),
                     id = Some("cancel"),
-                    href = Some(controllers.myapis.routes.MyApiEnvironmentController.onPageLoad(viewModel.apiDetail.id, viewModel.environment.id).url)
+                    href = Some(controllers.myapis.routes.MyApiEnvironmentController.onPageLoad(viewModel.apiDetail.id, viewModel.environment.id).url),
+                    preventDoubleClick = Some(true)
                 ).asSecondaryButton()
             )
         </div>

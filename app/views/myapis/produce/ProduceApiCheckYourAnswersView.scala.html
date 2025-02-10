@@ -56,7 +56,7 @@
 
     @formHelper(action = viewModel.formAction) {
         @govukButton(
-            ButtonViewModel(messages("produceApiCheckYourAnswers.button"))
+            ButtonViewModel(messages("produceApiCheckYourAnswers.button")).preventingDoubleClick()
         )
     }
 }

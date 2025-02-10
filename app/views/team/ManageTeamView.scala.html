@@ -46,7 +46,8 @@
                 Button(
                     href = Some(controllers.team.routes.AddTeamMemberController.onPageLoad(team.id).url),
                     content = Text(messages("manageTeam.addTeamMember")),
-                    classes = "hip-no-stretch"
+                    classes = "hip-no-stretch",
+                    preventDoubleClick = Some(true)
                 )
             )
         </div>

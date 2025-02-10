@@ -73,7 +73,8 @@
                 @govukButton(
                     Button(
                         href = Some(controllers.application.register.routes.RegisterApplicationStartController.startRegisterApplication().url),
-                        content = Text(messages("addAnApiSelectApplication.registerApplication"))
+                        content = Text(messages("addAnApiSelectApplication.registerApplication")),
+                        preventDoubleClick = Some(true)
                     )
                 )
             </div>
@@ -90,7 +91,8 @@
                 @govukButton(
                     Button(
                         href = Some(routes.ApiDetailsController.onPageLoad(apiDetail.id).url),
-                        content = Text(messages("addAnApiSelectApplication.returnTo", apiDetail.title))
+                        content = Text(messages("addAnApiSelectApplication.returnTo", apiDetail.title)),
+                        preventDoubleClick = Some(true)
                     )
                 )
             </div>
@@ -152,7 +154,7 @@
             }
 
             @govukButton(
-                ButtonViewModel(messages("site.continue")).withId("continueButton")
+                ButtonViewModel(messages("site.continue")).withId("continueButton").preventingDoubleClick()
             )
         }
     }

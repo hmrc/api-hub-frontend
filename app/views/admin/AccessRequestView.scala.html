@@ -232,14 +232,16 @@
             <div class="govuk-button-group">
                 @govukButton(
                     Button(
-                        content = Text(messages("site.continue"))
+                        content = Text(messages("site.continue")),
+                        preventDoubleClick = Some(true)
                     ).withId("continueButton")
                 )
                 @govukButton(
                     Button(
                         classes = "govuk-button--secondary",
                         content = Text(messages("site.cancel")),
-                        href = Some(controllers.admin.routes.AccessRequestsController.onPageLoad().url)
+                        href = Some(controllers.admin.routes.AccessRequestsController.onPageLoad().url),
+                        preventDoubleClick = Some(true)
                     ).withId("cancelButton")
                 )
                 @cancelAccessRequestLink()
@@ -252,7 +254,8 @@
             @govukButton(
                 Button(
                     content = Text(model.returnMessage),
-                    href = Some(model.returnCall.url)
+                    href = Some(model.returnCall.url),
+                    preventDoubleClick = Some(true)
                 ).withId("returnButton")
             )
 
