@@ -118,6 +118,7 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
 
         running(fixture.playApplication) {
           val request = FakeRequest(controllers.application.routes.AddCredentialController.addCredentialForEnvironment(FakeApplication.id, environment))
+            .withFormUrlEncodedBody(("value[0]", "confirm"))
           val result = route(fixture.playApplication, request).value
           status(result) mustBe expectedResponse
           redirectTo match {
@@ -125,6 +126,25 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
             case None => ()
           }
         }
+      }
+    }
+    "must give a bad request response when the creation is not confirmed" in {
+      val FakeSupporterOnApplicationTeam = FakeUser.copy(permissions = Permissions(false, true, false))
+      val FakePrivilegedUserOnApplicationTeam = FakeUser.copy(permissions = Permissions(false, false, true))
+
+      val fixture = buildFixture(FakePrivilegedUserOnApplicationTeam)
+      val credential = Credential("test-client-id", LocalDateTime.now(clock), Some("test-secret"), Some("test-fragment"), FakeHipEnvironments.production.id)
+      when(fixture.apiHubService.addCredential(eqTo(FakeApplication.id), any())(any()))
+        .thenReturn(Future.successful(Right(Some(credential))))
+      val view = fixture.playApplication.injector.instanceOf[AddCredentialChecklistView]
+
+      running(fixture.playApplication) {
+        implicit val msgs: Messages = messages(fixture.playApplication)
+        implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(controllers.application.routes.AddCredentialController.addCredentialForEnvironment(FakeApplication.id, FakeHipEnvironments.production.id))
+        val result = route(fixture.playApplication, request).value
+        status(result) mustBe BAD_REQUEST
+        contentAsString(result) mustEqual view(form.bindFromRequest(Map.empty), FakeApplication.id, Some(FakePrivilegedUserOnApplicationTeam)).toString
+        contentAsString(result) must validateAsHtml
       }
     }
   }
