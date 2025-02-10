@@ -669,6 +669,9 @@ header {
     .govuk-summary-list__key, .govuk-summary-list__value {
         padding-bottom: 0;
     }
+    .govuk-grid-row {
+        line-height: 1rem;
+    }
 }
 
 .hip-summary-list--wide-values {

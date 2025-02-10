@@ -30,7 +30,7 @@
     apiDeployments: ApiDeployments
 )
 
-@(apiDetail: ApiDetail, deploymentStatuses: ApiDeploymentStatuses, user: UserModel, supportEmailAddress: String, teamName: Option[String])(implicit request: Request[?], messages: Messages)
+@(apiDetail: ApiDetail, deploymentStatuses: ApiDeploymentStatuses, user: UserModel, teamName: Option[String])(implicit request: Request[?], messages: Messages)
 
 @teamContent = {
     <div class="govuk-grid-row">
@@ -51,13 +51,9 @@
     </div>
 }
 
-@supportEmailLink() = {
-    <a href="mailto:@supportEmailAddress" class="govuk-link">@supportEmailAddress</a>
-}
-
 @layout(pageTitle = titleNoForm(messages("myApis.details.title")), user = Some(user), fullWidth = true, customScriptsBlock = Some(iconsLink())) {
     @sideNav(apiDetail.title, myApisNavItems(apiDetail, user, MyApisNavPages.ProducerApiDetailsPage, deploymentStatuses)) {
-        <h1 id="details" class="govuk-heading-l">@messages("myApis.details.title")</h1>
+        <h1 id="details" class="govuk-heading-l govuk-!-margin-bottom-3">@messages("myApis.details.title")</h1>
 
         @govukSummaryList(SummaryList(
             rows = Seq(
@@ -85,25 +81,11 @@
                         content = Text(apiDetail.publisherReference)
                     ),
                 )))
-            .withCssClass("govuk-summary-list--no-border hip-summary-list__compact")
+            .withCssClass("govuk-summary-list--no-border hip-summary-list__compact govuk-!-margin-bottom-4")
         )
 
-        <div class="call-out-panel">
-        @if(user.permissions.canSupport && deploymentStatuses.isDeployed) {
-            <p class="govuk-body">
-                @messages("myApis.promoteToProd.text")
-            </p>
-            <a href="@controllers.myapis.routes.SimpleApiPromotionController.onPageLoad(apiDetail.id)" class="govuk-button govuk-!-margin-bottom-2">@messages("myApis.promoteToProd.button")</a>
-        } else {
-            <p class="govuk-body govuk-body-s">@Html(messages("myApis.promoteToProd.guidance.main", supportEmailLink()))
-            <ul class="govuk-list govuk-list--bullet govuk-!-margin-left-0">
-                <li>@messages("myApis.promoteToProd.guidance.item1")</li>
-                <li>@messages("myApis.promoteToProd.guidance.item2")</li>
-            </ul>
-        }
-        </div>
+        <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible govuk-!-margin-top-1 govuk-!-margin-bottom-7">
 
         @apiDeployments(deploymentStatuses)
-
     }
 }
