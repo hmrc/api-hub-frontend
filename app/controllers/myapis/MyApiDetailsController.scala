@@ -19,7 +19,6 @@ package controllers.myapis
 import config.HipEnvironments
 import cats.implicits.toTraverseOps
 import com.google.inject.{Inject, Singleton}
-import config.FrontendAppConfig
 import controllers.actions.{ApiAuthActionProvider, IdentifierAction}
 import controllers.helpers.ErrorResultBuilder
 import play.api.i18n.{I18nSupport, Messages}
@@ -35,7 +34,6 @@ class MyApiDetailsController @Inject()(
   override val controllerComponents: MessagesControllerComponents,
   view: MyApiDetailsView,
   identify: IdentifierAction,
-  config: FrontendAppConfig,
   apiAuth: ApiAuthActionProvider,
   errorResultBuilder: ErrorResultBuilder,
   apiHubService: ApiHubService,
@@ -49,7 +47,7 @@ class MyApiDetailsController @Inject()(
       maybeTeam <- request.apiDetails.teamId.fold(Future.successful(None))(apiHubService.findTeamById)
       teamName = maybeTeam.map(_.name).orElse(Some(Messages("apiDetails.details.team.error")))
     } yield
-      Ok(view(request.apiDetails, deploymentStatuses, request.identifierRequest.user, config.supportEmailAddress, teamName))
+      Ok(view(request.apiDetails, deploymentStatuses, request.identifierRequest.user, teamName))
   }
 
 }
