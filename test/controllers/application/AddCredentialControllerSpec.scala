@@ -128,6 +128,29 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
         }
       }
     }
+    "must not require credentials confirmation in non-prod environments" in {
+      val FakeSupporterOnApplicationTeam = FakeUser.copy(permissions = Permissions(false, true, false))
+      val FakePrivilegedUserOnApplicationTeam = FakeUser.copy(permissions = Permissions(false, false, true))
+      val user = FakeSupporterOnApplicationTeam
+      val environment = "test"
+      val expectedResponse = SEE_OTHER
+      val redirectTo: Option[() => String] = Some(() => controllers.application.routes.EnvironmentsController.onPageLoad(FakeApplication.id, environment).url + "#credentials")
+
+      val fixture = buildFixture(user)
+      val credential = Credential("test-client-id", LocalDateTime.now(clock), Some("test-secret"), Some("test-fragment"), environment)
+      when(fixture.apiHubService.addCredential(eqTo(FakeApplication.id), any())(any()))
+        .thenReturn(Future.successful(Right(Some(credential))))
+
+      running(fixture.playApplication) {
+        val request = FakeRequest(controllers.application.routes.AddCredentialController.addCredentialForEnvironment(FakeApplication.id, environment))
+        val result = route(fixture.playApplication, request).value
+        status(result) mustBe expectedResponse
+        redirectTo match {
+          case Some(urlBuilder) => redirectLocation(result).value mustBe urlBuilder()
+          case None => fail()
+        }
+      }
+    }
     "must give a bad request response when the creation is not confirmed" in {
       val FakeSupporterOnApplicationTeam = FakeUser.copy(permissions = Permissions(false, true, false))
       val FakePrivilegedUserOnApplicationTeam = FakeUser.copy(permissions = Permissions(false, false, true))

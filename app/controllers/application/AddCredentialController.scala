@@ -60,13 +60,14 @@ class AddCredentialController @Inject()(
 
   def addCredentialForEnvironment(applicationId: String, environment: String): Action[AnyContent] = (identify andThen applicationAuth(applicationId)).async {
     implicit request =>
-      form.bindFromRequest().fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors, applicationId, request.maybeUser))),
-        _ => hipEnvironments.forUrlPathParameter(environment) match {
-          case hipEnvironment if hipEnvironment.isProductionLike => addCredentialToProduction(hipEnvironment)
-          case hipEnvironment => addCredentialToNonProduction(hipEnvironment)
-        }
-      )
+      hipEnvironments.forUrlPathParameter(environment) match {
+        case hipEnvironment if hipEnvironment.isProductionLike =>
+          form.bindFromRequest().fold(
+            formWithErrors => Future.successful(BadRequest(view(formWithErrors, applicationId, request.maybeUser))),
+            _ => addCredentialToProduction(hipEnvironment)
+          )
+        case hipEnvironment => addCredentialToNonProduction(hipEnvironment)
+      }
   }
 
   private def addCredentialToNonProduction(hipEnvironment: HipEnvironment)(implicit request: ApplicationRequest[AnyContent]) = {
