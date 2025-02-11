@@ -21,7 +21,7 @@ import config.HipEnvironment
 import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
 import models.AvailableEndpoint
 import models.accessrequest.{AccessRequest, AccessRequestRequest, AccessRequestStatus}
-import models.api.{ApiDeploymentStatuses, ApiDetail, ApiDetailSummary, EgressGateway, PlatformContact}
+import models.api.{ApiDeploymentStatus, ApiDeploymentStatuses, ApiDetail, ApiDetailSummary, EgressGateway, PlatformContact}
 import models.application.*
 import models.deployment.{DeploymentDetails, DeploymentsRequest, DeploymentsResponse, RedeploymentRequest}
 import models.exception.ApplicationsException
@@ -84,8 +84,16 @@ class ApiHubService @Inject()(
     integrationCatalogueConnector.getApiDetail(id)
   }
 
+  def getApiDetailForPublishReference(publisherReference: String)(implicit hc: HeaderCarrier): Future[Option[ApiDetail]] = {
+    integrationCatalogueConnector.getApiDetailForPublishReference(publisherReference)
+  }
+
   def getApiDeploymentStatuses(publisherReference: String)(implicit hc: HeaderCarrier): Future[ApiDeploymentStatuses] = {
     applicationsConnector.getApiDeploymentStatuses(publisherReference)
+  }
+
+  def getApiDeploymentStatus(hipEnvironment: HipEnvironment, publisherReference: String)(implicit hc: HeaderCarrier): Future[ApiDeploymentStatus] = {
+    applicationsConnector.getApiDeploymentStatus(hipEnvironment, publisherReference)
   }
 
   def getDeploymentDetails(publisherReference: String)(implicit hc: HeaderCarrier): Future[Option[DeploymentDetails]] = {
@@ -248,6 +256,10 @@ class ApiHubService @Inject()(
 
   def fixScopes(applicationId: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
     applicationsConnector.fixScopes(applicationId)
+  }
+
+  def forcePublish(publisherReference: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    applicationsConnector.forcePublish(publisherReference)
   }
 
 }

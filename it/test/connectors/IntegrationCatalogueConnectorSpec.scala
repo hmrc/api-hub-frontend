@@ -329,6 +329,44 @@ class IntegrationCatalogueConnectorSpec
     }
   }
 
+  "getApiDetailForPublishReference" - {
+    "must place the correct request and return the API detail" in {
+      val expected = sampleApiDetail()
+
+      stubFor(
+        get(urlEqualTo(s"/integration-catalogue/integrations/publisher-reference/${expected.publisherReference}"))
+          .withHeader("Accept", equalTo("application/json"))
+          .withHeader("Authorization", equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withBody(Json.toJson(expected).toString())
+          )
+      )
+
+      buildConnector().getApiDetailForPublishReference(expected.publisherReference)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe Some(expected)
+      }
+    }
+
+    "must return None when the API detail is not found" in {
+      val expected = sampleApiDetail()
+
+      stubFor(
+        get(urlEqualTo(s"/integration-catalogue/integrations/publisher-reference/${expected.publisherReference}"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+          )
+      )
+
+      buildConnector().getApiDetailForPublishReference(expected.publisherReference)(HeaderCarrier()) map {
+        actual =>
+          actual mustBe None
+      }
+    }
+  }
+
   private def buildConnector(): IntegrationCatalogueConnector = {
     val servicesConfig = new ServicesConfig(
       Configuration.from(Map(

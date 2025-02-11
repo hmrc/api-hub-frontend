@@ -21,7 +21,7 @@ import config.{FrontendAppConfig, HipEnvironment}
 import models.UserEmail
 import models.accessrequest.*
 import models.api.ApiDeploymentStatuses.readApiDeploymentStatuses
-import models.api.{ApiDeployment, ApiDeploymentStatuses, ApiDetailSummary, EgressGateway}
+import models.api.{ApiDeployment, ApiDeploymentStatus, ApiDeploymentStatuses, ApiDetailSummary, EgressGateway}
 import models.application.*
 import models.deployment.*
 import models.exception.{ApplicationCredentialLimitException, ApplicationsException, TeamNameNotUniqueException}
@@ -409,6 +409,17 @@ class ApplicationsConnector @Inject()(
       }
   }
 
+  def getApiDeploymentStatus(hipEnvironment: HipEnvironment, publisherReference: String)(implicit hc: HeaderCarrier): Future[ApiDeploymentStatus] = {
+    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/apis/$publisherReference/environment/${hipEnvironment.id}/deployment-status")
+      .setHeader((ACCEPT, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Either[UpstreamErrorResponse, ApiDeploymentStatus]]
+      .flatMap {
+        case Right(apiDeploymentStatus) => Future.successful(apiDeploymentStatus)
+        case Left(e) => Future.failed(e)
+      }
+  }
+
   def getDeploymentDetails(publisherReference: String)(implicit hc: HeaderCarrier): Future[Option[DeploymentDetails]] = {
     httpClient.get(url"$applicationsBaseUrl/api-hub-applications/deployments/$publisherReference")
       .setHeader((ACCEPT, JSON))
@@ -635,6 +646,17 @@ class ApplicationsConnector @Inject()(
 
   def fixScopes(applicationId: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
     httpClient.put(url"$applicationsBaseUrl/api-hub-applications/applications/$applicationId/fix-scopes")
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Either[UpstreamErrorResponse, Unit]]
+      .flatMap {
+        case Right(scopes) => Future.successful(Some(()))
+        case Left(e) if e.statusCode == NOT_FOUND => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
+  }
+
+  def forcePublish(publisherReference: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    httpClient.put(url"$applicationsBaseUrl/api-hub-applications/apis/$publisherReference/force-publish")
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Either[UpstreamErrorResponse, Unit]]
       .flatMap {

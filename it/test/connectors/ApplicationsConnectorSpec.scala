@@ -24,9 +24,9 @@ import fakes.FakeHipEnvironments
 import generators.EgressGenerator
 import models.UserEmail
 import models.accessrequest.*
-import models.api.ApiDeploymentStatuses
 import models.api.ApiDeploymentStatus.*
 import models.api.ApiDetailLensesSpec.{sampleApiDetail, sampleApiDetailSummary}
+import models.api.{ApiDeploymentStatus, ApiDeploymentStatuses}
 import models.application.*
 import models.application.ApplicationLenses.*
 import models.deployment.{DeploymentDetails, DeploymentsRequest, EgressMapping, Error, FailuresResponse, InvalidOasResponse, RedeploymentRequest, SuccessfulDeploymentsResponse}
@@ -37,22 +37,21 @@ import models.team.{NewTeam, Team}
 import models.user.{LdapUser, UserContactDetails, UserModel}
 import org.mockito.ArgumentMatchers.{any, anyString}
 import org.mockito.Mockito.when
-import org.scalatest.{EitherValues, OptionValues}
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
+import org.scalatest.{EitherValues, OptionValues}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.Configuration
 import play.api.http.ContentTypes
 import play.api.http.Status.*
 import play.api.i18n.{Messages, MessagesProvider}
-import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.test.Helpers.{ACCEPT, AUTHORIZATION, CONTENT_TYPE}
 import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
-import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
+import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import java.net.URLEncoder
@@ -73,7 +72,7 @@ class ApplicationsConnectorSpec
   when(messagesProvider.messages).thenReturn(messages)
   when(messages.apply(anyString, any)).thenReturn(errorMessage)
 
-  import ApplicationsConnectorSpec._
+  import ApplicationsConnectorSpec.*
 
   "ApplicationsConnector.registerApplication" - {
     "must place the correct request and return the stored application" in {
@@ -1128,6 +1127,37 @@ class ApplicationsConnectorSpec
     }
   }
 
+  "ApplicationsConnector.getApiDeploymentStatus" - {
+    "must place the correct request and return the response" in {
+      val hipEnvironment = FakeHipEnvironments.production
+      val publisherReference = "ref123"
+
+      val responses = Table(
+        "response",
+        Deployed(hipEnvironment.id, "1.0.1"),
+        NotDeployed(hipEnvironment.id),
+        Unknown(hipEnvironment.id)
+      )
+
+      forAll(responses) {(response: ApiDeploymentStatus) =>
+        stubFor(
+          get(urlEqualTo(s"/api-hub-applications/apis/$publisherReference/environment/${hipEnvironment.id}/deployment-status"))
+            .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
+            .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+            .willReturn(
+              aResponse()
+                .withBody(Json.toJson(response).toString)
+            )
+        )
+
+        buildConnector(this).getApiDeploymentStatus(hipEnvironment, publisherReference)(HeaderCarrier()).map(
+          result =>
+            result mustBe response
+        )
+      }
+    }
+  }
+
   "ApplicationsConnector.getDeploymentDetails" - {
     "must place the correct request and return the deployment details when they exist" in {
       val publisherReference = "test-publisher-ref"
@@ -1855,6 +1885,44 @@ class ApplicationsConnectorSpec
       buildConnector(this).validateOAS(oas)(HeaderCarrier()).map {
         result =>
           result.value mustBe()
+      }
+    }
+  }
+
+  "forcePublish" - {
+    "must place the correct request and return success" in {
+      val publisherReference = "test-publisher-reference"
+
+      stubFor(
+        put(urlEqualTo(s"/api-hub-applications/apis/$publisherReference/force-publish"))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withStatus(NO_CONTENT)
+          )
+      )
+
+      buildConnector(this).forcePublish(publisherReference)(HeaderCarrier()).map {
+        result =>
+          result.value mustBe ()
+      }
+    }
+
+    "must return None when the deployment does not exist" in {
+      val publisherReference = "test-publisher-reference"
+
+      stubFor(
+        put(urlEqualTo(s"/api-hub-applications/apis/$publisherReference/force-publish"))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+          )
+      )
+
+      buildConnector(this).forcePublish(publisherReference)(HeaderCarrier()).map {
+        result =>
+          result mustBe None
       }
     }
   }
