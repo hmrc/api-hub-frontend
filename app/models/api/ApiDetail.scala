@@ -70,6 +70,7 @@ case class ApiDetail(
   platform: String,
   maintainer: Maintainer,
   apiType: Option[ApiType] = None,
+  apiNumber: Option[String] = None
 ) {
 
   def isSelfServe: Boolean = platform == "HIP"
@@ -106,6 +107,7 @@ object ApiDetail {
       ~ (__ \ "platform").read[String]
       ~ (__ \ "maintainer").read[Maintainer]
       ~ (__ \ "apiType").readNullable[ApiType]
+      ~ (__ \ "apiNumber").readNullable[String]
     )(ApiDetail.apply)
   val formatApiDetailSummary: OFormat[ApiDetail] = OFormat[ApiDetail](
     apiDetailSummaryReads,

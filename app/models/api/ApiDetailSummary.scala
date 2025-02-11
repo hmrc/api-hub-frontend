@@ -29,7 +29,8 @@ case class ApiDetailSummary(
     hods: Seq[String],
     platform: String,
     apiType: Option[ApiType],
-    teamId: Option[String]
+    teamId: Option[String],
+    apiNumber: Option[String]
 )
 
 object ApiDetailSummary {
@@ -46,7 +47,8 @@ object ApiDetailSummary {
       hods = apiDetail.hods,
       platform = apiDetail.platform,
       apiType = apiDetail.apiType,
-      teamId = apiDetail.teamId
+      teamId = apiDetail.teamId,
+      apiNumber = apiDetail.apiNumber
     )
   }
 
