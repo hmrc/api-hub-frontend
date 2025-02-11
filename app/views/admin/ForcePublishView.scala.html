@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import config.HipEnvironments
 @import models.user.UserModel
 @import viewmodels.admin.{AdminNavItems, AdminSideNavPages, ForcePublishViewModel}
 
@@ -24,7 +25,8 @@
     govukButton: GovukButton,
     govukInput: GovukInput,
     govukErrorSummary: GovukErrorSummary,
-    govukTable : GovukTable
+    govukTable : GovukTable,
+    hipEnvironments: HipEnvironments
 )
 
 @(viewModel: ForcePublishViewModel)(implicit request: Request[?], messages: Messages)
@@ -73,7 +75,12 @@
             head = Some(
                 Seq(
                     HeadCell(
-                        content = Text(messages("forcePublish.versionComparison.headCell.deployedVersion", "Test"))
+                        content = Text(
+                            messages(
+                                "forcePublish.versionComparison.headCell.deployedVersion",
+                                messages(hipEnvironments.deploymentHipEnvironment.nameKey)
+                            )
+                        )
                     ),
                     HeadCell(
                         content = Text(messages("forcePublish.versionComparison.headCell.catalogueVersion"))
