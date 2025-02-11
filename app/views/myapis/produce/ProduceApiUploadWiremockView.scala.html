@@ -67,7 +67,7 @@
   <input type="hidden" name="fileName" id="fileName" value="@form.value.map(_.fileName).getOrElse("")">
   <input type="hidden" name="fileContents" id="fileContents" value="@form.value.map(_.fileContents).getOrElse("")">
   @govukButton(
-   ButtonViewModel(messages("site.continue"))
+   ButtonViewModel(messages("site.continue")).preventingDoubleClick()
   )
  }
 }

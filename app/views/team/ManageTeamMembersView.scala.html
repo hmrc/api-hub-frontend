@@ -36,7 +36,8 @@
                 Button(
                     classes = "govuk-button--secondary",
                     content = messages("createTeamManageMembers.addTeamMember"),
-                    href = Some(controllers.team.routes.CreateTeamMemberController.onPageLoad().url)
+                    href = Some(controllers.team.routes.CreateTeamMemberController.onPageLoad().url),
+                    preventDoubleClick = Some(true)
                 ).withId("addTeamMemberButton")
             )
         </div>
@@ -49,6 +50,7 @@
             Button(
                 classes = "govuk-!-margin-top-6",
                 content = messages("site.continue"),
+                preventDoubleClick = Some(true)
             ).withId("continueButton")
         )
     }

@@ -89,6 +89,6 @@
             ).withHint(Hint(content = HtmlContent(egressHint)))
         )
 
-        @govukButton(ButtonViewModel(messages("site.continue")))
+        @govukButton(ButtonViewModel(messages("site.continue")).preventingDoubleClick())
     }
 }

@@ -38,7 +38,8 @@
         @govukButton(
             Button(
                 content = Text(messages("statistics.fetchStat")),
-                classes = "hip-stats-button"
+                classes = "hip-stats-button",
+                preventDoubleClick = Some(true)
             )
         )
     </div>

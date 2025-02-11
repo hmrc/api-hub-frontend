@@ -58,7 +58,8 @@
                         @govukButton(
                             Button(
                                 content = viewModel.createApplicationMessage,
-                                id = Some("registerAnApplicationButton")
+                                id = Some("registerAnApplicationButton"),
+                                preventDoubleClick = Some(true)
                             ).asSecondaryButton(viewModel.createApplicationButtonIsSecondary)
                         )
                     }
@@ -97,7 +98,8 @@
                         @govukButton(
                             Button(
                                 content = viewModel.createTeamMessage,
-                                id = Some("registerTeamButton")
+                                id = Some("registerTeamButton"),
+                                preventDoubleClick = Some(true)
                             ).asSecondaryButton(viewModel.createTeamButtonIsSecondary)
                         )
                     }
@@ -137,7 +139,8 @@
                             @govukButton(
                                 Button(
                                     content = viewModel.createApiMessage,
-                                    id = Some("createAnApiButton")
+                                    id = Some("createAnApiButton"),
+                                    preventDoubleClick = Some(true)
                                 ).asSecondaryButton(viewModel.createApisButtonIsSecondary)
                             )
                         }

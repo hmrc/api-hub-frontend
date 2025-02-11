@@ -119,7 +119,8 @@
             )
             @govukButton(Button(
                 name    = Option("fake-sign-in-btn"),
-                content = Text(messages("fake-sign-in.button"))
+                content = Text(messages("fake-sign-in.button")),
+                preventDoubleClick = Some(true)
             ))
         }
     </div>

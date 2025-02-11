@@ -31,8 +31,9 @@
 
     <p class="govuk-body">
         @govukButton(
-        ButtonViewModel(messages("site.startAgain"))
-        .asLink(routes.IndexController.onPageLoad.url)
+            ButtonViewModel(messages("site.startAgain"))
+                .asLink(routes.IndexController.onPageLoad.url)
+                .preventingDoubleClick()
         )
     </p>
 }

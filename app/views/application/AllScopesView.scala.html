@@ -68,7 +68,8 @@
         @formHelper(action = controllers.application.routes.AllScopesController.fixScopes(application.id), Symbol("autoComplete") -> "off") {
             @govukButton(
                 ButtonViewModel(messages("allScopes.fixScopes"))
-                .withId("fixScopesButton")
+                    .withId("fixScopesButton")
+                    .preventingDoubleClick()
             )
         }
     }

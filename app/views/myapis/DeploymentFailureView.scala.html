@@ -91,7 +91,7 @@
     <br>
     <div class="govuk-button-group">
         @govukButton(
-            ButtonViewModel(messages("api.deployment.failure.continue")).asLink(returnUrl)
+            ButtonViewModel(messages("api.deployment.failure.continue")).asLink(returnUrl).preventingDoubleClick()
         )
         <a class="govuk-link govuk-link--no-visited-state govuk-!-margin-left-3" href="@routes.IndexController.onPageLoad.url">@messages("site.cancel")</a>
     </div>

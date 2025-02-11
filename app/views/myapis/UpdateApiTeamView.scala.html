@@ -108,7 +108,7 @@
                 @govukButton(
                     ButtonViewModel(
                         messages("myApis.update.team.save")
-                    ).withCssClass("govuk-!-margin-top-5")
+                    ).withCssClass("govuk-!-margin-top-5").preventingDoubleClick()
                 )
             } else {
                 <div class="call-out-panel call-out-panel__small">

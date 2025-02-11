@@ -62,7 +62,8 @@
                         id = Some("addToAnApplicationButton"),
                         href = Some(routes.AddAnApiStartController.addAnApi(apiDetail.id).url),
                         content = Text(messages("apiDetails.addToAnApplication")),
-                        classes = "govuk-!-margin-bottom-2"
+                        classes = "govuk-!-margin-bottom-2",
+                        preventDoubleClick = Some(true)
                     )
                 )
             }

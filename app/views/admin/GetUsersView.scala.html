@@ -46,6 +46,7 @@
             ButtonViewModel(messages("getUsers.copy"))
                 .withAttribute("data-emails", {userEmails.mkString("; ")})
                 .withId("copyButton")
+                .preventingDoubleClick()
         )
     }
 }

@@ -81,6 +81,7 @@
             ButtonViewModel(messages("requestProductionAccess.button.accept"))
                 .withId("continueButton")
                 .withCssClass("govuk-!-margin-top-5")
+                .preventingDoubleClick()
         )
     }
 

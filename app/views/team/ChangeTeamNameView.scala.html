@@ -45,7 +45,7 @@ govukButton: GovukButton
         )
 
         @govukButton(
-            ButtonViewModel(messages("site.continue"))
+            ButtonViewModel(messages("site.continue")).preventingDoubleClick()
         )
     }
 }

@@ -29,7 +29,7 @@
     @formHelper(action = controllers.myapis.produce.routes.ProduceApiDeploymentController.onSubmit()) {
         <h1 class="govuk-heading-l">OAS is processing</h1>
         @govukButton(
-            ButtonViewModel("Finish")
+            ButtonViewModel("Finish").preventingDoubleClick()
         )
     }
 }
