@@ -61,7 +61,6 @@ class OasRedocController @Inject()(
             inline= false,
             fileName = Some(s"${apiDetail.id}.yaml")
           )
-//          Ok(apiDetail.openApiSpecification).as("application/yaml")
         case None => NotFound
       }
   }
