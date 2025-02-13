@@ -19,6 +19,8 @@ package controllers
 import com.google.inject.{Inject, Singleton}
 import controllers.actions.OptionalIdentifierAction
 import controllers.helpers.ErrorResultBuilder
+import org.apache.pekko.util.ByteString
+import play.api.http.HttpEntity
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
@@ -50,7 +52,16 @@ class OasRedocController @Inject()(
   def getOas(apiId: String): Action[AnyContent] = Action.async {
     implicit request =>
       apiHubService.getApiDetail(apiId).map {
-        case Some(apiDetail) => Ok(apiDetail.openApiSpecification)
+        case Some(apiDetail) =>
+          Ok.sendEntity(
+            entity = HttpEntity.Strict(
+              ByteString(apiDetail.openApiSpecification),
+              Some("application/yaml")
+            ),
+            inline= false,
+            fileName = Some(s"${apiDetail.id}.yaml")
+          )
+//          Ok(apiDetail.openApiSpecification).as("application/yaml")
         case None => NotFound
       }
   }
