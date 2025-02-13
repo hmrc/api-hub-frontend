@@ -52,6 +52,7 @@ site.publisherReference = Publisher reference
 site.createdDate = Created date
 site.version = Version
 site.apiName = API name
+site.apiNumber = API number
 
 date.day = Day
 date.month = Month
@@ -728,6 +729,7 @@ api.deployment.failure.contact.support = support
 myApis.details.title = API details
 myApis.details.name = Name
 myApis.details.team = Owning team
+myApis.details.noApiNumber = Not specified
 myApis.update.title = Update API
 myApis.promoteToProd.text = To deploy this API in production select the 'Promote to production' button
 myApis.promoteToProd.button = Promote to production
