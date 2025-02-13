@@ -56,10 +56,13 @@
 
         <div id="apiDetailPanels">
         @for(api <- apis){
-            <div class="hip-inner-card flex hip-api" data-apiname="@api.title" data-apiref="@api.publisherReference">
+            <div class="hip-inner-card hip-api" data-apiname="@api.title" data-apiref="@api.publisherReference">
                 <h5 class="govuk-heading-s hip-inner-card-title govuk-!-margin-bottom-2">
                     <a class="govuk-link govuk-link--no-visited-state" href=@controllers.myapis.routes.MyApiDetailsController.onPageLoad(api.id).url>@api.title</a>
                 </h5>
+                @for(apiNumber <- api.apiNumber){
+                    <p class="hip-api-number">@messages("site.apiNumber"): @apiNumber</p>
+                }
             </div>
         }
             <div id="noResultsPanel" class="call-out-panel call-out-panel__small govuk-!-display-none ">

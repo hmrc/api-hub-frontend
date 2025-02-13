@@ -137,6 +137,10 @@
                 @messages("apiDetails.apiName"): @apiDetail.title
             </h1>
 
+            @for(apiNumber <- apiDetail.apiNumber) {
+                <p class="hip-api-number__heading">@messages("site.apiNumber"): @apiNumber</p>
+            }
+
             <h2 class="govuk-heading-m">
                 @messages("apiDetails.details.overview")
             </h2>

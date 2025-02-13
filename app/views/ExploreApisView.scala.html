@@ -96,7 +96,12 @@
             }
         </div>
 
+        @for(apiNumber <- apiDetail.apiNumber) {
+            <p class="hip-api-number govuk-!-margin-bottom-3 govuk-!-margin-top-2">@messages("site.apiNumber"): @apiNumber</p>
+        }
+
         <p class="govuk-body additional-message">@apiDetail.shortDescription</p>
+
         <ul class="govuk-list hip-inline-list">
             @for(domain <- apiDetail.domain) {
                 <li>

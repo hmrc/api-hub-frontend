@@ -1006,3 +1006,18 @@ header {
     margin-top: 0;
     @include govuk-font-size($size: 19);
 }
+
+.hip-api-number {
+    @extend .govuk-body-s;
+    color: $govuk-secondary-text-colour;
+}
+.hip-api-number__heading {
+    @extend .hip-api-number;
+    margin-top: - govuk-spacing(6);
+}
+
+#apiDetailPanels {
+    .hip-inner-card {
+        display: block;
+    }
+}

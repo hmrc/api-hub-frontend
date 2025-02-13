@@ -51,37 +51,54 @@
     </div>
 }
 
+@summaryListRows = @{
+    val apiNameRow = SummaryListRow(
+        key = Key(
+            content = Text(messages("myApis.details.name"))
+        ),
+        value = Value(
+            content = apiDetail.title
+        ),
+    )
+
+    val owningTeamRow = SummaryListRow(
+        key = Key(
+            content = Text(messages("myApis.details.team"))
+        ),
+        value = Value(
+            content = HtmlContent(teamContent)
+        ),
+    )
+
+    val publisherReferenceRow = SummaryListRow(
+        key = Key(
+            content = Text(messages("site.publisherReference"))
+        ),
+        value = Value(
+            content = Text(apiDetail.publisherReference)
+        ),
+    )
+
+    val apiNumberRow = SummaryListRow(
+        key = Key(
+            content = Text(messages("site.apiNumber"))
+        ),
+        value = Value(
+            content = Text(apiDetail.apiNumber.getOrElse(messages("myApis.details.noApiNumber")))
+        ),
+    )
+
+    Seq(apiNameRow, apiNumberRow, owningTeamRow, publisherReferenceRow)
+}
+
 @layout(pageTitle = titleNoForm(messages("myApis.details.title")), user = Some(user), fullWidth = true, customScriptsBlock = Some(iconsLink())) {
     @sideNav(apiDetail.title, myApisNavItems(apiDetail, user, MyApisNavPages.ProducerApiDetailsPage, deploymentStatuses)) {
         <h1 id="details" class="govuk-heading-l govuk-!-margin-bottom-3">@messages("myApis.details.title")</h1>
 
-        @govukSummaryList(SummaryList(
-            rows = Seq(
-                SummaryListRow(
-                    key = Key(
-                        content = Text(messages("myApis.details.name"))
-                    ),
-                    value = Value(
-                        content = apiDetail.title
-                    ),
-                ),
-                SummaryListRow(
-                    key = Key(
-                        content = Text(messages("myApis.details.team"))
-                    ),
-                    value = Value(
-                        content = HtmlContent(teamContent)
-                    ),
-                ),
-                SummaryListRow(
-                    key = Key(
-                        content = Text(messages("site.publisherReference"))
-                    ),
-                    value = Value(
-                        content = Text(apiDetail.publisherReference)
-                    ),
-                )))
-            .withCssClass("govuk-summary-list--no-border hip-summary-list__compact govuk-!-margin-bottom-4")
+        @govukSummaryList(
+            SummaryList(
+                rows = summaryListRows
+            ).withCssClass("govuk-summary-list--no-border hip-summary-list__compact govuk-!-margin-bottom-4")
         )
 
         <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible govuk-!-margin-top-1 govuk-!-margin-bottom-7">
