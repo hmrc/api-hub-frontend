@@ -24,7 +24,7 @@ describe('adminManageApis', () => {
     function buildApiPanels(count) {
         document.getElementById('apiDetailPanels').innerHTML = Array.from(
             {length: count},
-            (_, i) => `<div class="hip-api" data-index="${i+1}" data-apiname="Api ${i+1}" data-apiref="Ref ${i+1}">Api ${i+1}</div>`
+            (_, i) => `<div class="hip-api" data-index="${i+1}" data-apiname="Api ${i+1}" data-apinumber="Num ${i+1}" data-apiref="Ref ${i+1}">Api ${i+1}</div>`
         ).join('');
     }
 
@@ -85,6 +85,22 @@ describe('adminManageApis', () => {
 
         paginationHelper.clickNext();
         expect(paginationHelper.getVisiblePanelData('.hip-api', 'apiref').map(o => o.apiref)).toEqual(['Ref 19', 'Ref 100']);
+        expect(noResultsPanelIsVisible()).toBeFalse();
+    });
+
+    it("when the user enters some filter text then APIs with api numbers that match the filter are shown",  () => {
+        buildApiPanels(100);
+
+        onPageShow();
+        enterFilterText('Num 1');
+
+        expect(paginationHelper.getVisiblePanelData('.hip-api', 'apinumber').map(o => o.apinumber)).toEqual([
+            'Num 1', 'Num 10', 'Num 11', 'Num 12', 'Num 13', 'Num 14', 'Num 15', 'Num 16', 'Num 17', 'Num 18'
+        ]);
+        expect(paginationHelper.paginationIsAvailable()).toBeTrue();
+
+        paginationHelper.clickNext();
+        expect(paginationHelper.getVisiblePanelData('.hip-api', 'apinumber').map(o => o.apinumber)).toEqual(['Num 19', 'Num 100']);
         expect(noResultsPanelIsVisible()).toBeFalse();
     });
 
