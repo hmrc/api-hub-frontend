@@ -87,7 +87,7 @@ class ProduceApiEgressSelectionController @Inject()(
       controllers.myapis.produce.routes.ProduceApiEgressAvailabilityController.onPageLoad(mode).url,
       true
     )
-    apiHubService.listEgressGateways(hipEnvironments.deploymentHipEnvironment).map(
+    apiHubService.listEgressGateways(hipEnvironments.deployTo).map(
       egressGateways =>
         status(view(form, request.user, config.helpDocsPath, egressGateways, viewModel))
     )

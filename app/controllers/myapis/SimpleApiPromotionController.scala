@@ -57,8 +57,8 @@ class SimpleApiPromotionController @Inject()(
         case Some(apiDetail) =>
           apiHubService.promoteAPI(
             apiDetail.publisherReference,
-            hipEnvironments.deploymentHipEnvironment,
-            hipEnvironments.productionHipEnvironment,
+            hipEnvironments.deployTo,
+            hipEnvironments.production,
             DeploymentDetails.egressFallback
           ).map {
             case Some(response: SuccessfulDeploymentsResponse) =>

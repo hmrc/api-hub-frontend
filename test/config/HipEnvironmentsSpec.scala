@@ -64,7 +64,7 @@ class HipEnvironmentsSpec extends AnyFreeSpec with Matchers with TableDrivenProp
     "must load the expected environments" in {
       val hipEnvironments = HipEnvironmentsImpl(hipEnvironmentsConfig)
 
-      hipEnvironments.environments mustBe expectedHipEnvironments
+      hipEnvironments.environmentsConfig mustBe expectedHipEnvironments
     }
     "must retrieve the expected environments by environment id" in {
       val hipEnvironments = HipEnvironmentsImpl(hipEnvironmentsConfig)
@@ -93,13 +93,13 @@ class HipEnvironmentsSpec extends AnyFreeSpec with Matchers with TableDrivenProp
     "must try and find the production environment" in {
       val hipEnvironments = HipEnvironmentsImpl(hipEnvironmentsConfig)
 
-      hipEnvironments.productionHipEnvironment.id mustBe "production"
+      hipEnvironments.production.id mustBe "production"
     }
 
     "must try and find the 'deployment' environment" in {
       val hipEnvironments = HipEnvironmentsImpl(hipEnvironmentsConfig)
 
-      hipEnvironments.deploymentHipEnvironment.id mustBe "test"
+      hipEnvironments.deployTo.id mustBe "test"
     }
 
     "promotionEnvironment" - {

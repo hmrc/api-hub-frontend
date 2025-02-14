@@ -169,7 +169,7 @@
     </a>
 }
 
-<h2 class="govuk-heading-m">@messages("environment.apis.heading", viewModel.hipEnvironment.name())</h2>
+<h2 class="govuk-heading-m">@messages("environment.apis.heading", viewModel.hipEnvironment.nameKey())</h2>
 
 @if(viewModel.noApis) {
     @noApisBanner(Html(messages("applicationApis.apis.noApis", exploreApisLink("applicationApis.apis.exploreApis"))))

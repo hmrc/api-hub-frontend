@@ -17,11 +17,11 @@
 package connectors
 
 import com.google.inject.{Inject, Singleton}
-import config.{FrontendAppConfig, HipEnvironment}
+import config.{FrontendAppConfig, HipEnvironment, HipEnvironments, ShareableHipConfig}
 import models.UserEmail
 import models.accessrequest.*
 import models.api.ApiDeploymentStatuses.readApiDeploymentStatuses
-import models.api.{ApiDeployment, ApiDeploymentStatus, ApiDeploymentStatuses, ApiDetailSummary, EgressGateway}
+import models.api.{ApiDeploymentStatus, ApiDeploymentStatuses, ApiDetailSummary, EgressGateway}
 import models.application.*
 import models.deployment.*
 import models.exception.{ApplicationCredentialLimitException, ApplicationsException, TeamNameNotUniqueException}
@@ -666,4 +666,13 @@ class ApplicationsConnector @Inject()(
       }
   }
 
+  def listEnvironments()(implicit hc: HeaderCarrier): Future[ShareableHipConfig] = {
+    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/config/environments")
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Either[UpstreamErrorResponse, ShareableHipConfig]]
+      .flatMap {
+        case Right(environments) => Future.successful(environments)
+        case Left(e) => Future.failed(e)
+      }
+  }
 }

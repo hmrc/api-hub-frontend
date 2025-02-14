@@ -56,7 +56,7 @@ class ProduceApiEgressSelectionControllerSpec extends SpecBase with MockitoSugar
 
       val egressGateways = sampleEgressGateways()
       val fixture = buildFixture(userAnswers = Some(emptyUserAnswers))
-      when(fixture.apiHubService.listEgressGateways(eqTo(FakeHipEnvironments.deploymentHipEnvironment))(any)).thenReturn(Future.successful(egressGateways))
+      when(fixture.apiHubService.listEgressGateways(eqTo(FakeHipEnvironments.deployTo))(any)).thenReturn(Future.successful(egressGateways))
 
       running(fixture.application) {
         val request = FakeRequest(GET, produceApiEgressSelectionRoute)
@@ -85,7 +85,7 @@ class ProduceApiEgressSelectionControllerSpec extends SpecBase with MockitoSugar
       val userAnswers = UserAnswers(userAnswersId).set(ProduceApiEgressSelectionPage, chooseEgress).success.value
 
       val fixture = buildFixture(userAnswers = Some(userAnswers))
-      when(fixture.apiHubService.listEgressGateways(eqTo(FakeHipEnvironments.deploymentHipEnvironment))(any)).thenReturn(Future.successful(egressGateways))
+      when(fixture.apiHubService.listEgressGateways(eqTo(FakeHipEnvironments.deployTo))(any)).thenReturn(Future.successful(egressGateways))
 
       running(fixture.application) {
         val request = FakeRequest(GET, produceApiEgressSelectionRoute)
@@ -112,7 +112,7 @@ class ProduceApiEgressSelectionControllerSpec extends SpecBase with MockitoSugar
       val fixture = buildFixture(userAnswers = Some(emptyUserAnswers))
       when(fixture.sessionRepository.set(any())).thenReturn(Future.successful(true))
 
-      when(fixture.apiHubService.listEgressGateways(eqTo(FakeHipEnvironments.deploymentHipEnvironment))(any)).thenReturn(Future.successful(egressGateways))
+      when(fixture.apiHubService.listEgressGateways(eqTo(FakeHipEnvironments.deployTo))(any)).thenReturn(Future.successful(egressGateways))
 
       running(fixture.application) {
         val request =

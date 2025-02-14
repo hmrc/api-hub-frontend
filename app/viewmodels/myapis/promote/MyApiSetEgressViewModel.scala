@@ -23,7 +23,7 @@ import models.user.UserModel
 import play.api.i18n.Messages
 
 case class MyApiSetEgressViewModel(apiDetail: ApiDetail, environment: HipEnvironment, promoteToEnvironment: HipEnvironment, userModel: Option[UserModel], egressGateways: Seq[EgressGateway], deploymentStatuses: ApiDeploymentStatuses)(implicit messages: Messages) {
-  val promotionEnvironmentName = messages(promoteToEnvironment.nameKey)
+  val promotionEnvironmentName = messages(promoteToEnvironment.nameKey())
   val apiVersion = deploymentStatuses.forEnvironment(environment.id) match {
     case Deployed(_, version) => version
     case _ => ""

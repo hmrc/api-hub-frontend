@@ -63,20 +63,20 @@ class MyApiSetEgressControllerSpec extends SpecBase with MockitoSugar with Egres
       val fixture = buildFixture()
       val apiDetail = FakeApiDetail.copy(teamId = Some(apiTeam.id))
       when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any)).thenReturn(Future.successful(Some(apiDetail)))
-      when(fixture.apiHubService.listEgressGateways(eqTo(FakeHipEnvironments.productionHipEnvironment))(any)).thenReturn(Future.successful(egressGateways))
+      when(fixture.apiHubService.listEgressGateways(eqTo(FakeHipEnvironments.production))(any)).thenReturn(Future.successful(egressGateways))
       when(fixture.apiHubService.findTeams(eqTo(Some(FakeUser.email)))(any)).thenReturn(Future.successful(List(apiTeam)))
       when(fixture.apiHubService.getApiDeploymentStatuses(eqTo(apiDetail.publisherReference))(any)).thenReturn(Future.successful(deploymentStatuses))
 
       running(fixture.application) {
-        val url = controllers.myapis.promote.routes.MyApiSetEgressController.onPageLoad(apiDetail.id, FakeHipEnvironments.deploymentHipEnvironment.id).url
+        val url = controllers.myapis.promote.routes.MyApiSetEgressController.onPageLoad(apiDetail.id, FakeHipEnvironments.deployTo.id).url
         val request = FakeRequest(GET, url)
 
         val result = route(fixture.application, request).value
 
         val viewModel = MyApiSetEgressViewModel(
           apiDetail,
-          FakeHipEnvironments.deploymentHipEnvironment,
-          FakeHipEnvironments.productionHipEnvironment,
+          FakeHipEnvironments.deployTo,
+          FakeHipEnvironments.production,
           Some(FakeUser),
           egressGateways,
           deploymentStatuses
@@ -96,7 +96,7 @@ class MyApiSetEgressControllerSpec extends SpecBase with MockitoSugar with Egres
       running(fixture.application) {
         when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any)).thenReturn(Future.successful(Some(apiDetail)))
         when(fixture.apiHubService.findTeams(eqTo(Some(FakeUser.email)))(any)).thenReturn(Future.successful(Seq.empty))
-        val url = controllers.myapis.promote.routes.MyApiSetEgressController.onPageLoad(apiDetail.id, FakeHipEnvironments.deploymentHipEnvironment.id).url
+        val url = controllers.myapis.promote.routes.MyApiSetEgressController.onPageLoad(apiDetail.id, FakeHipEnvironments.deployTo.id).url
         val request = FakeRequest(GET, url)
         val result = route(fixture.application, request).value
 
@@ -108,7 +108,7 @@ class MyApiSetEgressControllerSpec extends SpecBase with MockitoSugar with Egres
     "must return success view after form is submitted" in {
       val fixture = buildFixture()
       val apiDetail = FakeApiDetail
-      val fromEnvironment = FakeHipEnvironments.deploymentHipEnvironment
+      val fromEnvironment = FakeHipEnvironments.deployTo
       val toEnvironment = FakeHipEnvironments.promotionEnvironment(fromEnvironment).value
 
       running(fixture.application) {
@@ -140,7 +140,7 @@ class MyApiSetEgressControllerSpec extends SpecBase with MockitoSugar with Egres
         when(fixture.apiHubService.findTeams(eqTo(Some(FakeUser.email)))(any)).thenReturn(Future.successful(List(apiTeam)))
         when(fixture.apiHubService.promoteAPI(eqTo(apiDetail.publisherReference), any, any, any)(any)).thenReturn(
           Future.successful(Some(InvalidOasResponse(FailuresResponse("err", "err", None)))))
-        val url = controllers.myapis.promote.routes.MyApiSetEgressController.onSubmit(apiDetail.id, FakeHipEnvironments.deploymentHipEnvironment.id).url
+        val url = controllers.myapis.promote.routes.MyApiSetEgressController.onSubmit(apiDetail.id, FakeHipEnvironments.deployTo.id).url
         val request = FakeRequest(POST, url).withFormUrlEncodedBody("egress" -> "egressId")
         val result = route(fixture.application, request).value
         val view = fixture.application.injector.instanceOf[ErrorTemplate]

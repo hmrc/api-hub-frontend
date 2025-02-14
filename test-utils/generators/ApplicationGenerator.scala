@@ -62,7 +62,7 @@ trait ApplicationGenerator {
   }
 
   val hipEnvironmentGenerator: Gen[HipEnvironment] = {
-    Gen.oneOf(FakeHipEnvironments.environments)
+    Gen.oneOf(FakeHipEnvironments.environmentsConfig)
   }
 
   val credentialGenerator: Gen[Credential] = {

@@ -57,7 +57,7 @@ class CurlCommandService @Inject()(hipEnvironments: HipEnvironments) extends Log
 
   private def getCommonHeaders(application: Application): Map[String,String] = {
     val maybeAuthHeader = for {
-      credential <- application.getMasterCredential(hipEnvironments.deploymentHipEnvironment)
+      credential <- application.getMasterCredential(hipEnvironments.deployTo)
       secret <- credential.clientSecret
       credentials = s"${credential.clientId}:$secret"
       encodedCredentials = getEncoder.encodeToString(credentials.getBytes)
