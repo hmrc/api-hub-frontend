@@ -199,7 +199,7 @@ class CurlCommandServiceSpec extends SpecBase with MockitoSugar {
 
     "must return the correct curl commands if the oas file can be parsed" in {
       val service = new CurlCommandService(FakeHipEnvironments)
-      val credential = Credential("client-id", LocalDateTime.now, Some("client-secret"), None, FakeHipEnvironments.test.id)
+      val credential = Credential("client-id", LocalDateTime.now, Some("client-secret"), None, FakeHipEnvironments.dewey.id)
       val validOas =
         """
           |---

@@ -34,6 +34,27 @@ object FakeHipEnvironments extends HipEnvironments {
     isProductionLike = false
   )
 
-  override val environments: Seq[HipEnvironment] = Seq(production, test)
+  val huey: HipEnvironment = HipEnvironment(
+    id = "Huey",
+    rank = 3,
+    nameKey = "hipEnvironment.test.name",
+    isProductionLike = false
+  )
+
+  val louis: HipEnvironment = HipEnvironment(
+    id = "Louis",
+    rank = 4,
+    nameKey = "hipEnvironment.test.name",
+    isProductionLike = false
+  )
+
+  val dewey: HipEnvironment = HipEnvironment(
+    id = "Dewey",
+    rank = 5,
+    nameKey = "hipEnvironment.test.name",
+    isProductionLike = false
+  )
+
+  override val environments: Seq[HipEnvironment] = Seq(production, test, huey, louis, dewey)
 
 }
