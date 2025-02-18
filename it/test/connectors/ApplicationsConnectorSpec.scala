@@ -18,7 +18,7 @@ package connectors
 
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.typesafe.config.ConfigFactory
-import config.FrontendAppConfig
+import config.{BaseHipEnvironment, FrontendAppConfig, ShareableHipConfig}
 import connectors.ApplicationsConnectorSpec.ApplicationGetterBehaviours
 import fakes.FakeHipEnvironments
 import generators.EgressGenerator
@@ -460,7 +460,7 @@ class ApplicationsConnectorSpec
 
       buildConnector(this).createAccessRequest(request)(HeaderCarrier()).map {
         actual =>
-          actual mustBe ()
+          actual mustBe()
       }
     }
   }
@@ -486,7 +486,7 @@ class ApplicationsConnectorSpec
         (None, None, "")
       )
 
-      forAll(filters) {(applicationIdFilter: Option[String], statusFilter: Option[AccessRequestStatus], query: String) =>
+      forAll(filters) { (applicationIdFilter: Option[String], statusFilter: Option[AccessRequestStatus], query: String) =>
         stubFor(
           get(urlEqualTo(s"/api-hub-applications/access-requests$query"))
             .withHeader(ACCEPT, equalTo("application/json"))
@@ -1081,16 +1081,17 @@ class ApplicationsConnectorSpec
         Deployed(FakeHipEnvironments.production.id, "1.0"),
         Deployed(FakeHipEnvironments.test.id, "1.0"),
       ))
-      val response = s"""{
-        |"statuses": [{
-        | "_type": "Deployed",
-        | "environmentId": "production",
-        | "version": "1.0"
-        |},{
-        | "_type": "Deployed",
-        | "environmentId": "test",
-        | "version": "1.0"
-        |}]
+      val response =
+        s"""{
+           |"statuses": [{
+           | "_type": "Deployed",
+           | "environmentId": "production",
+           | "version": "1.0"
+           |},{
+           | "_type": "Deployed",
+           | "environmentId": "test",
+           | "version": "1.0"
+           |}]
       }""".stripMargin
 
       stubFor(
@@ -1139,7 +1140,7 @@ class ApplicationsConnectorSpec
         Unknown(hipEnvironment.id)
       )
 
-      forAll(responses) {(response: ApiDeploymentStatus) =>
+      forAll(responses) { (response: ApiDeploymentStatus) =>
         stubFor(
           get(urlEqualTo(s"/api-hub-applications/apis/$publisherReference/environment/${hipEnvironment.id}/deployment-status"))
             .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
@@ -1845,7 +1846,7 @@ class ApplicationsConnectorSpec
 
       buildConnector(this).fixScopes(applicationId)(HeaderCarrier()).map {
         result =>
-          result.value mustBe ()
+          result.value mustBe()
       }
     }
 
@@ -1904,7 +1905,7 @@ class ApplicationsConnectorSpec
 
       buildConnector(this).forcePublish(publisherReference)(HeaderCarrier()).map {
         result =>
-          result.value mustBe ()
+          result.value mustBe()
       }
     }
 
@@ -1927,6 +1928,42 @@ class ApplicationsConnectorSpec
     }
   }
 
+  "listEnvironments" - {
+    "must place the correct request and return the environments" in {
+
+      val applicationId = "test-application-id"
+      val productionBaseEnv = BaseHipEnvironment(
+        id = "production",
+        rank = 1,
+        isProductionLike = true,
+        promoteTo = None
+      )
+
+      val testBaseEnv = BaseHipEnvironment(
+        id = "test",
+        rank = 2,
+        isProductionLike = false,
+        promoteTo = Some("production")
+      )
+
+      val shareableConfig = ShareableHipConfig(Seq(productionBaseEnv, testBaseEnv), "production", "test")
+
+      stubFor(
+        get(urlEqualTo(s"/api-hub-applications/config/environments"))
+          .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withBody(Json.toJson(shareableConfig).toString)
+          )
+      )
+
+      buildConnector(this).listEnvironments()(HeaderCarrier()).map {
+        result =>
+          result mustBe shareableConfig
+      }
+    }
+  }
 }
 
 object ApplicationsConnectorSpec extends HttpClientV2Support {

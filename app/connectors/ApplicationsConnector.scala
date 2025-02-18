@@ -669,6 +669,7 @@ class ApplicationsConnector @Inject()(
   def listEnvironments()(implicit hc: HeaderCarrier): Future[ShareableHipConfig] = {
     httpClient.get(url"$applicationsBaseUrl/api-hub-applications/config/environments")
       .setHeader(AUTHORIZATION -> clientAuthToken)
+      .setHeader(ACCEPT -> JSON)
       .execute[Either[UpstreamErrorResponse, ShareableHipConfig]]
       .flatMap {
         case Right(environments) => Future.successful(environments)
