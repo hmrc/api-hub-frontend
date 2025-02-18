@@ -41,13 +41,10 @@ class IndexController @Inject()(
     val maxApplicationsToShow = 5
     val maxTeamsToShow = 5
 
-    apiHubService.listEnvironments().map(x => Console.println(s"OIYAF: hipEnviro0nments: $x"))
-
     for {
       userApps <- apiHubService.getApplications(Some(request.user.email), false)
       userTeams <- apiHubService.findTeams(Some(request.user.email))
       userApis <- apiHubService.getUserApis(request.user)
-      environments <- apiHubService.listEnvironments().map(x => Console.println(s"OIYAF: hipEnviro0nments: $x"))
     } yield Ok(view(
           DashboardViewModel(frontendAppConfig, userApps, userTeams, userApis, request.user)
     ))

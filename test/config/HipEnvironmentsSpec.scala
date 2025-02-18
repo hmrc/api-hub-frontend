@@ -18,137 +18,99 @@ package config
 
 import com.typesafe.config.ConfigFactory
 import fakes.FakeEmailDomains
+import org.mockito.ArgumentMatchers.{any, matches}
+import org.mockito.Mockito.{mock, when}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.Configuration
+import services.ApiHubService
+import matchers.CustomMatchers
 
-class HipEnvironmentsSpec extends AnyFreeSpec with Matchers with TableDrivenPropertyChecks {
+import scala.concurrent.Future
 
-  private val hoconConfig =
-    """
-      |hipEnvironments = {
-      |    production = {
-      |        id = "production",
-      |        rank = 1,
-      |        nameKey = "site.environment.production",
-      |        environmentName = "primary",
-      |        isProductionLike = true
-      |    },
-      |    test = {
-      |        id = "test",
-      |        rank = 2,
-      |        nameKey = "site.environment.test",
-      |        environmentName = "secondary",
-      |        isProductionLike = false
-      |    }
-      |}
-      |""".stripMargin
-  private val hipEnvironmentsConfig = Configuration.apply(ConfigFactory.parseString(hoconConfig))
-  private val expectedHipEnvironments = Seq(
-    HipEnvironment(
+class HipEnvironmentsSpec extends AnyFreeSpec with Matchers with TableDrivenPropertyChecks with MockitoSugar with CustomMatchers {
+
+  private val apiHubService = mock[ApiHubService]
+
+  private val production = DefaultHipEnvironment(
       id = "production",
       rank = 1,
-      nameKey = "site.environment.production",
-      isProductionLike = true
-    ),
-    HipEnvironment(
+      isProductionLike = true,
+      promoteTo = None
+  )
+  private val test = DefaultHipEnvironment(
       id = "test",
       rank = 2,
-      nameKey = "site.environment.test",
-      isProductionLike = false
-    ),
+      isProductionLike = false,
+      promoteTo = Some(production)
   )
+
+  private val expectedHipEnvironments = Seq(
+      production,
+      test,
+  )
+
+  private val productionBaseEnv = BaseHipEnvironment(
+    id = "production",
+    rank = 1,
+    isProductionLike = true,
+    promoteTo = None
+  )
+
+  private val testBaseEnv = BaseHipEnvironment(
+    id = "test",
+    rank = 2,
+    isProductionLike = false,
+    promoteTo = Some("production")
+  )
+
+  when(apiHubService.listEnvironments()(any()))
+    .thenReturn(Future.successful(ShareableHipConfig(Seq(productionBaseEnv, testBaseEnv), "production", "test")))
 
   "HipEnvironments" - {
     "must load the expected environments" in {
-      val hipEnvironments = HipEnvironmentsImpl(hipEnvironmentsConfig)
-
-      hipEnvironments.environmentsConfig mustBe expectedHipEnvironments
+      val hipEnvironments = HipEnvironmentsImpl(apiHubService)
+      hipEnvironments.environments.size mustBe 2
+      hipEnvironments.environments.head must matchHipEnvironment(production)
+      hipEnvironments.environments.last must matchHipEnvironment(test)
     }
     "must retrieve the expected environments by environment id" in {
-      val hipEnvironments = HipEnvironmentsImpl(hipEnvironmentsConfig)
+      val hipEnvironments = HipEnvironmentsImpl(apiHubService)
 
       forAll(Table(
         ("environmentName", "expectedEnvironment"),
-        ("production", expectedHipEnvironments.head),
-        ("test", expectedHipEnvironments.last),
-      )) { (environmentId: String, expectedEnvironment: HipEnvironment) =>
-        hipEnvironments.forEnvironmentIdOptional(environmentId) mustBe Some(expectedEnvironment)
+        ("production", production),
+        ("test", test),
+      )) { (environmentId: String, expectedEnvironment: DefaultHipEnvironment) =>
+        hipEnvironments.forEnvironmentIdOptional(environmentId).get must matchHipEnvironment(expectedEnvironment)
       }
     }
 
     "must retrieve the expected environments from url path parameter" in {
-      val hipEnvironments = HipEnvironmentsImpl(hipEnvironmentsConfig)
+      val hipEnvironments = HipEnvironmentsImpl(apiHubService)
 
       forAll(Table(
         ("parameter", "expectedEnvironment"),
-        ("production", expectedHipEnvironments.head),
-        ("test", expectedHipEnvironments.last),
-      )) { (parameterValue: String, expectedEnvironment: HipEnvironment) =>
-        hipEnvironments.forUrlPathParameter(parameterValue) mustBe expectedEnvironment
+        ("production", production),
+        ("test", test),
+      )) { (parameterValue: String, expectedEnvironment: DefaultHipEnvironment) =>
+        hipEnvironments.forUrlPathParameter(parameterValue) must matchHipEnvironment(expectedEnvironment)
       }
     }
 
     "must try and find the production environment" in {
-      val hipEnvironments = HipEnvironmentsImpl(hipEnvironmentsConfig)
+      val hipEnvironments = HipEnvironmentsImpl(apiHubService)
 
       hipEnvironments.production.id mustBe "production"
     }
 
     "must try and find the 'deployment' environment" in {
-      val hipEnvironments = HipEnvironmentsImpl(hipEnvironmentsConfig)
+      val hipEnvironments = HipEnvironmentsImpl(apiHubService)
 
-      hipEnvironments.deployTo.id mustBe "test"
-    }
-
-    "promotionEnvironment" - {
-      val hipMultiEnvironmentsConfig = Configuration.apply(ConfigFactory.parseString("""
-         |hipEnvironments = {
-         |    test = {
-         |        id = "test",
-         |        rank = 3,
-         |        nameKey = "site.environment.test",
-         |        isProductionLike = false
-         |    },
-         |    production = {
-         |        id = "production",
-         |        rank = 1,
-         |        nameKey = "site.environment.production",
-         |        isProductionLike = true
-         |    },
-         |    dev = {
-         |        id = "dev",
-         |        rank = 4,
-         |        nameKey = "site.environment.dev",
-         |        isProductionLike = false
-         |    },
-         |    preprod = {
-         |        id = "preprod",
-         |        rank = 2,
-         |        nameKey = "site.environment.preprod",
-         |        isProductionLike = false
-         |    }
-         |}
-         |""".stripMargin))
-        val hipMultiEnvironments = HipEnvironmentsImpl(hipMultiEnvironmentsConfig)
-        val prodEnvironment = hipMultiEnvironments.forEnvironmentId("production")
-        val preprodEnvironment = hipMultiEnvironments.forEnvironmentId("preprod")
-        val testEnvironment = hipMultiEnvironments.forEnvironmentId("test")
-        val devEnvironment = hipMultiEnvironments.forEnvironmentId("dev")
-
-      "production has no promotion environment" in {
-        hipMultiEnvironments.promotionEnvironment(prodEnvironment) mustBe None
-      }
-      "pre-production promotes to production" in {
-        hipMultiEnvironments.promotionEnvironment(preprodEnvironment) mustBe Some(prodEnvironment)
-      }
-      "test promotes to pre-production" in {
-        hipMultiEnvironments.promotionEnvironment(testEnvironment) mustBe Some(preprodEnvironment)
-      }
-      "dev promotes to test" in {
-        hipMultiEnvironments.promotionEnvironment(devEnvironment) mustBe Some(testEnvironment)
-      }
+      hipEnvironments.
+        deployTo.id mustBe "test"
     }
 
   }

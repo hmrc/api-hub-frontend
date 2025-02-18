@@ -17,15 +17,13 @@
 package config
 
 import com.google.inject.{Inject, Singleton}
-import com.typesafe.config.Config
 import play.api.libs.json.{Format, Json, Reads}
-import play.api.{ConfigLoader, Configuration}
 import services.ApiHubService
 import uk.gov.hmrc.http.HeaderCarrier
 
 import java.util.concurrent.TimeUnit
-import scala.concurrent.duration.{Duration, SECONDS}
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
 
 trait AbstractHipEnvironment[T] {
   def id: String
@@ -69,18 +67,30 @@ trait HipEnvironments {
 
   protected def baseEnvironments: Seq[BaseHipEnvironment]
 
-  def environments: Seq[HipEnvironment] = {
-    baseEnvironments
-      .map(
-        base =>
-          new Object with HipEnvironment:
-            override val id: String = base.id
-            override val rank: Int = base.rank
-            override val isProductionLike: Boolean = base.isProductionLike
-            override lazy val promoteTo: Option[HipEnvironment] = base.promoteTo.map(forId)
-      )
-      .sortBy(_.rank)
-  }
+  def environments: Seq[HipEnvironment] = baseEnvironments
+    .map(
+      base =>
+        new Object with HipEnvironment:
+          override val id: String = base.id
+          override val rank: Int = base.rank
+          override val isProductionLike: Boolean = base.isProductionLike
+          override lazy val promoteTo: Option[HipEnvironment] = base.promoteTo.map(forId)
+//          override def equals(other: Any) = {
+//            other match
+//              case hipEnvironment: HipEnvironment =>
+//                hipEnvironment.id == id
+//                  && hipEnvironment.rank == rank
+//                  && hipEnvironment.isProductionLike == isProductionLike
+//                  && hipEnvironment.promoteTo == promoteTo
+//              case _ => false
+//          }
+//
+//          override def toString: String = {
+//            DefaultHipEnvironment(id,rank,isProductionLike,promoteTo).toString
+//          }
+
+    )
+    .sortBy(_.rank)
 
   def forId(environmentId: String): HipEnvironment = {
     environments
@@ -92,11 +102,6 @@ trait HipEnvironments {
     environments.find(_.id == environmentId)
   }
 
-  //TODO: Get rid
-  def forEnvironmentId(environmentId: String): HipEnvironment = {
-    forId(environmentId)
-  }
-
   def forUrlPathParameter(pathParameter: String): HipEnvironment =
     environments.find(hipEnvironment => hipEnvironment.id == pathParameter)
       .getOrElse(throw new IllegalArgumentException(s"No configuration for environment $pathParameter"))
@@ -105,7 +110,6 @@ trait HipEnvironments {
 
   def deployTo: HipEnvironment
 
-  def promotionEnvironment(environment: HipEnvironment): Option[HipEnvironment] = environment.promoteTo //TODO: Get rid
 }
 
 @Singleton

@@ -17,7 +17,7 @@
 package controllers
 
 import base.SpecBase
-import config.FrontendAppConfig
+import config.{BaseHipEnvironment, FrontendAppConfig, ShareableHipConfig}
 import controllers.IndexControllerSpec.{buildFixture, buildViewModel}
 import controllers.actions.FakeUser
 import generators.{ApiDetailGenerators, TeamGenerator}
@@ -121,6 +121,8 @@ object IndexControllerSpec extends SpecBase with MockitoSugar {
 
   def buildFixture(): Fixture = {
     val mockApiHubService = mock[ApiHubService]
+    when(mockApiHubService.listEnvironments()(any()))
+      .thenReturn(Future.successful(ShareableHipConfig(Seq.empty, "", "")))
     val application =
       applicationBuilder(userAnswers = None)
         .overrides(

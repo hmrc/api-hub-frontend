@@ -56,7 +56,7 @@ case class ApiDeploymentStatuses(statuses: Seq[ApiDeploymentStatus]) {
 
   def sortStatusesWithHipEnvironments(hipEnvironments: HipEnvironments): ApiDeploymentStatuses = {
     val sortedStatuses = statuses.map(status =>
-      (hipEnvironments.forEnvironmentId(status.environmentId), status)
+      (hipEnvironments.forId(status.environmentId), status)
     ).sortBy { case (hipEnvironment, _) => hipEnvironment.rank }(Ordering[Int].reverse)
       .map { case (_, status) => status }
     copy(statuses = sortedStatuses)

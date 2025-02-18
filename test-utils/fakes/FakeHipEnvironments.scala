@@ -16,6 +16,8 @@
 
 package fakes
 
+import config.{BaseHipEnvironment, DefaultHipEnvironment, HipEnvironment, HipEnvironments}
+
 object FakeHipEnvironments extends HipEnvironments {
 
   val production: HipEnvironment = DefaultHipEnvironment(
@@ -29,9 +31,12 @@ object FakeHipEnvironments extends HipEnvironments {
     id = "test",
     rank = 2,
     isProductionLike = false,
-    promoteTo = "production"
+    promoteTo = Some(production)
   )
 
-  override val environmentsConfig: Seq[HipEnvironment] = Seq(production, test)
+  override def environments: Seq[HipEnvironment] = Seq(production, test)
 
+  override protected def baseEnvironments: Seq[BaseHipEnvironment] = Seq.empty
+
+  override def deployTo = test
 }

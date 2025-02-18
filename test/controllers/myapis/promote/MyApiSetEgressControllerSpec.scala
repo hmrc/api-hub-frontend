@@ -109,7 +109,7 @@ class MyApiSetEgressControllerSpec extends SpecBase with MockitoSugar with Egres
       val fixture = buildFixture()
       val apiDetail = FakeApiDetail
       val fromEnvironment = FakeHipEnvironments.deployTo
-      val toEnvironment = FakeHipEnvironments.promotionEnvironment(fromEnvironment).value
+      val toEnvironment = fromEnvironment.promoteTo.get
 
       running(fixture.application) {
         when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any)).thenReturn(Future.successful(Some(apiDetail)))
