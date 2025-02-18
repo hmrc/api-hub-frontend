@@ -75,20 +75,6 @@ trait HipEnvironments {
           override val rank: Int = base.rank
           override val isProductionLike: Boolean = base.isProductionLike
           override lazy val promoteTo: Option[HipEnvironment] = base.promoteTo.map(forId)
-//          override def equals(other: Any) = {
-//            other match
-//              case hipEnvironment: HipEnvironment =>
-//                hipEnvironment.id == id
-//                  && hipEnvironment.rank == rank
-//                  && hipEnvironment.isProductionLike == isProductionLike
-//                  && hipEnvironment.promoteTo == promoteTo
-//              case _ => false
-//          }
-//
-//          override def toString: String = {
-//            DefaultHipEnvironment(id,rank,isProductionLike,promoteTo).toString
-//          }
-
     )
     .sortBy(_.rank)
 
