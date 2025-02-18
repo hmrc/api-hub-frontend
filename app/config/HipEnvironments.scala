@@ -99,9 +99,9 @@ trait HipEnvironments {
 }
 
 @Singleton
-class HipEnvironmentsImpl @Inject(apiHubService: ApiHubService) extends HipEnvironments {
+class HipEnvironmentsImpl @Inject(apiHubService: ApiHubService, appConfig: FrontendAppConfig) extends HipEnvironments {
 
-  private lazy val config = Await.result(apiHubService.listEnvironments()(HeaderCarrier()), Duration(10, TimeUnit.SECONDS))
+  private lazy val config = Await.result(apiHubService.listEnvironments()(HeaderCarrier()), Duration(appConfig.hipEnvironmentsLookupTimeoutSeconds, TimeUnit.SECONDS))
   
   override protected def baseEnvironments: Seq[BaseHipEnvironment] = config.environments
 

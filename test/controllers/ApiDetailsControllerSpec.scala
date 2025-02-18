@@ -369,8 +369,12 @@ class ApiDetailsControllerSpec
       promoteTo = Some("production")
     )
 
+//    when(apiHubService.listEnvironments()(any()))
+//      .thenReturn(Future.successful(ShareableHipConfig(Seq(productionBaseEnv, testBaseEnv), "production", "test")))
+
+
     when(apiHubService.listEnvironments()(any()))
-      .thenReturn(Future.successful(ShareableHipConfig(Seq(productionBaseEnv, testBaseEnv), "production", "test")))
+      .thenReturn(Future.successful(FakeHipEnvironments))
 
     val application = applicationBuilder(userModel)
       .overrides(

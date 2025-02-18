@@ -20,6 +20,7 @@ import base.SpecBase
 import config.{BaseHipEnvironment, FrontendAppConfig, ShareableHipConfig}
 import controllers.IndexControllerSpec.{buildFixture, buildViewModel}
 import controllers.actions.FakeUser
+import fakes.FakeHipEnvironments
 import generators.{ApiDetailGenerators, TeamGenerator}
 import models.api.ApiDetail
 import models.application.{Application, Creator, TeamMember}

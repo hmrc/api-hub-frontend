@@ -33,7 +33,9 @@ import scala.concurrent.Future
 class HipEnvironmentsSpec extends AnyFreeSpec with Matchers with TableDrivenPropertyChecks with MockitoSugar with CustomMatchers {
 
   private val apiHubService = mock[ApiHubService]
-
+  private val frontendAppConfig = mock[FrontendAppConfig]
+  when(frontendAppConfig.hipEnvironmentsLookupTimeoutSeconds).thenReturn(1)
+  
   private val production = DefaultHipEnvironment(
       id = "production",
       rank = 1,
@@ -71,13 +73,13 @@ class HipEnvironmentsSpec extends AnyFreeSpec with Matchers with TableDrivenProp
 
   "HipEnvironments" - {
     "must load the expected environments" in {
-      val hipEnvironments = HipEnvironmentsImpl(apiHubService)
+      val hipEnvironments = HipEnvironmentsImpl(apiHubService, frontendAppConfig)
       hipEnvironments.environments.size mustBe 2
       hipEnvironments.environments.head must matchHipEnvironment(production)
       hipEnvironments.environments.last must matchHipEnvironment(test)
     }
     "must retrieve the expected environments by environment id" in {
-      val hipEnvironments = HipEnvironmentsImpl(apiHubService)
+      val hipEnvironments = HipEnvironmentsImpl(apiHubService, frontendAppConfig)
 
       forAll(Table(
         ("environmentName", "expectedEnvironment"),
@@ -89,7 +91,7 @@ class HipEnvironmentsSpec extends AnyFreeSpec with Matchers with TableDrivenProp
     }
 
     "must retrieve the expected environments from url path parameter" in {
-      val hipEnvironments = HipEnvironmentsImpl(apiHubService)
+      val hipEnvironments = HipEnvironmentsImpl(apiHubService, frontendAppConfig)
 
       forAll(Table(
         ("parameter", "expectedEnvironment"),
@@ -101,13 +103,13 @@ class HipEnvironmentsSpec extends AnyFreeSpec with Matchers with TableDrivenProp
     }
 
     "must try and find the production environment" in {
-      val hipEnvironments = HipEnvironmentsImpl(apiHubService)
+      val hipEnvironments = HipEnvironmentsImpl(apiHubService, frontendAppConfig)
 
       hipEnvironments.production.id mustBe "production"
     }
 
     "must try and find the 'deployment' environment" in {
-      val hipEnvironments = HipEnvironmentsImpl(apiHubService)
+      val hipEnvironments = HipEnvironmentsImpl(apiHubService, frontendAppConfig)
 
       hipEnvironments.
         deployTo.id mustBe "test"
