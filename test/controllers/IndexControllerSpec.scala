@@ -122,8 +122,7 @@ object IndexControllerSpec extends SpecBase with MockitoSugar {
 
   def buildFixture(): Fixture = {
     val mockApiHubService = mock[ApiHubService]
-    when(mockApiHubService.listEnvironments()(any()))
-      .thenReturn(Future.successful(ShareableHipConfig(Seq.empty, "", "")))
+    
     val application =
       applicationBuilder(userAnswers = None)
         .overrides(

@@ -355,23 +355,6 @@ class ApiDetailsControllerSpec
   private def buildFixture(userModel: Option[UserModel] = None): Fixture = {
     val apiHubService = mock[ApiHubService]
 
-    val productionBaseEnv = BaseHipEnvironment(
-      id = "production",
-      rank = 1,
-      isProductionLike = true,
-      promoteTo = None
-    )
-
-    val testBaseEnv = BaseHipEnvironment(
-      id = "test",
-      rank = 2,
-      isProductionLike = false,
-      promoteTo = Some("production")
-    )
-
-    when(apiHubService.listEnvironments()(any()))
-      .thenReturn(Future.successful(ShareableHipConfig(Seq(productionBaseEnv, testBaseEnv), "production", "test")))
-
     val application = applicationBuilder(userModel)
       .overrides(
         bind[ApiHubService].toInstance(apiHubService)
