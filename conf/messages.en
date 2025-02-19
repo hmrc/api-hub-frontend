@@ -693,7 +693,7 @@ manageApis.title = Manage APIs
 manageApis.heading = Manage APIs ({0})
 manageApis.admin = Integration Hub admin
 manageApis.search.label = Search APIs
-manageApis.search.hint = You can search by API name or publisher reference
+manageApis.search.hint = You can search by API name, API number or publisher reference
 manageApis.noResults.title = No APIs found
 manageApis.noResults.message = No APIs have been found that match your search criteria. Try adjusting your search.
 

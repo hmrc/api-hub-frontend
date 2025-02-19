@@ -11,6 +11,7 @@ export function onPageShow() {
             document.getElementById('apiFilter'),
             [
                 dataAttribute('apiname').whenNormalised().includesTheFilterText(),
+                dataAttribute('apinumber').whenNormalised().includesTheFilterText(),
                 dataAttribute('apiref').whenNormalised().includesTheFilterText(),
             ]
         );
