@@ -45,7 +45,7 @@ class CurlCommandController @Inject()(
 
       val application = request.application
 
-      val testEnvironment = hipEnvironments.deploymentHipEnvironment
+      val testEnvironment = hipEnvironments.deployTo
 
       for {
         maybeCredentials <- apiHubService.fetchCredentials(application.id, testEnvironment)

@@ -66,7 +66,7 @@ class ForcePublishController @Inject()(
   def showVersionComparison(publisherReference: String): Action[AnyContent] = (identify andThen isSupport).async {
     implicit request =>
       for {
-        deploymentStatus <- apiHubService.getApiDeploymentStatus(hipEnvironments.deploymentHipEnvironment, publisherReference)
+        deploymentStatus <- apiHubService.getApiDeploymentStatus(hipEnvironments.deployTo, publisherReference)
         apiDetail <- apiHubService.getApiDetailForPublishReference(publisherReference)
         viewModel = ForcePublishViewModel(
           form = form.fill(publisherReference),

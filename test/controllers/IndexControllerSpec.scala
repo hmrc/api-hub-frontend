@@ -17,9 +17,10 @@
 package controllers
 
 import base.SpecBase
-import config.FrontendAppConfig
+import config.{BaseHipEnvironment, FrontendAppConfig, ShareableHipConfig}
 import controllers.IndexControllerSpec.{buildFixture, buildViewModel}
 import controllers.actions.FakeUser
+import fakes.FakeHipEnvironments
 import generators.{ApiDetailGenerators, TeamGenerator}
 import models.api.ApiDetail
 import models.application.{Application, Creator, TeamMember}
@@ -121,6 +122,7 @@ object IndexControllerSpec extends SpecBase with MockitoSugar {
 
   def buildFixture(): Fixture = {
     val mockApiHubService = mock[ApiHubService]
+    
     val application =
       applicationBuilder(userAnswers = None)
         .overrides(

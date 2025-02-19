@@ -45,7 +45,7 @@ class MyApisNavItems @Inject()(hipEnvironments: HipEnvironments) {
   
   private def canUpdateApi(apiDetail: ApiDetail, deploymentStatuses: ApiDeploymentStatuses, hipEnvironments: HipEnvironments): Boolean = {
     val isDeployedToTest = deploymentStatuses.statuses.collectFirst {
-      case ApiDeploymentStatus.Deployed(environmentId, _) if environmentId == hipEnvironments.deploymentHipEnvironment.id => true
+      case ApiDeploymentStatus.Deployed(environmentId, _) if environmentId == hipEnvironments.deployTo.id => true
     }.getOrElse(false)
 
     val isHipApi = apiDetail.isSelfServe

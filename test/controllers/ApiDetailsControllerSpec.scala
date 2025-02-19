@@ -17,7 +17,7 @@
 package controllers
 
 import base.OptionallyAuthenticatedSpecBase
-import config.FrontendAppConfig
+import config.{BaseHipEnvironment, FrontendAppConfig, ShareableHipConfig}
 import controllers.actions.FakeUser
 import fakes.{FakeDomains, FakeHipEnvironments, FakeHods, FakePlatforms}
 import generators.ApiDetailGenerators

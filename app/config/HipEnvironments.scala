@@ -17,70 +17,95 @@
 package config
 
 import com.google.inject.{Inject, Singleton}
-import com.typesafe.config.Config
-import play.api.{ConfigLoader, Configuration}
+import play.api.libs.json.{Format, Json, Reads}
+import services.ApiHubService
+import uk.gov.hmrc.http.HeaderCarrier
 
-case class HipEnvironment(
-                           id: String,
-                           rank: Int,                          // 1 is production
-                           nameKey: String,                    // Key for the environment's name in messages file
-                           isProductionLike: Boolean
-                         ) {
-  def name()(implicit messages: play.api.i18n.Messages): String = messages(nameKey)
+import java.util.concurrent.TimeUnit
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
+
+trait AbstractHipEnvironment[T] {
+  def id: String
+  def rank: Int
+  def isProductionLike: Boolean
+  def promoteTo: Option[T]
 }
 
-object HipEnvironment {
+case class BaseHipEnvironment(
+                               id: String,
+                               rank: Int,
+                               isProductionLike: Boolean,
+                               promoteTo: Option[String]
+                             ) extends AbstractHipEnvironment[String]
 
-  implicit val hipEnvironmentConfigLoader: ConfigLoader[HipEnvironment] =
-    (rootConfig: Config, path: String) => {
-      val config = rootConfig.getConfig(path)
+object BaseHipEnvironment {
+  implicit val formatBaseHipEnvironment: Format[BaseHipEnvironment] = Json.format[BaseHipEnvironment]
+}
 
-      HipEnvironment(
-        id = config.getString("id"),
-        rank = config.getInt("rank"),
-        nameKey = config.getString("nameKey"),
-        isProductionLike = config.getBoolean("isProductionLike")
-      )
-    }
+trait HipEnvironment extends AbstractHipEnvironment[HipEnvironment] {
+  def nameKey(implicit messages: play.api.i18n.Messages): String = messages(s"site.environment.$id")
+}
 
+case class DefaultHipEnvironment(
+                                  id: String,
+                                  rank: Int,
+                                  isProductionLike: Boolean,
+                                  promoteTo: Option[HipEnvironment]) extends HipEnvironment
+
+case class ShareableHipConfig(
+                               environments: Seq[BaseHipEnvironment],
+                               production: String,
+                               deployTo: String
+                             )
+
+object ShareableHipConfig {
+  implicit val formatShareableHipConfig: Format[ShareableHipConfig] = Json.format[ShareableHipConfig]
 }
 
 trait HipEnvironments {
 
-  def environments: Seq[HipEnvironment]
+  protected def baseEnvironments: Seq[BaseHipEnvironment]
+
+  def environments: Seq[HipEnvironment] = baseEnvironments
+    .map(
+      base =>
+        new Object with HipEnvironment:
+          override val id: String = base.id
+          override val rank: Int = base.rank
+          override val isProductionLike: Boolean = base.isProductionLike
+          override lazy val promoteTo: Option[HipEnvironment] = base.promoteTo.map(forId)
+    )
+    .sortBy(_.rank)
+
+  def forId(environmentId: String): HipEnvironment = {
+    environments
+      .find(_.id == environmentId)
+      .getOrElse(throw new IllegalArgumentException(s"No configuration for environment $environmentId"))
+  }
 
   def forEnvironmentIdOptional(environmentId: String): Option[HipEnvironment] = {
     environments.find(_.id == environmentId)
-  }
-
-  def forEnvironmentId(environmentId: String): HipEnvironment = {
-    forEnvironmentIdOptional(environmentId)
-      .getOrElse(throw new IllegalArgumentException(s"No configuration for environment id $environmentId"))
   }
 
   def forUrlPathParameter(pathParameter: String): HipEnvironment =
     environments.find(hipEnvironment => hipEnvironment.id == pathParameter)
       .getOrElse(throw new IllegalArgumentException(s"No configuration for environment $pathParameter"))
 
-  def productionHipEnvironment: HipEnvironment = environments.find(_.isProductionLike)
-    .getOrElse(throw new IllegalArgumentException("No production environment configured"))
+  def production: HipEnvironment
 
-  def deploymentHipEnvironment: HipEnvironment = environments.maxBy(_.rank)
+  def deployTo: HipEnvironment
 
-  def promotionEnvironment(environment: HipEnvironment): Option[HipEnvironment] = {
-    environments.filter(_.rank < environment.rank).maxByOption(_.rank)
-  }
 }
 
 @Singleton
-class HipEnvironmentsImpl @Inject(configuration: Configuration) extends HipEnvironments {
+class HipEnvironmentsImpl @Inject(apiHubService: ApiHubService, appConfig: FrontendAppConfig) extends HipEnvironments {
 
-  override val environments: Seq[HipEnvironment] = {
-    configuration
-      .get[Map[String, HipEnvironment]]("hipEnvironments")
-      .values
-      .toSeq
-      .sortBy(_.rank)
-  }
+  private lazy val config = Await.result(apiHubService.listEnvironments()(HeaderCarrier()), Duration(appConfig.hipEnvironmentsLookupTimeoutSeconds, TimeUnit.SECONDS))
+  
+  override protected def baseEnvironments: Seq[BaseHipEnvironment] = config.environments
 
+  override def production: HipEnvironment = forId(config.production)
+
+  override def deployTo: HipEnvironment = forId(config.deployTo)
 }

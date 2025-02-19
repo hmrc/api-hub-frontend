@@ -16,7 +16,7 @@
 
 package viewmodels.application
 
-import config.HipEnvironment
+import config.{BaseHipEnvironment, DefaultHipEnvironment, HipEnvironment}
 import controllers.actions.FakeApiDetail
 import models.api.*
 import models.application.{Api, SelectedEndpoint}
@@ -229,7 +229,7 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
           ),
         ), 0)
 
-        applicationApi.isAccessibleInEnvironment(HipEnvironment("test", 2, "nameKey", isProductionLike = false)) mustBe true
+        applicationApi.isAccessibleInEnvironment(DefaultHipEnvironment("test", 2, isProductionLike = false, None)) mustBe true
       }
 
       "must return true for prod environments with available endpoints" in {
@@ -254,7 +254,7 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
           ),
         ), 0)
 
-        applicationApi.isAccessibleInEnvironment(HipEnvironment("prod", 1, "nameKey", isProductionLike = true)) mustBe true
+        applicationApi.isAccessibleInEnvironment(DefaultHipEnvironment("prod", 1, isProductionLike = true, promoteTo = None)) mustBe true
       }
 
       "must return false for prod environments without available endpoints" in {
@@ -270,7 +270,7 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
           ),
         ), 0)
 
-        applicationApi.isAccessibleInEnvironment(HipEnvironment("prod", 1, "nameKey", isProductionLike = true)) mustBe false
+        applicationApi.isAccessibleInEnvironment(DefaultHipEnvironment("prod", 1, isProductionLike = true, None)) mustBe false
       }
     }
 }

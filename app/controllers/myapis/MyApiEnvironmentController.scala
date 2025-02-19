@@ -47,7 +47,7 @@ class MyApiEnvironmentController @Inject()(
           .map(hipEnvironment =>
             for {
               deploymentStatuses <- apiHubService.getApiDeploymentStatuses(request.apiDetails.publisherReference)
-            } yield Ok(view(request.apiDetails, hipEnvironment, hipEnvironments.promotionEnvironment(hipEnvironment), request.identifierRequest.user, deploymentStatuses))
+            } yield Ok(view(request.apiDetails, hipEnvironment, hipEnvironment.promoteTo, request.identifierRequest.user, deploymentStatuses))
           ).getOrElse(
             Future.successful(errorResultBuilder.environmentNotFound(environment))
           )

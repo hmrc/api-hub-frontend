@@ -16,6 +16,7 @@
 
 package services
 
+import config.{BaseHipEnvironment, ShareableHipConfig}
 import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
 import controllers.actions.FakeApplication
 import fakes.FakeHipEnvironments
@@ -992,6 +993,35 @@ class ApiHubServiceSpec
         result =>
           verify(fixture.applicationsConnector).forcePublish(eqTo(publisherReference))(any)
           result.value mustBe ()
+      }
+    }
+  }
+
+  "listEnvironments" - {
+    "must make the correct request to the applications connector and return the environments" in {
+      val fixture = buildFixture()
+
+      val productionBaseEnv = BaseHipEnvironment(
+        id = "production",
+        rank = 1,
+        isProductionLike = true,
+        promoteTo = None
+      )
+
+      val testBaseEnv = BaseHipEnvironment(
+        id = "test",
+        rank = 2,
+        isProductionLike = false,
+        promoteTo = Some("production")
+      )
+
+      val shareableConfig = ShareableHipConfig(Seq(productionBaseEnv, testBaseEnv), "production", "test")
+
+      when(fixture.applicationsConnector.listEnvironments()(any)).thenReturn(Future.successful(shareableConfig))
+
+      fixture.service.listEnvironments()(HeaderCarrier()).map {
+        result =>
+          result mustBe shareableConfig
       }
     }
   }

@@ -144,12 +144,12 @@ class ForcePublishControllerSpec
     "must return Ok and the correct view for a support user" in {
       forAll(usersWhoCanSupport) { (user: UserModel) =>
         val fixture = buildFixture(user)
-        val environment = FakeHipEnvironments.deploymentHipEnvironment
+        val environment = FakeHipEnvironments.deployTo
         val deploymentStatus = Deployed(environment.id, "test-deployed-version")
         val apiDetail = sampleApiDetail()
 
         when(fixture.apiHubService.getApiDeploymentStatus(
-          eqTo(FakeHipEnvironments.deploymentHipEnvironment),
+          eqTo(FakeHipEnvironments.deployTo),
           eqTo(publisherReference)
         )(any)).thenReturn(Future.successful(deploymentStatus))
 

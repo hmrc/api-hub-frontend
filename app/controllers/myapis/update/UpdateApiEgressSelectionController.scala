@@ -85,7 +85,7 @@ class UpdateApiEgressSelectionController @Inject()(
       controllers.myapis.update.routes.UpdateApiEgressAvailabilityController.onPageLoad(mode).url,
       false
     )
-    apiHubService.listEgressGateways(hipEnvironments.deploymentHipEnvironment).map(
+    apiHubService.listEgressGateways(hipEnvironments.deployTo).map(
       egressGateways =>
         status(view(form, request.user, config.helpDocsPath, egressGateways, viewModel))
     )

@@ -61,7 +61,7 @@ class MyApiSetEgressController @Inject()(
         egress =>
           (for {
             fromEnvironment <- hipEnvironments.forEnvironmentIdOptional(environment)
-            toEnvironment <- hipEnvironments.promotionEnvironment(fromEnvironment)
+            toEnvironment <- fromEnvironment.promoteTo
           } yield apiHubService.promoteAPI(request.apiDetails.publisherReference, fromEnvironment, toEnvironment, egress)
             .map {
               case Some(SuccessfulDeploymentsResponse(_,_,_,_)) => Ok(successView(request.apiDetails, fromEnvironment, toEnvironment, request.identifierRequest.user))
@@ -78,7 +78,7 @@ class MyApiSetEgressController @Inject()(
   private def buildView(form: Form[?], apiDetail: ApiDetail, environment: String)(implicit request: ApiRequest[AnyContent]) = {
     (for {
       fromEnvironment <- hipEnvironments.forEnvironmentIdOptional(environment)
-      toEnvironment <- hipEnvironments.promotionEnvironment(fromEnvironment)
+      toEnvironment <- fromEnvironment.promoteTo
     } yield for {
       egresses <- apiHubService.listEgressGateways(toEnvironment)
       deploymentStatuses <- apiHubService.getApiDeploymentStatuses(apiDetail.publisherReference)

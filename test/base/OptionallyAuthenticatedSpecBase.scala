@@ -16,9 +16,9 @@
 
 package base
 
-import config.{Domains, EmailDomains, Hods, Platforms}
+import config.{Domains, EmailDomains, HipEnvironments, Hods, Platforms}
 import controllers.actions.{FakeOptionalIdentifierAction, OptionalIdentifierAction, OptionalUserProvider, OptionalUserProviderImpl}
-import fakes.{FakeDomains, FakeHods, FakePlatforms, FakeEmailDomains}
+import fakes.{FakeDomains, FakeEmailDomains, FakeHipEnvironments, FakeHods, FakePlatforms}
 import models.user.UserModel
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -38,7 +38,8 @@ trait OptionallyAuthenticatedSpecBase extends AnyFreeSpec with Matchers {
         bind[Domains].toInstance(FakeDomains),
         bind[Hods].toInstance(FakeHods),
         bind[Platforms].toInstance(FakePlatforms),
-        bind[EmailDomains].toInstance(FakeEmailDomains)
+        bind[EmailDomains].toInstance(FakeEmailDomains),
+        bind[HipEnvironments].toInstance(FakeHipEnvironments)
       )
   }
 

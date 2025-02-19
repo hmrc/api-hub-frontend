@@ -17,7 +17,7 @@
 package services
 
 import com.google.inject.{Inject, Singleton}
-import config.HipEnvironment
+import config.{HipEnvironment, ShareableHipConfig}
 import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
 import models.AvailableEndpoint
 import models.accessrequest.{AccessRequest, AccessRequestRequest, AccessRequestStatus}
@@ -260,6 +260,10 @@ class ApiHubService @Inject()(
 
   def forcePublish(publisherReference: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
     applicationsConnector.forcePublish(publisherReference)
+  }
+  
+  def listEnvironments()(implicit hc: HeaderCarrier): Future[ShareableHipConfig] = {
+    applicationsConnector.listEnvironments()
   }
 
 }
