@@ -16,3 +16,6 @@ GET         /force-publish                                                      
 POST        /force-publish                                                          controllers.admin.ForcePublishController.onSubmit()
 GET         /force-publish/:publisherReference                                      controllers.admin.ForcePublishController.showVersionComparison(publisherReference: String)
 POST        /force-publish/:publisherReference                                      controllers.admin.ForcePublishController.forcePublish(publisherReference: String)
+
+GET         /shutter                                                                controllers.admin.ShutterController.shutter()
+POST        /shutter                                                                controllers.admin.ShutterController.changeShutter()

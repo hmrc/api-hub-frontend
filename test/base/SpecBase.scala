@@ -18,7 +18,7 @@ package base
 
 import config.*
 import controllers.actions.*
-import fakes.{FakeDomains, FakeEmailDomains, FakeHipEnvironments, FakeHods, FakePlatforms}
+import fakes.{FakeDomains, FakeEmailDomains, FakeHipEnvironments, FakeHods, FakeHubStatusService, FakePlatforms}
 import models.UserAnswers
 import models.user.UserModel
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -30,6 +30,7 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
 import play.api.{Application, Configuration}
+import services.HubStatusService
 
 trait SpecBase
   extends AnyFreeSpec
@@ -65,6 +66,7 @@ trait SpecBase
         bind[EmailDomains].toInstance(FakeEmailDomains),
         bind[Platforms].toInstance(FakePlatforms),
         bind[HipEnvironments].toInstance(FakeHipEnvironments),
+        bind[HubStatusService].toInstance(FakeHubStatusService)
   )
 
 }
