@@ -32,6 +32,7 @@ object AdminSideNavPages {
   case object ConfigurationPage extends SideNavPage
   case object StatisticsPage extends SideNavPage
   case object ForcePublishPage extends SideNavPage
+  case object ShutterPage extends SideNavPage
 
 }
 
@@ -96,6 +97,12 @@ object AdminNavItems {
           title = messages("forcePublish.menuTitle"),
           link = controllers.admin.routes.ForcePublishController.onPageLoad(),
           isCurrentPage = currentPage == ForcePublishPage
+        ),
+        SideNavItemLeaf(
+          page = ShutterPage,
+          title = messages("shutter.menuTitle"),
+          link = controllers.admin.routes.ShutterController.shutter(),
+          isCurrentPage = currentPage == ShutterPage
         ),
         accessRequestsNavItem
       )

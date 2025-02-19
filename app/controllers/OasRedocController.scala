@@ -49,7 +49,7 @@ class OasRedocController @Inject()(
       }
   }
 
-  def getOas(apiId: String): Action[AnyContent] = Action.async {
+  def getOas(apiId: String): Action[AnyContent] = optionallyIdentified.async {
     implicit request =>
       apiHubService.getApiDetail(apiId).map {
         case Some(apiDetail) =>
