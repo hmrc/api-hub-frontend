@@ -17,7 +17,8 @@
 package generators
 
 import fakes.FakeDomains
-import models.api._
+import models.api.*
+import models.api.ApiGeneration.V2
 import org.scalacheck.rng.Seed
 import org.scalacheck.{Arbitrary, Gen}
 
@@ -71,6 +72,7 @@ trait ApiDetailGenerators {
       maintainerSlack <- sensiblySizedAlphaNumStr
       apiType <- Gen.oneOf(ApiType.values.toIndexedSeq)
       apiNumber <- Gen.option(sensiblySizedAlphaNumStr)
+      apiGeneration <- Gen.oneOf(ApiGeneration.values)
     } yield ApiDetail(
       id.toString,
       publisherReference,
@@ -88,7 +90,8 @@ trait ApiDetailGenerators {
       platform = platform,
       maintainer = Maintainer(maintainerName, s"#$maintainerSlack", List.empty),
       apiType = Some(apiType),
-      apiNumber = apiNumber
+      apiNumber = apiNumber,
+      apiGeneration = Some(apiGeneration),
     )
   }
 

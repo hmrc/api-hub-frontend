@@ -30,7 +30,8 @@ case class ApiDetailSummary(
     platform: String,
     apiType: Option[ApiType],
     teamId: Option[String],
-    apiNumber: Option[String]
+    apiNumber: Option[String],
+    apiGeneration: Option[ApiGeneration],
 )
 
 object ApiDetailSummary {
@@ -48,7 +49,8 @@ object ApiDetailSummary {
       platform = apiDetail.platform,
       apiType = apiDetail.apiType,
       teamId = apiDetail.teamId,
-      apiNumber = apiDetail.apiNumber
+      apiNumber = apiDetail.apiNumber,
+      apiGeneration = apiDetail.apiGeneration,
     )
   }
 
