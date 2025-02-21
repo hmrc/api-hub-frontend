@@ -22,8 +22,9 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import play.api.i18n.Messages
+import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.Aliases.Value
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{Key, SummaryListRow}
 
 class AddAnApiApiIdSummarySpec extends AnyFreeSpec with Matchers with ApiDetailGenerators with ScalaCheckDrivenPropertyChecks {
@@ -37,7 +38,7 @@ class AddAnApiApiIdSummarySpec extends AnyFreeSpec with Matchers with ApiDetailG
 
         val expected = SummaryListRow(
           key = Key(Text("addAnApiApiId.checkYourAnswersLabel")),
-          value = Value(Text(apiDetail.title)),
+          value = Value(HtmlContent(HtmlFormat.escape(apiDetail.title).toString)),
           actions = None
         )
 
