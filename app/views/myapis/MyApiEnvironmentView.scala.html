@@ -55,7 +55,7 @@
             )
         )
     )
-    @if(apiDetail.isSelfServe) {
+    @if(apiDetail.isHubMaintainable) {
         @for(promoteEnvironment <- promoteToEnvironment) {
             @formHelper(action = controllers.myapis.routes.MyApiEnvironmentController.onSubmit(apiDetail.id, environment.id)) {
                 @govukButton(

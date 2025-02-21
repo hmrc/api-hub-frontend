@@ -51,7 +51,7 @@ class MyApiSetEgressController @Inject()(
 
   def onPageLoad(id: String, environment: String): Action[AnyContent] = (identify andThen apiAuth(id)).async  {
     implicit request =>
-      if (request.apiDetails.isSelfServe) then
+      if (request.apiDetails.isHubMaintainable) then
         buildView(form, request.apiDetails, environment)
       else Future.successful(errorResultBuilder.notHubMaintainable())
   }

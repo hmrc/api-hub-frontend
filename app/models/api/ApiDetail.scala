@@ -89,7 +89,9 @@ case class ApiDetail(
   apiGeneration: Option[ApiGeneration] = None,
 ) {
 
-  def isSelfServe: Boolean = platform == "HIP" && apiGeneration.contains(V2)
+  def isSelfServe: Boolean = platform == "HIP"
+  
+  def isHubMaintainable: Boolean = apiGeneration.contains(V2)
 
   def toApiDetailSummary: ApiDetailSummary = ApiDetailSummary(this)
   

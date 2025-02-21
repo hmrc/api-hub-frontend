@@ -53,7 +53,7 @@ class UpdateApiStartController @Inject()(
 
   def startProduceApi(id: String): Action[AnyContent] = (identify  andThen apiAuth(id)).async {
     implicit request => {
-      if (request.apiDetails.isSelfServe) then
+      if (request.apiDetails.isHubMaintainable) then
         val userAnswers = UserAnswers(
           id = request.identifierRequest.user.userId,
           lastUpdated = clock.instant()
