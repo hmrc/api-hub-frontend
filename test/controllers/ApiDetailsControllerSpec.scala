@@ -22,6 +22,7 @@ import controllers.actions.FakeUser
 import fakes.{FakeDomains, FakeHipEnvironments, FakeHods, FakePlatforms}
 import generators.ApiDetailGenerators
 import models.api.ApiDeploymentStatus.*
+import models.api.ApiGeneration.V2
 import models.api.{ApiDeploymentStatuses, ApiDetail, ContactInfo, ContactInformation, PlatformContact}
 import models.team.Team
 import models.user.UserModel
@@ -62,7 +63,7 @@ class ApiDetailsControllerSpec
         ))
 
         forAll {(baseApiDetail: ApiDetail) =>
-          val apiDetail = baseApiDetail.copy(platform = "HIP")
+          val apiDetail = baseApiDetail.copy(platform = "HIP", apiGeneration = Some(V2))
           when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
             .thenReturn(Future.successful(Some(apiDetail)))
           when(fixture.apiHubService.getApiDeploymentStatuses(eqTo(apiDetail.publisherReference))(any()))
@@ -97,7 +98,7 @@ class ApiDetailsControllerSpec
         ))
 
         forAll {(baseApiDetail: ApiDetail) =>
-          val apiDetail = baseApiDetail.copy(platform = "OTHER", maintainer = baseApiDetail.maintainer.copy(contactInfo = List.empty))
+          val apiDetail = baseApiDetail.copy(platform = "OTHER", maintainer = baseApiDetail.maintainer.copy(contactInfo = List.empty), apiGeneration = Some(V2))
           when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
             .thenReturn(Future.successful(Some(apiDetail)))
           when(fixture.apiHubService.getApiDeploymentStatuses(eqTo(apiDetail.publisherReference))(any()))
@@ -134,7 +135,9 @@ class ApiDetailsControllerSpec
 
         forAll {(baseApiDetail: ApiDetail) =>
           val apiDetail = baseApiDetail.copy(platform = "OTHER",
-            maintainer = baseApiDetail.maintainer.copy(contactInfo = List(ContactInformation(name=None, emailAddress = Some(apiTeamEmail)))))
+            maintainer = baseApiDetail.maintainer.copy(contactInfo = List(ContactInformation(name=None, emailAddress = Some(apiTeamEmail)))),
+            apiGeneration = Some(V2)
+          )
           when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any()))
             .thenReturn(Future.successful(Some(apiDetail)))
           when(fixture.apiHubService.getApiDeploymentStatuses(eqTo(apiDetail.publisherReference))(any()))

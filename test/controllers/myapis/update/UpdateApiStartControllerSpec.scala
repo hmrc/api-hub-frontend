@@ -240,6 +240,40 @@ class UpdateApiStartControllerSpec extends SpecBase with MockitoSugar with Table
       }
     }
 
+    "must show a fot found screen when the API is not Hub maintainable" in {
+      val fixture = buildFixture(
+        maybeApiDetail = Some(FakeApiDetail.copy(apiGeneration = None)),
+      )
+      when(fixture.apiHubService.getDeploymentDetails(any)(any))
+        .thenReturn(Future.successful(Some(DeploymentDetails(
+          description = None,
+          status = None,
+          domain = None,
+          subDomain = None,
+          hods = None,
+          egressMappings = None,
+          prefixesToRemove = None,
+          egress = None,
+        ))))
+      when(fixture.sessionRepository.set(any())).thenReturn(Future.successful(true))
+
+      running(fixture.application) {
+        val request = FakeRequest(controllers.myapis.update.routes.UpdateApiStartController.startProduceApi("id"))
+        val result = route(fixture.application, request).value
+
+        val view = fixture.application.injector.instanceOf[ErrorTemplate]
+
+        status(result) mustBe NOT_FOUND
+        contentAsString(result) mustBe view.apply(
+            "Page not found - 404",
+            "This page can’t be found",
+            message = "This API is not maintainable by The Integration Hub",
+            Some(FakeUser)
+          )(request, messages(fixture.application))
+          .toString()
+        contentAsString(result) must validateAsHtml
+      }
+    }
   }
 
   private case class Fixture(
