@@ -53,15 +53,15 @@ class UpdateApiStartController @Inject()(
 
   def startProduceApi(id: String): Action[AnyContent] = (identify  andThen apiAuth(id)).async {
     implicit request => {
-      if (request.apiDetails.isHubMaintainable) then
+      if (request.apiDetails.isHubMaintainable) {
         val userAnswers = UserAnswers(
           id = request.identifierRequest.user.userId,
           lastUpdated = clock.instant()
         )
 
         apiHubService.getDeploymentDetails(request.apiDetails.publisherReference).flatMap(_.fold(
-            Future.successful(errorResultBuilder.apiNotFoundInApim(request.apiDetails))
-          )(deploymentDetails =>
+          Future.successful(errorResultBuilder.apiNotFoundInApim(request.apiDetails))
+        )(deploymentDetails =>
           for {
             updatedAnswers <- updateAnswer(userAnswers, UpdateApiApiPage, request.apiDetails)
             updatedAnswers <- updateOptionalAnswer(updatedAnswers, UpdateApiShortDescriptionPage, deploymentDetails.description)
@@ -89,7 +89,7 @@ class UpdateApiStartController @Inject()(
             result = Redirect(navigator.nextPage(UpdateApiStartPage, NormalMode, updatedAnswers))
           } yield result
         ))
-      else Future.successful(errorResultBuilder.notHubMaintainable())
+      } else Future.successful(errorResultBuilder.notHubMaintainable())
     }
   }
 
