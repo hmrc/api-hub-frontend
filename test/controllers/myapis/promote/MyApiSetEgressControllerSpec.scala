@@ -23,10 +23,12 @@ import forms.myapis.produce.ProduceApiEgressSelectionForm
 import generators.EgressGenerator
 import models.api.ApiDeploymentStatus.Deployed
 import models.api.ApiDeploymentStatuses
+import models.api.ApiGeneration.V1
 import models.deployment.{FailuresResponse, InvalidOasResponse, SuccessfulDeploymentsResponse}
 import models.team.Team
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
+import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.Application as PlayApplication
 import play.api.inject.bind
@@ -42,7 +44,7 @@ import views.html.myapis.promote.{MyApiPromoteSuccessView, MyApiSetEgressView}
 import java.time.LocalDateTime
 import scala.concurrent.Future
 
-class MyApiSetEgressControllerSpec extends SpecBase with MockitoSugar with EgressGenerator with HtmlValidation {
+class MyApiSetEgressControllerSpec extends SpecBase with MockitoSugar with EgressGenerator with HtmlValidation with TableDrivenPropertyChecks {
 
   private def onwardRoute = Call("GET", "/foo")
 
@@ -158,39 +160,45 @@ class MyApiSetEgressControllerSpec extends SpecBase with MockitoSugar with Egres
     }
 
     "must return not found when the API is not Hub maintainable" in {
-      val egressGateways = sampleEgressGateways()
-      val fixture = buildFixture()
-      val apiDetail = FakeApiDetail.copy(teamId = Some(apiTeam.id), apiGeneration = None)
-      when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any)).thenReturn(Future.successful(Some(apiDetail)))
-      when(fixture.apiHubService.listEgressGateways(eqTo(FakeHipEnvironments.production))(any)).thenReturn(Future.successful(egressGateways))
-      when(fixture.apiHubService.findTeams(eqTo(Some(FakeUser.email)))(any)).thenReturn(Future.successful(List(apiTeam)))
-      when(fixture.apiHubService.getApiDeploymentStatuses(eqTo(apiDetail.publisherReference))(any)).thenReturn(Future.successful(deploymentStatuses))
+      forAll(Table(
+        "deploymentDetails",
+        None,
+        Some(V1)
+      )) { apiGeneration =>
+        val egressGateways = sampleEgressGateways()
+        val fixture = buildFixture()
+        val apiDetail = FakeApiDetail.copy(teamId = Some(apiTeam.id), apiGeneration = None)
+        when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any)).thenReturn(Future.successful(Some(apiDetail)))
+        when(fixture.apiHubService.listEgressGateways(eqTo(FakeHipEnvironments.production))(any)).thenReturn(Future.successful(egressGateways))
+        when(fixture.apiHubService.findTeams(eqTo(Some(FakeUser.email)))(any)).thenReturn(Future.successful(List(apiTeam)))
+        when(fixture.apiHubService.getApiDeploymentStatuses(eqTo(apiDetail.publisherReference))(any)).thenReturn(Future.successful(deploymentStatuses))
 
-      running(fixture.application) {
-        val url = controllers.myapis.promote.routes.MyApiSetEgressController.onPageLoad(apiDetail.id, FakeHipEnvironments.deployTo.id).url
-        val request = FakeRequest(GET, url)
+        running(fixture.application) {
+          val url = controllers.myapis.promote.routes.MyApiSetEgressController.onPageLoad(apiDetail.id, FakeHipEnvironments.deployTo.id).url
+          val request = FakeRequest(GET, url)
 
-        val result = route(fixture.application, request).value
+          val result = route(fixture.application, request).value
 
-        val viewModel = MyApiSetEgressViewModel(
-          apiDetail,
-          FakeHipEnvironments.deployTo,
-          FakeHipEnvironments.production,
-          Some(FakeUser),
-          egressGateways,
-          deploymentStatuses
-        )(messages(fixture.application))
-        val view = fixture.application.injector.instanceOf[ErrorTemplate]
+          val viewModel = MyApiSetEgressViewModel(
+            apiDetail,
+            FakeHipEnvironments.deployTo,
+            FakeHipEnvironments.production,
+            Some(FakeUser),
+            egressGateways,
+            deploymentStatuses
+          )(messages(fixture.application))
+          val view = fixture.application.injector.instanceOf[ErrorTemplate]
 
-        status(result) mustBe NOT_FOUND
-        contentAsString(result) mustBe view.apply(
-            "Page not found - 404",
-            "This page can’t be found",
-            message = "This API is not maintainable by The Integration Hub",
-            Some(FakeUser)
-          )(request, messages(fixture.application))
-          .toString()
-        contentAsString(result) must validateAsHtml
+          status(result) mustBe NOT_FOUND
+          contentAsString(result) mustBe view.apply(
+              "Page not found - 404",
+              "This page can’t be found",
+              message = "This API is not maintainable by The Integration Hub",
+              Some(FakeUser)
+            )(request, messages(fixture.application))
+            .toString()
+          contentAsString(result) must validateAsHtml
+        }
       }
     }
   }
