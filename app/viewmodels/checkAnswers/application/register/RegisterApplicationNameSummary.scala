@@ -20,9 +20,10 @@ import models.{CheckMode, UserAnswers}
 import pages.application.register.RegisterApplicationNamePage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.govuk.summarylist._
-import viewmodels.implicits._
+import viewmodels.govuk.summarylist.*
+import viewmodels.implicits.*
 
 object RegisterApplicationNameSummary  {
 
@@ -31,7 +32,7 @@ object RegisterApplicationNameSummary  {
       answer =>
         SummaryListRowViewModel(
           key     = "registerApplicationName.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
+          value   = ValueViewModel(HtmlContent(HtmlFormat.escape(answer).toString)),
           actions = Seq(
             ActionItemViewModel("site.change", controllers.application.register.routes.RegisterApplicationNameController.onPageLoad(CheckMode).url)
               .withVisuallyHiddenText(messages("registerApplicationName.change.hidden"))

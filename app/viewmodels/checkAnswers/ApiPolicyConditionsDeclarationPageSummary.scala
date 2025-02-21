@@ -35,7 +35,7 @@ object ApiPolicyConditionsDeclarationPageSummary  {
         val value = ValueViewModel(
           HtmlContent(
             answers.map {
-              answer => HtmlFormat.escape(messages(s"apiPolicyConditionsDeclarationPage.$answer")).toString
+              answer => HtmlContent(HtmlFormat.escape(messages(s"apiPolicyConditionsDeclarationPage.$answer")).toString)
             }
             .mkString(",<br>")
           )

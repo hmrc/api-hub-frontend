@@ -20,6 +20,7 @@ import models.{CheckMode, UserAnswers}
 import pages.myapis.update.UpdateApiEnterApiTitlePage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
@@ -31,7 +32,7 @@ object UpdateApiNameSummary  {
       answer =>
         SummaryListRowViewModel(
           key     = "produceApiReviewNameDescription.checkYourAnswersLabel.1",
-          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
+          value   = ValueViewModel(HtmlContent(HtmlFormat.escape(answer).toString)),
           actions = Seq(
             ActionItemViewModel("site.change", controllers.myapis.update.routes.UpdateApiReviewNameDescriptionController.onPageLoad(CheckMode).url)
               .withVisuallyHiddenText(messages("produceApiReviewNameDescription.change.hidden"))

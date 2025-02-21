@@ -19,9 +19,10 @@ package viewmodels.checkAnswers
 import models.api.ApiDetail
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.govuk.summarylist._
-import viewmodels.implicits._
+import viewmodels.govuk.summarylist.*
+import viewmodels.implicits.*
 
 object AddAnApiApiIdSummary {
 
@@ -30,7 +31,7 @@ object AddAnApiApiIdSummary {
       api =>
         SummaryListRowViewModel(
           key = "addAnApiApiId.checkYourAnswersLabel",
-          value = ValueViewModel(HtmlFormat.escape(api.title).toString)
+          value = ValueViewModel(HtmlContent(HtmlFormat.escape(api.title).toString))
         )
     }
   }
