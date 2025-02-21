@@ -156,6 +156,43 @@ class MyApiSetEgressControllerSpec extends SpecBase with MockitoSugar with Egres
         contentAsString(result) must validateAsHtml
       }
     }
+
+    "must return not found when the API is not Hub maintainable" in {
+      val egressGateways = sampleEgressGateways()
+      val fixture = buildFixture()
+      val apiDetail = FakeApiDetail.copy(teamId = Some(apiTeam.id), apiGeneration = None)
+      when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any)).thenReturn(Future.successful(Some(apiDetail)))
+      when(fixture.apiHubService.listEgressGateways(eqTo(FakeHipEnvironments.production))(any)).thenReturn(Future.successful(egressGateways))
+      when(fixture.apiHubService.findTeams(eqTo(Some(FakeUser.email)))(any)).thenReturn(Future.successful(List(apiTeam)))
+      when(fixture.apiHubService.getApiDeploymentStatuses(eqTo(apiDetail.publisherReference))(any)).thenReturn(Future.successful(deploymentStatuses))
+
+      running(fixture.application) {
+        val url = controllers.myapis.promote.routes.MyApiSetEgressController.onPageLoad(apiDetail.id, FakeHipEnvironments.deployTo.id).url
+        val request = FakeRequest(GET, url)
+
+        val result = route(fixture.application, request).value
+
+        val viewModel = MyApiSetEgressViewModel(
+          apiDetail,
+          FakeHipEnvironments.deployTo,
+          FakeHipEnvironments.production,
+          Some(FakeUser),
+          egressGateways,
+          deploymentStatuses
+        )(messages(fixture.application))
+        val view = fixture.application.injector.instanceOf[ErrorTemplate]
+
+        status(result) mustBe NOT_FOUND
+        contentAsString(result) mustBe view.apply(
+            "Page not found - 404",
+            "This page can’t be found",
+            message = "This API is not maintainable by The Integration Hub",
+            Some(FakeUser)
+          )(request, messages(fixture.application))
+          .toString()
+        contentAsString(result) must validateAsHtml
+      }
+    }
   }
 
   private case class Fixture(application: PlayApplication, apiHubService: ApiHubService)

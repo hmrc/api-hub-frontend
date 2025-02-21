@@ -49,7 +49,7 @@ class MyApisNavItems @Inject()(hipEnvironments: HipEnvironments) {
     }.getOrElse(false)
 
     val isHipApi = apiDetail.isSelfServe
-    isHipApi && isDeployedToTest
+    isHipApi && isDeployedToTest && apiDetail.isHubMaintainable
   }
 
   def apply(apiDetail: ApiDetail, user: UserModel, currentPage: SideNavPage, apiDeploymentStatuses: ApiDeploymentStatuses)(implicit messages: Messages): Seq[SideNavItem] = {
