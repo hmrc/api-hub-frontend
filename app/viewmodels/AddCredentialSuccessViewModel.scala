@@ -45,7 +45,7 @@ object AddCredentialSuccessViewModel {
   private def applicationNameRow(application: Application)(implicit messages: Messages): SummaryListRow = {
     SummaryListRowViewModel(
       key     = "addCredentialSuccess.applicationName",
-      value   = ValueViewModel(HtmlFormat.escape(application.name).toString),
+      value   = ValueViewModel(HtmlContent(HtmlFormat.escape(application.name).toString)),
       actions = Seq.empty
     )
   }
@@ -89,7 +89,7 @@ object AddCredentialSuccessViewModel {
   private def clientSecretRow(credential: Credential)(implicit messages: Messages): SummaryListRow = {
     SummaryListRowViewModel(
       key     = "addCredentialSuccess.clientSecret",
-      value   = ValueViewModel(HtmlFormat.escape(credential.clientSecret.getOrElse("")).toString),
+      value   = ValueViewModel(HtmlContent(HtmlFormat.escape(credential.clientSecret.getOrElse("")).toString)),
       actions = Seq(
         ActionItem(
           href = "#",
