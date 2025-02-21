@@ -55,15 +55,17 @@
             )
         )
     )
-    @for(promoteEnvironment <- promoteToEnvironment) {
-        @formHelper(action = controllers.myapis.routes.MyApiEnvironmentController.onSubmit(apiDetail.id, environment.id)) {
-            @govukButton(
-                Button(
-                    content = Text(messages("myApis.environment.promoteTo", messages(promoteEnvironment.nameKey))),
-                    id = Some("promoteApi"),
-                    preventDoubleClick = Some(true)
+    @if(apiDetail.isSelfServe) {
+        @for(promoteEnvironment <- promoteToEnvironment) {
+            @formHelper(action = controllers.myapis.routes.MyApiEnvironmentController.onSubmit(apiDetail.id, environment.id)) {
+                @govukButton(
+                    Button(
+                        content = Text(messages("myApis.environment.promoteTo", messages(promoteEnvironment.nameKey))),
+                        id = Some("promoteApi"),
+                        preventDoubleClick = Some(true)
+                    )
                 )
-            )
+            }
         }
     }
 }
