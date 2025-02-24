@@ -53,41 +53,43 @@ class UpdateApiStartController @Inject()(
 
   def startProduceApi(id: String): Action[AnyContent] = (identify  andThen apiAuth(id)).async {
     implicit request => {
-      val userAnswers = UserAnswers(
-        id = request.identifierRequest.user.userId,
-        lastUpdated = clock.instant()
-      )
+      if (request.apiDetails.isHubMaintainable) {
+        val userAnswers = UserAnswers(
+          id = request.identifierRequest.user.userId,
+          lastUpdated = clock.instant()
+        )
 
-      apiHubService.getDeploymentDetails(request.apiDetails.publisherReference).flatMap(_.fold(
+        apiHubService.getDeploymentDetails(request.apiDetails.publisherReference).flatMap(_.fold(
           Future.successful(errorResultBuilder.apiNotFoundInApim(request.apiDetails))
         )(deploymentDetails =>
-        for {
-          updatedAnswers <- updateAnswer(userAnswers, UpdateApiApiPage, request.apiDetails)
-          updatedAnswers <- updateOptionalAnswer(updatedAnswers, UpdateApiShortDescriptionPage, deploymentDetails.description)
-          deploymentStatus = deploymentDetails.status.flatMap(s => ApiStatus.values.find(_.toString.equalsIgnoreCase(s)))
-          updatedAnswers <- updateOptionalAnswer(updatedAnswers, UpdateApiStatusPage, deploymentStatus)
-          domainSubdomain = (deploymentDetails.domain, deploymentDetails.subDomain) match {
-            case (Some(domain), Some(subDomain)) => Some(ProduceApiDomainSubdomain(domain, subDomain))
-            case _ => None
-          }
-          updatedAnswers <- updateOptionalAnswer(updatedAnswers, UpdateApiDomainPage, domainSubdomain)
-          updatedAnswers <- updateOptionalAnswer(updatedAnswers, UpdateApiHodPage, deploymentDetails.hods.map(_.toSet))
-          updatedAnswers <- updateAnswer(updatedAnswers, UpdateApiEgressAvailabilityPage, deploymentDetails.hasEgress)
-          updatedAnswers <- updateOptionalAnswer(updatedAnswers, UpdateApiEgressSelectionPage, Option.when(deploymentDetails.hasEgress)(deploymentDetails.egress).flatten)
-          egressMappings = deploymentDetails.egressMappings.map(_.map(em =>
-            ProduceApiEgressPrefixMapping(em.egressPrefix, em.prefix).toString
-          ))
-          egressPrefixes = deploymentDetails.prefixesToRemove
-          egressPrefixesMappings = (egressMappings, egressPrefixes) match {
-            case (Some(mappings), Some(prefixes)) => Some(ProduceApiEgressPrefixes(prefixes, mappings))
-            case _ => None
-          }
-          updatedAnswers <- updateAnswer(updatedAnswers, UpdateApiAddPrefixesPage, egressPrefixesMappings.exists(!_.isEmpty))
-          updatedAnswers <- updateOptionalAnswer(updatedAnswers, UpdateApiEgressPrefixesPage, egressPrefixesMappings)
-          response <- sessionRepository.set(updatedAnswers)
-          result = Redirect(navigator.nextPage(UpdateApiStartPage, NormalMode, updatedAnswers))
-        } yield result
-      ))
+          for {
+            updatedAnswers <- updateAnswer(userAnswers, UpdateApiApiPage, request.apiDetails)
+            updatedAnswers <- updateOptionalAnswer(updatedAnswers, UpdateApiShortDescriptionPage, deploymentDetails.description)
+            deploymentStatus = deploymentDetails.status.flatMap(s => ApiStatus.values.find(_.toString.equalsIgnoreCase(s)))
+            updatedAnswers <- updateOptionalAnswer(updatedAnswers, UpdateApiStatusPage, deploymentStatus)
+            domainSubdomain = (deploymentDetails.domain, deploymentDetails.subDomain) match {
+              case (Some(domain), Some(subDomain)) => Some(ProduceApiDomainSubdomain(domain, subDomain))
+              case _ => None
+            }
+            updatedAnswers <- updateOptionalAnswer(updatedAnswers, UpdateApiDomainPage, domainSubdomain)
+            updatedAnswers <- updateOptionalAnswer(updatedAnswers, UpdateApiHodPage, deploymentDetails.hods.map(_.toSet))
+            updatedAnswers <- updateAnswer(updatedAnswers, UpdateApiEgressAvailabilityPage, deploymentDetails.hasEgress)
+            updatedAnswers <- updateOptionalAnswer(updatedAnswers, UpdateApiEgressSelectionPage, Option.when(deploymentDetails.hasEgress)(deploymentDetails.egress).flatten)
+            egressMappings = deploymentDetails.egressMappings.map(_.map(em =>
+              ProduceApiEgressPrefixMapping(em.egressPrefix, em.prefix).toString
+            ))
+            egressPrefixes = deploymentDetails.prefixesToRemove
+            egressPrefixesMappings = (egressMappings, egressPrefixes) match {
+              case (Some(mappings), Some(prefixes)) => Some(ProduceApiEgressPrefixes(prefixes, mappings))
+              case _ => None
+            }
+            updatedAnswers <- updateAnswer(updatedAnswers, UpdateApiAddPrefixesPage, egressPrefixesMappings.exists(!_.isEmpty))
+            updatedAnswers <- updateOptionalAnswer(updatedAnswers, UpdateApiEgressPrefixesPage, egressPrefixesMappings)
+            response <- sessionRepository.set(updatedAnswers)
+            result = Redirect(navigator.nextPage(UpdateApiStartPage, NormalMode, updatedAnswers))
+          } yield result
+        ))
+      } else Future.successful(errorResultBuilder.notHubMaintainable())
     }
   }
 

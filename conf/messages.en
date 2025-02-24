@@ -53,6 +53,8 @@ site.createdDate = Created date
 site.version = Version
 site.apiName = API name
 site.apiNumber = API number
+site.apiGeneration = API Generation
+site.notHubMaintainable = This API is not maintainable by The Integration Hub
 
 date.day = Day
 date.month = Month

@@ -88,7 +88,16 @@
         ),
     )
 
-    Seq(apiNameRow, apiNumberRow, owningTeamRow, publisherReferenceRow)
+    val apiGenerationRow = apiDetail.apiGeneration.map(apiGeneration => SummaryListRow(
+        key = Key(
+            content = Text(messages("site.apiGeneration"))
+        ),
+        value = Value(
+            content = Text(apiGeneration.toString)
+        ),
+    ))
+
+    Seq(apiNameRow, apiNumberRow, owningTeamRow, publisherReferenceRow) ++ apiGenerationRow
 }
 
 @layout(pageTitle = titleNoForm(messages("myApis.details.title")), user = Some(user), fullWidth = true, customScriptsBlock = Some(iconsLink())) {

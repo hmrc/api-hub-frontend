@@ -16,6 +16,7 @@
 
 package models.api
 
+import models.api.ApiGeneration.V2
 import models.{Enumerable, WithName}
 import play.api.libs.functional.syntax.*
 import play.api.libs.json.*
@@ -52,6 +53,20 @@ object ApiType extends Enumerable.Implicits {
     Enumerable(values.map(value => value.toString -> value)*)
 }
 
+sealed trait ApiGeneration
+
+object ApiGeneration extends Enumerable.Implicits {
+
+  val values: Seq[ApiGeneration] = Seq(V1, V2)
+
+  implicit val enumerable: Enumerable[ApiGeneration] =
+    Enumerable(values.map(value => value.toString -> value)*)
+
+  case object V1 extends WithName("V1") with ApiGeneration
+
+  case object V2 extends WithName("V2") with ApiGeneration
+}
+
 case class ApiDetail(
   id: String,
   publisherReference: String,
@@ -70,10 +85,13 @@ case class ApiDetail(
   platform: String,
   maintainer: Maintainer,
   apiType: Option[ApiType] = None,
-  apiNumber: Option[String] = None
+  apiNumber: Option[String] = None,
+  apiGeneration: Option[ApiGeneration] = None,
 ) {
 
   def isSelfServe: Boolean = platform == "HIP"
+  
+  def isHubMaintainable: Boolean = apiGeneration.contains(V2)
 
   def toApiDetailSummary: ApiDetailSummary = ApiDetailSummary(this)
   
@@ -108,6 +126,7 @@ object ApiDetail {
       ~ (__ \ "maintainer").read[Maintainer]
       ~ (__ \ "apiType").readNullable[ApiType]
       ~ (__ \ "apiNumber").readNullable[String]
+      ~ (__ \ "apiGeneration").readNullable[ApiGeneration]
     )(ApiDetail.apply)
   val formatApiDetailSummary: OFormat[ApiDetail] = OFormat[ApiDetail](
     apiDetailSummaryReads,

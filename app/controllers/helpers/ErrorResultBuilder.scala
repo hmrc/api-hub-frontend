@@ -140,6 +140,10 @@ class ErrorResultBuilder @Inject()(
     )
   }
 
+  def notHubMaintainable()(implicit request: BaseRequest[?]): Result = {
+    notFound(None, None, Some("site.notHubMaintainable"))
+  }
+
   def internalServerError(error: String)(implicit request: BaseRequest[?]): Result = {
     logger.warn(s"Internal server error: $error")
     internalServerError()

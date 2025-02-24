@@ -16,6 +16,7 @@
 
 package controllers.actions
 
+import models.api.ApiGeneration.V2
 import models.api.{ApiDetail, Endpoint, EndpointMethod, Live, Maintainer}
 
 import java.time.Instant
@@ -37,5 +38,6 @@ object FakeApiDetail extends ApiDetail(
   Seq("hod1"),
   Instant.now(),
   "HIP",
-  Maintainer("name", "#slack", List.empty)
+  Maintainer("name", "#slack", List.empty),
+  apiGeneration = Some(V2)
 )
