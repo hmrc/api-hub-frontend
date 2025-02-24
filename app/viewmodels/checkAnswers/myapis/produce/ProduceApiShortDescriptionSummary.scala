@@ -21,9 +21,10 @@ import models.{CheckMode, UserAnswers}
 import pages.myapis.produce.ProduceApiShortDescriptionPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.govuk.summarylist._
-import viewmodels.implicits._
+import viewmodels.govuk.summarylist.*
+import viewmodels.implicits.*
 
 object ProduceApiShortDescriptionSummary  {
 
@@ -32,7 +33,7 @@ object ProduceApiShortDescriptionSummary  {
       answer =>
         SummaryListRowViewModel(
           key     = "produceApiReviewNameDescription.checkYourAnswersLabel.2",
-          value   = ValueViewModel(HtmlFormat.escape(answer).toString)
+          value   = ValueViewModel(HtmlContent(HtmlFormat.escape(answer).toString))
         )
     }
 }

@@ -22,8 +22,9 @@ import models.{AddAnApi, AddEndpoints, CheckMode}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.i18n.Messages
+import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.Aliases.Value
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, Actions, Key, SummaryListRow}
 
 class AddAnApiSelectApplicationSummarySpec extends AnyFreeSpec with Matchers {
@@ -36,7 +37,7 @@ class AddAnApiSelectApplicationSummarySpec extends AnyFreeSpec with Matchers {
 
       val expected = SummaryListRow(
         key = Key(Text("addAnApiSelectApplication.checkYourAnswersLabel")),
-        value = Value(Text(FakeApplication.name)),
+        value = Value(HtmlContent(HtmlFormat.escape(FakeApplication.name))),
         actions = Some(Actions(
           items = Seq(
             ActionItem(
@@ -56,7 +57,7 @@ class AddAnApiSelectApplicationSummarySpec extends AnyFreeSpec with Matchers {
 
       val expected = SummaryListRow(
         key = Key(Text("addAnApiSelectApplication.checkYourAnswersLabel")),
-        value = Value(Text(FakeApplication.name)),
+        value = Value(HtmlContent(FakeApplication.name)),
         actions = Some(Actions(items = Seq.empty))
       )
 

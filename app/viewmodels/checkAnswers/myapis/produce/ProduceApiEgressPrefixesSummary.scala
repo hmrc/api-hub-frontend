@@ -62,6 +62,6 @@ object ProduceApiEgressPrefixesSummary  {
   }
   
   private def buildList(items: Seq[String]): String = {
-    "<ul><li>" + items.map(HtmlFormat.escape(_)).mkString("</li><li>") + "</li></ul>"
+    "<ul><li>" + items.map(i => HtmlContent(HtmlFormat.escape(i))).mkString("</li><li>") + "</li></ul>"
   }
 }
