@@ -130,7 +130,7 @@ class EnvironmentsViewModelSpec extends AnyFreeSpec with Matchers with ScalaChec
     }
     "addCredentialFormAction" - {
       "must return the correct checklist route if the environment is production like" in {
-        buildViewModel(0, FakePrivilegedUser, FakeHipEnvironments.production).addCredentialFormAction mustBe controllers.application.routes.AddCredentialController.checklist(FakeApplication.id)
+        buildViewModel(0, FakePrivilegedUser, FakeHipEnvironments.production).addCredentialFormAction mustBe controllers.application.routes.AddCredentialController.checklist(FakeApplication.id, FakeHipEnvironments.production.id)
       }
       "must return the correct addCredentialForEnvironment route if the environment is not production like" in {
         buildViewModel(0, FakeUser, FakeHipEnvironments.test).addCredentialFormAction mustBe controllers.application.routes.AddCredentialController.addCredentialForEnvironment(FakeApplication.id, FakeHipEnvironments.test.id)
