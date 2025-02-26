@@ -47,6 +47,10 @@ trait AccessRequestGenerator {
   private def genHttpMethod: Gen[String] = {
     Gen.oneOf("GET", "POST", "PUT", "DELETE", "PATCH")
   }
+  
+  private def genEnvironmentId: Gen[String] = {
+    Gen.oneOf("test", "production")
+  }
 
   private def genScopes: Gen[Seq[String]] = Gen.sized {_ =>
     Gen.nonEmptyListOf(sensiblySizedAlphaNumStr)
@@ -109,6 +113,7 @@ trait AccessRequestGenerator {
       supportingInformation <- sensiblySizedAlphaNumStr
       requested <- genLocalDateTime
       requestedBy <- sensiblySizedAlphaNumStr
+      environmentId <- Gen.option(genEnvironmentId)
     } yield AccessRequest(
       id = id.toString,
       applicationId = applicationId,
@@ -120,7 +125,8 @@ trait AccessRequestGenerator {
       requested = requested,
       requestedBy = requestedBy,
       decision = None,
-      cancelled = None
+      cancelled = None,
+      environmentId = environmentId
     )
   }
 
@@ -212,11 +218,13 @@ trait AccessRequestGenerator {
       supportingInformation <- sensiblySizedAlphaNumStr
       requestedBy <- sensiblySizedAlphaNumStr
       apis <- Gen.resize(newSize(size), genAccessRequestApis)
+      environmentId <- Gen.option(genEnvironmentId)
     } yield AccessRequestRequest(
       applicationId = applicationId.toString,
       supportingInformation = supportingInformation,
       requestedBy = requestedBy,
-      apis = apis
+      apis = apis,
+      environmentId = environmentId
     )
   }
 
