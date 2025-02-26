@@ -17,6 +17,7 @@
 package controllers.application.accessrequest
 
 import com.google.inject.{Inject, Singleton}
+import config.HipEnvironments
 import controllers.actions.{AccessRequestDataRetrievalAction, DataRequiredAction, IdentifierAction}
 import controllers.helpers.ErrorResultBuilder
 import models.{CheckMode, UserAnswers}
@@ -44,7 +45,8 @@ class RequestProductionAccessEndJourneyController @Inject()(
   requireData: DataRequiredAction,
   requestProductionAccessSuccessView: RequestProductionAccessSuccessView,
   apiHubService: ApiHubService,
-  errorResultBuilder: ErrorResultBuilder
+  errorResultBuilder: ErrorResultBuilder,
+  hipEnvironments: HipEnvironments
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   import RequestProductionAccessEndJourneyController.*
@@ -54,8 +56,8 @@ class RequestProductionAccessEndJourneyController @Inject()(
       validate(request).fold(
         call => Future.successful(Redirect(call)),
         data =>
-          val accessRequest = data.toRequest(request.user.email)
-
+          val accessRequest = data.toRequest(request.user.email, hipEnvironments.production.id)
+          
           apiHubService.requestProductionAccess(accessRequest)
             .flatMap(_ => sessionRepository.clear(request.user.userId))
             .flatMap(_ => Future.successful(Ok(requestProductionAccessSuccessView(data.application, Some(request.user), accessRequest.apis))))
@@ -125,7 +127,7 @@ object RequestProductionAccessEndJourneyController {
     supportingInformation: String
   ) {
 
-    def toRequest(requestedBy: String): AccessRequestRequest = {
+    def toRequest(requestedBy: String, forEnvironmentId: String): AccessRequestRequest = {
 
       AccessRequestRequest(
         applicationId = application.id,
@@ -150,7 +152,7 @@ object RequestProductionAccessEndJourneyController {
                 )
             )
           ),
-        environmentId = None //TODO: Set this appropriately
+        environmentId = Some(forEnvironmentId)
       )
     }
   }
