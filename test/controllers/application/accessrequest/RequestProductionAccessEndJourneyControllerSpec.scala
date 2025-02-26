@@ -186,7 +186,8 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
                 )
             )
           )
-        )
+        ),
+        environmentId = None
       )
 
       val actual = data.toRequest(FakeUser.email)
@@ -221,7 +222,8 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
                 )
             )
           )
-        )
+        ),
+        environmentId = None
       )
 
       val actual = data.toRequest(FakeUser.email)

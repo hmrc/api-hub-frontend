@@ -149,10 +149,9 @@ object RequestProductionAccessEndJourneyController {
                   )
                 )
             )
-          )
+          ),
+        environmentId = None //TODO: Set this appropriately
       )
     }
-
   }
-
 }

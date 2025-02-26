@@ -443,7 +443,8 @@ class ApplicationsConnectorSpec
               )
             )
           )
-        )
+        ),
+        environmentId = None
       )
 
       stubFor(
@@ -475,7 +476,8 @@ class ApplicationsConnectorSpec
         status = Rejected,
         supportingInformation = "test-supporting-information",
         requested = LocalDateTime.now(),
-        requestedBy = "test-requested-by"
+        requestedBy = "test-requested-by",
+        environmentId = None
       )
 
       val filters = Table(
@@ -516,7 +518,8 @@ class ApplicationsConnectorSpec
         status = Rejected,
         supportingInformation = "test-supporting-information",
         requested = LocalDateTime.now(),
-        requestedBy = "test-requested-by"
+        requestedBy = "test-requested-by",
+        environmentId = None
       )
 
       stubFor(

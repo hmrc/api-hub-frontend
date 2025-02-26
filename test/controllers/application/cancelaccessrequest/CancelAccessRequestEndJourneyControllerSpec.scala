@@ -164,7 +164,9 @@ object CancelAccessRequestEndJourneyControllerSpec extends OptionValues{
     LocalDateTime.now(clock),
     "me",
     None,
-    None)
+    None,
+    Some("test")
+  )
 
 
   private def buildApplicationApi(apiId: Int, endpointAccesses: Seq[ApplicationEndpointAccess]): ApplicationApi = {

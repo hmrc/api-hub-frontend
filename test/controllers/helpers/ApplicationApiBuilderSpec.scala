@@ -294,7 +294,8 @@ object ApplicationApiBuilderSpec {
       requested = LocalDateTime.now(),
       requestedBy = "test-requested-by",
       decision = None,
-      cancelled = None
+      cancelled = None,
+      environmentId = None
     )
   }
 

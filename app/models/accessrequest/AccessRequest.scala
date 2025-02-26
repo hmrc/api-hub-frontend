@@ -32,7 +32,8 @@ case class AccessRequest(
   requested: LocalDateTime,
   requestedBy: String,
   decision: Option[AccessRequestDecision],
-  cancelled: Option[AccessRequestCancelled]
+  cancelled: Option[AccessRequestCancelled],
+  environmentId: Option[String]
 )
 
 object AccessRequest {
@@ -46,6 +47,7 @@ object AccessRequest {
     supportingInformation: String,
     requested: LocalDateTime,
     requestedBy: String,
+    environmentId: Option[String]
   ): AccessRequest = {
     AccessRequest(
       id = id,
@@ -58,7 +60,8 @@ object AccessRequest {
       requested = requested,
       requestedBy = requestedBy,
       decision = None,
-      cancelled = None
+      cancelled = None,
+      environmentId = environmentId
     )
   }
 
