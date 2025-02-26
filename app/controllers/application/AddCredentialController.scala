@@ -55,8 +55,11 @@ class AddCredentialController @Inject()(
 
   def checklist(applicationId: String, environment: String): Action[AnyContent] = (identify andThen isPrivileged andThen applicationAuth(applicationId)) {
     implicit request =>
-      val hipEnvironment = hipEnvironments.forUrlPathParameter(environment)
-      Ok(view(form, applicationId, request.maybeUser, hipEnvironment))
+      hipEnvironments.forUrlPathParameter(environment) match {
+        case hipEnvironment if hipEnvironment.isProductionLike =>
+          Ok(view(form, applicationId, request.maybeUser, hipEnvironment))
+        case _ => errorResultBuilder.notFound()
+      }
   }
 
   def addCredentialForEnvironment(applicationId: String, environment: String): Action[AnyContent] = (identify andThen applicationAuth(applicationId)).async {
