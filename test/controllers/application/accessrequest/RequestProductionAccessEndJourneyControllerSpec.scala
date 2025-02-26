@@ -19,6 +19,7 @@ package controllers.application.accessrequest
 import base.SpecBase
 import controllers.actions.{FakeApplication, FakeUser}
 import controllers.application.accessrequest.RequestProductionAccessEndJourneyController.Data
+import fakes.FakeHipEnvironments
 import models.accessrequest.{AccessRequestApi, AccessRequestEndpoint, AccessRequestRequest}
 import models.application.*
 import models.application.ApplicationLenses.ApplicationLensOps
@@ -55,7 +56,7 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
           val application = anApplication
           val userAnswers = buildUserAnswers()
           val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
-          val accessRequestRequest = data.toRequest(user.email)
+          val accessRequestRequest = data.toRequest(user.email, FakeHipEnvironments.production.id)
 
           when(fixture.apiHubService.requestProductionAccess(any())(any())).thenReturn(Future.successful(()))
           when(fixture.accessRequestSessionRepository.clear(any())).thenReturn(Future.successful(true))
@@ -187,10 +188,10 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
             )
           )
         ),
-        environmentId = None
+        environmentId = Some(FakeHipEnvironments.production.id)
       )
 
-      val actual = data.toRequest(FakeUser.email)
+      val actual = data.toRequest(FakeUser.email, FakeHipEnvironments.production.id)
 
       actual mustBe expected
     }
@@ -223,10 +224,10 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
             )
           )
         ),
-        environmentId = None
+        environmentId = Some(FakeHipEnvironments.production.id)
       )
 
-      val actual = data.toRequest(FakeUser.email)
+      val actual = data.toRequest(FakeUser.email, FakeHipEnvironments.production.id)
 
       actual mustBe expected
     }
