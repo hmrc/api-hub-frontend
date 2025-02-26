@@ -38,6 +38,7 @@ import play.api.Application as PlayApplication
 import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
 import viewmodels.AddCredentialSuccessViewModel
+import views.html.ErrorTemplate
 import views.html.application.{AddCredentialChecklistView, AddCredentialSuccessView}
 
 import java.time.{Clock, Instant, LocalDateTime, ZoneId}
@@ -60,7 +61,32 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
             val view = fixture.playApplication.injector.instanceOf[AddCredentialChecklistView]
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual view(form, FakeApplication.id, Some(user)).toString
+            contentAsString(result) mustEqual view(form, FakeApplication.id, Some(user), FakeHipEnvironments.production).toString
+            contentAsString(result) must validateAsHtml
+          }
+      }
+    }
+    "must return 404 when the environment is not product-like" in {
+      forAll(privilegedTeamMemberAndSupporterTable) {
+        user =>
+          val fixture = buildFixture(user)
+
+          running(fixture.playApplication) {
+            implicit val msgs: Messages = messages(fixture.playApplication)
+            val checkListTestRoute = controllers.application.routes.AddCredentialController.checklist(FakeApplication.id, FakeHipEnvironments.test.id).url
+            implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, checkListTestRoute)
+            val result = route(fixture.playApplication, request).value
+            val view = fixture.playApplication.injector.instanceOf[ErrorTemplate]
+
+            status(result) mustEqual NOT_FOUND
+            contentAsString(result) mustBe
+              view(
+                "Page not found - 404",
+                "This page can’t be found",
+                "Please check that you have entered the correct web address.",
+                Some(user)
+              )(request, messages(fixture.playApplication))
+                .toString()
             contentAsString(result) must validateAsHtml
           }
       }
@@ -166,7 +192,7 @@ class AddCredentialControllerSpec extends SpecBase with MockitoSugar with TestHe
         implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(controllers.application.routes.AddCredentialController.addCredentialForEnvironment(FakeApplication.id, FakeHipEnvironments.production.id))
         val result = route(fixture.playApplication, request).value
         status(result) mustBe BAD_REQUEST
-        contentAsString(result) mustEqual view(form.bindFromRequest(Map.empty), FakeApplication.id, Some(FakePrivilegedUserOnApplicationTeam)).toString
+        contentAsString(result) mustEqual view(form.bindFromRequest(Map.empty), FakeApplication.id, Some(FakePrivilegedUserOnApplicationTeam), FakeHipEnvironments.production).toString
         contentAsString(result) must validateAsHtml
       }
     }
@@ -178,7 +204,7 @@ object AddCredentialControllerSpec extends SpecBase with MockitoSugar {
   private case class Fixture(playApplication: PlayApplication, apiHubService: ApiHubService)
 
   private val clock: Clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
-  private def checklistRoute() = controllers.application.routes.AddCredentialController.checklist(FakeApplication.id).url
+  private def checklistRoute() = controllers.application.routes.AddCredentialController.checklist(FakeApplication.id, FakeHipEnvironments.production.id).url
   private val formProvider = new AddCredentialChecklistFormProvider()
   private val form = formProvider()
 

@@ -28,7 +28,7 @@ case class CredentialsTabViewModel(credentials: Seq[Credential], applicationId: 
   val userCanDeleteCredentials = credentials.size > 1 && userCanAddCredentials
 
   val addCredentialFormAction = hipEnvironment.isProductionLike match {
-    case true => controllers.application.routes.AddCredentialController.checklist(applicationId)
+    case true => controllers.application.routes.AddCredentialController.checklist(applicationId, hipEnvironment.id)
     case false => controllers.application.routes.AddCredentialController.addCredentialForEnvironment(applicationId, hipEnvironment.id)
   }
 

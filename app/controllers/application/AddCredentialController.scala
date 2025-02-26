@@ -53,9 +53,13 @@ class AddCredentialController @Inject()(
   private val form = formProvider()
   private val credentialsTabFragment = "#credentials"
 
-  def checklist(applicationId: String): Action[AnyContent] = (identify andThen isPrivileged andThen applicationAuth(applicationId)) {
+  def checklist(applicationId: String, environment: String): Action[AnyContent] = (identify andThen isPrivileged andThen applicationAuth(applicationId)) {
     implicit request =>
-      Ok(view(form, applicationId, request.maybeUser))
+      hipEnvironments.forUrlPathParameter(environment) match {
+        case hipEnvironment if hipEnvironment.isProductionLike =>
+          Ok(view(form, applicationId, request.maybeUser, hipEnvironment))
+        case _ => errorResultBuilder.notFound()
+      }
   }
 
   def addCredentialForEnvironment(applicationId: String, environment: String): Action[AnyContent] = (identify andThen applicationAuth(applicationId)).async {
@@ -63,21 +67,21 @@ class AddCredentialController @Inject()(
       hipEnvironments.forUrlPathParameter(environment) match {
         case hipEnvironment if hipEnvironment.isProductionLike =>
           form.bindFromRequest().fold(
-            formWithErrors => Future.successful(BadRequest(view(formWithErrors, applicationId, request.maybeUser))),
-            _ => addCredentialToProduction(hipEnvironment)
+            formWithErrors => Future.successful(BadRequest(view(formWithErrors, applicationId, request.maybeUser, hipEnvironment))),
+            _ => addCredentialToProductionLike(hipEnvironment)
           )
-        case hipEnvironment => addCredentialToNonProduction(hipEnvironment)
+        case hipEnvironment => addCredentialToNonProductionLike(hipEnvironment)
       }
   }
 
-  private def addCredentialToNonProduction(hipEnvironment: HipEnvironment)(implicit request: ApplicationRequest[AnyContent]) = {
+  private def addCredentialToNonProductionLike(hipEnvironment: HipEnvironment)(implicit request: ApplicationRequest[AnyContent]) = {
     addCredential(
       hipEnvironment,
       credential => Future.successful(SeeOther(controllers.application.routes.EnvironmentsController.onPageLoad(request.application.id, hipEnvironment.id).url + credentialsTabFragment))
     )
   }
 
-  private def addCredentialToProduction(hipEnvironment: HipEnvironment)(implicit request: ApplicationRequest[AnyContent]) = {
+  private def addCredentialToProductionLike(hipEnvironment: HipEnvironment)(implicit request: ApplicationRequest[AnyContent]) = {
     isPrivileged.invokeBlock(
       request.identifierRequest,
       _ => addCredential(

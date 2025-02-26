@@ -226,7 +226,7 @@ environmentAndCredentials.created = Created
 environmentAndCredentials.addNewCredential = Create new credential
 environmentAndCredentials.noCredentials = No production credentials have been created.
 environmentAndCredentials.notPrivileged = You do not have permission to manage credentials
-environmentAndCredentials.notPrivileged.additional1 = To manage production credentials you need Security Check (SC) clearance and the relevant role assigned to your account.
+environmentAndCredentials.notPrivileged.additional1 = To manage {0} credentials you need Security Check (SC) clearance and the relevant role assigned to your account.
 environmentAndCredentials.notPrivileged.additional2 = To find out more, view our {0}.
 environmentAndCredentials.notPrivileged.additional3 = access and roles guide
 environmentAndCredentials.deleteCredential = Revoke credential
@@ -248,12 +248,12 @@ environments.credentialNotFound.message = Cannot find credential with ID {0} for
 environments.cannotDeleteLastCredential.heading = Cannot revoke last credential
 environments.cannotDeleteLastCredential.message = You cannot revoke the last credential for an application.
 
-addCredentialChecklist.title = Creating production credentials
-addCredentialChecklist.heading = Creating production credentials
+addCredentialChecklist.title = Creating {0} credentials
+addCredentialChecklist.heading = Creating {0} credentials
 addCredentialChecklist.error.required = You must confirm you meet the conditions to continue
-addCredentialChecklist.guidance = To create production credentials, you must satisfy the following conditions:
+addCredentialChecklist.guidance = To create {0} credentials, you must satisfy the following conditions:
 addCredentialChecklist.condition1 = You must have Security Check (SC) clearance
-addCredentialChecklist.condition2 = You must have a secure mechanism for storing production credentials
+addCredentialChecklist.condition2 = You must have a secure mechanism for storing {0} credentials
 addCredentialChecklist.condition3 = You must agree that if the credentials are compromised or there is suspicion of compromise by an intruder or unauthorised user, you will notify the Integration Hub immediately
 addCredentialChecklist.confirm = I confirm that the above conditions are satisfied
 
