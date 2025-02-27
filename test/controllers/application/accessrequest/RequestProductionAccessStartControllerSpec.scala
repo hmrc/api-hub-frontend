@@ -153,6 +153,7 @@ object RequestProductionAccessStartControllerSpec {
     shortDescription = None,
     openApiSpecification = "test-oas-spec",
     apiStatus = Live,
+    created = Instant.now(),
     reviewedDate = Instant.now(),
     platform = "HIP",
     maintainer = Maintainer("name", "#slack", List.empty)

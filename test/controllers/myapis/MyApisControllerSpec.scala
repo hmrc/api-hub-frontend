@@ -91,22 +91,24 @@ class MyApisControllerSpec
       val view = fixture.application.injector.instanceOf[MyApisView]
 
       val zebras = ApiDetail("id1", "ref1", "zebras", "zebras api", "1.0.0", Seq.empty, None, "oas", Live,
-        reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
+         created = Instant.now(), reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
       val molluscs = ApiDetail("id2", "ref2", "MOLLUSCS", "molluscs api", "1.0.0", Seq.empty, None, "oas", Live,
-        reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
+         created = Instant.now(), reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
       val aardvarks = ApiDetail("id3", "ref3", "aardvarks", "aardvarks api", "1.0.0", Seq.empty, None, "oas", Live,
-        reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
+         created = Instant.now(), reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
       val pigeons = ApiDetail("id4", "ref4", "PIGEONS", "pigeons api", "1.0.0", Seq.empty, None, "oas", Live,
-        reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
+         created = Instant.now(), reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
+      val apis = Seq(aardvarks, molluscs, pigeons, zebras)
+      val sortedApis = apis.sortWith((a, b) => a.created.isAfter(b.created))
 
       when(fixture.apiHubService.getUserApis(eqTo(TeamMember(FakeUser.email)))(any))
-        .thenReturn(Future.successful(Seq(molluscs, zebras, aardvarks, pigeons)))
+        .thenReturn(Future.successful(apis))
 
       val request = FakeRequest(GET, controllers.myapis.routes.MyApisController.onPageLoad().url)
       val result = route(fixture.application, request).value
 
       status(result) mustBe OK
-      contentAsString(result) mustBe view(Seq(aardvarks, molluscs, pigeons, zebras), FakeUser)(request, messages(fixture.application)).toString()
+      contentAsString(result) mustBe view(sortedApis, FakeUser)(request, messages(fixture.application)).toString()
       contentAsString(result) must validateAsHtml
     }
   }

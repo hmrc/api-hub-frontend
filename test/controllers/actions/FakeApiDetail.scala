@@ -32,6 +32,7 @@ object FakeApiDetail extends ApiDetail(
   Some("short description"),
   "oas",
   Live,
+  Instant.now(),
   Some("teamId"),
   Some("domain"),
   Some("subdomain"),

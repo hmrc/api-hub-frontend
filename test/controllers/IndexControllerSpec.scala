@@ -51,7 +51,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with TeamGenerator 
         Application("id-2", "app-name-2", Creator(creatorEmail), Seq.empty).copy(teamMembers = Seq(TeamMember(testEmail)))
       )
       val teams = Seq(sampleTeam(), sampleTeam())
-      val apis = Seq(sampleApiDetail(), sampleApiDetail())
+      val apis = Seq(sampleApiDetail(), sampleApiDetail(), sampleApiDetail())
 
       val fixture = buildFixture()
 
@@ -72,9 +72,8 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with TeamGenerator 
 
         status(result) mustEqual OK
 
-        val sortedApplications = applications.sortBy(_.created).reverse
-        val sortedTeams = teams.sortBy(_.created).reverse
-        contentAsString(result) mustEqual view(buildViewModel(fixture.application, applications, teams, apis))(request, messages(fixture.application)).toString
+        val sortedApis = apis.sortWith((a, b) => a.created.isAfter(b.created))
+        contentAsString(result) mustEqual view(buildViewModel(fixture.application, applications, teams, sortedApis))(request, messages(fixture.application)).toString
         contentAsString(result) must validateAsHtml
       }
     }

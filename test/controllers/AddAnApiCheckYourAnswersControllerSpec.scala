@@ -77,6 +77,7 @@ class AddAnApiCheckYourAnswersControllerSpec extends SpecBase with SummaryListFl
         None,
         sampleOas,
         Live,
+        created = Instant.now(),
         reviewedDate = Instant.now(),
         platform = "API_PLATFORM",
         maintainer = Maintainer("name", "#slack", List.empty)

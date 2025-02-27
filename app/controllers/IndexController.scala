@@ -45,8 +45,9 @@ class IndexController @Inject()(
       userApps <- apiHubService.getApplications(Some(request.user.email), false)
       userTeams <- apiHubService.findTeams(Some(request.user.email))
       userApis <- apiHubService.getUserApis(request.user)
+      sortedUserApis = userApis.sortWith((a, b) => a.created.isAfter(b.created))
     } yield Ok(view(
-          DashboardViewModel(frontendAppConfig, userApps, userTeams, userApis, request.user)
+          DashboardViewModel(frontendAppConfig, userApps, userTeams, sortedUserApis, request.user)
     ))
   }
 

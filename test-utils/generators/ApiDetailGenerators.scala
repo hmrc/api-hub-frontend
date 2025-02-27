@@ -73,6 +73,7 @@ trait ApiDetailGenerators {
       apiType <- Gen.oneOf(ApiType.values.toIndexedSeq)
       apiNumber <- Gen.option(sensiblySizedAlphaNumStr)
       apiGeneration <- Gen.oneOf(ApiGeneration.values)
+      created <- Gen.const(Instant.now().truncatedTo(ChronoUnit.SECONDS))
     } yield ApiDetail(
       id.toString,
       publisherReference,
@@ -83,6 +84,7 @@ trait ApiDetailGenerators {
       Some(shortDescription),
       openApiSpecification,
       apiStatus,
+      created,
       domain = Some(domain.code),
       subDomain = Some(subDomain.code),
       hods = hods,

@@ -39,6 +39,7 @@ class AvailableEndpointsSpec extends AnyFreeSpec with Matchers with TableDrivenP
     shortDescription = None,
     openApiSpecification = sampleOas,
     apiStatus = Live,
+    created = Instant.now(),
     reviewedDate = Instant.now(),
     platform = "HIP",
     maintainer = Maintainer("test-name", "test-slack"),

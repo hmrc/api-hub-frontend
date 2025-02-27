@@ -54,6 +54,7 @@ class AddAnApiCompleteControllerSpec extends SpecBase with HtmlValidation with M
     None,
     "",
     Live,
+    created = Instant.now(),
     reviewedDate = Instant.now(),
     platform = "API_PLATFORM",
     maintainer = Maintainer("name", "#slack", List.empty)

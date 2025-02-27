@@ -77,6 +77,7 @@ case class ApiDetail(
   shortDescription: Option[String],
   openApiSpecification: String,
   apiStatus: ApiStatus,
+  created: Instant,
   teamId: Option[String] = None,
   domain: Option[String] = None,
   subDomain: Option[String] = None,
@@ -117,6 +118,7 @@ object ApiDetail {
       ~ (__ \ "shortDescription").readNullable[String]
       ~ Reads.pure("")
       ~ (__ \ "apiStatus").read[ApiStatus]
+      ~ (__ \ "created").read[Instant]
       ~ (__ \ "teamId").readNullable[String]
       ~ (__ \ "domain").readNullable[String]
       ~ (__ \ "subDomain").readNullable[String]

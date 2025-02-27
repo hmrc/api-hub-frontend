@@ -153,6 +153,7 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
       openApiSpecification = "test-oas-spec",
       apiStatus = Live,
       reviewedDate = Instant.now(),
+      created = Instant.now(),
       platform = "HIP",
       maintainer = Maintainer("name", "#slack", List.empty)
     )
