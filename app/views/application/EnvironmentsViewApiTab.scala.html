@@ -93,7 +93,7 @@
                 @messages("applicationApis.apiMissing")
             </p>
             <p class="govuk-body">
-                <a class="govuk-link govuk-link--no-visited-state" href="@controllers.application.routes.RemoveApiController.onPageLoad(viewModel.applicationId, applicationApi.apiId)" data-remove-api-api-id="@applicationApi.apiId">
+                <a class="govuk-link govuk-link--no-visited-state" href="@controllers.application.routes.RemoveApiController.onPageLoad(viewModel.applicationId, applicationApi.apiId, viewModel.hipEnvironment.id)" data-remove-api-api-id="@applicationApi.apiId">
                     @messages("applicationApis.removeApi")
                 </a>
             </p>
@@ -154,7 +154,7 @@
                         .withAttribute("data-add-endpoints-api-id", applicationApi.apiId)
                     )
                 }
-                <a class="govuk-link govuk-link--no-visited-state" href="@controllers.application.routes.RemoveApiController.onPageLoad(viewModel.applicationId, applicationApi.apiId)" data-remove-api-api-id="@applicationApi.apiId">
+                <a class="govuk-link govuk-link--no-visited-state" href="@controllers.application.routes.RemoveApiController.onPageLoad(viewModel.applicationId, applicationApi.apiId, viewModel.hipEnvironment.id)" data-remove-api-api-id="@applicationApi.apiId">
                     @messages("applicationApis.removeApi")
                 </a>
             </div>

@@ -18,6 +18,7 @@ package controllers.application
 
 import base.SpecBase
 import controllers.actions.{FakeApiDetail, FakeApplication, FakeApprover, FakeUser}
+import fakes.FakeHipEnvironments
 import forms.YesNoFormProvider
 import models.api.ApiDetail
 import models.application.ApplicationLenses.*
@@ -55,12 +56,12 @@ class RemoveApiControllerSpec extends SpecBase with MockitoSugar with HtmlValida
             .thenReturn(Future.successful(Some(apiDetail)))
 
           running(fixture.playApplication) {
-            val request = FakeRequest(controllers.application.routes.RemoveApiController.onPageLoad(application.id, apiDetail.id))
+            val request = FakeRequest(controllers.application.routes.RemoveApiController.onPageLoad(application.id, apiDetail.id, FakeHipEnvironments.test.id))
             val result = route(fixture.playApplication, request).value
             val view = fixture.playApplication.injector.instanceOf[RemoveApiConfirmationView]
 
             status(result) mustBe OK
-            contentAsString(result) mustBe view(application, apiDetail.id, apiDetail.title,  form, user)(request, messages(fixture.playApplication)).toString()
+            contentAsString(result) mustBe view(application, apiDetail.id, apiDetail.title,  form, user, FakeHipEnvironments.test.id)(request, messages(fixture.playApplication)).toString()
             contentAsString(result) must validateAsHtml
           }
       }
@@ -76,12 +77,12 @@ class RemoveApiControllerSpec extends SpecBase with MockitoSugar with HtmlValida
         .thenReturn(Future.successful(None))
 
       running(fixture.playApplication) {
-        val request = FakeRequest(controllers.application.routes.RemoveApiController.onPageLoad(application.id, apiDetail.id))
+        val request = FakeRequest(controllers.application.routes.RemoveApiController.onPageLoad(application.id, apiDetail.id, FakeHipEnvironments.test.id))
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[RemoveApiConfirmationView]
 
         status(result) mustBe OK
-        contentAsString(result) mustBe view(application, api.id, api.title, form, FakeUser)(request, messages(fixture.playApplication)).toString()
+        contentAsString(result) mustBe view(application, api.id, api.title, form, FakeUser, FakeHipEnvironments.test.id)(request, messages(fixture.playApplication)).toString()
         contentAsString(result) must validateAsHtml
       }
     }
@@ -93,7 +94,7 @@ class RemoveApiControllerSpec extends SpecBase with MockitoSugar with HtmlValida
         .thenReturn(Future.successful(Some(application)))
 
       running(fixture.playApplication) {
-        val request = FakeRequest(controllers.application.routes.RemoveApiController.onPageLoad(application.id, apiDetail.id))
+        val request = FakeRequest(controllers.application.routes.RemoveApiController.onPageLoad(application.id, apiDetail.id, FakeHipEnvironments.test.id))
         val result = route(fixture.playApplication, request).value
 
         status(result) mustBe SEE_OTHER
@@ -111,7 +112,7 @@ class RemoveApiControllerSpec extends SpecBase with MockitoSugar with HtmlValida
         .thenReturn(Future.successful(Some(apiDetail)))
 
       running(fixture.playApplication) {
-        val request = FakeRequest(controllers.application.routes.RemoveApiController.onPageLoad(applicationWithoutApis.id, apiDetail.id))
+        val request = FakeRequest(controllers.application.routes.RemoveApiController.onPageLoad(applicationWithoutApis.id, apiDetail.id, FakeHipEnvironments.test.id))
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[ErrorTemplate]
 
@@ -139,7 +140,7 @@ class RemoveApiControllerSpec extends SpecBase with MockitoSugar with HtmlValida
         .thenReturn(Future.successful(None))
 
       running(fixture.playApplication) {
-        val request = FakeRequest(controllers.application.routes.RemoveApiController.onPageLoad(FakeApplication.id, apiDetail.id))
+        val request = FakeRequest(controllers.application.routes.RemoveApiController.onPageLoad(FakeApplication.id, apiDetail.id, FakeHipEnvironments.test.id))
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[ErrorTemplate]
 
@@ -171,7 +172,7 @@ class RemoveApiControllerSpec extends SpecBase with MockitoSugar with HtmlValida
             .thenReturn(Future.successful(Some(())))
 
           running(fixture.playApplication) {
-            val request = FakeRequest(controllers.application.routes.RemoveApiController.onSubmit(application.id, apiDetail.id))
+            val request = FakeRequest(controllers.application.routes.RemoveApiController.onSubmit(application.id, apiDetail.id, FakeHipEnvironments.test.id))
               .withFormUrlEncodedBody(("value", "true"))
 
             val result = route(fixture.playApplication, request).value
@@ -194,7 +195,7 @@ class RemoveApiControllerSpec extends SpecBase with MockitoSugar with HtmlValida
         .thenReturn(Future.successful(Some(apiDetail)))
 
       running(fixture.playApplication) {
-        val request = FakeRequest(controllers.application.routes.RemoveApiController.onSubmit(application.id, apiDetail.id))
+        val request = FakeRequest(controllers.application.routes.RemoveApiController.onSubmit(application.id, apiDetail.id, FakeHipEnvironments.test.id))
           .withFormUrlEncodedBody(("value", ""))
 
         val result = route(fixture.playApplication, request).value
@@ -203,7 +204,7 @@ class RemoveApiControllerSpec extends SpecBase with MockitoSugar with HtmlValida
         val formWithErrors = form.bind(Map("value" -> ""))
 
         status(result) mustBe BAD_REQUEST
-        contentAsString(result) mustBe view(application, apiDetail.id, apiDetail.title, formWithErrors, FakeUser)(request, messages(fixture.playApplication)).toString()
+        contentAsString(result) mustBe view(application, apiDetail.id, apiDetail.title, formWithErrors, FakeUser, FakeHipEnvironments.test.id)(request, messages(fixture.playApplication)).toString()
         contentAsString(result) must validateAsHtml
       }
     }
@@ -215,7 +216,7 @@ class RemoveApiControllerSpec extends SpecBase with MockitoSugar with HtmlValida
         .thenReturn(Future.successful(Some(application)))
 
       running(fixture.playApplication) {
-        val request = FakeRequest(controllers.application.routes.RemoveApiController.onSubmit(application.id, apiDetail.id))
+        val request = FakeRequest(controllers.application.routes.RemoveApiController.onSubmit(application.id, apiDetail.id, FakeHipEnvironments.test.id))
           .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(fixture.playApplication, request).value
@@ -235,7 +236,7 @@ class RemoveApiControllerSpec extends SpecBase with MockitoSugar with HtmlValida
         .thenReturn(Future.successful(None))
 
       running(fixture.playApplication) {
-        val request = FakeRequest(controllers.application.routes.RemoveApiController.onSubmit(application.id, apiDetail.id))
+        val request = FakeRequest(controllers.application.routes.RemoveApiController.onSubmit(application.id, apiDetail.id, FakeHipEnvironments.test.id))
           .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(fixture.playApplication, request).value
@@ -262,13 +263,13 @@ class RemoveApiControllerSpec extends SpecBase with MockitoSugar with HtmlValida
         .thenReturn(Future.successful(Some(application)))
 
       running(fixture.playApplication) {
-        val request = FakeRequest(controllers.application.routes.RemoveApiController.onSubmit(application.id, apiDetail.id))
+        val request = FakeRequest(controllers.application.routes.RemoveApiController.onSubmit(application.id, apiDetail.id, FakeHipEnvironments.test.id))
           .withFormUrlEncodedBody(("value", "false"))
 
         val result = route(fixture.playApplication, request).value
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url
+        redirectLocation(result).value mustBe controllers.application.routes.EnvironmentsController.onPageLoad(application.id, FakeHipEnvironments.test.id).url
       }
     }
   }

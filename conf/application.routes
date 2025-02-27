@@ -34,8 +34,8 @@ GET         /manage-team-members/:id                                            
 GET         /add-team-member/:id                                                    controllers.application.AddTeamMemberController.onPageLoad(id: String)
 POST        /add-team-member/:id                                                    controllers.application.AddTeamMemberController.onSubmit(id: String)
 
-GET         /remove-api/:applicationId/:apiId                                       controllers.application.RemoveApiController.onPageLoad(applicationId: String, apiId: String)
-POST        /remove-api/:applicationId/:apiId                                       controllers.application.RemoveApiController.onSubmit(applicationId: String, apiId: String)
+GET         /remove-api/:applicationId/:apiId/:environmentId                        controllers.application.RemoveApiController.onPageLoad(applicationId: String, apiId: String, environmentId: String)
+POST        /remove-api/:applicationId/:apiId/:environmentId                        controllers.application.RemoveApiController.onSubmit(applicationId: String, apiId: String, environmentId: String)
 
 GET         /register/start                                                         controllers.application.register.RegisterApplicationStartController.startRegisterApplication()
 GET         /register/name                                                          controllers.application.register.RegisterApplicationNameController.onPageLoad(mode: Mode = NormalMode)
