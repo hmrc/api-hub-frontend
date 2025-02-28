@@ -9,21 +9,21 @@ POST        /delete-credentials/:id/client/:clientId/environment/:environmentId 
 GET         /add-credential-checklist/:id/:environment                              controllers.application.AddCredentialController.checklist(id: String, environment: String)
 POST        /add-credential/:id/:environment                                        controllers.application.AddCredentialController.addCredentialForEnvironment(id: String, environment: String)
 
-GET         /request-production-access/:id/start                                    controllers.application.accessrequest.RequestProductionAccessStartController.onPageLoad(id: String)
-GET         /request-production-access/check-your-answers                           controllers.application.accessrequest.RequestProductionAccessController.onPageLoad()
-POST        /request-production-access/check-your-answers                           controllers.application.accessrequest.RequestProductionAccessController.onSubmit()
+GET         /request-access/:id/start                                               controllers.application.accessrequest.RequestProductionAccessStartController.onPageLoad(id: String)
+GET         /request-access/check-your-answers                                      controllers.application.accessrequest.RequestProductionAccessController.onPageLoad()
+POST        /request-access/check-your-answers                                      controllers.application.accessrequest.RequestProductionAccessController.onSubmit()
 
-GET         /request-production-access/select-apis                                  controllers.application.accessrequest.RequestProductionAccessSelectApisController.onPageLoad(mode: Mode = NormalMode)
-POST        /request-production-access/select-apis                                  controllers.application.accessrequest.RequestProductionAccessSelectApisController.onSubmit(mode: Mode = NormalMode)
-GET         /request-production-access/change-select-apis                           controllers.application.accessrequest.RequestProductionAccessSelectApisController.onPageLoad(mode: Mode = CheckMode)
-POST        /request-production-access/change-select-apis                           controllers.application.accessrequest.RequestProductionAccessSelectApisController.onSubmit(mode: Mode = CheckMode)
+GET         /request-access/select-apis                                             controllers.application.accessrequest.RequestProductionAccessSelectApisController.onPageLoad(mode: Mode = NormalMode)
+POST        /request-access/select-apis                                             controllers.application.accessrequest.RequestProductionAccessSelectApisController.onSubmit(mode: Mode = NormalMode)
+GET         /request-access/change-select-apis                                      controllers.application.accessrequest.RequestProductionAccessSelectApisController.onPageLoad(mode: Mode = CheckMode)
+POST        /request-access/change-select-apis                                      controllers.application.accessrequest.RequestProductionAccessSelectApisController.onSubmit(mode: Mode = CheckMode)
 
-GET         /request-production-access/supporting-information                       controllers.application.accessrequest.ProvideSupportingInformationController.onPageLoad(mode: Mode = NormalMode)
-POST        /request-production-access/supporting-information                       controllers.application.accessrequest.ProvideSupportingInformationController.onSubmit(mode: Mode = NormalMode)
-GET         /request-production-access/change-supporting-information                controllers.application.accessrequest.ProvideSupportingInformationController.onPageLoad(mode: Mode = CheckMode)
-POST        /request-production-access/change-supporting-information                controllers.application.accessrequest.ProvideSupportingInformationController.onSubmit(mode: Mode = CheckMode)
+GET         /request-access/supporting-information                                  controllers.application.accessrequest.ProvideSupportingInformationController.onPageLoad(mode: Mode = NormalMode)
+POST        /request-access/supporting-information                                  controllers.application.accessrequest.ProvideSupportingInformationController.onSubmit(mode: Mode = NormalMode)
+GET         /request-access/change-supporting-information                           controllers.application.accessrequest.ProvideSupportingInformationController.onPageLoad(mode: Mode = CheckMode)
+POST        /request-access/change-supporting-information                           controllers.application.accessrequest.ProvideSupportingInformationController.onSubmit(mode: Mode = CheckMode)
 
-GET         /request-production-access/success                                      controllers.application.accessrequest.RequestProductionAccessEndJourneyController.submitRequest()
+GET         /request-access/success                                                 controllers.application.accessrequest.RequestProductionAccessEndJourneyController.submitRequest()
 
 GET         /access-request/:accessRequestId                                        controllers.application.AccessRequestController.onPageLoad(accessRequestId: String)
 
