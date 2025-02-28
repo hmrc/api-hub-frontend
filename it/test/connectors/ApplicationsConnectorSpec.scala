@@ -444,7 +444,7 @@ class ApplicationsConnectorSpec
             )
           )
         ),
-        environmentId = None
+        environmentId = "test"
       )
 
       stubFor(
@@ -477,7 +477,7 @@ class ApplicationsConnectorSpec
         supportingInformation = "test-supporting-information",
         requested = LocalDateTime.now(),
         requestedBy = "test-requested-by",
-        environmentId = None
+        environmentId = "test"
       )
 
       val filters = Table(
@@ -519,7 +519,7 @@ class ApplicationsConnectorSpec
         supportingInformation = "test-supporting-information",
         requested = LocalDateTime.now(),
         requestedBy = "test-requested-by",
-        environmentId = None
+        environmentId = "test"
       )
 
       stubFor(

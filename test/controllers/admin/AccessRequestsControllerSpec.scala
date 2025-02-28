@@ -77,7 +77,7 @@ class AccessRequestsControllerSpec
         supportingInformation = "test-supporting-information-1",
         requested = now,
         requestedBy = "test-requested-by-1",
-        environmentId = None
+        environmentId = "test"
       )
 
       val accessRequest2 = AccessRequest(
@@ -89,7 +89,7 @@ class AccessRequestsControllerSpec
         supportingInformation = "test-supporting-information-2",
         requested = now.minusDays(1),
         requestedBy = "test-requested-by-2",
-        environmentId = Some("test")
+        environmentId = "test"
       )
 
       val accessRequest3 = AccessRequest(
@@ -101,7 +101,7 @@ class AccessRequestsControllerSpec
         supportingInformation = "test-supporting-information-3",
         requested = now.minusDays(1),
         requestedBy = "test-requested-by-3",
-        environmentId = Some("test")
+        environmentId = "test"
       )
 
       val accessRequest4 = AccessRequest(
@@ -113,7 +113,7 @@ class AccessRequestsControllerSpec
         supportingInformation = "test-supporting-information-4",
         requested = now.minusDays(2),
         requestedBy = "test-requested-by-4",
-        environmentId = Some("test")
+        environmentId = "test"
       )
 
       val accessRequests = Seq(accessRequest4, accessRequest3, accessRequest2, accessRequest1)

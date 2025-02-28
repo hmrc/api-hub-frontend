@@ -23,7 +23,7 @@ case class AccessRequestRequest(
   supportingInformation: String,
   requestedBy: String,
   apis: Seq[AccessRequestApi],
-  environmentId: Option[String]
+  environmentId: String
 )
 
 object AccessRequestRequest {

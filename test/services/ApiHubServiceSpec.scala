@@ -593,7 +593,7 @@ class ApiHubServiceSpec
 
       when(fixture.applicationsConnector.createAccessRequest(any())(any())).thenReturn(Future.successful(()))
 
-      val anAccessRequest = AccessRequestRequest("appId", "blah", "me@here", Seq.empty, None)
+      val anAccessRequest = AccessRequestRequest("appId", "blah", "me@here", Seq.empty, "test")
 
       fixture.service.requestProductionAccess(anAccessRequest)(HeaderCarrier()).map {
         result =>
