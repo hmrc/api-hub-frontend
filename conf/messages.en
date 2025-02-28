@@ -440,9 +440,9 @@ addAnApiSelectEndpoints.scopesUsed = These endpoints use the following scopes:
 addAnApiCheckYourAnswers.title = Check your answers
 addAnApiCheckYourAnswers.heading = Check your answers before continuing
 addAnApiCheckYourAnswers.details = Details
-addAnApiCheckYourAnswers.guidance.heading = Finishing adding API to application
-addAnApiCheckYourAnswers.guidance.p1 = Once the API has been added to your application you will be able to use it in the test environment.
-addAnApiCheckYourAnswers.guidance.p2 = To use this API in production you will need to request production access.
+addAnApiCheckYourAnswers.guidance.heading = Finish adding API to application
+addAnApiCheckYourAnswers.guidance.p1 = Once the API has been added to your application you will be able to use it in the non-production environments.
+addAnApiCheckYourAnswers.guidance.p2 = To use this API in production environments you will need to request access.
 
 addAnApiSuccess.title = API added successfully
 addAnApiSuccess.summary = {0} is now available within your application
