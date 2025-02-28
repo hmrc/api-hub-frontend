@@ -298,7 +298,7 @@ object ApplicationApiBuilderSpec {
       requestedBy = "test-requested-by",
       decision = None,
       cancelled = None,
-      environmentId = None
+      environmentId = "test"
     )
   }
 

@@ -165,7 +165,7 @@ object CancelAccessRequestEndJourneyControllerSpec extends OptionValues{
     "me",
     None,
     None,
-    Some("test")
+    "test"
   )
 
 

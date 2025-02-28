@@ -152,7 +152,7 @@ object RequestProductionAccessEndJourneyController {
                 )
             )
           ),
-        environmentId = Some(forEnvironmentId)
+        environmentId = forEnvironmentId
       )
     }
   }

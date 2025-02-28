@@ -113,7 +113,7 @@ trait AccessRequestGenerator {
       supportingInformation <- sensiblySizedAlphaNumStr
       requested <- genLocalDateTime
       requestedBy <- sensiblySizedAlphaNumStr
-      environmentId <- Gen.option(genEnvironmentId)
+      environmentId <- genEnvironmentId
     } yield AccessRequest(
       id = id.toString,
       applicationId = applicationId,
@@ -218,7 +218,7 @@ trait AccessRequestGenerator {
       supportingInformation <- sensiblySizedAlphaNumStr
       requestedBy <- sensiblySizedAlphaNumStr
       apis <- Gen.resize(newSize(size), genAccessRequestApis)
-      environmentId <- Gen.option(genEnvironmentId)
+      environmentId <- genEnvironmentId
     } yield AccessRequestRequest(
       applicationId = applicationId.toString,
       supportingInformation = supportingInformation,
