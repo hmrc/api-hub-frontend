@@ -37,6 +37,7 @@ import utils.HtmlValidation
 import viewmodels.DashboardViewModel
 import views.html.IndexView
 
+import java.time.Instant
 import scala.concurrent.Future
 
 class IndexControllerSpec extends SpecBase with MockitoSugar with TeamGenerator with ApiDetailGenerators with HtmlValidation {
@@ -44,6 +45,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with TeamGenerator 
   "Index Controller" - {
 
     "must return OK and the correct view when teams and applications exist for the user" in {
+      val now = Instant.now()
       val testEmail = "test-email"
       val creatorEmail = "creator-email-2"
       val applications = Seq(
@@ -51,7 +53,19 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with TeamGenerator 
         Application("id-2", "app-name-2", Creator(creatorEmail), Seq.empty).copy(teamMembers = Seq(TeamMember(testEmail)))
       )
       val teams = Seq(sampleTeam(), sampleTeam())
-      val apis = Seq(sampleApiDetail(), sampleApiDetail(), sampleApiDetail())
+      val api1 = sampleApiDetail().copy(created = now.minusSeconds(20))
+      val api2 = sampleApiDetail().copy(created = now.minusSeconds(40))
+      val api3 = sampleApiDetail().copy(created = now)
+      val apis = Seq(
+        api1,
+        api2,
+        api3,
+      )
+      val sortedApis = Seq(
+        api3,
+        api1,
+        api2
+      )
 
       val fixture = buildFixture()
 
@@ -72,7 +86,6 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with TeamGenerator 
 
         status(result) mustEqual OK
 
-        val sortedApis = apis.sortWith((a, b) => a.created.isAfter(b.created))
         contentAsString(result) mustEqual view(buildViewModel(fixture.application, applications, teams, sortedApis))(request, messages(fixture.application)).toString
         contentAsString(result) must validateAsHtml
       }

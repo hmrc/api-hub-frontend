@@ -90,16 +90,17 @@ class MyApisControllerSpec
     running(fixture.application) {
       val view = fixture.application.injector.instanceOf[MyApisView]
 
+      val now = Instant.now()
       val zebras = ApiDetail("id1", "ref1", "zebras", "zebras api", "1.0.0", Seq.empty, None, "oas", Live,
-         created = Instant.now(), reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
+         created = now.minusSeconds(40), reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
       val molluscs = ApiDetail("id2", "ref2", "MOLLUSCS", "molluscs api", "1.0.0", Seq.empty, None, "oas", Live,
-         created = Instant.now(), reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
+         created = now.minusSeconds(20), reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
       val aardvarks = ApiDetail("id3", "ref3", "aardvarks", "aardvarks api", "1.0.0", Seq.empty, None, "oas", Live,
-         created = Instant.now(), reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
+         created = now.minusSeconds(30), reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
       val pigeons = ApiDetail("id4", "ref4", "PIGEONS", "pigeons api", "1.0.0", Seq.empty, None, "oas", Live,
-         created = Instant.now(), reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
+         created = now.minusSeconds(10), reviewedDate = Instant.now(), platform = "HIP", maintainer = Maintainer("name", "#slack", List.empty))
       val apis = Seq(aardvarks, molluscs, pigeons, zebras)
-      val sortedApis = apis.sortWith((a, b) => a.created.isAfter(b.created))
+      val sortedApis = Seq(pigeons, molluscs, aardvarks, zebras)
 
       when(fixture.apiHubService.getUserApis(eqTo(TeamMember(FakeUser.email)))(any))
         .thenReturn(Future.successful(apis))
