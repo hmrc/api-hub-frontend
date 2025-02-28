@@ -217,6 +217,7 @@ object ApplicationApiBuilderSpec {
       shortDescription = None,
       openApiSpecification = "test-oas-spec-1",
       apiStatus = Live,
+      created = Instant.now(),
       reviewedDate = Instant.now(),
       platform = "HIP",
       maintainer = Maintainer("name", "#slack", List.empty)
@@ -247,6 +248,7 @@ object ApplicationApiBuilderSpec {
       shortDescription = None,
       openApiSpecification = "test-oas-spec-2",
       apiStatus = Live,
+      created = Instant.now(),
       reviewedDate = Instant.now(),
       platform = "HIP",
       maintainer = Maintainer("name", "#slack", List.empty)
@@ -270,6 +272,7 @@ object ApplicationApiBuilderSpec {
       shortDescription = None,
       openApiSpecification = "test-oas-spec-3",
       apiStatus = Live,
+      created = Instant.now(),
       reviewedDate = Instant.now(),
       platform = "HIP",
       maintainer = Maintainer("name", "#slack", List.empty)

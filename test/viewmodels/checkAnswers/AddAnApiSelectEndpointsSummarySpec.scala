@@ -60,6 +60,7 @@ class AddAnApiSelectEndpointsSummarySpec extends AnyFreeSpec with Matchers with 
     None,
     sampleOas,
     Live,
+    created = Instant.now(),
     reviewedDate = Instant.now(),
     platform = "API_PLATFORM",
     maintainer = Maintainer("name", "#slack", List.empty)

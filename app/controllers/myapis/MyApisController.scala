@@ -46,7 +46,7 @@ class MyApisController @Inject()(
             Messages("myApis.empty.heading")
           ))
         case apiDetails: Seq[ApiDetail] =>
-          Future.successful(Ok(view(apiDetails.sortWith( _.title.toUpperCase < _.title.toUpperCase), request.user)))
+          Future.successful(Ok(view(apiDetails.sortWith((a, b) => a.created.isAfter(b.created)), request.user)))
       }
   }
 
