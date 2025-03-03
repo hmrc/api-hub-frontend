@@ -36,8 +36,8 @@ case class CredentialsTabViewModel(credentials: Seq[Credential], applicationId: 
 }
 
 case class ApiTabViewModel(applicationApis: Seq[ApplicationApi], applicationId: String, hipEnvironment: HipEnvironment, noApis: Boolean) {
-  val showRequestProdAccessBanner = hipEnvironment.isProductionLike && applicationApis.exists(_.needsProductionAccessRequest)
-  val pendingAccessRequestsCount = applicationApis.count(_.hasPendingAccessRequest)
+  val showRequestProdAccessBanner = hipEnvironment.isProductionLike && applicationApis.exists(_.needsAccessRequest(hipEnvironment))
+  val pendingAccessRequestsCount = applicationApis.count(_.hasPendingAccessRequest(hipEnvironment))
   val showPendingAccessRequestsBanner = hipEnvironment.isProductionLike && pendingAccessRequestsCount > 0
 }
 

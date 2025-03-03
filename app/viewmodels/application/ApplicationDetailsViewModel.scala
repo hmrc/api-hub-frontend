@@ -16,11 +16,11 @@
 
 package viewmodels.application
 
-import config.HipEnvironment
+import config.{HipEnvironment, HipEnvironments}
 import models.application.Application
 import models.user.UserModel
 
-case class ApplicationDetailsViewModel(application: Application, applicationApis: Seq[ApplicationApi], user: Option[UserModel], productionEnvironmentId: String) {
+case class ApplicationDetailsViewModel(application: Application, applicationApis: Seq[ApplicationApi], user: Option[UserModel], hipEnvironments: HipEnvironments) {
   val applicationId = application.id
   val applicationName = application.name
   val showApplicationProblemsPanel = application.issues.nonEmpty
@@ -29,9 +29,13 @@ case class ApplicationDetailsViewModel(application: Application, applicationApis
   val missingApiNames: Seq[String] = applicationApis.filter(_.isMissing).map(_.apiTitle)
   val allApiNames = applicationApis.map(_.apiTitle)
   val hasMissingApis = missingApiNames.nonEmpty
-  val pendingAccessRequestsCount = applicationApis.map(_.pendingAccessRequestCount).sum
+  val pendingAccessRequestsCount = applicationApis.map(_.pendingAccessRequests.size).sum
   val hasPendingAccessRequests = pendingAccessRequestsCount > 0
-  val needsProductionAccessRequest = applicationApis.exists(_.needsProductionAccessRequest)
+  val needsProductionAccessRequest = applicationApis.flatMap(_.endpoints).exists(applicationEndpoint => {
+    hipEnvironments.environments.filter(_.isProductionLike).exists(env => {
+      applicationEndpoint.accessFor(env) == Inaccessible
+    })
+  })
   val notUsingGlobalTeams = application.teamId.isEmpty
   val applicationTeamMemberCount = application.teamMembers.size
   val applicationTeamMemberEmails = application.teamMembers.map(_.email)

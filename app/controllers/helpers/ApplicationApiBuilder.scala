@@ -17,8 +17,9 @@
 package controllers.helpers
 
 import com.google.inject.Inject
+import config.HipEnvironment
 import models.accessrequest.{AccessRequest, Pending}
-import models.api.ApiDetail
+import models.api.{ApiDetail, EndpointMethod}
 import models.application.*
 import play.api.mvc.Request
 import services.ApiHubService
@@ -70,19 +71,19 @@ class ApplicationApiBuilder @Inject()(
                     endpointMethod.summary,
                     endpointMethod.description,
                     endpointMethod.scopes,
-                    ApplicationEndpointAccess.production(theoreticalScopes, pendingAccessRequestCount(apiDetail.id, pendingAccessRequests), endpointMethod),
-                    ApplicationEndpointAccess.nonProduction(theoreticalScopes, pendingAccessRequestCount(apiDetail.id, pendingAccessRequests), endpointMethod)
+                    theoreticalScopes, 
+                    pendingAccessRequests
                   )
               )
         }
-        ApplicationApi(apiDetail, endpoints, pendingAccessRequestCount(apiDetail.id, pendingAccessRequests))
+        ApplicationApi(apiDetail, endpoints, findPendingAccessRequests(apiDetail.id, pendingAccessRequests))
       case (api, None) =>
-        ApplicationApi(api, pendingAccessRequestCount(api.id, pendingAccessRequests))
+        ApplicationApi(api, findPendingAccessRequests(api.id, pendingAccessRequests))
     }
   }
-
-  private def pendingAccessRequestCount(apiId: String, pendingAccessRequests: Seq[AccessRequest]): Int = {
-    pendingAccessRequests.count(_.apiId == apiId)
+  
+  private def findPendingAccessRequests(apiId: String, pendingAccessRequests: Seq[AccessRequest]): Seq[AccessRequest] = {
+    pendingAccessRequests.filter(_.apiId == apiId)
   }
 
   private def fetchApiDetails(application: Application)(implicit request: Request[?]): Future[Seq[(Api, Option[ApiDetail])]] = {
