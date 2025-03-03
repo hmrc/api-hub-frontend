@@ -18,6 +18,7 @@ package controllers.application.accessrequest
 
 import base.SpecBase
 import controllers.actions.{FakeApplication, FakeUser}
+import fakes.FakeHipEnvironments
 import forms.application.accessrequest.RequestProductionAccessDeclarationFormProvider
 import models.accessrequest.Pending
 import models.api.*
@@ -39,7 +40,7 @@ import repositories.AccessRequestSessionRepository
 import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
 import viewmodels.application.*
-import viewmodels.checkAnswers.application.accessrequest.{ProvideSupportingInformationSummary, RequestProductionAccessApplicationSummary, RequestProductionAccessSelectApisSummary}
+import viewmodels.checkAnswers.application.accessrequest.{ProvideSupportingInformationSummary, RequestProductionAccessApplicationSummary, RequestProductionAccessEnvironmentSummary, RequestProductionAccessSelectApisSummary}
 import views.html.application.accessrequest.RequestProductionAccessView
 
 import java.time.{Clock, Instant, ZoneId}
@@ -211,6 +212,7 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
     UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
       .set(RequestProductionAccessApplicationPage, application).toOption.value
       .set(RequestProductionAccessApisPage, Seq(applicationApi(application))).toOption.value
+      .set(RequestProductionAccessEnvironmentIdPage, FakeHipEnvironments.production.id).toOption.value
       .set(RequestProductionAccessSelectApisPage, Set(applicationApi(application).apiId)).toOption.value
       .set(ProvideSupportingInformationPage, supportingInformation).toOption.value
   }
@@ -218,6 +220,7 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
   private def buildSummaries(userAnswers: UserAnswers)(implicit messages: Messages) = {
     Seq(
       RequestProductionAccessApplicationSummary.row(userAnswers),
+      new RequestProductionAccessEnvironmentSummary(FakeHipEnvironments).row(userAnswers),
       RequestProductionAccessSelectApisSummary.row(userAnswers),
       ProvideSupportingInformationSummary.row(userAnswers)
     )
