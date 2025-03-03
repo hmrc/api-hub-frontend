@@ -127,7 +127,8 @@ class AddCredentialController @Inject()(
     val summaryList = AddCredentialSuccessViewModel.buildSummary(
       application,
       apiNames,
-      credential
+      credential,
+      hipEnvironment
     )
 
     Ok(successView(application, summaryList, Some(user), credential, controllers.application.routes.EnvironmentsController.onPageLoad(application.id, hipEnvironment.id).url + credentialsTabFragment))

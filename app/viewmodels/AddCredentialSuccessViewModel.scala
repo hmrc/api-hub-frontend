@@ -16,26 +16,28 @@
 
 package viewmodels
 
+import config.HipEnvironment
 import models.application.{Application, Credential}
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, SummaryList, SummaryListRow}
-import viewmodels.govuk.summarylist._
-import viewmodels.implicits._
+import viewmodels.govuk.summarylist.*
+import viewmodels.implicits.*
 
 object AddCredentialSuccessViewModel {
 
   def buildSummary(
     application: Application,
     apiNames: Seq[String],
-    credential: Credential
+    credential: Credential,
+    hipEnvironment: HipEnvironment,
   )(implicit messages: Messages): SummaryList = {
     SummaryListViewModel(
       rows = Seq(
         applicationNameRow(application),
         apisRow(apiNames),
-        environmentNameRow(),
+        environmentNameRow(hipEnvironment),
         clientIdRow(credential),
         clientSecretRow(credential)
       )
@@ -63,10 +65,10 @@ object AddCredentialSuccessViewModel {
     )
   }
 
-  private def environmentNameRow()(implicit messages: Messages): SummaryListRow = {
+  private def environmentNameRow(hipEnvironment: HipEnvironment)(implicit messages: Messages): SummaryListRow = {
     SummaryListRowViewModel(
       key     = "addCredentialSuccess.environment",
-      value   = ValueViewModel(HtmlFormat.escape(messages("site.environment.production")).toString),
+      value   = ValueViewModel(HtmlFormat.escape(hipEnvironment.nameKey).toString),
       actions = Seq.empty
     )
   }
