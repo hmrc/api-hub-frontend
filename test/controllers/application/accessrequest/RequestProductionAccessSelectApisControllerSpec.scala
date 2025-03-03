@@ -243,7 +243,7 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
     }
 
 
-    "must redirect to Journey Recovery for a GET if hip environment is not productionLike is found" in {
+    "must redirect to Journey Recovery for a GET if hip environment is not productionLike" in {
 
       val application = applicationBuilder(userAnswers = userAnswersWithApplicationAndApisAndNonProductionlikeEnvironmentId).build()
 
@@ -290,7 +290,7 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
       }
     }
 
-    "must redirect to Journey Recovery for a POST if existing data is found but environment is not productionlike" in {
+    "must redirect to Journey Recovery for a POST if existing data is found but environment is not productionLike" in {
 
       val application = applicationBuilder(userAnswers = userAnswersWithApplicationAndApisAndNonProductionlikeEnvironmentId).build()
 
