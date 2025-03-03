@@ -897,6 +897,7 @@ applicationHistory.requests = Below are the access requests for this application
 applicationHistory.noRequests = No access requests have been made for this application.
 applicationHistory.secondaryTitle = Access request history
 applicationHistory.viewRequest = View request
+applicationHistory.cancelAccessRequests = Cancel access requests
 
 produceApiEnterOas.title = Enter your OAS document
 produceApiEnterOas.heading = Enter your OAS document
