@@ -39,6 +39,7 @@ import repositories.AccessRequestSessionRepository
 import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
 import viewmodels.application.*
+import views.html.ErrorTemplate
 import views.html.application.accessrequest.RequestProductionAccessSuccessView
 
 import java.time.{Clock, Instant, ZoneId}
@@ -67,7 +68,7 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
 
             val view = fixture.application.injector.instanceOf[RequestProductionAccessSuccessView]
             status(result) mustEqual OK
-            contentAsString(result) mustBe view(application, Some(user), accessRequestRequest.apis)(request, messages(fixture.application)).toString
+            contentAsString(result) mustBe view(application, Some(user), accessRequestRequest.apis, FakeHipEnvironments.production)(request, messages(fixture.application)).toString
             contentAsString(result) must validateAsHtml
             verify(fixture.apiHubService).requestProductionAccess(eqTo(accessRequestRequest))(any())
             verify(fixture.accessRequestSessionRepository).clear(eqTo(user.userId))
@@ -117,6 +118,40 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.routes.JourneyRecoveryController.onPageLoad().url)
+      }
+    }
+
+    "must return Not found when the provided environment is invalid" in {
+
+      forAll(teamMemberAndSupporterTable) {
+        (user: UserModel) =>
+          val application = anApplication
+          val userAnswers = buildUserAnswers()
+            .set(RequestProductionAccessEnvironmentIdPage, "invalid-environment")
+            .get
+          val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
+          val accessRequestRequest = data.toRequest(user.email)
+
+          when(fixture.apiHubService.requestProductionAccess(any())(any())).thenReturn(Future.successful(()))
+          when(fixture.accessRequestSessionRepository.clear(any())).thenReturn(Future.successful(true))
+
+          running(fixture.application) {
+            val request = FakeRequest(GET, controllers.application.accessrequest.routes.RequestProductionAccessEndJourneyController.submitRequest().url)
+            val result = route(fixture.application, request).value
+
+            val view = fixture.application.injector.instanceOf[ErrorTemplate]
+
+            status(result) mustBe NOT_FOUND
+            contentAsString(result) mustBe
+              view(
+                "Page not found - 404",
+                "This page can’t be found",
+                "Please check that you have entered the correct web address.",
+                Some(user)
+              )(request, messages(fixture.application))
+                .toString()
+            contentAsString(result) must validateAsHtml
+          }
       }
     }
 

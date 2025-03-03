@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import config.HipEnvironment
 @import models.application.Application
 @import models.user.UserModel
 @import uk.gov.hmrc.govukfrontend.views.html.components._
@@ -25,7 +26,7 @@
     govukSummaryList: GovukSummaryList
 )
 
-@(app:Application, user: Option[UserModel], apis: Seq[AccessRequestApi])(implicit request: Request[?], messages: Messages)
+@(app:Application, user: Option[UserModel], apis: Seq[AccessRequestApi], hipEnvironment: HipEnvironment)(implicit request: Request[?], messages: Messages)
 
 @applicationLink(application: Application) = {
     <a id="viewApplicationLink" data-application-id="@application.id" href='@applicationLinkUrl(application)' class='govuk-link govuk-link--no-visited-state'>
@@ -67,12 +68,22 @@
             ),
             SummaryListRow(
                 key = Key(
+                    content = Text(messages("site.environment"))
+                ),
+                value = Value(
+                    content = HtmlContent(hipEnvironment.nameKey)
+                )
+            ),
+            SummaryListRow(
+                key = Key(
                     content = Text(messages("requestProductionAccessSuccess.apiName"))
                 ),
                 value = Value(
                     content = HtmlContent(apiList(apis))
                 )
-            ))))
+            )
+        )
+    ))
 
  <h2 class="govuk-heading-m">@messages("requestProductionAccessSuccess.h2")</h2>
  <p class="govuk-body">

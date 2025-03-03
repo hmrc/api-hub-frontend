@@ -529,8 +529,8 @@ provideSupportingInformation.error.required = Enter information to support your 
 provideSupportingInformation.checkYourAnswersLabel = Supporting information
 provideSupportingInformation.change.hidden = Provide supporting information
 
-requestProductionAccessSuccess.title = Request production access success
-requestProductionAccessSuccess.heading = Request for production access has been submitted
+requestProductionAccessSuccess.title = Access request submitted successfully
+requestProductionAccessSuccess.heading = Access request submitted successfully
 requestProductionAccessSuccess.applicationName = Application name
 requestProductionAccessSuccess.apiName = APIs
 requestProductionAccessSuccess.h2 = What you can do now
