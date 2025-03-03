@@ -29,7 +29,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.AccessRequestSessionRepository
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.checkAnswers.application.accessrequest.{ProvideSupportingInformationSummary, RequestProductionAccessApplicationSummary, RequestProductionAccessSelectApisSummary}
+import viewmodels.checkAnswers.application.accessrequest.{ProvideSupportingInformationSummary, RequestProductionAccessApplicationSummary, RequestProductionAccessEnvironmentSummary, RequestProductionAccessSelectApisSummary}
 import views.html.application.accessrequest.RequestProductionAccessView
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -42,7 +42,8 @@ class RequestProductionAccessController @Inject()(
   sessionRepository: AccessRequestSessionRepository,
   getData: AccessRequestDataRetrievalAction,
   requireData: DataRequiredAction,
-  navigator: Navigator
+  navigator: Navigator,
+  environmentSummary: RequestProductionAccessEnvironmentSummary
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
@@ -84,6 +85,7 @@ class RequestProductionAccessController @Inject()(
   private def buildSummaries(userAnswers: UserAnswers)(implicit messages: Messages): Seq[SummaryListRow] = {
     Seq(
       RequestProductionAccessApplicationSummary.row(userAnswers),
+      environmentSummary.row(userAnswers),
       RequestProductionAccessSelectApisSummary.row(userAnswers),
       ProvideSupportingInformationSummary.row(userAnswers)
     )
