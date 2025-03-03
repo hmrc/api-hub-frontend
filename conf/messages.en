@@ -190,9 +190,9 @@ applicationDetails.apis.apiName = API name
 applicationDetails.teamMembers.heading = Team members ({0})
 applicationDetails.teamMembers.emailAddress = Email address
 applicationDetails.teamMembers = Team members
-applicationDetails.pending.heading = {0} Outstanding production access requests
-applicationDetails.pending.message.1 = There are a total of {0} outstanding production access requests for this application.
-applicationDetails.pending.message.2 = When a decision is made for your production request for APIs you will be notified by email.
+applicationDetails.pending.heading = {0} Outstanding access requests
+applicationDetails.pending.message.1 = There are a total of {0} outstanding access requests for this application.
+applicationDetails.pending.message.2 = When a decision is made for your access requests you will be notified via email.
 applicationDetails.no.prod.access.heading = APIs not available in production
 applicationDetails.no.prod.access.message = This application has APIs that are not currently accessible in the {0} environment.
 
