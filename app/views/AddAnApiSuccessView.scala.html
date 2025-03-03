@@ -19,9 +19,9 @@
 @import models.user.UserModel
 
 @this(
-layout: templates.Layout,
-govukButton: GovukButton,
-govukPanel: GovukPanel
+    layout: templates.Layout,
+    govukButton: GovukButton,
+    govukPanel: GovukPanel
 )
 
 @(application: Application, api: ApiDetail, user: Option[UserModel])(implicit request: Request[?], messages: Messages)
@@ -63,7 +63,15 @@ govukPanel: GovukPanel
     <p class="govuk-body">
         @Html(
             messages(
-                "addAnApiSuccess.advice.body2",
+                "addAnApiSuccess.advice.body2"
+            )
+        )
+    </p>
+
+    <p class="govuk-body">
+        @Html(
+            messages(
+                "addAnApiSuccess.advice.link",
                 applicationLink(application)
             )
         )

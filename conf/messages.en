@@ -447,8 +447,9 @@ addAnApiCheckYourAnswers.guidance.p2 = To use this API in production environment
 addAnApiSuccess.title = API added successfully
 addAnApiSuccess.summary = {0} is now available within your application
 addAnApiSuccess.advice.heading = What you can do next
-addAnApiSuccess.advice.body1 = You can now use the API within your application, with the credentials that are available in the credentials section of your application.
-addAnApiSuccess.advice.body2 = View your application: {0}
+addAnApiSuccess.advice.body1 = The API has been added to your application. It is now available in non-production environments.
+addAnApiSuccess.advice.body2 = To use this API in production environments you will need to request access.
+addAnApiSuccess.advice.link = View your application: {0}
 
 addAnApiComplete.failed = You should check this application''s details before trying again as it is possible that this action was partially successful.
 
