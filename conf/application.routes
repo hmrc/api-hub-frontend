@@ -9,7 +9,7 @@ POST        /delete-credentials/:id/client/:clientId/environment/:environmentId 
 GET         /add-credential-checklist/:id/:environment                              controllers.application.AddCredentialController.checklist(id: String, environment: String)
 POST        /add-credential/:id/:environment                                        controllers.application.AddCredentialController.addCredentialForEnvironment(id: String, environment: String)
 
-GET         /request-access/:id/start                                               controllers.application.accessrequest.RequestProductionAccessStartController.onPageLoad(id: String)
+GET         /request-access/:id/:environmentId/start                                controllers.application.accessrequest.RequestProductionAccessStartController.onPageLoad(id: String, environmentId: String)
 GET         /request-access/check-your-answers                                      controllers.application.accessrequest.RequestProductionAccessController.onPageLoad()
 POST        /request-access/check-your-answers                                      controllers.application.accessrequest.RequestProductionAccessController.onSubmit()
 

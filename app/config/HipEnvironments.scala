@@ -17,7 +17,7 @@
 package config
 
 import com.google.inject.{Inject, Singleton}
-import play.api.libs.json.{Format, Json, Reads}
+import play.api.libs.json.{Format, Json}
 import services.ApiHubService
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -88,9 +88,8 @@ trait HipEnvironments {
     environments.find(_.id == environmentId)
   }
 
-  def forUrlPathParameter(pathParameter: String): HipEnvironment =
+  def forUrlPathParameter(pathParameter: String): Option[HipEnvironment] =
     environments.find(hipEnvironment => hipEnvironment.id == pathParameter)
-      .getOrElse(throw new IllegalArgumentException(s"No configuration for environment $pathParameter"))
 
   def production: HipEnvironment
 

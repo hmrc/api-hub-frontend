@@ -27,10 +27,11 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.Configuration
 import services.ApiHubService
 import matchers.CustomMatchers
+import org.scalatest.OptionValues
 
 import scala.concurrent.Future
 
-class HipEnvironmentsSpec extends AnyFreeSpec with Matchers with TableDrivenPropertyChecks with MockitoSugar with CustomMatchers {
+class HipEnvironmentsSpec extends AnyFreeSpec with Matchers with TableDrivenPropertyChecks with MockitoSugar with CustomMatchers with OptionValues {
 
   private val apiHubService = mock[ApiHubService]
   private val frontendAppConfig = mock[FrontendAppConfig]
@@ -98,7 +99,7 @@ class HipEnvironmentsSpec extends AnyFreeSpec with Matchers with TableDrivenProp
         ("production", production),
         ("test", test),
       )) { (parameterValue: String, expectedEnvironment: DefaultHipEnvironment) =>
-        hipEnvironments.forUrlPathParameter(parameterValue) must matchHipEnvironment(expectedEnvironment)
+        hipEnvironments.forUrlPathParameter(parameterValue).value must matchHipEnvironment(expectedEnvironment)
       }
     }
 
