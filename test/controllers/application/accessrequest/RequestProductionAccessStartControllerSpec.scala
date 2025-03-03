@@ -19,6 +19,7 @@ package controllers.application.accessrequest
 import base.SpecBase
 import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
 import controllers.helpers.ApplicationApiBuilder
+import fakes.FakeHipEnvironments
 import generators.ApiDetailGenerators
 import models.api.*
 import models.application.*
@@ -28,7 +29,7 @@ import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.application.accessrequest.{RequestProductionAccessApisPage, RequestProductionAccessApplicationPage}
+import pages.application.accessrequest.{RequestProductionAccessApisPage, RequestProductionAccessApplicationPage, RequestProductionAccessEnvironmentIdPage}
 import play.api.Application as PlayApplication
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -58,7 +59,7 @@ class RequestProductionAccessStartControllerSpec extends SpecBase with MockitoSu
       when(fixture.accessRequestSessionRepository.set(any())).thenReturn(Future.successful(true))
 
       running(fixture.playApplication) {
-        val request = FakeRequest(GET, routes.RequestProductionAccessStartController.onPageLoad(application.id).url)
+        val request = FakeRequest(GET, routes.RequestProductionAccessStartController.onPageLoad(application.id, FakeHipEnvironments.production.id).url)
 
         val result = route(fixture.playApplication, request).value
 
@@ -67,6 +68,7 @@ class RequestProductionAccessStartControllerSpec extends SpecBase with MockitoSu
         val expected = UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
           .set(RequestProductionAccessApplicationPage, application)
           .flatMap(_.set(RequestProductionAccessApisPage, Seq(applicationApi)))
+          .flatMap(_.set(RequestProductionAccessEnvironmentIdPage, FakeHipEnvironments.production.id))
           .toOption.value
 
         verify(fixture.accessRequestSessionRepository).set(eqTo(expected))
@@ -85,7 +87,7 @@ class RequestProductionAccessStartControllerSpec extends SpecBase with MockitoSu
       when(fixture.accessRequestSessionRepository.set(any())).thenReturn(Future.successful(true))
 
       running(fixture.playApplication) {
-        val request = FakeRequest(GET, routes.RequestProductionAccessStartController.onPageLoad(application.id).url)
+        val request = FakeRequest(GET, routes.RequestProductionAccessStartController.onPageLoad(application.id, FakeHipEnvironments.production.id).url)
         val result = route(fixture.playApplication, request).value
 
         status(result) mustBe SEE_OTHER
@@ -101,7 +103,7 @@ class RequestProductionAccessStartControllerSpec extends SpecBase with MockitoSu
         .thenReturn(Future.successful(Some(application)))
 
       running(fixture.playApplication) {
-        val request = FakeRequest(GET, routes.RequestProductionAccessStartController.onPageLoad(application.id).url)
+        val request = FakeRequest(GET, routes.RequestProductionAccessStartController.onPageLoad(application.id, FakeHipEnvironments.production.id).url)
         val result = route(fixture.playApplication, request).value
 
         status(result) mustBe SEE_OTHER

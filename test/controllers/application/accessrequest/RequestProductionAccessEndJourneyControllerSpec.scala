@@ -56,7 +56,7 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
           val application = anApplication
           val userAnswers = buildUserAnswers()
           val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
-          val accessRequestRequest = data.toRequest(user.email, FakeHipEnvironments.production.id)
+          val accessRequestRequest = data.toRequest(user.email)
 
           when(fixture.apiHubService.requestProductionAccess(any())(any())).thenReturn(Future.successful(()))
           when(fixture.accessRequestSessionRepository.clear(any())).thenReturn(Future.successful(true))
@@ -104,6 +104,19 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
             status(result) mustEqual SEE_OTHER
             redirectLocation(result) mustBe Some(controllers.routes.JourneyRecoveryController.onPageLoad().url)
           }
+      }
+    }
+
+    "must redirect to journey recovery when no Environment Id in user answers" in {
+      val userAnswers = buildUserAnswers(without = Seq(RequestProductionAccessEnvironmentIdPage))
+      val fixture = buildFixture(userModel = FakeUser, userAnswers = Some(userAnswers))
+
+      running(fixture.application) {
+        val request = FakeRequest(GET, controllers.application.accessrequest.routes.RequestProductionAccessEndJourneyController.submitRequest().url)
+        val result = route(fixture.application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result) mustBe Some(controllers.routes.JourneyRecoveryController.onPageLoad().url)
       }
     }
 
@@ -166,6 +179,7 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
       val data = Data(
         application = anApplication,
         applicationApis = Seq(selectedApplicationApi, nonSelectedApplicationApi),
+        environmentId = FakeHipEnvironments.production.id,
         selectedApis = Set(selectedApplicationApi.apiId),
         supportingInformation = supportingInformation
       )
@@ -191,7 +205,7 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
         environmentId = FakeHipEnvironments.production.id
       )
 
-      val actual = data.toRequest(FakeUser.email, FakeHipEnvironments.production.id)
+      val actual = data.toRequest(FakeUser.email)
 
       actual mustBe expected
     }
@@ -202,6 +216,7 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
       val data = Data(
         application = anApplication,
         applicationApis = Seq(selectedApplicationApi),
+        environmentId = FakeHipEnvironments.production.id,
         selectedApis = Set(selectedApplicationApi.apiId),
         supportingInformation = supportingInformation
       )
@@ -227,7 +242,7 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
         environmentId = FakeHipEnvironments.production.id
       )
 
-      val actual = data.toRequest(FakeUser.email, FakeHipEnvironments.production.id)
+      val actual = data.toRequest(FakeUser.email)
 
       actual mustBe expected
     }
@@ -287,6 +302,7 @@ object RequestProductionAccessEndJourneyControllerSpec extends OptionValues{
   private val data: Data = Data(
     application = anApplication,
     applicationApis = Seq(applicationApi),
+    environmentId = FakeHipEnvironments.production.id,
     selectedApis = Set(applicationApi.apiId),
     supportingInformation = supportingInformation
   )
@@ -295,6 +311,7 @@ object RequestProductionAccessEndJourneyControllerSpec extends OptionValues{
     val fullUserAnswers = UserAnswers(id = FakeUser.userId, lastUpdated = clock.instant())
       .set(RequestProductionAccessApplicationPage, data.application).toOption.value
       .set(RequestProductionAccessApisPage, data.applicationApis).toOption.value
+      .set(RequestProductionAccessEnvironmentIdPage, FakeHipEnvironments.production.id).toOption.value
       .set(RequestProductionAccessSelectApisPage, data.selectedApis).toOption.value
       .set(ProvideSupportingInformationPage, data.supportingInformation).toOption.value
       .set(RequestProductionAccessPage, acceptRequestProductionAccessConditions).toOption.value

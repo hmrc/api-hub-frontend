@@ -50,7 +50,7 @@
         <p class="govuk-body additional-message">
             @govukButton(
                 Button(
-                    href = Some(controllers.application.accessrequest.routes.RequestProductionAccessStartController.onPageLoad(viewModel.applicationId).url),
+                    href = Some(controllers.application.accessrequest.routes.RequestProductionAccessStartController.onPageLoad(viewModel.applicationId, viewModel.hipEnvironment.id).url),
                     content = Text(messages("applicationApis.requestProductionAccess")),
                     id = Some("requestProductionAccessButton"),
                     classes = "govuk-!-margin-bottom-2",

@@ -16,12 +16,12 @@
 
 package controllers.application.accessrequest
 
-import config.FrontendAppConfig
+import config.{DefaultHipEnvironment, FrontendAppConfig, HipEnvironments}
 import controllers.actions.{ApplicationAuthActionProvider, IdentifierAction}
-import controllers.helpers.ApplicationApiBuilder
+import controllers.helpers.{ApplicationApiBuilder, ErrorResultBuilder}
 import models.{NormalMode, UserAnswers}
 import navigation.Navigator
-import pages.application.accessrequest.{RequestProductionAccessApisPage, RequestProductionAccessApplicationPage, RequestProductionAccessStartPage}
+import pages.application.accessrequest.{RequestProductionAccessApisPage, RequestProductionAccessApplicationPage, RequestProductionAccessEnvironmentIdPage, RequestProductionAccessStartPage}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.AccessRequestSessionRepository
@@ -39,23 +39,30 @@ class RequestProductionAccessStartController @Inject()(
     applicationAuth: ApplicationAuthActionProvider,
     appConfig: FrontendAppConfig,
     applicationApiBuilder: ApplicationApiBuilder,
-    navigator: Navigator
+    navigator: Navigator,
+    hipEnvironments: HipEnvironments,
+    errorResultBuilder: ErrorResultBuilder
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(id: String): Action[AnyContent] = (identify andThen applicationAuth(id)).async {
+  def onPageLoad(id: String, environmentId: String): Action[AnyContent] = (identify andThen applicationAuth(id)).async {
     implicit request =>
-      for {
-        applicationApis <- applicationApiBuilder.build(request.application)
-        userAnswers <- Future.fromTry(
-          UserAnswers(
-            id = request.identifierRequest.user.userId,
-            lastUpdated = clock.instant()
-          )
-          .set(RequestProductionAccessApplicationPage, request.application)
-            .flatMap(_.set(RequestProductionAccessApisPage, applicationApis))
-        )
-        _ <- accessRequestSessionRepository.set(userAnswers)
-      } yield Redirect(navigator.nextPage(RequestProductionAccessStartPage, NormalMode, userAnswers))
+      hipEnvironments.forUrlPathParameter(environmentId) match {
+        case Some(hipEnvironment) if hipEnvironment.isProductionLike =>
+          for {
+            applicationApis <- applicationApiBuilder.build(request.application)
+            userAnswers <- Future.fromTry(
+              UserAnswers(
+                id = request.identifierRequest.user.userId,
+                lastUpdated = clock.instant()
+              )
+                .set(RequestProductionAccessApplicationPage, request.application)
+                .flatMap(_.set(RequestProductionAccessApisPage, applicationApis))
+                .flatMap(_.set(RequestProductionAccessEnvironmentIdPage, hipEnvironment.id))
+            )
+            _ <- accessRequestSessionRepository.set(userAnswers)
+          } yield Redirect(navigator.nextPage(RequestProductionAccessStartPage, NormalMode, userAnswers))
+        case _ => Future.successful(errorResultBuilder.notFound())
+      }
   }
 
 }

@@ -24,7 +24,7 @@ import models.{CheckMode, UserAnswers}
 import models.accessrequest.{AccessRequestApi, AccessRequestEndpoint, AccessRequestRequest}
 import models.application.Application
 import models.requests.{BaseRequest, DataRequest}
-import pages.application.accessrequest.{ProvideSupportingInformationPage, RequestProductionAccessApisPage, RequestProductionAccessApplicationPage, RequestProductionAccessPage, RequestProductionAccessSelectApisPage}
+import pages.application.accessrequest.{ProvideSupportingInformationPage, RequestProductionAccessApisPage, RequestProductionAccessApplicationPage, RequestProductionAccessEnvironmentIdPage, RequestProductionAccessPage, RequestProductionAccessSelectApisPage}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.*
 import repositories.AccessRequestSessionRepository
@@ -56,7 +56,7 @@ class RequestProductionAccessEndJourneyController @Inject()(
       validate(request).fold(
         call => Future.successful(Redirect(call)),
         data =>
-          val accessRequest = data.toRequest(request.user.email, hipEnvironments.production.id)
+          val accessRequest = data.toRequest(request.user.email)
           
           apiHubService.requestProductionAccess(accessRequest)
             .flatMap(_ => sessionRepository.clear(request.user.userId))
@@ -71,10 +71,11 @@ class RequestProductionAccessEndJourneyController @Inject()(
     for {
       application <- validateApplication(request.userAnswers)
       applicationApis <- validateApis(request.userAnswers)
+      environmentId <- validateEnvironmentId(request.userAnswers)
       selectedApis <- validateSelectedApis(request.userAnswers)
       supportingInformation <- validateSupportingInformation(request.userAnswers)
       _ <- validateDeclaration(request.userAnswers)
-    } yield Data(application, applicationApis, selectedApis, supportingInformation)
+    } yield Data(application, applicationApis, environmentId, selectedApis, supportingInformation)
   }
 
   private def validateApplication(userAnswers: UserAnswers): Either[Call, Application] = {
@@ -87,6 +88,13 @@ class RequestProductionAccessEndJourneyController @Inject()(
   private def validateApis(userAnswers: UserAnswers): Either[Call, Seq[ApplicationApi]] = {
     userAnswers.get(RequestProductionAccessApisPage) match {
       case Some(applicationApis) => Right(applicationApis)
+      case None => Left(controllers.routes.JourneyRecoveryController.onPageLoad())
+    }
+  }
+
+  private def validateEnvironmentId(userAnswers: UserAnswers): Either[Call, String] = {
+    userAnswers.get(RequestProductionAccessEnvironmentIdPage) match {
+      case Some(environmentId) => Right(environmentId)
       case None => Left(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
   }
@@ -123,11 +131,12 @@ object RequestProductionAccessEndJourneyController {
   case class Data(
     application: Application,
     applicationApis: Seq[ApplicationApi],
+    environmentId: String,
     selectedApis: Set[String],
     supportingInformation: String
   ) {
 
-    def toRequest(requestedBy: String, forEnvironmentId: String): AccessRequestRequest = {
+    def toRequest(requestedBy: String): AccessRequestRequest = {
 
       AccessRequestRequest(
         applicationId = application.id,
@@ -152,7 +161,7 @@ object RequestProductionAccessEndJourneyController {
                 )
             )
           ),
-        environmentId = forEnvironmentId
+        environmentId = environmentId
       )
     }
   }

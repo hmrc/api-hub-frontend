@@ -56,7 +56,7 @@ class AddCredentialController @Inject()(
   def checklist(applicationId: String, environment: String): Action[AnyContent] = (identify andThen isPrivileged andThen applicationAuth(applicationId)) {
     implicit request =>
       hipEnvironments.forUrlPathParameter(environment) match {
-        case hipEnvironment if hipEnvironment.isProductionLike =>
+        case Some(hipEnvironment) if hipEnvironment.isProductionLike =>
           Ok(view(form, applicationId, request.maybeUser, hipEnvironment))
         case _ => errorResultBuilder.notFound()
       }
@@ -65,12 +65,13 @@ class AddCredentialController @Inject()(
   def addCredentialForEnvironment(applicationId: String, environment: String): Action[AnyContent] = (identify andThen applicationAuth(applicationId)).async {
     implicit request =>
       hipEnvironments.forUrlPathParameter(environment) match {
-        case hipEnvironment if hipEnvironment.isProductionLike =>
+        case Some(hipEnvironment) if hipEnvironment.isProductionLike =>
           form.bindFromRequest().fold(
             formWithErrors => Future.successful(BadRequest(view(formWithErrors, applicationId, request.maybeUser, hipEnvironment))),
             _ => addCredentialToProductionLike(hipEnvironment)
           )
-        case hipEnvironment => addCredentialToNonProductionLike(hipEnvironment)
+        case Some(hipEnvironment) => addCredentialToNonProductionLike(hipEnvironment)
+        case None => Future.successful(errorResultBuilder.notFound())
       }
   }
 
