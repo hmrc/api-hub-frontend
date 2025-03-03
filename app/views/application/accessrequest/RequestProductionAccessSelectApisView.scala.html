@@ -16,22 +16,23 @@
 
 @import models.user.UserModel
 @import viewmodels.application.ApplicationApi
+@import config.HipEnvironment
 
 @this(
-    layout: templates.Layout,
-    formHelper: FormWithCSRF,
-    govukErrorSummary: GovukErrorSummary,
-    govukCheckboxes: GovukCheckboxes,
-    govukButton: GovukButton,
-    govukWarningText: GovukWarningText
+layout: templates.Layout,
+formHelper: FormWithCSRF,
+govukErrorSummary: GovukErrorSummary,
+govukCheckboxes: GovukCheckboxes,
+govukButton: GovukButton,
+govukWarningText: GovukWarningText
 )
 
-@(form: Form[?], mode: Mode, applicationApis: Seq[ApplicationApi], applicationApisPendingRequest: Seq[ApplicationApi], user: UserModel)(implicit request: Request[?], messages: Messages)
+@(form: Form[?], mode: Mode, applicationApis: Seq[ApplicationApi], applicationApisPendingRequest: Seq[ApplicationApi], user: UserModel, forEnvironment: HipEnvironment)(implicit request: Request[?], messages: Messages)
 
 @pendingRequestsContent() = {
         <p class="govuk-body">
             <strong class="govuk-warning-text__text ">
-                @messages("requestProductionAccessSelectApis.pendingRequests.heading")
+                @messages("requestProductionAccessSelectApis.pendingRequests.heading", forEnvironment.nameKey)
             </strong>
             <ul class="hip-warning-list">
             @applicationApisPendingRequest.map(applicationApi =>
@@ -43,7 +44,7 @@
         </p>
 }
 
-@layout(pageTitle = title(form, messages("requestProductionAccessSelectApis.title")), user = Some(user)) {
+@layout(pageTitle = title(form, messages("requestProductionAccessSelectApis.title", forEnvironment.nameKey)), user = Some(user)) {
 
     @formHelper(action = controllers.application.accessrequest.routes.RequestProductionAccessSelectApisController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
@@ -52,7 +53,7 @@
         }
 
         <h1 class="govuk-heading-l">
-            @messages("requestProductionAccessSelectApis.heading")
+            @messages("requestProductionAccessSelectApis.heading", forEnvironment.nameKey)
         </h1>
 
         @if(applicationApisPendingRequest.nonEmpty){
