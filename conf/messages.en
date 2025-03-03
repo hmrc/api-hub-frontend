@@ -206,7 +206,7 @@ applicationApis.apis.endpointsAdded = {0} of {1} endpoints selected
 applicationApis.apis.headings.endpoint = Endpoints and scopes
 applicationApis.apis.headings.scopes = Scopes
 applicationApis.apis.viewSpecification = View specification
-applicationApis.requestProductionAccess = Request production access
+applicationApis.requestProductionAccess = Request access
 applicationApis.pending.heading = {0} Outstanding production access requests
 applicationApis.pending.message.1 = There are a total of {0} outstanding production access requests for this application.
 applicationApis.pending.message.2 = When a decision is made for your production request for APIs you will be notified by email.
@@ -1175,8 +1175,9 @@ environment.credentials.heading = Credentials
 
 environment.apis.heading = APIs in {0} environment
 environment.apis.endpoints = Available endpoints
-environment.apis.noAvailableInProd.heading = APIs not available in production
-environment.apis.noAvailableInProd.message = This application has APIs that are not currently available in the production environment.
+environment.apis.noAvailableInProd.heading = APIs not available for use in this environment
+environment.apis.noAvailableInProd.message1 = This application has APIs that are not currently available for use in this environment.
+environment.apis.noAvailableInProd.message2 = To make use of these APIs you will need to request access.
 
 myApiPromoteSuccessView.title = API promotion has been initiated
 myApiPromoteSuccessView.label.deployingFrom = Deploying from
