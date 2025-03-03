@@ -83,9 +83,10 @@ class RequestProductionAccessSelectApisController @Inject()(
       )
   }
 
-  private def partitionApplicationApis(applicationApis: Seq[ApplicationApi]): (Seq[ApplicationApi], Seq[ApplicationApi]) =
-    val (applicationApisPendingRequest, applicationApisNoPendingRequest) = applicationApis.partition(_.hasPendingAccessRequest)
-    val applicationsThatCanRequestAccess = applicationApisNoPendingRequest.filter(api => !api.isMissing && api.needsProductionAccessRequest)
+  private def partitionApplicationApis(applicationApis: Seq[ApplicationApi], environmentId: String): (Seq[ApplicationApi], Seq[ApplicationApi]) =
+    val hipEnvironment = hipEnvironments.forId(environmentId)
+    val (applicationApisPendingRequest, applicationApisNoPendingRequest) = applicationApis.partition(_.hasPendingAccessRequest(hipEnvironment))
+    val applicationsThatCanRequestAccess = applicationApisNoPendingRequest.filter(api => !api.isMissing && api.needsAccessRequest(hipEnvironment))
     (applicationsThatCanRequestAccess, applicationApisPendingRequest)
 
   private def preparedForm(applicationApis: Seq[ApplicationApi])(implicit request: DataRequest[?]) =
@@ -102,9 +103,9 @@ class RequestProductionAccessSelectApisController @Inject()(
                                          applicationApisPendingRequests: Seq[ApplicationApi]
                                        ) => Future[Result]
                                      )(implicit hc: HeaderCarrier, request: DataRequest[?]): Future[Result] =
-    request.userAnswers.get(RequestProductionAccessApisPage) match {
-      case Some(apis) =>
-        result.tupled(partitionApplicationApis(apis))
+    (request.userAnswers.get(RequestProductionAccessApisPage), request.userAnswers.get(RequestProductionAccessEnvironmentIdPage)) match {
+      case (Some(apis), Some(environmentId)) =>
+        result.tupled(partitionApplicationApis(apis, environmentId))
       case _ => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
     }
 
