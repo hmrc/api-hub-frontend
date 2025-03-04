@@ -466,7 +466,7 @@ requestProductionAccess.error.required = You must confirm that you have read and
 requestProductionAccess.declaration.accept = I confirm that I have read and meet the requirements outlined in the usage policies.
 
 accessRequests.title = API requests
-accessRequests.heading = API production access requests ({0})
+accessRequests.heading = API access requests ({0})
 accessRequests.admin = Integration Hub admin
 accessRequests.headings.environment = Environment
 accessRequests.headings.requestedOn = Requested on
