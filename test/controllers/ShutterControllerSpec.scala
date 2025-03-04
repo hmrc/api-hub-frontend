@@ -66,7 +66,7 @@ class ShutterControllerSpec extends SpecBase with MockitoSugar with TableDrivenP
         testConfiguration = Configuration.from(
           Map(
             "play.http.router" -> "shutter.Routes",
-            "shutter-message" -> shutterMessage
+            "hubStatus.shutterMessage" -> shutterMessage
           )
         )
       ).build()
