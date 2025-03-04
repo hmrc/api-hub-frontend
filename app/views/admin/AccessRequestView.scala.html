@@ -18,7 +18,7 @@
 @import viewmodels.admin.AccessRequestViewModel
 @import viewmodels.admin.Decision.{Approve, Reject}
 @import views.ViewUtils
-
+@import config.HipEnvironments
 @import java.time.LocalDateTime
 
 @this(
@@ -28,7 +28,8 @@
     govukErrorSummary: GovukErrorSummary,
     govukButton : GovukButton,
     govukRadios : GovukRadios,
-    govukTextarea : GovukTextarea
+    govukTextarea : GovukTextarea,
+    hipEnvironments: HipEnvironments
 )
 
 @(model: AccessRequestViewModel, form: Form[?], user: UserModel, allowAccessRequestCancellation: Boolean)(implicit request: Request[?], messages: Messages)
@@ -53,6 +54,10 @@
                 Some(SummaryListRow(
                     key = Key(messages("accessRequest.headings.apiName")),
                     value = Value(Text(model.apiName))
+                )),
+                Some(SummaryListRow(
+                    key = Key(messages("accessRequest.headings.environment")),
+                    value = Value(Text(hipEnvironments.forId(model.environmentId).nameKey))
                 )),
                 Some(SummaryListRow(
                     key = Key(messages("accessRequest.headings.status")),
