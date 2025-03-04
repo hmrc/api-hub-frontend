@@ -66,7 +66,8 @@ case class AccessRequestViewModel(
   canCancel: Boolean,
   returnCall: Call,
   returnMessage: String,
-  activeLink: Option[String]
+  activeLink: Option[String],
+  environmentId: String
 )
 
 object AccessRequestViewModel {
@@ -106,7 +107,8 @@ object AccessRequestViewModel {
       canCancel = canCancel(application, accessRequest, user, viewType),
       returnCall = returnCall(application, viewType),
       returnMessage = returnMessage(viewType),
-      activeLink = activeLink
+      activeLink = activeLink,
+      environmentId = accessRequest.environmentId
     )
   }
 
