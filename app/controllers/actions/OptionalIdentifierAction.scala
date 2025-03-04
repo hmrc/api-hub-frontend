@@ -18,8 +18,13 @@ package controllers.actions
 
 import com.google.inject.Inject
 import models.requests.OptionalIdentifierRequest
-import play.api.mvc._
+import models.user.UserModel
+import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.mvc.*
+import play.api.mvc.Results.ServiceUnavailable
+import services.HubStatusService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider
+import views.html.ShutteredView
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -29,9 +34,12 @@ trait OptionalIdentifierAction
 
 class OptionallyAuthenticatedIdentifierAction @Inject()(
   val parser: BodyParsers.Default,
+  override val messagesApi: MessagesApi,
   ldapAuthenticator: LdapAuthenticator,
-  strideAuthenticator: StrideAuthenticator
-)(implicit val executionContext: ExecutionContext) extends OptionalIdentifierAction with FrontendHeaderCarrierProvider {
+  strideAuthenticator: StrideAuthenticator,
+  hubStatusService: HubStatusService,
+  shutteredView: ShutteredView
+)(implicit val executionContext: ExecutionContext) extends OptionalIdentifierAction with FrontendHeaderCarrierProvider with I18nSupport {
 
   override def invokeBlock[A](request: Request[A], block: OptionalIdentifierRequest[A] => Future[Result]): Future[Result] = {
     if (hc(request).authorization.isDefined) {
@@ -39,14 +47,31 @@ class OptionallyAuthenticatedIdentifierAction @Inject()(
         case UserUnauthenticated => ldapAuthenticator.authenticate()(request)
         case result: UserAuthResult => Future.successful(result)
       }.flatMap {
-        case UserAuthenticated(user) => block(OptionalIdentifierRequest(request, Some(user)))
-        case UserMissingEmail(_, _) => block(OptionalIdentifierRequest(request, None))
-        case UserUnauthorised => block(OptionalIdentifierRequest(request, None))
-        case UserUnauthenticated => block(OptionalIdentifierRequest(request, None))
+        case UserAuthenticated(user) => handleRequest(request, block, Some(user))
+        case UserMissingEmail(_, _) => handleRequest(request, block, None)
+        case UserUnauthorised => handleRequest(request, block, None)
+        case UserUnauthenticated => handleRequest(request, block, None)
       }
     }
     else {
-      block(OptionalIdentifierRequest(request, None))
+      handleRequest(request, block, None)
+    }
+  }
+
+  private def shuttered(user: Option[UserModel])(implicit request: Request[?]): Future[Result] = {
+    Future.successful(ServiceUnavailable(shutteredView(hubStatusService.shutterMessage, user)))
+  }
+
+  private def handleRequest[A](
+    request: Request[A],
+    block: OptionalIdentifierRequest[A] => Future[Result],
+    user: Option[UserModel]
+  ): Future[Result] = {
+    if (hubStatusService.isAvailable || user.exists(_.permissions.canSupport)) {
+      block(OptionalIdentifierRequest(request, user))
+    }
+    else {
+      shuttered(user)(request)
     }
   }
 
