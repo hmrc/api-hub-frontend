@@ -72,7 +72,7 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
             val result = route(fixture.playApplication, request).value
             val view = fixture.playApplication.injector.instanceOf[EnvironmentsView]
             val config: FrontendAppConfig = fixture.playApplication.injector.instanceOf[FrontendAppConfig]
-            val applicationApis = FakeApplication.apis.map(api => ApplicationApi(api, 0))
+            val applicationApis = FakeApplication.apis.map(api => ApplicationApi(api, Seq.empty))
             val viewModel = EnvironmentsViewModel(FakeApplication, applicationApis, user, FakeHipEnvironments.test, credentials, config.helpDocsPath, false)
 
             status(result) mustEqual OK
@@ -148,7 +148,7 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
             val result = route(fixture.playApplication, request).value
             val view = fixture.playApplication.injector.instanceOf[EnvironmentsView]
             val config: FrontendAppConfig = fixture.playApplication.injector.instanceOf[FrontendAppConfig]
-            val applicationApis = FakeApplication.apis.map(api => ApplicationApi(api, 0))
+            val applicationApis = FakeApplication.apis.map(api => ApplicationApi(api, Seq.empty))
             val viewModel = EnvironmentsViewModel(FakeApplication, applicationApis, user, FakeHipEnvironments.test, FakeApplication.getCredentials(FakeHipEnvironments.test), config.helpDocsPath, true)
 
             status(result) mustEqual OK

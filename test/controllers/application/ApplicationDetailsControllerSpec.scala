@@ -19,6 +19,7 @@ package controllers.application
 import base.SpecBase
 import controllers.actions.{FakeApplication, FakeUser, FakeUserNotTeamMember}
 import controllers.routes
+import fakes.FakeHipEnvironments
 import models.accessrequest.Pending
 import models.api.{ApiDetail, Endpoint, EndpointMethod, Live, Maintainer}
 import models.application.{Api, SelectedEndpoint, TeamMember}
@@ -34,7 +35,7 @@ import play.api.test.Helpers.*
 import play.api.Application as PlayApplication
 import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
-import viewmodels.application.{Accessible, ApplicationApi, ApplicationDetailsViewModel, ApplicationEndpoint, Inaccessible}
+import viewmodels.application.{Accessible, ApplicationApi, ApplicationDetailsViewModel, ApplicationEndpoint, Inaccessible, TheoreticalScopes}
 import views.html.ErrorTemplate
 import views.html.application.ApplicationDetailsView
 
@@ -59,7 +60,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
             val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id).url)
             val result = route(fixture.playApplication, request).value
             val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
-            val viewModel = ApplicationDetailsViewModel(FakeApplication, Seq.empty, Some(user), "production")
+            val viewModel = ApplicationDetailsViewModel(FakeApplication, Seq.empty, Some(user), FakeHipEnvironments)
 
             status(result) mustEqual OK
             contentAsString(result) mustBe view(viewModel)(request, messages(fixture.playApplication)).toString
@@ -87,7 +88,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url)
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
-        val viewModel = ApplicationDetailsViewModel(application, Seq.empty, Some(FakeUser), "production")
+        val viewModel = ApplicationDetailsViewModel(application, Seq.empty, Some(FakeUser), FakeHipEnvironments)
 
         status(result) mustEqual OK
         contentAsString(result) mustBe view(viewModel)(request, messages(fixture.playApplication)).toString
@@ -130,7 +131,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url)
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
-        val viewModel = ApplicationDetailsViewModel(expected, Seq.empty, Some(FakeUser), "production")
+        val viewModel = ApplicationDetailsViewModel(expected, Seq.empty, Some(FakeUser), FakeHipEnvironments)
 
         status(result) mustBe OK
         contentAsString(result) mustBe view(viewModel)(request, messages(fixture.playApplication)).toString
@@ -160,7 +161,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         .addApi(Api(apiDetail.id, apiDetail.title, Seq(SelectedEndpoint("GET", "/test"))))
 
       val applicationApis = Seq(
-        ApplicationApi(apiDetail, Seq(ApplicationEndpoint("GET", "/test", None, None, Seq("test-scope"), Inaccessible, Accessible)), 0)
+        ApplicationApi(apiDetail, Seq(ApplicationEndpoint("GET", "/test", None, None, Seq("test-scope"), TheoreticalScopes(Seq("test-scope").toSet, Map.empty), Seq.empty)), Seq.empty)
       )
 
       when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false))(any()))
@@ -176,7 +177,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id).url)
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
-        val viewModel = ApplicationDetailsViewModel(application, applicationApis, Some(FakeUser), "production")
+        val viewModel = ApplicationDetailsViewModel(application, applicationApis, Some(FakeUser), FakeHipEnvironments)
 
         status(result) mustEqual OK
         contentAsString(result) mustBe view(viewModel)(request, messages(fixture.playApplication)).toString
@@ -195,7 +196,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         .addApi(api)
 
       val applicationApis = Seq(
-        ApplicationApi(api, 0)
+        ApplicationApi(api, Seq.empty)
       )
 
       when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false))(any()))
@@ -211,7 +212,7 @@ class ApplicationDetailsControllerSpec extends SpecBase with MockitoSugar with T
         val request = FakeRequest(GET, controllers.application.routes.ApplicationDetailsController.onPageLoad(FakeApplication.id).url)
         val result = route(fixture.playApplication, request).value
         val view = fixture.playApplication.injector.instanceOf[ApplicationDetailsView]
-        val viewModel = ApplicationDetailsViewModel(application, applicationApis, Some(FakeUser), "production")
+        val viewModel = ApplicationDetailsViewModel(application, applicationApis, Some(FakeUser), FakeHipEnvironments)
 
         status(result) mustEqual OK
         contentAsString(result) mustBe view(viewModel)(request, messages(fixture.playApplication)).toString

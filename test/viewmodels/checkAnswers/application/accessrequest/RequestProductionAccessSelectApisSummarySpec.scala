@@ -63,7 +63,7 @@ object RequestProductionAccessSelectApisSummarySpec {
     apiTitle = "test-title-1",
     totalEndpoints = 0,
     endpoints = Seq.empty,
-    pendingAccessRequestCount = 0,
+    pendingAccessRequests = Seq.empty,
     isMissing = false
   )
 
@@ -72,7 +72,7 @@ object RequestProductionAccessSelectApisSummarySpec {
     apiTitle = "test-title-2",
     totalEndpoints = 0,
     endpoints = Seq.empty,
-    pendingAccessRequestCount = 0,
+    pendingAccessRequests = Seq.empty,
     isMissing = false
   )
 
