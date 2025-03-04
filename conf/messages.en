@@ -945,9 +945,9 @@ configuration.hods.fullName = Full name
 configuration.email.domains.heading = Email Domains
 configuration.email.domains.domain = Email Domain
 
-requestProductionAccessSelectApis.title = Which APIs do you want to request production access for?
-requestProductionAccessSelectApis.heading = Which APIs do you want to request production access for?
-requestProductionAccessSelectApis.pendingRequests.heading = The following APIs already have pending production access requests:
+requestProductionAccessSelectApis.title = Which APIs do you want to request {0} access for?
+requestProductionAccessSelectApis.heading = Which APIs do you want to request {0} access for?
+requestProductionAccessSelectApis.pendingRequests.heading = The following APIs already have pending {0} access requests:
 requestProductionAccessSelectApis.checkYourAnswersLabel = Selected APIs
 requestProductionAccessSelectApis.error.required = Select at least one API
 requestProductionAccessSelectApis.change.hidden = APIs

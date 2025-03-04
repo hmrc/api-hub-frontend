@@ -18,6 +18,7 @@ package controllers.application.accessrequest
 
 import base.SpecBase
 import controllers.actions.FakeUser
+import fakes.FakeHipEnvironments
 import forms.application.accessrequest.RequestProductionAccessSelectApisFormProvider
 import models.NormalMode
 import models.application.*
@@ -25,7 +26,7 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.application.accessrequest.{RequestProductionAccessApisPage, RequestProductionAccessApplicationPage, RequestProductionAccessSelectApisPage}
+import pages.application.accessrequest.{RequestProductionAccessApisPage, RequestProductionAccessApplicationPage, RequestProductionAccessEnvironmentIdPage, RequestProductionAccessSelectApisPage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -105,12 +106,25 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
     applicationApiPendingRequest,
   )
 
-  private val userAnswersWithApplicationAndApis = Some(
+  private lazy val userAnswersWithApplicationAndApis = Some(
     emptyUserAnswers
       .set(RequestProductionAccessApplicationPage, testApplication)
       .flatMap(_.set(RequestProductionAccessApisPage, applicationApis))
       .get
   )
+
+  private val userAnswersWithApplicationAndApisAndProductionlikeEnvironmentId = Some(
+  userAnswersWithApplicationAndApis.value
+    .set(RequestProductionAccessEnvironmentIdPage, "production")
+    .get
+  )
+
+  private val userAnswersWithApplicationAndApisAndNonProductionlikeEnvironmentId = Some(
+  userAnswersWithApplicationAndApis.value
+    .set(RequestProductionAccessEnvironmentIdPage, "test")
+    .get
+  )
+
 
   val formProvider = new RequestProductionAccessSelectApisFormProvider()
   private val form = formProvider(applicationApis.toSet)
@@ -119,7 +133,7 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = userAnswersWithApplicationAndApis)
+      val application = applicationBuilder(userAnswers = userAnswersWithApplicationAndApisAndProductionlikeEnvironmentId)
         .build()
 
       running(application) {
@@ -131,12 +145,12 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
 
         status(result) mustEqual OK
 
-        contentAsString(result) mustEqual view(form, NormalMode, Seq(applicationApiEndpointNotAccessible), Seq(applicationApiPendingRequest), FakeUser)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, Seq(applicationApiEndpointNotAccessible), Seq(applicationApiPendingRequest), FakeUser, FakeHipEnvironments.production)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
-      val userAnswers = userAnswersWithApplicationAndApis.map(
+      val userAnswers = userAnswersWithApplicationAndApisAndProductionlikeEnvironmentId.map(
         _.set(RequestProductionAccessSelectApisPage, Set(applicationApi.apiId)).success.value
       )
 
@@ -151,7 +165,7 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(Set(applicationApiEndpointNotAccessible.apiId)), NormalMode, Seq(applicationApiEndpointNotAccessible), Seq(applicationApiPendingRequest), FakeUser)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(Set(applicationApiEndpointNotAccessible.apiId)), NormalMode, Seq(applicationApiEndpointNotAccessible), Seq(applicationApiPendingRequest), FakeUser, FakeHipEnvironments.production)(request, messages(application)).toString
       }
     }
 
@@ -161,7 +175,7 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
       val application =
-        applicationBuilder(userAnswers = userAnswersWithApplicationAndApis)
+        applicationBuilder(userAnswers = userAnswersWithApplicationAndApisAndProductionlikeEnvironmentId)
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[AccessRequestSessionRepository].toInstance(mockSessionRepository),
@@ -181,7 +195,7 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
-      val application = applicationBuilder(userAnswers = userAnswersWithApplicationAndApis)
+      val application = applicationBuilder(userAnswers = userAnswersWithApplicationAndApisAndProductionlikeEnvironmentId)
         .build()
 
       running(application) {
@@ -196,7 +210,7 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode,  Seq(applicationApiEndpointNotAccessible), Seq(applicationApiPendingRequest), FakeUser)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode,  Seq(applicationApiEndpointNotAccessible), Seq(applicationApiPendingRequest), FakeUser, FakeHipEnvironments.production)(request, messages(application)).toString
       }
     }
 
@@ -214,9 +228,71 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
       }
     }
 
+    "must redirect to Journey Recovery for a GET if no hip environment data is found" in {
+
+      val application = applicationBuilder(userAnswers = userAnswersWithApplicationAndApis).build()
+
+      running(application) {
+        val request = FakeRequest(GET, requestProductionAccessSelectApisRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+
+    "must redirect to Journey Recovery for a GET if hip environment is not productionLike" in {
+
+      val application = applicationBuilder(userAnswers = userAnswersWithApplicationAndApisAndNonProductionlikeEnvironmentId).build()
+
+      running(application) {
+        val request = FakeRequest(GET, requestProductionAccessSelectApisRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
       val application = applicationBuilder(userAnswers = None).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, requestProductionAccessSelectApisRoute)
+            .withFormUrlEncodedBody(("value[0]", applicationApi.apiId))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST if existing data is found but no environment id" in {
+
+      val application = applicationBuilder(userAnswers = userAnswersWithApplicationAndApis).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, requestProductionAccessSelectApisRoute)
+            .withFormUrlEncodedBody(("value[0]", applicationApi.apiId))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST if existing data is found but environment is not productionLike" in {
+
+      val application = applicationBuilder(userAnswers = userAnswersWithApplicationAndApisAndNonProductionlikeEnvironmentId).build()
 
       running(application) {
         val request =

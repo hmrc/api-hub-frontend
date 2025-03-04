@@ -16,15 +16,17 @@
 
 package controllers.application.accessrequest
 
+import config.{HipEnvironment, HipEnvironments}
 import controllers.actions.*
+import controllers.application.accessrequest.RequestProductionAccessEndJourneyController.Data
 import controllers.routes
 import forms.application.accessrequest.RequestProductionAccessSelectApisFormProvider
-import models.Mode
+import models.{Mode, UserAnswers}
 import models.requests.DataRequest
 import navigation.Navigator
-import pages.application.accessrequest.{RequestProductionAccessApisPage, RequestProductionAccessSelectApisPage}
+import pages.application.accessrequest.{RequestProductionAccessApisPage, RequestProductionAccessEnvironmentIdPage, RequestProductionAccessSelectApisPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, Result}
 import repositories.AccessRequestSessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -43,27 +45,33 @@ class RequestProductionAccessSelectApisController @Inject()(
                                         requireData: DataRequiredAction,
                                         formProvider: RequestProductionAccessSelectApisFormProvider,
                                         val controllerComponents: MessagesControllerComponents,
-                                        view: RequestProductionAccessSelectApisView
+                                        view: RequestProductionAccessSelectApisView,
+                                        hipEnvironments: HipEnvironments
                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport:
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      viewWithApiApplications(
-        mode,
-        (applicationApis: Seq[ApplicationApi], applicationApisPendingRequest: Seq[ApplicationApi]) =>
-          Future.successful(Ok(view(preparedForm(applicationApis), mode, applicationApis, applicationApisPendingRequest, request.user)))
+      validateEnvironmentId(request.userAnswers).fold(
+        call => Future.successful(Redirect(call)),
+        hipEnvironment => viewWithApiApplications(
+          mode,
+          (applicationApis: Seq[ApplicationApi], applicationApisPendingRequest: Seq[ApplicationApi]) =>
+            Future.successful(Ok(view(preparedForm(applicationApis), mode, applicationApis, applicationApisPendingRequest, request.user, hipEnvironment)))
+        )
       )
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
 
-      viewWithApiApplications(
+      validateEnvironmentId(request.userAnswers).fold(
+        call => Future.successful(Redirect(call)),
+        hipEnvironment => viewWithApiApplications(
         mode,
         (applicationApis: Seq[ApplicationApi], applicationApisPendingRequest: Seq[ApplicationApi]) =>
           formProvider(applicationApis.toSet).bindFromRequest().fold(
             formWithErrors =>
-                  Future.successful(BadRequest(view(formWithErrors, mode, applicationApis, applicationApisPendingRequest, request.user))),
+                  Future.successful(BadRequest(view(formWithErrors, mode, applicationApis, applicationApisPendingRequest, request.user, hipEnvironment))),
 
             selectedApiIds =>
               for {
@@ -71,6 +79,7 @@ class RequestProductionAccessSelectApisController @Inject()(
                 _              <- sessionRepository.set(updatedAnswers)
               } yield Redirect(navigator.nextPage(RequestProductionAccessSelectApisPage, mode, updatedAnswers))
         )
+      )
       )
   }
 
@@ -98,3 +107,16 @@ class RequestProductionAccessSelectApisController @Inject()(
         result.tupled(partitionApplicationApis(apis))
       case _ => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
     }
+
+  private def validateEnvironmentId(userAnswers: UserAnswers): Either[Call, HipEnvironment] = {
+    userAnswers.get(RequestProductionAccessEnvironmentIdPage) match {
+      case Some(environmentId) => 
+        val hipEnvironment = hipEnvironments.forId(environmentId)
+        if (hipEnvironment.isProductionLike) {
+          Right(hipEnvironment)
+        } else {
+          Left(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
+      case None => Left(controllers.routes.JourneyRecoveryController.onPageLoad())
+    }
+  }
