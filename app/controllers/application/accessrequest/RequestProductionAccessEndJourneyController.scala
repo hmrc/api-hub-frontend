@@ -56,8 +56,8 @@ class RequestProductionAccessEndJourneyController @Inject()(
       validate(request).fold(
         call => Future.successful(Redirect(call)),
         data =>
-          hipEnvironments.forUrlPathParameter(data.environmentId) match {
-            case Some(hipEnvironment) if hipEnvironment.isProductionLike =>
+          hipEnvironments.forEnvironmentIdOptional(data.environmentId) match {
+            case Some(hipEnvironment) =>
               val accessRequest = data.toRequest(request.user.email)
 
               apiHubService.requestProductionAccess(accessRequest)
@@ -66,7 +66,7 @@ class RequestProductionAccessEndJourneyController @Inject()(
                 .recoverWith {
                   case e: UpstreamErrorResponse if e.statusCode == BAD_GATEWAY => Future.successful(badGateway(e))
                 }
-            case _ => Future.successful(errorResultBuilder.notFound())
+            case _ => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
           }
     )
   }

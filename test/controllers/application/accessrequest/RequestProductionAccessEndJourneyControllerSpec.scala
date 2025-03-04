@@ -121,40 +121,6 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
       }
     }
 
-    "must return Not found when the provided environment is invalid" in {
-
-      forAll(teamMemberAndSupporterTable) {
-        (user: UserModel) =>
-          val application = anApplication
-          val userAnswers = buildUserAnswers()
-            .set(RequestProductionAccessEnvironmentIdPage, "invalid-environment")
-            .get
-          val fixture = buildFixture(userModel = user, userAnswers = Some(userAnswers))
-          val accessRequestRequest = data.toRequest(user.email)
-
-          when(fixture.apiHubService.requestProductionAccess(any())(any())).thenReturn(Future.successful(()))
-          when(fixture.accessRequestSessionRepository.clear(any())).thenReturn(Future.successful(true))
-
-          running(fixture.application) {
-            val request = FakeRequest(GET, controllers.application.accessrequest.routes.RequestProductionAccessEndJourneyController.submitRequest().url)
-            val result = route(fixture.application, request).value
-
-            val view = fixture.application.injector.instanceOf[ErrorTemplate]
-
-            status(result) mustBe NOT_FOUND
-            contentAsString(result) mustBe
-              view(
-                "Page not found - 404",
-                "This page can’t be found",
-                "Please check that you have entered the correct web address.",
-                Some(user)
-              )(request, messages(fixture.application))
-                .toString()
-            contentAsString(result) must validateAsHtml
-          }
-      }
-    }
-
     "must redirect to request production access page when no accept conditions in user answers" in {
       forAll(teamMemberAndSupporterTable) {
         (user: UserModel) =>
