@@ -14,10 +14,11 @@
  * limitations under the License.
  *@
 
+@import config.HipEnvironments
 @import viewmodels.components.AccessRequestPanelViewModel
 @import views.ViewUtils
 
-@this()
+@this(hipEnvironments: HipEnvironments)
 
 @(model: AccessRequestPanelViewModel)(implicit request: RequestHeader, messages: Messages)
 
@@ -27,8 +28,14 @@
         @model.accessRequest.apiName
     </p>
 
-    <p class="govuk-body additional-message utcDateTime">
-        @ViewUtils.formatLocalDateTimeContainingUtc(model.accessRequest.requested)
+    <p class="govuk-body additional-message">
+        <strong>@messages("accessRequests.headings.environment"):</strong>
+        @hipEnvironments.forId(model.accessRequest.environmentId).nameKey
+    </p>
+
+    <p class="govuk-body additional-message">
+        <strong>@messages("accessRequests.headings.requestedOn"):</strong>
+        <span class="utcDateTime">@ViewUtils.formatLocalDateTimeContainingUtc(model.accessRequest.requested)</span>
     </p>
 
     <p class="govuk-body additional-message">
