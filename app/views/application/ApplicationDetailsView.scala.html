@@ -45,9 +45,9 @@
     </a>
 }
 
-@prodAccessRequestLink(messageId: String) = {
-    <a href="@{controllers.application.routes.EnvironmentsController.onPageLoad(viewModel.applicationId, viewModel.productionEnvironmentId).url}" class="govuk-link govuk-link--no-visited-state">
-        @messages(messageId)
+@environmentAccessRequestLink(hipEnvironment: HipEnvironment) = {
+    <a href="@{controllers.application.routes.EnvironmentsController.onPageLoad(viewModel.applicationId, hipEnvironment.id).url}" class="govuk-link govuk-link--no-visited-state">
+        @hipEnvironment.nameKey
     </a>
 }
 
@@ -136,7 +136,7 @@
             </span>
         </p>
         <p class="govuk-body additional-message">
-            @Html(messages("applicationDetails.no.prod.access.message", prodAccessRequestLink("site.environment.production")))
+            @Html(messages("applicationDetails.no.prod.access.message"))
         </p>
     </div>
 }
