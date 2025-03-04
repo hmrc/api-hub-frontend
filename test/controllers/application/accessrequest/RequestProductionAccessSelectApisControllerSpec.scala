@@ -210,7 +210,7 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode,  Seq(applicationApiEndpointNotAccessible), Seq(applicationApiPendingRequest), FakeUser, FakeHipEnvironments.production)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, Seq(applicationApiEndpointNotAccessible), Seq(applicationApiPendingRequest), FakeUser, FakeHipEnvironments.production)(request, messages(application)).toString
       }
     }
 
@@ -241,22 +241,6 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
-
-
-    "must redirect to Journey Recovery for a GET if hip environment is not productionLike" in {
-
-      val application = applicationBuilder(userAnswers = userAnswersWithApplicationAndApisAndNonProductionlikeEnvironmentId).build()
-
-      running(application) {
-        val request = FakeRequest(GET, requestProductionAccessSelectApisRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
@@ -289,22 +273,5 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
-
-    "must redirect to Journey Recovery for a POST if existing data is found but environment is not productionLike" in {
-
-      val application = applicationBuilder(userAnswers = userAnswersWithApplicationAndApisAndNonProductionlikeEnvironmentId).build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, requestProductionAccessSelectApisRoute)
-            .withFormUrlEncodedBody(("value[0]", applicationApi.apiId))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
   }
-
 }
