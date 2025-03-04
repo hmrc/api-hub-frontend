@@ -24,7 +24,7 @@ import models.{CheckMode, UserAnswers}
 import models.accessrequest.{AccessRequestApi, AccessRequestEndpoint, AccessRequestRequest}
 import models.application.Application
 import models.requests.{BaseRequest, DataRequest}
-import pages.application.accessrequest.{ProvideSupportingInformationPage, RequestProductionAccessApisPage, RequestProductionAccessApplicationPage, RequestProductionAccessEnvironmentIdPage, RequestProductionAccessPage, RequestProductionAccessSelectApisPage}
+import pages.application.accessrequest.*
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.*
 import repositories.AccessRequestSessionRepository
@@ -46,7 +46,7 @@ class RequestProductionAccessEndJourneyController @Inject()(
   requestProductionAccessSuccessView: RequestProductionAccessSuccessView,
   apiHubService: ApiHubService,
   errorResultBuilder: ErrorResultBuilder,
-  hipEnvironments: HipEnvironments
+  hipEnvironments: HipEnvironments,
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   import RequestProductionAccessEndJourneyController.*
@@ -56,15 +56,19 @@ class RequestProductionAccessEndJourneyController @Inject()(
       validate(request).fold(
         call => Future.successful(Redirect(call)),
         data =>
-          val accessRequest = data.toRequest(request.user.email)
-          
-          apiHubService.requestProductionAccess(accessRequest)
-            .flatMap(_ => sessionRepository.clear(request.user.userId))
-            .flatMap(_ => Future.successful(Ok(requestProductionAccessSuccessView(data.application, Some(request.user), accessRequest.apis))))
-            .recoverWith {
-              case e: UpstreamErrorResponse if e.statusCode == BAD_GATEWAY => Future.successful(badGateway(e))
-            }
-      )
+          hipEnvironments.forEnvironmentIdOptional(data.environmentId) match {
+            case Some(hipEnvironment) =>
+              val accessRequest = data.toRequest(request.user.email)
+
+              apiHubService.requestProductionAccess(accessRequest)
+                .flatMap(_ => sessionRepository.clear(request.user.userId))
+                .flatMap(_ => Future.successful(Ok(requestProductionAccessSuccessView(data.application, Some(request.user), accessRequest.apis, hipEnvironment))))
+                .recoverWith {
+                  case e: UpstreamErrorResponse if e.statusCode == BAD_GATEWAY => Future.successful(badGateway(e))
+                }
+            case _ => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+          }
+    )
   }
 
   private def validate(request: DataRequest[?]): Either[Call, Data] = {

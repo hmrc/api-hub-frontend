@@ -39,6 +39,7 @@ import repositories.AccessRequestSessionRepository
 import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
 import viewmodels.application.*
+import views.html.ErrorTemplate
 import views.html.application.accessrequest.RequestProductionAccessSuccessView
 
 import java.time.{Clock, Instant, ZoneId}
@@ -67,7 +68,7 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
 
             val view = fixture.application.injector.instanceOf[RequestProductionAccessSuccessView]
             status(result) mustEqual OK
-            contentAsString(result) mustBe view(application, Some(user), accessRequestRequest.apis)(request, messages(fixture.application)).toString
+            contentAsString(result) mustBe view(application, Some(user), accessRequestRequest.apis, FakeHipEnvironments.production)(request, messages(fixture.application)).toString
             contentAsString(result) must validateAsHtml
             verify(fixture.apiHubService).requestProductionAccess(eqTo(accessRequestRequest))(any())
             verify(fixture.accessRequestSessionRepository).clear(eqTo(user.userId))
