@@ -67,19 +67,19 @@ class RequestProductionAccessSelectApisController @Inject()(
       validateEnvironmentId(request.userAnswers).fold(
         call => Future.successful(Redirect(call)),
         hipEnvironment => viewWithApiApplications(
-        mode,
-        (applicationApis: Seq[ApplicationApi], applicationApisPendingRequest: Seq[ApplicationApi]) =>
-          formProvider(applicationApis.toSet).bindFromRequest().fold(
-            formWithErrors =>
-                  Future.successful(BadRequest(view(formWithErrors, mode, applicationApis, applicationApisPendingRequest, request.user, hipEnvironment))),
+          mode,
+          (applicationApis: Seq[ApplicationApi], applicationApisPendingRequest: Seq[ApplicationApi]) =>
+            formProvider(applicationApis.toSet).bindFromRequest().fold(
+              formWithErrors =>
+                Future.successful(BadRequest(view(formWithErrors, mode, applicationApis, applicationApisPendingRequest, request.user, hipEnvironment))),
 
-            selectedApiIds =>
-              for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(RequestProductionAccessSelectApisPage, selectedApiIds))
-                _              <- sessionRepository.set(updatedAnswers)
-              } yield Redirect(navigator.nextPage(RequestProductionAccessSelectApisPage, mode, updatedAnswers))
+              selectedApiIds =>
+                for {
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(RequestProductionAccessSelectApisPage, selectedApiIds))
+                  _ <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(navigator.nextPage(RequestProductionAccessSelectApisPage, mode, updatedAnswers))
+            )
         )
-      )
       )
   }
 
@@ -110,13 +110,7 @@ class RequestProductionAccessSelectApisController @Inject()(
 
   private def validateEnvironmentId(userAnswers: UserAnswers): Either[Call, HipEnvironment] = {
     userAnswers.get(RequestProductionAccessEnvironmentIdPage) match {
-      case Some(environmentId) => 
-        val hipEnvironment = hipEnvironments.forId(environmentId)
-        if (hipEnvironment.isProductionLike) {
-          Right(hipEnvironment)
-        } else {
-          Left(controllers.routes.JourneyRecoveryController.onPageLoad())
-        }
+      case Some(environmentId) => Right(hipEnvironments.forId(environmentId))
       case None => Left(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
   }
