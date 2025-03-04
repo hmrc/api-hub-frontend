@@ -961,7 +961,7 @@ statistics.apisInProductionStatistic.totalInProduction = APIs in production
 statistics.apisInProductionStatistic.list = List of APIs in production
 
 cancelAccessRequestSelectApi.title = Select APIs
-cancelAccessRequestSelectApi.heading = Which APIs do you want to cancel production access requests for?
+cancelAccessRequestSelectApi.heading = Which APIs do you want to cancel access requests for?
 cancelAccessRequestSelectApi.error.required = Select at least one API
 
 cancelAccessRequestConfirm.title = Confirm API production access request cancellations
