@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import config.HipEnvironments
 @import controllers.application.cancelaccessrequest.routes
 @import models.accessrequest.AccessRequest
 @import models.user.UserModel
@@ -23,10 +24,15 @@
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukCheckboxes: GovukCheckboxes,
-    govukButton: GovukButton
+    govukButton: GovukButton,
+    hipEnvironments: HipEnvironments
 )
 
 @(accessRequests: Seq[AccessRequest], form: Form[?], mode: Mode, user: UserModel)(implicit request: Request[?], messages: Messages)
+
+@environmentHint(accessRequest: AccessRequest) = {
+    @messages("site.environment"): @hipEnvironments.forId(accessRequest.environmentId).nameKey
+}
 
 @layout(pageTitle = title(form, messages("cancelAccessRequestSelectApi.title")), user = Some(user), fullWidth = true) {
 
@@ -48,7 +54,7 @@
                             fieldId = "value",
                             index = index,
                             value = accessRequest.id
-                        )
+                        ).withHint(Hint(content = HtmlContent(environmentHint(accessRequest))))
                 }
             ).withClasses("govuk-!-margin-top-6 govuk-!-margin-bottom-6")
         )

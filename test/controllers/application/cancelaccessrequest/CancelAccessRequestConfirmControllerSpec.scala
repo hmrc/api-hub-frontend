@@ -40,15 +40,15 @@ import views.html.application.cancelaccessrequest.CancelAccessRequestConfirmView
 
 import scala.concurrent.Future
 
-class CancelAccessConfirmControllerSpec extends SpecBase with MockitoSugar with HtmlValidation with UserAnswersSugar with AccessRequestGenerator {
+class CancelAccessRequestConfirmControllerSpec extends SpecBase with MockitoSugar with HtmlValidation with UserAnswersSugar with AccessRequestGenerator {
 
-  import CancelAccessConfirmControllerSpec.*
+  import CancelAccessRequestConfirmControllerSpec.*
 
   "CancelAccessRequestConfirm Controller" - {
 
     "must return OK and the correct view for a GET" in {
       val accessRequests = sampleAccessRequests()
-      val apiIds = accessRequests.map(_.apiId).toSet
+      val apiIds = accessRequests.map(_.id).toSet
       val fixture = buildFixture(accessRequests = Some(accessRequests), apis = Some(apiIds))
 
       running(fixture.application) {
@@ -64,7 +64,7 @@ class CancelAccessConfirmControllerSpec extends SpecBase with MockitoSugar with 
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
       val accessRequests = sampleAccessRequests()
-      val apiIds = accessRequests.map(_.apiId).toSet
+      val apiIds = accessRequests.map(_.id).toSet
       val fixture = buildFixture(accessRequests = Some(accessRequests), apis = Some(apiIds), accepted = true)
 
       running(fixture.application) {
@@ -226,7 +226,7 @@ class CancelAccessConfirmControllerSpec extends SpecBase with MockitoSugar with 
 
 }
 
-object CancelAccessConfirmControllerSpec {
+object CancelAccessRequestConfirmControllerSpec {
 
   private val onwardRoute = Call("GET", "/CancelAccessConfirmControllerSpec")
   private lazy val cancelAccessConfirmRoute = routes.CancelAccessRequestConfirmController.onPageLoad(NormalMode).url

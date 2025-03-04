@@ -45,7 +45,7 @@ class CancelAccessRequestConfirmController @Inject()(
                                          view: CancelAccessRequestConfirmView
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form = formProvider()
+  private val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) async {
     implicit request => {
@@ -65,7 +65,7 @@ class CancelAccessRequestConfirmController @Inject()(
   private def getCancellableRequests(request: DataRequest[AnyContent]) = {
     val pendingAccessRequests = request.userAnswers.get(CancelAccessRequestPendingPage).getOrElse(Seq.empty)
     val apisToCancel = request.userAnswers.get(CancelAccessRequestSelectApiPage).getOrElse(Set.empty)
-    val accessRequestsToCancel = pendingAccessRequests.filter(accessRequest => apisToCancel.contains(accessRequest.apiId))
+    val accessRequestsToCancel = pendingAccessRequests.filter(accessRequest => apisToCancel.exists(_.equals(accessRequest.id)))
     accessRequestsToCancel
   }
 
