@@ -27,7 +27,6 @@ class RequestProductionAccessSelectApisFormProviderSpec extends CheckboxFieldBeh
     ApplicationApi(
       apiId = "api-id-1",
       apiTitle = "API title 1",
-      totalEndpoints = 0,
       endpoints = Seq.empty,
       pendingAccessRequestCount = 0,
       isMissing = false
@@ -36,7 +35,6 @@ class RequestProductionAccessSelectApisFormProviderSpec extends CheckboxFieldBeh
     ApplicationApi(
       apiId = "api-id-2",
       apiTitle = "API title 2",
-      totalEndpoints = 0,
       endpoints = Seq.empty,
       pendingAccessRequestCount = 0,
       isMissing = false
@@ -45,7 +43,6 @@ class RequestProductionAccessSelectApisFormProviderSpec extends CheckboxFieldBeh
     ApplicationApi(
       apiId = "api-id-3",
       apiTitle = "API title 3",
-      totalEndpoints = 0,
       endpoints = Seq.empty,
       pendingAccessRequestCount = 0,
       isMissing = false

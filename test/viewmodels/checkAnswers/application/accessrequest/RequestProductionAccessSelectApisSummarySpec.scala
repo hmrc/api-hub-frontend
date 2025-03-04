@@ -61,7 +61,6 @@ object RequestProductionAccessSelectApisSummarySpec {
   private val applicationApi1 = ApplicationApi(
     apiId = "test-id-1",
     apiTitle = "test-title-1",
-    totalEndpoints = 0,
     endpoints = Seq.empty,
     pendingAccessRequests = Seq.empty,
     isMissing = false
@@ -70,7 +69,6 @@ object RequestProductionAccessSelectApisSummarySpec {
   private val applicationApi2 = ApplicationApi(
     apiId = "test-id-2",
     apiTitle = "test-title-2",
-    totalEndpoints = 0,
     endpoints = Seq.empty,
     pendingAccessRequests = Seq.empty,
     isMissing = false

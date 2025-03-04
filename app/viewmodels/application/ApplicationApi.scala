@@ -106,7 +106,6 @@ object ApplicationEndpoint {
 case class ApplicationApi(
   apiId: String,
   apiTitle: String,
-  totalEndpoints: Int,
   endpoints: Seq[ApplicationEndpoint],
   pendingAccessRequests: Seq[AccessRequest],
   isMissing: Boolean
@@ -116,7 +115,7 @@ case class ApplicationApi(
   def availableEndpoints(hipEnvironment: HipEnvironment): Int = endpoints.count(_.accessFor(hipEnvironment) == Accessible)
   def needsAccessRequest(hipEnvironment: HipEnvironment): Boolean = !hasPendingAccessRequest(hipEnvironment) && endpoints.exists(_.accessFor(hipEnvironment) == Inaccessible)
   def hasPendingAccessRequest(hipEnvironment: HipEnvironment): Boolean = pendingAccessRequests.exists(_.environmentId.contains(hipEnvironment.id))
-  def isAccessibleInEnvironment(hipEnvironment: HipEnvironment): Boolean = !hipEnvironment.isProductionLike || availableEndpoints(hipEnvironment) > 0
+  def isAccessibleInEnvironment(hipEnvironment: HipEnvironment): Boolean = availableEndpoints(hipEnvironment) > 0
 }
 
 object ApplicationApi {
@@ -125,7 +124,6 @@ object ApplicationApi {
     ApplicationApi(
       apiId = apiDetail.id,
       apiTitle = apiDetail.title,
-      totalEndpoints = apiDetail.endpoints.flatMap(_.methods).size,
       endpoints = endpoints,
       pendingAccessRequests = pendingAccessRequests,
       isMissing = false
@@ -136,7 +134,6 @@ object ApplicationApi {
     ApplicationApi(
       apiId = api.id,
       apiTitle = api.title,
-      totalEndpoints = 0,
       endpoints = api.endpoints.map(ApplicationEndpoint.forMissingApi),
       pendingAccessRequests = pendingAccessRequests,
       isMissing = true
@@ -174,15 +171,9 @@ object TheoreticalScopes {
   }
 
   private def buildApprovedScopes(accessRequests: Seq[AccessRequest]): Map[String,Set[String]] = {
-    accessRequests.foldLeft(Map.empty[String, Set[String]]) {
-      case (approvedScopes, accessRequest) =>
-        (accessRequest.status, accessRequest.environmentId) match {
-          case (Approved, environmentId) =>
-            approvedScopes.updated(environmentId, accessRequest.endpoints.flatMap(_.scopes).toSet)
-          case _ =>
-            approvedScopes
-        }
-    }
+    accessRequests
+      .filter(_.status == Approved)
+      .groupMapReduce(_.environmentId)(_.endpoints.flatMap(_.scopes).toSet)(_ ++ _)
   }
 
   implicit val formatTheoreticalScopes: Format[TheoreticalScopes] = Json.format[TheoreticalScopes]
