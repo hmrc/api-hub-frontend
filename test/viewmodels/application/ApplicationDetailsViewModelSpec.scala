@@ -31,7 +31,10 @@ class ApplicationDetailsViewModelSpec extends AnyFreeSpec with Matchers {
       ApplicationApi(Api(id, id), buildPendingAccessRequests(pendingCount)).copy(isMissing = isMissing)
     }
     def buildApplicationEndpoint() = {
-      ApplicationEndpoint("GET", "/path", None, None, Seq("scope"), TheoreticalScopes(Seq("scope").toSet, Map(FakeHipEnvironments.production.id -> Seq("scope").toSet)), Seq.empty)
+      ApplicationEndpoint("GET", "/path", None, None, Seq("scope"), TheoreticalScopes(Seq("scope").toSet, Map(
+        FakeHipEnvironments.production.id -> Seq("scope").toSet,
+        FakeHipEnvironments.preProduction.id -> Seq("scope").toSet,
+      )), Seq.empty)
     }
     def buildApplicationApiWithEndpoint(id: String, endpoint: ApplicationEndpoint) = {
       buildApplicationApi(id).copy(endpoints = Seq(endpoint))

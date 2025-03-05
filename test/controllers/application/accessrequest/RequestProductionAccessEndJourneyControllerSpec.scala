@@ -282,7 +282,6 @@ object RequestProductionAccessEndJourneyControllerSpec extends OptionValues{
     ApplicationApi(
       apiId = s"test-api-id-$apiId",
       apiTitle = s"test-api-title-$apiId",
-      totalEndpoints = endpointAccesses.size,
       endpoints = endpointAccesses.map(
         endpointAccess =>
           ApplicationEndpoint(

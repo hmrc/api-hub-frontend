@@ -28,7 +28,7 @@ class RequestProductionAccessSelectApisFormProviderSpec extends CheckboxFieldBeh
       apiId = "api-id-1",
       apiTitle = "API title 1",
       endpoints = Seq.empty,
-      pendingAccessRequestCount = 0,
+      pendingAccessRequests = Seq.empty,
       isMissing = false
     )
   private val applicationApi2 =
@@ -36,7 +36,7 @@ class RequestProductionAccessSelectApisFormProviderSpec extends CheckboxFieldBeh
       apiId = "api-id-2",
       apiTitle = "API title 2",
       endpoints = Seq.empty,
-      pendingAccessRequestCount = 0,
+      pendingAccessRequests = Seq.empty,
       isMissing = false
     )
   private val applicationApi3 =
@@ -44,7 +44,7 @@ class RequestProductionAccessSelectApisFormProviderSpec extends CheckboxFieldBeh
       apiId = "api-id-3",
       apiTitle = "API title 3",
       endpoints = Seq.empty,
-      pendingAccessRequestCount = 0,
+      pendingAccessRequests = Seq.empty,
       isMissing = false
     )
   private val applicationApis = Seq(

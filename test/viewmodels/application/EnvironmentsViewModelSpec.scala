@@ -65,11 +65,10 @@ class EnvironmentsViewModelSpec extends AnyFreeSpec with Matchers with ScalaChec
           supportingInformation = "supportingInformation",
           requested = LocalDateTime.now(),
           requestedBy = "requestedBy",
-          environmentId = "environmentId"
+          environmentId = FakeHipEnvironments.production.id
         )
       }
     }
-
 
     "showRequestProdAccessBanner" - {
       "must return true if the environment is production like and the application has an API that needs production access request" in {

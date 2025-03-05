@@ -148,6 +148,12 @@ case class TheoreticalScopes(requiredScopes: Set[String], approvedScopes: Map[St
   def allowedScopes(hipEnvironment: HipEnvironment): Set[String] = {
     requiredScopes.intersect(approvedScopes.get(hipEnvironment.id).getOrElse(Set.empty))
   }
+  def filterByScopes(scopes: Set[String]): TheoreticalScopes = {
+    copy(
+      requiredScopes = requiredScopes.intersect(scopes),
+      approvedScopes = approvedScopes.view.mapValues(_.intersect(scopes)).filter { case (_, value) => value.nonEmpty }.toMap
+    )
+  }
 }
 
 object TheoreticalScopes {

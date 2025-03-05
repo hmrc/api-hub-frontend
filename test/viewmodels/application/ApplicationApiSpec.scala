@@ -16,7 +16,6 @@
 
 package viewmodels.application
 
-import config.{BaseHipEnvironment, DefaultHipEnvironment, HipEnvironment}
 import controllers.actions.FakeApiDetail
 import fakes.FakeHipEnvironments
 import models.accessrequest.{AccessRequest, AccessRequestEndpoint, AccessRequestStatus, Pending, Approved, Rejected}
@@ -29,8 +28,6 @@ import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import java.time.{Instant, LocalDateTime}
 
 class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks {
-
-  import ApplicationApiSpec.*
 
   private val selectedEndpoint = SelectedEndpoint(httpMethod = "test-method", path = "test-path")
   private def buildApplicationEndpoint(scopes: Seq[String] = Seq.empty,
@@ -74,7 +71,7 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
       isMissing = false
     )
   }
-  
+
   private def buildAccessRequestEndpoint(scopes: Seq[String]) = {
     AccessRequestEndpoint(httpMethod = "GET", path = "/path", scopes = scopes)
   }
@@ -167,8 +164,9 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
           accessibleEndpoint1,
           accessibleEndpoint2,
           inaccessibleEndpoint
-        )).availableEndpoints(FakeHipEnvironments.test) mustBe 0
+        )).availableEndpoints(FakeHipEnvironments.preProduction) mustBe 0
       }
+
     }
 
     "needsAccessRequest" - {
@@ -350,6 +348,7 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
           FakeHipEnvironments.production.id -> Set("scope3", "scope4", "scope7", "scope8"),
           FakeHipEnvironments.test.id -> Set("scope11", "scope12")
         )
+      }
     }
   }
 }

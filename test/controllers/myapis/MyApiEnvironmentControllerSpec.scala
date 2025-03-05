@@ -55,6 +55,7 @@ class MyApiEnvironmentControllerSpec
     val apiDetail = sampleApiDetail().copy(teamId = Some(apiTeam.id))
     val deploymentStatuses = ApiDeploymentStatuses(Seq(
       Deployed(FakeHipEnvironments.production.id, "1.0"),
+      Deployed(FakeHipEnvironments.preProduction.id, "1.0"),
       Deployed(FakeHipEnvironments.test.id, "1.0")
     ))
 
@@ -73,7 +74,7 @@ class MyApiEnvironmentControllerSpec
       val result = route(fixture.application, request).value
 
       status(result) mustBe OK
-      contentAsString(result) mustBe view(apiDetail, FakeHipEnvironments.test, Some(FakeHipEnvironments.production), FakeUser, deploymentStatuses)(request, messages(fixture.application)).toString()
+      contentAsString(result) mustBe view(apiDetail, FakeHipEnvironments.test, Some(FakeHipEnvironments.preProduction), FakeUser, deploymentStatuses)(request, messages(fixture.application)).toString()
       contentAsString(result) must validateAsHtml
     }
   }
@@ -83,6 +84,7 @@ class MyApiEnvironmentControllerSpec
     val apiDetail = sampleApiDetail()
     val deploymentStatuses = ApiDeploymentStatuses(Seq(
       Deployed(FakeHipEnvironments.production.id, "1.0"),
+      Deployed(FakeHipEnvironments.preProduction.id, "1.0"),
       Deployed(FakeHipEnvironments.test.id, "1.0")
     ))
 
@@ -96,7 +98,7 @@ class MyApiEnvironmentControllerSpec
       val result = route(fixture.application, request).value
 
       status(result) mustBe OK
-      contentAsString(result) mustBe view(apiDetail, FakeHipEnvironments.test, Some(FakeHipEnvironments.production), FakeSupporter, deploymentStatuses)(request, messages(fixture.application)).toString()
+      contentAsString(result) mustBe view(apiDetail, FakeHipEnvironments.test, Some(FakeHipEnvironments.preProduction), FakeSupporter, deploymentStatuses)(request, messages(fixture.application)).toString()
       contentAsString(result) must validateAsHtml
     }
   }

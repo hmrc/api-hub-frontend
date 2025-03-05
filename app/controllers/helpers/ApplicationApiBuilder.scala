@@ -71,8 +71,8 @@ class ApplicationApiBuilder @Inject()(
                     endpointMethod.summary,
                     endpointMethod.description,
                     endpointMethod.scopes,
-                    theoreticalScopes, 
-                    pendingAccessRequests
+                    theoreticalScopes.filterByScopes(endpointMethod.scopes.toSet),
+                    pendingAccessRequests.filter(_.endpoints.flatMap(_.scopes).toSet.subsetOf(endpointMethod.scopes.toSet))
                   )
               )
         }

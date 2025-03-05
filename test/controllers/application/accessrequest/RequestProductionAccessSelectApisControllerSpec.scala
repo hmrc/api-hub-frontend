@@ -17,7 +17,7 @@
 package controllers.application.accessrequest
 
 import base.SpecBase
-import controllers.actions.FakeUser
+import controllers.actions.{FakeAccessRequest, FakeUser}
 import fakes.FakeHipEnvironments
 import forms.application.accessrequest.RequestProductionAccessSelectApisFormProvider
 import models.NormalMode
@@ -70,7 +70,6 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
     ApplicationApi(
       apiId = "api-id-1",
       apiTitle = "API title 1",
-      totalEndpoints = 0,
       endpoints = Seq(applicationEndpoint),
       pendingAccessRequests = Seq.empty,
       isMissing = false
@@ -79,7 +78,6 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
     ApplicationApi(
       apiId = "api-id-1",
       apiTitle = "API title 1",
-      totalEndpoints = 0,
       endpoints = Seq(applicationEndpointNotAccessibleInProd),
       pendingAccessRequests = Seq.empty,
       isMissing = false
@@ -88,7 +86,6 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
     ApplicationApi(
       apiId = "api-id-2",
       apiTitle = "API title 2",
-      totalEndpoints = 0,
       endpoints = Seq(applicationEndpoint),
       pendingAccessRequests = Seq.empty,
       isMissing = true
@@ -97,9 +94,8 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
     ApplicationApi(
       apiId = "api-id-3",
       apiTitle = "API title 3",
-      totalEndpoints = 0,
       endpoints = Seq(applicationEndpoint),
-      pendingAccessRequests = Seq.empty,
+      pendingAccessRequests = Seq(FakeAccessRequest),
       isMissing = false
     )
   private val applicationApis = Seq(
@@ -109,7 +105,7 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
     applicationApiPendingRequest,
   )
 
-  private lazy val userAnswersWithApplicationsApisAndEnvironment = Some(
+  private lazy val userAnswersWithApplicationAndApis = Some(
     emptyUserAnswers
       .set(RequestProductionAccessApplicationPage, testApplication)
       .flatMap(_.set(RequestProductionAccessApisPage, applicationApis))
