@@ -19,6 +19,7 @@ package viewmodels.application
 import config.HipEnvironment
 import controllers.actions.{FakeApiDetail, FakeApplication, FakePrivilegedUser, FakeUser}
 import fakes.FakeHipEnvironments
+import models.accessrequest.{AccessRequest, Pending}
 import models.application.Credential
 import models.user.UserModel
 import org.scalatest.freespec.AnyFreeSpec
@@ -30,23 +31,43 @@ import java.time.LocalDateTime
 class EnvironmentsViewModelSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks {
   "ApiTabViewModel" - {
     def buildApplicationEndpoint(prodAccess: ApplicationEndpointAccess) = {
+      val approvedScopes = prodAccess match {
+        case Accessible => Map(FakeHipEnvironments.production.id -> Seq("test-scope").toSet)
+        case _ => Map.empty
+      }
       ApplicationEndpoint(
         httpMethod = "GET",
         path = "/test1",
         summary = Some("test-summary"),
         description = Some("test-description"),
-        scopes = Seq.empty,
-        productionAccess = prodAccess,
-        nonProductionAccess = Accessible
+        scopes = Seq("test-scope"),
+        theoreticalScopes = TheoreticalScopes(Seq("test-scope").toSet, approvedScopes),
+        pendingAccessRequests = Seq.empty
       )
     }
     def buildViewModel(hipEnvironment: HipEnvironment, prodAccess: ApplicationEndpointAccess, pendingRequestCount: Int = 0) = {
-      val applicationApis = Seq(ApplicationApi(FakeApiDetail, Seq(buildApplicationEndpoint(prodAccess)), pendingRequestCount))
+      val applicationApis = Seq(ApplicationApi(FakeApiDetail, Seq(buildApplicationEndpoint(prodAccess)), buildAccessRequests(pendingRequestCount)))
       buildViewModelWithApplicationApis(applicationApis, hipEnvironment, prodAccess)
     }
 
     def buildViewModelWithApplicationApis(applicationApis: Seq[ApplicationApi], hipEnvironment: HipEnvironment, prodAccess: ApplicationEndpointAccess) = {
       EnvironmentsViewModel(FakeApplication, applicationApis, FakeUser, hipEnvironment, List.empty, "apiHubGuideUrl").apiTabViewModel
+    }
+
+    def buildAccessRequests(count: Int): Seq[AccessRequest] = {
+      Range(0, count) map { index =>
+        AccessRequest(
+          id = s"id$index",
+          applicationId = "applicationId",
+          apiId = "apiId",
+          apiName = "apiName",
+          status = Pending,
+          supportingInformation = "supportingInformation",
+          requested = LocalDateTime.now(),
+          requestedBy = "requestedBy",
+          environmentId = FakeHipEnvironments.production.id
+        )
+      }
     }
 
     "showRequestProdAccessBanner" - {
@@ -66,11 +87,11 @@ class EnvironmentsViewModelSpec extends AnyFreeSpec with Matchers with ScalaChec
 
     "pendingAccessRequestsCount must return the number of APIs with pending production access requests" in {
       val applicationApis = Seq(
-        ApplicationApi(FakeApiDetail, Seq(buildApplicationEndpoint(Accessible)), 1),
-        ApplicationApi(FakeApiDetail, Seq(buildApplicationEndpoint(Accessible)), 0),
-        ApplicationApi(FakeApiDetail, Seq(buildApplicationEndpoint(Accessible)), 3),
-        ApplicationApi(FakeApiDetail, Seq(buildApplicationEndpoint(Accessible)), 0),
-        ApplicationApi(FakeApiDetail, Seq(buildApplicationEndpoint(Accessible)), 1),
+        ApplicationApi(FakeApiDetail, Seq(buildApplicationEndpoint(Accessible)), buildAccessRequests(1)),
+        ApplicationApi(FakeApiDetail, Seq(buildApplicationEndpoint(Accessible)), buildAccessRequests(0)),
+        ApplicationApi(FakeApiDetail, Seq(buildApplicationEndpoint(Accessible)), buildAccessRequests(3)),
+        ApplicationApi(FakeApiDetail, Seq(buildApplicationEndpoint(Accessible)), buildAccessRequests(0)),
+        ApplicationApi(FakeApiDetail, Seq(buildApplicationEndpoint(Accessible)), buildAccessRequests(1)),
       )
       buildViewModelWithApplicationApis(applicationApis, FakeHipEnvironments.production, Accessible).pendingAccessRequestsCount mustBe 3
     }

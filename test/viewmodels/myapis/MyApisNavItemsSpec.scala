@@ -185,6 +185,12 @@ object MyApisNavItemsSpec {
           isCurrentPage = false
         ),
         SideNavItemLeaf(
+          page = EnvironmentPage(FakeHipEnvironments.preProduction),
+          title = "Pre-Production",
+          link = controllers.myapis.routes.MyApiEnvironmentController.onPageLoad(apiDetail.id, "preprod"),
+          isCurrentPage = false,
+        ),
+        SideNavItemLeaf(
           page = EnvironmentPage(FakeHipEnvironments.production),
           title = "Production",
           link = controllers.myapis.routes.MyApiEnvironmentController.onPageLoad(apiDetail.id, "production"),

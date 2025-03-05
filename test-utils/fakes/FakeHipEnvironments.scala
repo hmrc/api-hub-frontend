@@ -27,14 +27,21 @@ object FakeHipEnvironments extends HipEnvironments {
     promoteTo = None
   )
 
-  val test: HipEnvironment = DefaultHipEnvironment(
-    id = "test",
+  val preProduction: HipEnvironment = DefaultHipEnvironment(
+    id = "preprod",
     rank = 2,
-    isProductionLike = false,
+    isProductionLike = true,
     promoteTo = Some(production)
   )
 
-  override def environments: Seq[HipEnvironment] = Seq(production, test)
+  val test: HipEnvironment = DefaultHipEnvironment(
+    id = "test",
+    rank = 3,
+    isProductionLike = false,
+    promoteTo = Some(preProduction)
+  )
+
+  override def environments: Seq[HipEnvironment] = Seq(production, preProduction, test)
 
   override protected def baseEnvironments: Seq[BaseHipEnvironment] = Seq.empty
 

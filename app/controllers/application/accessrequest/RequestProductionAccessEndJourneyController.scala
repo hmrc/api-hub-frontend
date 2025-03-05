@@ -17,7 +17,7 @@
 package controllers.application.accessrequest
 
 import com.google.inject.{Inject, Singleton}
-import config.HipEnvironments
+import config.{HipEnvironment, HipEnvironments}
 import controllers.actions.{AccessRequestDataRetrievalAction, DataRequiredAction, IdentifierAction}
 import controllers.helpers.ErrorResultBuilder
 import models.{CheckMode, UserAnswers}
@@ -56,7 +56,7 @@ class RequestProductionAccessEndJourneyController @Inject()(
       validate(request).fold(
         call => Future.successful(Redirect(call)),
         data =>
-          hipEnvironments.forEnvironmentIdOptional(data.environmentId) match {
+          hipEnvironments.forEnvironmentIdOptional(data.environment.id) match {
             case Some(hipEnvironment) =>
               val accessRequest = data.toRequest(request.user.email)
 
@@ -79,7 +79,7 @@ class RequestProductionAccessEndJourneyController @Inject()(
       selectedApis <- validateSelectedApis(request.userAnswers)
       supportingInformation <- validateSupportingInformation(request.userAnswers)
       _ <- validateDeclaration(request.userAnswers)
-    } yield Data(application, applicationApis, environmentId, selectedApis, supportingInformation)
+    } yield Data(application, applicationApis, hipEnvironments.forId(environmentId), selectedApis, supportingInformation)
   }
 
   private def validateApplication(userAnswers: UserAnswers): Either[Call, Application] = {
@@ -135,13 +135,12 @@ object RequestProductionAccessEndJourneyController {
   case class Data(
     application: Application,
     applicationApis: Seq[ApplicationApi],
-    environmentId: String,
+    environment: HipEnvironment,
     selectedApis: Set[String],
     supportingInformation: String
   ) {
 
     def toRequest(requestedBy: String): AccessRequestRequest = {
-
       AccessRequestRequest(
         applicationId = application.id,
         supportingInformation = supportingInformation,
@@ -155,7 +154,7 @@ object RequestProductionAccessEndJourneyController {
               apiId = applicationApi.apiId,
               apiName = applicationApi.apiTitle,
               endpoints = applicationApi.endpoints
-                .filter(_.productionAccess.equals(Inaccessible))
+                .filter(_.accessFor(environment).equals(Inaccessible))
                 .map(
                   endpoint => AccessRequestEndpoint(
                     httpMethod = endpoint.httpMethod,
@@ -165,7 +164,7 @@ object RequestProductionAccessEndJourneyController {
                 )
             )
           ),
-        environmentId = environmentId
+        environmentId = environment.id
       )
     }
   }

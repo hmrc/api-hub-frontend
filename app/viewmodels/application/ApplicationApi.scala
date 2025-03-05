@@ -45,39 +45,6 @@ case object Unknown extends WithName("unknown") with ApplicationEndpointAccess {
 }
 
 object ApplicationEndpointAccess extends Enumerable.Implicits{
-
-  def production(
-    theoreticalScopes: TheoreticalScopes,
-    pendingAccessRequestCount: Int,
-    endpointMethod: EndpointMethod,
-  ): ApplicationEndpointAccess = {
-    apply(theoreticalScopes.allowedScopes, pendingAccessRequestCount, endpointMethod)
-  }
-
-  def nonProduction(
-    theoreticalScopes: TheoreticalScopes,
-    pendingAccessRequestCount: Int,
-    endpointMethod: EndpointMethod,
-  ): ApplicationEndpointAccess = {
-    apply(theoreticalScopes.requiredScopes, pendingAccessRequestCount, endpointMethod)
-  }
-
-  private def apply(
-    scopes: Set[String],
-    pendingAccessRequestCount: Int,
-    endpointMethod: EndpointMethod
-  ): ApplicationEndpointAccess = {
-    if (endpointMethod.scopes.toSet.subsetOf(scopes)) {
-      Accessible
-    }
-    else if (pendingAccessRequestCount > 0) {
-      Requested
-    }
-    else {
-      Inaccessible
-    }
-  }
-
   val values: Seq[ApplicationEndpointAccess] = Seq(
     Accessible,
     Inaccessible,
@@ -96,9 +63,27 @@ case class ApplicationEndpoint(
   summary: Option[String],
   description: Option[String],
   scopes: Seq[String],
-  productionAccess: ApplicationEndpointAccess,
-  nonProductionAccess: ApplicationEndpointAccess
-)
+  theoreticalScopes: TheoreticalScopes,
+  pendingAccessRequests: Seq[AccessRequest]
+) {
+  def accessFor(hipEnvironment: HipEnvironment): ApplicationEndpointAccess = {
+    val allowedScopes = hipEnvironment.isProductionLike match {
+      case true => theoreticalScopes.allowedScopes(hipEnvironment)
+      case false => theoreticalScopes.requiredScopes
+    }
+
+    if (scopes.isEmpty) {
+      Unknown
+    } else if (scopes.toSet.subsetOf(allowedScopes)) {
+      Accessible
+    } else if (pendingAccessRequests.exists(_.environmentId.contains(hipEnvironment.id))) {
+      Requested
+    } else {
+      Inaccessible
+    }
+  }
+}
+
 
 object ApplicationEndpoint {
 
@@ -109,8 +94,8 @@ object ApplicationEndpoint {
       summary = None,
       description = None,
       scopes = Seq.empty,
-      productionAccess = Unknown,
-      nonProductionAccess = Unknown
+      theoreticalScopes = TheoreticalScopes(Set.empty, Map.empty),
+      pendingAccessRequests = Seq.empty
     )
   }
 
@@ -121,40 +106,36 @@ object ApplicationEndpoint {
 case class ApplicationApi(
   apiId: String,
   apiTitle: String,
-  totalEndpoints: Int,
   endpoints: Seq[ApplicationEndpoint],
-  pendingAccessRequestCount: Int,
+  pendingAccessRequests: Seq[AccessRequest],
   isMissing: Boolean
 ) {
 
   def selectedEndpoints: Int = endpoints.size
-  def availableProductionEndpoints: Int = endpoints.count(_.productionAccess.isAccessible)
-  def availableNonProductionEndpoints: Int = endpoints.count(_.nonProductionAccess.isAccessible)
-  def needsProductionAccessRequest: Boolean = !hasPendingAccessRequest && endpoints.exists(_.productionAccess == Inaccessible)
-  def hasPendingAccessRequest: Boolean = pendingAccessRequestCount > 0
-  def isAccessibleInEnvironment(hipEnvironment: HipEnvironment): Boolean = !hipEnvironment.isProductionLike || availableProductionEndpoints > 0
+  def availableEndpoints(hipEnvironment: HipEnvironment): Int = endpoints.count(_.accessFor(hipEnvironment) == Accessible)
+  def needsAccessRequest(hipEnvironment: HipEnvironment): Boolean = !hasPendingAccessRequest(hipEnvironment) && endpoints.exists(_.accessFor(hipEnvironment) == Inaccessible)
+  def hasPendingAccessRequest(hipEnvironment: HipEnvironment): Boolean = pendingAccessRequests.exists(_.environmentId.contains(hipEnvironment.id))
+  def isAccessibleInEnvironment(hipEnvironment: HipEnvironment): Boolean = availableEndpoints(hipEnvironment) > 0
 }
 
 object ApplicationApi {
 
-  def apply(apiDetail: ApiDetail, endpoints: Seq[ApplicationEndpoint], pendingAccessRequestCount: Int): ApplicationApi = {
+  def apply(apiDetail: ApiDetail, endpoints: Seq[ApplicationEndpoint], pendingAccessRequests: Seq[AccessRequest]): ApplicationApi = {
     ApplicationApi(
       apiId = apiDetail.id,
       apiTitle = apiDetail.title,
-      totalEndpoints = apiDetail.endpoints.flatMap(_.methods).size,
       endpoints = endpoints,
-      pendingAccessRequestCount = pendingAccessRequestCount,
+      pendingAccessRequests = pendingAccessRequests,
       isMissing = false
     )
   }
 
-  def apply(api: Api, pendingAccessRequestCount: Int): ApplicationApi = {
+  def apply(api: Api, pendingAccessRequests: Seq[AccessRequest]): ApplicationApi = {
     ApplicationApi(
       apiId = api.id,
       apiTitle = api.title,
-      totalEndpoints = 0,
       endpoints = api.endpoints.map(ApplicationEndpoint.forMissingApi),
-      pendingAccessRequestCount = pendingAccessRequestCount,
+      pendingAccessRequests = pendingAccessRequests,
       isMissing = true
     )
   }
@@ -163,9 +144,15 @@ object ApplicationApi {
 
 }
 
-case class TheoreticalScopes(requiredScopes: Set[String], approvedScopes: Set[String]) {
-  def allowedScopes: Set[String] = {
-    requiredScopes.intersect(approvedScopes)
+case class TheoreticalScopes(requiredScopes: Set[String], approvedScopes: Map[String, Set[String]]) {
+  def allowedScopes(hipEnvironment: HipEnvironment): Set[String] = {
+    requiredScopes.intersect(approvedScopes.get(hipEnvironment.id).getOrElse(Set.empty))
+  }
+  def filterByScopes(scopes: Set[String]): TheoreticalScopes = {
+    copy(
+      requiredScopes = requiredScopes.intersect(scopes),
+      approvedScopes = approvedScopes.view.mapValues(_.intersect(scopes)).filter { case (_, value) => value.nonEmpty }.toMap
+    )
   }
 }
 
@@ -189,11 +176,11 @@ object TheoreticalScopes {
       .toSet
   }
 
-  private def buildApprovedScopes(accessRequests: Seq[AccessRequest]): Set[String] = {
+  private def buildApprovedScopes(accessRequests: Seq[AccessRequest]): Map[String,Set[String]] = {
     accessRequests
       .filter(_.status == Approved)
-      .flatMap(_.endpoints.flatMap(_.scopes))
-      .toSet
+      .groupMapReduce(_.environmentId)(_.endpoints.flatMap(_.scopes).toSet)(_ ++ _)
   }
 
+  implicit val formatTheoreticalScopes: Format[TheoreticalScopes] = Json.format[TheoreticalScopes]
 }

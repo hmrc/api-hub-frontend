@@ -46,7 +46,7 @@
 }
 
 @prodAccessRequestLink(messageId: String) = {
-    <a href="@{controllers.application.routes.EnvironmentsController.onPageLoad(viewModel.applicationId, viewModel.productionEnvironmentId).url}" class="govuk-link govuk-link--no-visited-state">
+    <a href="@{controllers.application.routes.EnvironmentsController.onPageLoad(viewModel.applicationId, hipEnvironments.production.id).url}" class="govuk-link govuk-link--no-visited-state">
         @messages(messageId)
     </a>
 }

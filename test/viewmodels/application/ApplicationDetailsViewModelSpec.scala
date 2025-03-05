@@ -17,25 +17,47 @@
 package viewmodels.application
 
 import controllers.actions.{FakeApplication, FakeUser}
+import fakes.FakeHipEnvironments
+import models.accessrequest.{AccessRequest, Pending}
 import models.application.{Api, Application, TeamMember}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 
+import java.time.LocalDateTime
+
 class ApplicationDetailsViewModelSpec extends AnyFreeSpec with Matchers {
   "ApplicationDetailsViewModel" - {
     def buildApplicationApi(id: String, pendingCount: Int = 0, isMissing: Boolean = false) = {
-      ApplicationApi(Api(id, id), pendingCount).copy(isMissing = isMissing)
+      ApplicationApi(Api(id, id), buildPendingAccessRequests(pendingCount)).copy(isMissing = isMissing)
     }
     def buildApplicationEndpoint() = {
-      ApplicationEndpoint("GET", "/path", None, None, Seq.empty, Accessible, Accessible)
+      ApplicationEndpoint("GET", "/path", None, None, Seq("scope"), TheoreticalScopes(Seq("scope").toSet, Map(
+        FakeHipEnvironments.production.id -> Seq("scope").toSet,
+        FakeHipEnvironments.preProduction.id -> Seq("scope").toSet,
+      )), Seq.empty)
     }
     def buildApplicationApiWithEndpoint(id: String, endpoint: ApplicationEndpoint) = {
       buildApplicationApi(id).copy(endpoints = Seq(endpoint))
     }
     def buildViewModel(application: Application = FakeApplication, applicationApis: Seq[ApplicationApi] = Seq.empty) = {
-      ApplicationDetailsViewModel(application, applicationApis, Some(FakeUser), "production")
+      ApplicationDetailsViewModel(application, applicationApis, Some(FakeUser), FakeHipEnvironments)
     }
 
+    def buildPendingAccessRequests(count: Int): Seq[AccessRequest] = {
+      Range(0, count) map { index =>
+        AccessRequest(
+          id = s"id$index",
+          applicationId = "applicationId",
+          apiId = "apiId",
+          apiName = "apiName",
+          status = Pending,
+          supportingInformation = "supportingInformation",
+          requested = LocalDateTime.now(),
+          requestedBy = "requestedBy",
+          environmentId = "environmentId"
+        )
+      }
+    }
     "must return the correct application id" in {
       buildViewModel().applicationId mustBe FakeApplication.id
     }
@@ -122,7 +144,7 @@ class ApplicationDetailsViewModelSpec extends AnyFreeSpec with Matchers {
       "must be true when at least one API needs a production access request" in {
         buildViewModel(applicationApis = Seq(
           buildApplicationApiWithEndpoint("1", buildApplicationEndpoint()),
-          buildApplicationApiWithEndpoint("2", buildApplicationEndpoint().copy(productionAccess = Inaccessible)),
+          buildApplicationApiWithEndpoint("2", buildApplicationEndpoint().copy(theoreticalScopes = TheoreticalScopes(Seq("scope").toSet, Map.empty))),
           buildApplicationApiWithEndpoint("3", buildApplicationEndpoint()),
         )).needsProductionAccessRequest mustBe true
       }

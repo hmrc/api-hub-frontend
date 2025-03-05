@@ -146,7 +146,23 @@ object CancelAccessRequestEndJourneyControllerSpec extends OptionValues{
   private val acceptRequestProductionAccessConditions: Set[RequestProductionAccessDeclaration] = Set(RequestProductionAccessDeclaration.Accept)
   private val clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
   private val supportingInformation = "test-supporting-information"
-  private val applicationApi = buildApplicationApi(1, Seq(Inaccessible))
+  private val applicationApi = ApplicationApi(
+    apiId = "test-api-id",
+    apiTitle = "test-api-title",
+    endpoints = Seq(
+        ApplicationEndpoint(
+          httpMethod = "GET",
+          path = "/test",
+          summary = None,
+          description = None,
+          scopes = Seq("scope"),
+          theoreticalScopes = TheoreticalScopes(Set.empty, Map.empty),
+          pendingAccessRequests = Seq.empty
+        )
+    ),
+    pendingAccessRequests = Seq.empty,
+    isMissing = false
+  )
 
   private val anApi: Api = Api(applicationApi.apiId, applicationApi.apiTitle, Seq(SelectedEndpoint("GET", "/test"), SelectedEndpoint("POST", "/anothertest")))
   private val anApplication =
@@ -168,28 +184,6 @@ object CancelAccessRequestEndJourneyControllerSpec extends OptionValues{
     "test"
   )
 
-
-  private def buildApplicationApi(apiId: Int, endpointAccesses: Seq[ApplicationEndpointAccess]): ApplicationApi = {
-    ApplicationApi(
-      apiId = s"test-api-id-$apiId",
-      apiTitle = s"test-api-title-$apiId",
-      totalEndpoints = endpointAccesses.size,
-      endpoints = endpointAccesses.map(
-        endpointAccess =>
-          ApplicationEndpoint(
-            httpMethod = "GET",
-            path = s"/test/$apiId/$endpointAccess",
-            summary = None,
-            description = None,
-            scopes = Seq(s"test-scope-$apiId-$endpointAccess"),
-            productionAccess = endpointAccess,
-            nonProductionAccess = Accessible
-          )
-      ),
-      pendingAccessRequestCount = 0,
-      isMissing = false
-    )
-  }
 
   private val data: Data = Data(
     application = anApplication,

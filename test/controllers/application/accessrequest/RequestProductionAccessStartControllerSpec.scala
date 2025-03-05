@@ -168,7 +168,7 @@ object RequestProductionAccessStartControllerSpec {
   private val applicationApi = ApplicationApi(
     apiDetail = apiDetail,
     endpoints = Seq.empty,
-    pendingAccessRequestCount = 0
+    pendingAccessRequests = Seq.empty
   )
 
 }

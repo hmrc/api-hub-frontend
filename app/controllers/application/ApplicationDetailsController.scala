@@ -46,7 +46,7 @@ class ApplicationDetailsController @Inject()(
             request.application.withSortedTeam(),
             applicationApis,
             Some(request.identifierRequest.user),
-            hipEnvironments.production.id
+            hipEnvironments
           )))
       )
   }

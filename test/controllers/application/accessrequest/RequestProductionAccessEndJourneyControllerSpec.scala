@@ -180,7 +180,7 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
       val data = Data(
         application = anApplication,
         applicationApis = Seq(selectedApplicationApi, nonSelectedApplicationApi),
-        environmentId = FakeHipEnvironments.production.id,
+        environment = FakeHipEnvironments.production,
         selectedApis = Set(selectedApplicationApi.apiId),
         supportingInformation = supportingInformation
       )
@@ -217,7 +217,7 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
       val data = Data(
         application = anApplication,
         applicationApis = Seq(selectedApplicationApi),
-        environmentId = FakeHipEnvironments.production.id,
+        environment = FakeHipEnvironments.production,
         selectedApis = Set(selectedApplicationApi.apiId),
         supportingInformation = supportingInformation
       )
@@ -230,7 +230,7 @@ class RequestProductionAccessEndJourneyControllerSpec extends SpecBase with Mock
           AccessRequestApi(
             apiId = selectedApplicationApi.apiId,
             apiName = selectedApplicationApi.apiTitle,
-            endpoints = selectedApplicationApi.endpoints.filter(!_.productionAccess.isAccessible).map(
+            endpoints = selectedApplicationApi.endpoints.filter(!_.accessFor(FakeHipEnvironments.production).isAccessible).map(
               endpoint =>
                 AccessRequestEndpoint(
                   httpMethod = endpoint.httpMethod,
@@ -282,7 +282,6 @@ object RequestProductionAccessEndJourneyControllerSpec extends OptionValues{
     ApplicationApi(
       apiId = s"test-api-id-$apiId",
       apiTitle = s"test-api-title-$apiId",
-      totalEndpoints = endpointAccesses.size,
       endpoints = endpointAccesses.map(
         endpointAccess =>
           ApplicationEndpoint(
@@ -291,11 +290,11 @@ object RequestProductionAccessEndJourneyControllerSpec extends OptionValues{
             summary = None,
             description = None,
             scopes = Seq(s"test-scope-$apiId-$endpointAccess"),
-            productionAccess = endpointAccess,
-            nonProductionAccess = Accessible
+            theoreticalScopes = TheoreticalScopes(Seq(s"test-scope-$apiId-$endpointAccess").toSet, Map.empty),
+            pendingAccessRequests = Seq.empty
           )
       ),
-      pendingAccessRequestCount = 0,
+      pendingAccessRequests = Seq.empty,
       isMissing = false
     )
   }
@@ -303,7 +302,7 @@ object RequestProductionAccessEndJourneyControllerSpec extends OptionValues{
   private val data: Data = Data(
     application = anApplication,
     applicationApis = Seq(applicationApi),
-    environmentId = FakeHipEnvironments.production.id,
+    environment = FakeHipEnvironments.production,
     selectedApis = Set(applicationApi.apiId),
     supportingInformation = supportingInformation
   )

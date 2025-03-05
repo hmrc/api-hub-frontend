@@ -27,7 +27,8 @@ The following terms and language are specific to the Integration Hub and should 
 * users are 'removed' from teams, and APIs are 'removed' from applications (not deleted, the user or API still exists afterwards we have just removed the association)
 * we say 'your applications' and 'your APIs' to mean applications and APIs that are owned by a team of which the user is a member (no personal ownership is implied)
 * we say 'your teams' to mean teams that the user is a member of, not just teams that the user personally created
-* the live environment is referred to as 'production'. The collective term for all other environments is 'non-production'. 
+* the live environment is referred to as 'production'. The collective term for all other environments is 'non-production'.
+* Production-like environments (ie those which require API access requests) are referred to as 'production environments'. The collective term for non-production-like environments is 'non-production environments'.
 * we use the term 'HoD/Backend' rather than just 'HoD' because some users may not understand the acronym on its own 
 * we use the term 'search' to describe the user finding an item by entering text into the standard blue search box. This is the case whether or not the results are ordered by relevance, and whether the search happens client-side or server-side.
 * we use the term 'filter' to describe the user finding an item by narrowing down a list by selecting checkboxes

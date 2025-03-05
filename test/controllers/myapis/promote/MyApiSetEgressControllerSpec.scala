@@ -65,7 +65,7 @@ class MyApiSetEgressControllerSpec extends SpecBase with MockitoSugar with Egres
       val fixture = buildFixture()
       val apiDetail = FakeApiDetail.copy(teamId = Some(apiTeam.id))
       when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any)).thenReturn(Future.successful(Some(apiDetail)))
-      when(fixture.apiHubService.listEgressGateways(eqTo(FakeHipEnvironments.production))(any)).thenReturn(Future.successful(egressGateways))
+      when(fixture.apiHubService.listEgressGateways(eqTo(FakeHipEnvironments.preProduction))(any)).thenReturn(Future.successful(egressGateways))
       when(fixture.apiHubService.findTeams(eqTo(Some(FakeUser.email)))(any)).thenReturn(Future.successful(List(apiTeam)))
       when(fixture.apiHubService.getApiDeploymentStatuses(eqTo(apiDetail.publisherReference))(any)).thenReturn(Future.successful(deploymentStatuses))
 
@@ -78,7 +78,7 @@ class MyApiSetEgressControllerSpec extends SpecBase with MockitoSugar with Egres
         val viewModel = MyApiSetEgressViewModel(
           apiDetail,
           FakeHipEnvironments.deployTo,
-          FakeHipEnvironments.production,
+          FakeHipEnvironments.preProduction,
           Some(FakeUser),
           egressGateways,
           deploymentStatuses

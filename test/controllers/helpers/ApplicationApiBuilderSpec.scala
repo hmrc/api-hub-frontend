@@ -34,7 +34,8 @@ import play.api.test.Helpers.*
 import services.ApiHubService
 import viewmodels.application.*
 
-import java.time.{Instant, LocalDateTime}
+import java.time.{Clock, Instant, LocalDateTime, ZoneId}
+import scala.collection.immutable.HashSet
 import scala.concurrent.Future
 
 class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
@@ -78,25 +79,53 @@ class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
           ApplicationApi(
             apiDetail1,
             Seq(
-              ApplicationEndpoint("GET", "/test1/1", None, None, Seq("all:test-scope-1", "get:test-scope-1-1"), Accessible, Accessible),
-              ApplicationEndpoint("POST", "/test1/1", None, None, Seq("all:test-scope-1", "post:test-scope-1-1"), Inaccessible, Accessible),
-              ApplicationEndpoint("GET", "/test1/2", None, None, Seq("all:test-scope-1", "get:test-scope-1-2"), Accessible, Accessible)
+              ApplicationEndpoint("GET", "/test1/1", None, None, Seq("all:test-scope-1", "get:test-scope-1-1"), TheoreticalScopes(
+                HashSet("all:test-scope-1", "get:test-scope-1-1"),
+                Map("test" -> Set("all:test-scope-1", "get:test-scope-1-1"))
+              ), Seq.empty),
+              ApplicationEndpoint("POST", "/test1/1", None, None, Seq("all:test-scope-1", "post:test-scope-1-1"), TheoreticalScopes(
+                HashSet("all:test-scope-1", "post:test-scope-1-1"),
+                Map("test" -> Set("all:test-scope-1"))
+              ), Seq.empty),
+              ApplicationEndpoint("GET", "/test1/2", None, None, Seq("all:test-scope-1", "get:test-scope-1-2"), TheoreticalScopes(
+                HashSet("all:test-scope-1", "get:test-scope-1-2"),
+                Map("test" -> Set("all:test-scope-1", "get:test-scope-1-2"))
+              ), Seq.empty)
             ),
-            0
+            Seq.empty
           ),
           ApplicationApi(
             apiDetail2,
             Seq(
-              ApplicationEndpoint("GET", "/test2/1", None, None, Seq("get:test-scope-2-1"), Inaccessible, Accessible)
+              ApplicationEndpoint("GET", "/test2/1", None, None, Seq("get:test-scope-2-1"), TheoreticalScopes(
+                HashSet("get:test-scope-2-1"), Map.empty
+              ), Seq.empty)
             ),
-            0
+            Seq.empty
           ),
           ApplicationApi(
             apiDetail3,
             Seq(
-              ApplicationEndpoint("GET", "/test3/1", None, None, Seq("get:test-scope-3-1"), Requested, Accessible)
+              ApplicationEndpoint("GET", "/test3/1", None, None, Seq("get:test-scope-3-1"), TheoreticalScopes(
+                HashSet("get:test-scope-3-1"), Map.empty
+              ), Seq(buildAccessRequest(application.id, api3, apiDetail3, Pending)))
             ),
-            1
+            Seq(AccessRequest(
+              id = "test-id",
+              applicationId = FakeApplication.id,
+              apiId = apiId3,
+              apiName = apiTitle3,
+              status = Pending,
+              endpoints = Seq(
+                AccessRequestEndpoint("GET", "/test3/1", Seq("get:test-scope-3-1"))
+              ),
+              supportingInformation = "test-supporting-information",
+              requested = clock.instant().atZone(clock.getZone()).toLocalDateTime(),
+              requestedBy = "test-requested-by",
+              decision = None,
+              cancelled = None,
+              environmentId = "test"
+            ))
           )
         )
 
@@ -145,13 +174,13 @@ class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
         val actual = fixture.applicationApiBuilder.build(application).futureValue
 
         val expected = Seq(
-          ApplicationApi(missingApi, 0),
+          ApplicationApi(missingApi, Seq.empty),
           ApplicationApi(
             apiDetail2,
             Seq(
-              ApplicationEndpoint("GET", "/test2/1", None, None, Seq("get:test-scope-2-1"), Inaccessible, Accessible)
+              ApplicationEndpoint("GET", "/test2/1", None, None, Seq("get:test-scope-2-1"), TheoreticalScopes(Set("get:test-scope-2-1"), Map.empty), Seq.empty)
             ),
-            0
+            Seq.empty
           )
         )
 
@@ -177,6 +206,8 @@ class ApplicationApiBuilderSpec extends SpecBase with MockitoSugar {
 }
 
 object ApplicationApiBuilderSpec {
+
+  private val clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
 
   private case class Fixture(
     application: PlayApplication,
@@ -294,7 +325,7 @@ object ApplicationApiBuilderSpec {
           )
       ),
       supportingInformation = "test-supporting-information",
-      requested = LocalDateTime.now(),
+      requested = clock.instant().atZone(clock.getZone()).toLocalDateTime(),
       requestedBy = "test-requested-by",
       decision = None,
       cancelled = None,

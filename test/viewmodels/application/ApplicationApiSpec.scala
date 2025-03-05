@@ -16,85 +16,102 @@
 
 package viewmodels.application
 
-import config.{BaseHipEnvironment, DefaultHipEnvironment, HipEnvironment}
 import controllers.actions.FakeApiDetail
+import fakes.FakeHipEnvironments
+import models.accessrequest.{AccessRequest, AccessRequestEndpoint, AccessRequestStatus, Pending, Approved, Rejected}
 import models.api.*
 import models.application.{Api, SelectedEndpoint}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
-import java.time.Instant
+import java.time.{Instant, LocalDateTime}
 
 class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks {
 
-  import ApplicationApiSpec.*
+  private val selectedEndpoint = SelectedEndpoint(httpMethod = "test-method", path = "test-path")
+  private def buildApplicationEndpoint(scopes: Seq[String] = Seq.empty,
+                                       approvedScopes: Map[String,Set[String]] = Map.empty,
+                                       pendingRequests: Seq[AccessRequest] = Seq.empty) = {
+    ApplicationEndpoint(
+      httpMethod = selectedEndpoint.httpMethod,
+      path = selectedEndpoint.path,
+      summary = None,
+      description = None,
+      scopes = scopes,
+      theoreticalScopes = TheoreticalScopes(scopes.toSet, approvedScopes),
+      pendingAccessRequests = pendingRequests
+    )
+  }
 
-  "ApplicationEndpointAccess" - {
-    "must return Accessible when an application has the scopes required by the endpoint" in {
-      val endpointMethod = EndpointMethod("GET", None, None, Seq(testScope1, testScope3))
+  private def buildPendingAccessRequest(environmentId: String) = {
+    buildAccessRequest(Pending, environmentId)
+  }
 
-      val actual = ApplicationEndpointAccess.production(
-        theoreticalScopes = TheoreticalScopes(Set(testScope1, testScope2, testScope3), Set(testScope1, testScope2, testScope3)),
-        pendingAccessRequestCount = 0,
-        endpointMethod = endpointMethod
-      )
+  private def buildAccessRequest(status: AccessRequestStatus, environmentId: String, endpoints: Seq[AccessRequestEndpoint] = Seq.empty) = {
+    AccessRequest(
+      id = "test-id",
+      applicationId = "test-application-id",
+      apiId = "test-api-id",
+      apiName = "test-api-name",
+      status = status,
+      supportingInformation = "test-supporting-information",
+      requested = LocalDateTime.now(),
+      requestedBy = "requester",
+      environmentId = environmentId
+    ).copy(endpoints = endpoints)
+  }
 
-      actual mustBe Accessible
-    }
+  private def buildApplicationApi(endpoints: Seq[ApplicationEndpoint] = Seq.empty, pendingAccessRequests: Seq[AccessRequest] = Seq.empty) = {
+    ApplicationApi(
+      apiId = "test-api-id",
+      apiTitle = "test-api-title",
+      endpoints = endpoints,
+      pendingAccessRequests = pendingAccessRequests,
+      isMissing = false
+    )
+  }
 
-    "must return Inaccessible when an application does not have the scopes required by the endpoint" in {
-      val endpointMethod = EndpointMethod("GET", None, None, Seq(testScope2, testScope3))
-
-      val actual = ApplicationEndpointAccess.production(
-        theoreticalScopes = TheoreticalScopes(Set(testScope2, testScope3), Set(testScope1)),
-        pendingAccessRequestCount = 0,
-        endpointMethod = endpointMethod
-      )
-
-      actual mustBe Inaccessible
-    }
-
-    "must return Inaccessible when an application only has a subset of the scopes required by the endpoint" in {
-      val endpointMethod = EndpointMethod("GET", None, None, Seq(testScope2, testScope3))
-
-      val actual = ApplicationEndpointAccess.production(
-        theoreticalScopes = TheoreticalScopes(Set(testScope2, testScope3), Set(testScope1, testScope2)),
-        pendingAccessRequestCount = 0,
-        endpointMethod = endpointMethod
-      )
-
-      actual mustBe Inaccessible
-    }
-
-    "must return Requested for a primary endpoint without required scopes when there is a pending production access request" in {
-      val endpointMethod = EndpointMethod("GET", None, None, Seq(testScope2, testScope3))
-
-      val actual = ApplicationEndpointAccess.production(
-        theoreticalScopes = TheoreticalScopes(Set(testScope2, testScope3), Set(testScope1)),
-        pendingAccessRequestCount = 1,
-        endpointMethod = endpointMethod
-      )
-
-      actual mustBe Requested
-    }
-
-    "must return Accessible for a primary endpoint with required scopes when there is a pending production access request" in {
-      val endpointMethod = EndpointMethod("GET", None, None, Seq(testScope1, testScope3))
-
-      val actual = ApplicationEndpointAccess.production(
-        theoreticalScopes = TheoreticalScopes(Set(testScope1, testScope3), Set(testScope1, testScope2, testScope3)),
-        pendingAccessRequestCount = 1,
-        endpointMethod = endpointMethod
-      )
-
-      actual mustBe Accessible
-    }
+  private def buildAccessRequestEndpoint(scopes: Seq[String]) = {
+    AccessRequestEndpoint(httpMethod = "GET", path = "/path", scopes = scopes)
   }
 
   "ApplicationEndpoint" - {
+    "accessFor must return Unknown if scopes are empty" in {
+      buildApplicationEndpoint(scopes = Seq.empty).accessFor(FakeHipEnvironments.production) mustBe Unknown
+    }
+
+    "accessFor must return Accessible for non-prod-like environments even if there are no approvals" in {
+      buildApplicationEndpoint(
+        scopes = Seq("scope1", "scope2"),
+        approvedScopes = Map.empty
+      ).accessFor(FakeHipEnvironments.test) mustBe Accessible
+    }
+
+    "accessFor must return Accessible for prod-like environments if there are sufficient approvals" in {
+      buildApplicationEndpoint(
+        scopes = Seq("scope1", "scope2"),
+        approvedScopes = Map(FakeHipEnvironments.production.id -> Set("scope1", "scope2"))
+      ).accessFor(FakeHipEnvironments.production) mustBe Accessible
+    }
+
+    "accessFor must return Requested for prod-like environments if there are insufficient approvals but there are pending requests" in {
+      buildApplicationEndpoint(
+        scopes = Seq("scope1", "scope2"),
+        approvedScopes = Map(FakeHipEnvironments.production.id -> Set("scope1")),
+        pendingRequests = Seq(buildPendingAccessRequest(FakeHipEnvironments.production.id))
+      ).accessFor(FakeHipEnvironments.production) mustBe Requested
+    }
+
+    "accessFor must return Inaccessible for prod-like environments if there are insufficient approvals and no pending requests" in {
+      buildApplicationEndpoint(
+        scopes = Seq("scope1", "scope2"),
+        approvedScopes = Map(FakeHipEnvironments.production.id -> Set("scope1")),
+        pendingRequests = Seq.empty
+      ).accessFor(FakeHipEnvironments.production) mustBe Inaccessible
+    }
+
     "must construct the correct endpoint for a missing API" in {
-      val selectedEndpoint = SelectedEndpoint(httpMethod = "test-method", path = "test-path")
       val actual = ApplicationEndpoint.forMissingApi(selectedEndpoint)
       val expected = ApplicationEndpoint(
         httpMethod = selectedEndpoint.httpMethod,
@@ -102,8 +119,8 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
         summary = None,
         description = None,
         scopes = Seq.empty,
-        productionAccess = Unknown,
-        nonProductionAccess = Unknown
+        theoreticalScopes = TheoreticalScopes(Set.empty, Map.empty),
+        pendingAccessRequests = Seq.empty
       )
 
       actual mustBe expected
@@ -111,84 +128,155 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
   }
 
   "ApplicationApi" - {
-    "must produce the correct summary values" in {
-      Range.inclusive(0,1) map (pendingAccessRequestCount =>
-        val apiDetail = ApiDetail(
-          id = "test-id",
-          publisherReference = "test-pub-ref",
-          title = "test-title",
-          description = "test-description",
-          version = "test-version",
+    val unknownEndpoint = buildApplicationEndpoint(scopes = Seq.empty)
+    val requestedEndpoint = buildApplicationEndpoint(scopes = Seq("scope1"), pendingRequests = Seq(buildPendingAccessRequest(FakeHipEnvironments.production.id)))
+    val accessibleEndpoint1 = buildApplicationEndpoint(scopes = Seq("scope1", "scope2"), approvedScopes = Map(FakeHipEnvironments.production.id -> Set("scope1", "scope2")))
+    val accessibleEndpoint2 = buildApplicationEndpoint(scopes = Seq("scope3"), approvedScopes = Map(FakeHipEnvironments.production.id -> Set("scope3")))
+    val inaccessibleEndpoint = buildApplicationEndpoint(scopes = Seq("scope1", "scope2"), approvedScopes = Map(FakeHipEnvironments.production.id -> Set("scope1")))
+
+    "selectedEndpoints" - {
+      "must return correct value for multiple endpoints" in {
+        buildApplicationApi(Seq(
+          buildApplicationEndpoint(scopes = Seq("scope1", "scope2")),
+          buildApplicationEndpoint(scopes = Seq("scope3"))
+        )).selectedEndpoints mustBe 2
+      }
+      "must return correct value for no endpoints" in {
+        buildApplicationApi().selectedEndpoints mustBe 0
+      }
+    }
+
+    "availableEndpoints" - {
+      "must return correct number of accessible endpoints in matching environment" in {
+        buildApplicationApi(Seq(
+          unknownEndpoint,
+          requestedEndpoint,
+          accessibleEndpoint1,
+          accessibleEndpoint2,
+          inaccessibleEndpoint
+        )).availableEndpoints(FakeHipEnvironments.production) mustBe 2
+      }
+
+      "must return 0 for accessible endpoints in non-matching environment" in {
+        buildApplicationApi(Seq(
+          unknownEndpoint,
+          requestedEndpoint,
+          accessibleEndpoint1,
+          accessibleEndpoint2,
+          inaccessibleEndpoint
+        )).availableEndpoints(FakeHipEnvironments.preProduction) mustBe 0
+      }
+
+    }
+
+    "needsAccessRequest" - {
+      "must return true if there are inaccessible endpoints and no pending requests" in {
+        buildApplicationApi(
           endpoints = Seq(
-            Endpoint(
-              path = "/test",
-              methods = Seq(
-                EndpointMethod("GET", None, None, Seq.empty),
-                EndpointMethod("POST", None, None, Seq.empty)
-              )
-            ),
-            Endpoint(
-              path = "/test2",
-              methods = Seq(
-                EndpointMethod("GET", None, None, Seq.empty)
-              )
-            )
+            unknownEndpoint,
+            requestedEndpoint,
+            accessibleEndpoint1,
+            inaccessibleEndpoint
           ),
-          shortDescription = None,
-          openApiSpecification = "test-oas-spec",
-          apiStatus = Live,
-          created = Instant.now(),
-          reviewedDate = Instant.now(),
-          platform = "HIP",
-          maintainer = Maintainer("name", "#slack", List.empty)
-        )
+          pendingAccessRequests = Seq.empty
+        ).needsAccessRequest(FakeHipEnvironments.production) mustBe true
+      }
 
-        val endpoints = Seq(
-          ApplicationEndpoint(
-            httpMethod = "GET",
-            path = "/test",
-            summary = Some("test-summary"),
-            description = Some("test-description"),
-            scopes = Seq.empty,
-            productionAccess = Accessible,
-            nonProductionAccess = Accessible
+      "must return false if there are inaccessible endpoints but not for this environment" in {
+        buildApplicationApi(
+          endpoints = Seq(
+            unknownEndpoint,
+            requestedEndpoint,
+            accessibleEndpoint1,
+            inaccessibleEndpoint
           ),
-          ApplicationEndpoint(
-            httpMethod = "GET",
-            path = "/test",
-            summary = Some("test-summary"),
-            description = Some("test-description"),
-            scopes = Seq.empty,
-            productionAccess = Accessible,
-            nonProductionAccess = Inaccessible
+          pendingAccessRequests = Seq.empty
+        ).needsAccessRequest(FakeHipEnvironments.test) mustBe false
+      }
+
+      "must return false if there are no inaccessible endpoints" in {
+        buildApplicationApi(
+          endpoints = Seq(
+            unknownEndpoint,
+            requestedEndpoint,
+            accessibleEndpoint1
           ),
-          ApplicationEndpoint(
-            httpMethod = "GET",
-            path = "/test",
-            summary = Some("test-summary"),
-            description = Some("test-description"),
-            scopes = Seq.empty,
-            productionAccess = Inaccessible,
-            nonProductionAccess = Accessible
+          pendingAccessRequests = Seq.empty
+        ).needsAccessRequest(FakeHipEnvironments.production) mustBe false
+      }
+
+      "must return false if there are no inaccessible endpoints and there are pending requests" in {
+        buildApplicationApi(
+          endpoints = Seq(
+            unknownEndpoint,
+            requestedEndpoint,
+            accessibleEndpoint1
           ),
-          ApplicationEndpoint(
-            httpMethod = "GET",
-            path = "/test",
-            summary = Some("test-summary"),
-            description = Some("test-description"),
-            scopes = Seq.empty,
-            productionAccess = Requested,
-            nonProductionAccess = Accessible
+          pendingAccessRequests = Seq(
+            buildPendingAccessRequest(FakeHipEnvironments.production.id)
           )
-        )
+        ).needsAccessRequest(FakeHipEnvironments.production) mustBe false
+      }
+    }
 
-        val applicationApi = ApplicationApi(apiDetail, endpoints, pendingAccessRequestCount)
+    "hasPendingAccessRequest" - {
+      "must return true if there are pending requests for this environment" in {
+        buildApplicationApi(
+          pendingAccessRequests = Seq(
+            buildPendingAccessRequest(FakeHipEnvironments.production.id)
+          )
+        ).hasPendingAccessRequest(FakeHipEnvironments.production) mustBe true
+      }
 
-        applicationApi.selectedEndpoints mustBe 4
-        applicationApi.totalEndpoints mustBe 3
-        applicationApi.availableProductionEndpoints mustBe 2
-        applicationApi.availableNonProductionEndpoints mustBe 3
-        applicationApi.needsProductionAccessRequest mustBe !applicationApi.hasPendingAccessRequest )
+      "must return false if there are pending requests but not for this environment" in {
+        buildApplicationApi(
+          pendingAccessRequests = Seq(
+            buildPendingAccessRequest(FakeHipEnvironments.production.id)
+          )
+        ).hasPendingAccessRequest(FakeHipEnvironments.test) mustBe false
+      }
+
+      "must return false if there are no pending requests" in {
+        buildApplicationApi(
+          endpoints = Seq(
+            unknownEndpoint,
+            requestedEndpoint,
+            accessibleEndpoint1
+          ),
+          pendingAccessRequests = Seq.empty
+        ).hasPendingAccessRequest(FakeHipEnvironments.production) mustBe false
+      }
+    }
+
+    "isAccessibleInEnvironment" - {
+      "must return true if there are accessible endpoints in this environments" in {
+        buildApplicationApi(
+          endpoints = Seq(
+            unknownEndpoint,
+            requestedEndpoint,
+            accessibleEndpoint1
+          )
+        ).isAccessibleInEnvironment(FakeHipEnvironments.production) mustBe true
+      }
+
+      "must return false if there are accessible endpoints but not in this environments" in {
+        buildApplicationApi(
+          endpoints = Seq(
+            unknownEndpoint,
+            requestedEndpoint,
+            accessibleEndpoint1
+          )
+        ).isAccessibleInEnvironment(FakeHipEnvironments.test) mustBe true
+      }
+
+      "must return false if there are no accessible endpoints" in {
+        buildApplicationApi(
+          endpoints = Seq(
+            unknownEndpoint,
+            requestedEndpoint,
+            inaccessibleEndpoint
+          )
+        ).isAccessibleInEnvironment(FakeHipEnvironments.production) mustBe false
       }
     }
 
@@ -202,84 +290,89 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
         )
       )
 
-      val actual = ApplicationApi(api, 1)
+      val actual = ApplicationApi(api, Seq(buildPendingAccessRequest(FakeHipEnvironments.production.id)))
 
       val expected = ApplicationApi(
         apiId = api.id,
         apiTitle = api.title,
-        totalEndpoints = 0,
         endpoints = api.endpoints.map(ApplicationEndpoint.forMissingApi),
-        pendingAccessRequestCount = 1,
+        pendingAccessRequests = actual.pendingAccessRequests,
         isMissing = true
       )
 
       actual mustBe expected
     }
 
-    "isAccessibleInEnvironment" - {
-      "must return true for non-prod environments" in {
-        val applicationApi = ApplicationApi(FakeApiDetail, Seq(
-          ApplicationEndpoint(
-            httpMethod = "GET",
-            path = "/test",
-            summary = Some("test-summary"),
-            description = Some("test-description"),
-            scopes = Seq.empty,
-            productionAccess = Inaccessible,
-            nonProductionAccess = Accessible
-          ),
-        ), 0)
-
-        applicationApi.isAccessibleInEnvironment(DefaultHipEnvironment("test", 2, isProductionLike = false, None)) mustBe true
-      }
-
-      "must return true for prod environments with available endpoints" in {
-        val applicationApi = ApplicationApi(FakeApiDetail, Seq(
-          ApplicationEndpoint(
-            httpMethod = "GET",
-            path = "/test1",
-            summary = Some("test-summary"),
-            description = Some("test-description"),
-            scopes = Seq.empty,
-            productionAccess = Inaccessible,
-            nonProductionAccess = Accessible
-          ),
-          ApplicationEndpoint(
-            httpMethod = "GET",
-            path = "/test2",
-            summary = Some("test-summary"),
-            description = Some("test-description"),
-            scopes = Seq.empty,
-            productionAccess = Accessible,
-            nonProductionAccess = Accessible
-          ),
-        ), 0)
-
-        applicationApi.isAccessibleInEnvironment(DefaultHipEnvironment("prod", 1, isProductionLike = true, promoteTo = None)) mustBe true
-      }
-
-      "must return false for prod environments without available endpoints" in {
-        val applicationApi = ApplicationApi(FakeApiDetail, Seq(
-          ApplicationEndpoint(
-            httpMethod = "GET",
-            path = "/test1",
-            summary = Some("test-summary"),
-            description = Some("test-description"),
-            scopes = Seq.empty,
-            productionAccess = Inaccessible,
-            nonProductionAccess = Accessible
-          ),
-        ), 0)
-
-        applicationApi.isAccessibleInEnvironment(DefaultHipEnvironment("prod", 1, isProductionLike = true, None)) mustBe false
-      }
-    }
 }
 
-object ApplicationApiSpec {
+  "TheoreticalScopes" - {
+    "allowedScopes" - {
+      val theoreticalScopes = TheoreticalScopes(
+        requiredScopes = Set("scope1", "scope2", "scope3"),
+        approvedScopes = Map(FakeHipEnvironments.production.id -> Set("scope1", "scope2", "scope4"))
+      )
 
-  private val testScope1 = "test-scope-1"
-  private val testScope2 = "test-scope-2"
-  private val testScope3 = "test-scope-3"
-  
+      "returns correct scopes for matching environment" in {
+        theoreticalScopes.allowedScopes(FakeHipEnvironments.production) mustBe Set("scope1", "scope2")
+      }
+
+      "returns empty set for non-matching environment" in {
+        theoreticalScopes.allowedScopes(FakeHipEnvironments.test) mustBe Set.empty
+      }
+    }
+
+    "filterByScopes" - {
+      val theoreticalScopes = TheoreticalScopes(
+        requiredScopes = Set("scope1", "scope2"),
+        approvedScopes = Map(
+          FakeHipEnvironments.preProduction.id -> Set("scope1", "scope2"),
+          FakeHipEnvironments.production.id -> Set("scope1"),
+        )
+      )
+
+      "returns an empty object if no scopes are provided" in {
+        theoreticalScopes.filterByScopes(Set.empty) mustBe TheoreticalScopes(Set.empty, Map.empty)
+      }
+
+      "returns an object containing only the specified scopes if a subset of scopes is provided" in {
+        theoreticalScopes.filterByScopes(Set("scope2")) mustBe TheoreticalScopes(Set("scope2"), Map(
+          FakeHipEnvironments.preProduction.id -> Set("scope2"),
+        ))
+      }
+
+      "returns an identical object if a super-set of scopes is provided" in {
+        theoreticalScopes.filterByScopes(Set("scope1", "scope2", "scope3")) mustBe theoreticalScopes
+      }
+    }
+
+    "apply" - {
+      "constructs requiredScopes correctly" in {
+        val api1 = Api(id = "api1", title = "title1")
+        val api2 = Api(id = "api2", title = "title2")
+        val api3 = Api(id = "api3", title = "title3")
+        val apiDetail1 = FakeApiDetail.copy(endpoints = Seq(Endpoint("/path1", Seq(EndpointMethod("GET", None, None, Seq("scope1", "scope2"))))))
+        val apiDetail2 = FakeApiDetail.copy(endpoints = Seq(Endpoint("/path2", Seq(EndpointMethod("GET", None, None, Seq("scope2", "scope3"))))))
+
+        TheoreticalScopes(Seq(
+          (api1, Some(apiDetail1)),
+          (api2, Some(apiDetail2)),
+          (api3, None),
+        ), Seq.empty).requiredScopes mustBe Set("scope1", "scope2", "scope3")
+      }
+
+      "constructs approvedScopes correctly" in {
+        TheoreticalScopes(Seq.empty, Seq(
+          buildAccessRequest(Pending, FakeHipEnvironments.production.id, Seq(buildAccessRequestEndpoint(Seq("scope1", "scope2")))),
+          buildAccessRequest(Approved, FakeHipEnvironments.production.id, Seq(buildAccessRequestEndpoint(Seq("scope3", "scope4")))),
+          buildAccessRequest(Rejected, FakeHipEnvironments.production.id, Seq(buildAccessRequestEndpoint(Seq("scope5", "scope6")))),
+          buildAccessRequest(Approved, FakeHipEnvironments.production.id, Seq(buildAccessRequestEndpoint(Seq("scope7", "scope8")))),
+          buildAccessRequest(Rejected, FakeHipEnvironments.test.id, Seq(buildAccessRequestEndpoint(Seq("scope9", "scope10")))),
+          buildAccessRequest(Approved, FakeHipEnvironments.test.id, Seq(buildAccessRequestEndpoint(Seq("scope11", "scope12")))),
+        )).approvedScopes mustBe Map(
+          FakeHipEnvironments.production.id -> Set("scope3", "scope4", "scope7", "scope8"),
+          FakeHipEnvironments.test.id -> Set("scope11", "scope12")
+        )
+      }
+    }
+  }
 }

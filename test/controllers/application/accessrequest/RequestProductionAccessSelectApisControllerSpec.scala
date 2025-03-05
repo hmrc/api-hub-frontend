@@ -17,7 +17,7 @@
 package controllers.application.accessrequest
 
 import base.SpecBase
-import controllers.actions.FakeUser
+import controllers.actions.{FakeAccessRequest, FakeUser}
 import fakes.FakeHipEnvironments
 import forms.application.accessrequest.RequestProductionAccessSelectApisFormProvider
 import models.NormalMode
@@ -32,7 +32,7 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.AccessRequestSessionRepository
-import viewmodels.application.{Accessible, ApplicationApi, ApplicationEndpoint, Inaccessible}
+import viewmodels.application.{Accessible, ApplicationApi, ApplicationEndpoint, Inaccessible, TheoreticalScopes}
 import views.html.application.accessrequest.RequestProductionAccessSelectApisView
 
 import scala.concurrent.Future
@@ -44,59 +44,58 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
   private lazy val requestProductionAccessSelectApisRoute = controllers.application.accessrequest.routes.RequestProductionAccessSelectApisController.onPageLoad(NormalMode).url
 
   private val testApplication = Application("id-1", "test", Creator("creator-email"), Seq(TeamMember("test-email")))
+  private val endpointScopes = Seq("scope-1")
+  private val theoreticalScopesNotApproved = TheoreticalScopes(endpointScopes.toSet, Map.empty)
+  private val theoreticalScopesApproved = TheoreticalScopes(endpointScopes.toSet, Map(FakeHipEnvironments.production.id -> endpointScopes.toSet))
 
   private val applicationEndpoint = ApplicationEndpoint(
     httpMethod = "GET",
     path = "test-path",
     summary = None,
     description = None,
-    scopes = Seq.empty,
-    productionAccess = Accessible,
-    nonProductionAccess = Accessible
+    scopes = endpointScopes,
+    theoreticalScopes = theoreticalScopesApproved,
+    pendingAccessRequests = Seq.empty
   )
   private val applicationEndpointNotAccessibleInProd = ApplicationEndpoint(
     httpMethod = "GET",
     path = "test-path",
     summary = None,
     description = None,
-    scopes = Seq.empty,
-    productionAccess = Inaccessible,
-    nonProductionAccess = Accessible
+    scopes = endpointScopes,
+    theoreticalScopes = theoreticalScopesNotApproved,
+    pendingAccessRequests = Seq.empty
   )
   private val applicationApi =
     ApplicationApi(
       apiId = "api-id-1",
       apiTitle = "API title 1",
-      totalEndpoints = 0,
       endpoints = Seq(applicationEndpoint),
-      pendingAccessRequestCount = 0,
+      pendingAccessRequests = Seq.empty,
       isMissing = false
     )
   private val applicationApiEndpointNotAccessible =
     ApplicationApi(
       apiId = "api-id-1",
       apiTitle = "API title 1",
-      totalEndpoints = 0,
       endpoints = Seq(applicationEndpointNotAccessibleInProd),
-      pendingAccessRequestCount = 0,
+      pendingAccessRequests = Seq.empty,
       isMissing = false
     )
   private val applicationApiMissing =
     ApplicationApi(
       apiId = "api-id-2",
       apiTitle = "API title 2",
-      totalEndpoints = 0,
       endpoints = Seq(applicationEndpoint),
-      pendingAccessRequestCount = 0,
+      pendingAccessRequests = Seq.empty,
       isMissing = true
     )
   private val applicationApiPendingRequest =
     ApplicationApi(
       apiId = "api-id-3",
       apiTitle = "API title 3",
-      totalEndpoints = 0,
       endpoints = Seq(applicationEndpoint),
-      pendingAccessRequestCount = 1,
+      pendingAccessRequests = Seq(FakeAccessRequest),
       isMissing = false
     )
   private val applicationApis = Seq(
