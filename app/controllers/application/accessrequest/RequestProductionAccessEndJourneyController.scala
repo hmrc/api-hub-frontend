@@ -56,12 +56,12 @@ class RequestProductionAccessEndJourneyController @Inject()(
       validate(request).fold(
         call => Future.successful(Redirect(call)),
         data =>
-          hipEnvironments.forEnvironmentIdOptional(data.environmentId) match {
+          hipEnvironments.forEnvironmentIdOptional(data.environment.id) match {
             case Some(hipEnvironment) =>
-          val accessRequest = data.toRequest(request.user.email)
+              val accessRequest = data.toRequest(request.user.email)
 
-          apiHubService.requestProductionAccess(accessRequest)
-            .flatMap(_ => sessionRepository.clear(request.user.userId))
+              apiHubService.requestProductionAccess(accessRequest)
+                .flatMap(_ => sessionRepository.clear(request.user.userId))
                 .flatMap(_ => Future.successful(Ok(requestProductionAccessSuccessView(data.application, Some(request.user), accessRequest.apis, hipEnvironment))))
                 .recoverWith {
                   case e: UpstreamErrorResponse if e.statusCode == BAD_GATEWAY => Future.successful(badGateway(e))
