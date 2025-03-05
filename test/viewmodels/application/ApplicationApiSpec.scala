@@ -321,6 +321,30 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
       }
     }
 
+    "filterByScopes" - {
+      val theoreticalScopes = TheoreticalScopes(
+        requiredScopes = Set("scope1", "scope2"),
+        approvedScopes = Map(
+          FakeHipEnvironments.preProduction.id -> Set("scope1", "scope2"),
+          FakeHipEnvironments.production.id -> Set("scope1"),
+        )
+      )
+
+      "returns an empty object if no scopes are provided" in {
+        theoreticalScopes.filterByScopes(Set.empty) mustBe TheoreticalScopes(Set.empty, Map.empty)
+      }
+
+      "returns an object containing only the specified scopes if a subset of scopes is provided" in {
+        theoreticalScopes.filterByScopes(Set("scope2")) mustBe TheoreticalScopes(Set("scope2"), Map(
+          FakeHipEnvironments.preProduction.id -> Set("scope2"),
+        ))
+      }
+
+      "returns an identical object if a super-set of scopes is provided" in {
+        theoreticalScopes.filterByScopes(Set("scope1", "scope2", "scope3")) mustBe theoreticalScopes
+      }
+    }
+
     "apply" - {
       "constructs requiredScopes correctly" in {
         val api1 = Api(id = "api1", title = "title1")
