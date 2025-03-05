@@ -17,12 +17,18 @@
 package controllers.actions
 
 import com.google.inject.Inject
+import config.FrontendAppConfig
 import handlers.ErrorHandler
+import models.hubstatus.{FeatureStatus, FrontendShutter}
 import models.requests.IdentifierRequest
 import models.user.{LdapUser, StrideUser, UserModel, UserType}
 import play.api.Logging
-import play.api.mvc.Results._
-import play.api.mvc._
+import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.mvc.Results.*
+import play.api.mvc.*
+import play.twirl.api.Html
+import services.HubStatusService
+import views.html.ShutteredView
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -30,29 +36,84 @@ trait IdentifierAction extends ActionBuilder[IdentifierRequest, AnyContent] with
 
 class AuthenticatedIdentifierAction @Inject()(
   val parser: BodyParsers.Default,
+  override val messagesApi: MessagesApi,
   ldapAuthenticator: LdapAuthenticator,
   strideAuthenticator: StrideAuthenticator,
-  errorHandler: ErrorHandler
-)(implicit val executionContext: ExecutionContext) extends IdentifierAction with Logging {
+  hubStatusService: HubStatusService,
+  errorHandler: ErrorHandler,
+  shutteredView: ShutteredView,
+  frontendAppConfig: FrontendAppConfig
+)(implicit val executionContext: ExecutionContext) extends IdentifierAction with Logging with I18nSupport {
 
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
-    strideAuthenticator.authenticate()(request).flatMap {
-      case UserUnauthenticated => ldapAuthenticator.authenticate()(request)
-      case result: UserAuthResult => Future.successful(result)
-    }.flatMap {
-      case UserAuthenticated(user) => block(IdentifierRequest(request, user))
-      case UserMissingEmail(userId, userType) => handleMissingEmail(userId, userType)(request)
-      case UserUnauthorised => Future.successful(Redirect(controllers.routes.UnauthorisedController.onPageLoad))
-      case UserUnauthenticated => Future.successful(Redirect(controllers.auth.routes.SignInController.onPageLoad()))
+    for {
+      featureStatus <- hubStatusService.status(FrontendShutter)
+      strideAuthResult <- strideAuthenticator.authenticate()(request)
+      authResult <- strideAuthResult match {
+        case UserUnauthenticated => ldapAuthenticator.authenticate()(request)
+        case result: UserAuthResult => Future.successful(result)
+      }
+      result <- authResult match {
+        case UserAuthenticated(user) => authenticated(request, block, user, featureStatus)
+        case UserMissingEmail(userId, userType) => handleMissingEmail(featureStatus, userId, userType)(request)
+        case UserUnauthorised => unauthorized(featureStatus)(request)
+        case UserUnauthenticated => unauthenticated(featureStatus)(request)
+      }
+    } yield result
+  }
+
+  private def authenticated[A](
+    request: Request[A],
+    block: IdentifierRequest[A] => Future[Result],
+    user: UserModel,
+    featureStatus: FeatureStatus
+  ): Future[Result] = {
+    if (featureStatus.available || user.permissions.canSupport) {
+      block(IdentifierRequest(request, user))
+    }
+    else {
+      shuttered(featureStatus, Some(user))(request)
     }
   }
 
-  private def handleMissingEmail(userId: String, userType: UserType)(implicit request: RequestHeader) = {
-    logger.warn(s"Missing email address for user withId $userId of type $userType")
-    buildMissingEmailView(userType).map(html => Ok(html))
+  private def unauthorized(featureStatus: FeatureStatus)(implicit request: Request[?]): Future[Result] = {
+    if (featureStatus.available) {
+      Future.successful(Redirect(controllers.routes.UnauthorisedController.onPageLoad))
+    }
+    else {
+      shuttered(featureStatus, None)
+    }
   }
 
-  private def buildMissingEmailView(userType: UserType)(implicit request: RequestHeader) = {
+  private def unauthenticated(featureStatus: FeatureStatus)(implicit request: Request[?]): Future[Result] = {
+    if (featureStatus.available) {
+      Future.successful(Redirect(controllers.auth.routes.SignInController.onPageLoad()))
+    }
+    else {
+      shuttered(featureStatus, None)
+    }
+  }
+
+  private def shuttered(featureStatus: FeatureStatus, user: Option[UserModel])(implicit request: Request[?]): Future[Result] = {
+    val shutterMessage = featureStatus.shutterMessage match {
+      case Some(shutterMessage) => shutterMessage
+      case None => frontendAppConfig.shutterMessage
+    }
+
+    Future.successful(ServiceUnavailable(shutteredView(shutterMessage, user)))
+  }
+
+  private def handleMissingEmail(featureStatus: FeatureStatus, userId: String, userType: UserType)(implicit request: Request[?]): Future[Result] = {
+    if (featureStatus.available) {
+      logger.warn(s"Missing email address for user withId $userId of type $userType")
+      buildMissingEmailView(userType).map(html => Ok(html))
+    }
+    else {
+      shuttered(featureStatus, None)
+    }
+  }
+
+  private def buildMissingEmailView(userType: UserType)(implicit request: RequestHeader): Future[Html] = {
     val messages = errorHandler.messagesApi.messages.getOrElse("en", Map.empty)
     val title = messages.getOrElse("unauthorised.title", "")
     val heading = messages.getOrElse("unauthorised.missingEmail.heading", "")

@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,24 +12,25 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package models.hubstatus
+@import models.user.UserModel
 
-import play.api.libs.json.{Format, Json}
+@this(
+    layout: templates.Layout
+)
 
-case class FeatureStatus(
-  feature: Feature,
-  shuttered: Boolean,
-  shutterMessage: Option[String]
+@(shutterMessage: String, user: Option[UserModel])(implicit request: Request[?], messages: Messages)
+
+@layout(
+    pageTitle = titleNoForm(messages("shuttered.title")),
+    timeout = false,
+    user = user,
+    showBackLink = false
 ) {
-  
-  def available: Boolean = !shuttered
-  
-}
 
-object FeatureStatus {
+    <h1 class="govuk-heading-l">@messages("shuttered.heading")</h1>
 
-  implicit val formatFeatureStatus: Format[FeatureStatus] = Json.format[FeatureStatus]
+    <p class="govuk-body">@shutterMessage</p>
 
 }
