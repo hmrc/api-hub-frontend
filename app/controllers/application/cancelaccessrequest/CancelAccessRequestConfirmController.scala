@@ -16,6 +16,7 @@
 
 package controllers.application.cancelaccessrequest
 
+import config.{HipEnvironment, HipEnvironments}
 import controllers.actions.*
 import controllers.routes
 import forms.application.cancelaccessrequest.CancelAccessRequestConfirmFormProvider
@@ -29,7 +30,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.{CancelAccessRequestSessionRepository, SessionRepository}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.application.cancelaccessrequest.CancelAccessRequestConfirmView
-
+import viewmodels.application.AccessRequestsByEnvironment
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -42,7 +43,8 @@ class CancelAccessRequestConfirmController @Inject()(
                                          requireData: DataRequiredAction,
                                          formProvider: CancelAccessRequestConfirmFormProvider,
                                          val controllerComponents: MessagesControllerComponents,
-                                         view: CancelAccessRequestConfirmView
+                                         view: CancelAccessRequestConfirmView,
+                                         hipEnvironments: HipEnvironments
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
@@ -57,7 +59,8 @@ class CancelAccessRequestConfirmController @Inject()(
             case None => form
             case Some(value) => form.fill(value)
           }
-          Future.successful(Ok(view(preparedForm, mode, getCancellableRequests(request), request.user)))
+          val accessRequests = AccessRequestsByEnvironment(getCancellableRequests(request), hipEnvironments)
+          Future.successful(Ok(view(preparedForm, mode, accessRequests, request.user)))
       }
     }
   }
@@ -68,7 +71,7 @@ class CancelAccessRequestConfirmController @Inject()(
     val accessRequestsToCancel = pendingAccessRequests.filter(accessRequest => apisToCancel.exists(_.equals(accessRequest.id)))
     accessRequestsToCancel
   }
-
+  
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
       implicit request => {
         (request.userAnswers.get(CancelAccessRequestPendingPage),
@@ -78,7 +81,7 @@ class CancelAccessRequestConfirmController @Inject()(
           case (Some(accessRequests), Some(apiIds)) =>
             form.bindFromRequest().fold(
               formWithErrors =>
-                Future.successful(BadRequest(view(formWithErrors, mode, accessRequests, request.user))),
+                Future.successful(BadRequest(view(formWithErrors, mode, AccessRequestsByEnvironment(accessRequests, hipEnvironments), request.user))),
 
               value =>
                 for {
