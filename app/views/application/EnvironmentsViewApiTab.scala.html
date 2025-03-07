@@ -84,11 +84,13 @@
 }
 
 @apiStatus(applicationApi: ApplicationApi) = @{
-        (applicationApi.isAccessibleInEnvironment(viewModel.hipEnvironment), applicationApi.needsAccessRequest(viewModel.hipEnvironment)) match {
-            case (false, _) => "No access"
-            case (true, true) => "Partial access"
-            case (true, false) => "Full access"
-        }
+    val needsApproving = applicationApi.needsAccessRequest(viewModel.hipEnvironment) || applicationApi.hasPendingAccessRequest(viewModel.hipEnvironment)
+
+    (applicationApi.isAccessibleInEnvironment(viewModel.hipEnvironment), needsApproving) match {
+        case (false, _) => "No access"
+        case (true, true) => "Partial access"
+        case (true, false) => "Full access"
+    }
 }
 
 @apiStatusBanner(applicationApi: ApplicationApi) = {
