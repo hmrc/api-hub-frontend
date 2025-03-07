@@ -94,7 +94,7 @@
 }
 
 @apiStatusBanner(applicationApi: ApplicationApi) = {
-    <div class="hip-details govuk-!-padding-bottom-4 govuk-!-padding-top-4 govuk-!-padding-left-6 govuk-!-padding-right-6">
+    <div class="hip-details govuk-!-padding-bottom-4 govuk-!-padding-top-4 govuk-!-padding-left-6 govuk-!-padding-right-6" data-api-id="@applicationApi.apiId">
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
                 <strong>@applicationApi.apiTitle</strong>
@@ -147,7 +147,7 @@
 }
 
 @existingApiDetails(applicationApi: ApplicationApi) = {
-    <details class="hip-details hip-expander">
+    <details class="hip-details hip-expander" data-api-id="@applicationApi.apiId">
         <summary class="hip-details__summary">
             <div>
                 <span class="hip-details__summary-text govuk-heading-s govuk-!-margin-bottom-0">
