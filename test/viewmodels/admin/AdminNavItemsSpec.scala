@@ -24,7 +24,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers.running
 import viewmodels.SideNavItem
 import SideNavItem.SideNavItemLeaf
-import viewmodels.admin.AdminSideNavPages.{AccessRequestsPage, ConfigurationPage, ForcePublishPage, GetUsersPage, ManageApisPage, ManageApplicationsPage, ManageTeamsPage, StatisticsPage, TeamMigrationPage}
+import viewmodels.admin.AdminSideNavPages.{AccessRequestsPage, ConfigurationPage, ForcePublishPage, GetUsersPage, ManageApisPage, ManageApplicationsPage, ManageTeamsPage, ShutterPage, StatisticsPage, TeamMigrationPage}
 
 class AdminNavItemsSpec extends SpecBase with Matchers with TableDrivenPropertyChecks {
 
@@ -46,6 +46,7 @@ class AdminNavItemsSpec extends SpecBase with Matchers with TableDrivenPropertyC
           configurationNavItem(),
           statisticsNavItem(),
           forcePublishNavItem(),
+          shutterNavItem(),
           accessRequestsNavItem()
         )
 
@@ -172,6 +173,15 @@ object AdminNavItemsSpec {
       page = ForcePublishPage,
       title = "Check publish status",
       link = controllers.admin.routes.ForcePublishController.onPageLoad(),
+      isCurrentPage = false
+    )
+  }
+
+  private def shutterNavItem(): SideNavItem = {
+    SideNavItemLeaf(
+      page = ShutterPage,
+      title = "Shutter service",
+      link = controllers.admin.routes.ShutterController.onPageLoad(),
       isCurrentPage = false
     )
   }

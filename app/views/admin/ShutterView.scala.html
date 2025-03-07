@@ -1,0 +1,132 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.hubstatus.FeatureStatus
+@import models.user.UserModel
+@import viewmodels.admin.{AdminNavItems, AdminSideNavPages}
+
+@this(
+    layout: templates.Layout,
+    sideNav: views.html.templates.SideNav,
+    govukSummaryList : GovukSummaryList,
+    formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukRadios: GovukRadios,
+    govukTextarea : GovukTextarea,
+    govukButton: GovukButton
+)
+
+@(form: Form[?], featureStatus: FeatureStatus, user: UserModel)(implicit request: Request[?], messages: Messages)
+
+@heading() = {
+
+    <h1 class="govuk-heading-m">@messages("shutter.heading")</h1>
+    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-bottom-5">
+
+}
+
+@serviceStatus() = {
+
+    @govukSummaryList(
+        SummaryList(
+            rows = Seq(
+                SummaryListRow(
+                    key = Key(
+                        content = Text(messages("shutter.shuttered.label"))
+                    ),
+                    value = Value(
+                        content = Text(serviceStatusText())
+                    )
+                ),
+                SummaryListRow(
+                    key = Key(
+                        content = Text(messages("shutter.shutterMessage.label"))
+                    ),
+                    value = Value(
+                        content = Text(featureStatus.shutterMessage.getOrElse(""))
+                    )
+                )
+            )
+        )
+    )
+
+}
+
+@serviceStatusText() = @{
+    if(featureStatus.shuttered) {
+        messages("shutter.status.shuttered")
+    } else {
+        messages("shutter.status.unShuttered")
+    }
+}
+
+@shutterForm() = {
+
+    @formHelper(action = controllers.admin.routes.ShutterController.onSubmit(), Symbol("autoComplete") -> "off") {
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form))
+        }
+
+        @govukRadios(
+            RadiosViewModel(
+                field = form("shuttered"),
+                items = Seq(
+                    RadioItem(
+                        content = Text(messages("shutter.shutter.label")),
+                        value = Some(true.toString),
+                        conditionalHtml = Some(
+                            govukTextarea(
+                                TextareaViewModel(
+                                    field = form("shutterMessage"),
+                                    label = LabelViewModel(messages("shutter.shutterMessage.label"))
+                                ).withHint(HintViewModel(messages("shutter.shutterMessage.hint")))
+                            )
+                        )
+                    ),
+                    RadioItem(
+                        content = Text(messages("shutter.unShutter.label")),
+                        value = Some(false.toString)
+                    )
+                ),
+                fieldset = Fieldset(
+                    legend = None
+                )
+            ).withHint(HintViewModel(messages("shutter.hint")))
+        )
+
+        @govukButton(
+            ButtonViewModel(messages("site.continue"))
+                .withId("submitButton")
+                .preventingDoubleClick()
+        )
+    }
+
+}
+
+@layout(
+    pageTitle = titleNoForm(messages("shutter.title")),
+    timeout   = false,
+    user = Some(user),
+    fullWidth = true
+) {
+
+    @sideNav(messages("manageApplications.admin"), AdminNavItems(user, AdminSideNavPages.ShutterPage)) {
+        @heading()
+        @serviceStatus()
+        @shutterForm()
+    }
+
+}

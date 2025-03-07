@@ -55,6 +55,7 @@ site.apiName = API name
 site.apiNumber = API number
 site.apiGeneration = API Generation
 site.notHubMaintainable = This API is not maintainable by The Integration Hub
+site.shuttered.warning = The service is currently shuttered
 
 date.day = Day
 date.month = Month
@@ -1210,3 +1211,26 @@ forcePublish.cannotPublish = This API cannot be published as it is not deployed.
 forcePublishSuccess.pageTitle = API published successfully
 forcePublishSuccess.guidance.heading = What you can do now
 forcePublishSuccess.guidance.content = Return to {0}.
+
+shuttered.title = The Integration Hub is unavailable
+shuttered.heading = The Integration Hub is unavailable
+
+shutter.title = Shutter service
+shutter.heading = Shutter The Integration Hub
+shutter.shuttered.label = Service status
+shutter.shuttered.error.required = You must select whether you want to shutter or un-shutter the service.
+shutter.shutterMessage.label = Shutter message
+shutter.shutterMessage.hint = The shutter message will appear on the shuttered page to all non-support users.
+shutter.shutterMessage.error.required = You must enter a shutter message when shuttering the service.
+shutter.shutter.label = Shutter the service
+shutter.unShutter.label = Un-shutter the service
+shutter.hint = Shuttering The Integration Hub will stop all users from accessing the service, except for support users who will be able to continue using the service.
+shutter.status.shuttered = Shuttered
+shutter.status.unShuttered = Not shuttered
+
+shutterSuccess.title = Shutter service
+shutterSuccess.success.shuttered = Service shuttered successfully
+shutterSuccess.success.unShuttered = Service un-shuttered successfully
+shutterSuccess.shutterMessage.heading = Provided shutter message
+shutterSuccess.whatYouCanDoNow.heading = What you can do now
+shutterSuccess.whatYouCanDoNow.content = Return to the {0}.

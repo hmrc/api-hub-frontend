@@ -16,9 +16,10 @@
 
 package config
 
-import controllers.actions._
-import play.api.inject.{Binding, bind => bindz}
+import controllers.actions.*
+import play.api.inject.{Binding, bind as bindz}
 import play.api.{Configuration, Environment}
+import services.{HubStatusService, HubStatusServiceImpl}
 import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 
 import java.time.{Clock, ZoneOffset}
@@ -49,7 +50,8 @@ class Module extends play.api.inject.Module {
       bindz[Hods].to(classOf[HodsImpl]).eagerly(),
       bindz[Platforms].to(classOf[PlatformsImpl]).eagerly(),
       bindz[EmailDomains].to(classOf[EmailDomainsImpl]).eagerly(),
-      bindz[HipEnvironments].to(classOf[HipEnvironmentsImpl]).eagerly()
+      bindz[HipEnvironments].to(classOf[HipEnvironmentsImpl]).eagerly(),
+      bindz[HubStatusService].to(classOf[HubStatusServiceImpl]).eagerly()
     )
 
     val authTokenInitialiserBindings: Seq[Binding[?]] = if (configuration.get[Boolean]("create-internal-auth-token-on-start")) {
