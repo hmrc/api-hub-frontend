@@ -14,10 +14,14 @@
  * limitations under the License.
  *@
 
+@import models.hubstatus.FrontendShutter
 @import models.user.UserModel
+@import services.HubStatusService
 
 @this(
-    govukBackLink: GovukBackLink
+    govukBackLink: GovukBackLink,
+    hubStatusService: HubStatusService,
+    govukWarningText : GovukWarningText
 )
 
 @(
@@ -26,6 +30,7 @@
     helpDocsPath: String,
     activeLink: Option[String] = None
 )(implicit request: RequestHeader, messages: Messages)
+
 <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PLWQQZB" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
@@ -86,6 +91,18 @@
 }
 
 <div class="govuk-width-container" role="region">
+    @if(user.exists(_.permissions.canSupport) && hubStatusService.awaitStatus(FrontendShutter).shuttered) {
+        <div class="call-out-panel call-out-panel__small">
+            @govukWarningText(
+                WarningText(
+                    iconFallbackText = Some("Warning"),
+                    content = Text(messages("site.shuttered.warning")),
+                    classes = "govuk-!-margin-bottom-0"
+                )
+            )
+        </div>
+    }
+
     <nav class="hip-nav-header-links govuk-!-padding-bottom-3 govuk-!-padding-top-3">
         @if(showBackLink) {
             @govukBackLink(BackLinkViewModel(href = "#").withCssClass("custom-back-link"))

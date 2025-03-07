@@ -22,11 +22,15 @@ import models.hubstatus.{Feature, FeatureStatus, FrontendShutter}
 import play.api.Logging
 import repositories.FeatureStatusRepository
 
-import scala.concurrent.{ExecutionContext, Future}
+import java.util.concurrent.TimeUnit
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 trait HubStatusService {
 
   def status(feature: Feature): Future[FeatureStatus]
+
+  def awaitStatus(feature: Feature): FeatureStatus
 
   def shutterDown(feature: Feature, shutterMessage: String): Future[FeatureStatus]
 
@@ -59,6 +63,10 @@ class HubStatusServiceImpl @Inject()(
     }
 
     repository.upsert(featureStatus).map(_ => featureStatus)
+  }
+
+  override def awaitStatus(feature: Feature): FeatureStatus = {
+    Await.result(status(feature), Duration(config.hubStatusTimeoutSeconds, TimeUnit.SECONDS))
   }
 
   override def shutterDown(feature: Feature, shutterMessage: String): Future[FeatureStatus] = {

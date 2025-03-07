@@ -23,10 +23,16 @@ import scala.concurrent.Future
 
 object FakeHubStatusService extends HubStatusService {
 
+  val frontendShutterStatus: FeatureStatus = FeatureStatus(FrontendShutter, false, None)
+
   override def status(feature: Feature): Future[FeatureStatus] = {
     feature match {
-      case FrontendShutter => Future.successful(FeatureStatus(FrontendShutter, false, None))
+      case FrontendShutter => Future.successful(frontendShutterStatus)
     }
+  }
+
+  override def awaitStatus(feature: Feature): FeatureStatus = {
+    frontendShutterStatus
   }
 
   override def shutterDown(feature: Feature, shutterMessage: String): Future[FeatureStatus] = {
