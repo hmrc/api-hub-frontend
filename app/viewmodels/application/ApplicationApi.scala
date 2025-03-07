@@ -116,6 +116,9 @@ case class ApplicationApi(
   def needsAccessRequest(hipEnvironment: HipEnvironment): Boolean = !hasPendingAccessRequest(hipEnvironment) && endpoints.exists(_.accessFor(hipEnvironment) == Inaccessible)
   def hasPendingAccessRequest(hipEnvironment: HipEnvironment): Boolean = pendingAccessRequests.exists(_.environmentId.contains(hipEnvironment.id))
   def isAccessibleInEnvironment(hipEnvironment: HipEnvironment): Boolean = availableEndpoints(hipEnvironment) > 0
+  def allEndpointsHavePendingAccessRequests(hipEnvironment: HipEnvironment): Boolean = {
+    endpoints.forall(endpoint => pendingAccessRequests.exists(par => par.environmentId == hipEnvironment.id && par.endpoints.exists(e => e.path == endpoint.path && e.httpMethod == endpoint.httpMethod)))
+  }
 }
 
 object ApplicationApi {

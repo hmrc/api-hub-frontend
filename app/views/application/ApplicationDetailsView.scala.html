@@ -112,8 +112,8 @@
 @pendingAccessRequestsPanel = {
     <div class="call-out-panel call-out-panel__small govuk-!-margin-top-2">
         <p class="govuk-body information-tag">
-            <i class="fa-solid fa-circle-exclamation warning-colour"></i>
-            <span class="call-out-type warning">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span class="call-out-type">
                 @messages("applicationDetails.pending.heading", viewModel.pendingAccessRequestsCount)
             </span>
         </p>
@@ -122,7 +122,7 @@
             @messages("applicationDetails.pending.message.2", viewModel.pendingAccessRequestsCount)
         </p>
         <p class="govuk-body additional-message">
-            <a class="govuk-link" id="cancelAccessRequestsLink" href="@controllers.application.cancelaccessrequest.routes.CancelAccessRequestStartController.startJourney(viewModel.applicationId)">Cancel production access requests</a>
+            <a class="govuk-link" id="cancelAccessRequestsLink" href="@controllers.application.cancelaccessrequest.routes.CancelAccessRequestStartController.startJourney(viewModel.applicationId)">Cancel access requests</a>
         </p>
     </div>
 }

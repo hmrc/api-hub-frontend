@@ -68,8 +68,8 @@
 @pendingAccessRequestBanner() = {
     <div class="call-out-panel call-out-panel__small govuk-!-margin-top-2">
         <p class="govuk-body information-tag">
-            <i class="fa-solid fa-circle-exclamation warning-colour"></i>
-            <span class="call-out-type warning">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span class="call-out-type">
                 @messages("applicationApis.pending.heading", viewModel.pendingAccessRequestsCount)
             </span>
         </p>
@@ -78,8 +78,31 @@
             @messages("applicationApis.pending.message.2", viewModel.pendingAccessRequestsCount)
         </p>
         <p class="govuk-body additional-message">
-            <a class="govuk-link" href="@controllers.application.cancelaccessrequest.routes.CancelAccessRequestStartController.startJourney(viewModel.applicationId)">Cancel production access requests</a>
+            <a class="govuk-link" href="@controllers.application.cancelaccessrequest.routes.CancelAccessRequestStartController.startJourney(viewModel.applicationId)">Cancel access requests</a>
         </p>
+    </div>
+}
+
+@apiStatus(applicationApi: ApplicationApi) = @{
+        (applicationApi.isAccessibleInEnvironment(viewModel.hipEnvironment), applicationApi.needsAccessRequest(viewModel.hipEnvironment)) match {
+            case (false, _) => "No access"
+            case (true, true) => "Partial access"
+            case (true, false) => "Full access"
+        }
+}
+
+@apiStatusBanner(applicationApi: ApplicationApi) = {
+    <div class="hip-details govuk-!-padding-bottom-4 govuk-!-padding-top-4 govuk-!-padding-left-6 govuk-!-padding-right-6">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <strong>@applicationApi.apiTitle</strong>
+            </div>
+            <div class="govuk-grid-column-one-third">
+                <span class="hip-details__summary-info govuk-body-s align-left">
+                    @apiStatus(applicationApi)
+                </span>
+            </div>
+        </div>
     </div>
 }
 
@@ -129,9 +152,7 @@
                     @applicationApi.apiTitle
                 </span>
                 <span class="hip-details__summary-info govuk-body-s">
-                    <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="@routes.ApiDetailsController.onPageLoad(applicationApi.apiId)" data-api-specification-api-id="@applicationApi.apiId">
-                        @messages("applicationApis.apis.viewSpecification")
-                    </a>
+                    @apiStatus(applicationApi)
                 </span>
             </div>
         </summary>
@@ -194,6 +215,8 @@
         } else {
             @existingApiDetails(applicationApi)
         }
+    } else {
+        @apiStatusBanner(applicationApi)
     }
 }
 </div>
