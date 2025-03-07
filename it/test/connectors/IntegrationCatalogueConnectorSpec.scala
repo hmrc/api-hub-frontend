@@ -16,16 +16,19 @@
 
 package connectors
 
-import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import config.FrontendAppConfig
+import fakes.FakeHubStatusService
 import generators.ApiDetailGenerators
 import models.api.{ContactInfo, IntegrationResponse, PlatformContact}
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.Configuration
 import play.api.http.Status.{INTERNAL_SERVER_ERROR, NOT_FOUND}
+import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
+import services.HubStatusService
 import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
@@ -375,7 +378,9 @@ class IntegrationCatalogueConnectorSpec
       ))
     )
 
-    val application = new GuiceApplicationBuilder().build()
+    val application = new GuiceApplicationBuilder()
+      .overrides(bind[HubStatusService].toInstance(FakeHubStatusService))
+      .build()
     new IntegrationCatalogueConnector(httpClientV2, servicesConfig, application.injector.instanceOf[FrontendAppConfig])
   }
 

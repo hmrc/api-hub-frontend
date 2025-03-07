@@ -16,7 +16,8 @@
 
 package config
 
-import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.client.WireMock.*
+import fakes.FakeHubStatusService
 import org.scalatest.concurrent.Eventually.eventually
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -24,9 +25,11 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.time.{Seconds, Span}
 import play.api.http.Status.{CREATED, NOT_FOUND, OK}
+import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.test.Helpers.AUTHORIZATION
+import services.HubStatusService
 import util.WireMockHelper
 
 import scala.util.Try
@@ -75,6 +78,7 @@ class InternalAuthTokenInitialiserSpec extends AnyFreeSpec with Matchers with Sc
           "create-internal-auth-token-on-start" -> true,
           "internal-auth.token" -> authToken
         )
+        .overrides(bind[HubStatusService].toInstance(FakeHubStatusService))
         .build()
 
       eventually(Timeout(Span(30, Seconds))) {
@@ -130,6 +134,7 @@ class InternalAuthTokenInitialiserSpec extends AnyFreeSpec with Matchers with Sc
             "create-internal-auth-token-on-start" -> true,
             "internal-auth.token" -> authToken
           )
+          .overrides(bind[HubStatusService].toInstance(FakeHubStatusService))
           .build()
 
         eventually(Timeout(Span(30, Seconds))) {
@@ -169,6 +174,7 @@ class InternalAuthTokenInitialiserSpec extends AnyFreeSpec with Matchers with Sc
           "create-internal-auth-token-on-start" -> true,
           "internal-auth.token" -> authToken
         )
+        .overrides(bind[HubStatusService].toInstance(FakeHubStatusService))
         .build()
 
       app.injector.instanceOf[InternalAuthTokenInitialiser].initialised.futureValue
@@ -207,6 +213,7 @@ class InternalAuthTokenInitialiserSpec extends AnyFreeSpec with Matchers with Sc
           "create-internal-auth-token-on-start" -> false,
           "internal-auth.token" -> authToken
         )
+        .overrides(bind[HubStatusService].toInstance(FakeHubStatusService))
         .build()
 
       app.injector.instanceOf[InternalAuthTokenInitialiser].initialised.futureValue
