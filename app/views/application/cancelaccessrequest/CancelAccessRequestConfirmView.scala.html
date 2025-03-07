@@ -16,6 +16,8 @@
 
 @import models.accessrequest.AccessRequest
 @import models.user.UserModel
+@import config.HipEnvironment
+@import viewmodels.application.AccessRequestsByEnvironment
 
 @this(
 layout: templates.Layout,
@@ -25,7 +27,7 @@ govukRadios: GovukRadios,
 govukButton: GovukButton
 )
 
-@(form: Form[?], mode: Mode, requestsToCancel: Seq[AccessRequest], userModel: UserModel)(implicit request: Request[?], messages: Messages)
+@(form: Form[?], mode: Mode, requestsToCancel: AccessRequestsByEnvironment, userModel: UserModel)(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = title(form, messages("cancelAccessRequestConfirm.title")), user = Some(userModel)) {
 
@@ -45,13 +47,15 @@ govukButton: GovukButton
         @messages("cancelAccessRequestConfirm.message.2")
         </h2>
 
-        <h2 class="govuk-heading-s">
-        @messages("cancelAccessRequestConfirm.message.3")
-        </h2>
+        @for(envAccessRequests <- requestsToCancel.groupByEnvironment) {
+            <h2 class="govuk-heading-s">
+                @messages("cancelAccessRequestConfirm.environment.heading", messages(envAccessRequests.environment.nameKey))
+            </h2>
 
-        <ul class="govuk-list govuk-list--bullet">
-            @requestsToCancel.map(request => <li>{request.apiName}</li>)
-        </ul>
+            <ul class="govuk-list govuk-list--bullet">
+                @envAccessRequests.accessRequests.map(request => <li>{request.apiName}</li>)
+            </ul>
+        }
 
         @govukRadios(
             RadiosViewModel.yesNo(

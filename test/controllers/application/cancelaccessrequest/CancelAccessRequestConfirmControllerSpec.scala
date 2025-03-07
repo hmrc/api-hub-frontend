@@ -18,6 +18,7 @@ package controllers.application.cancelaccessrequest
 
 import base.SpecBase
 import controllers.actions.FakeUser
+import fakes.FakeHipEnvironments
 import forms.application.cancelaccessrequest.CancelAccessRequestConfirmFormProvider
 import generators.AccessRequestGenerator
 import models.accessrequest.AccessRequest
@@ -39,6 +40,7 @@ import utils.{HtmlValidation, UserAnswersSugar}
 import views.html.application.cancelaccessrequest.CancelAccessRequestConfirmView
 
 import scala.concurrent.Future
+import viewmodels.application.AccessRequestsByEnvironment
 
 class CancelAccessRequestConfirmControllerSpec extends SpecBase with MockitoSugar with HtmlValidation with UserAnswersSugar with AccessRequestGenerator {
 
@@ -54,10 +56,11 @@ class CancelAccessRequestConfirmControllerSpec extends SpecBase with MockitoSuga
       running(fixture.application) {
         val request = FakeRequest(GET, cancelAccessConfirmRoute)
         val result = route(fixture.application, request).value
-
+        val environmentAccessRequests = AccessRequestsByEnvironment(accessRequests, FakeHipEnvironments)
+        
         status(result) mustBe OK
 
-        contentAsString(result) mustBe fixture.view(fixture.form, NormalMode, accessRequests, FakeUser)(request, messages(fixture.application)).toString
+        contentAsString(result) mustBe fixture.view(fixture.form, NormalMode, environmentAccessRequests, FakeUser)(request, messages(fixture.application)).toString
         contentAsString(result) must validateAsHtml
       }
     }
@@ -71,9 +74,10 @@ class CancelAccessRequestConfirmControllerSpec extends SpecBase with MockitoSuga
         val request = FakeRequest(GET, cancelAccessConfirmRoute)
         val result = route(fixture.application, request).value
         val filledForm = fixture.form.fill(true)
+        val environmentAccessRequests = AccessRequestsByEnvironment(accessRequests, FakeHipEnvironments)
 
         status(result) mustBe OK
-        contentAsString(result) mustBe fixture.view(filledForm, NormalMode, accessRequests, FakeUser)(request, messages(fixture.application)).toString
+        contentAsString(result) mustBe fixture.view(filledForm, NormalMode, environmentAccessRequests, FakeUser)(request, messages(fixture.application)).toString
         contentAsString(result) must validateAsHtml
       }
     }
@@ -110,9 +114,10 @@ class CancelAccessRequestConfirmControllerSpec extends SpecBase with MockitoSuga
 
         val boundForm = fixture.form.bind(Map("value" -> "invalid value"))
         val result = route(fixture.application, request).value
+        val environmentAccessRequests = AccessRequestsByEnvironment(accessRequests, FakeHipEnvironments)
 
         status(result) mustBe BAD_REQUEST
-        contentAsString(result) mustBe fixture.view(boundForm, NormalMode, accessRequests, FakeUser)(request, messages(fixture.application)).toString
+        contentAsString(result) mustBe fixture.view(boundForm, NormalMode, environmentAccessRequests, FakeUser)(request, messages(fixture.application)).toString
         contentAsString(result) must validateAsHtml
       }
     }
