@@ -32,6 +32,8 @@ import services.ApiHubService
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.application.cancelaccessrequest.CancelAccessRequestSuccessView
+import config.HipEnvironments
+import viewmodels.application.AccessRequestsByEnvironment
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -43,7 +45,8 @@ class CancelAccessRequestEndJourneyController @Inject()(
   requireData: DataRequiredAction,
   cancelAccessRequestSuccessView: CancelAccessRequestSuccessView,
   apiHubService: ApiHubService,
-  errorResultBuilder: ErrorResultBuilder
+  errorResultBuilder: ErrorResultBuilder,
+  hipEnvironments: HipEnvironments
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   import CancelAccessRequestEndJourneyController.*
@@ -56,7 +59,7 @@ class CancelAccessRequestEndJourneyController @Inject()(
           val accessRequests = getCancellableRequests(data)
           Future.sequence(getCancellableRequests(data).map(accessRequest => apiHubService.cancelAccessRequest(accessRequest.id, request.user.email)))
             .flatMap(_ => sessionRepository.clear(request.user.userId))
-            .map(_ => Ok(cancelAccessRequestSuccessView(data.application, Some(request.user), accessRequests)))
+            .map(_ => Ok(cancelAccessRequestSuccessView(data.application, Some(request.user), AccessRequestsByEnvironment(accessRequests, hipEnvironments))))
             .recoverWith {
               case e: UpstreamErrorResponse if e.statusCode == BAD_GATEWAY => Future.successful(badGateway(e))
             }

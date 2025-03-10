@@ -17,8 +17,10 @@
 package controllers.application.cancelaccessrequest
 
 import base.SpecBase
+import config.HipEnvironments
 import controllers.actions.{FakeApplication, FakeUser}
 import controllers.application.cancelaccessrequest.CancelAccessRequestEndJourneyController.Data
+import fakes.FakeHipEnvironments
 import models.accessrequest.{AccessRequest, Pending}
 import models.application.*
 import models.application.ApplicationLenses.ApplicationLensOps
@@ -66,7 +68,7 @@ class CancelAccessRequestEndJourneyControllerSpec extends SpecBase with MockitoS
 
             val view = fixture.application.injector.instanceOf[CancelAccessRequestSuccessView]
             status(result) mustEqual OK
-            contentAsString(result) mustBe view(application, Some(user), Seq(anAccessRequest))(request, messages(fixture.application)).toString
+            contentAsString(result) mustBe view(application, Some(user), AccessRequestsByEnvironment(Seq(anAccessRequest), FakeHipEnvironments))(request, messages(fixture.application)).toString
             contentAsString(result) must validateAsHtml
             verify(fixture.apiHubService).cancelAccessRequest(eqTo(anAccessRequest.id), eqTo(user.email))(any())
             verify(fixture.cancelAccessRequestSessionRepository).clear(eqTo(user.userId))
