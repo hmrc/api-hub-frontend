@@ -18,6 +18,7 @@
 @import models.user.UserModel
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import models.accessrequest.AccessRequest
+@import viewmodels.application.AccessRequestsByEnvironment
 
 @this(
     layout: templates.Layout,
@@ -25,7 +26,7 @@
     govukSummaryList: GovukSummaryList
 )
 
-@(app:Application, user: Option[UserModel], accessRequests: Seq[AccessRequest])(implicit request: Request[?], messages: Messages)
+@(app:Application, user: Option[UserModel], cancelledRequests: AccessRequestsByEnvironment)(implicit request: Request[?], messages: Messages)
 
 @applicationLink(application: Application) = {
     <a id="viewApplicationLink" data-application-id="@application.id" href='@applicationLinkUrl(application)' class='govuk-link govuk-link--no-visited-state'>
@@ -41,11 +42,24 @@
     <li>@accessRequest.apiName</li>
 }
 
-@apiList(apis: Seq[AccessRequest]) = {
+@apiList(apis: Set[AccessRequest]) = {
     <br>
     <ul class="govuk-list govuk-list--bullet govuk-!-margin-top-0">
     @{apis.map(accessRequest => apiListItem(accessRequest))}
     </ul>
+}
+
+@requestRows() = @{
+    cancelledRequests.groupByEnvironment.map { envAccessRequest =>
+        SummaryListRow(
+            key = Key(
+                content = Text(messages("cancelAccessRequestSuccess.apiName", messages(envAccessRequest.environment.nameKey)))
+            ),
+            value = Value(
+                content = HtmlContent(apiList(envAccessRequest.accessRequests))
+            )
+        )
+    }
 }
 
 @layout(pageTitle = titleNoForm(messages("cancelAccessRequestSuccess.title")), user = user, showBackLink = false) {
@@ -55,24 +69,20 @@
         attributes = Map("id" -> "successHeading")
     ))
 
-    @govukSummaryList(SummaryList(
-        rows = Seq(
-            SummaryListRow(
-                key = Key(
-                    content = Text(messages("cancelAccessRequestSuccess.applicationName"))
-                ),
-                value = Value(
-                    content = HtmlContent(app.name)
-                ),
-            ),
-            SummaryListRow(
-                key = Key(
-                    content = Text(messages("cancelAccessRequestSuccess.apiName"))
-                ),
-                value = Value(
-                    content = HtmlContent(apiList(accessRequests))
+    @govukSummaryList(
+        SummaryList(
+            rows = Seq(
+                SummaryListRow(
+                    key = Key(
+                        content = Text(messages("cancelAccessRequestSuccess.applicationName"))
+                    ),
+                    value = Value(
+                        content = HtmlContent(app.name)
+                    ),
                 )
-            ))))
+            ) ++ requestRows()
+        )
+    )
 
  <h2 class="govuk-heading-m">@messages("cancelAccessRequestSuccess.h2")</h2>
  <p class="govuk-body">
