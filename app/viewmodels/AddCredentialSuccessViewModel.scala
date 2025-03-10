@@ -47,7 +47,7 @@ object AddCredentialSuccessViewModel {
   private def applicationNameRow(application: Application)(implicit messages: Messages): SummaryListRow = {
     SummaryListRowViewModel(
       key     = "addCredentialSuccess.applicationName",
-      value   = ValueViewModel(HtmlContent(HtmlFormat.escape(application.name).toString)),
+      value   = ValueViewModel(HtmlContent(HtmlFormat.escape(application.name).toString)).withCssClass("hip-summary-value-max-width"),
       actions = Seq.empty
     )
   }
@@ -60,7 +60,7 @@ object AddCredentialSuccessViewModel {
 
     SummaryListRowViewModel(
       key     = "addCredentialSuccess.apis",
-      value   = ValueViewModel(HtmlContent(s"<ul class=\"govuk-list govuk-list--bullet\">$listItems</ul>")),
+      value   = ValueViewModel(HtmlContent(s"<ul class=\"govuk-list govuk-list--bullet\">$listItems</ul>")).withCssClass("hip-summary-value-max-width"),
       actions = Seq.empty
     )
   }

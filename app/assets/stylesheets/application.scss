@@ -925,6 +925,10 @@ header {
     margin-top: 0;
     margin-bottom: govuk-spacing(2);
 }
+.govuk-summary-list__value.hip-summary-value-max-width {
+    display: block;
+    margin-right: -100%;
+}
 .hip-file-drop {
     border: 2px dashed govuk-colour("blue");
     width: 350px;
