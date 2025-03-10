@@ -60,7 +60,8 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
 
   val cacheTtl: Int = configuration.get[Int]("mongodb.timeToLiveInSeconds")
 
-  val shutterMessage: String = configuration.get[String]("shutter-message")
+  val shuttered: Boolean = configuration.get[Boolean]("hubStatus.shuttered")
+  val shutterMessage: String = configuration.get[String]("hubStatus.shutterMessage")
 
   val feedbackLink: String = configuration.get[String]("feedback-link")
   val wireMockGuidanceLink: String = configuration.get[String]("wiremock-guidance-link")
@@ -77,4 +78,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val showApisOnDashboard: Boolean = configuration.getOptional[Boolean]("features.showApisOnDashboard").getOrElse(false)
 
   val hipEnvironmentsLookupTimeoutSeconds: Int = configuration.get[Int]("hipEnvironmentsLookupTimeoutSeconds")
+  val hubStatusTimeoutSeconds: Int = configuration.get[Int]("hubStatusTimeoutSeconds")
+
 }

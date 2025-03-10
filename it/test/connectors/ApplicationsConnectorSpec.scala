@@ -20,7 +20,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.typesafe.config.ConfigFactory
 import config.{BaseHipEnvironment, FrontendAppConfig, ShareableHipConfig}
 import connectors.ApplicationsConnectorSpec.ApplicationGetterBehaviours
-import fakes.FakeHipEnvironments
+import fakes.{FakeHipEnvironments, FakeHubStatusService}
 import generators.EgressGenerator
 import models.UserEmail
 import models.accessrequest.*
@@ -46,9 +46,11 @@ import play.api.Configuration
 import play.api.http.ContentTypes
 import play.api.http.Status.*
 import play.api.i18n.{Messages, MessagesProvider}
+import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.test.Helpers.{ACCEPT, AUTHORIZATION, CONTENT_TYPE}
+import services.HubStatusService
 import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
 import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
@@ -1979,7 +1981,10 @@ object ApplicationsConnectorSpec extends HttpClientV2Support {
       ))
     )
 
-    val application = new GuiceApplicationBuilder().build()
+    val application = new GuiceApplicationBuilder()
+      .overrides(bind[HubStatusService].toInstance(FakeHubStatusService))
+      .build()
+
     val crypto: ApplicationCrypto = application.injector.instanceOf[ApplicationCrypto]
     new ApplicationsConnector(httpClientV2, crypto, servicesConfig, application.injector.instanceOf[FrontendAppConfig])
   }

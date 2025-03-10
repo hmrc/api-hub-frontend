@@ -16,6 +16,7 @@
 
 package oldRoutes
 
+import fakes.FakeHubStatusService
 import generators.Generators
 import org.scalacheck.Gen
 import org.scalatest.TestData
@@ -25,9 +26,11 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.Application
+import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.test.Helpers._
-import play.api.test._
+import play.api.test.Helpers.*
+import play.api.test.*
+import services.HubStatusService
 
 import scala.language.implicitConversions
 
@@ -42,6 +45,7 @@ class RoutesSpec
   implicit override def newAppForTest(testData: TestData): Application =
     new GuiceApplicationBuilder()
       .configure(testData.configMap ++ Map("play.http.router" -> "prod.Routes"))
+      .overrides(bind[HubStatusService].toInstance(FakeHubStatusService))
       .build()
 
   "Routes" should {
