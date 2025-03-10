@@ -1210,3 +1210,15 @@ forcePublish.cannotPublish = This API cannot be published as it is not deployed.
 forcePublishSuccess.pageTitle = API published successfully
 forcePublishSuccess.guidance.heading = What you can do now
 forcePublishSuccess.guidance.content = Return to {0}.
+
+shuttered.title = The Integration Hub is unavailable
+shuttered.heading = The Integration Hub is unavailable
+
+shutter.title = Shutter settings
+shutter.heading = Shutter The Integration Hub?
+shutter.hint = This will shutter the Hub for all non-support users. Support uses will still be able to access the service.
+shutter.shuttered.error.required = Enter a value for shuttered
+shutter.shutteredMessage.label = Shutter message
+shutter.shutteredMessage.hint = The shutter message will appear on the shuttered page to all non-support users.
+shutter.submit.label = Submit
+shutter.menuTitle = Shutter
