@@ -36,6 +36,11 @@ case class ApplicationDetailsViewModel(application: Application, applicationApis
       applicationEndpoint.accessFor(env) == Inaccessible
     })
   })
+  val environmentsNeedingAccessRequest = hipEnvironments.environments
+    .filter(_.isProductionLike)
+    .filter(env => !(applicationApis.exists(applicationApi => applicationApi.hasPendingAccessRequest(env))))
+
+
   val notUsingGlobalTeams = application.teamId.isEmpty
   val applicationTeamMemberCount = application.teamMembers.size
   val applicationTeamMemberEmails = application.teamMembers.map(_.email)
