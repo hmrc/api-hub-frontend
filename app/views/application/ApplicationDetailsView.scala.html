@@ -76,6 +76,11 @@
             </h2>
         </div>
     </div>
+    @if(!viewModel.noApis) {
+        <p class="govuk-body">
+            @messages("applicationDetails.apis.body")
+        </p>
+    }
 }
 
 @noApisMessage = {
@@ -127,7 +132,7 @@
     </div>
 }
 
-@needsProductionAccessRequestsPanel = {
+@needsAccessRequestsPanel = {
     <div class="call-out-panel call-out-panel__small govuk-!-margin-top-2">
         <p class="govuk-body information-tag">
             <i class="fa-solid fa-circle-exclamation"></i>
@@ -138,6 +143,13 @@
         <p class="govuk-body additional-message">
             @Html(messages("applicationDetails.no.prod.access.message", prodAccessRequestLink("site.environment.production")))
         </p>
+        <ul class="govuk-list govuk-list--bullet">
+        @for(environmentNeedingAccess <- viewModel.environmentsNeedingAccessRequest) {
+            <li>
+                <a href="@{controllers.application.routes.EnvironmentsController.onPageLoad(viewModel.applicationId, environmentNeedingAccess.id).url}">@environmentNeedingAccess.nameKey</a>
+            </li>
+        }
+        </ul>
     </div>
 }
 
@@ -202,7 +214,7 @@
                 }
 
                 @if(viewModel.needsProductionAccessRequest) {
-                    @needsProductionAccessRequestsPanel
+                    @needsAccessRequestsPanel
                 }
 
                 @apiList
