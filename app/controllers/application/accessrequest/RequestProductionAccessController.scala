@@ -17,6 +17,7 @@
 package controllers.application.accessrequest
 
 import com.google.inject.Inject
+import config.{HipEnvironment, HipEnvironments}
 import controllers.actions.{AccessRequestDataRetrievalAction, DataRequiredAction, IdentifierAction}
 import forms.application.accessrequest.RequestProductionAccessDeclarationFormProvider
 import models.requests.DataRequest
@@ -25,14 +26,16 @@ import navigation.Navigator
 import pages.application.accessrequest.*
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, Messages}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, Result}
 import repositories.AccessRequestSessionRepository
+import uk.gov.hmrc.govukfrontend.views.Aliases.Value
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.application.accessrequest.{ProvideSupportingInformationSummary, RequestProductionAccessApplicationSummary, RequestProductionAccessEnvironmentSummary, RequestProductionAccessSelectApisSummary}
 import views.html.application.accessrequest.RequestProductionAccessView
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Left
 
 class RequestProductionAccessController @Inject()(
   val controllerComponents: MessagesControllerComponents,
@@ -43,43 +46,58 @@ class RequestProductionAccessController @Inject()(
   getData: AccessRequestDataRetrievalAction,
   requireData: DataRequiredAction,
   navigator: Navigator,
-  environmentSummary: RequestProductionAccessEnvironmentSummary
+  environmentSummary: RequestProductionAccessEnvironmentSummary,
+  hipEnvironments: HipEnvironments
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) {
+  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      val filledForm =  request.userAnswers.get(RequestProductionAccessPage) match {
-        case Some(value) => form.fill(value)
-        case None => form
-      }
+      validateEnvironmentId(request.userAnswers).fold(
+        call => Future.successful(Redirect(call)),
+        hipEnvironment => {
+          val filledForm = request.userAnswers.get(RequestProductionAccessPage) match {
+            case Some(value) => form.fill(value)
+            case None => form
+          }
 
-      showPage(filledForm, OK)
+          Future.successful(view(filledForm, OK, hipEnvironment))
+        })
   }
 
-  private def showPage(form: Form[?], status: Int)(implicit request: DataRequest[?]): Result = {
-    Status(status)(
-      requestProductionAccessView(
+  private def validateEnvironmentId(userAnswers: UserAnswers): Either[Call, HipEnvironment] = {
+    userAnswers.get(RequestProductionAccessEnvironmentIdPage) match {
+      case Some(environmentId) => Right(hipEnvironments.forId(environmentId))
+      case None => Left(controllers.routes.JourneyRecoveryController.onPageLoad())
+    }
+  }
+
+  private def view(form: Form[?], status: Int, hipEnvironment: HipEnvironment)(implicit request: DataRequest[?]): Result = {
+    Status(status)(requestProductionAccessView(
         form,
         buildSummaries(request.userAnswers),
         RequestProductionAccessSelectApisSummary.buildSelectedApis(request.userAnswers),
-        Some(request.user)
-      )
-    )
+        Some(request.user),
+        hipEnvironment
+    ))
   }
 
   def onSubmit: Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      form.bindFromRequest().fold(
-        formWithErrors => Future.successful(showPage(formWithErrors, BAD_REQUEST)),
-        value => {
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(RequestProductionAccessPage, value))
-            _ <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(RequestProductionAccessPage, NormalMode, request.userAnswers).url)
-        }
-      )
+      validateEnvironmentId(request.userAnswers).fold(
+        call => Future.successful(Redirect(call)),
+        hipEnvironment => {
+          form.bindFromRequest().fold(
+            formWithErrors => Future.successful(view(formWithErrors, BAD_REQUEST, hipEnvironment)),
+            value => {
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(RequestProductionAccessPage, value))
+                _ <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(navigator.nextPage(RequestProductionAccessPage, NormalMode, request.userAnswers).url)
+            }
+          )
+        })
   }
 
   private def buildSummaries(userAnswers: UserAnswers)(implicit messages: Messages): Seq[SummaryListRow] = {

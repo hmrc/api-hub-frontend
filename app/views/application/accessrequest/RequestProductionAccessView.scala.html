@@ -17,6 +17,7 @@
 @import models.application._
 @import models.user.UserModel
 @import viewmodels.application.ApplicationApi
+@import config.HipEnvironment
 
 @this(
     layout: templates.Layout,
@@ -28,9 +29,9 @@
     govukButton: GovukButton
 )
 
-@(form: Form[?], summaries: Seq[SummaryListRow], selectedApis: Seq[ApplicationApi], user: Option[UserModel])(implicit request: Request[?], messages: Messages)
+@(form: Form[?], summaries: Seq[SummaryListRow], selectedApis: Seq[ApplicationApi], user: Option[UserModel], hipEnvironment: HipEnvironment)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("requestProductionAccess.title")), user = user) {
+@layout(pageTitle = titleNoForm(messages("requestProductionAccess.title", hipEnvironment.nameKey)), user = user) {
 
     @formHelper(action = controllers.application.accessrequest.routes.RequestProductionAccessController.onSubmit(), Symbol("autoComplete") -> "off") {
         @if(form.errors.nonEmpty) {
