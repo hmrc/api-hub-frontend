@@ -73,13 +73,15 @@ class MyApisNavItems @Inject()(hipEnvironments: HipEnvironments) {
       Some(
         SideNavItemBranch(
           title = messages("applicationNav.page.environments"),
-          sideNavItems = hipEnvironments.environments.reverse.map { hipEnvironment =>
-            val environmentPage = EnvironmentPage(hipEnvironment)
+          sideNavItems = hipEnvironments.environments.reverse.map { navItemEnvironment =>
             SideNavItemLeaf(
-              page = environmentPage,
-              title = messages(s"site.environment.${hipEnvironment.id}"),
-              link = controllers.myapis.routes.MyApiEnvironmentController.onPageLoad(apiDetail.id, hipEnvironment.id),
-              isCurrentPage = currentPage == environmentPage,
+              page = EnvironmentPage(navItemEnvironment),
+              title = messages(s"site.environment.${navItemEnvironment.id}"),
+              link = controllers.myapis.routes.MyApiEnvironmentController.onPageLoad(apiDetail.id, navItemEnvironment.id),
+              isCurrentPage = currentPage match {
+                case EnvironmentPage(env) => env.id == navItemEnvironment.id
+                case _ => false
+              }
             )
           }
         )
