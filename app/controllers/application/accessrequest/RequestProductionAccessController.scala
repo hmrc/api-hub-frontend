@@ -62,7 +62,7 @@ class RequestProductionAccessController @Inject()(
             case None => form
           }
 
-          Future.successful(view(filledForm, OK, hipEnvironment))
+          Future.successful(showPage(filledForm, OK, hipEnvironment))
         })
   }
 
@@ -73,7 +73,7 @@ class RequestProductionAccessController @Inject()(
     }
   }
 
-  private def view(form: Form[?], status: Int, hipEnvironment: HipEnvironment)(implicit request: DataRequest[?]): Result = {
+  private def showPage(form: Form[?], status: Int, hipEnvironment: HipEnvironment)(implicit request: DataRequest[?]): Result = {
     Status(status)(requestProductionAccessView(
         form,
         buildSummaries(request.userAnswers),
@@ -89,7 +89,7 @@ class RequestProductionAccessController @Inject()(
         call => Future.successful(Redirect(call)),
         hipEnvironment => {
           form.bindFromRequest().fold(
-            formWithErrors => Future.successful(view(formWithErrors, BAD_REQUEST, hipEnvironment)),
+            formWithErrors => Future.successful(showPage(formWithErrors, BAD_REQUEST, hipEnvironment)),
             value => {
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(RequestProductionAccessPage, value))
