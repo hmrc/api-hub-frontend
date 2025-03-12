@@ -128,8 +128,8 @@ class AccessRequestControllerSpec
           contentAsString(result) mustBe
             view(
               "Page not found - 404",
-              "Production access request not found",
-              s"Cannot find a production access request with ID $accessRequestId.",
+              "Access request not found",
+              s"Cannot find an access request with ID $accessRequestId.",
               Some(user)
             )(request, messages(fixture.application))
               .toString()

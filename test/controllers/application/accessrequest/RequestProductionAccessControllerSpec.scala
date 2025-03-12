@@ -74,7 +74,7 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
             val view = fixture.application.injector.instanceOf[RequestProductionAccessView]
 
             status(result) mustEqual OK
-            contentAsString(result) mustBe view(form, buildSummaries(userAnswers)(messages(fixture.application)), applicationApis, Some(user))(request, messages(fixture.application)).toString
+            contentAsString(result) mustBe view(form, buildSummaries(userAnswers)(messages(fixture.application)), applicationApis, Some(user), FakeHipEnvironments.production)(request, messages(fixture.application)).toString
             contentAsString(result) must validateAsHtml
           }
       }
@@ -102,7 +102,7 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
         val view = fixture.application.injector.instanceOf[RequestProductionAccessView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustBe view(form, buildSummaries(userAnswers)(messages(fixture.application)), applicationApis, Some(FakeUser))(request, messages(fixture.application)).toString
+        contentAsString(result) mustBe view(form, buildSummaries(userAnswers)(messages(fixture.application)), applicationApis, Some(FakeUser), FakeHipEnvironments.production)(request, messages(fixture.application)).toString
         contentAsString(result) must validateAsHtml
       }
     }

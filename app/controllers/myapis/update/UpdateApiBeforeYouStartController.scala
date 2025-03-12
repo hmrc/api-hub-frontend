@@ -60,11 +60,6 @@ class UpdateApiBeforeYouStartController @Inject()(
     Seq(
       RelatedContentLink.apiHubGuideLink(
         config,
-        messages("produceApiBeforeYouStart.relatedContent.generatingProductionCredentials"),
-        "documentation/how-do-I-consume-apis.html#managing-your-applications"
-      ),
-      RelatedContentLink.apiHubGuideLink(
-        config,
         messages("produceApiBeforeYouStart.relatedContent.producingApis"),
         "documentation/how-do-i-produce.apis.html#how-do-i-produce-apis"
       ),
