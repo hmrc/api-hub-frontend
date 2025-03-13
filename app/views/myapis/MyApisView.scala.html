@@ -25,7 +25,9 @@
         govukTable: GovukTable,
         govukTag: GovukTag,
         searchBox: SearchBox,
-        paginator: Paginator
+        paginator: Paginator,
+        govukButton: GovukButton,
+        formHelper: FormWithCSRF
 )
 
 @(myApis: Seq[ApiDetail], user: UserModel)(implicit request: Request[?], messages: Messages)
@@ -47,9 +49,22 @@
     customScriptsBlock = Some(scripts()),
 ) {
 
-    <h1 class="govuk-heading-m">
-        @messages("myApis.all.heading") (<span id="searchResultsSize">@myApis.size</span>)
-    </h1>
+    <div class="flex">
+        <h1 class="govuk-heading-m">
+            @messages("myApis.all.heading") (<span id="searchResultsSize">@myApis.size</span>)
+        </h1>
+        <div class="align-right">
+            @formHelper(action = controllers.myapis.produce.routes.ProduceApiStartController.startProduceApi()) {
+                @govukButton(
+                    Button(
+                        content = messages("manageApis.create"),
+                        id = Some("createAnApiButton"),
+                        preventDoubleClick = Some(true)
+                    )
+                )
+            }
+        </div>
+    </div>
 
     @searchBox(messages("myApis.search.label"), None, "nameFilter", "govuk-!-margin-bottom-5")
 

@@ -41,9 +41,22 @@
     fullWidth = true,
     customScriptsBlock = Some(scripts()),
 ) {
-    <h1 class="govuk-heading-m govuk-!-margin-bottom-7">
-        @messages("applications.heading")
-    </h1>
+    <div class="flex">
+        <h1 class="govuk-heading-m govuk-!-margin-bottom-7">
+            @messages("applications.heading")
+        </h1>
+        <div class="align-right">
+            @formHelper(action = controllers.application.register.routes.RegisterApplicationStartController.startRegisterApplication()) {
+                @govukButton(
+                    Button(
+                        content = messages("manageApplications.create"),
+                        id = Some("registerAnApplicationButton"),
+                        preventDoubleClick = Some(true)
+                    )
+                )
+            }
+        </div>
+    </div>
 
     <div id="appDetailPanels">
     @applications.map( application =>

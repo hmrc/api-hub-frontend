@@ -696,6 +696,7 @@ manageApplications.application.created = Registered
 manageApplications.search.label = Search for an application
 manageApplications.search.hint = Search by application name or ID, or by credential client ID
 manageApplications.search.noResults.title = No applications found
+manageApplications.create = Register application
 
 manageApis.title = Manage APIs
 manageApis.heading = Manage APIs ({0})
@@ -704,6 +705,7 @@ manageApis.search.label = Search APIs
 manageApis.search.hint = You can search by API name, API number or publisher reference
 manageApis.noResults.title = No APIs found
 manageApis.noResults.message = No APIs have been found that match your search criteria. Try adjusting your search.
+manageApis.create = Create API
 
 manageTeams.title = Manage teams
 manageTeams.heading = Manage teams ({0})
