@@ -438,6 +438,9 @@ addAnApiSelectEndpoints.change.hidden = AddAnApiSelectEndpoints
 addAnApiSelectEndpoints.selectEndpoint = Select endpoint
 addAnApiSelectEndpoints.selectEndpoints = Select endpoints
 addAnApiSelectEndpoints.scopesUsed = These endpoints use the following scopes:
+addAnApiSelectEndpoints.banner.heading = Selecting endpoints
+addAnApiSelectEndpoints.banner.message.1 = The following endpoints are grouped by their controlling scope.
+addAnApiSelectEndpoints.banner.message.2 = You can change your endpoints selection later from your applications overview page.
 
 addAnApiCheckYourAnswers.title = Check your answers
 addAnApiCheckYourAnswers.heading = Check your answers before continuing
