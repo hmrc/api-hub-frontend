@@ -964,6 +964,16 @@ statistics.apisInProductionStatistic.totalApis = Total APIs
 statistics.apisInProductionStatistic.totalInProduction = APIs in production
 statistics.apisInProductionStatistic.list = List of APIs in production
 
+testApimEndpoints.title = Test APIM APIs
+testApimEndpoints.heading = Test APIM endpoints
+testApimEndpoints.preamble = Trigger test requests to different APIM endpoints, to verify they''re working as expected.
+testApimEndpoints.selectEnvironment = Select which environment you want to test
+testApimEndpoints.selectEndpoint = Select which endpoint you want to test
+testApimEndpoints.noEnvironmentSelection = Select an environment
+testApimEndpoints.noEndpointSelection = Select endpoint
+testApimEndpoints.submit = Test endpoint
+testApimEndpoints.copy = Copy
+
 cancelAccessRequestSelectApi.title = Select APIs
 cancelAccessRequestSelectApi.heading = Which APIs do you want to cancel access requests for?
 cancelAccessRequestSelectApi.error.required = Select at least one API
