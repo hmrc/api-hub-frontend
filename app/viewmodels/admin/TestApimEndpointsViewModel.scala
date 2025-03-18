@@ -18,8 +18,9 @@ package viewmodels.admin
 
 import config.HipEnvironments
 import viewmodels.govuk.all.SelectItemViewModel
+import viewmodels.govuk.all.FluentSelectItem
 
 case class TestApimEndpointsViewModel (hipEnvironments: HipEnvironments)(implicit messages: play.api.i18n.Messages) {
   val environments = Seq(SelectItemViewModel("", messages("testApimEndpoints.noEnvironmentSelection"))) ++ hipEnvironments.environments.reverse.map(env => SelectItemViewModel(env.id, env.nameKey))
-  val endpoints = Seq(SelectItemViewModel("", messages("testApimEndpoints.noEndpointSelection"))) ++ ApimRequests.requests.map(apimRequest => SelectItemViewModel(apimRequest.url, apimRequest.url))
+  val endpoints = Seq(SelectItemViewModel("", messages("testApimEndpoints.noEndpointSelection"))) ++ ApimRequests.requests.map(apimRequest => SelectItemViewModel(apimRequest.url, apimRequest.url).withAttribute("data-param-names", apimRequest.paramNames.mkString(",")))
 }

@@ -20,14 +20,15 @@ import com.google.inject.{Inject, Singleton}
 import config.HipEnvironments
 import controllers.actions.{AuthorisedSupportAction, IdentifierAction}
 import play.api.i18n.I18nSupport
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, Writes}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.admin.TestApimEndpointsViewModel
+import viewmodels.admin.{ApimRequests, TestApimEndpointsViewModel}
 import views.html.admin.TestApimEndpointsView
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class TestApimEndpointsController @Inject()(
@@ -42,6 +43,17 @@ class TestApimEndpointsController @Inject()(
   def onPageLoad(): Action[AnyContent] = (identify andThen isSupport) {
     implicit request =>
       Ok(view(TestApimEndpointsViewModel(hipEnvironments), request.user))
+  }
+
+  def callApim[T](environment: String, endpoint: String, params: String): Action[AnyContent] = (identify andThen isSupport).async {
+    implicit request =>
+      (for {
+        hipEnvironment <- hipEnvironments.forEnvironmentIdOptional(environment)
+        apimRequest <- ApimRequests.requests.find(_.url == endpoint)
+      } yield apiHubService.testApimEndpoint(hipEnvironment, apimRequest, params)) match {
+        case Some(f) => f.map(response => Ok(response))
+        case None => Future.successful(BadRequest)
+      }
   }
 
 }

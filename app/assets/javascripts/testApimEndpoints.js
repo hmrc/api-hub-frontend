@@ -9,9 +9,11 @@ export function onDomLoaded() {
         VIEW_STATE_SHOWING_RESPONSE = 'showingResponse',
 
         view = (() => {
-            const elSelectEnvironment = document.getElementById('selectEnvironment'),
+            const elInputsContainer = document.getElementById('apimRequestInputs'),
+                elSelectEnvironment = document.getElementById('selectEnvironment'),
                 elSelectEndpoint = document.getElementById('selectEndpoint'),
                 elSelectEndpointContainer = elSelectEndpoint.closest('.govuk-form-group'),
+                elParameterInputsContainer = document.getElementById('parameterInputs'),
                 elSubmitButton = document.getElementById('submit'),
                 elResponseContainer = document.getElementById('apimResponseContainer'),
                 elResponse = document.getElementById('apimResponse'),
@@ -25,7 +27,14 @@ export function onDomLoaded() {
                 environmentChangedHandler(event.target.value);
             });
             elSelectEndpoint.addEventListener('input', event => {
-                endpointChangedHandler(event.target.value);
+                let paramNames = [];
+                if (event.target.selectedOptions.length) {
+                    const paramNamesString = event.target.selectedOptions[0].dataset['paramNames'];
+                    if (paramNamesString) {
+                        paramNames = paramNamesString.split(',');
+                    }
+                }
+                endpointChangedHandler(event.target.value, paramNames);
             });
             elSubmitButton.addEventListener('click', event => {
                 submitHandler();
@@ -33,6 +42,13 @@ export function onDomLoaded() {
 
             function setEnabled(el, isEnabled) {
                 el.disabled = !isEnabled;
+            }
+
+            function buildParameterInputHtml(name) {
+                return `<div class="govuk-form-group">
+                            <label class="govuk-label" for="${name}">${name}:</label>
+                            <input class="govuk-input" name="${name}" type="text">
+                        </div>`;
             }
 
             return {
@@ -45,12 +61,15 @@ export function onDomLoaded() {
                 onSubmit(handler) {
                     submitHandler = handler;
                 },
+                setParameterInputs(...parameterNames) {
+                    elParameterInputsContainer.innerHTML = parameterNames.map(buildParameterInputHtml).join('');
+                },
                 set state(viewState) {
                     setVisible(elSelectEndpointContainer, viewState !== VIEW_STATE_INITIAL);
+                    setVisible(elParameterInputsContainer, viewState !== VIEW_STATE_INITIAL);
                     setVisible(elResponseContainer, viewState === VIEW_STATE_SHOWING_RESPONSE);
 
-                    setEnabled(elSelectEndpoint, viewState !== VIEW_STATE_WAITING_FOR_RESPONSE);
-                    setEnabled(elSelectEndpointContainer, viewState !== VIEW_STATE_WAITING_FOR_RESPONSE);
+                    setEnabled(elInputsContainer, viewState !== VIEW_STATE_WAITING_FOR_RESPONSE);
                     setEnabled(elSubmitButton, [VIEW_STATE_READY_TO_SEND, VIEW_STATE_SHOWING_RESPONSE].includes(viewState));
                 }
             };
@@ -66,9 +85,10 @@ export function onDomLoaded() {
         }
     });
 
-    view.onEndpointChanged(endpoint => {
+    view.onEndpointChanged((endpoint, paramNames) => {
         if (endpoint) {
             view.state = VIEW_STATE_READY_TO_SEND;
+            view.setParameterInputs(...paramNames);
         } else {
             view.state = VIEW_STATE_SELECT_ENDPOINT;
         }

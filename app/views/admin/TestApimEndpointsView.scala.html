@@ -46,29 +46,35 @@
 
         <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-bottom-5">
 
-        @govukSelect(
-            Select(
-                id = "selectEnvironment",
-                name = "value",
-                items = viewModel.environments,
-                label = Label(
-                    content = messages("testApimEndpoints.selectEnvironment"),
-                    classes = "govuk-heading-s govuk-!-margin-bottom-1"
-                ),
-            )
-        )
+        <form>
+            <fieldset class="hip-hidden-fieldset" id="apimRequestInputs">
+                @govukSelect(
+                    Select(
+                        id = "selectEnvironment",
+                        name = "value",
+                        items = viewModel.environments,
+                        label = Label(
+                            content = messages("testApimEndpoints.selectEnvironment"),
+                            classes = "govuk-heading-s govuk-!-margin-bottom-1"
+                        ),
+                    )
+                )
 
-        @govukSelect(
-            Select(
-                id = "selectEndpoint",
-                name = "value",
-                items = viewModel.endpoints,
-                label = Label(
-                    content = messages("testApimEndpoints.selectEndpoint"),
-                    classes = "govuk-heading-s govuk-!-margin-bottom-1"
-                ),
-            ).withCssClass("selectEndpointContainer")
-        )
+                @govukSelect(
+                    Select(
+                        id = "selectEndpoint",
+                        name = "value",
+                        items = viewModel.endpoints,
+                        label = Label(
+                            content = messages("testApimEndpoints.selectEndpoint"),
+                            classes = "govuk-heading-s govuk-!-margin-bottom-1"
+                        ),
+                    ).withCssClass("selectEndpointContainer")
+                )
+
+                <div id="parameterInputs"></div>
+            </fieldset>
+        </form>
 
         @govukButton(
             ButtonViewModel(messages("testApimEndpoints.submit")).preventingDoubleClick().withId("submit")
