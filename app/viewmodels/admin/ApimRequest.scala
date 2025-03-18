@@ -22,7 +22,7 @@ import models.api.{ApiDeployment, EgressGateway}
 import models.application.ClientScope
 import models.deployment.{DeploymentDetails, StatusResponse, SuccessfulDeploymentResponse}
 import models.exception.ApimException
-import play.api.libs.json.{Json, Writes}
+import play.api.libs.json.{Json, OFormat, Writes}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -44,7 +44,7 @@ sealed trait ApimRequest[T] {
     apimConnector: ApimConnector,
     hipEnvironment: HipEnvironment,
     paramValues: Seq[String]
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext, writesT: Writes[T]): Future[String] = {
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[String] = {
     if (paramValues.size != paramNames.size) {
       throw new IllegalArgumentException(s"Expected ${paramNames.size} parameters but found ${paramValues.size}")
     }
@@ -60,13 +60,14 @@ sealed trait ApimRequest[T] {
     paramValues: Seq[String]
   )(implicit hc: HeaderCarrier): Future[Either[ApimException, T]]
 
-  private def resultToString(result: Either[ApimException, T])(implicit writesT: Writes[T]): String = {
+  private def resultToString(result: Either[ApimException, T]): String = {
     result match {
-      case Right(s) => Json.prettyPrint(Json.toJson(s))
+      case Right(s) => Json.prettyPrint(Json.toJson(s)(writes))
       case Left(e) => e.getStackTrace.mkString(System.lineSeparator())
     }
   }
 
+  def writes: Writes[T]
 }
 
 object ApimRequests {
@@ -83,6 +84,8 @@ object ApimRequests {
       apimConnector.getDeployments(hipEnvironment)
     }
 
+    override val writes: Writes[Seq[ApiDeployment]] = implicitly
+
   }
 
   val getDeployment: ApimRequest[SuccessfulDeploymentResponse] = new ApimRequest[SuccessfulDeploymentResponse] {
@@ -96,6 +99,8 @@ object ApimRequests {
     )(implicit hc: HeaderCarrier): Future[Either[ApimException, SuccessfulDeploymentResponse]] = {
       apimConnector.getDeployment(hipEnvironment, paramValues.head)
     }
+
+    override val writes: Writes[SuccessfulDeploymentResponse] = implicitly
 
   }
 
@@ -111,6 +116,7 @@ object ApimRequests {
       apimConnector.getOpenApiSpecification(hipEnvironment, paramValues.head)
     }
 
+    override val writes: Writes[String] = implicitly
   }
 
   val getDeploymentDetails: ApimRequest[DeploymentDetails] = new ApimRequest[DeploymentDetails] {
@@ -124,6 +130,7 @@ object ApimRequests {
     )(implicit hc: HeaderCarrier): Future[Either[ApimException, DeploymentDetails]] = {
       apimConnector.getDeploymentDetails(hipEnvironment, paramValues.head)
     }
+    override val writes: Writes[DeploymentDetails] = implicitly
 
   }
 
@@ -144,6 +151,7 @@ object ApimRequests {
       )
     }
 
+    override val writes: Writes[StatusResponse] = implicitly
   }
 
   val listEgressGateways: ApimRequest[Seq[EgressGateway]] = new ApimRequest[Seq[EgressGateway]] {
@@ -158,6 +166,7 @@ object ApimRequests {
       apimConnector.listEgressGateways(hipEnvironment)
     }
 
+    override val writes: Writes[Seq[EgressGateway]] = implicitly
   }
 
   val fetchClientScopes: ApimRequest[Seq[ClientScope]] = new ApimRequest[Seq[ClientScope]] {
@@ -172,6 +181,7 @@ object ApimRequests {
       apimConnector.fetchClientScopes(hipEnvironment, paramValues.head)
     }
 
+    override val writes: Writes[Seq[ClientScope]] = implicitly
   }
 
   val requests: Seq[ApimRequest[?]] = Seq(

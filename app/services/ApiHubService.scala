@@ -18,7 +18,7 @@ package services
 
 import com.google.inject.{Inject, Singleton}
 import config.{HipEnvironment, ShareableHipConfig}
-import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
+import connectors.{ApimConnector, ApplicationsConnector, IntegrationCatalogueConnector}
 import models.AvailableEndpoint
 import models.accessrequest.{AccessRequest, AccessRequestRequest, AccessRequestStatus}
 import models.api.{ApiDeploymentStatus, ApiDeploymentStatuses, ApiDetail, ApiDetailSummary, EgressGateway, PlatformContact}
@@ -31,13 +31,15 @@ import models.team.{NewTeam, Team}
 import models.user.{UserContactDetails, UserModel}
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
+import viewmodels.admin.ApimRequest
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ApiHubService @Inject()(
   applicationsConnector: ApplicationsConnector,
-  integrationCatalogueConnector: IntegrationCatalogueConnector
+  integrationCatalogueConnector: IntegrationCatalogueConnector,
+  apimConnector: ApimConnector
 )(implicit ec: ExecutionContext) extends Logging {
 
   def registerApplication(newApplication: NewApplication)(implicit hc: HeaderCarrier): Future[Application] = {
@@ -261,9 +263,13 @@ class ApiHubService @Inject()(
   def forcePublish(publisherReference: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
     applicationsConnector.forcePublish(publisherReference)
   }
-  
+
   def listEnvironments()(implicit hc: HeaderCarrier): Future[ShareableHipConfig] = {
     applicationsConnector.listEnvironments()
+  }
+
+  def testApimEndpoint[T](environment: HipEnvironment, apimRequest: ApimRequest[T], params: String)(implicit hc: HeaderCarrier): Future[String] = {
+    apimRequest.makeRequest(apimConnector, environment, params.split(","))
   }
 
 }
