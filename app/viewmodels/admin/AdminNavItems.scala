@@ -32,6 +32,7 @@ object AdminSideNavPages {
   case object ConfigurationPage extends SideNavPage
   case object StatisticsPage extends SideNavPage
   case object ForcePublishPage extends SideNavPage
+  case object TestApimEndpointsPage extends SideNavPage
   case object ShutterPage extends SideNavPage
 
 }
@@ -91,6 +92,12 @@ object AdminNavItems {
           title = messages("statistics.menuTitle"),
           link = controllers.admin.routes.StatisticsController.onPageLoad(),
           isCurrentPage = currentPage == StatisticsPage
+        ),
+        SideNavItemLeaf(
+          page = TestApimEndpointsPage,
+          title = messages("testApimEndpoints.title"),
+          link = controllers.admin.routes.TestApimEndpointsController.onPageLoad(),
+          isCurrentPage = currentPage == TestApimEndpointsPage
         ),
         SideNavItemLeaf(
           page = ForcePublishPage,

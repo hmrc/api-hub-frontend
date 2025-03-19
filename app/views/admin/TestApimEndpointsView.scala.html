@@ -1,0 +1,86 @@
+@*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.user.UserModel
+@import viewmodels.admin.{AdminNavItems, AdminSideNavPages, TestApimEndpointsViewModel}
+@import views.html.helper.CSPNonce
+@import config.HipEnvironments
+@import views.html.components.IconsLink
+
+@this(
+    layout: templates.Layout,
+    govukButton: GovukButton,
+    govukSelect : GovukSelect,
+    iconsLink: IconsLink,
+    sideNav: views.html.templates.SideNav,
+    hipEnvironments: HipEnvironments
+)
+
+@(viewModel: TestApimEndpointsViewModel, user: UserModel)(implicit request: Request[?], messages: Messages)
+
+@scripts() = {
+    @iconsLink()
+    <script src='@routes.Assets.versioned("javascripts/testApimEndpoints.js")' type="module" @{CSPNonce.attr}></script>
+}
+
+@layout(pageTitle = titleNoForm(messages("testApimEndpoints.title")), fullWidth = true, user = Some(user), customScriptsBlock = Some(scripts())) {
+
+    @sideNav(messages("manageApplications.admin"), AdminNavItems(user, AdminSideNavPages.TestApimEndpointsPage)) {
+
+        <h1 class="govuk-heading-m govuk-!-margin-bottom-4">@messages("testApimEndpoints.heading")</h1>
+
+        <p class="govuk-body">@messages("testApimEndpoints.preamble")</p>
+
+        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-bottom-5">
+
+        <form>
+            <fieldset class="hip-hidden-fieldset" id="apimRequestInputs">
+                @govukSelect(
+                    Select(
+                        id = "selectEnvironment",
+                        name = "value",
+                        items = viewModel.environments,
+                        label = Label(
+                            content = messages("testApimEndpoints.selectEnvironment"),
+                            classes = "govuk-heading-s govuk-!-margin-bottom-1"
+                        ),
+                    )
+                )
+
+                @govukSelect(
+                    Select(
+                        id = "selectEndpoint",
+                        name = "value",
+                        items = viewModel.endpoints,
+                        label = Label(
+                            content = messages("testApimEndpoints.selectEndpoint"),
+                            classes = "govuk-heading-s govuk-!-margin-bottom-1"
+                        ),
+                    ).withCssClass("selectEndpointContainer")
+                )
+
+                <div id="parameterInputs"></div>
+            </fieldset>
+        </form>
+
+        @govukButton(
+            ButtonViewModel(messages("testApimEndpoints.submit")).preventingDoubleClick().withId("submit")
+        )
+
+        <div id="apimResponseContainer" class="hip-json-response"><pre id="apimResponse"></pre><button class="govuk-button" id="copyApimResponse">@messages("testApimEndpoints.copy") <i class="fa-regular fa-copy"></i></button></div>
+    }
+
+}

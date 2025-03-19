@@ -141,6 +141,39 @@ body, input {
     text-align: center;
 }
 
+.hip-json-response {
+    width: 100%;
+    border: 1px solid $hip-card-border;
+    background-color: $hip-card-background;
+    position: relative;
+    padding: govuk-spacing(1);
+    height: 20rem;
+    display: flex;
+    resize: both;
+    overflow: auto;
+
+    pre {
+        overflow: scroll;
+        width: 100%;
+    }
+
+    button {
+        position: absolute;
+        top: 0;
+        right: 0;
+        margin: govuk-spacing(1);
+    }
+}
+
+.hip-hidden-fieldset {
+    border: none;
+    padding: 0;
+
+    input, select {
+        width: 100%;
+    }
+}
+
 .hip-nav-header-links {
     .custom-second-nav {
         margin: 0;
