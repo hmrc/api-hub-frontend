@@ -41,6 +41,7 @@ import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.{EitherValues, OptionValues}
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.http.HeaderCarrier
+import viewmodels.admin.ApimRequest
 
 import java.time.LocalDateTime
 import scala.concurrent.Future
@@ -1026,9 +1027,28 @@ class ApiHubServiceSpec
     }
   }
 
+  "testApimEndpoint" - {
+    "must make the correct APIM request and return the result" in {
+      val fixture = buildFixture()
+      val env = FakeHipEnvironments.production
+      val apimRequest = mock[ApimRequest[?]]
+      val params = Seq("p1", "p2")
+      val apimResponse = "hello"
+
+      when(apimRequest.makeRequest(eqTo(fixture.apimConnector), eqTo(env), eqTo(params))(any(), any()))
+        .thenReturn(Future.successful(Right(apimResponse)))
+
+      fixture.service.testApimEndpoint(env, apimRequest, params)(HeaderCarrier()).map {
+        result =>
+          result mustBe Right(apimResponse)
+      }
+    }
+  }
+
   private case class Fixture(
     applicationsConnector: ApplicationsConnector,
     integrationCatalogueConnector: IntegrationCatalogueConnector,
+    apimConnector: ApimConnector,
     service: ApiHubService
   )
 
@@ -1038,7 +1058,7 @@ class ApiHubServiceSpec
     val apimConnector = mock[ApimConnector]
     val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector, apimConnector)
 
-    Fixture(applicationsConnector, integrationCatalogueConnector, service)
+    Fixture(applicationsConnector, integrationCatalogueConnector, apimConnector, service)
   }
 
 }

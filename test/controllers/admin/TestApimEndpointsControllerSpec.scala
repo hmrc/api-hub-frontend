@@ -18,11 +18,9 @@ package controllers.admin
 
 import base.SpecBase
 import fakes.FakeHipEnvironments
-import models.api.ApiDetailLensesSpec.sampleApiDetailSummary
-import models.stats.ApisInProductionStatistic
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.inject.bind
@@ -32,9 +30,9 @@ import play.api.test.Helpers.*
 import play.api.{Application, Application as PlayApplication}
 import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
-import viewmodels.admin.TestApimEndpointsViewModel
-import views.html.admin.{StatisticsView, TestApimEndpointsView}
-
+import viewmodels.admin.{ApimRequests, TestApimEndpointsViewModel}
+import views.html.admin.TestApimEndpointsView
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import scala.concurrent.Future
 
 class TestApimEndpointsControllerSpec
@@ -68,7 +66,7 @@ class TestApimEndpointsControllerSpec
           val fixture = buildFixture(user)
 
           running(fixture.application) {
-            val request = FakeRequest(controllers.admin.routes.StatisticsController.onPageLoad())
+            val request = FakeRequest(controllers.admin.routes.TestApimEndpointsController.onPageLoad())
             val result = route(fixture.application, request).value
 
             status(result) mustBe SEE_OTHER
@@ -77,20 +75,63 @@ class TestApimEndpointsControllerSpec
         }
       }
     }
-    
-    "apisInProduction" - {
-      "must return Ok and the JSON for a support user" in {
+
+    "callApim" - {
+      "must return Ok with an APIM response for a support user" in {
         forAll(usersWhoCanSupport) { (user: UserModel) =>
           val fixture = buildFixture(user)
-          val stats = ApisInProductionStatistic(10, 5)
-          when(fixture.apiHubService.apisInProduction()(any)).thenReturn(Future.successful(stats))
+          val apimResponse = "APIM says Hi"
+          when(fixture.apiHubService.testApimEndpoint(any(), any(), any())(any())).thenReturn(Future.successful(Right(apimResponse)))
 
           running(fixture.application) {
-            val request = FakeRequest(controllers.admin.routes.StatisticsController.apisInProduction())
+            val request = FakeRequest(controllers.admin.routes.TestApimEndpointsController.callApim(FakeHipEnvironments.test.id, ApimRequests.listEgressGateways.id, "p1,p2,,p4"))
             val result = route(fixture.application, request).value
 
             status(result) mustBe OK
-            contentAsJson(result) mustBe Json.toJson(stats)
+            contentAsString(result) mustBe apimResponse
+            verify(fixture.apiHubService).testApimEndpoint(eqTo(FakeHipEnvironments.test), eqTo(ApimRequests.listEgressGateways), eqTo(Array("p1", "p2", "p4")))(any())
+          }
+        }
+      }
+
+      "must return Bad Request for unrecognised hip environment" in {
+        forAll(usersWhoCanSupport) { (user: UserModel) =>
+          val fixture = buildFixture(user)
+
+          running(fixture.application) {
+            val request = FakeRequest(controllers.admin.routes.TestApimEndpointsController.callApim("not an env", ApimRequests.listEgressGateways.id, "param123"))
+            val result = route(fixture.application, request).value
+
+            status(result) mustBe BAD_REQUEST
+          }
+        }
+      }
+
+      "must return Bad Request for unrecognised endpoint id" in {
+        forAll(usersWhoCanSupport) { (user: UserModel) =>
+          val fixture = buildFixture(user)
+
+          running(fixture.application) {
+            val request = FakeRequest(controllers.admin.routes.TestApimEndpointsController.callApim(FakeHipEnvironments.test.id, "not an endpoint", "param123"))
+            val result = route(fixture.application, request).value
+
+            status(result) mustBe BAD_REQUEST
+          }
+        }
+      }
+
+      "must return Bad Request with error details if APIM returns an error" in {
+        forAll(usersWhoCanSupport) { (user: UserModel) =>
+          val fixture = buildFixture(user)
+          val apimError = "Noooo!"
+          when(fixture.apiHubService.testApimEndpoint(any(), any(), any())(any())).thenReturn(Future.successful(Left(new IllegalArgumentException(apimError))))
+
+          running(fixture.application) {
+            val request = FakeRequest(controllers.admin.routes.TestApimEndpointsController.callApim(FakeHipEnvironments.test.id, ApimRequests.listEgressGateways.id, "param123"))
+            val result = route(fixture.application, request).value
+
+            status(result) mustBe BAD_REQUEST
+            contentAsString(result) mustBe apimError
           }
         }
       }
@@ -100,43 +141,7 @@ class TestApimEndpointsControllerSpec
           val fixture = buildFixture(user)
 
           running(fixture.application) {
-            val request = FakeRequest(controllers.admin.routes.StatisticsController.apisInProduction())
-            val result = route(fixture.application, request).value
-
-            status(result) mustBe SEE_OTHER
-            redirectLocation(result) mustBe Some(controllers.routes.UnauthorisedController.onPageLoad.url)
-          }
-        }
-      }      
-    }
-
-    "listApisInProduction" - {
-      "must return Ok and the sorted list of API names for a support user" in {
-        forAll(usersWhoCanSupport) { (user: UserModel) =>
-          val fixture = buildFixture(user)
-          val apis = Seq(
-            sampleApiDetailSummary().copy(title = "Api 2"),
-            sampleApiDetailSummary().copy(title = "api 1"),
-            sampleApiDetailSummary().copy(title = "api 3")
-          )
-          when(fixture.apiHubService.listApisInProduction()(any)).thenReturn(Future.successful(apis))
-
-          running(fixture.application) {
-            val request = FakeRequest(controllers.admin.routes.StatisticsController.listApisInProduction())
-            val result = route(fixture.application, request).value
-
-            status(result) mustBe OK
-            contentAsJson(result) mustBe Json.toJson(Seq("api 1", "Api 2", "api 3"))
-          }
-        }
-      }
-
-      "must return Unauthorized for a non-support user" in {
-        forAll(usersWhoCannotSupport) { (user: UserModel) =>
-          val fixture = buildFixture(user)
-
-          running(fixture.application) {
-            val request = FakeRequest(controllers.admin.routes.StatisticsController.listApisInProduction())
+            val request = FakeRequest(controllers.admin.routes.TestApimEndpointsController.callApim("env", "enmdpointId", "param123"))
             val result = route(fixture.application, request).value
 
             status(result) mustBe SEE_OTHER
