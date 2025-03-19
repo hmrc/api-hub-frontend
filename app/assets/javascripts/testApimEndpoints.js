@@ -79,6 +79,21 @@ export function onDomLoaded() {
 
                     setEnabled(elInputsContainer, viewState !== VIEW_STATE_WAITING_FOR_RESPONSE);
                     setEnabled(elSubmitButton, [VIEW_STATE_READY_TO_SEND, VIEW_STATE_SHOWING_RESPONSE].includes(viewState));
+
+                    if (viewState === VIEW_STATE_INITIAL) {
+                        elSelectEnvironment.value = '';
+                        elSelectEndpoint.value = '';
+                        this.setParameterInputs();
+                        this.response = '';
+
+                    } else if (viewState === VIEW_STATE_SELECT_ENDPOINT) {
+                        elSelectEndpoint.value = '';
+                        this.setParameterInputs();
+                        this.response = '';
+
+                    } else if (viewState === VIEW_STATE_WAITING_FOR_RESPONSE) {
+                        this.response = '';
+                    }
                 },
                 get environment() {
                     return elSelectEnvironment.value;
@@ -102,38 +117,90 @@ export function onDomLoaded() {
                     }
                 }
             };
-        })();
+        })(),
+        stateMachine = (onStateChanged => {
+            let currentState;
 
-    view.state = VIEW_STATE_INITIAL;
+            function setState(newState) {
+                if (newState !== currentState) {
+                    console.debug("State changed: ", currentState, " -> ", newState);
+                    currentState = newState;
+                    onStateChanged(currentState);
+                }
+            }
+
+            setState(VIEW_STATE_INITIAL);
+
+            return {
+                get state() {
+                    return currentState;
+                },
+                environmentSelected() {
+                    if (currentState === VIEW_STATE_INITIAL) {
+                        setState(VIEW_STATE_SELECT_ENDPOINT);
+                    } else if (currentState === VIEW_STATE_SHOWING_RESPONSE) {
+                        setState(VIEW_STATE_READY_TO_SEND);
+                    }
+                },
+                environmentCleared() {
+                    setState(VIEW_STATE_INITIAL);
+                },
+                endpointSelected() {
+                    setState(VIEW_STATE_READY_TO_SEND);
+                },
+                endpointCleared() {
+                    setState(VIEW_STATE_SELECT_ENDPOINT);
+                },
+                requestSubmitted() {
+                    setState(VIEW_STATE_WAITING_FOR_RESPONSE);
+                },
+                successResponseReceived() {
+                    setState(VIEW_STATE_SHOWING_RESPONSE);
+                },
+                errorResponseReceived() {
+                    setState(VIEW_STATE_SHOWING_RESPONSE);
+                }
+            }
+        })(newState => view.state = newState);
 
     view.onEnvironmentChanged(env => {
         if (env) {
-            view.state = VIEW_STATE_SELECT_ENDPOINT;
+            stateMachine.environmentSelected();
         } else {
-            view.state = VIEW_STATE_INITIAL;
+            stateMachine.environmentCleared();
         }
     });
 
     view.onEndpointChanged((endpoint, paramNames) => {
         if (endpoint) {
-            view.state = VIEW_STATE_READY_TO_SEND;
+            stateMachine.endpointSelected();
             view.setParameterInputs(...paramNames);
         } else {
-            view.state = VIEW_STATE_SELECT_ENDPOINT;
+            stateMachine.endpointCleared();
         }
     });
 
     view.onSubmit(() => {
-        view.response = '';
-        view.state = VIEW_STATE_WAITING_FOR_RESPONSE;
+        stateMachine.requestSubmitted();
         const environment = encodeURIComponent(view.environment),
             endpoint = encodeURIComponent(view.endpoint),
             params = view.parameterValues.map(encodeURIComponent).join(',');
         fetch(`test-apim-endpoints/${environment}/${endpoint}/${params}`)
-            .then(response => response.text())
+            .then(response => {
+                if (!response.ok) {
+                    return Promise.reject(response);
+                }
+                return response.text();
+            })
             .then(text => {
-                view.state = VIEW_STATE_SHOWING_RESPONSE;
+                stateMachine.successResponseReceived();
                 view.response = text;
+            })
+            .catch(errorResponse => {
+               stateMachine.errorResponseReceived();
+               errorResponse.text().then(responseBody => {
+                   view.response = `Request not submitted to APIM\nHub endpoint returned HTTP error: ${errorResponse.status} - ${errorResponse.statusText}\n\n${responseBody}`;
+               });
             });
     });
 }

@@ -263,13 +263,13 @@ class ApiHubService @Inject()(
   def forcePublish(publisherReference: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
     applicationsConnector.forcePublish(publisherReference)
   }
-
+  
   def listEnvironments()(implicit hc: HeaderCarrier): Future[ShareableHipConfig] = {
     applicationsConnector.listEnvironments()
   }
 
-  def testApimEndpoint[T](environment: HipEnvironment, apimRequest: ApimRequest[T], params: String)(implicit hc: HeaderCarrier): Future[String] = {
-    apimRequest.makeRequest(apimConnector, environment, params.split(","))
+  def testApimEndpoint[T](environment: HipEnvironment, apimRequest: ApimRequest[T], params: Seq[String])(implicit hc: HeaderCarrier): Future[Either[IllegalArgumentException,String]] = {
+    apimRequest.makeRequest(apimConnector, environment, params)
   }
 
 }

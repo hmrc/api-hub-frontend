@@ -60,8 +60,9 @@ class ApimRequestSpec extends AsyncFreeSpec with Matchers with MockitoSugar with
     "must reject a request with an invalid number of parameters" in {
       val apimConnector = mock[ApimConnector]
 
-      an [IllegalArgumentException] must be thrownBy {
-        ApimRequests.getDeployments.makeRequest(apimConnector, environment, Seq("invalid argument"))
+      ApimRequests.getDeployments.makeRequest(apimConnector, environment, Seq("invalid argument")).map {
+        case Left(error) => error.getMessage() must include("Expected 0 parameters but found 1")
+        case _ => fail()
       }
     }
 
@@ -72,7 +73,7 @@ class ApimRequestSpec extends AsyncFreeSpec with Matchers with MockitoSugar with
 
       ApimRequests.getDeployments.makeRequest(apimConnector, environment, Seq.empty).map {
         result =>
-          result mustBe Json.prettyPrint(Json.toJson(deployments))
+          result mustBe Right(Json.prettyPrint(Json.toJson(deployments)))
       }
     }
 
@@ -92,8 +93,11 @@ class ApimRequestSpec extends AsyncFreeSpec with Matchers with MockitoSugar with
         when(apimConnector.getDeployments(any)(any)).thenReturn(Future.successful(Left(failure)))
 
         ApimRequests.getDeployments.makeRequest(apimConnector, environment, Seq.empty).map {
-          result =>
-            result mustBe failure.getStackTrace.mkString(System.lineSeparator())
+          case Right(message) => {
+            message must include(failure.getMessage())
+            message must include(failure.getStackTrace().map("    " + _.toString).mkString(System.lineSeparator()))
+          }
+          case _ => fail()
         }
       }
     }
@@ -108,7 +112,7 @@ class ApimRequestSpec extends AsyncFreeSpec with Matchers with MockitoSugar with
 
       ApimRequests.getDeployments.makeRequest(apimConnector, environment, Seq.empty).map {
         result =>
-          result mustBe prettyPrint(deployments)
+          result mustBe Right(prettyPrint(deployments))
       }
     }
   }
@@ -122,7 +126,7 @@ class ApimRequestSpec extends AsyncFreeSpec with Matchers with MockitoSugar with
 
       ApimRequests.getDeployment.makeRequest(apimConnector, environment, Seq(publisherRef)).map {
         result =>
-          result mustBe prettyPrint(deployment)
+          result mustBe Right(prettyPrint(deployment))
       }
     }
   }
@@ -136,7 +140,7 @@ class ApimRequestSpec extends AsyncFreeSpec with Matchers with MockitoSugar with
 
       ApimRequests.getOpenApiSpecification.makeRequest(apimConnector, environment, Seq(publisherRef)).map {
         result =>
-          result mustBe prettyPrint(oas)
+          result mustBe Right(prettyPrint(oas))
       }
     }
   }
@@ -150,7 +154,7 @@ class ApimRequestSpec extends AsyncFreeSpec with Matchers with MockitoSugar with
 
       ApimRequests.getDeploymentDetails.makeRequest(apimConnector, environment, Seq(publisherRef)).map {
         result =>
-          result mustBe prettyPrint(deploymentDetails)
+          result mustBe Right(prettyPrint(deploymentDetails))
       }
     }
   }
@@ -164,7 +168,7 @@ class ApimRequestSpec extends AsyncFreeSpec with Matchers with MockitoSugar with
 
       ApimRequests.getDeploymentStatus.makeRequest(apimConnector, environment, Seq(publisherRef, mergeRequestIid, version)).map {
         result =>
-          result mustBe prettyPrint(statusResponse)
+          result mustBe Right(prettyPrint(statusResponse))
       }
     }
   }
@@ -178,7 +182,7 @@ class ApimRequestSpec extends AsyncFreeSpec with Matchers with MockitoSugar with
 
       ApimRequests.listEgressGateways.makeRequest(apimConnector, environment, Seq.empty).map {
         result =>
-          result mustBe prettyPrint(egressGateways)
+          result mustBe Right(prettyPrint(egressGateways))
       }
     }
   }
@@ -192,7 +196,7 @@ class ApimRequestSpec extends AsyncFreeSpec with Matchers with MockitoSugar with
 
       ApimRequests.fetchClientScopes.makeRequest(apimConnector, environment, Seq(clientId)).map {
         result =>
-          result mustBe prettyPrint(clientScopes)
+          result mustBe Right(prettyPrint(clientScopes))
       }
     }
   }

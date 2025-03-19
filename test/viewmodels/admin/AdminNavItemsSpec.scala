@@ -24,7 +24,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers.running
 import viewmodels.SideNavItem
 import SideNavItem.SideNavItemLeaf
-import viewmodels.admin.AdminSideNavPages.{AccessRequestsPage, ConfigurationPage, ForcePublishPage, GetUsersPage, ManageApisPage, ManageApplicationsPage, ManageTeamsPage, ShutterPage, StatisticsPage, TeamMigrationPage}
+import viewmodels.admin.AdminSideNavPages.{AccessRequestsPage, ConfigurationPage, ForcePublishPage, GetUsersPage, ManageApisPage, ManageApplicationsPage, ManageTeamsPage, ShutterPage, StatisticsPage, TeamMigrationPage, TestApimEndpointsPage}
 
 class AdminNavItemsSpec extends SpecBase with Matchers with TableDrivenPropertyChecks {
 
@@ -45,6 +45,7 @@ class AdminNavItemsSpec extends SpecBase with Matchers with TableDrivenPropertyC
           getUsersNavItem(),
           configurationNavItem(),
           statisticsNavItem(),
+          testApimNavItem(),
           forcePublishNavItem(),
           shutterNavItem(),
           accessRequestsNavItem()
@@ -164,6 +165,15 @@ object AdminNavItemsSpec {
       page = StatisticsPage,
       title = "Hub stats",
       link = controllers.admin.routes.StatisticsController.onPageLoad(),
+      isCurrentPage = false
+    )
+  }
+
+  private def testApimNavItem(): SideNavItem = {
+    SideNavItemLeaf(
+      page = TestApimEndpointsPage,
+      title = "Test APIM APIs",
+      link = controllers.admin.routes.TestApimEndpointsController.onPageLoad(),
       isCurrentPage = false
     )
   }

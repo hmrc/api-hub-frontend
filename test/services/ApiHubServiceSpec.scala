@@ -17,7 +17,7 @@
 package services
 
 import config.{BaseHipEnvironment, ShareableHipConfig}
-import connectors.{ApplicationsConnector, IntegrationCatalogueConnector}
+import connectors.{ApimConnector, ApplicationsConnector, IntegrationCatalogueConnector}
 import controllers.actions.FakeApplication
 import fakes.FakeHipEnvironments
 import generators.{AccessRequestGenerator, ApiDetailGenerators, EgressGenerator}
@@ -1035,7 +1035,8 @@ class ApiHubServiceSpec
   private def buildFixture(): Fixture = {
     val applicationsConnector = mock[ApplicationsConnector]
     val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-    val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+    val apimConnector = mock[ApimConnector]
+    val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector, apimConnector)
 
     Fixture(applicationsConnector, integrationCatalogueConnector, service)
   }
@@ -1050,10 +1051,11 @@ trait ApplicationGetterBehaviours extends AsyncFreeSpec with Matchers with Mocki
       val expected = Some(application)
 
       val applicationsConnector = mock[ApplicationsConnector]
+      val apimConnector = mock[ApimConnector]
       when(applicationsConnector.getApplication(eqTo("id-1"), eqTo(includeDeleted))(any())).thenReturn(Future.successful(expected))
 
       val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector)
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector, apimConnector)
 
       service.getApplication("id-1")(HeaderCarrier()) map {
         actual =>

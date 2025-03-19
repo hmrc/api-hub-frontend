@@ -22,7 +22,7 @@ import models.api.{ApiDeployment, EgressGateway}
 import models.application.ClientScope
 import models.deployment.{DeploymentDetails, StatusResponse, SuccessfulDeploymentResponse}
 import models.exception.ApimException
-import play.api.libs.json.{Json, OFormat, Writes}
+import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -46,13 +46,13 @@ sealed trait ApimRequest[T] {
     apimConnector: ApimConnector,
     hipEnvironment: HipEnvironment,
     paramValues: Seq[String]
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[String] = {
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[IllegalArgumentException, String]] = {
     if (paramValues.size != paramNames.size) {
-      throw new IllegalArgumentException(s"Expected ${paramNames.size} parameters but found ${paramValues.size}")
+      Future.successful(Left(new IllegalArgumentException(s"Expected ${paramNames.size} parameters but found ${paramValues.size}")))
     }
     else {
       buildRequest(apimConnector, hipEnvironment, paramValues)
-        .map(resultToString)
+        .map(result => Right(resultToString(result)))
     }
   }
 

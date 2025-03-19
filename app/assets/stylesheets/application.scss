@@ -152,8 +152,9 @@ body, input {
     resize: both;
     overflow: auto;
 
-    div {
+    pre {
         overflow: scroll;
+        width: 100%;
     }
 
     button {

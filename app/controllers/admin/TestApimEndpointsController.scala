@@ -20,10 +20,8 @@ import com.google.inject.{Inject, Singleton}
 import config.HipEnvironments
 import controllers.actions.{AuthorisedSupportAction, IdentifierAction}
 import play.api.i18n.I18nSupport
-import play.api.libs.json.{Json, Writes}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.admin.{ApimRequests, TestApimEndpointsViewModel}
 import views.html.admin.TestApimEndpointsView
@@ -50,8 +48,11 @@ class TestApimEndpointsController @Inject()(
       (for {
         hipEnvironment <- hipEnvironments.forEnvironmentIdOptional(environment)
         apimRequest <- ApimRequests.requests.find(_.id == endpointId)
-      } yield apiHubService.testApimEndpoint(hipEnvironment, apimRequest, params)) match {
-        case Some(f) => f.map(response => Ok(response))
+      } yield apiHubService.testApimEndpoint(hipEnvironment, apimRequest, params.split(",").filter(p => !p.isBlank))) match {
+        case Some(f) => f.map(response => response match {
+          case Right(result) => Ok(result)
+          case Left(error) => BadRequest(error.getMessage())
+        })
         case None => Future.successful(BadRequest)
       }
   }

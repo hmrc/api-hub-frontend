@@ -17,43 +17,47 @@
 package controllers.admin
 
 import base.SpecBase
+import fakes.FakeHipEnvironments
+import models.api.ApiDetailLensesSpec.sampleApiDetailSummary
+import models.stats.ApisInProductionStatistic
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.i18n.Messages
 import play.api.inject.bind
-import play.api.{Application, Application as PlayApplication}
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import play.api.{Application, Application as PlayApplication}
 import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
-import views.html.admin.StatisticsView
-import org.mockito.Mockito.when
+import viewmodels.admin.TestApimEndpointsViewModel
+import views.html.admin.{StatisticsView, TestApimEndpointsView}
 
 import scala.concurrent.Future
-import models.stats.ApisInProductionStatistic
-import models.api.ApiDetailLensesSpec.sampleApiDetailSummary
-import play.api.i18n.Messages
 
-class StatisticsControllerSpec
+class TestApimEndpointsControllerSpec
   extends SpecBase
     with MockitoSugar
     with TestHelpers
     with HtmlValidation {
 
-  "StatisticsController" - {
+  "TestApimEndpointsController" - {
     "onPageLoad" - {
       "must return Ok and the correct view for a support user" in {
         forAll(usersWhoCanSupport) { (user: UserModel) =>
           val fixture = buildFixture(user)
   
           running(fixture.application) {
-            val request = FakeRequest(controllers.admin.routes.StatisticsController.onPageLoad())
+            val request = FakeRequest(controllers.admin.routes.TestApimEndpointsController.onPageLoad())
             val result = route(fixture.application, request).value
-            val view = fixture.application.injector.instanceOf[StatisticsView]
-  
+            val view = fixture.application.injector.instanceOf[TestApimEndpointsView]
+            implicit val msgs: Messages = messages(fixture.application)
+            val viewModel = TestApimEndpointsViewModel(FakeHipEnvironments)
+
             status(result) mustBe OK
-            contentAsString(result) mustBe view(user)(request, messages(fixture.application)).toString
+            contentAsString(result) mustBe view(viewModel, user)(request, messages(fixture.application)).toString
             contentAsString(result) must validateAsHtml
           }
         }
