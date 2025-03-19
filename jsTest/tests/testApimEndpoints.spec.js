@@ -2,7 +2,7 @@ import {JSDOM} from 'jsdom';
 import {onDomLoaded} from '../../app/assets/javascripts/testApimEndpoints.js';
 import {buildFakeClipboard, isVisible, waitFor} from "./testUtils.js";
 
-fdescribe('testApimEndpoints', () => {
+describe('testApimEndpoints', () => {
     let document, clipboard, elSelectEnvironment, elSelectEndpoint, elResponseContainer;
 
     beforeEach(() => {
