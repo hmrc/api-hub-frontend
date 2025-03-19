@@ -1,6 +1,7 @@
 import {noop, setVisible} from "./utils.js";
 
 export function onDomLoaded() {
+    /*jshint -W078 */
     const
         VIEW_STATE_INITIAL = 'initial',
         VIEW_STATE_SELECT_ENDPOINT = 'selectEndpoint',
@@ -30,7 +31,7 @@ export function onDomLoaded() {
             elSelectEndpoint.addEventListener('input', event => {
                 let paramNames = [];
                 if (event.target.selectedOptions.length) {
-                    const paramNamesString = event.target.selectedOptions[0].dataset['paramNames'];
+                    const paramNamesString = event.target.selectedOptions[0].dataset.paramNames;
                     if (paramNamesString) {
                         paramNames = paramNamesString.split(',');
                     }
@@ -38,7 +39,7 @@ export function onDomLoaded() {
                 endpointChangedHandler(event.target.value, paramNames);
             });
 
-            elSubmitButton.addEventListener('click', event => {
+            elSubmitButton.addEventListener('click', () => {
                 submitHandler();
             });
 
@@ -160,7 +161,7 @@ export function onDomLoaded() {
                 errorResponseReceived() {
                     setState(VIEW_STATE_SHOWING_RESPONSE);
                 }
-            }
+            };
         })(newState => view.state = newState);
 
     view.onEnvironmentChanged(env => {
