@@ -30,6 +30,8 @@ import scala.concurrent.{ExecutionContext, Future}
 sealed trait ApimRequest[T] {
 
   def url: String
+  
+  def id: String
 
   def paramNames: Seq[String] = {
     val regex = """(\{\w+})""".r
@@ -75,6 +77,8 @@ object ApimRequests {
   val getDeployments: ApimRequest[Seq[ApiDeployment]] = new ApimRequest[Seq[ApiDeployment]]() {
 
     override val url: String = "/v1/oas-deployments"
+    
+    override val id: String = "getDeployments"
 
     override protected def buildRequest(
       apimConnector: ApimConnector,
@@ -91,6 +95,8 @@ object ApimRequests {
   val getDeployment: ApimRequest[SuccessfulDeploymentResponse] = new ApimRequest[SuccessfulDeploymentResponse] {
 
     override val url: String = "/v1/oas-deployments/{id}"
+    
+    override val id: String = "getDeployment"
 
     override protected def buildRequest(
       apimConnector: ApimConnector,
@@ -108,6 +114,8 @@ object ApimRequests {
 
     override val url: String = "/v1/oas-deployments/{id}/oas"
 
+    override val id: String = "getOpenApiSpecification"
+    
     override protected def buildRequest(
       apimConnector: ApimConnector,
       hipEnvironment: HipEnvironment,
@@ -123,6 +131,8 @@ object ApimRequests {
 
     override val url: String = "/v1/simple-api-deployment/deployments/{serviceId}"
 
+    override val id: String = "getDeploymentDetails"
+    
     override protected def buildRequest(
       apimConnector: ApimConnector,
       hipEnvironment: HipEnvironment,
@@ -138,6 +148,8 @@ object ApimRequests {
 
     override val url: String = "/v1/simple-api-deployment/deployments/{serviceId}/status?mr-iid={mergeRequestIid}&version={version}"
 
+    override val id: String = "getDeploymentStatus"
+    
     override protected def buildRequest(
       apimConnector: ApimConnector,
       hipEnvironment: HipEnvironment,
@@ -158,6 +170,8 @@ object ApimRequests {
 
     override val url: String = "/v1/simple-api-deployment/egress-gateways"
 
+    override val id: String = "listEgressGateways"
+    
     override protected def buildRequest(
       apimConnector: ApimConnector,
       hipEnvironment: HipEnvironment,
@@ -172,6 +186,8 @@ object ApimRequests {
   val fetchClientScopes: ApimRequest[Seq[ClientScope]] = new ApimRequest[Seq[ClientScope]] {
 
     override val url: String = "/identity/clients/{id}/client-scopes"
+    
+    override val id: String = "fetchClientScopes"
 
     override protected def buildRequest(
       apimConnector: ApimConnector,

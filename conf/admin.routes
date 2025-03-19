@@ -13,7 +13,7 @@ GET         /statistics                                                         
 GET         /statistics/apis-in-production                                          controllers.admin.StatisticsController.apisInProduction()
 GET         /statistics/list-apis-in-production                                     controllers.admin.StatisticsController.listApisInProduction()
 GET         /test-apim-endpoints                                                    controllers.admin.TestApimEndpointsController.onPageLoad()
-GET         /test-apim-endpoints/:environment/:endpoint/:params                     controllers.admin.TestApimEndpointsController.callApim(environment: String, endpoint: String, params: String)
+GET         /test-apim-endpoints/:environment/:endpointId/:params                   controllers.admin.TestApimEndpointsController.callApim(environment: String, endpointId: String, params: String)
 GET         /force-publish                                                          controllers.admin.ForcePublishController.onPageLoad()
 POST        /force-publish                                                          controllers.admin.ForcePublishController.onSubmit()
 GET         /force-publish/:publisherReference                                      controllers.admin.ForcePublishController.showVersionComparison(publisherReference: String)

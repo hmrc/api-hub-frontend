@@ -45,11 +45,11 @@ class TestApimEndpointsController @Inject()(
       Ok(view(TestApimEndpointsViewModel(hipEnvironments), request.user))
   }
 
-  def callApim[T](environment: String, endpoint: String, params: String): Action[AnyContent] = (identify andThen isSupport).async {
+  def callApim[T](environment: String, endpointId: String, params: String): Action[AnyContent] = (identify andThen isSupport).async {
     implicit request =>
       (for {
         hipEnvironment <- hipEnvironments.forEnvironmentIdOptional(environment)
-        apimRequest <- ApimRequests.requests.find(_.url == endpoint)
+        apimRequest <- ApimRequests.requests.find(_.id == endpointId)
       } yield apiHubService.testApimEndpoint(hipEnvironment, apimRequest, params)) match {
         case Some(f) => f.map(response => Ok(response))
         case None => Future.successful(BadRequest)
