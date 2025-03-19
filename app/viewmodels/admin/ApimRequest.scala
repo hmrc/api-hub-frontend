@@ -63,7 +63,7 @@ sealed trait ApimRequest[T] {
   private def resultToString(result: Either[ApimException, T]): String = {
     result match {
       case Right(s) => Json.prettyPrint(Json.toJson(s)(writes))
-      case Left(e) => e.getStackTrace.mkString(System.lineSeparator())
+      case Left(e) => (s"ApimException: ${e.message}" +: "" +: "Stack trace:" +: e.getStackTrace.map("    " + _.toString)).mkString(System.lineSeparator())
     }
   }
 

@@ -26,6 +26,7 @@ export function onDomLoaded() {
             elSelectEnvironment.addEventListener('input', event => {
                 environmentChangedHandler(event.target.value);
             });
+
             elSelectEndpoint.addEventListener('input', event => {
                 let paramNames = [];
                 if (event.target.selectedOptions.length) {
@@ -36,8 +37,15 @@ export function onDomLoaded() {
                 }
                 endpointChangedHandler(event.target.value, paramNames);
             });
+
             elSubmitButton.addEventListener('click', event => {
                 submitHandler();
+            });
+
+            elCopyButton.addEventListener('click', () => {
+                navigator.clipboard.writeText(elResponse.innerText).catch(err => {
+                    console.error('Failed to copy value to clipboard: ', err);
+                });
             });
 
             function setEnabled(el, isEnabled) {
@@ -71,6 +79,27 @@ export function onDomLoaded() {
 
                     setEnabled(elInputsContainer, viewState !== VIEW_STATE_WAITING_FOR_RESPONSE);
                     setEnabled(elSubmitButton, [VIEW_STATE_READY_TO_SEND, VIEW_STATE_SHOWING_RESPONSE].includes(viewState));
+                },
+                get environment() {
+                    return elSelectEnvironment.value;
+                },
+                get endpoint() {
+                    return elSelectEndpoint.value;
+                },
+                get parameterValues() {
+                    return [...elParameterInputsContainer.querySelectorAll('input')].map(input => input.value);
+                },
+                set response(text) {
+                    try {
+                        const parseResult = JSON.parse(text);
+                        if (typeof parseResult === 'string') {
+                            elResponse.innerText = parseResult;
+                        } else {
+                            elResponse.innerText = JSON.stringify(parseResult, null, 4);
+                        }
+                    } catch (e) {
+                        elResponse.innerText = text;
+                    }
                 }
             };
         })();
@@ -95,7 +124,17 @@ export function onDomLoaded() {
     });
 
     view.onSubmit(() => {
+        view.response = '';
         view.state = VIEW_STATE_WAITING_FOR_RESPONSE;
+        const environment = encodeURIComponent(view.environment),
+            endpoint = encodeURIComponent(view.endpoint),
+            params = view.parameterValues.map(encodeURIComponent).join(',');
+        fetch(`test-apim-endpoints/${environment}/${endpoint}/${params}`)
+            .then(response => response.text())
+            .then(text => {
+                view.state = VIEW_STATE_SHOWING_RESPONSE;
+                view.response = text;
+            });
     });
 }
 

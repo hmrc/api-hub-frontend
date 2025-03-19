@@ -147,9 +147,14 @@ body, input {
     background-color: $hip-card-background;
     position: relative;
     padding: govuk-spacing(1);
-    min-height: 15rem;
-    resize: vertical;
-    overflow:auto;
+    height: 20rem;
+    display: flex;
+    resize: both;
+    overflow: auto;
+
+    div {
+        overflow: scroll;
+    }
 
     button {
         position: absolute;
@@ -162,6 +167,10 @@ body, input {
 .hip-hidden-fieldset {
     border: none;
     padding: 0;
+
+    input, select {
+        width: 100%;
+    }
 }
 
 .hip-nav-header-links {
