@@ -29,11 +29,9 @@ import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
 import views.html.admin.StatisticsView
 import org.mockito.Mockito.when
-
 import scala.concurrent.Future
 import models.stats.ApisInProductionStatistic
 import models.api.ApiDetailLensesSpec.sampleApiDetailSummary
-import play.api.i18n.Messages
 
 class StatisticsControllerSpec
   extends SpecBase

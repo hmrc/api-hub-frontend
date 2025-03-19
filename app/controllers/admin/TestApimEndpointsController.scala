@@ -43,7 +43,7 @@ class TestApimEndpointsController @Inject()(
       Ok(view(TestApimEndpointsViewModel(hipEnvironments), request.user))
   }
 
-  def callApim[T](environment: String, endpointId: String, params: String): Action[AnyContent] = (identify andThen isSupport).async {
+  def callApim(environment: String, endpointId: String, params: String): Action[AnyContent] = (identify andThen isSupport).async {
     implicit request =>
       (for {
         hipEnvironment <- hipEnvironments.forEnvironmentIdOptional(environment)
