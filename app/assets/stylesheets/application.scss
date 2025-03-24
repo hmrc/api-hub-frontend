@@ -1058,3 +1058,31 @@ header {
         display: block;
     }
 }
+
+.hero {
+    overflow: hidden;
+    background: #1d70b8;
+    color: #ffffff;
+    margin: 0;
+}
+
+.hero-title {
+    color: #ffffff !important;
+    margin: 25px 0 !important;
+    margin: 25px 0 !important;
+}
+
+.hero .app-inverse {
+    color: #fff !important;
+}
+
+.hero .app-stats {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 5px;
+    padding: 10px 15px 10px 15px;
+    margin-bottom: 10px;
+}
+
+.hero .app-stats strong {
+    font-size: 1.5rem;
+}

@@ -16,7 +16,11 @@
 
 package viewmodels
 
+import com.typesafe.config.Config
 import config.FrontendAppConfig
+import play.api.{ConfigLoader, Configuration}
+
+import scala.jdk.CollectionConverters._
 
 case class RelatedContentLink(description: String, url: String)
 
@@ -24,6 +28,18 @@ object RelatedContentLink {
 
   def apiHubGuideLink(config: FrontendAppConfig, description: String, relativeUrl: String): RelatedContentLink = {
     RelatedContentLink(description, s"${config.helpDocsPath}/$relativeUrl")
+  }
+
+  implicit val relatedContentLinkConfigLoader: ConfigLoader[Seq[RelatedContentLink]] = ConfigLoader {
+    config =>
+      path =>
+        config.getConfigList(path).asScala.toSeq.map(
+          config =>
+            RelatedContentLink(
+              description = config.getString("description"),
+              url = config.getString("url")
+            )
+        )
   }
 
 }

@@ -14,68 +14,134 @@
  * limitations under the License.
  *@
 
-@import models.user.UserModel
+@import components.NonFixedWidthPageLayout
+@import config.FrontendAppConfig
+@import viewmodels.ServiceStartViewModel
 
 @this(
     layout: templates.Layout,
-    govukButton : GovukButton
+    govukButton : GovukButton,
+    nonFixedWidthPageLayout: NonFixedWidthPageLayout,
+    frontendAppConfig: FrontendAppConfig
 )
 
-@(user: Option[UserModel])(implicit request: Request[?], messages: Messages)
+@(viewModel: ServiceStartViewModel)(implicit request: Request[?], messages: Messages)
+
+@permissionAndRolesLink() = {
+    <a href="@permissionAndRolesUrl()" class="govuk-link">@messages("serviceStart.beforeConsuming.link")</a>
+}
+
+@permissionAndRolesUrl() = @{
+    s"${frontendAppConfig.helpDocsPath}/documentation/what-access-do-i-need.html"
+}
 
 @layout(
     pageTitle    = titleNoForm(messages("serviceStart.title")),
     showBackLink = false,
-    user = user
+    user = viewModel.user,
+    fullWidth = true,
+    fixedWidth = false
 ) {
 
-    <h1 class="govuk-heading-xl" id="serviceStartHeading">@messages("serviceStart.heading")</h1>
+    <div class="hero">
+        <div class="govuk-width-container">
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-full">
+                    <h1 class="govuk-heading-xl hero-title">
+                        @messages("serviceStart.heading")
+                    </h1>
+                </div>
+            </div>
 
-    <p class="govuk-body">@messages("serviceStart.introduction")</p>
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-two-thirds">
+                    <p class="govuk-body govuk-!-font-size-24 app-inverse">
+                        @messages("serviceStart.introduction")
+                    </p>
 
-    <h2 class="govuk-heading-m">@messages("serviceStart.whatYouCanDo")</h2>
+                    <p class="govuk-body app-inverse">
+                        @messages("serviceStart.whatYouCanDo.heading")
+                    </p>
 
-    <ul class="govuk-list govuk-list--bullet">
-        <li>
-            <strong>@messages("serviceStart.consume.heading")</strong>
-            <ul class="govuk-list">
-                <li>@messages("serviceStart.consume.list.1")</li>
-                <li>@messages("serviceStart.consume.list.2")</li>
-                <li>@messages("serviceStart.consume.list.3")</li>
-                <li>@messages("serviceStart.consume.list.4")</li>
-            </ul>
-        </li>
-        <li>
-            <strong>@messages("serviceStart.produce.heading")</strong>
-            <ul class="govuk-list">
-                <li>@messages("serviceStart.produce.list.1")</li>
-                <li>@messages("serviceStart.produce.list.2")</li>
-                <li>@messages("serviceStart.produce.list.3")</li>
-            </ul>
-        </li>
-    </ul>
+                    <ul class="govuk-list govuk-list--bullet app-inverse">
+                        <li>
+                            <p class="govuk-body">
+                                <a href="@viewModel.exploreApisUrl" class="govuk-link govuk-!-margin-top-0 app-inverse">
+                                    @messages("serviceStart.whatYouCanDo.exploreApis")
+                                </a>
+                            </p>
+                        </li>
+                        <li>
+                            <p class="govuk-body">
+                                <a href="@viewModel.exploreFileTransfersUrl" class="govuk-link govuk-!-margin-top-0 app-inverse">
+                                    @messages("serviceStart.whatYouCanDo.exploreFileTransfers")
+                                </a>
+                            </p>
+                        </li>
+                        <li>
+                            <p class="govuk-body app-inverse">@messages("serviceStart.whatYouCanDo.produceApis")</p>
+                        </li>
+                        <li>
+                            <p class="govuk-body app-inverse">@messages("serviceStart.whatYouCanDo.consumeApis")</p>
+                        </li>
+                    </ul>
+                </div>
 
-    <h2 class="govuk-heading-m" id="before-you-start">@messages("serviceStart.beforeYouStart")</h2>
+                <div class="govuk-grid-column-one-third">
+                    <div class="app-stats">
+                        <p class="govuk-body app-inverse govuk-!-margin-bottom-0">
+                            <span><strong>@viewModel.dashboardStatistics.totalApis</strong></span>
+                            <span>Total APIs</span>
+                        </p>
+                    </div>
+                    <div class="app-stats">
+                        <p class="govuk-body app-inverse govuk-!-margin-bottom-0">
+                            <span><strong>@viewModel.dashboardStatistics.selfServiceApis</strong></span>
+                            <span>APIs available for self-service</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <p class="govuk-body"><strong>@messages("serviceStart.beforeExploring.heading")</strong></p>
-    <p class="govuk-body">@messages("serviceStart.beforeExploring.content")</p>
+    <div class="govuk-width-container">
+        <div class="govuk-grid-row govuk-!-margin-top-5">
+            <div class="govuk-grid-column-two-thirds">
+                <h2 class="govuk-heading-l" id="before-you-start">@messages("serviceStart.beforeYouStart")</h2>
 
-    <p class="govuk-body"><strong>@messages("serviceStart.beforeConsuming.heading")</strong></p>
-    <p class="govuk-body">@messages("serviceStart.beforeConsuming.content")</p>
+                <p class="govuk-body"><strong>@messages("serviceStart.beforeExploring.heading")</strong></p>
+                <p class="govuk-body">@messages("serviceStart.beforeExploring.content")</p>
 
-    <p class="govuk-body"><strong>@messages("serviceStart.beforeProducing.heading")</strong></p>
-    <p class="govuk-body">@messages("serviceStart.beforeProducing.content")</p>
-    <ul class="govuk-list govuk-list--bullet">
-        <li>@messages("serviceStart.beforeProducing.list.1")</li>
-    </ul>
+                <p class="govuk-body"><strong>@messages("serviceStart.beforeConsuming.heading")</strong></p>
+                <p class="govuk-body">@Html(messages("serviceStart.beforeConsuming.content", permissionAndRolesLink().toString.trim))</p>
 
-    @govukButton(Button(
-        id = Some("startNowButton"),
-        href = Some(routes.IndexController.onPageLoad.url),
-        isStartButton = true,
-        content = Text(messages("site.start")),
-        classes = "govuk-!-margin-top-5",
-        preventDoubleClick = Some(true)
-    ))
+                @govukButton(Button(
+                    id = Some("startNowButton"),
+                    href = Some(routes.IndexController.onPageLoad.url),
+                    isStartButton = true,
+                    content = Text(messages("site.start")),
+                    classes = "govuk-!-margin-top-5",
+                    preventDoubleClick = Some(true)
+                ))
+            </div>
+
+            <div class="govuk-grid-column-one-third">
+                <h2 class="govuk-heading-m">
+                    @messages("serviceStart.documentation.heading")
+                </h2>
+
+                <ul class="govuk-list">
+                    @for(link <- viewModel.documentationLinks) {
+                        <li class="govuk-!-margin-bottom-3">
+                            <a class="govuk-link" href="@link.url">
+                                @messages(link.description)
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
 
 }
