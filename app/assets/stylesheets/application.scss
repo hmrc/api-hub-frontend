@@ -9,6 +9,7 @@ $off-white: #fbfbfb;
 $light-mid-grey: #ebebeb;
 $grey: #bfc1c3;
 $mid-blue: #005ea5;
+$hero-background: #1d70b8;
 
 // Colour mapping
 $hip-card-border: govuk-colour("mid-grey");
@@ -44,6 +45,7 @@ $input-text-background: govuk-colour("white");
 $secondary-success-color: govuk-colour("white");
 $secondary-success-background: govuk-colour("dark-grey");
 $active-link-color: govuk-colour("dark-blue");
+$hero-color: govuk-colour("white");
 
 $border-radius-size: 4px;
 
@@ -1061,19 +1063,22 @@ header {
 
 .hero {
     overflow: hidden;
-    background: #1d70b8;
-    color: #ffffff;
+    background: $hero-background;
+    color: $hero-color;
     margin: 0;
 }
 
+.hero-padding-top {
+    padding-top: 25px;
+}
+
 .hero-title {
-    color: #ffffff !important;
-    margin: 25px 0 !important;
+    color: $hero-color !important;
     margin: 25px 0 !important;
 }
 
 .hero .app-inverse {
-    color: #fff !important;
+    color: $hero-color !important;
 }
 
 .hero .app-stats {
