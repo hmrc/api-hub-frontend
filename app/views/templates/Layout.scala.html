@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import components.FullWidthMainContent
+@import components.{FullWidthMainContent, VariableWidthPageLayout}
 @import config.FrontendAppConfig
 @import models.user.{StrideUser, UserModel}
 @import templates.ApiHubHeader
@@ -37,7 +37,9 @@
     twoThirdsMainContent: TwoThirdsMainContent,
     fullWidthMainContentLayout: FullWidthMainContent,
     header: ApiHubHeader,
-    hmrcInternalHead: HmrcInternalHead
+    hmrcInternalHead: HmrcInternalHead,
+    fixedWidthPageLayout: FixedWidthPageLayout,
+    variableWidthPageLayout: VariableWidthPageLayout
 )
 
 @(
@@ -49,7 +51,8 @@
     fullWidth: Boolean = false,
     customScriptsBlock: Option[Html] = None,
     customStyles: Option[Html] = None,
-    activeLink: Option[String] = None
+    activeLink: Option[String] = None,
+    fixedWidth: Boolean = true
 )(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
 
 @head = {
@@ -105,9 +108,10 @@
 
     @contentBlock
 
-    <div class="govuk-!-margin-top-8">
+    <div class="govuk-width-container govuk-!-margin-top-8 @if(!fixedWidth){govuk-!-margin-bottom-8}">
         @hmrcReportTechnicalIssueHelper()
     </div>
+
 }
 
 @govukLayout(
@@ -120,4 +124,5 @@
         scriptsBlock = Some(additionalScripts)
     )),
     mainContentLayout = Some(if (fullWidth) fullWidthMainContentLayout(_) else twoThirdsMainContent(_)),
+    pageLayout = if (fixedWidth) Some(fixedWidthPageLayout(_)) else Some(variableWidthPageLayout(_))
 )(content)

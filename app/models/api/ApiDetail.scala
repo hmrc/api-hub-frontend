@@ -99,11 +99,18 @@ case class ApiDetail(
 }
 
 object ApiDetail {
+
+  object IntegrationType {
+    val api: String = "API"
+  }
+  
   private val instantDateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+
   implicit val customInstantFormat: Format[Instant] = Format(
     Reads(js => JsSuccess(instantDateFormatter.parse(js.as[String], Instant.from))),
     Writes(d => JsString(instantDateFormatter.format(d.atOffset(ZoneOffset.UTC))))
   )
+
   implicit val formatApiDetail: OFormat[ApiDetail] = {
     Json.format[ApiDetail]
   }
