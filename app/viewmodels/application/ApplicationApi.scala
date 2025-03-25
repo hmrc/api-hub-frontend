@@ -106,6 +106,7 @@ object ApplicationEndpoint {
 case class ApplicationApi(
   apiId: String,
   apiTitle: String,
+  apiNumber: Option[String],
   endpoints: Seq[ApplicationEndpoint],
   pendingAccessRequests: Seq[AccessRequest],
   isMissing: Boolean
@@ -124,6 +125,7 @@ object ApplicationApi {
     ApplicationApi(
       apiId = apiDetail.id,
       apiTitle = apiDetail.title,
+      apiNumber = apiDetail.apiNumber,
       endpoints = endpoints,
       pendingAccessRequests = pendingAccessRequests,
       isMissing = false
@@ -134,6 +136,7 @@ object ApplicationApi {
     ApplicationApi(
       apiId = api.id,
       apiTitle = api.title,
+      None,
       endpoints = api.endpoints.map(ApplicationEndpoint.forMissingApi),
       pendingAccessRequests = pendingAccessRequests,
       isMissing = true
