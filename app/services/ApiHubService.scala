@@ -26,7 +26,7 @@ import models.application.*
 import models.deployment.{DeploymentDetails, DeploymentsRequest, DeploymentsResponse, RedeploymentRequest}
 import models.exception.ApplicationsException
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
-import models.stats.ApisInProductionStatistic
+import models.stats.{ApisInProductionStatistic, DashboardStatistics, DashboardStatisticsBuilder}
 import models.team.{NewTeam, Team}
 import models.user.{UserContactDetails, UserModel}
 import play.api.Logging
@@ -39,7 +39,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class ApiHubService @Inject()(
   applicationsConnector: ApplicationsConnector,
   integrationCatalogueConnector: IntegrationCatalogueConnector,
-  apimConnector: ApimConnector
+  apimConnector: ApimConnector,
+  dashboardStatisticsBuilder: DashboardStatisticsBuilder
 )(implicit ec: ExecutionContext) extends Logging {
 
   def registerApplication(newApplication: NewApplication)(implicit hc: HeaderCarrier): Future[Application] = {
@@ -270,6 +271,10 @@ class ApiHubService @Inject()(
 
   def testApimEndpoint[T](environment: HipEnvironment, apimRequest: ApimRequest[T], params: Seq[String])(implicit hc: HeaderCarrier): Future[Either[IllegalArgumentException,String]] = {
     apimRequest.makeRequest(apimConnector, environment, params)
+  }
+
+  def fetchDashboardStatistics()(implicit hc: HeaderCarrier): Future[DashboardStatistics] = {
+    integrationCatalogueConnector.getReport().map(dashboardStatisticsBuilder.build)
   }
 
 }

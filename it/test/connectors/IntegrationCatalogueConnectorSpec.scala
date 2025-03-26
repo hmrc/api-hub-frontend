@@ -20,7 +20,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import config.FrontendAppConfig
 import fakes.FakeHubStatusService
 import generators.ApiDetailGenerators
-import models.api.{ContactInfo, IntegrationResponse, PlatformContact}
+import models.api.{ApiDetail, ContactInfo, IntegrationPlatformReport, IntegrationResponse, PlatformContact}
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.Configuration
@@ -366,6 +366,38 @@ class IntegrationCatalogueConnectorSpec
       buildConnector().getApiDetailForPublishReference(expected.publisherReference)(HeaderCarrier()) map {
         actual =>
           actual mustBe None
+      }
+    }
+  }
+
+  "getReport" - {
+    "must place the correct request and return the response" in {
+      val expected = Seq(
+        IntegrationPlatformReport(
+          platformType = "HIP",
+          integrationType = ApiDetail.IntegrationType.api,
+          count = 12
+        ),
+        IntegrationPlatformReport(
+          platformType = "NOT-HIP",
+          integrationType = ApiDetail.IntegrationType.api,
+          count = 23
+        )
+      )
+
+      stubFor(
+        get(urlEqualTo(s"/integration-catalogue/report"))
+          .withHeader("Accept", equalTo("application/json"))
+          .withHeader("Authorization", equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withBody(Json.toJson(expected).toString())
+          )
+      )
+
+      buildConnector().getReport()(HeaderCarrier()) map {
+        actual =>
+          actual mustBe expected
       }
     }
   }

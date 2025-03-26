@@ -19,12 +19,11 @@ package controllers.admin
 import base.SpecBase
 import fakes.FakeHipEnvironments
 import models.user.UserModel
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.inject.bind
-import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import play.api.{Application, Application as PlayApplication}
@@ -32,7 +31,7 @@ import services.ApiHubService
 import utils.{HtmlValidation, TestHelpers}
 import viewmodels.admin.{ApimRequests, TestApimEndpointsViewModel}
 import views.html.admin.TestApimEndpointsView
-import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+
 import scala.concurrent.Future
 
 class TestApimEndpointsControllerSpec
@@ -89,7 +88,7 @@ class TestApimEndpointsControllerSpec
 
             status(result) mustBe OK
             contentAsString(result) mustBe apimResponse
-            verify(fixture.apiHubService).testApimEndpoint(eqTo(FakeHipEnvironments.test), eqTo(ApimRequests.listEgressGateways), eqTo(Array("p1", "p2", "p4")))(any())
+            verify(fixture.apiHubService).testApimEndpoint(eqTo(FakeHipEnvironments.test), eqTo(ApimRequests.listEgressGateways), eqTo(Seq("p1", "p2", "p4")))(any())
           }
         }
       }

@@ -21,6 +21,7 @@ import play.api.Configuration
 import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.http.StringContextOps
+import viewmodels.RelatedContentLink
 
 @Singleton
 class FrontendAppConfig @Inject() (configuration: Configuration) {
@@ -79,5 +80,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
 
   val hipEnvironmentsLookupTimeoutSeconds: Int = configuration.get[Int]("hipEnvironmentsLookupTimeoutSeconds")
   val hubStatusTimeoutSeconds: Int = configuration.get[Int]("hubStatusTimeoutSeconds")
+
+  val startPageLinks: Seq[RelatedContentLink] = configuration.get[Seq[RelatedContentLink]]("startPage.links")
 
 }

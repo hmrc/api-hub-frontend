@@ -18,7 +18,7 @@ package connectors
 
 import com.google.inject.{Inject, Singleton}
 import config.FrontendAppConfig
-import models.api.{ApiDetail, ApiDetailSummary, IntegrationId, IntegrationResponse, PlatformContact}
+import models.api.{ApiDetail, ApiDetailSummary, IntegrationId, IntegrationPlatformReport, IntegrationResponse, PlatformContact}
 import play.api.Logging
 import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION}
 import play.api.http.MimeTypes.JSON
@@ -102,6 +102,13 @@ class IntegrationCatalogueConnector @Inject()(
 
   def deepSearchApis(searchText: String)(implicit hc: HeaderCarrier): Future[Seq[ApiDetailSummary]] = {
     queryApis(Seq(("searchTerm", searchText)))
+  }
+
+  def getReport()(implicit hc: HeaderCarrier): Future[Seq[IntegrationPlatformReport]] = {
+    httpClient.get(url"$integrationCatalogueBaseUrl/integration-catalogue/report")
+      .setHeader(ACCEPT -> JSON)
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Seq[IntegrationPlatformReport]]
   }
 
   private def queryApis(queryParams: Seq[(String,String)])(implicit hc: HeaderCarrier): Future[Seq[ApiDetailSummary]] = {

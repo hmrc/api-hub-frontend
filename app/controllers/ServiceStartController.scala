@@ -17,22 +17,38 @@
 package controllers
 
 import com.google.inject.{Inject, Singleton}
+import config.FrontendAppConfig
 import controllers.actions.OptionalIdentifierAction
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.ServiceStartViewModel
 import views.html.ServiceStartView
+
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class ServiceStartController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   optionalIdentifierAction: OptionalIdentifierAction,
+  frontendAppConfig: FrontendAppConfig,
+  apiHubService: ApiHubService,
   view: ServiceStartView
-) extends FrontendBaseController with I18nSupport {
+)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = optionalIdentifierAction {
+  def onPageLoad: Action[AnyContent] = optionalIdentifierAction.async {
     implicit request =>
-      Ok(view(request.user))
+      apiHubService.fetchDashboardStatistics().map(
+        dashboardStatistics =>
+          Ok(view(
+            ServiceStartViewModel(
+              user = request.user,
+              dashboardStatistics = dashboardStatistics,
+              frontendAppConfig.startPageLinks
+            )
+          ))
+      )
   }
 
 }

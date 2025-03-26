@@ -19,18 +19,18 @@ package services
 import config.{BaseHipEnvironment, ShareableHipConfig}
 import connectors.{ApimConnector, ApplicationsConnector, IntegrationCatalogueConnector}
 import controllers.actions.FakeApplication
-import fakes.FakeHipEnvironments
+import fakes.{FakeHipEnvironments, FakePlatforms}
 import generators.{AccessRequestGenerator, ApiDetailGenerators, EgressGenerator}
 import models.AvailableEndpoint
 import models.accessrequest.*
 import models.api.ApiDeploymentStatus.*
 import models.api.ApiDetailLensesSpec.sampleApiDetailSummary
-import models.api.{ApiDeploymentStatuses, ContactInfo, EndpointMethod, PlatformContact}
+import models.api.{ApiDeploymentStatuses, ApiDetail, ContactInfo, EndpointMethod, IntegrationPlatformReport, PlatformContact}
 import models.application.*
 import models.application.ApplicationLenses.*
 import models.deployment.{DeploymentDetails, DeploymentsRequest, EgressMapping, SuccessfulDeploymentsResponse}
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
-import models.stats.ApisInProductionStatistic
+import models.stats.{ApisInProductionStatistic, DashboardStatistics, DashboardStatisticsBuilder}
 import models.team.{NewTeam, Team}
 import models.user.UserContactDetails
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -1045,6 +1045,35 @@ class ApiHubServiceSpec
     }
   }
 
+  "fetchDashboardStatistics" - {
+    "must fetch the data, pass to the builder, and return the result" in {
+      val fixture = buildFixture()
+
+      val report = Seq(
+        IntegrationPlatformReport(
+          platformType = "HIP",
+          integrationType = ApiDetail.IntegrationType.api,
+          count = 12
+        ),
+        IntegrationPlatformReport(
+          platformType = "NOT-HIP",
+          integrationType = ApiDetail.IntegrationType.api,
+          count = 34
+        )
+      )
+
+      val expected = DashboardStatistics(totalApis = 12 + 34, selfServiceApis = 12)
+
+      when(fixture.integrationCatalogueConnector.getReport()(any))
+        .thenReturn(Future.successful(report))
+
+      fixture.service.fetchDashboardStatistics()(HeaderCarrier()).map {
+        result =>
+          result mustBe expected
+      }
+    }
+  }
+
   private case class Fixture(
     applicationsConnector: ApplicationsConnector,
     integrationCatalogueConnector: IntegrationCatalogueConnector,
@@ -1056,7 +1085,8 @@ class ApiHubServiceSpec
     val applicationsConnector = mock[ApplicationsConnector]
     val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
     val apimConnector = mock[ApimConnector]
-    val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector, apimConnector)
+    val dashboardStatisticsBuilder = new DashboardStatisticsBuilder(FakePlatforms)
+    val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector, apimConnector, dashboardStatisticsBuilder)
 
     Fixture(applicationsConnector, integrationCatalogueConnector, apimConnector, service)
   }
@@ -1075,7 +1105,8 @@ trait ApplicationGetterBehaviours extends AsyncFreeSpec with Matchers with Mocki
       when(applicationsConnector.getApplication(eqTo("id-1"), eqTo(includeDeleted))(any())).thenReturn(Future.successful(expected))
 
       val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector, apimConnector)
+      val dashboardStatisticsBuilder = new DashboardStatisticsBuilder(FakePlatforms)
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector, apimConnector, dashboardStatisticsBuilder)
 
       service.getApplication("id-1")(HeaderCarrier()) map {
         actual =>

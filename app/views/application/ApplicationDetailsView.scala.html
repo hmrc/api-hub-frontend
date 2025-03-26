@@ -20,12 +20,14 @@
 @import views.html.components.IconsLink
 @import views.html.components.ApplicationDetailsTable
 @import config.HipEnvironments
+@import views.html.components.OutstandingAccessRequestsPanel
 
 @this(
     layout: templates.Layout,
     govukTable: GovukTable,
     iconsLink: IconsLink,
     applicationDetailsTable: ApplicationDetailsTable,
+    outstandingAccessRequestsPanel: OutstandingAccessRequestsPanel,
     sideNav: views.html.templates.SideNav,
     applicationNavItems: ApplicationNavItems,
     hipEnvironments: HipEnvironments
@@ -209,7 +211,7 @@
             } else {
 
                 @if(viewModel.hasPendingAccessRequests) {
-                    @pendingAccessRequestsPanel
+                    @outstandingAccessRequestsPanel(viewModel.pendingAccessRequestsCount, viewModel.applicationId)
                 }
 
                 @if(viewModel.needsProductionAccessRequest) {
