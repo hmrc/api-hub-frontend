@@ -70,6 +70,7 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
     ApplicationApi(
       apiId = "api-id-1",
       apiTitle = "API title 1",
+      apiNumber = None,
       endpoints = Seq(applicationEndpoint),
       pendingAccessRequests = Seq.empty,
       isMissing = false
@@ -78,6 +79,7 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
     ApplicationApi(
       apiId = "api-id-1",
       apiTitle = "API title 1",
+      apiNumber = None,
       endpoints = Seq(applicationEndpointNotAccessibleInProd),
       pendingAccessRequests = Seq.empty,
       isMissing = false
@@ -86,6 +88,7 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
     ApplicationApi(
       apiId = "api-id-2",
       apiTitle = "API title 2",
+      apiNumber = None,
       endpoints = Seq(applicationEndpoint),
       pendingAccessRequests = Seq.empty,
       isMissing = true
@@ -94,6 +97,7 @@ class RequestProductionAccessSelectApisControllerSpec extends SpecBase with Mock
     ApplicationApi(
       apiId = "api-id-3",
       apiTitle = "API title 3",
+      apiNumber = None,
       endpoints = Seq(applicationEndpoint),
       pendingAccessRequests = Seq(FakeAccessRequest),
       isMissing = false

@@ -164,6 +164,7 @@ class RequestProductionAccessControllerSpec extends SpecBase with MockitoSugar w
     ApplicationApi(
       apiId = anApiDetail.id,
       apiTitle = anApiDetail.title,
+      apiNumber = anApiDetail.apiNumber,
       endpoints = anApiDetail.endpoints.flatMap(
         endpoint =>
           endpoint.methods.map(
