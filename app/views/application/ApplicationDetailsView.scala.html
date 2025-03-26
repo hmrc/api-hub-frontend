@@ -20,12 +20,14 @@
 @import views.html.components.IconsLink
 @import views.html.components.ApplicationDetailsTable
 @import config.HipEnvironments
+@import views.html.components.OutstandingAccessRequestsPanel
 
 @this(
     layout: templates.Layout,
     govukTable: GovukTable,
     iconsLink: IconsLink,
     applicationDetailsTable: ApplicationDetailsTable,
+    outstandingAccessRequestsPanel: OutstandingAccessRequestsPanel,
     sideNav: views.html.templates.SideNav,
     applicationNavItems: ApplicationNavItems,
     hipEnvironments: HipEnvironments
@@ -114,24 +116,6 @@
     </div>
 }
 
-@pendingAccessRequestsPanel = {
-    <div class="call-out-panel call-out-panel__small govuk-!-margin-top-2">
-        <p class="govuk-body information-tag">
-            <i class="fa-solid fa-circle-exclamation"></i>
-            <span class="call-out-type">
-                @messages("applicationDetails.pending.heading", viewModel.pendingAccessRequestsCount)
-            </span>
-        </p>
-        <p class="govuk-body additional-message">
-            @messages("applicationDetails.pending.message.1", viewModel.pendingAccessRequestsCount)
-            @messages("applicationDetails.pending.message.2", viewModel.pendingAccessRequestsCount)
-        </p>
-        <p class="govuk-body additional-message">
-            <a class="govuk-link" id="cancelAccessRequestsLink" href="@controllers.application.cancelaccessrequest.routes.CancelAccessRequestStartController.startJourney(viewModel.applicationId)">Cancel access requests</a>
-        </p>
-    </div>
-}
-
 @needsAccessRequestsPanel = {
     <div class="call-out-panel call-out-panel__small govuk-!-margin-top-2">
         <p class="govuk-body information-tag">
@@ -210,7 +194,7 @@
                 }
 
                 @if(viewModel.hasPendingAccessRequests) {
-                    @pendingAccessRequestsPanel
+                    @outstandingAccessRequestsPanel(viewModel.pendingAccessRequestsCount, viewModel.applicationId)
                 }
 
                 @if(viewModel.needsProductionAccessRequest) {
