@@ -68,12 +68,17 @@
 }
 
 @apiStatus(applicationApi: ApplicationApi) = @{
-    val needsApproving = applicationApi.needsAccessRequest(viewModel.hipEnvironment) || applicationApi.hasPendingAccessRequest(viewModel.hipEnvironment)
 
-    (applicationApi.isAccessibleInEnvironment(viewModel.hipEnvironment), needsApproving) match {
-        case (false, _) => "No access"
-        case (true, true) => "Partial access"
-        case (true, false) => "Full access"
+    if (applicationApi.isMissing) {
+        "No longer available"
+    } else {
+        val needsApproving = applicationApi.needsAccessRequest(viewModel.hipEnvironment) || applicationApi.hasPendingAccessRequest(viewModel.hipEnvironment)
+
+        (applicationApi.isAccessibleInEnvironment(viewModel.hipEnvironment), needsApproving) match {
+            case (false, _) => "No access"
+            case (true, true) => "Partial access"
+            case (true, false) => "Full access"
+        }
     }
 }
 
@@ -103,11 +108,6 @@
         <div class="hip-details__text">
             <p class="govuk-body">
                 @messages("applicationApis.apiMissing")
-            </p>
-            <p class="govuk-body">
-                <a class="govuk-link govuk-link--no-visited-state" href="@controllers.application.routes.RemoveApiController.onPageLoad(viewModel.applicationId, applicationApi.apiId, viewModel.hipEnvironment.id)" data-remove-api-api-id="@applicationApi.apiId">
-                    @messages("applicationApis.removeApi")
-                </a>
             </p>
         </div>
     </details>
@@ -164,9 +164,6 @@
                         .withAttribute("data-add-endpoints-api-id", applicationApi.apiId)
                     )
                 }
-                <a class="govuk-link govuk-link--no-visited-state" href="@controllers.application.routes.RemoveApiController.onPageLoad(viewModel.applicationId, applicationApi.apiId, viewModel.hipEnvironment.id)" data-remove-api-api-id="@applicationApi.apiId">
-                    @messages("applicationApis.removeApi")
-                </a>
             </div>
         </div>
 

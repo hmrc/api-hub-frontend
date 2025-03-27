@@ -167,7 +167,7 @@ applicationDetails.apis.exploreApis = Add APIs
 applicationDetails.apis.noApis = You have not added any APIs. {0} to your application.
 applicationDetails.apis.endpointsAvailable = {0} of {1} endpoints available
 
-applicationDetails.apis.missing.heading = An API used by this application no longer exists
+applicationDetails.apis.missing.heading = This API no longer exists and should be removed from this application.
 applicationDetails.apis.missing.unavailable = The following API is no longer available:
 applicationDetails.apis.missing.remove = To remove this API from your application visit the {0}.
 applicationDetails.apis.page = Application APIs page

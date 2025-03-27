@@ -151,6 +151,7 @@ object CancelAccessRequestEndJourneyControllerSpec extends OptionValues{
   private val applicationApi = ApplicationApi(
     apiId = "test-api-id",
     apiTitle = "test-api-title",
+    apiNumber = None,
     endpoints = Seq(
         ApplicationEndpoint(
           httpMethod = "GET",

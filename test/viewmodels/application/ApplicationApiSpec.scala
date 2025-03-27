@@ -66,6 +66,7 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
     ApplicationApi(
       apiId = "test-api-id",
       apiTitle = "test-api-title",
+      apiNumber = Some("API#1234"),
       endpoints = endpoints,
       pendingAccessRequests = pendingAccessRequests,
       isMissing = false
@@ -295,6 +296,7 @@ class ApplicationApiSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
       val expected = ApplicationApi(
         apiId = api.id,
         apiTitle = api.title,
+        apiNumber = None,
         endpoints = api.endpoints.map(ApplicationEndpoint.forMissingApi),
         pendingAccessRequests = actual.pendingAccessRequests,
         isMissing = true

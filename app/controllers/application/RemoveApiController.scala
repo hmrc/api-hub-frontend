@@ -47,50 +47,40 @@ class RemoveApiController @Inject()(
 
   private val form = formProvider("removeApiConfirmation.error")
 
-  def onPageLoad(applicationId: String, apiId: String, environmentId: String): Action[AnyContent] = (identify andThen applicationAuth(applicationId)).async {
+  def onPageLoad(applicationId: String, apiId: String): Action[AnyContent] = (identify andThen applicationAuth(applicationId)).async {
     implicit request =>
-      hipEnvironments.environments.find(_.id == environmentId)
-        .map { hipEnvironment =>
-          showConfirmationView(Ok, apiId, form, environmentId)
-        }.getOrElse(
-          Future.successful(errorResultBuilder.environmentNotFound(environmentId))
-        )
+      showConfirmationView(Ok, apiId, form)
   }
 
-  def onSubmit(applicationId: String, apiId: String, environmentId: String): Action[AnyContent] = (identify andThen applicationAuth(applicationId)).async {
+  def onSubmit(applicationId: String, apiId: String): Action[AnyContent] = (identify andThen applicationAuth(applicationId)).async {
     implicit request =>
       form.bindFromRequest().fold(
         formWithErrors =>
-          showConfirmationView(BadRequest, apiId, formWithErrors, environmentId),
-        value =>
-          if (value) {
+          showConfirmationView(BadRequest, apiId, formWithErrors),
+        confirmed =>
+          if (confirmed) {
             apiHubService.removeApi(applicationId, apiId).map {
               case Some(_) => Ok(successView(request.application, request.identifierRequest.user))
               case None => errorResultBuilder.apiNotFoundInApplication(apiId, request.application)
             }
           }
           else {
-            hipEnvironments.environments.find(_.id == environmentId)
-              .map { _ =>
-                Future.successful(Redirect(controllers.application.routes.EnvironmentsController.onPageLoad(applicationId, environmentId)))
-              }.getOrElse(
-                Future.successful(errorResultBuilder.environmentNotFound(environmentId))
-              )
+            Future.successful(Redirect(controllers.application.routes.ApplicationDetailsController.onPageLoad(applicationId)))
           }
       )
   }
 
-  private def showConfirmationView(status: Status, apiId: String, form: Form[?], environmentId: String)(implicit request: ApplicationRequest[?]): Future[Result] = {
+  private def showConfirmationView(status: Status, apiId: String, form: Form[?])(implicit request: ApplicationRequest[?]): Future[Result] = {
     apiHubService.getApiDetail(apiId).map {
       case Some(apiDetail) if request.application.hasApi(apiDetail.id) =>
-        status(confirmationView(request.application, apiDetail.id, apiDetail.title, form, request.identifierRequest.user, environmentId))
+        status(confirmationView(request.application, apiDetail.id, apiDetail.title, form, request.identifierRequest.user))
       case Some(apiDetail) =>
         errorResultBuilder.apiNotFoundInApplication(apiDetail, request.application)
       case None =>
         request.application.apis.find(_.id.equals(apiId))
           .map(
             api =>
-              status(confirmationView(request.application, api.id, api.title, form, request.identifierRequest.user, environmentId))
+              status(confirmationView(request.application, api.id, api.title, form, request.identifierRequest.user))
           )
           .getOrElse(errorResultBuilder.apiNotFound(apiId))
     }
