@@ -181,6 +181,16 @@ export function onDomLoaded() {
         }
     });
 
+    function checkForHtmlRedirect(response) {
+        if (response.headers.has('content-type')) {
+            const contentType = response.headers.get('content-type') || '';
+            if (contentType.includes('text/html')) {
+                // this probably means we got signed out
+                window.location.href = response.url;
+            }
+        }
+    }
+
     view.onSubmit(() => {
         stateMachine.requestSubmitted();
         const environment = encodeURIComponent(view.environment),
@@ -190,6 +200,8 @@ export function onDomLoaded() {
             .then(response => {
                 if (!response.ok) {
                     return Promise.reject(response);
+                } else if (response.redirected) {
+                    checkForHtmlRedirect(response);
                 }
                 return response.text();
             })
