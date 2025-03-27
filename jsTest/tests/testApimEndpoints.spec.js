@@ -35,6 +35,7 @@ describe('testApimEndpoints', () => {
         elSelectEndpoint = document.getElementById('selectEndpoint');
         elResponseContainer = document.getElementById('apimResponseContainer');
         globalThis.document = document;
+        globalThis.window = Object.create(dom.window);
         globalThis.Event = dom.window.Event;
         clipboard = buildFakeClipboard(dom);
     });
@@ -132,6 +133,33 @@ describe('testApimEndpoints', () => {
         expect(document.getElementById('apimResponse').innerText).toBe(serverResponse);
         expect(globalThis.fetch).toHaveBeenCalledWith('test-apim-endpoints/test/endpointParams/v1,v2');
         expect(submitButtonEnabled()).toBe(true);
+    });
+
+    it("when the server sends a redirect to an html page we follow the redirect",  async () => {
+        const redirectLocation = "http://example.com";
+
+        Object.defineProperty(globalThis.window, "location", {
+            value: {
+                href: ''
+            },
+            writable: true
+        });
+
+        globalThis.fetch = jasmine.createSpy('fetch').and.returnValue(Promise.resolve({
+            ok: true,
+            redirected: true,
+            url: redirectLocation,
+            headers: new Map([['content-type', 'text/html']]),
+            text: () => Promise.resolve('')
+        }));
+
+        onDomLoaded();
+
+        selectEnvironment(1);
+        selectEndpoint(1);
+        clickSubmit();
+
+        await waitFor(() => globalThis.window.location.href, redirectLocation);
     });
 
     it("when the server responds with an error, then the error message is displayed",  async () => {
