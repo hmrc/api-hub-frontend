@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,22 +16,18 @@
 
 package models.team
 
-import models.application.TeamMember
-import play.api.libs.json.{Format, Json}
+import models.{Enumerable, WithName}
 
-import java.time.LocalDateTime
+sealed trait TeamType
 
-case class Team(
-  id: String,
-  name: String,
-  created: LocalDateTime,
-  teamMembers: Seq[TeamMember],
-  teamType: TeamType = TeamType.ConsumerTeam,
-  egresses: Seq[String] = Seq.empty
-)
+object TeamType extends Enumerable.Implicits {
 
-object Team {
+  case object ConsumerTeam extends WithName("consumer") with TeamType
+  case object ProducerTeam extends WithName("producer") with TeamType
 
-  implicit val formatTeam: Format[Team] = Json.using[Json.WithDefaultValues].format[Team]
+  val values: Seq[TeamType] = Seq(ConsumerTeam, ProducerTeam)
+
+  implicit val enumerable: Enumerable[TeamType] =
+    Enumerable(values.map(value => value.toString -> value)*)
 
 }
