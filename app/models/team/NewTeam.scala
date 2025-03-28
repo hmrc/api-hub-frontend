@@ -17,10 +17,15 @@
 package models.team
 
 import models.application.TeamMember
+import models.team.TeamType.ConsumerTeam
 import play.api.libs.json.{Format, Json}
 
-case class NewTeam(name: String, teamMembers: Seq[TeamMember])
+case class NewTeam(
+                    name: String,
+                    teamMembers: Seq[TeamMember],
+                    teamType: TeamType = ConsumerTeam
+                  )
 
 object NewTeam {
-  implicit val formatNewTeam: Format[NewTeam] = Json.format[NewTeam]
+  implicit val formatNewTeam: Format[NewTeam] = Json.using[Json.WithDefaultValues].format[NewTeam]
 }
