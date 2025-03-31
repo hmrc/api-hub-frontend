@@ -25,3 +25,4 @@ POST    /add-team-member/:id                                controllers.team.Add
 GET     /change-team-name/:id                               controllers.team.ChangeTeamNameController.onPageLoad(id: String)
 POST    /change-team-name/:id                               controllers.team.ChangeTeamNameController.onSubmit(id: String)
 
+GET     /manage-team-egresses/:id                           controllers.team.ManageTeamEgressesController.onPageLoad(id: String)

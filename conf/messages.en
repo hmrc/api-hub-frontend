@@ -664,6 +664,22 @@ manageTeam.removeTeamMember.success.content.2 = {0} team
 manageTeam.return = Return to all teams
 manageTeam.returnToApplication = Return to {0}
 manageTeam.addTeamMember = Add team member
+manageTeam.egresses = Egresses
+
+manageTeamEgresses.title = Manage team egresses
+manageTeamEgresses.heading = Manage team egresses
+manageTeamEgresses.addEgresses = Add egress to team
+
+selectTeamEgresses.title = Select which egresses you want to add to the team
+selectTeamEgresses.heading = Select which egresses you want to add to the team
+
+teamEgressCheckYourAnswers.title = Check your answers
+teamEgressCheckYourAnswers.heading = Check your answers
+teamEgressCheckYourAnswers.finish = Finish adding egresses
+teamEgressCheckYourAnswers.change = Change egresses
+
+teamEgressSuccess.title = Egress assigned successfully
+teamEgressSuccess.heading = Egress assigned successfully
 
 createTeam.title = Team registered successfully
 createTeam.successMessage = Team registered successfully
