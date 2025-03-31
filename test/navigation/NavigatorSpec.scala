@@ -21,8 +21,10 @@ import controllers.actions.FakeUser
 import controllers.routes
 import pages.*
 import models.*
-import models.myapis.produce.{ProduceApiChooseEgress, ProduceApiHowToAddWiremock}
+import models.application.TeamMember
+import models.myapis.produce.ProduceApiHowToAddWiremock
 import models.myapis.produce.ProduceApiHowToCreate.Editor
+import models.team.Team
 import models.user.Permissions
 import org.scalatest.TryValues
 import pages.application.accessrequest.{ProvideSupportingInformationPage, RequestProductionAccessPage, RequestProductionAccessSelectApisPage, RequestProductionAccessStartPage}
@@ -31,9 +33,13 @@ import pages.application.register.{RegisterApplicationNamePage, RegisterApplicat
 import pages.myapis.produce.*
 import pages.myapis.update.*
 
+import java.time.LocalDateTime
+
 class NavigatorSpec extends SpecBase with TryValues {
 
   val navigator = new Navigator
+  val teamWithEgresses = Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email)), egresses = Seq("NPS"))
+  val teamWithNoEgresses = Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email)))
 
   "Navigator" - {
 
@@ -127,8 +133,14 @@ class NavigatorSpec extends SpecBase with TryValues {
         "must go from the Before You Start page to the Choose owning team page" in {
           navigator.nextPage(ProduceApiBeforeYouStartPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiChooseTeamController.onPageLoad(NormalMode)
         }
-        "must go from the Before You Start page to the How To Create page" in {
-          navigator.nextPage(ProduceApiChooseTeamPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiHowToCreateController.onPageLoad(NormalMode)
+        "must go from the Choose owning team page to the How To Create page when the team has egresses" in {
+          navigator.nextPage(ProduceApiChooseTeamPage, NormalMode, emptyUserAnswers.set(ProduceApiChooseTeamPage, teamWithEgresses).get) mustBe controllers.myapis.produce.routes.ProduceApiHowToCreateController.onPageLoad(NormalMode)
+        }
+        "must go from the Choose owning team page to the No egress team page when the selected team has no egresses" in {
+          navigator.nextPage(ProduceApiChooseTeamPage, NormalMode, emptyUserAnswers.set(ProduceApiChooseTeamPage, teamWithNoEgresses).get) mustBe controllers.myapis.produce.routes.ProduceApiTeamWithNoEgressController.onPageLoad(NormalMode)
+        }
+        "must go from the No egress team page to the How To Create page when the team has egresses" in {
+          navigator.nextPage(ProduceApiTeamWithNoEgressPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiHowToCreateController.onPageLoad(NormalMode)
         }
         "must go from the How To Create page to the Produce Api Enter OAS page" in {
           navigator.nextPage(ProduceApiHowToCreatePage, NormalMode, emptyUserAnswers.set(ProduceApiHowToCreatePage, Editor).get) mustBe controllers.myapis.produce.routes.ProduceApiEnterOasController.onPageLoad(NormalMode)
@@ -330,7 +342,7 @@ class NavigatorSpec extends SpecBase with TryValues {
 
       "during the Produce an API journey" - {
         "must go from Owning Team page to the Check Your Answers page" in {
-          navigator.nextPage(ProduceApiChooseTeamPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
+          navigator.nextPage(ProduceApiChooseTeamPage, CheckMode, emptyUserAnswers.set(ProduceApiChooseTeamPage, teamWithEgresses).get) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
         }
         "must go from the OAS editor page to the Short Description page" in {
           navigator.nextPage(ProduceApiEnterOasPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiShortDescriptionController.onPageLoad(CheckMode)
