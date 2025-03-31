@@ -20,40 +20,55 @@ import models.team.Team
 import play.api.i18n.Messages
 import viewmodels.{SideNavItem, SideNavPage}
 import SideNavItem.SideNavItemLeaf
+import config.FrontendAppConfig
+import jakarta.inject.Singleton
+
+import javax.inject.Inject
 
 object ManageTeamSideNavPages {
 
   case object ManageTeamMembersPage extends SideNavPage
+  case object EgressesPage extends SideNavPage
   case object ChangeTeamNamePage extends SideNavPage
   case object ViewTeamApplicationsPage extends SideNavPage
 
 }
 
-object ManageTeamNavItems {
+@Singleton
+class ManageTeamNavItems @Inject()(config: FrontendAppConfig) {
 
   import ManageTeamSideNavPages._
 
   def apply(team: Team, currentPage: SideNavPage)(implicit messages: Messages): Seq[SideNavItem] = {
-      Seq(
-        SideNavItemLeaf(
-          page = ManageTeamMembersPage,
-          title = messages("manageTeamMembers.title"),
-          link = controllers.team.routes.ManageTeamController.onPageLoad(team.id),
-          isCurrentPage = currentPage == ManageTeamMembersPage
-        ),
-        SideNavItemLeaf(
-          page = ChangeTeamNamePage,
-          title = messages("changeTeamName.title"),
-          link = controllers.team.routes.ChangeTeamNameController.onPageLoad(team.id),
-          isCurrentPage = currentPage == ChangeTeamNamePage
-        ),
-        SideNavItemLeaf(
-          page = ViewTeamApplicationsPage,
-          title = messages("viewTeamApplications.title"),
-          link = controllers.team.routes.ViewTeamApplicationsController.onPageLoad(team.id),
-          isCurrentPage = currentPage == ViewTeamApplicationsPage
-        )
+    val items = Seq(
+      SideNavItemLeaf(
+        page = ManageTeamMembersPage,
+        title = messages("manageTeamMembers.title"),
+        link = controllers.team.routes.ManageTeamController.onPageLoad(team.id),
+        isCurrentPage = currentPage == ManageTeamMembersPage
+      ),
+      SideNavItemLeaf(
+        page = ChangeTeamNamePage,
+        title = messages("changeTeamName.title"),
+        link = controllers.team.routes.ChangeTeamNameController.onPageLoad(team.id),
+        isCurrentPage = currentPage == ChangeTeamNamePage
+      ),
+      SideNavItemLeaf(
+        page = ViewTeamApplicationsPage,
+        title = messages("viewTeamApplications.title"),
+        link = controllers.team.routes.ViewTeamApplicationsController.onPageLoad(team.id),
+        isCurrentPage = currentPage == ViewTeamApplicationsPage
       )
+    )
+
+    val teamEgressesItem = SideNavItemLeaf(
+      page = EgressesPage,
+      title = messages("manageTeam.egresses"),
+      link = controllers.team.routes.ManageTeamEgressesController.onPageLoad(team.id),
+      isCurrentPage = currentPage == EgressesPage
+    )
+
+    if (config.showApisOnDashboard) items.patch(1, Seq(teamEgressesItem), 0) else items
   }
 
 }
