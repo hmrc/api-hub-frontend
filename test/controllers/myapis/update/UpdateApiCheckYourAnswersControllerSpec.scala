@@ -21,6 +21,7 @@ import controllers.actions.{FakeApiDetail, FakeSupporter, FakeUser}
 import controllers.myapis.update.routes as updateApiRoutes
 import controllers.routes
 import fakes.{FakeDomains, FakeHods}
+import forms.YesNoFormProvider
 import models.api.Alpha
 import models.deployment.*
 import models.myapis.produce.*
@@ -56,6 +57,7 @@ class UpdateApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar
   private lazy val updateApiCheckYourAnswersRoute = controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onPageLoad()
   private lazy val updateApiCancelRoute = controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onCancel()
   private lazy val errorViewModel = produce.ProduceApiDeploymentErrorViewModel(updateApiCancelRoute, updateApiCheckYourAnswersRoute)
+  private lazy val form = YesNoFormProvider()("produceApiCheckYourAnswers.noEgress.confirmation.error")
 
   private val fullyPopulatedUserAnswers = UserAnswers(userAnswersId)
     .set(UpdateApiApiPage, FakeApiDetail).success.value
@@ -70,16 +72,16 @@ class UpdateApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar
     .set(UpdateApiEgressSelectionPage, "egress").success.value
     .set(UpdateApiEgressAvailabilityPage, true).success.value
 
-  private def summaryList()(implicit msg: Messages) = SummaryListViewModel(Seq(
-    UpdateApiEnterOasSummary.row(fullyPopulatedUserAnswers),
-    UpdateApiNameSummary.row(fullyPopulatedUserAnswers),
-    UpdateApiShortDescriptionSummary.row(fullyPopulatedUserAnswers),
-    UpdateApiEgressAvailabilitySummary.row(fullyPopulatedUserAnswers),
-    UpdateApiEgressSummary.row(fullyPopulatedUserAnswers),
-    UpdateApiEgressPrefixesSummary.row(fullyPopulatedUserAnswers),
-    UpdateApiHodSummary.row(fullyPopulatedUserAnswers, FakeHods),
-    UpdateApiDomainSummary.row(fullyPopulatedUserAnswers, FakeDomains),
-    UpdateApiSubDomainSummary.row(fullyPopulatedUserAnswers, FakeDomains),
+  private def summaryList(userAnswers: UserAnswers = fullyPopulatedUserAnswers)(implicit msg: Messages) = SummaryListViewModel(Seq(
+    UpdateApiEnterOasSummary.row(userAnswers),
+    UpdateApiNameSummary.row(userAnswers),
+    UpdateApiShortDescriptionSummary.row(userAnswers),
+    UpdateApiEgressAvailabilitySummary.row(userAnswers),
+    UpdateApiEgressSummary.row(userAnswers),
+    UpdateApiEgressPrefixesSummary.row(userAnswers),
+    UpdateApiHodSummary.row(userAnswers, FakeHods),
+    UpdateApiDomainSummary.row(userAnswers, FakeDomains),
+    UpdateApiSubDomainSummary.row(userAnswers, FakeDomains),
   ).flatten)
 
   "UpdateApiCheckYourAnswersController" - {
@@ -98,7 +100,7 @@ class UpdateApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar
         
         status(result) mustEqual OK
 
-        contentAsString(result) mustEqual view(expectedSummaryList, FakeUser, viewModel)(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(expectedSummaryList, FakeUser, viewModel, None)(request, messages(fixture.application)).toString
       }
     }
     
@@ -117,7 +119,7 @@ class UpdateApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar
         
         status(result) mustEqual OK
 
-        contentAsString(result) mustEqual view(expectedSummaryList, FakeSupporter, viewModel)(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(expectedSummaryList, FakeSupporter, viewModel, None)(request, messages(fixture.application)).toString
       }
     }
 
@@ -268,12 +270,44 @@ class UpdateApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar
           .thenReturn(Future.successful(Some(response)))
 
         val request = FakeRequest(POST, updateApiCheckYourAnswersRoute.url)
+          .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(fixture.application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual expectedLocation
       }
+    }
+  }
+
+  "returns bad request when the acknowledgement checkbox is not ticked on submission" in {
+    val userAnswers = fullyPopulatedUserAnswers
+      .remove(UpdateApiEgressSelectionPage).success.value
+
+    val response: DeploymentsResponse = SuccessfulDeploymentsResponse("id", "1.0.0", 1, "uri.com")
+
+    val fixture = buildFixture(userAnswers = Some(userAnswers))
+    implicit val msgs: Messages = messages(fixture.application)
+
+    when(fixture.apiHubService.generateDeployment(any)(any))
+      .thenReturn(Future.successful(response))
+
+    when(fixture.sessionRepository.clear(FakeUser.userId))
+      .thenReturn(Future.successful(true))
+
+    running(fixture.application) {
+      val view = fixture.application.injector.instanceOf[ProduceApiCheckYourAnswersView]
+
+      val request = FakeRequest(controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onSubmit())
+        .withFormUrlEncodedBody()
+      val result = route(fixture.application, request).value
+      val viewModel = ProduceApiCheckYourAnswersViewModel(
+        controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onSubmit()
+      )
+      val expectedSummaryList = summaryList(userAnswers)
+
+      status(result) mustEqual BAD_REQUEST
+      contentAsString(result) mustEqual view(expectedSummaryList, FakeUser, viewModel, Some(form.bind(Map.empty)))(request, messages(fixture.application)).toString
     }
   }
 

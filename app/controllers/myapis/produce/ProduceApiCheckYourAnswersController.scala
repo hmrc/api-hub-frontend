@@ -18,6 +18,7 @@ package controllers.myapis.produce
 
 import config.{Domains, Hods}
 import controllers.actions.*
+import forms.YesNoFormProvider
 import models.api.ApiStatus
 import models.deployment.{DeploymentsRequest, EgressMapping, InvalidOasResponse, SuccessfulDeploymentsResponse}
 import models.myapis.produce.{ProduceApiDomainSubdomain, ProduceApiEgressPrefixes}
@@ -25,6 +26,7 @@ import models.requests.DataRequest
 import models.team.Team
 import models.{CheckMode, UserAnswers}
 import pages.myapis.produce.*
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.*
 import repositories.ProduceApiSessionRepository
@@ -54,39 +56,43 @@ class ProduceApiCheckYourAnswersController @Inject()(
                                                       hods: Hods,
                                                       domains: Domains,
                                                       apiHubService: ApiHubService,
+                                                      formProvider: YesNoFormProvider,
                                            )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private lazy val failureViewModel = ProduceApiDeploymentErrorViewModel(
     controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onCancel(),
     controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
   )
+  private val form = formProvider("produceApiCheckYourAnswers.noEgress.confirmation.error")
+
+  private def hasEgressSelected(userAnswers: UserAnswers) =
+    userAnswers.get(ProduceApiEgressSelectionPage).isDefined
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
-      Ok(view(
-        SummaryListViewModel(summaryListRows(request.userAnswers)),
-        request.user,
-        ProduceApiCheckYourAnswersViewModel(controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onSubmit())
-      ))
+      Ok(buildView(form))
   }
 
   def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      validate(request).fold(
-        call => Future.successful(Redirect(call)), {
-        case (apiTitle, deployment) => apiHubService.generateDeployment(deployment).flatMap {
-          case response: SuccessfulDeploymentsResponse =>
-            produceApiSessionRepository.clear(request.user.userId)
-              .map(_ =>
-                Redirect(
-                  controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onSuccess(
-                    apiTitle, response.id
+      validateNoEgressAcknowledgement(request).fold(
+        formWithErrors => Future.successful(BadRequest(buildView(formWithErrors))),
+        _ => validate(request).fold(
+          call => Future.successful(Redirect(call)), {
+          case (apiTitle, deployment) => apiHubService.generateDeployment(deployment).flatMap {
+            case response: SuccessfulDeploymentsResponse =>
+              produceApiSessionRepository.clear(request.user.userId)
+                .map(_ =>
+                  Redirect(
+                    controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onSuccess(
+                      apiTitle, response.id
+                    )
                   )
                 )
-              )
-          case InvalidOasResponse(failure) =>
-            Future.successful(BadRequest(errorView(request.user, failure, failureViewModel)))
-        }})
+            case InvalidOasResponse(failure) =>
+              Future.successful(BadRequest(errorView(request.user, failure, failureViewModel)))
+          }})
+      )
   }
 
   def onSuccess(apiName: String, publisherReference: String): Action[AnyContent] = identify {
@@ -139,6 +145,13 @@ class ProduceApiCheckYourAnswersController @Inject()(
         )),
       )
     } yield (apiTitle, deployment)
+
+  private def validateNoEgressAcknowledgement(request: DataRequest[?]): Either[Form[?], Unit] =
+    if(hasEgressSelected(request.userAnswers))
+      Right(())
+    else
+      form.bindFromRequest()(request)
+        .fold(Left(_),_ => Right(()))
 
   private def validateApiTile(userAnswers: UserAnswers): Either[Call, String] = {
     userAnswers.get(ProduceApiEnterApiTitlePage) match {
@@ -239,6 +252,17 @@ class ProduceApiCheckYourAnswersController @Inject()(
       ProduceApiStatusSummary.row(userAnswers),
       ProduceApiPassthroughSummary.row(userAnswers),
     ).flatten
+
+  private def buildView(form: Form[?])(implicit request: DataRequest[AnyContent]) = {
+    view(
+      SummaryListViewModel(summaryListRows(request.userAnswers)),
+      request.user,
+      ProduceApiCheckYourAnswersViewModel(
+        controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onSubmit(),
+      ),
+      maybeForm = Option.when(!hasEgressSelected(request.userAnswers))(form)
+    )
+  }
 }
 
 object ProduceApiCheckYourAnswersController {
