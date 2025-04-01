@@ -58,6 +58,7 @@ trait SpecBase
         bind[AccessRequestDataRetrievalAction].toInstance(new FakeAccessRequestDataRetrievalAction(userAnswers)),
         bind[AddAnApiDataRetrievalAction].toInstance(new FakeAddAnApiDataRetrievalAction(userAnswers)),
         bind[CreateTeamDataRetrievalAction].toInstance(new FakeCreateTeamDataRetrievalAction(userAnswers)),
+        bind[AddEgressToTeamDataRetrievalAction].toInstance(new FakeAddEgressToTeamDataRetrievalAction(userAnswers)),
         bind[ProduceApiDataRetrievalAction].toInstance(new FakeProduceApiDataRetrievalAction(userAnswers)),
         bind[UpdateApiDataRetrievalAction].toInstance(new FakeUpdateApiDataRetrievalAction(userAnswers)),
         bind[CancelAccessRequestDataRetrievalAction].toInstance(new FakeCancelAccessRequestDataRetrievalAction(userAnswers)),

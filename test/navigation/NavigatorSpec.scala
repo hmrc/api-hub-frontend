@@ -27,6 +27,7 @@ import models.myapis.produce.ProduceApiHowToCreate.Editor
 import models.team.Team
 import models.user.Permissions
 import org.scalatest.TryValues
+import pages.admin.addegresstoteam.AddEgressToTeamStartPage
 import pages.application.accessrequest.{ProvideSupportingInformationPage, RequestProductionAccessPage, RequestProductionAccessSelectApisPage, RequestProductionAccessStartPage}
 import pages.application.cancelaccessrequest.CancelAccessRequestStartPage
 import pages.application.register.{RegisterApplicationNamePage, RegisterApplicationStartPage, RegisterApplicationTeamPage}
@@ -284,6 +285,13 @@ class NavigatorSpec extends SpecBase with TryValues {
           navigator.nextPage(CancelAccessRequestStartPage, NormalMode, emptyUserAnswers) mustBe controllers.application.cancelaccessrequest.routes.CancelAccessRequestSelectApiController.onPageLoad(NormalMode)
         }
       }
+
+      "during the Add Egress to Team journey" - {
+        "must start with the Select Egress page" in {
+          navigator.nextPage(AddEgressToTeamStartPage, NormalMode, emptyUserAnswers) mustBe controllers.admin.addegresstoteam.routes.SelectTeamEgressesController.onPageLoad(NormalMode)
+        }
+      }
+
     }
 
     "in Check mode" - {

@@ -18,6 +18,7 @@ package controllers.admin.addegresstoteam
 
 import com.google.inject.{Inject, Singleton}
 import controllers.actions.{AuthorisedSupportAction, IdentifierAction}
+import models.Mode
 import models.team.Team
 import play.api.i18n.I18nSupport
 import play.api.mvc.*
@@ -35,11 +36,11 @@ class SelectTeamEgressesController @Inject()(
                                              view: SelectTeamEgressView
                                            )(implicit ex: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen isSupport) {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen isSupport) {
     implicit request => Ok(view(Team("id", "name", LocalDateTime.now(), Seq.empty), request.user))
   }
   
-  def onSubmit(): Action[AnyContent] = (identify andThen isSupport) {
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen isSupport) {
     implicit request => Redirect(controllers.admin.addegresstoteam.routes.TeamEgressCheckYourAnswersController.onPageLoad())
   }
 

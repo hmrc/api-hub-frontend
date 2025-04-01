@@ -24,8 +24,10 @@ GET         /shutter-service                                                    
 POST        /shutter-service                                                        controllers.admin.ShutterController.onSubmit()
 
 GET         /add-egress-to-team/start/:teamId                                       controllers.admin.addegresstoteam.AddEgressToTeamStartController.onPageLoad(teamId: String)
-GET         /add-egress-to-team/select-egress                                       controllers.admin.addegresstoteam.SelectTeamEgressesController.onPageLoad()
-POST        /add-egress-to-team/select-egress                                       controllers.admin.addegresstoteam.SelectTeamEgressesController.onSubmit()
+GET         /add-egress-to-team/select-egress                                       controllers.admin.addegresstoteam.SelectTeamEgressesController.onPageLoad(mode: Mode = NormalMode)
+POST        /add-egress-to-team/select-egress                                       controllers.admin.addegresstoteam.SelectTeamEgressesController.onSubmit(mode: Mode = NormalMode)
+GET         /add-egress-to-team/change-egress                                       controllers.admin.addegresstoteam.SelectTeamEgressesController.onPageLoad(mode: Mode = CheckMode)
+POST        /add-egress-to-team/change-egress                                       controllers.admin.addegresstoteam.SelectTeamEgressesController.onSubmit(mode: Mode = CheckMode)
 GET         /add-egress-to-team/check-your-answers                                  controllers.admin.addegresstoteam.TeamEgressCheckYourAnswersController.onPageLoad()
 POST        /add-egress-to-team/check-your-answers                                  controllers.admin.addegresstoteam.TeamEgressCheckYourAnswersController.onSubmit()
 GET         /add-egress-to-team/success                                             controllers.admin.addegresstoteam.TeamEgressSuccessController.onPageLoad()
