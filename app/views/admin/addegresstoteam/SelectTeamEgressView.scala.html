@@ -34,7 +34,7 @@
     @sideNav(team.name, manageTeamNavItems(team, ManageTeamSideNavPages.EgressesPage)) {
         <h1 id="h1" class="govuk-heading-l">@messages("selectTeamEgresses.heading")</h1>
 
-        @formHelper(action = controllers.admin.addegresstoteam.routes.SelectTeamEgressesController.onSubmit()) {
+        @formHelper(action = controllers.admin.addegresstoteam.routes.SelectTeamEgressesController.onSubmit(NormalMode)) {
             @govukButton(
                 Button(
                     content = Text(messages("site.continue")),

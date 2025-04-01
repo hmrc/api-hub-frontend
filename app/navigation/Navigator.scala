@@ -22,6 +22,7 @@ import models.myapis.produce.ProduceApiChooseEgress
 import models.myapis.produce.ProduceApiHowToCreate.{Editor, Upload}
 import models.myapis.produce.ProduceApiHowToAddWiremock
 import pages.*
+import pages.admin.addegresstoteam.AddEgressToTeamStartPage
 import pages.application.accessrequest.{ProvideSupportingInformationPage, RequestProductionAccessPage, RequestProductionAccessSelectApisPage, RequestProductionAccessStartPage}
 import pages.application.cancelaccessrequest.{CancelAccessRequestApplicationPage, CancelAccessRequestConfirmPage, CancelAccessRequestSelectApiPage, CancelAccessRequestStartPage}
 import pages.application.register.{RegisterApplicationNamePage, RegisterApplicationStartPage, RegisterApplicationTeamPage}
@@ -92,6 +93,7 @@ class Navigator @Inject()() {
     case UpdateApiHodPage => _ => controllers.myapis.update.routes.UpdateApiDomainController.onPageLoad(NormalMode)
     case UpdateApiStatusPage => _ => controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onPageLoad()
     case UpdateApiDomainPage => _ => controllers.myapis.update.routes.UpdateApiStatusController.onPageLoad(NormalMode)
+    case AddEgressToTeamStartPage => _ => controllers.admin.addegresstoteam.routes.SelectTeamEgressesController.onPageLoad(NormalMode)
     case _ => _ => routes.IndexController.onPageLoad
   }
 

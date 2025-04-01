@@ -19,6 +19,7 @@ package controllers.helpers
 import models.accessrequest.AccessRequest
 import models.application.Application
 import models.requests.BaseRequest
+import models.team.Team
 import play.api.mvc.{Request, Result}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -42,6 +43,13 @@ trait Fetching {
     apiHubService.getApplication(applicationId, includeDeleted).map {
       case Some(application) => Right(application)
       case None => Left(errorResultBuilder.applicationNotFound(applicationId))
+    }
+  }
+
+  def fetchTeamOrNotFound(teamId: String)(implicit request: BaseRequest[?], ec: ExecutionContext): Future[Either[Result, Team]] = {
+    apiHubService.findTeamById(teamId).map {
+      case Some(team) => Right(team)
+      case None => Left(errorResultBuilder.teamNotFound(teamId))
     }
   }
 

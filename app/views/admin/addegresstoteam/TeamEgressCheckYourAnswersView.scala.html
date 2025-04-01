@@ -34,7 +34,7 @@
         <h1 id="h1" class="govuk-heading-l">@messages("teamEgressCheckYourAnswers.heading")</h1>
 
         <p>
-            <a href="@controllers.admin.addegresstoteam.routes.SelectTeamEgressesController.onPageLoad().url" class="govuk-link">@messages("teamEgressCheckYourAnswers.change")</a>
+            <a href="@controllers.admin.addegresstoteam.routes.SelectTeamEgressesController.onPageLoad(NormalMode).url" class="govuk-link">@messages("teamEgressCheckYourAnswers.change")</a>
         </p>
 
         @formHelper(action = controllers.admin.addegresstoteam.routes.TeamEgressCheckYourAnswersController.onSubmit()) {

@@ -36,6 +36,7 @@ class Module extends play.api.inject.Module {
       bindz(classOf[CreateTeamDataRetrievalAction]).to(classOf[CreateTeamDataRetrievalActionImpl]).eagerly(),
       bindz(classOf[ProduceApiDataRetrievalAction]).to(classOf[ProduceApiDataRetrievalActionImpl]).eagerly(),
       bindz(classOf[UpdateApiDataRetrievalAction]).to(classOf[UpdateApiDataRetrievalActionImpl]).eagerly(),
+      bindz(classOf[AddEgressToTeamDataRetrievalAction]).to(classOf[AddEgressToTeamDataRetrievalActionImpl]).eagerly(),
       bindz(classOf[CancelAccessRequestDataRetrievalAction]).to(classOf[CancelAccessRequestDataRetrievalActionImpl]).eagerly(),
       bindz(classOf[DataRequiredAction]).to(classOf[DataRequiredActionImpl]).eagerly(),
       bindz[ApplicationAuthActionProvider].to(classOf[ApplicationAuthActionProviderImpl]).eagerly(),

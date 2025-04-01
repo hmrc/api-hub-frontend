@@ -18,21 +18,48 @@ package controllers.admin.addegresstoteam
 
 import com.google.inject.{Inject, Singleton}
 import controllers.actions.{AuthorisedSupportAction, IdentifierAction}
+import controllers.helpers.{Fetching, ErrorResultBuilder}
+import models.{NormalMode, UserAnswers}
+import navigation.Navigator
+import pages.admin.addegresstoteam.{AddEgressToTeamStartPage, AddEgressToTeamTeamPage}
 import play.api.i18n.I18nSupport
 import play.api.mvc.*
+import repositories.AddEgressToTeamSessionRepository
+import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
-import scala.concurrent.ExecutionContext
+import java.time.Clock
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class AddEgressToTeamStartController @Inject()(
                                                   override val controllerComponents: MessagesControllerComponents,
                                                   identify: IdentifierAction,
+                                                  clock: Clock,
+                                                  navigator: Navigator,
+                                                  override val apiHubService: ApiHubService,
+                                                  override val errorResultBuilder: ErrorResultBuilder,
+                                                  sessionRepository: AddEgressToTeamSessionRepository,
                                                   isSupport: AuthorisedSupportAction
-                                                )(implicit ex: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                                )(implicit ex: ExecutionContext) extends FrontendBaseController with I18nSupport with Fetching {
 
-  def onPageLoad(teamId: String): Action[AnyContent] = (identify andThen isSupport) {
-    implicit request => Redirect(controllers.admin.addegresstoteam.routes.SelectTeamEgressesController.onPageLoad())
+  def onPageLoad(teamId: String): Action[AnyContent] = (identify andThen isSupport).async {
+    implicit request =>
+      fetchTeamOrNotFound(teamId).flatMap {
+        case Left(result) => Future.successful(result)
+        case Right(team) =>
+          val userAnswers = UserAnswers(
+            id = request.user.userId,
+            lastUpdated = clock.instant()
+          )
+          for {
+            answersWithTeam <- Future.fromTry(userAnswers.set(AddEgressToTeamTeamPage, team))
+            _ <- sessionRepository.set(answersWithTeam)
+          } yield Redirect(navigator.nextPage(AddEgressToTeamStartPage, NormalMode, userAnswers))
+    }
+
   }
 
 }
+
+
