@@ -832,6 +832,12 @@ myApis.produce.selectegress.cya.label = Selected Egress
 myApis.produce.selectegress.change.hidden = Egress
 myApis.produce.egressprefix.error.required = You must state whether you wish to configure path prefixes for your API
 
+myApis.produce.teamHasNoEgress.title = The selected team has no egresses available
+myApis.produce.teamHasNoEgress.body.1 = You can continue creating the API without egress, but you will not be able to deploy to the production environments.
+myApis.produce.teamHasNoEgress.body.2 = If you need access to an egress, review the {0} support documentation.
+myApis.produce.teamHasNoEgress.body.2.link = Getting access to egresses
+myApis.produce.teamHasNoEgress.selectedTeam = Selected team
+
 myApis.update.howtocreate.upload = Upload an OAS file
 myApis.update.howtocreate.editor = Copy and paste into the graphical OpenAPI Specification Editor
 myApis.update.howtocreate.upload.hint = If you already have an OAS file you can upload this file to begin registering your API

@@ -52,7 +52,8 @@ class Navigator @Inject()() {
     case RequestProductionAccessPage => _ => controllers.application.accessrequest.routes.RequestProductionAccessEndJourneyController.submitRequest()
     case ProduceApiStartPage => _ => controllers.myapis.produce.routes.ProduceApiBeforeYouStartController.onPageLoad()
     case ProduceApiBeforeYouStartPage => _ => controllers.myapis.produce.routes.ProduceApiChooseTeamController.onPageLoad(NormalMode)
-    case ProduceApiChooseTeamPage => _ => controllers.myapis.produce.routes.ProduceApiHowToCreateController.onPageLoad(NormalMode)
+    case ProduceApiChooseTeamPage => produceApiChooseTeamNextPage(NormalMode)
+    case ProduceApiTeamWithNoEgressPage => _ => controllers.myapis.produce.routes.ProduceApiHowToCreateController.onPageLoad(NormalMode)
     case ProduceApiUploadOasPage => _ => controllers.myapis.produce.routes.ProduceApiEnterOasController.onPageLoadWithUploadedOas(NormalMode)
     case ProduceApiUploadWiremockPage => _ => controllers.myapis.produce.routes.ProduceApiEnterWiremockController.onPageLoadWithUploadedWiremock(NormalMode)
     case ProduceApiEnterOasPage => _ => controllers.myapis.produce.routes.ProduceApiShortDescriptionController.onPageLoad(NormalMode)
@@ -174,6 +175,14 @@ class Navigator @Inject()() {
     (mode, userAnswers.get(CancelAccessRequestConfirmPage), userAnswers.get(CancelAccessRequestApplicationPage)) match {
       case (_, Some(true), _) => controllers.application.cancelaccessrequest.routes.CancelAccessRequestEndJourneyController.submitRequest()
       case (_, Some(false), Some(application)) => controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id)
+      case _ => routes.JourneyRecoveryController.onPageLoad()
+    }
+  }
+
+  private def produceApiChooseTeamNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
+    (mode, userAnswers.get(ProduceApiChooseTeamPage)) match {
+      case (_, Some(team)) if team.egresses.isEmpty => controllers.myapis.produce.routes.ProduceApiTeamWithNoEgressController.onPageLoad(mode)
+      case (_, Some(_)) => controllers.myapis.produce.routes.ProduceApiHowToCreateController.onPageLoad(mode)
       case _ => routes.JourneyRecoveryController.onPageLoad()
     }
   }

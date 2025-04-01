@@ -41,6 +41,11 @@ POST    /produce/enter-owning-team                          controllers.myapis.p
 GET     /produce/change-enter-owning-team                   controllers.myapis.produce.ProduceApiChooseTeamController.onPageLoad(mode: Mode = CheckMode)
 POST    /produce/change-enter-owning-team                   controllers.myapis.produce.ProduceApiChooseTeamController.onSubmit(mode: Mode = CheckMode)
 
+GET     /produce/team-with-no-egress                        controllers.myapis.produce.ProduceApiTeamWithNoEgressController.onPageLoad(mode: Mode = NormalMode)
+POST    /produce/team-with-no-egress                        controllers.myapis.produce.ProduceApiTeamWithNoEgressController.onSubmit(mode: Mode = NormalMode)
+GET     /produce/change-team-with-no-egress                 controllers.myapis.produce.ProduceApiTeamWithNoEgressController.onPageLoad(mode: Mode = CheckMode)
+POST    /produce/change-team-with-no-egress                 controllers.myapis.produce.ProduceApiTeamWithNoEgressController.onSubmit(mode: Mode = CheckMode)
+
 GET     /produce/upload-oas                                 controllers.myapis.produce.ProduceApiUploadOasController.onPageLoad(mode: Mode = NormalMode)
 POST    /produce/upload-oas                                 controllers.myapis.produce.ProduceApiUploadOasController.onSubmit(mode: Mode = NormalMode)
 GET     /produce/change-upload-oas                          controllers.myapis.produce.ProduceApiUploadOasController.onPageLoad(mode: Mode = CheckMode)
