@@ -56,6 +56,8 @@ site.apiNumber = API number
 site.apiGeneration = API Generation
 site.notHubMaintainable = This API is not maintainable by The Integration Hub
 site.shuttered.warning = The service is currently shuttered
+site.friendlyName = Friendly name
+site.id = ID
 
 date.day = Day
 date.month = Month
@@ -668,6 +670,7 @@ manageTeam.egresses = Egresses
 
 manageTeamEgresses.title = Manage team egresses
 manageTeamEgresses.heading = Manage team egresses
+manageTeamEgresses.table.title = Available egresses
 manageTeamEgresses.addEgresses = Add egress to team
 
 selectTeamEgresses.title = Select which egresses you want to add to the team

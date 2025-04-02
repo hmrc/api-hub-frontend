@@ -16,31 +16,35 @@
 
 package controllers.team
 
+import cats.data.EitherT
 import com.google.inject.{Inject, Singleton}
-import config.CryptoProvider
+import config.HipEnvironments
 import controllers.actions.{IdentifierAction, TeamAuthActionProvider}
-import controllers.helpers.ErrorResultBuilder
-import models.application.Application
-import models.requests.BaseRequest
-import models.team.TeamLenses.*
 import play.api.i18n.I18nSupport
 import play.api.mvc.*
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.team.ManageTeamEgressesView
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class ManageTeamEgressesController @Inject()(
   override val controllerComponents: MessagesControllerComponents,
   identify: IdentifierAction,
   teamAuth: TeamAuthActionProvider,
-  view: ManageTeamEgressesView
+  view: ManageTeamEgressesView,
+  apiHubService: ApiHubService,
+  hipEnvironments: HipEnvironments,
 )(implicit ex: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(id: String): Action[AnyContent] = (identify andThen teamAuth(id)) {
-    implicit request => Ok(view(request.team, request.identifierRequest.user))
+  def onPageLoad(id: String): Action[AnyContent] = (identify andThen teamAuth(id)).async {
+    implicit request =>
+      for {
+        egressGateways <- apiHubService.listEgressGateways(hipEnvironments.deployTo)
+        egresses = egressGateways.filter(e => request.team.egresses.contains(e.id))
+      } yield Ok(view(request.team, request.identifierRequest.user, egresses))
+
   }
 
 }
