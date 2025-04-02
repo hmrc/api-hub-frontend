@@ -672,6 +672,7 @@ manageTeamEgresses.addEgresses = Add egress to team
 
 selectTeamEgresses.title = Select which egresses you want to add to the team
 selectTeamEgresses.heading = Select which egresses you want to add to the team
+selectTeamEgresses.error.required = Select at least one egress
 
 teamEgressCheckYourAnswers.title = Check your answers
 teamEgressCheckYourAnswers.heading = Check your answers

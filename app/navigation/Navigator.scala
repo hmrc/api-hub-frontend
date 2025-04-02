@@ -18,11 +18,10 @@ package navigation
 
 import controllers.routes
 import models.*
-import models.myapis.produce.ProduceApiChooseEgress
 import models.myapis.produce.ProduceApiHowToCreate.{Editor, Upload}
 import models.myapis.produce.ProduceApiHowToAddWiremock
 import pages.*
-import pages.admin.addegresstoteam.AddEgressToTeamStartPage
+import pages.admin.addegresstoteam.{AddEgressToTeamStartPage, SelectTeamEgressesPage}
 import pages.application.accessrequest.{ProvideSupportingInformationPage, RequestProductionAccessPage, RequestProductionAccessSelectApisPage, RequestProductionAccessStartPage}
 import pages.application.cancelaccessrequest.{CancelAccessRequestApplicationPage, CancelAccessRequestConfirmPage, CancelAccessRequestSelectApiPage, CancelAccessRequestStartPage}
 import pages.application.register.{RegisterApplicationNamePage, RegisterApplicationStartPage, RegisterApplicationTeamPage}
@@ -95,6 +94,7 @@ class Navigator @Inject()() {
     case UpdateApiStatusPage => _ => controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onPageLoad()
     case UpdateApiDomainPage => _ => controllers.myapis.update.routes.UpdateApiStatusController.onPageLoad(NormalMode)
     case AddEgressToTeamStartPage => _ => controllers.admin.addegresstoteam.routes.SelectTeamEgressesController.onPageLoad(NormalMode)
+    case SelectTeamEgressesPage => _ => controllers.admin.addegresstoteam.routes.TeamEgressCheckYourAnswersController.onPageLoad()
     case _ => _ => routes.IndexController.onPageLoad
   }
 
