@@ -16,30 +16,62 @@
 
 @import models.team.Team
 @import models.user.UserModel
+@import models.api.EgressGateway
 @import viewmodels.team.{ManageTeamNavItems, ManageTeamSideNavPages}
+@import viewmodels.LegendSize
 @import config.FrontendAppConfig
 
 @this(
     layout: templates.Layout,
     govukButton: GovukButton,
+    govukCheckboxes: GovukCheckboxes,
+    govukErrorSummary: GovukErrorSummary,
     sideNav: views.html.templates.SideNav,
     formHelper: FormWithCSRF,
     manageTeamNavItems: ManageTeamNavItems
 )
 
-@(team: Team, user: UserModel)(implicit request: Request[?], messages: Messages)
+@(form: Form[?], team: Team, egresses: Seq[EgressGateway], user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("selectTeamEgresses.title")), user = Some(user), fullWidth = true) {
 
     @sideNav(team.name, manageTeamNavItems(team, ManageTeamSideNavPages.EgressesPage)) {
-        <h1 id="h1" class="govuk-heading-l">@messages("selectTeamEgresses.heading")</h1>
-
         @formHelper(action = controllers.admin.addegresstoteam.routes.SelectTeamEgressesController.onSubmit(NormalMode)) {
+            @if(form.errors.nonEmpty) {
+                @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
+            }
+
+            @govukCheckboxes(
+                CheckboxesViewModel(
+                    form   = form,
+                    name   = "value",
+                    legend = LegendViewModel(messages("selectTeamEgresses.heading")).asPageHeading(LegendSize.Large),
+                    hint   = Some(Hint(content = Text(team.name))),
+                    items  = egresses.zipWithIndex.map {
+                        case (egress, index) =>
+                            CheckboxItemViewModel(
+                                content = Text(egress.friendlyName),
+                                fieldId = "value",
+                                index = index,
+                                value   = egress.id
+                            )
+                    }
+                )
+            )
+
             @govukButton(
                 Button(
                     content = Text(messages("site.continue")),
                     preventDoubleClick = Some(true)
                 )
+            )
+
+            @govukButton(
+                Button(
+                    content = Text(messages("site.cancel")),
+                    preventDoubleClick = Some(true),
+                    href = Some(controllers.team.routes.ManageTeamEgressesController.onPageLoad(team.id).url)
+                ).asSecondaryButton().withCssClass("govuk-!-margin-left-2")
             )
         }
 
