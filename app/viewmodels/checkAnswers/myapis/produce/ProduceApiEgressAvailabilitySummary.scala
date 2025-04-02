@@ -18,10 +18,9 @@ package viewmodels.checkAnswers.myapis.produce
 
 import controllers.myapis.produce.routes
 import models.{CheckMode, UserAnswers}
-import pages.myapis.produce.ProduceApiEgressAvailabilityPage
+import pages.myapis.produce.ProduceApiChooseTeamPage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
@@ -29,16 +28,13 @@ import viewmodels.implicits.*
 object ProduceApiEgressAvailabilitySummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(ProduceApiEgressAvailabilityPage).map(available =>
-      SummaryListRowViewModel(
-        key = "produceApiEgressAvailability.cya.label",
-        value = ValueViewModel(
-          if (available) "site.yes" else "site.no"
-        ),
-        actions = Seq(
-          ActionItemViewModel("site.change", routes.ProduceApiEgressAvailabilityController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("produceApiEgressAvailability.change.hidden"))
+    answers.get(ProduceApiChooseTeamPage).collect {
+      case team if team.egresses.isEmpty =>
+        SummaryListRowViewModel(
+          key = "produceApiEgressAvailability.cya.label",
+          value = ValueViewModel(
+            Text(messages("produceApiEgressAvailability.cya.teamWithNoEgress"))
+          )
         )
-      )
-    )
+    }
 }

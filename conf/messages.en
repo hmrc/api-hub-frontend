@@ -1133,6 +1133,11 @@ produceApiCheckYourAnswers.title = Review the details of your API
 produceApiCheckYourAnswers.heading = Review the details of your API
 produceApiCheckYourAnswers.description = Review the details of your API before starting the deployment.
 produceApiCheckYourAnswers.button = Deploy API
+produceApiCheckYourAnswers.noEgress.heading = Before you deploy your API, confirm the following:
+produceApiCheckYourAnswers.noEgress.checkbox = I understand that the API will be deployed to the {0} environment, to deploy the API to production environments, I will need to request access to an egress.
+produceApiCheckYourAnswers.noEgress.p1 = You can review the {0} support documentation for more information.
+produceApiCheckYourAnswers.noEgress.p1.link = Getting access to egresses
+produceApiCheckYourAnswers.noEgress.confirmation.error = Confirm that you acknowledge the limitations of missing egresses
 
 allScopes.title = All scopes
 allScopes.heading = All scopes
@@ -1199,7 +1204,8 @@ produceApiEgressAvailability.hint = For more Egress information please follow th
 produceApiEgressAvailability.hint.guidance = Guidance for Egress
 produceApiEgressAvailability.error.required = Select an answer
 produceApiEgressAvailability.change.hidden = ProduceApiEgressAvailability
-produceApiEgressAvailability.cya.label = Is egress available?
+produceApiEgressAvailability.cya.label = Egress availability
+produceApiEgressAvailability.cya.teamWithNoEgress = No egresses available for this team
 
 produceApiEgressSelection.title = Select the Egress for your API
 produceApiEgressSelection.heading = Select the Egress for your API

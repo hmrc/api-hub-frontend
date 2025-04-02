@@ -21,6 +21,7 @@ import controllers.actions.FakeUser
 import controllers.myapis.produce.routes as produceApiRoutes
 import controllers.routes
 import fakes.{FakeDomains, FakeHods}
+import forms.YesNoFormProvider
 import models.api.Alpha
 import models.deployment.*
 import models.myapis.produce.*
@@ -55,6 +56,7 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
   private lazy val produceApiCheckYourAnswersRoute = controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
   private lazy val produceApiCancelRoute = controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onCancel()
   private lazy val viewModel = produce.ProduceApiDeploymentErrorViewModel(produceApiCancelRoute, produceApiCheckYourAnswersRoute)
+  private lazy val form = YesNoFormProvider()("produceApiCheckYourAnswers.noEgress.confirmation.error")
 
   private val fullyPopulatedUserAnswers = UserAnswers(userAnswersId)
     .set(ProduceApiChooseTeamPage, Team("id", "name", LocalDateTime.now(), Seq.empty)).success.value
@@ -70,19 +72,19 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
     .set(ProduceApiEgressAvailabilityPage, true).success.value
     .set(ProduceApiPassthroughPage, true).success.value
 
-  private def summaryList()(implicit msg: Messages) = SummaryListViewModel(Seq(
-    ProduceApiChooseTeamSummary.row(fullyPopulatedUserAnswers),
-    ProduceApiEnterOasSummary.row(fullyPopulatedUserAnswers),
-    ProduceApiNameSummary.row(fullyPopulatedUserAnswers),
-    ProduceApiShortDescriptionSummary.row(fullyPopulatedUserAnswers),
-    ProduceApiEgressAvailabilitySummary.row(fullyPopulatedUserAnswers),
-    ProduceApiEgressSummary.row(fullyPopulatedUserAnswers),
-    ProduceApiEgressPrefixesSummary.row(fullyPopulatedUserAnswers),
-    ProduceApiHodSummary.row(fullyPopulatedUserAnswers, FakeHods),
-    ProduceApiDomainSummary.row(fullyPopulatedUserAnswers, FakeDomains),
-    ProduceApiSubDomainSummary.row(fullyPopulatedUserAnswers, FakeDomains),
-    ProduceApiStatusSummary.row(fullyPopulatedUserAnswers),
-    ProduceApiPassthroughSummary.row(fullyPopulatedUserAnswers)
+  private def summaryList(userAnswers: UserAnswers = fullyPopulatedUserAnswers)(implicit msg: Messages) = SummaryListViewModel(Seq(
+    ProduceApiChooseTeamSummary.row(userAnswers),
+    ProduceApiEnterOasSummary.row(userAnswers),
+    ProduceApiNameSummary.row(userAnswers),
+    ProduceApiShortDescriptionSummary.row(userAnswers),
+    ProduceApiEgressAvailabilitySummary.row(userAnswers),
+    ProduceApiEgressSummary.row(userAnswers),
+    ProduceApiEgressPrefixesSummary.row(userAnswers),
+    ProduceApiHodSummary.row(userAnswers, FakeHods),
+    ProduceApiDomainSummary.row(userAnswers, FakeDomains),
+    ProduceApiSubDomainSummary.row(userAnswers, FakeDomains),
+    ProduceApiStatusSummary.row(userAnswers),
+    ProduceApiPassthroughSummary.row(userAnswers)
   ).flatten)
 
   "ProduceApiCheckYourAnswersController" - {
@@ -101,7 +103,7 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
         
         status(result) mustEqual OK
 
-        contentAsString(result) mustEqual view(expectedSummaryList, FakeUser, viewModel)(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(expectedSummaryList, FakeUser, viewModel, None)(request, messages(fixture.application)).toString
       }
     }
 
@@ -228,6 +230,7 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
           .thenReturn(Future.successful(response))
 
         val request = FakeRequest(POST, produceApiCheckYourAnswersRoute.url)
+          .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(fixture.application, request).value
 
@@ -260,7 +263,7 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       }
     }
 
-    "does not require an egress when one is not available" in {
+    "does not require an egress when one is not available and the acknowledgement checkbox is ticked" in {
       val userAnswers = fullyPopulatedUserAnswers
         .set(ProduceApiEgressAvailabilityPage, false).success.value
         .remove(ProduceApiEgressSelectionPage).success.value
@@ -277,10 +280,42 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
 
       running(fixture.application) {
         val request = FakeRequest(controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onSubmit())
+          .withFormUrlEncodedBody(("value", "true"))
         val result = route(fixture.application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onSuccess("api name", "id").url)
+      }
+    }
+
+    "returns bad request when the acknowledgement checkbox is not ticked on submission" in {
+      val userAnswers = fullyPopulatedUserAnswers
+        .remove(ProduceApiEgressSelectionPage).success.value
+
+      val response: DeploymentsResponse = SuccessfulDeploymentsResponse("id", "1.0.0", 1, "uri.com")
+
+      val fixture = buildFixture(userAnswers = Some(userAnswers))
+      implicit val msgs: Messages = messages(fixture.application)
+
+      when(fixture.apiHubService.generateDeployment(any)(any))
+        .thenReturn(Future.successful(response))
+
+      when(fixture.sessionRepository.clear(FakeUser.userId))
+        .thenReturn(Future.successful(true))
+
+      running(fixture.application) {
+        val view = fixture.application.injector.instanceOf[ProduceApiCheckYourAnswersView]
+
+        val request = FakeRequest(controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onSubmit())
+          .withFormUrlEncodedBody()
+        val result = route(fixture.application, request).value
+        val viewModel = ProduceApiCheckYourAnswersViewModel(
+          controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onSubmit()
+        )
+        val expectedSummaryList = summaryList(userAnswers)
+
+        status(result) mustEqual BAD_REQUEST
+        contentAsString(result) mustEqual view(expectedSummaryList, FakeUser, viewModel, Some(form.bind(Map.empty)))(request, messages(fixture.application)).toString
       }
     }
 

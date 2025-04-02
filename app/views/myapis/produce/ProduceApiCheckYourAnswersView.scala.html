@@ -15,26 +15,79 @@
  *@
 
 @import play.api.libs.json.Json
+@import config.HipEnvironments
 @import models.deployment.{Error, FailuresResponse}
 @import models.user.UserModel
 @import models.myapis.produce.ProduceApiHowToCreate
 @import viewmodels.myapis.produce.ProduceApiCheckYourAnswersViewModel
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukButton: GovukButton,
+    govukCheckboxes: GovukCheckboxes,
     govukSummaryList: GovukSummaryList,
     govukErrorSummary: GovukErrorSummary,
+    hipEnvironments: HipEnvironments,
 )
 
-@(summaryList: SummaryList, userModel: UserModel, viewModel: ProduceApiCheckYourAnswersViewModel, maybeFailuresResponse: Option[FailuresResponse] = None)(implicit request: Request[?], messages: Messages)
+@(
+    summaryList: SummaryList,
+    userModel: UserModel,
+    viewModel: ProduceApiCheckYourAnswersViewModel,
+    maybeForm: Option[Form[?]],
+    maybeFailuresResponse: Option[FailuresResponse] = None
+)(implicit request: Request[?], messages: Messages)
 
 @error(failuresResponse: FailuresResponse) = @{
     ErrorLink(
         content = HtmlContent(s"<pre>${HtmlFormat.escape(Json.prettyPrint(Json.toJson(failuresResponse)))}</pre>"),
         href = Some("#")
     )
+}
+
+@gettingAccessToEgressDocLink = {
+    <a href="TODO">
+        @messages("produceApiCheckYourAnswers.noEgress.p1.link")
+    </a>
+}
+
+@acknowledgementContent = {
+    <p class="govuk-!-margin-top-0">
+        @messages(
+            "produceApiCheckYourAnswers.noEgress.checkbox",
+            hipEnvironments.deployTo.nameKey
+        )
+    </p>
+    <p class="govuk-!-margin-bottom-0">
+        @Html(messages(
+            "produceApiCheckYourAnswers.noEgress.p1",
+            gettingAccessToEgressDocLink
+        ))
+    </p>
+}
+
+@noEgressAcknowledgementSection = {
+    @for(form <- maybeForm){
+        <h3 class="govuk-heading-m govuk-!-margin-bottom-3">
+            @messages("produceApiCheckYourAnswers.noEgress.heading")
+        </h3>
+        @govukCheckboxes(
+            Checkboxes(
+                name   = "value",
+                fieldset = None,
+                errorMessage = form.errors.asTextErrorMessageForField(fieldKey = "value"),
+                items  = Seq(
+                    CheckboxItem(
+                        content = HtmlContent(acknowledgementContent),
+                        id = Some("value"),
+                        name = Some("value"),
+                        value = "true"
+                    )
+                )
+            ))
+    }
 }
 
 @layout(pageTitle = titleNoForm(messages("produceApiCheckYourAnswers.title")), user = Some(userModel), fullWidth = true) {
@@ -55,6 +108,7 @@
     @govukSummaryList(summaryList)
 
     @formHelper(action = viewModel.formAction) {
+        @noEgressAcknowledgementSection
         @govukButton(
             ButtonViewModel(messages("produceApiCheckYourAnswers.button")).preventingDoubleClick()
         )
