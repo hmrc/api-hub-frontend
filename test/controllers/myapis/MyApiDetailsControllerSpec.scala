@@ -76,7 +76,7 @@ class MyApiDetailsControllerSpec
 
       status(result) mustBe OK
       contentAsString(result) mustBe view(apiDetail, deploymentStatuses, FakeUser,
-        Some(teamName))(request, messages(fixture.application)).toString()
+        Some(apiTeam))(request, messages(fixture.application)).toString()
       contentAsString(result) must validateAsHtml
     }
   }
@@ -108,7 +108,7 @@ class MyApiDetailsControllerSpec
 
       status(result) mustBe OK
       contentAsString(result) mustBe view(apiDetail, deploymentStatuses, FakeSupporter,
-        Some(apiTeam.name))(request, messages(fixture.application)).toString()
+        Some(apiTeam))(request, messages(fixture.application)).toString()
       contentAsString(result) must validateAsHtml
     }
   }

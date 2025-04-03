@@ -16,6 +16,7 @@
 
 @import models.api.*
 @import models.user.UserModel
+@import models.team.Team
 @import views.html.components.ApiDeployments
 @import views.html.components.IconsLink
 @import viewmodels.myapis.{MyApisNavPages, MyApisNavItems}
@@ -31,15 +32,15 @@
     apiDeployments: ApiDeployments
 )
 
-@(apiDetail: ApiDetail, deploymentStatuses: ApiDeploymentStatuses, user: UserModel, teamName: Option[String])(implicit request: Request[?], messages: Messages)
+@(apiDetail: ApiDetail, deploymentStatuses: ApiDeploymentStatuses, user: UserModel, maybeTeam: Option[Team])(implicit request: Request[?], messages: Messages)
 
 @teamContent = {
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            @{(teamName, apiDetail.teamId) match {
-                case (Some(team), Some(teamId)) =>
-                    Html(s"""<a class="govuk-link govuk-link--no-visited-state" href="${controllers.team.routes.ManageTeamController.onPageLoad(teamId).url}">
-                        $team
+            @{maybeTeam match {
+                case Some(team) =>
+                    Html(s"""<a class="govuk-link govuk-link--no-visited-state" href="${controllers.team.routes.ManageTeamController.onPageLoad(team.id).url}">
+                        ${team.name}
                     </a>""")
                 case _ => messages("apiDetails.details.notSpecified")
             }}
@@ -111,6 +112,20 @@
     Seq(apiNameRow, apiNumberRow, owningTeamRow, publisherReferenceRow, createdRow) ++ apiGenerationRow
 }
 
+@teamHasNoEgressPanel = {
+    <div class="call-out-panel call-out-panel__small govuk-!-margin-top-2">
+        <p class="govuk-body information-tag">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span class="call-out-type">
+                @messages("myApis.details.noEgress.heading")
+            </span>
+        </p>
+        <p class="govuk-body additional-message">
+            @messages("myApis.details.noEgress.message")
+        </p>
+    </div>
+}
+
 @layout(pageTitle = titleNoForm(messages("myApis.details.title")), user = Some(user), fullWidth = true, customScriptsBlock = Some(iconsLink())) {
     @sideNav(apiDetail.title, myApisNavItems(apiDetail, user, MyApisNavPages.ProducerApiDetailsPage, deploymentStatuses)) {
         <h1 id="details" class="govuk-heading-l govuk-!-margin-bottom-3">@messages("myApis.details.title")</h1>
@@ -121,7 +136,13 @@
             ).withCssClass("govuk-summary-list--no-border hip-summary-list__compact govuk-!-margin-bottom-4")
         )
 
-        <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible govuk-!-margin-top-1 govuk-!-margin-bottom-7">
+        <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible govuk-!-margin-top-1 govuk-!-margin-bottom-4">
+
+        @for(team <- maybeTeam){
+            @if(team.egresses.isEmpty){
+                @teamHasNoEgressPanel
+            }
+        }
 
         @apiDeployments(deploymentStatuses)
     }

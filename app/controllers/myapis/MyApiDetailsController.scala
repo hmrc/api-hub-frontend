@@ -45,9 +45,8 @@ class MyApiDetailsController @Inject()(
       deploymentStatuses <- apiHubService.getApiDeploymentStatuses(request.apiDetails.publisherReference)
         .map(_.sortStatusesWithHipEnvironments(hipEnvironments))
       maybeTeam <- request.apiDetails.teamId.fold(Future.successful(None))(apiHubService.findTeamById)
-      teamName = maybeTeam.map(_.name).orElse(Some(Messages("apiDetails.details.team.error")))
     } yield
-      Ok(view(request.apiDetails, deploymentStatuses, request.identifierRequest.user, teamName))
+      Ok(view(request.apiDetails, deploymentStatuses, request.identifierRequest.user, maybeTeam))
   }
 
 }
