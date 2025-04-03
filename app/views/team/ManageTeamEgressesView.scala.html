@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import models.api.EgressGateway
 @import models.team.Team
 @import models.user.UserModel
 @import viewmodels.team.{ManageTeamNavItems, ManageTeamSideNavPages}
@@ -21,24 +22,50 @@
 @this(
     layout: templates.Layout,
     govukButton: GovukButton,
+    govukTable: GovukTable,
     sideNav: views.html.templates.SideNav,
     manageTeamNavItems: ManageTeamNavItems
 )
 
-@(team: Team, user: UserModel)(implicit request: Request[?], messages: Messages)
+@(team: Team, user: UserModel, egresses: Seq[EgressGateway])(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("manageTeamEgresses.title")), user = Some(user), fullWidth = true) {
 
     @sideNav(team.name, manageTeamNavItems(team, ManageTeamSideNavPages.EgressesPage)) {
-        <h1 id="h1" class="govuk-heading-l">@messages("manageTeamEgresses.heading")</h1>
+        <h1 id="h1" class="govuk-heading-l govuk-!-margin-bottom-1">@messages("manageTeamEgresses.heading")</h1>
+        <span class="govuk-caption-l">@team.name</span>
 
-        @govukButton(
-         Button(
-          href = Some(controllers.admin.addegresstoteam.routes.AddEgressToTeamStartController.onPageLoad(team.id).url),
-          content = Text(messages("manageTeamEgresses.addEgresses")),
-          preventDoubleClick = Some(true)
-         )
-        )
+        <div class="govuk-grid-row govuk-!-margin-top-5">
+            <div class="govuk-grid-column-one-half">
+                <h3 class="govuk-heading-m">
+                    @messages("manageTeamEgresses.table.title")
+                </h3>
+            </div>
+            <div class="govuk-grid-column-one-half govuk-!-text-align-right">
+                @if(user.permissions.canSupport) {
+                    @govukButton(
+                        Button(
+                            href = Some(controllers.admin.addegresstoteam.routes.AddEgressToTeamStartController.onPageLoad(team.id).url),
+                            content = Text(messages("manageTeamEgresses.addEgresses")),
+                            preventDoubleClick = Some(true)
+                        )
+                    )
+                }
+            </div>
+        </div>
+
+        @govukTable(Table(
+            head = Some(Seq(
+                HeadCell(Text(messages("site.id"))),
+                HeadCell(Text(messages("site.friendlyName"))),
+            )),
+            rows = egresses.map { egress =>
+                Seq(
+                    TableRow(Text(egress.id)),
+                    TableRow(Text(egress.friendlyName))
+                )
+            },
+        ))
     }
 
 }
