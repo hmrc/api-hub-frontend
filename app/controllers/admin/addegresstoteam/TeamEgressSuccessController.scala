@@ -17,14 +17,15 @@
 package controllers.admin.addegresstoteam
 
 import com.google.inject.{Inject, Singleton}
-import controllers.actions.{AuthorisedSupportAction, IdentifierAction}
+import controllers.actions.{AddEgressToTeamDataRetrievalAction, AuthorisedSupportAction, DataRequiredAction, IdentifierAction}
+import controllers.helpers.ErrorResultBuilder
 import models.team.Team
+import pages.admin.addegresstoteam.AddEgressToTeamTeamPage
 import play.api.i18n.I18nSupport
 import play.api.mvc.*
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.admin.addegresstoteam.TeamEgressSuccessView
 
-import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext
 
 @Singleton
@@ -32,11 +33,17 @@ class TeamEgressSuccessController @Inject()(
                                              override val controllerComponents: MessagesControllerComponents,
                                              identify: IdentifierAction,
                                              isSupport: AuthorisedSupportAction,
+                                             getData: AddEgressToTeamDataRetrievalAction,
+                                             requireData: DataRequiredAction,
+                                             errorResultBuilder: ErrorResultBuilder,
                                              view: TeamEgressSuccessView
                                            )(implicit ex: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen isSupport) {
-    implicit request => Ok(view(Team("id", "name", LocalDateTime.now(), Seq.empty), request.user))
-  }
-
+  def onPageLoad(): Action[AnyContent] = (identify andThen isSupport andThen getData andThen requireData) {
+    implicit request => 
+      request.userAnswers.get(AddEgressToTeamTeamPage) match {
+        case None => errorResultBuilder.teamNotFound("unknown")
+        case Some(team) => Ok(view(team, request.user))
+      }
+    }
 }
