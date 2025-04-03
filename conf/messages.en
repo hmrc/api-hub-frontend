@@ -684,6 +684,10 @@ teamEgressCheckYourAnswers.change = Change egresses
 
 teamEgressSuccess.title = Egress assigned successfully
 teamEgressSuccess.heading = Egress assigned successfully
+teamEgressSuccess.whatnow.heading = What you can do now
+teamEgressSuccess.whatnow.content = View and manage other {0}, or return to the {1} page.
+teamEgressSuccess.whatnow.content.0 = teams
+teamEgressSuccess.whatnow.content.1 = egress
 
 createTeam.title = Team registered successfully
 createTeam.successMessage = Team registered successfully

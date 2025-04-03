@@ -20,17 +20,24 @@
 
 @this(
     layout: templates.Layout,
-    govukButton: GovukButton,
-    sideNav: views.html.templates.SideNav,
-    manageTeamNavItems: ManageTeamNavItems
+    govukPanel: GovukPanel
 )
 
 @(team: Team, user: UserModel)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("teamEgressSuccess.title")), user = Some(user), fullWidth = true) {
+@otherTeamsLink = {<a href="@controllers.admin.routes.ManageTeamsController.onPageLoad().url" class="govuk-link">@messages("teamEgressSuccess.whatnow.content.0")</a>}
 
-    @sideNav(team.name, manageTeamNavItems(team, ManageTeamSideNavPages.EgressesPage)) {
-        <h1 id="h1" class="govuk-heading-l">@messages("teamEgressSuccess.heading")</h1>
-    }
+@egressPageLink = {<a href="@controllers.team.routes.ManageTeamEgressesController.onPageLoad(team.id)" class="govuk-link">@team.name @messages("teamEgressSuccess.whatnow.content.1")</a>}
 
+@layout(pageTitle = titleNoForm(messages("teamEgressSuccess.title")), user = Some(user)) {
+    @govukPanel(Panel(
+        classes = "govuk-!-margin-bottom-9 govuk-panel--warning",
+        title = Text(messages("teamEgressSuccess.title"))
+    ))
+    <h2 class="govuk-heading-m">
+        @messages("teamEgressSuccess.whatnow.heading")
+    </h2>
+    <p class="govuk-body">
+        @Html(messages("teamEgressSuccess.whatnow.content", otherTeamsLink, egressPageLink))
+    </p>
 }
