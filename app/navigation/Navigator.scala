@@ -77,7 +77,7 @@ class Navigator @Inject()() {
     case CancelAccessRequestSelectApiPage => _ => controllers.application.cancelaccessrequest.routes.CancelAccessRequestConfirmController.onPageLoad(NormalMode)
     case CancelAccessRequestConfirmPage => cancelAccessRequestConfirmNextPage(NormalMode)
     case UpdateApiStartPage => _ => controllers.myapis.update.routes.UpdateApiBeforeYouStartController.onPageLoad()
-    case UpdateApiBeforeYouStartPage => _ => controllers.myapis.update.routes.UpdateApiHowToUpdateController.onPageLoad(NormalMode)
+    case UpdateApiBeforeYouStartPage => updateApiChooseTeamNextPage(NormalMode)
     case UpdateApiEnterOasPage => _ => controllers.myapis.update.routes.UpdateApiShortDescriptionController.onPageLoad(NormalMode)
     case UpdateApiUploadOasPage => _ => controllers.myapis.update.routes.UpdateApiEnterOasController.onPageLoadWithUploadedOas(NormalMode)
     case UpdateApiShortDescriptionPage => _ => controllers.myapis.update.routes.UpdateApiReviewNameDescriptionController.onPageLoad(NormalMode)
@@ -227,6 +227,14 @@ class Navigator @Inject()() {
     userAnswers.get(ProduceApiStartPage) match {
       case Some(user) if user.permissions.canSupport => controllers.myapis.produce.routes.ProduceApiPassthroughController.onPageLoad(mode)
       case _ => controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
+    }
+  }
+
+  private def updateApiChooseTeamNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
+    (mode, userAnswers.get(UpdateApiTeamPage)) match {
+      case (_, Some(team)) if team.egresses.isEmpty => controllers.myapis.update.routes.UpdateApiTeamWithNoEgressController.onPageLoad(mode)
+      case (_, Some(_)) => controllers.myapis.update.routes.UpdateApiHowToUpdateController.onPageLoad(mode)
+      case _ => routes.JourneyRecoveryController.onPageLoad()
     }
   }
 

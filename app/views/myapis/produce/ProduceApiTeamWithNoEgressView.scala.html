@@ -16,6 +16,7 @@
 
 @import models.team.Team
 @import models.user.UserModel
+@import viewmodels.myapis.produce.ProduceApiTeamWithNoEgressViewModel
 
 @this(
     formHelper: FormWithCSRF,
@@ -24,7 +25,7 @@
     layout: templates.Layout,
 )
 
-@(team: Team, userModel: UserModel, mode: Mode)(implicit request: Request[?], messages: Messages)
+@(viewModel: ProduceApiTeamWithNoEgressViewModel)(implicit request: Request[?], messages: Messages)
 
 @gettingAccessToEgressLink = {
     <a href="TODO">
@@ -32,9 +33,9 @@
     </a>
 }
 
-@layout(pageTitle = messages("myApis.produce.teamHasNoEgress.title"), user = Some(userModel)) {
+@layout(pageTitle = messages("myApis.produce.teamHasNoEgress.title"), user = Some(viewModel.user)) {
 
-    @formHelper(action = controllers.myapis.produce.routes.ProduceApiTeamWithNoEgressController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = viewModel.formAction, Symbol("autoComplete") -> "off") {
         <h1 id="produceApiTeamWithNoEgressView" class="govuk-!-margin-bottom-2 govuk-heading-xl">@messages("myApis.produce.teamHasNoEgress.title")</h1>
 
         @govukTable(Table(
@@ -45,14 +46,14 @@
                         classes = "govuk-!-font-weight-bold"
                     ),
                     TableRow(
-                        content = Text(team.name),
+                        content = Text(viewModel.team.name),
                         classes = "govuk-!-text-align-left"
                     )
                 ),
             )
         ))
 
-        <p class="govuk-body">@messages("myApis.produce.teamHasNoEgress.body.1")</p>
+        <p class="govuk-body">@messages(viewModel.bodyMessage)</p>
 
         <p class="govuk-body">@Html(messages("myApis.produce.teamHasNoEgress.body.2", gettingAccessToEgressLink))</p>
 
