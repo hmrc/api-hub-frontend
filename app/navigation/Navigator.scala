@@ -53,6 +53,7 @@ class Navigator @Inject()() {
     case ProduceApiStartPage => _ => controllers.myapis.produce.routes.ProduceApiBeforeYouStartController.onPageLoad()
     case ProduceApiBeforeYouStartPage => _ => controllers.myapis.produce.routes.ProduceApiChooseTeamController.onPageLoad(NormalMode)
     case ProduceApiChooseTeamPage => produceApiChooseTeamNextPage(NormalMode)
+    case ProduceApiSelectEgressPage => _ => controllers.myapis.produce.routes.ProduceApiHowToCreateController.onPageLoad(NormalMode)
     case ProduceApiTeamWithNoEgressPage => _ => controllers.myapis.produce.routes.ProduceApiHowToCreateController.onPageLoad(NormalMode)
     case ProduceApiUploadOasPage => _ => controllers.myapis.produce.routes.ProduceApiEnterOasController.onPageLoadWithUploadedOas(NormalMode)
     case ProduceApiUploadWiremockPage => _ => controllers.myapis.produce.routes.ProduceApiEnterWiremockController.onPageLoadWithUploadedWiremock(NormalMode)
@@ -184,7 +185,7 @@ class Navigator @Inject()() {
   private def produceApiChooseTeamNextPage(mode: Mode)(userAnswers: UserAnswers): Call = {
     (mode, userAnswers.get(ProduceApiChooseTeamPage)) match {
       case (_, Some(team)) if team.egresses.isEmpty => controllers.myapis.produce.routes.ProduceApiTeamWithNoEgressController.onPageLoad(mode)
-      case (_, Some(_)) => controllers.myapis.produce.routes.ProduceApiHowToCreateController.onPageLoad(mode)
+      case (_, Some(_)) => controllers.myapis.produce.routes.ProduceApiSelectEgressController.onPageLoad(mode)
       case _ => routes.JourneyRecoveryController.onPageLoad()
     }
   }

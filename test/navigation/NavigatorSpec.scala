@@ -134,8 +134,11 @@ class NavigatorSpec extends SpecBase with TryValues {
         "must go from the Before You Start page to the Choose owning team page" in {
           navigator.nextPage(ProduceApiBeforeYouStartPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiChooseTeamController.onPageLoad(NormalMode)
         }
-        "must go from the Choose owning team page to the How To Create page when the team has egresses" in {
-          navigator.nextPage(ProduceApiChooseTeamPage, NormalMode, emptyUserAnswers.set(ProduceApiChooseTeamPage, teamWithEgresses).get) mustBe controllers.myapis.produce.routes.ProduceApiHowToCreateController.onPageLoad(NormalMode)
+        "must go from the Choose owning team page to the Select Egress page when the team has egresses" in {
+          navigator.nextPage(ProduceApiChooseTeamPage, NormalMode, emptyUserAnswers.set(ProduceApiChooseTeamPage, teamWithEgresses).get) mustBe controllers.myapis.produce.routes.ProduceApiSelectEgressController.onPageLoad(NormalMode)
+        }
+        "must go from the Select Egress page to the How To Create page when the team has egresses" in {
+          navigator.nextPage(ProduceApiSelectEgressPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiHowToCreateController.onPageLoad(NormalMode)
         }
         "must go from the Choose owning team page to the No egress team page when the selected team has no egresses" in {
           navigator.nextPage(ProduceApiChooseTeamPage, NormalMode, emptyUserAnswers.set(ProduceApiChooseTeamPage, teamWithNoEgresses).get) mustBe controllers.myapis.produce.routes.ProduceApiTeamWithNoEgressController.onPageLoad(NormalMode)
