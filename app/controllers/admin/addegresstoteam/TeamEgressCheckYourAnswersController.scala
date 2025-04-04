@@ -64,45 +64,34 @@ class TeamEgressCheckYourAnswersController @Inject()(
     }
   }
 
-//  def onSubmit(): Action[AnyContent] = (identify andThen isSupport andThen getData andThen requireData) async {
-//    implicit request => {
-//
-//      val egresses = request.userAnswers.get(SelectTeamEgressesPage).get
-//      val team = request.userAnswers.get(AddEgressToTeamTeamPage).get
-//
-//      apiHubService.addEgressesToTeam(team.id, egresses) match
-//        case Future.successful(Some(_)) => Redirect(controllers.admin.addegresstoteam.routes.TeamEgressSuccessController.onPageLoad())
-//        case Future.successful(None) =>
+  def onSubmit: Action[AnyContent] = (identify andThen isSupport andThen getData andThen requireData).async {
+    implicit request =>
+      validate(request.userAnswers).fold(
+        call => Future.successful(Redirect(call)),
+        (team, egresses) =>
+          apiHubService.addEgressesToTeam(team.id, egresses).flatMap {
+            case Some(()) =>
+              for {
+                _ <- sessionRepository.clear(request.userAnswers.id)
+              } yield Ok(successView(team, request.user))
+            case _ => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+          }
+      )
+  }
 
+  private def validate(userAnswers: UserAnswers): Either[Call, (Team, Set[String])] = {
+    for {
+      team <- validateTeam(userAnswers)
+      egresses <- validateEgresses(userAnswers, team)
+    } yield (team, egresses)
+  }
 
-    def onSubmit: Action[AnyContent] = (identify andThen isSupport andThen getData andThen requireData).async {
-      implicit request =>
-        validate(request.userAnswers).fold(
-          call => Future.successful(Redirect(call)),
-          (team, egresses) =>
-            apiHubService.addEgressesToTeam(team.id, egresses).flatMap {
-              case Some(()) =>
-                for {
-                  _ <- sessionRepository.clear(request.userAnswers.id)
-                } yield Ok(successView(team, request.user))
-              case _ => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
-            }
-        )
+  private def validateTeam(userAnswers: UserAnswers): Either[Call, Team] = {
+    userAnswers.get(AddEgressToTeamTeamPage) match {
+      case Some(team) => Right(team)
+      case _ => Left(controllers.admin.routes.ManageTeamsController.onPageLoad())
     }
-
-    private def validate(userAnswers: UserAnswers): Either[Call, (Team, Set[String])] = {
-      for {
-        team <- validateTeam(userAnswers)
-        egresses <- validateEgresses(userAnswers, team)
-      } yield (team, egresses)
-    }
-
-    private def validateTeam(userAnswers: UserAnswers): Either[Call, Team] = {
-      userAnswers.get(AddEgressToTeamTeamPage) match {
-        case Some(team) => Right(team)
-        case _ => Left(controllers.admin.routes.ManageTeamsController.onPageLoad())
-      }
-    }
+  }
 
   private def validateEgresses(userAnswers: UserAnswers, team: Team): Either[Call, Set[String]] = {
     userAnswers.get(SelectTeamEgressesPage) match {
