@@ -16,10 +16,11 @@
 
 @import models.api.*
 @import models.api.ApiDeploymentStatus.*
+@import models.team.Team
 @import models.user.UserModel
 @import views.html.components.IconsLink
-@import viewmodels.myapis.{MyApisNavPages, MyApisNavItems}
-@import config.HipEnvironment
+@import viewmodels.myapis.{MyApisNavPages, MyApisNavItems, MyApiEnvironmentViewModel}
+@import config.{HipEnvironment, HipEnvironments}
 
 @this(
         layout: templates.Layout,
@@ -29,9 +30,12 @@
         govukSummaryList: GovukSummaryList,
         govukButton: GovukButton,
         formHelper: FormWithCSRF,
+        hipEnvironments: HipEnvironments,
+        iconsLink: IconsLink,
+        govukWarningText: GovukWarningText,
 )
 
-@(apiDetail: ApiDetail, environment: HipEnvironment, promoteToEnvironment: Option[HipEnvironment], userModel: UserModel, deploymentStatuses: ApiDeploymentStatuses)(implicit request: Request[?], messages: Messages)
+@(viewModel: MyApiEnvironmentViewModel)(implicit request: Request[?], messages: Messages)
 
 @notDeployedContent() = {
     <h3 class="govuk-heading-m">@messages("myApis.environment.title")</h3>
@@ -50,19 +54,25 @@
             rows = Seq(
                 SummaryListRow(
                     key = Key(messages("myApis.environment.version")),
-                    value = Value(HtmlContent(version))
+                    value = Value(Text(version))
+                ),
+                SummaryListRow(
+                    key = Key(messages("site.egress")),
+                    value = Value(Text(viewModel.selectedEgress.getOrElse(messages("myApis.environment.noEgressSelected"))))
                 )
             )
         )
     )
-    @if(apiDetail.isHubMaintainable) {
-        @for(promoteEnvironment <- promoteToEnvironment) {
-            @formHelper(action = controllers.myapis.routes.MyApiEnvironmentController.onSubmit(apiDetail.id, environment.id)) {
+    @if(viewModel.apiDetail.isHubMaintainable) {
+        @warningTeamNoEgress
+        @for(promoteEnvironment <- viewModel.promoteToEnvironment) {
+            @formHelper(action = controllers.myapis.routes.MyApiEnvironmentController.onSubmit(viewModel.apiDetail.id, viewModel.environment.id)) {
                 @govukButton(
                     Button(
                         content = Text(messages("myApis.environment.promoteTo", messages(promoteEnvironment.nameKey))),
                         id = Some("promoteApi"),
-                        preventDoubleClick = Some(true)
+                        preventDoubleClick = Some(true),
+                        disabled = viewModel.selectedEgress.isEmpty
                     )
                 )
             }
@@ -70,16 +80,54 @@
     }
 }
 
+@egressDocumentationLink = {
+    <a class="govuk-link" href="TODO">
+        @messages("myApis.environment.teamWithNoEgresses.p2.link1")
+    </a>
+}
+
+@teamEgressPageLink(team: Team) = {
+    <a class="govuk-link" href="@controllers.team.routes.ManageTeamEgressesController.onPageLoad(team.id).url">
+        @messages("myApis.environment.teamWithNoEgresses.p2.link2")
+    </a>
+}
+
+@warningTeamNoEgressContent(team: Team) = {
+    <div class="govuk-!-margin-left-5">
+        <h3 class="govuk-heading-s">
+            @messages("myApis.environment.teamWithNoEgresses.heading")
+        </h3>
+        <p class="govuk-body">
+            @messages("myApis.environment.teamWithNoEgresses.p1")
+        </p>
+        <p class="govuk-body">
+            @Html(messages("myApis.environment.teamWithNoEgresses.p2", egressDocumentationLink, teamEgressPageLink(team)))
+        </p>
+    </div>
+}
+
+@warningTeamNoEgress = {
+    @for(team <- viewModel.team) {
+        @if(team.egresses.isEmpty && viewModel.environment.id == hipEnvironments.deployTo.id) {
+            @govukWarningText(WarningText(
+                iconFallbackText = Some("Warning"),
+                classes = "hip-warning-text govuk-!-margin-top-2",
+                content = HtmlContent(warningTeamNoEgressContent(team)),
+            ))
+        }
+    }
+}
+
 @tabContent() = @{
-    deploymentStatuses.forEnvironment(environment.id) match {
+    viewModel.deploymentStatuses.forEnvironment(viewModel.environment.id) match {
         case Deployed(_, version) => isDeployedContent(version)
         case _ => notDeployedContent()
     }
 }
 
-@layout(pageTitle = titleNoForm(messages("myApis.details.title")), user = Some(userModel), fullWidth = true) {
-    @sideNav(apiDetail.title, myApisNavItems(apiDetail, userModel, MyApisNavPages.EnvironmentPage(environment), deploymentStatuses)) {
-        <h1 id="details" class="govuk-heading-l">@messages(environment.nameKey) @messages("site.environment")</h1>
+@layout(pageTitle = titleNoForm(messages("myApis.details.title")), user = Some(viewModel.userModel), fullWidth = true, customScriptsBlock = Some(iconsLink())) {
+    @sideNav(viewModel.apiDetail.title, myApisNavItems(viewModel.apiDetail, viewModel.userModel, MyApisNavPages.EnvironmentPage(viewModel.environment), viewModel.deploymentStatuses)) {
+        <h1 id="details" class="govuk-heading-l">@messages(viewModel.environment.nameKey) @messages("site.environment")</h1>
 
         @govukTabs(Tabs(
             items = Seq(

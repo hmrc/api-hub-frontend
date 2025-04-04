@@ -24,6 +24,8 @@ import fakes.FakeHipEnvironments
 import generators.ApiDetailGenerators
 import models.api.ApiDeploymentStatus.{Deployed, NotDeployed}
 import models.api.ApiDeploymentStatuses
+import models.application.TeamMember
+import models.deployment.DeploymentDetails
 import models.team.Team
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -35,6 +37,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import services.ApiHubService
 import utils.HtmlValidation
+import viewmodels.myapis.MyApiEnvironmentViewModel
 import views.html.ErrorTemplate
 import views.html.myapis.MyApiEnvironmentView
 
@@ -51,21 +54,44 @@ class MyApiEnvironmentControllerSpec
     val fixture = buildFixture()
     val teamId = "teamId"
     val teamName = "teamName"
-    val apiTeam = Team(teamId, teamName, LocalDateTime.now(), List.empty)
+    val apiTeam = Team(teamId, teamName, LocalDateTime.now(), List.empty, egresses = Seq("test-egress"))
     val apiDetail = sampleApiDetail().copy(teamId = Some(apiTeam.id))
     val deploymentStatuses = ApiDeploymentStatuses(Seq(
       Deployed(FakeHipEnvironments.production.id, "1.0"),
       Deployed(FakeHipEnvironments.preProduction.id, "1.0"),
       Deployed(FakeHipEnvironments.test.id, "1.0")
     ))
+    val deploymentDetails = DeploymentDetails(
+      description = None,
+      status = None,
+      domain = None,
+      subDomain = None,
+      hods = None,
+      egressMappings = None,
+      prefixesToRemove = None,
+      egress = apiTeam.egresses.headOption
+    )
 
     running(fixture.application) {
       val view = fixture.application.injector.instanceOf[MyApiEnvironmentView]
+      val viewModel = MyApiEnvironmentViewModel(
+        apiDetail,
+        FakeHipEnvironments.test,
+        Some(FakeHipEnvironments.preProduction),
+        FakeUser,
+        deploymentStatuses,
+        Some(apiTeam.egresses.head),
+        Some(apiTeam)
+      )
 
       when(fixture.apiHubService.getApiDeploymentStatuses(eqTo(apiDetail.publisherReference))(any))
         .thenReturn(Future.successful(deploymentStatuses))
+      when(fixture.apiHubService.getDeploymentDetails(eqTo(apiDetail.publisherReference), eqTo(FakeHipEnvironments.test))(any))
+        .thenReturn(Future.successful(Some(deploymentDetails)))
       when(fixture.apiHubService.findTeams(eqTo(Some(FakeUser.email)))(any))
         .thenReturn(Future.successful(List(apiTeam)))
+      when(fixture.apiHubService.findTeamById(eqTo(apiTeam.id))(any))
+        .thenReturn(Future.successful(Some(apiTeam)))
       when(fixture.apiHubService.findTeamById(eqTo(teamId))(any))
         .thenReturn(Future.successful(Some(apiTeam)))
       when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any)).thenReturn(Future.successful(Some(apiDetail)))
@@ -74,31 +100,57 @@ class MyApiEnvironmentControllerSpec
       val result = route(fixture.application, request).value
 
       status(result) mustBe OK
-      contentAsString(result) mustBe view(apiDetail, FakeHipEnvironments.test, Some(FakeHipEnvironments.preProduction), FakeUser, deploymentStatuses)(request, messages(fixture.application)).toString()
+      contentAsString(result) mustBe view(viewModel)(request, messages(fixture.application)).toString()
       contentAsString(result) must validateAsHtml
     }
   }
 
   "must return OK and the correct view for a support user not on the api team" in {
     val fixture = buildFixture(FakeSupporter)
-    val apiDetail = sampleApiDetail()
+    val teamId = "teamId"
+    val teamName = "teamName"
+    val apiTeam = Team(teamId, teamName, LocalDateTime.now(), List.empty, egresses = Seq("test-egress"))
+    val apiDetail = sampleApiDetail().copy(teamId = Some(apiTeam.id))
     val deploymentStatuses = ApiDeploymentStatuses(Seq(
       Deployed(FakeHipEnvironments.production.id, "1.0"),
       Deployed(FakeHipEnvironments.preProduction.id, "1.0"),
       Deployed(FakeHipEnvironments.test.id, "1.0")
     ))
+    val deploymentDetails = DeploymentDetails(
+      description = None,
+      status = None,
+      domain = None,
+      subDomain = None,
+      hods = None,
+      egressMappings = None,
+      prefixesToRemove = None,
+      egress = apiTeam.egresses.headOption
+    )
 
     running(fixture.application) {
       val view = fixture.application.injector.instanceOf[MyApiEnvironmentView]
 
       when(fixture.apiHubService.getApiDeploymentStatuses(eqTo(apiDetail.publisherReference))(any))
         .thenReturn(Future.successful(deploymentStatuses))
+      when(fixture.apiHubService.getDeploymentDetails(eqTo(apiDetail.publisherReference), eqTo(FakeHipEnvironments.test))(any))
+        .thenReturn(Future.successful(Some(deploymentDetails)))
+      when(fixture.apiHubService.findTeamById(eqTo(teamId))(any))
+        .thenReturn(Future.successful(Some(apiTeam)))
       when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any)).thenReturn(Future.successful(Some(apiDetail)))
       val request = FakeRequest(GET, controllers.myapis.routes.MyApiEnvironmentController.onPageLoad(apiDetail.id, FakeHipEnvironments.test.id).url)
       val result = route(fixture.application, request).value
+      val viewModel = MyApiEnvironmentViewModel(
+        apiDetail,
+        FakeHipEnvironments.test,
+        Some(FakeHipEnvironments.preProduction),
+        FakeSupporter,
+        deploymentStatuses,
+        Some(apiTeam.egresses.head),
+        Some(apiTeam)
+      )
 
       status(result) mustBe OK
-      contentAsString(result) mustBe view(apiDetail, FakeHipEnvironments.test, Some(FakeHipEnvironments.preProduction), FakeSupporter, deploymentStatuses)(request, messages(fixture.application)).toString()
+      contentAsString(result) mustBe view(viewModel)(request, messages(fixture.application)).toString()
       contentAsString(result) must validateAsHtml
     }
   }

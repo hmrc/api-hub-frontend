@@ -103,6 +103,10 @@ class ApiHubService @Inject()(
     applicationsConnector.getDeploymentDetails(publisherReference)
   }
 
+  def getDeploymentDetails(publisherReference: String, hipEnvironment: HipEnvironment)(implicit hc: HeaderCarrier): Future[Option[DeploymentDetails]] = {
+    applicationsConnector.getDeploymentDetails(publisherReference, Some(hipEnvironment))
+  }
+
   def generateDeployment(deploymentsRequest: DeploymentsRequest)(implicit hc: HeaderCarrier): Future[DeploymentsResponse] =
     applicationsConnector.generateDeployment(deploymentsRequest)
 

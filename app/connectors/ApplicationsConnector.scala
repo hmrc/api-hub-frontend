@@ -420,8 +420,12 @@ class ApplicationsConnector @Inject()(
       }
   }
 
-  def getDeploymentDetails(publisherReference: String)(implicit hc: HeaderCarrier): Future[Option[DeploymentDetails]] = {
-    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/deployments/$publisherReference")
+  def getDeploymentDetails(publisherReference: String, hipEnvironment: Option[HipEnvironment] = None)(implicit hc: HeaderCarrier): Future[Option[DeploymentDetails]] = {
+    val deploymentUrl = hipEnvironment.fold(
+      url"$applicationsBaseUrl/api-hub-applications/deployments/$publisherReference"
+    )(e =>url"$applicationsBaseUrl/api-hub-applications/deployments/$publisherReference/environment/${e.id}")
+
+    httpClient.get(deploymentUrl)
       .setHeader((ACCEPT, JSON))
       .setHeader(AUTHORIZATION -> clientAuthToken)
       .execute[Either[UpstreamErrorResponse, DeploymentDetails]]

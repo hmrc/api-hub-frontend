@@ -18,13 +18,15 @@ package controllers.myapis
 
 import cats.implicits.toTraverseOps
 import com.google.inject.{Inject, Singleton}
-import config.{FrontendAppConfig, HipEnvironments}
+import config.{FrontendAppConfig, HipEnvironment, HipEnvironments}
 import controllers.actions.{ApiAuthActionProvider, IdentifierAction}
 import controllers.helpers.ErrorResultBuilder
-import play.api.i18n.{I18nSupport, Messages}
+import models.requests.ApiRequest
+import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.myapis.MyApiEnvironmentViewModel
 import views.html.myapis.MyApiEnvironmentView
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -38,7 +40,7 @@ class MyApiEnvironmentController @Inject()(
   apiAuth: ApiAuthActionProvider,
   errorResultBuilder: ErrorResultBuilder,
   apiHubService: ApiHubService,
-  hipEnvironments: HipEnvironments
+  hipEnvironments: HipEnvironments,
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(id: String, environment: String): Action[AnyContent] = (identify andThen apiAuth(id)) async {
@@ -47,11 +49,29 @@ class MyApiEnvironmentController @Inject()(
           .map(hipEnvironment =>
             for {
               deploymentStatuses <- apiHubService.getApiDeploymentStatuses(request.apiDetails.publisherReference)
-            } yield Ok(view(request.apiDetails, hipEnvironment, hipEnvironment.promoteTo, request.identifierRequest.user, deploymentStatuses))
+              selectedEgress <- getEgress(hipEnvironment)
+              team <- request.apiDetails.teamId.flatTraverse(apiHubService.findTeamById)
+              viewModel = MyApiEnvironmentViewModel(
+                request.apiDetails,
+                hipEnvironment,
+                hipEnvironment.promoteTo,
+                request.identifierRequest.user,
+                deploymentStatuses,
+                selectedEgress,
+                team
+              )
+            } yield Ok(view(viewModel))
           ).getOrElse(
             Future.successful(errorResultBuilder.environmentNotFound(environment))
           )
   }
+
+  private def getEgress(hipEnvironment: HipEnvironment)(implicit request: ApiRequest[?]): Future[Option[String]] =
+    apiHubService.getDeploymentDetails(request.apiDetails.publisherReference, hipEnvironment)
+      .map(_.flatMap(deploymentDetails =>
+          Option.when(deploymentDetails.hasEgress)(deploymentDetails.egress).flatten
+      ))
+
 
   def onSubmit(id: String, environment: String): Action[AnyContent] = (identify andThen apiAuth(id)) {
     implicit request =>
