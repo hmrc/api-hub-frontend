@@ -844,7 +844,8 @@ myApis.produce.selectegress.change.hidden = Egress
 myApis.produce.egressprefix.error.required = You must state whether you wish to configure path prefixes for your API
 
 myApis.produce.teamHasNoEgress.title = The selected team has no egresses available
-myApis.produce.teamHasNoEgress.body.1 = You can continue creating the API without egress, but you will not be able to deploy to the production environments.
+myApis.produce.teamHasNoEgress.body.create.1 = You can continue creating the API without egress, but you will not be able to deploy to the production environments.
+myApis.produce.teamHasNoEgress.body.update.1 = You can continue updating the API without egress, but you will not be able to deploy to the production environments.
 myApis.produce.teamHasNoEgress.body.2 = If you need access to an egress, review the {0} support documentation.
 myApis.produce.teamHasNoEgress.body.2.link = Getting access to egresses
 myApis.produce.teamHasNoEgress.selectedTeam = Selected team
