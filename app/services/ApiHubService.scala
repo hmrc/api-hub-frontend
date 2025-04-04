@@ -277,4 +277,8 @@ class ApiHubService @Inject()(
     integrationCatalogueConnector.getReport().map(dashboardStatisticsBuilder.build)
   }
 
+  def addEgressesToTeam(teamId: String, egresses: Set[String]) (implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    logger.debug(s"Adding egresses $egresses to team $teamId")
+    applicationsConnector.addEgressesToTeam(teamId, egresses)
+  }
 }

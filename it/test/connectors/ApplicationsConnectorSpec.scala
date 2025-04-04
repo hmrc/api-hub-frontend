@@ -1876,10 +1876,8 @@ class ApplicationsConnectorSpec
   "validateOas" - {
     "must place the correct request and return success" in {
       val oas = "some oas"
-      val value1 = s"/api-hub-applications/oas/validate"
-      Console.println(s"OIYAF! $value1")
       stubFor(
-        post(urlEqualTo(value1))
+        post(urlEqualTo(s"/api-hub-applications/oas/validate"))
           .withHeader(AUTHORIZATION, equalTo("An authentication token"))
           .withHeader(ACCEPT, equalTo("application/json"))
           .withRequestBody(equalTo(oas))

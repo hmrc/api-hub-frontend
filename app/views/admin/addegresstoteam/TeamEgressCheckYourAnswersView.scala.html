@@ -17,35 +17,75 @@
 @import models.team.Team
 @import models.user.UserModel
 @import viewmodels.team.{ManageTeamNavItems, ManageTeamSideNavPages}
-
+@import viewmodels.admin.AssignTeamEgressesViewModel
 @this(
     layout: templates.Layout,
     govukButton: GovukButton,
     sideNav: views.html.templates.SideNav,
     formHelper: FormWithCSRF,
-    manageTeamNavItems: ManageTeamNavItems
+    manageTeamNavItems: ManageTeamNavItems,
+    govukSummaryList: GovukSummaryList
 )
 
-@(team: Team, user: UserModel)(implicit request: Request[?], messages: Messages)
+@(assignEgressesViewModel: AssignTeamEgressesViewModel, user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("teamEgressCheckYourAnswers.title")), user = Some(user), fullWidth = true) {
 
-    @sideNav(team.name, manageTeamNavItems(team, ManageTeamSideNavPages.EgressesPage)) {
-        <h1 id="h1" class="govuk-heading-l">@messages("teamEgressCheckYourAnswers.heading")</h1>
+    <h1 id="h1" class="govuk-heading-l">@messages("teamEgressCheckYourAnswers.heading")</h1>
 
-        <p>
-            <a href="@controllers.admin.addegresstoteam.routes.SelectTeamEgressesController.onPageLoad(NormalMode).url" class="govuk-link">@messages("teamEgressCheckYourAnswers.change")</a>
-        </p>
+    <h2 class="govuk-heading-m">@messages("teamEgressCheckYourAnswers.details")</h2>
 
-        @formHelper(action = controllers.admin.addegresstoteam.routes.TeamEgressCheckYourAnswersController.onSubmit()) {
-            @govukButton(
-                Button(
-                    content = Text(messages("teamEgressCheckYourAnswers.finish")),
-                    preventDoubleClick = Some(true)
+    @govukSummaryList(
+        SummaryList(
+            rows = Seq(
+                SummaryListRow(
+                    key = Key(HtmlContent(messages("teamEgressCheckYourAnswers.details.name"))),
+                    value = Value(Text(assignEgressesViewModel.team.name))
                 )
+            ),
+        )
+    )
+
+    <h2 class="govuk-heading-m">@messages("teamEgressCheckYourAnswers.addedEgresses")</h2>
+        <div class="call-out-panel govuk-!-margin-top-5 govuk-!-padding-bottom-0 govuk-!-margin-bottom-2">
+            <table class="govuk-table">
+                <thead class="govuk-table__header">
+                    <tr>
+                        <th scope="col" class="govuk-table__header">ID</th>
+                        <th scope="col" class="govuk-table__header">Friendly name</th>
+                    </tr>
+                </thead>
+
+                <tbody class="govuk-table">
+                    @for(egress <- assignEgressesViewModel.egresses) {
+                        <tr >
+                            <td class="govuk-table__cell">
+                                @egress.id
+                            </td>
+                            <td class="govuk-table__cell">
+                                @egress.friendlyName
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    <p>
+        <a href="@controllers.admin.addegresstoteam.routes.SelectTeamEgressesController.onPageLoad(NormalMode).url" class="govuk-link">@messages("teamEgressCheckYourAnswers.change")</a>
+    </p>
+
+    <br>
+
+    <h2 class="govuk-heading-m">@messages("teamEgressCheckYourAnswers.guidance.title")</h2>
+
+    <div class="govuk-body">@messages("teamEgressCheckYourAnswers.guidance")</div>
+
+    @formHelper(action = controllers.admin.addegresstoteam.routes.TeamEgressCheckYourAnswersController.onSubmit()) {
+        @govukButton(
+            Button(
+                content = Text(messages("teamEgressCheckYourAnswers.finish")),
+                preventDoubleClick = Some(true)
             )
-        }
-
+        )
     }
-
 }
