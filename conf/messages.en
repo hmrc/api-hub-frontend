@@ -58,6 +58,7 @@ site.notHubMaintainable = This API is not maintainable by The Integration Hub
 site.shuttered.warning = The service is currently shuttered
 site.friendlyName = Friendly name
 site.id = ID
+site.egress = Egress
 
 date.day = Day
 date.month = Month
@@ -858,7 +859,13 @@ myApis.environment.title = Deployed API
 myApis.environment.notDeployed.message = This API has not been deployed to this environment. To deploy the API to this environment the following steps are required:
 myApis.environment.notDeployed.action = Promote a version from another environment
 myApis.environment.version = API version
+myApis.environment.noEgressSelected = No egress selected
 myApis.environment.promoteTo = Promote to {0} environment
+myApis.environment.teamWithNoEgresses.heading = This team has no egresses available
+myApis.environment.teamWithNoEgresses.p1 = To deploy to a production environment, you will need to request access to an egress.
+myApis.environment.teamWithNoEgresses.p2 = Review the {0} support documentation, you can also check your {1}.
+myApis.environment.teamWithNoEgresses.p2.link1 = Getting access to egresses
+myApis.environment.teamWithNoEgresses.p2.link2 = teams egresses page
 
 myApis.promote.setegress.message = To promote to {0} you must set the egress for this environment
 myApis.promote.setegress.version = Version to be promoted

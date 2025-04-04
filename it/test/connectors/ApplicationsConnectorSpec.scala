@@ -1194,6 +1194,36 @@ class ApplicationsConnectorSpec
       )
     }
 
+    "must perform a request against an environmnet when provided" in {
+      val publisherReference = "test-publisher-ref"
+      val environment = FakeHipEnvironments.production
+      val deploymentDetails = DeploymentDetails(
+        description = Some("test-description"),
+        status = Some("test-status"),
+        domain = Some("test-domain"),
+        subDomain = Some("test-dub-domain"),
+        hods = Some(Seq("test-backend-1", "test-backend-2")),
+        egressMappings = Some(Seq(EgressMapping("prefix", "egress-prefix"))),
+        prefixesToRemove = Some(Seq("test-prefix-1", "test-prefix-2")),
+        egress = Some("test-egress")
+      )
+
+      stubFor(
+        get(urlEqualTo(s"/api-hub-applications/deployments/$publisherReference/environment/${environment.id}"))
+          .withHeader(ACCEPT, equalTo(ContentTypes.JSON))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withBody(Json.toJson(deploymentDetails).toString())
+          )
+      )
+
+      buildConnector(this).getDeploymentDetails(publisherReference, Some(environment))(HeaderCarrier()).map(
+        result =>
+          result.value mustBe deploymentDetails
+      )
+    }
+
     "must return None when the service cannot be found" in {
       val publisherReference = "test-publisher-ref"
 

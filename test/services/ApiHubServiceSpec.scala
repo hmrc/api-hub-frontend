@@ -303,10 +303,36 @@ class ApiHubServiceSpec
 
       val fixture = buildFixture()
 
-      when(fixture.applicationsConnector.getDeploymentDetails(eqTo(publisherReference))(any()))
+      when(fixture.applicationsConnector.getDeploymentDetails(eqTo(publisherReference), any())(any()))
         .thenReturn(Future.successful(Some(deploymentDetails)))
 
       fixture.service.getDeploymentDetails(publisherReference)(HeaderCarrier()).map(
+        actual =>
+          actual.value mustBe deploymentDetails
+      )
+    }
+
+    "must call the applications connector and return the deployment detail for a specific environment" in {
+      val publisherReference = "ref123"
+
+      val deploymentDetails = DeploymentDetails(
+        description = Some("test-description"),
+        status = Some("test-status"),
+        domain = Some("test-domain"),
+        subDomain = Some("test-dub-domain"),
+        hods = Some(Seq("test-backend-1", "test-backend-2")),
+        egressMappings = Some(Seq(EgressMapping("prefix", "egress-prefix"))),
+        prefixesToRemove = Some(Seq("test-prefix-1", "test-prefix-2")),
+        egress = Some("test-egress"),
+      )
+      val environment = FakeHipEnvironments.production
+
+      val fixture = buildFixture()
+
+      when(fixture.applicationsConnector.getDeploymentDetails(eqTo(publisherReference), eqTo(Some(environment)))(any()))
+        .thenReturn(Future.successful(Some(deploymentDetails)))
+
+      fixture.service.getDeploymentDetails(publisherReference, environment)(HeaderCarrier()).map(
         actual =>
           actual.value mustBe deploymentDetails
       )
