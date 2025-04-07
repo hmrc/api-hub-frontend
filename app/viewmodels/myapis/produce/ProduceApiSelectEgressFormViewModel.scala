@@ -14,19 +14,6 @@
  * limitations under the License.
  */
 
-package pages.myapis.produce
+package viewmodels.myapis.produce
 
-import pages.behaviours.PageBehaviours
-import pages.myapis.produce.ProduceApiEgressAvailabilityPage
-
-class ProduceApiEgressAvailablePageSpec extends PageBehaviours {
-
-  "ProduceApiDomainPage" - {
-
-    beRetrievable[Boolean](ProduceApiEgressAvailabilityPage)
-
-    beSettable[Boolean](ProduceApiEgressAvailabilityPage)
-
-    beRemovable[Boolean](ProduceApiEgressAvailabilityPage)
-  }
-}
+case class ProduceApiSelectEgressFormViewModel(value: String, noEgress: Boolean)

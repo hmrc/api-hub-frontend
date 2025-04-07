@@ -14,15 +14,9 @@
  * limitations under the License.
  */
 
-package pages.myapis.produce
+package viewmodels.myapis.produce
 
-import models.myapis.produce.ProduceApiEgressPrefixes
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import models.api.EgressGateway
+import play.api.mvc.Call
 
-case object ProduceApiEgressSelectionPage extends QuestionPage[String] {
-
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "produceApiEgressSelection"
-}
+case class ProduceApiSelectEgressViewModel(titleMessageKey: String, egresses: Seq[EgressGateway], formAction: Call)

@@ -68,8 +68,7 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
     .set(ProduceApiHodPage, Set("hod1")).success.value
     .set(ProduceApiDomainPage, ProduceApiDomainSubdomain("domain", "subdomain")).success.value
     .set(ProduceApiStatusPage, Alpha).success.value
-    .set(ProduceApiEgressSelectionPage, "egress").success.value
-    .set(ProduceApiEgressAvailabilityPage, true).success.value
+    .set(ProduceApiSelectEgressPage, "egress").success.value
     .set(ProduceApiPassthroughPage, true).success.value
 
   private def summaryList(userAnswers: UserAnswers = fullyPopulatedUserAnswers)(implicit msg: Messages) = SummaryListViewModel(Seq(
@@ -218,8 +217,7 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
         (ProduceApiDomainPage, nonSupportUser, produceApiRoutes.ProduceApiDomainController.onPageLoad(CheckMode).url),
         (ProduceApiStatusPage, nonSupportUser, produceApiRoutes.ProduceApiStatusController.onPageLoad(CheckMode).url),
         (ProduceApiPassthroughPage, supportUser, produceApiRoutes.ProduceApiPassthroughController.onPageLoad(CheckMode).url),
-        (ProduceApiEgressSelectionPage, supportUser, produceApiRoutes.ProduceApiEgressSelectionController.onPageLoad(CheckMode).url),
-        (ProduceApiEgressAvailabilityPage, supportUser, produceApiRoutes.ProduceApiEgressAvailabilityController.onPageLoad(CheckMode).url),
+        (ProduceApiSelectEgressPage, supportUser, produceApiRoutes.ProduceApiSelectEgressController.onPageLoad(CheckMode).url),
       )){ case (userAnswerToRemove: QuestionPage[?], user: UserModel, expectedLocation: String) =>
         val fixture = buildFixture(
           Some(fullyPopulatedUserAnswers.remove(userAnswerToRemove).get),
@@ -265,8 +263,7 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
 
     "does not require an egress when one is not available and the acknowledgement checkbox is ticked" in {
       val userAnswers = fullyPopulatedUserAnswers
-        .set(ProduceApiEgressAvailabilityPage, false).success.value
-        .remove(ProduceApiEgressSelectionPage).success.value
+        .set(ProduceApiSelectEgressPage, "").success.value
 
       val response: DeploymentsResponse = SuccessfulDeploymentsResponse("id", "1.0.0", 1, "uri.com")
 
@@ -289,8 +286,7 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
     }
 
     "returns bad request when the acknowledgement checkbox is not ticked on submission" in {
-      val userAnswers = fullyPopulatedUserAnswers
-        .remove(ProduceApiEgressSelectionPage).success.value
+      val userAnswers = fullyPopulatedUserAnswers.set(ProduceApiSelectEgressPage, "").success.value
 
       val response: DeploymentsResponse = SuccessfulDeploymentsResponse("id", "1.0.0", 1, "uri.com")
 

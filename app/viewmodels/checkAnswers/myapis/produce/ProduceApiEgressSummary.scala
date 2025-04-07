@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.myapis.produce
 
 import controllers.myapis.produce.routes
 import models.{CheckMode, UserAnswers}
-import pages.myapis.produce.{ProduceApiChooseTeamPage, ProduceApiEgressSelectionPage}
+import pages.myapis.produce.ProduceApiSelectEgressPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
@@ -29,14 +29,14 @@ import viewmodels.implicits.*
 object ProduceApiEgressSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(ProduceApiEgressSelectionPage).map(egress =>
+    answers.get(ProduceApiSelectEgressPage).map(egress =>
       SummaryListRowViewModel(
         key = "myApis.produce.selectegress.cya.label",
         value = ValueViewModel(
           HtmlContent(HtmlFormat.escape(egress))
         ),
         actions = Seq(
-          ActionItemViewModel("site.change", routes.ProduceApiEgressSelectionController.onPageLoad(CheckMode).url)
+          ActionItemViewModel("site.change", routes.ProduceApiSelectEgressController.onPageLoad(CheckMode).url)
             .withVisuallyHiddenText(messages("produceApiEgressSelection.change.hidden"))
         )
       )

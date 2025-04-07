@@ -19,9 +19,9 @@ package pages.myapis.produce
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object ProduceApiEgressAvailabilityPage extends QuestionPage[Boolean] {
+case object ProduceApiSelectEgressPage extends QuestionPage[String] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "produceApiEgressAvailability"
+  override def toString: String = "produceApiSelectEgress"
 }

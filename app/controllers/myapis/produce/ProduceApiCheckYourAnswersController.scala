@@ -66,7 +66,7 @@ class ProduceApiCheckYourAnswersController @Inject()(
   private val form = formProvider("produceApiCheckYourAnswers.noEgress.confirmation.error")
 
   private def hasEgressSelected(userAnswers: UserAnswers) =
-    userAnswers.get(ProduceApiEgressSelectionPage).isDefined
+    userAnswers.get(ProduceApiSelectEgressPage).exists(!_.isBlank)
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
@@ -182,11 +182,9 @@ class ProduceApiCheckYourAnswersController @Inject()(
   }
 
   private def validateEgress(userAnswers: UserAnswers): Either[Call, Option[String]] = {
-    (userAnswers.get(ProduceApiEgressAvailabilityPage), userAnswers.get(ProduceApiEgressSelectionPage)) match {
-      case (Some(true), Some(egress)) => Right(Some(egress))
-      case (Some(true), None) => Left(routes.ProduceApiEgressSelectionController.onPageLoad(CheckMode))
-      case (Some(false), _) => Right(None)
-      case (None, _) => Left(routes.ProduceApiEgressAvailabilityController.onPageLoad(CheckMode))
+    userAnswers.get(ProduceApiSelectEgressPage) match {
+      case Some(egress) => Right(Option.when(!egress.isBlank)(egress))
+      case None => Left(routes.ProduceApiSelectEgressController.onPageLoad(CheckMode))
     }
   }
 

@@ -1,0 +1,89 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.team.Team
+@import models.api.EgressGateway
+@import models.user.UserModel
+@import viewmodels.myapis.produce.ProduceApiSelectEgressViewModel
+@import views.html.components.IconsLink
+
+@this(
+    formHelper: FormWithCSRF,
+    govukButton: GovukButton,
+    govukSelect: GovukSelect,
+    govukErrorSummary: GovukErrorSummary,
+    iconsLink: IconsLink,
+    layout: templates.Layout,
+)
+
+@(form: Form[?], viewModel: ProduceApiSelectEgressViewModel, userModel: UserModel)(implicit request: Request[?], messages: Messages)
+
+@egressAccessLink = {
+  <a href="TODO" class="govuk-link">@messages("myApis.produce.selectegress.hint.link")</a>
+}
+
+@layout(pageTitle = messages(viewModel.titleMessageKey), user = Some(userModel), customScriptsBlock = Some(iconsLink())) {
+
+    @formHelper(action = viewModel.formAction, Symbol("autoComplete") -> "off") {
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form))
+        }
+
+        <h1 id="produceApiTeamWithNoEgressView" class="govuk-!-margin-bottom-6 govuk-heading-xl">@messages(viewModel.titleMessageKey)</h1>
+
+        <div class="call-out-panel call-out-panel__small ">
+            <p class="govuk-body information-tag">
+                <i class="fa-solid fa-circle-info"></i>
+                <span class="call-out-type">
+                    @messages("myApis.produce.selectegress.hint.heading")
+                </span>
+            </p>
+            <p class="govuk-body additional-message govuk-!-margin-top-1">
+                @Html(messages("myApis.produce.selectegress.hint.body", egressAccessLink))
+            </p>
+        </div>
+
+        @govukSelect(
+            SelectViewModel(
+                field = form("value"),
+                items = SelectItemViewModel(
+                    value = "",
+                    text = messages("myApis.produce.selectegress.unassigned")
+                ) +: viewModel.egresses.map(egressGateway =>
+                    SelectItemViewModel(
+                        value = egressGateway.id,
+                        text = egressGateway.friendlyName
+                    )
+                ),
+                label = LabelViewModel("")
+            )
+        )
+
+        @govukButton(
+            ButtonViewModel(messages("site.continue"))
+                .withName("noegress").withAttribute("value", "false")
+                .preventingDoubleClick()
+        )
+
+        @govukButton(
+            ButtonViewModel(messages("myApis.produce.selectegress.continuewithout"))
+                .withName("noegress").withAttribute("value", "true")
+                .preventingDoubleClick()
+                .withCssClass("govuk-!-margin-left-2")
+                .asSecondaryButton()
+        )
+    }
+}

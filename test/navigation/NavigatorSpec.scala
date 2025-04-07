@@ -134,8 +134,11 @@ class NavigatorSpec extends SpecBase with TryValues {
         "must go from the Before You Start page to the Choose owning team page" in {
           navigator.nextPage(ProduceApiBeforeYouStartPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiChooseTeamController.onPageLoad(NormalMode)
         }
-        "must go from the Choose owning team page to the How To Create page when the team has egresses" in {
-          navigator.nextPage(ProduceApiChooseTeamPage, NormalMode, emptyUserAnswers.set(ProduceApiChooseTeamPage, teamWithEgresses).get) mustBe controllers.myapis.produce.routes.ProduceApiHowToCreateController.onPageLoad(NormalMode)
+        "must go from the Choose owning team page to the Select Egress page when the team has egresses" in {
+          navigator.nextPage(ProduceApiChooseTeamPage, NormalMode, emptyUserAnswers.set(ProduceApiChooseTeamPage, teamWithEgresses).get) mustBe controllers.myapis.produce.routes.ProduceApiSelectEgressController.onPageLoad(NormalMode)
+        }
+        "must go from the Select Egress page to the How To Create page when the team has egresses" in {
+          navigator.nextPage(ProduceApiSelectEgressPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiHowToCreateController.onPageLoad(NormalMode)
         }
         "must go from the Choose owning team page to the No egress team page when the selected team has no egresses" in {
           navigator.nextPage(ProduceApiChooseTeamPage, NormalMode, emptyUserAnswers.set(ProduceApiChooseTeamPage, teamWithNoEgresses).get) mustBe controllers.myapis.produce.routes.ProduceApiTeamWithNoEgressController.onPageLoad(NormalMode)
@@ -157,20 +160,6 @@ class NavigatorSpec extends SpecBase with TryValues {
         //          navigator.nextPage(ProduceApiReviewNameDescriptionPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiHowToAddWiremockController.onPageLoad(NormalMode)
         //        }
         // TODO: remove when bringing back with Wiremock
-        "must go from the API review page to the Egress Availability page" in {
-          navigator.nextPage(ProduceApiReviewNameDescriptionPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiEgressAvailabilityController.onPageLoad(NormalMode)
-        }
-        "must go from the Egress Availability page to the Do You Want to Configure Prefixes page if user answered No" in {
-          val userAnswers = emptyUserAnswers.set(ProduceApiEgressAvailabilityPage, false).get
-          navigator.nextPage(ProduceApiEgressAvailabilityPage, NormalMode, userAnswers) mustBe controllers.myapis.produce.routes.ProduceApiAddPrefixesController.onPageLoad(NormalMode)
-        }
-        "must go from the Egress Availability page to the Egress Selection page if user answered Yes" in {
-          val userAnswers = emptyUserAnswers.set(ProduceApiEgressAvailabilityPage, true).get
-          navigator.nextPage(ProduceApiEgressAvailabilityPage, NormalMode, userAnswers) mustBe controllers.myapis.produce.routes.ProduceApiEgressSelectionController.onPageLoad(NormalMode)
-        }
-        "must go from the Select Egress page to the Add Prefixes page" in {
-          navigator.nextPage(ProduceApiEgressSelectionPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiAddPrefixesController.onPageLoad(NormalMode)
-        }
         "must go from the Add Prefixes page to the Enter Prefixes page if user answered Yes" in {
           val userAnswers = emptyUserAnswers.set(ProduceApiAddPrefixesPage, true).get
           navigator.nextPage(ProduceApiAddPrefixesPage, NormalMode, userAnswers) mustBe controllers.myapis.produce.routes.ProduceApiEgressPrefixesController.onPageLoad(NormalMode)
@@ -358,6 +347,9 @@ class NavigatorSpec extends SpecBase with TryValues {
         "must go from Owning Team page to the Check Your Answers page" in {
           navigator.nextPage(ProduceApiChooseTeamPage, CheckMode, emptyUserAnswers.set(ProduceApiChooseTeamPage, teamWithEgresses).get) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
         }
+        "must go from Select Egress page to the Check Your Answers page" in {
+          navigator.nextPage(ProduceApiSelectEgressPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
+        }
         "must go from the OAS editor page to the Short Description page" in {
           navigator.nextPage(ProduceApiEnterOasPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiShortDescriptionController.onPageLoad(CheckMode)
         }
@@ -367,15 +359,6 @@ class NavigatorSpec extends SpecBase with TryValues {
         "must go from the Preview Name/Description page to the Check Your Answers page" in {
           navigator.nextPage(ProduceApiReviewNameDescriptionPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
         }
-        "must go from the Egress Availability page to the Check Your Answers page if the user selects 'No'" in {
-          val userAnswers = emptyUserAnswers.set(ProduceApiEgressAvailabilityPage, false).get
-          navigator.nextPage(ProduceApiEgressAvailabilityPage, CheckMode, userAnswers) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
-        }
-        "must go from the Egress Availability page to the Egress Selection page if the user selects 'Yes'" in {
-          val userAnswers = emptyUserAnswers.set(ProduceApiEgressAvailabilityPage, true).get
-          navigator.nextPage(ProduceApiEgressAvailabilityPage, CheckMode, userAnswers) mustBe controllers.myapis.produce.routes.ProduceApiEgressSelectionController.onPageLoad(CheckMode)
-        }
-
         "must go from the Wiremock Editor page to the Check Your Answers page" in {
           navigator.nextPage(ProduceApiEnterWiremockPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onPageLoad()
         }
