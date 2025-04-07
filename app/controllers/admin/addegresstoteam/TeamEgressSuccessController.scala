@@ -23,6 +23,7 @@ import models.team.Team
 import pages.admin.addegresstoteam.AddEgressToTeamTeamPage
 import play.api.i18n.I18nSupport
 import play.api.mvc.*
+import repositories.AddEgressToTeamSessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.admin.addegresstoteam.TeamEgressSuccessView
 
@@ -36,14 +37,19 @@ class TeamEgressSuccessController @Inject()(
                                              getData: AddEgressToTeamDataRetrievalAction,
                                              requireData: DataRequiredAction,
                                              errorResultBuilder: ErrorResultBuilder,
-                                             view: TeamEgressSuccessView
+                                             view: TeamEgressSuccessView,
+                                             sessionRepository: AddEgressToTeamSessionRepository
                                            )(implicit ex: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = (identify andThen isSupport andThen getData andThen requireData) {
-    implicit request => 
-      request.userAnswers.get(AddEgressToTeamTeamPage) match {
-        case None => errorResultBuilder.teamNotFound("unknown")
-        case Some(team) => Ok(view(team, request.user))
+    implicit request =>
+      val maybeTeam = request.userAnswers.get(AddEgressToTeamTeamPage)
+      sessionRepository.clear(request.userAnswers.id)
+      maybeTeam match {
+        case None =>
+          errorResultBuilder.teamNotFound("unknown")
+        case Some(team) =>
+          Ok(view(team, request.user))
       }
     }
 }

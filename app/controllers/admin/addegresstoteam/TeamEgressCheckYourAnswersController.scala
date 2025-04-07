@@ -62,10 +62,7 @@ class TeamEgressCheckYourAnswersController @Inject()(
         call => Future.successful(Redirect(call)),
         (team, egresses) =>
           apiHubService.addEgressesToTeam(team.id, egresses).flatMap {
-            case Some(()) =>
-              for {
-                _ <- sessionRepository.clear(request.userAnswers.id)
-              } yield Redirect(controllers.admin.addegresstoteam.routes.TeamEgressSuccessController.onPageLoad())
+            case Some(()) => Future.successful(Redirect(controllers.admin.addegresstoteam.routes.TeamEgressSuccessController.onPageLoad()))
             case _ => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
           }
       )
