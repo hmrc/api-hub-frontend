@@ -20,7 +20,7 @@ import com.google.inject.{Inject, Singleton}
 import config.HipEnvironments
 import controllers.actions.{AddEgressToTeamDataRetrievalAction, AuthorisedSupportAction, DataRequiredAction, IdentifierAction}
 import controllers.routes
-import models.UserAnswers
+import models.{CheckMode, UserAnswers}
 import models.team.Team
 import pages.admin.addegresstoteam.{AddEgressToTeamTeamPage, SelectTeamEgressesPage}
 import play.api.i18n.I18nSupport
@@ -85,7 +85,7 @@ class TeamEgressCheckYourAnswersController @Inject()(
   private def validateEgresses(userAnswers: UserAnswers, team: Team): Either[Call, Set[String]] = {
     userAnswers.get(SelectTeamEgressesPage) match {
       case Some(egresses) => Right(egresses)
-      case _ => Left(controllers.team.routes.ManageTeamEgressesController.onPageLoad(team.id))
+      case _ => Left(controllers.admin.addegresstoteam.routes.SelectTeamEgressesController.onPageLoad(CheckMode))
     }
   }
 
