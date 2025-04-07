@@ -17,29 +17,76 @@
 package controllers.admin.addegresstoteam
 
 import com.google.inject.{Inject, Singleton}
-import controllers.actions.{AuthorisedSupportAction, IdentifierAction}
+import config.HipEnvironments
+import controllers.actions.{AddEgressToTeamDataRetrievalAction, AuthorisedSupportAction, DataRequiredAction, IdentifierAction}
+import controllers.routes
+import models.{CheckMode, UserAnswers}
 import models.team.Team
+import pages.admin.addegresstoteam.{AddEgressToTeamTeamPage, SelectTeamEgressesPage}
 import play.api.i18n.I18nSupport
 import play.api.mvc.*
+import repositories.AddEgressToTeamSessionRepository
+import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.admin.addegresstoteam.TeamEgressCheckYourAnswersView
+import viewmodels.admin.AssignTeamEgressesViewModel
+import views.html.admin.addegresstoteam.{TeamEgressCheckYourAnswersView, TeamEgressSuccessView}
 
-import java.time.LocalDateTime
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class TeamEgressCheckYourAnswersController @Inject()(
-                                             override val controllerComponents: MessagesControllerComponents,
-                                             identify: IdentifierAction,
-                                             isSupport: AuthorisedSupportAction,
-                                             view: TeamEgressCheckYourAnswersView
-                                           )(implicit ex: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                                      override val controllerComponents: MessagesControllerComponents,
+                                                      identify: IdentifierAction,
+                                                      isSupport: AuthorisedSupportAction,
+                                                      cyaView: TeamEgressCheckYourAnswersView,
+                                                      getData: AddEgressToTeamDataRetrievalAction,
+                                                      requireData: DataRequiredAction,
+                                                      apiHubService: ApiHubService,
+                                                      hipEnvironments: HipEnvironments,
+                                                      sessionRepository: AddEgressToTeamSessionRepository
+                                                    )(implicit ex: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen isSupport) {
-    implicit request => Ok(view(Team("id", "name", LocalDateTime.now(), Seq.empty), request.user))
+  def onPageLoad(): Action[AnyContent] = (identify andThen isSupport andThen getData andThen requireData) async {
+    implicit request => {
+        validate(request.userAnswers).fold(
+          call => Future.successful(Redirect(call)),
+          (team, egresses) => for {
+            egressGateways <- apiHubService.listEgressGateways(hipEnvironments.deployTo)
+          } yield Ok(cyaView(AssignTeamEgressesViewModel(team, egressGateways.filter(egressGateway => egresses.contains(egressGateway.id))), request.user)))
+    }
   }
 
-  def onSubmit(): Action[AnyContent] = (identify andThen isSupport) {
-    implicit request => Redirect(controllers.admin.addegresstoteam.routes.TeamEgressSuccessController.onPageLoad())
+  def onSubmit: Action[AnyContent] = (identify andThen isSupport andThen getData andThen requireData).async {
+    implicit request =>
+      validate(request.userAnswers).fold(
+        call => Future.successful(Redirect(call)),
+        (team, egresses) =>
+          apiHubService.addEgressesToTeam(team.id, egresses).flatMap {
+            case Some(()) => Future.successful(Redirect(controllers.admin.addegresstoteam.routes.TeamEgressSuccessController.onPageLoad()))
+            case _ => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+          }
+      )
   }
+
+  private def validate(userAnswers: UserAnswers): Either[Call, (Team, Set[String])] = {
+    for {
+      team <- validateTeam(userAnswers)
+      egresses <- validateEgresses(userAnswers, team)
+    } yield (team, egresses)
+  }
+
+  private def validateTeam(userAnswers: UserAnswers): Either[Call, Team] = {
+    userAnswers.get(AddEgressToTeamTeamPage) match {
+      case Some(team) => Right(team)
+      case _ => Left(controllers.admin.routes.ManageTeamsController.onPageLoad())
+    }
+  }
+
+  private def validateEgresses(userAnswers: UserAnswers, team: Team): Either[Call, Set[String]] = {
+    userAnswers.get(SelectTeamEgressesPage) match {
+      case Some(egresses) => Right(egresses)
+      case _ => Left(controllers.admin.addegresstoteam.routes.SelectTeamEgressesController.onPageLoad(CheckMode))
+    }
+  }
+
 }

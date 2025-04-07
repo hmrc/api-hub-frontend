@@ -25,7 +25,7 @@ import models.api.{ApiDeploymentStatus, ApiDeploymentStatuses, ApiDetailSummary,
 import models.application.*
 import models.deployment.*
 import models.exception.{ApplicationCredentialLimitException, ApplicationsException, TeamNameNotUniqueException}
-import models.requests.{AddApiRequest, ChangeTeamNameRequest, PromotionRequest, TeamMemberRequest}
+import models.requests.{AddApiRequest, AddEgressesRequest, ChangeTeamNameRequest, PromotionRequest, TeamMemberRequest}
 import models.stats.ApisInProductionStatistic
 import models.team.{NewTeam, Team}
 import models.user.UserContactDetails
@@ -677,6 +677,19 @@ class ApplicationsConnector @Inject()(
       .execute[Either[UpstreamErrorResponse, ShareableHipConfig]]
       .flatMap {
         case Right(environments) => Future.successful(environments)
+        case Left(e) => Future.failed(e)
+      }
+  }
+
+  def addEgressesToTeam(teamId: String, egresses: Set[String])(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    httpClient.put(url"$applicationsBaseUrl/api-hub-applications/teams/$teamId/egresses")
+      .setHeader((ACCEPT, JSON))
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .withBody(Json.toJson(AddEgressesRequest(egresses.toSeq)))
+      .execute[Either[UpstreamErrorResponse, Unit]]
+      .flatMap {
+        case Right(_) => Future.successful(Some(()))
+        case Left(e) if e.statusCode == NOT_FOUND => Future.successful(None)
         case Left(e) => Future.failed(e)
       }
   }

@@ -682,6 +682,13 @@ teamEgressCheckYourAnswers.title = Check your answers
 teamEgressCheckYourAnswers.heading = Check your answers
 teamEgressCheckYourAnswers.finish = Finish adding egresses
 teamEgressCheckYourAnswers.change = Change egresses
+teamEgressCheckYourAnswers.details = Team Details
+teamEgressCheckYourAnswers.details.name = Name
+teamEgressCheckYourAnswers.addedEgresses = Added egresses
+teamEgressCheckYourAnswers.guidance.title = Complete adding the egresses
+teamEgressCheckYourAnswers.guidance = The team will have access to the egresses you have added, in all available environments.
+teamEgressCheckYourAnswers.egress.id = ID
+teamEgressCheckYourAnswers.egress.friendlyName = Friendly name
 
 teamEgressSuccess.title = Egress assigned successfully
 teamEgressSuccess.heading = Egress assigned successfully
