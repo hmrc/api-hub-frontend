@@ -71,7 +71,6 @@ class TeamEgressCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
 
       val fixture = buildFixture(FakeSupporter, userAnswers = Some(userAnswers))
 
-      when(fixture.apiHubService.addEgressesToTeam(any(), any())(any())).thenReturn(Future.successful(Some(())))
       when(fixture.apiHubService.listEgressGateways(any())(any())).thenReturn(Future.successful(Seq(gateway)))
       running(fixture.playApplication) {
         val view = fixture.playApplication.injector.instanceOf[TeamEgressCheckYourAnswersView]
@@ -126,7 +125,6 @@ class TeamEgressCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       val fixture = buildFixture(FakeSupporter, userAnswers = Some(userAnswers))
 
       when(fixture.apiHubService.addEgressesToTeam(any(), any())(any())).thenReturn(Future.successful(Some(())))
-      when(fixture.apiHubService.listEgressGateways(any())(any())).thenReturn(Future.successful(Seq(gateway)))
       running(fixture.playApplication) {
         val view = fixture.playApplication.injector.instanceOf[TeamEgressCheckYourAnswersView]
         val request = FakeRequest(POST, controllers.admin.addegresstoteam.routes.TeamEgressCheckYourAnswersController.onPageLoad().url)
