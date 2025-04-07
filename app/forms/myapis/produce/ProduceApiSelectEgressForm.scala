@@ -29,7 +29,10 @@ class ProduceApiSelectEgressForm @Inject() extends Mappings {
     mapping(
       "value" -> default(text(), ""),
       "noegress" -> boolean()
-    )(ProduceApiSelectEgressFormViewModel.apply)(formValues => Some(Tuple.fromProductTyped(formValues))).verifying(
+    )(ProduceApiSelectEgressFormViewModel.apply)(formValues => Some(Tuple.fromProductTyped(formValues))).transform(
+      formValues => if (formValues.noEgress) formValues.copy(value = "") else formValues,
+      identity
+    ).verifying(
       "Select an egress, or use the 'Continue without an egress' button",
       fields => fields match {
         case ProduceApiSelectEgressFormViewModel(_, true) => true

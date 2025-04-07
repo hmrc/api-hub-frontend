@@ -29,7 +29,7 @@
     layout: templates.Layout,
 )
 
-@(form: Form[?], viewModel: ProduceApiSelectEgressViewModel, userModel: UserModel, mode: Mode)(implicit request: Request[?], messages: Messages)
+@(form: Form[?], viewModel: ProduceApiSelectEgressViewModel, userModel: UserModel)(implicit request: Request[?], messages: Messages)
 
 @egressAccessLink = {
   <a href="TODO" class="govuk-link">@messages("myApis.produce.selectegress.hint.link")</a>
@@ -37,7 +37,7 @@
 
 @layout(pageTitle = messages(viewModel.titleMessageKey), user = Some(userModel), customScriptsBlock = Some(iconsLink())) {
 
-    @formHelper(action = controllers.myapis.produce.routes.ProduceApiSelectEgressController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = viewModel.formAction, Symbol("autoComplete") -> "off") {
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }

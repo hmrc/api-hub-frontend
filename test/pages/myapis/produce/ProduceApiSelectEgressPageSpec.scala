@@ -16,13 +16,16 @@
 
 package pages.myapis.produce
 
-import models.myapis.produce.ProduceApiEgressPrefixes
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import pages.behaviours.PageBehaviours
 
-case object ProduceApiEgressSelectionPage extends QuestionPage[String] {
+class ProduceApiSelectEgressPageSpec extends PageBehaviours {
 
-  override def path: JsPath = JsPath \ toString
+  "ProduceApiSelectEgressPage" - {
 
-  override def toString: String = "produceApiEgressSelection"
+    beRetrievable[String](ProduceApiSelectEgressPage)
+
+    beSettable[String](ProduceApiSelectEgressPage)
+
+    beRemovable[String](ProduceApiSelectEgressPage)
+  }
 }

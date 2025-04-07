@@ -81,7 +81,7 @@ class ProduceApiSelectEgressController @Inject()(
         apiHubService.listEgressGateways(hipEnvironments.deployTo).map(egressGateways => {
           val teamEgresses = egressGateways.filter(e => team.egresses.contains(e.id))
           val viewModel = ProduceApiSelectEgressViewModel("myApis.produce.selectegress.title", teamEgresses, controllers.myapis.produce.routes.ProduceApiSelectEgressController.onSubmit(mode))
-          status(view(form, viewModel, request.user, mode))
+          status(view(form, viewModel, request.user))
         })
       case _ => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
     }
