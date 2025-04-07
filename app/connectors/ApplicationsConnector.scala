@@ -678,11 +678,10 @@ class ApplicationsConnector @Inject()(
   }
 
   def addEgressesToTeam(teamId: String, egresses: Set[String])(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
-    val value = Json.toJson(AddEgressesRequest(egresses))
-    httpClient.put(url"$applicationsBaseUrl/api-hub-applications/teams/$teamId")
+    httpClient.put(url"$applicationsBaseUrl/api-hub-applications/teams/$teamId/egresses")
       .setHeader((ACCEPT, JSON))
       .setHeader(AUTHORIZATION -> clientAuthToken)
-      .withBody(value)
+      .withBody(Json.toJson(AddEgressesRequest(egresses.toSeq)))
       .execute[Either[UpstreamErrorResponse, Unit]]
       .flatMap {
         case Right(_) => Future.successful(Some(()))

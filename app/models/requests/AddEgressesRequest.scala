@@ -18,7 +18,7 @@ package models.requests
 
 import play.api.libs.json.{Format, Json}
 
-case class AddEgressesRequest(egresses: Set[String])
+case class AddEgressesRequest(egresses: Seq[String])
 
 object AddEgressesRequest {
   implicit val formatEgressRequest: Format[AddEgressesRequest] = Json.format[AddEgressesRequest]

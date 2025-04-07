@@ -20,23 +20,18 @@ import com.google.inject.{Inject, Singleton}
 import config.HipEnvironments
 import controllers.actions.{AddEgressToTeamDataRetrievalAction, AuthorisedSupportAction, DataRequiredAction, IdentifierAction}
 import controllers.routes
-import models.{CheckMode, UserAnswers}
+import models.UserAnswers
 import models.team.Team
 import pages.admin.addegresstoteam.{AddEgressToTeamTeamPage, SelectTeamEgressesPage}
 import play.api.i18n.I18nSupport
 import play.api.mvc.*
-import repositories.{AddEgressToTeamSessionRepository, CreateTeamSessionRepository}
+import repositories.AddEgressToTeamSessionRepository
 import services.ApiHubService
-import uk.gov.hmrc.govukfrontend.views.Aliases.HtmlContent
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.Key
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.admin.AssignTeamEgressesViewModel
-import viewmodels.govuk.all.{SummaryListRowViewModel, SummaryListViewModel, ValueViewModel}
 import views.html.admin.addegresstoteam.{TeamEgressCheckYourAnswersView, TeamEgressSuccessView}
 
-import java.time.LocalDateTime
 import scala.concurrent.{ExecutionContext, Future}
-import scala.concurrent.impl.Promise
 
 @Singleton
 class TeamEgressCheckYourAnswersController @Inject()(
@@ -44,7 +39,6 @@ class TeamEgressCheckYourAnswersController @Inject()(
                                                       identify: IdentifierAction,
                                                       isSupport: AuthorisedSupportAction,
                                                       cyaView: TeamEgressCheckYourAnswersView,
-                                                      successView: TeamEgressSuccessView,
                                                       getData: AddEgressToTeamDataRetrievalAction,
                                                       requireData: DataRequiredAction,
                                                       apiHubService: ApiHubService,
@@ -54,13 +48,11 @@ class TeamEgressCheckYourAnswersController @Inject()(
 
   def onPageLoad(): Action[AnyContent] = (identify andThen isSupport andThen getData andThen requireData) async {
     implicit request => {
-
-      val egresses = request.userAnswers.get(SelectTeamEgressesPage).get
-      val team = request.userAnswers.get(AddEgressToTeamTeamPage).get
-
-      for {
-        egressGateways <- apiHubService.listEgressGateways(hipEnvironments.deployTo)
-      } yield Ok(cyaView(AssignTeamEgressesViewModel(team, egressGateways.filter(egressGateway => egresses.contains(egressGateway.id))), request.user))
+        validate(request.userAnswers).fold(
+          call => Future.successful(Redirect(call)),
+          (team, egresses) => for {
+            egressGateways <- apiHubService.listEgressGateways(hipEnvironments.deployTo)
+          } yield Ok(cyaView(AssignTeamEgressesViewModel(team, egressGateways.filter(egressGateway => egresses.contains(egressGateway.id))), request.user)))
     }
   }
 
@@ -73,7 +65,7 @@ class TeamEgressCheckYourAnswersController @Inject()(
             case Some(()) =>
               for {
                 _ <- sessionRepository.clear(request.userAnswers.id)
-              } yield Ok(successView(team, request.user))
+              } yield Redirect(controllers.admin.addegresstoteam.routes.TeamEgressSuccessController.onPageLoad())
             case _ => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
           }
       )

@@ -1072,6 +1072,20 @@ class ApiHubServiceSpec
           result mustBe expected
       }
     }
+
+    "addEgressesToTeam" - {
+      "must make the correct request to the applications connector" in {
+        val fixture = buildFixture()
+
+        when(fixture.applicationsConnector.addEgressesToTeam(any, any)(any)).thenReturn(Future.successful(Some(())))
+
+        fixture.service.addEgressesToTeam("team-id", Set("egress1"))(HeaderCarrier()).map {
+          result =>
+            verify(fixture.applicationsConnector).addEgressesToTeam(eqTo("team-id"), eqTo(Set("egress1")))(any)
+            result mustBe Some(())
+        }
+      }
+    }
   }
 
   private case class Fixture(

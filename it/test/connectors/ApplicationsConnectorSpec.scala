@@ -1967,6 +1967,26 @@ class ApplicationsConnectorSpec
       }
     }
   }
+
+  "addEgressesToTeam" - {
+    "must place the correct request and return success" in {
+      val teamId = "test-team-id"
+
+      stubFor(
+        put(urlEqualTo(s"/api-hub-applications/teams/$teamId/egresses"))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withStatus(CREATED)
+          )
+      )
+
+      buildConnector(this).addEgressesToTeam(teamId, Set("egress1","egress2"))(HeaderCarrier()).map {
+        result =>
+          result mustBe Some(())
+      }
+    }
+  }
 }
 
 object ApplicationsConnectorSpec extends HttpClientV2Support {
