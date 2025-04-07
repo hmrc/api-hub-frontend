@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package controllers.myapis.produce
+package controllers.myapis.update
 
 import base.SpecBase
 import controllers.actions.FakeUser
-import controllers.myapis.produce.routes as produceApiRoutes
+import controllers.myapis.update.routes as updateApiRoutes
 import controllers.routes
 import models.application.TeamMember
 import models.team.Team
@@ -27,7 +27,7 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.myapis.produce.ProduceApiChooseTeamPage
+import pages.myapis.update.UpdateApiTeamPage
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -39,21 +39,21 @@ import views.html.myapis.produce.ProduceApiTeamWithNoEgressView
 import java.time.LocalDateTime
 import scala.concurrent.Future
 
-class ProduceApiTeamWithNoEgressControllerSpec extends SpecBase with MockitoSugar {
+class UpdateApiTeamWithNoEgressControllerSpec extends SpecBase with MockitoSugar {
 
   private def onwardRoute = Call("GET", "/foo")
 
-  private lazy val produceApiTeamWithNoEgressRoute = produceApiRoutes.ProduceApiTeamWithNoEgressController.onPageLoad(NormalMode).url
+  private lazy val updateApiTeamWithNoEgressRoute = updateApiRoutes.UpdateApiTeamWithNoEgressController.onPageLoad(NormalMode).url
   private val team = Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email)))
 
-  "ProduceApiTeamWithNoEgress Controller" - {
+  "UpdateApiTeamWithNoEgress Controller" - {
 
     "must return OK and the correct view for a GET" in {
-      val userAnswers = UserAnswers(userAnswersId).set(ProduceApiChooseTeamPage, team).success.value
+      val userAnswers = UserAnswers(userAnswersId).set(UpdateApiTeamPage, team).success.value
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, produceApiTeamWithNoEgressRoute)
+        val request = FakeRequest(GET, updateApiTeamWithNoEgressRoute)
 
         val result = route(application, request).value
 
@@ -62,8 +62,8 @@ class ProduceApiTeamWithNoEgressControllerSpec extends SpecBase with MockitoSuga
           ProduceApiTeamWithNoEgressViewModel(
             team,
             FakeUser,
-            controllers.myapis.produce.routes.ProduceApiTeamWithNoEgressController.onSubmit(NormalMode),
-            "myApis.produce.teamHasNoEgress.body.create.1"
+            controllers.myapis.update.routes.UpdateApiTeamWithNoEgressController.onSubmit(NormalMode),
+            "myApis.produce.teamHasNoEgress.body.update.1"
           )
 
         status(result) mustEqual OK
@@ -87,7 +87,7 @@ class ProduceApiTeamWithNoEgressControllerSpec extends SpecBase with MockitoSuga
 
       running(application) {
         val request =
-          FakeRequest(POST, produceApiTeamWithNoEgressRoute)
+          FakeRequest(POST, updateApiTeamWithNoEgressRoute)
 
         val result = route(application, request).value
 
@@ -101,7 +101,7 @@ class ProduceApiTeamWithNoEgressControllerSpec extends SpecBase with MockitoSuga
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, produceApiTeamWithNoEgressRoute)
+        val request = FakeRequest(GET, updateApiTeamWithNoEgressRoute)
 
         val result = route(application, request).value
 

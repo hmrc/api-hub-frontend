@@ -128,6 +128,7 @@ class UpdateApiStartControllerSpec extends SpecBase with MockitoSugar with Table
         ), UpdateApiEgressAvailabilityPage,
         false
       )
+      val team = Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email)))
 
       forAll(Table(
         ("deploymentDetails", "expectedAnswers"),
@@ -142,6 +143,8 @@ class UpdateApiStartControllerSpec extends SpecBase with MockitoSugar with Table
         when(fixture.sessionRepository.set(any())).thenReturn(Future.successful(true))
         when(fixture.apiHubService.getDeploymentDetails(any)(any))
           .thenReturn(Future.successful(Some(deploymentDetails)))
+        when(fixture.apiHubService.findTeamById(any)(any))
+          .thenReturn(Future.successful(Some(team)))
 
         running(fixture.application) {
           val request = FakeRequest(controllers.myapis.update.routes.UpdateApiStartController.startProduceApi("id"))
@@ -156,6 +159,7 @@ class UpdateApiStartControllerSpec extends SpecBase with MockitoSugar with Table
 
     "must redirect to the next page" in {
       val fixture = buildFixture()
+      val team = Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email)))
       when(fixture.apiHubService.getDeploymentDetails(any)(any))
         .thenReturn(Future.successful(Some(DeploymentDetails(
           description = None,
@@ -168,6 +172,8 @@ class UpdateApiStartControllerSpec extends SpecBase with MockitoSugar with Table
           egress = None,
         ))))
       when(fixture.sessionRepository.set(any())).thenReturn(Future.successful(true))
+      when(fixture.apiHubService.findTeamById(any)(any))
+        .thenReturn(Future.successful(Some(team)))
 
       running(fixture.application) {
         val request = FakeRequest(controllers.myapis.update.routes.UpdateApiStartController.startProduceApi("id"))

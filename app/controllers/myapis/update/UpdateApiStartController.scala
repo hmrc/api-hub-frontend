@@ -16,7 +16,7 @@
 
 package controllers.myapis.update
 
-import cats.data.EitherT
+import cats.data.OptionT
 import com.google.inject.{Inject, Singleton}
 import controllers.actions.{ApiAuthActionProvider, IdentifierAction}
 import controllers.helpers.ErrorResultBuilder
@@ -64,6 +64,7 @@ class UpdateApiStartController @Inject()(
         )(deploymentDetails =>
           for {
             updatedAnswers <- updateAnswer(userAnswers, UpdateApiApiPage, request.apiDetails)
+            updatedAnswers <- updateTeamAnswer(updatedAnswers)
             updatedAnswers <- updateOptionalAnswer(updatedAnswers, UpdateApiShortDescriptionPage, deploymentDetails.description)
             deploymentStatus = deploymentDetails.status.flatMap(s => ApiStatus.values.find(_.toString.equalsIgnoreCase(s)))
             updatedAnswers <- updateOptionalAnswer(updatedAnswers, UpdateApiStatusPage, deploymentStatus)
@@ -92,6 +93,14 @@ class UpdateApiStartController @Inject()(
       } else Future.successful(errorResultBuilder.notHubMaintainable())
     }
   }
+
+  private def updateTeamAnswer(userAnswers: UserAnswers)(implicit request: ApiRequest[?]): Future[UserAnswers] =
+    (for {
+      teamId <- OptionT.fromOption[Future](request.apiDetails.teamId)
+      team <- OptionT(apiHubService.findTeamById(teamId))
+      updatedAnswers <- OptionT.liftF(updateAnswer(userAnswers, UpdateApiTeamPage, team))
+    } yield updatedAnswers)
+      .getOrElse(userAnswers)
 
   private def updateAnswer[A](userAnswers: UserAnswers, page: QuestionPage[A], answer: A)
                              (implicit r: Request[?], w: Writes[A]) =

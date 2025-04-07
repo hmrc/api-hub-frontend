@@ -136,6 +136,11 @@ GET     /update/:id/start                                   controllers.myapis.u
 
 GET     /update/before-you-start                            controllers.myapis.update.UpdateApiBeforeYouStartController.onPageLoad()
 
+GET     /update/team-with-no-egress                        controllers.myapis.update.UpdateApiTeamWithNoEgressController.onPageLoad(mode: Mode = NormalMode)
+POST    /update/team-with-no-egress                        controllers.myapis.update.UpdateApiTeamWithNoEgressController.onSubmit(mode: Mode = NormalMode)
+GET     /update/change-team-with-no-egress                 controllers.myapis.update.UpdateApiTeamWithNoEgressController.onPageLoad(mode: Mode = CheckMode)
+POST    /update/change-team-with-no-egress                 controllers.myapis.update.UpdateApiTeamWithNoEgressController.onSubmit(mode: Mode = CheckMode)
+
 GET     /update/how-to-update                               controllers.myapis.update.UpdateApiHowToUpdateController.onPageLoad(mode: Mode = NormalMode)
 POST    /update/how-to-update                               controllers.myapis.update.UpdateApiHowToUpdateController.onSubmit(mode: Mode = NormalMode)
 GET     /update/change-how-to-update                        controllers.myapis.update.UpdateApiHowToUpdateController.onPageLoad(mode: Mode = CheckMode)

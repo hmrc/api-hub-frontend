@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package controllers.myapis.produce
+package controllers.myapis.update
 
 import controllers.actions.*
 import controllers.routes
 import models.Mode
 import navigation.Navigator
-import pages.myapis.produce.{ProduceApiChooseTeamPage, ProduceApiTeamWithNoEgressPage}
+import pages.myapis.update.{UpdateApiTeamPage, UpdateApiTeamWithNoEgressPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.ProduceApiSessionRepository
@@ -31,12 +31,12 @@ import views.html.myapis.produce.ProduceApiTeamWithNoEgressView
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class ProduceApiTeamWithNoEgressController @Inject()(
+class UpdateApiTeamWithNoEgressController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        sessionRepository: ProduceApiSessionRepository,
                                        navigator: Navigator,
                                        identify: IdentifierAction,
-                                       getData: ProduceApiDataRetrievalAction,
+                                       getData: UpdateApiDataRetrievalAction,
                                        requireData: DataRequiredAction,
                                        val controllerComponents: MessagesControllerComponents,
                                        view: ProduceApiTeamWithNoEgressView
@@ -45,20 +45,20 @@ class ProduceApiTeamWithNoEgressController @Inject()(
     
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
-      request.userAnswers.get(ProduceApiChooseTeamPage).fold(
+      request.userAnswers.get(UpdateApiTeamPage).fold(
         Redirect(routes.JourneyRecoveryController.onPageLoad())
       )(team => Ok(view(
         ProduceApiTeamWithNoEgressViewModel(
           team,
           request.user,
-          controllers.myapis.produce.routes.ProduceApiTeamWithNoEgressController.onSubmit(mode),
-          "myApis.produce.teamHasNoEgress.body.create.1"
+          controllers.myapis.update.routes.UpdateApiTeamWithNoEgressController.onSubmit(mode),
+          "myApis.produce.teamHasNoEgress.body.update.1"
         )
       )))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
-      Redirect(navigator.nextPage(ProduceApiTeamWithNoEgressPage, mode, request.userAnswers))
+      Redirect(navigator.nextPage(UpdateApiTeamWithNoEgressPage, mode, request.userAnswers))
   }
 }
