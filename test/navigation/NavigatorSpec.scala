@@ -203,11 +203,14 @@ class NavigatorSpec extends SpecBase with TryValues {
         "must start with the Before you Start page" in {
           navigator.nextPage(UpdateApiStartPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiBeforeYouStartController.onPageLoad()
         }
-        "must go from the Choose owning team page to the How To Create page when the team has egresses" in {
+        "must go from the Choose owning team page to the How To Update page when the team has egresses" in {
           navigator.nextPage(UpdateApiBeforeYouStartPage, NormalMode, emptyUserAnswers.set(UpdateApiTeamPage, teamWithEgresses).get) mustBe controllers.myapis.update.routes.UpdateApiHowToUpdateController.onPageLoad(NormalMode)
         }
         "must go from the Choose owning team page to the No egress team page when the selected team has no egresses" in {
           navigator.nextPage(UpdateApiBeforeYouStartPage, NormalMode, emptyUserAnswers.set(UpdateApiTeamPage, teamWithNoEgresses).get) mustBe controllers.myapis.update.routes.UpdateApiTeamWithNoEgressController.onPageLoad(NormalMode)
+        }
+        "must go from the No egress team page to the How to update page" in {
+          navigator.nextPage(UpdateApiTeamWithNoEgressPage, NormalMode, emptyUserAnswers.set(UpdateApiTeamPage, teamWithNoEgresses).get) mustBe controllers.myapis.update.routes.UpdateApiHowToUpdateController.onPageLoad(NormalMode)
         }
         "must go from the Enter the OAS page to the Short description page" in {
           navigator.nextPage(UpdateApiEnterOasPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiShortDescriptionController.onPageLoad(NormalMode)
