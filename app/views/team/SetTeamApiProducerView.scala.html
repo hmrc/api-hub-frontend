@@ -1,0 +1,76 @@
+@*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import viewmodels.InputWidth._
+@import models.user.UserModel
+
+@this(
+        layout: templates.Layout,
+        formHelper: FormWithCSRF,
+        govukErrorSummary: GovukErrorSummary,
+        govukInput: GovukInput,
+        govukButton: GovukButton,
+        govukRadios: GovukRadios
+)
+
+@(form: Form[?], submitTo: Call, user: UserModel)(implicit request: Request[?], messages: Messages)
+
+@layout(pageTitle = title(form, messages("changeTeamName.title")), user = Some(user)) {
+
+    @formHelper(action = submitTo) {
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form))
+        }
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <div class="govuk-form-group">
+
+                        @govukRadios(
+                            RadiosViewModel(
+                                field = form("value"),
+                                items = Seq(
+                                    RadioItem(
+                                            content = HtmlContent(messages("manageTeam.apiConsumer", <b>No</b>)),
+                                            value = Some("produce.apis.no"),
+                                            attributes = Map()
+                                        ),
+                                    RadioItem(
+                                        content = HtmlContent(messages("manageTeam.apiProducer", <b>Yes</b>)),
+                                        value = Some("produce.apis.yes"),
+                                        attributes = Map(),
+                                        hint = Some(Hint(content = messages("manageTeam.apiProducer.hint")))
+                                    )
+                                ),
+                                fieldset = Fieldset(
+                                    legend = Some(Legend(
+                                        content = messages("manageTeam.apiProducer.title"),
+                                        classes = "govuk-fieldset__legend--l",
+                                        isPageHeading = true
+                                    ))
+                                )
+                            ).copy(hint = Some(Hint(content = messages("manageTeam.apiProducer.content"))))
+                        )
+                <input type="hidden" value="version20" name="folder">
+                <button type="submit" class="govuk-button govuk-!-margin-top-5" data-module="govuk-button">Continue</button>
+            </div>
+        </div>
+
+
+        </main>
+    }
+}
