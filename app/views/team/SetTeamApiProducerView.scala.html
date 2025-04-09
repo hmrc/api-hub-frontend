@@ -26,11 +26,11 @@
         govukRadios: GovukRadios
 )
 
-@(form: Form[?], submitTo: Call, user: UserModel)(implicit request: Request[?], messages: Messages)
+@(form: Form[?], mode: Mode, user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @layout(pageTitle = title(form, messages("changeTeamName.title")), user = Some(user)) {
 
-    @formHelper(action = submitTo) {
+    @formHelper(action = controllers.team.routes.ManageTeamProducerConsumerController.onSubmit(mode)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -46,12 +46,12 @@
                                 items = Seq(
                                     RadioItem(
                                             content = HtmlContent(messages("manageTeam.apiConsumer", <b>No</b>)),
-                                            value = Some("produce.apis.no"),
+                                            value = Some("false"),
                                             attributes = Map()
                                         ),
                                     RadioItem(
                                         content = HtmlContent(messages("manageTeam.apiProducer", <b>Yes</b>)),
-                                        value = Some("produce.apis.yes"),
+                                        value = Some("true"),
                                         attributes = Map(),
                                         hint = Some(Hint(content = messages("manageTeam.apiProducer.hint")))
                                     )

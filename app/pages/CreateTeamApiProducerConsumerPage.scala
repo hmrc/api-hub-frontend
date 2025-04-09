@@ -18,9 +18,9 @@ package pages
 
 import play.api.libs.json.JsPath
 
-case object CreateTeamApiProducerConsumerPage extends QuestionPage[String] {
+case object CreateTeamApiProducerConsumerPage extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "createTeamApiProducerConsumer"
+  override def toString: String = "createTeamApiProducer"
 }
