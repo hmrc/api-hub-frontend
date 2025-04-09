@@ -668,7 +668,12 @@ manageTeam.return = Return to all teams
 manageTeam.returnToApplication = Return to {0}
 manageTeam.addTeamMember = Add team member
 manageTeam.egresses = Egresses
-
+manageTeam.apiConsumer = {0}, my team will only be consuming APIs
+manageTeam.apiProducer = {0}, my team will be producing APIs
+manageTeam.apiProducer.title = Will the team be producing APIs?
+manageTeam.apiProducer.content = If your team will be producing APIs, you will need to request egress access, to the systems they will be using.
+manageTeam.apiProducer.hint = Once the team has been created, you will be able to request egress access from your teams page.
+manageTeam.apiProducer.error = Make a selection
 manageTeamEgresses.title = Manage team egresses
 manageTeamEgresses.heading = Manage team egresses
 manageTeamEgresses.table.title = Available egresses
