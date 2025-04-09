@@ -884,6 +884,9 @@ myApis.promote.setegress.hint = Set egress for {0}
 myApis.promote.setegress.select = Select an egress
 myApis.promote.setegress.deploy = Promote to {0} environment
 myApis.promote.setegress.error.required = Select an egress for the environment
+myApis.promote.setegress.missing.heading = If the egress you are looking for is not listed
+myApis.promote.setegress.missing.message = If you need access to an egress that is not listed, please review the {0} support documentation.
+myApis.promote.setegress.missing.link = Getting access to egresses
 
 applicationDetailsTable.applicationName = Name
 applicationDetailsTable.owningTeam = Owning team

@@ -22,7 +22,7 @@ import fakes.FakeHipEnvironments
 import forms.myapis.produce.ProduceApiEgressSelectionForm
 import generators.EgressGenerator
 import models.api.ApiDeploymentStatus.Deployed
-import models.api.ApiDeploymentStatuses
+import models.api.{ApiDeploymentStatuses, EgressGateway}
 import models.api.ApiGeneration.V1
 import models.deployment.{FailuresResponse, InvalidOasResponse, SuccessfulDeploymentsResponse}
 import models.team.Team
@@ -56,17 +56,28 @@ class MyApiSetEgressControllerSpec extends SpecBase with MockitoSugar with Egres
   ))
   private val teamId = "teamId"
   private val teamName = "teamName"
-  private val apiTeam = Team(teamId, teamName, LocalDateTime.now(), List.empty)
+  private val allEgresses = Seq(
+    EgressGateway("eg1", "Egress 1"),
+    EgressGateway("eg2", "Egress 2"),
+    EgressGateway("eg3", "Egress 3"),
+    EgressGateway("eg4", "Egress 4"),
+    EgressGateway("eg5", "Egress 5"),
+  )
+  private val teamEgresses = Seq(
+    EgressGateway("eg1", "Egress 1"),
+    EgressGateway("eg4", "Egress 4"),
+  )
+  private val apiTeam = Team(teamId, teamName, LocalDateTime.now(), List.empty, egresses = teamEgresses.map(_.id))
 
   "MyApiSetEgressController Controller" - {
 
     "must return OK and the correct view for a GET" in {
-      val egressGateways = sampleEgressGateways()
       val fixture = buildFixture()
       val apiDetail = FakeApiDetail.copy(teamId = Some(apiTeam.id))
       when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any)).thenReturn(Future.successful(Some(apiDetail)))
-      when(fixture.apiHubService.listEgressGateways(eqTo(FakeHipEnvironments.preProduction))(any)).thenReturn(Future.successful(egressGateways))
+      when(fixture.apiHubService.listEgressGateways(eqTo(FakeHipEnvironments.preProduction))(any)).thenReturn(Future.successful(allEgresses))
       when(fixture.apiHubService.findTeams(eqTo(Some(FakeUser.email)))(any)).thenReturn(Future.successful(List(apiTeam)))
+      when(fixture.apiHubService.findTeamById(eqTo(teamId))(any)).thenReturn(Future.successful(Some(apiTeam)))
       when(fixture.apiHubService.getApiDeploymentStatuses(eqTo(apiDetail.publisherReference))(any)).thenReturn(Future.successful(deploymentStatuses))
 
       running(fixture.application) {
@@ -80,7 +91,7 @@ class MyApiSetEgressControllerSpec extends SpecBase with MockitoSugar with Egres
           FakeHipEnvironments.deployTo,
           FakeHipEnvironments.preProduction,
           Some(FakeUser),
-          egressGateways,
+          teamEgresses,
           deploymentStatuses
         )(messages(fixture.application))
         val view = fixture.application.injector.instanceOf[MyApiSetEgressView]

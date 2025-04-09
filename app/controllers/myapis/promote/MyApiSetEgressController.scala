@@ -81,10 +81,14 @@ class MyApiSetEgressController @Inject()(
     (for {
       fromEnvironment <- hipEnvironments.forEnvironmentIdOptional(environment)
       toEnvironment <- fromEnvironment.promoteTo
+      owningTeamId <- apiDetail.teamId
     } yield for {
       egresses <- apiHubService.listEgressGateways(toEnvironment)
+      team <- apiHubService.findTeamById(owningTeamId)
+      teamEgressIds = team.map(_.egresses).getOrElse(Seq.empty)
+      teamEgresses = egresses.filter(egress => teamEgressIds.contains(egress.id))
       deploymentStatuses <- apiHubService.getApiDeploymentStatuses(apiDetail.publisherReference)
-      viewModel = MyApiSetEgressViewModel(apiDetail, fromEnvironment, toEnvironment, request.maybeUser, egresses, deploymentStatuses)
+      viewModel = MyApiSetEgressViewModel(apiDetail, fromEnvironment, toEnvironment, request.maybeUser, teamEgresses, deploymentStatuses)
     } yield Ok(view(form, viewModel))).getOrElse(
       Future.successful(errorResultBuilder.environmentNotFound(environment))
     )
