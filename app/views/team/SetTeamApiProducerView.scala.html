@@ -65,9 +65,9 @@
                                 )
                             ).copy(hint = Some(Hint(content = messages("manageTeam.apiProducer.content"))))
                         )
-                        <input type="hidden" value="version20" name="folder">
-                        <button type="submit" class="govuk-button govuk-!-margin-top-5" data-module="govuk-button">
-                            Continue</button>
+                        @govukButton(
+                            ButtonViewModel(messages("site.continue")).withCssClass("govuk-!-margin-top-5").withId("continueButton").preventingDoubleClick()
+                        )
                     </div>
                 </div>
             </div>
