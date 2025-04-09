@@ -40,7 +40,7 @@ class Navigator @Inject()() {
     case AddAnApiSelectEndpointsPage => addAnApiSelectEndpointsNextPage(NormalMode)
     case ApiPolicyConditionsDeclarationPage => apiPolicyConditionsDeclarationNextPage(NormalMode)
     case CreateTeamStartPage => _ => controllers.team.routes.CreateTeamNameController.onPageLoad(NormalMode)
-    case CreateTeamNamePage => _ => controllers.team.routes.ManageTeamProducerConsumerController.onPageLoad()
+    case CreateTeamNamePage => _ => controllers.team.routes.ManageTeamProducerConsumerController.onPageLoad(NormalMode)
     case CreateTeamApiProducerConsumerPage => _ => controllers.team.routes.ManageTeamMembersController.onPageLoad()
     case CreateTeamMembersPage => _ => controllers.team.routes.CreateTeamCheckYourAnswersController.onPageLoad()
     case CreateTeamMemberPage => _ => controllers.team.routes.ManageTeamMembersController.onPageLoad()

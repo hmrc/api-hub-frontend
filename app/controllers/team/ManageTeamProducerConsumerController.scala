@@ -54,7 +54,7 @@ class ManageTeamProducerConsumerController @Inject()(
         case None => form
         case Some(value) => form.fill(value)
       }
-      Future.successful(Ok(view(form, mode, request.user)))
+      Future.successful(Ok(view(preparedForm, mode, request.user)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
