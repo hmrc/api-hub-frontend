@@ -29,16 +29,18 @@ import viewmodels.implicits.*
 object ProduceApiEgressSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(ProduceApiSelectEgressPage).map(egress =>
-      SummaryListRowViewModel(
-        key = "myApis.produce.selectegress.cya.label",
-        value = ValueViewModel(
-          HtmlContent(HtmlFormat.escape(egress))
-        ),
-        actions = Seq(
-          ActionItemViewModel("site.change", routes.ProduceApiSelectEgressController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("produceApiEgressSelection.change.hidden"))
-        )
+    val egressValue = answers.get(ProduceApiSelectEgressPage) match {
+      case Some(egress) if egress.nonEmpty => egress
+      case _ => messages("myApis.environment.noEgressSelected")
+    }
+    Some(SummaryListRowViewModel(
+      key = "myApis.produce.selectegress.cya.label",
+      value = ValueViewModel(
+        HtmlContent(HtmlFormat.escape(egressValue))
+      ),
+      actions = Seq(
+        ActionItemViewModel("site.change", routes.ProduceApiSelectEgressController.onPageLoad(CheckMode).url)
+          .withVisuallyHiddenText(messages("produceApiEgressSelection.change.hidden"))
       )
-    )
+    ))
 }

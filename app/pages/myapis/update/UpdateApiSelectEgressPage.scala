@@ -20,9 +20,9 @@ import models.myapis.produce.ProduceApiEgressPrefixes
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object UpdateApiEgressSelectionPage extends QuestionPage[String] {
+case object UpdateApiSelectEgressPage extends QuestionPage[String] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "updateApiEgressSelection"
+  override def toString: String = "UpdateApiSelectEgress"
 }

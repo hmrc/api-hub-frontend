@@ -69,15 +69,13 @@ class UpdateApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar
     .set(UpdateApiHodPage, Set("hod1")).success.value
     .set(UpdateApiDomainPage, ProduceApiDomainSubdomain("domain", "subdomain")).success.value
     .set(UpdateApiStatusPage, Alpha).success.value
-    .set(UpdateApiEgressSelectionPage, "egress").success.value
-    .set(UpdateApiEgressAvailabilityPage, true).success.value
+    .set(UpdateApiSelectEgressPage, "egress").success.value
 
   private def summaryList(userAnswers: UserAnswers = fullyPopulatedUserAnswers)(implicit msg: Messages) = SummaryListViewModel(Seq(
+    UpdateApiEgressSummary.row(userAnswers),
     UpdateApiEnterOasSummary.row(userAnswers),
     UpdateApiNameSummary.row(userAnswers),
     UpdateApiShortDescriptionSummary.row(userAnswers),
-    UpdateApiEgressAvailabilitySummary.row(userAnswers),
-    UpdateApiEgressSummary.row(userAnswers),
     UpdateApiEgressPrefixesSummary.row(userAnswers),
     UpdateApiHodSummary.row(userAnswers, FakeHods),
     UpdateApiDomainSummary.row(userAnswers, FakeDomains),
@@ -258,8 +256,7 @@ class UpdateApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar
         (UpdateApiEgressPrefixesPage, nonSupportUser, updateApiRoutes.UpdateApiEgressPrefixesController.onPageLoad(CheckMode).url),
         (UpdateApiHodPage, nonSupportUser, updateApiRoutes.UpdateApiHodController.onPageLoad(CheckMode).url),
         (UpdateApiDomainPage, nonSupportUser, updateApiRoutes.UpdateApiDomainController.onPageLoad(CheckMode).url),
-        (UpdateApiEgressSelectionPage, supportUser, updateApiRoutes.UpdateApiEgressSelectionController.onPageLoad(CheckMode).url),
-        (UpdateApiEgressAvailabilityPage, supportUser, updateApiRoutes.UpdateApiEgressAvailabilityController.onPageLoad(CheckMode).url),
+        (UpdateApiSelectEgressPage, supportUser, updateApiRoutes.UpdateApiSelectEgressController.onPageLoad(CheckMode).url),
       )){ case (userAnswerToRemove: QuestionPage[?], user: UserModel, expectedLocation: String) =>
         val fixture = buildFixture(
           Some(fullyPopulatedUserAnswers.remove(userAnswerToRemove).get),
@@ -282,7 +279,7 @@ class UpdateApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar
 
   "returns bad request when the acknowledgement checkbox is not ticked on submission" in {
     val userAnswers = fullyPopulatedUserAnswers
-      .remove(UpdateApiEgressSelectionPage).success.value
+      .remove(UpdateApiSelectEgressPage).success.value
 
     val response: DeploymentsResponse = SuccessfulDeploymentsResponse("id", "1.0.0", 1, "uri.com")
 

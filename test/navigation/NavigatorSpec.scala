@@ -204,7 +204,7 @@ class NavigatorSpec extends SpecBase with TryValues {
           navigator.nextPage(UpdateApiStartPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiBeforeYouStartController.onPageLoad()
         }
         "must go from the Choose owning team page to the How To Update page when the team has egresses" in {
-          navigator.nextPage(UpdateApiBeforeYouStartPage, NormalMode, emptyUserAnswers.set(UpdateApiTeamPage, teamWithEgresses).get) mustBe controllers.myapis.update.routes.UpdateApiHowToUpdateController.onPageLoad(NormalMode)
+          navigator.nextPage(UpdateApiBeforeYouStartPage, NormalMode, emptyUserAnswers.set(UpdateApiTeamPage, teamWithEgresses).get) mustBe controllers.myapis.update.routes.UpdateApiSelectEgressController.onPageLoad(NormalMode)
         }
         "must go from the Choose owning team page to the No egress team page when the selected team has no egresses" in {
           navigator.nextPage(UpdateApiBeforeYouStartPage, NormalMode, emptyUserAnswers.set(UpdateApiTeamPage, teamWithNoEgresses).get) mustBe controllers.myapis.update.routes.UpdateApiTeamWithNoEgressController.onPageLoad(NormalMode)
@@ -218,29 +218,8 @@ class NavigatorSpec extends SpecBase with TryValues {
         "must go from the Review a short description page to the API review page" in {
           navigator.nextPage(UpdateApiShortDescriptionPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiReviewNameDescriptionController.onPageLoad(NormalMode)
         }
-        "must go from the API review page to the Egress Availability page if the user previously answered No" in {
-          val userAnswers = emptyUserAnswers.set(UpdateApiEgressAvailabilityPage, false).get
-          navigator.nextPage(UpdateApiReviewNameDescriptionPage, NormalMode, userAnswers) mustBe controllers.myapis.update.routes.UpdateApiEgressAvailabilityController.onPageLoad(NormalMode)
-        }
-        "must go from the API review page to the Egress Selection page if the user previously answered Yes" in {
-          val userAnswers = emptyUserAnswers.set(UpdateApiEgressAvailabilityPage, true).get
-          navigator.nextPage(UpdateApiReviewNameDescriptionPage, NormalMode, userAnswers) mustBe controllers.myapis.update.routes.UpdateApiEgressSelectionController.onPageLoad(NormalMode)
-        }
-        "must go from the Egress Availability page to the Do You Want to Configure Prefixes page if user answered No" in {
-          val userAnswers = emptyUserAnswers.set(UpdateApiEgressAvailabilityPage, false).get
-          navigator.nextPage(UpdateApiEgressAvailabilityPage, NormalMode, userAnswers) mustBe controllers.myapis.update.routes.UpdateApiAddPrefixesController.onPageLoad(NormalMode)
-        }
-        "must go from the Egress Availability page to the Egress Selection page if user answered Yes" in {
-          val userAnswers = emptyUserAnswers.set(UpdateApiEgressAvailabilityPage, true).get
-          navigator.nextPage(UpdateApiEgressAvailabilityPage, NormalMode, userAnswers) mustBe controllers.myapis.update.routes.UpdateApiEgressSelectionController.onPageLoad(NormalMode)
-        }
-        "must go from the Select Egress page to the Add Prefixes page if the user previously answered No" in {
-          val userAnswers = emptyUserAnswers.set(UpdateApiAddPrefixesPage, false).get
-          navigator.nextPage(UpdateApiEgressSelectionPage, NormalMode, userAnswers) mustBe controllers.myapis.update.routes.UpdateApiAddPrefixesController.onPageLoad(NormalMode)
-        }
-        "must go from the Select Egress page to the Prefixes page if the user previously answered Yes" in {
-          val userAnswers = emptyUserAnswers.set(UpdateApiAddPrefixesPage, true).get
-          navigator.nextPage(UpdateApiEgressSelectionPage, NormalMode, userAnswers) mustBe controllers.myapis.update.routes.UpdateApiEgressPrefixesController.onPageLoad(NormalMode)
+        "must go from the Select Egress page to the How To Create page when the team has egresses" in {
+          navigator.nextPage(UpdateApiSelectEgressPage, NormalMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiHowToUpdateController.onPageLoad(NormalMode)
         }
         "must go from the Add Prefixes page to the HoDs page if user answered No" in {
           val userAnswers = emptyUserAnswers.set(UpdateApiAddPrefixesPage, false).get
@@ -406,13 +385,8 @@ class NavigatorSpec extends SpecBase with TryValues {
         "must go from the review page to the CYA page" in {
           navigator.nextPage(UpdateApiReviewNameDescriptionPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onPageLoad()
         }
-        "must go from the Egress Availability page to the Egress Selection page if user answered Yes" in {
-          val userAnswers = emptyUserAnswers.set(UpdateApiEgressAvailabilityPage, true).get
-          navigator.nextPage(UpdateApiEgressAvailabilityPage, CheckMode, userAnswers) mustBe controllers.myapis.update.routes.UpdateApiEgressSelectionController.onPageLoad(CheckMode)
-        }
-        "must go from the Egress Availability page to the User Answers page if user answered No" in {
-          val userAnswers = emptyUserAnswers.set(UpdateApiEgressAvailabilityPage, false).get
-          navigator.nextPage(UpdateApiEgressAvailabilityPage, CheckMode, userAnswers) mustBe controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onPageLoad()
+        "must go from Select Egress page to the Check Your Answers page" in {
+          navigator.nextPage(UpdateApiSelectEgressPage, CheckMode, emptyUserAnswers) mustBe controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onPageLoad()
         }
         "must go from the Add Prefixes page to the Check Your Answers page if user answered No" in {
           val userAnswers = emptyUserAnswers.set(UpdateApiAddPrefixesPage, false).get
