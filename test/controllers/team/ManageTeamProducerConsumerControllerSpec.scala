@@ -21,7 +21,7 @@ import controllers.actions.FakeUser
 import controllers.{routes, team}
 import forms.{CreateTeamNameFormProvider, YesNoFormProvider}
 import models.team.Team
-import models.{NormalMode, CheckMode, UserAnswers}
+import models.{CheckMode, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
@@ -49,8 +49,6 @@ class ManageTeamProducerConsumerControllerSpec extends SpecBase with MockitoSuga
   private val form = formProvider("manageTeam.apiProducer.error")
 
   private lazy val createTeamProducerConsumerRoute = team.routes.ManageTeamProducerConsumerController.onPageLoad(NormalMode).url
-  private lazy val changeTeamProducerConsumerRoute = team.routes.ManageTeamProducerConsumerController.onPageLoad(CheckMode).url
-
 
   "ManageTeamProducerConsumer Controller" - {
 
@@ -81,7 +79,7 @@ class ManageTeamProducerConsumerControllerSpec extends SpecBase with MockitoSuga
       val fixture = buildFixture(Some(userAnswers))
 
       running(fixture.application) {
-        val request = FakeRequest(GET, changeTeamProducerConsumerRoute)
+        val request = FakeRequest(GET, createTeamProducerConsumerRoute)
 
         val result = route(fixture.application, request).value
 
@@ -89,7 +87,7 @@ class ManageTeamProducerConsumerControllerSpec extends SpecBase with MockitoSuga
 
         redirectLocation(result) mustBe None
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), CheckMode, FakeUser)(request, messages(fixture.application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, FakeUser)(request, messages(fixture.application)).toString
         contentAsString(result) must validateAsHtml
       }
     }
