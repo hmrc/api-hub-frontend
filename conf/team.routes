@@ -11,10 +11,10 @@ POST    /create-team/team-name                              controllers.team.Cre
 GET     /create-team/change-team-name                       controllers.team.CreateTeamNameController.onPageLoad(mode: Mode = CheckMode)
 POST    /create-team/change-team-name                       controllers.team.CreateTeamNameController.onSubmit(mode: Mode = CheckMode)
 
-GET     /create-team/team-producer_consumer                 controllers.team.ManageTeamProducerConsumerController.onPageLoad(mode: Mode = NormalMode)
-POST    /create-team/team-producer_consumer                 controllers.team.ManageTeamProducerConsumerController.onSubmit(mode: Mode = NormalMode)
-GET     /create-team/change-team-producer_consumer          controllers.team.ManageTeamProducerConsumerController.onPageLoad(mode: Mode = CheckMode)
-POST    /create-team/change-team-producer_consumer          controllers.team.ManageTeamProducerConsumerController.onSubmit(mode: Mode = CheckMode)
+GET     /create-team/team-producer-consumer                 controllers.team.ManageTeamProducerConsumerController.onPageLoad(mode: Mode = NormalMode)
+POST    /create-team/team-producer-consumer                 controllers.team.ManageTeamProducerConsumerController.onSubmit(mode: Mode = NormalMode)
+GET     /create-team/change-team-producer-consumer          controllers.team.ManageTeamProducerConsumerController.onPageLoad(mode: Mode = CheckMode)
+POST    /create-team/change-team-producer-consumer          controllers.team.ManageTeamProducerConsumerController.onSubmit(mode: Mode = CheckMode)
 
 GET     /create-team/check-your-answers                     controllers.team.CreateTeamCheckYourAnswersController.onPageLoad()
 
