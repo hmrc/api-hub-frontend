@@ -166,7 +166,7 @@
     <div class="call-out-panel call-out-panel__small govuk-!-margin-top-2">
         <div class="govuk-grid-row govuk-!-margin-bottom-2">
             <div class="govuk-grid-column-two-thirds govuk-heading-s govuk-!-margin-bottom-0">
-                <a class="govuk-link" href=@controllers.myapis.routes.MyApiDetailsController.onPageLoad(applicationApi.apiId)>@applicationApi.apiTitle</a>
+                <a class="govuk-link" href=@controllers.routes.ApiDetailsController.onPageLoad(applicationApi.apiId)>@applicationApi.apiTitle</a>
             </div>
             @if(applicationApi.apiNumber.isDefined) {
                 <div class="govuk-grid-column-one-third govuk-!-text-align-right">
