@@ -28,27 +28,27 @@
 
 @(form: Form[?], mode: Mode, user: UserModel)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = title(form, messages("changeTeamName.title")), user = Some(user)) {
+    @layout(pageTitle = title(form, messages("changeTeamName.title")), user = Some(user)) {
 
-    @formHelper(action = controllers.team.routes.ManageTeamProducerConsumerController.onSubmit(mode)) {
+        @formHelper(action = controllers.team.routes.ManageTeamProducerConsumerController.onSubmit(mode)) {
 
-        @if(form.errors.nonEmpty) {
-            @govukErrorSummary(ErrorSummaryViewModel(form))
-        }
+            @if(form.errors.nonEmpty) {
+                @govukErrorSummary(ErrorSummaryViewModel(form))
+            }
 
-        <div class="govuk-grid-row">
-            <div class="govuk-grid-column-two-thirds">
-                <div class="govuk-form-group">
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-two-thirds">
+                    <div class="govuk-form-group">
 
                         @govukRadios(
                             RadiosViewModel(
                                 field = form("value"),
                                 items = Seq(
                                     RadioItem(
-                                            content = HtmlContent(messages("manageTeam.apiConsumer", <b>No</b>)),
-                                            value = Some("false"),
-                                            attributes = Map()
-                                        ),
+                                        content = HtmlContent(messages("manageTeam.apiConsumer", <b>No</b>)),
+                                        value = Some("false"),
+                                        attributes = Map()
+                                    ),
                                     RadioItem(
                                         content = HtmlContent(messages("manageTeam.apiProducer", <b>Yes</b>)),
                                         value = Some("true"),
@@ -65,12 +65,11 @@
                                 )
                             ).copy(hint = Some(Hint(content = messages("manageTeam.apiProducer.content"))))
                         )
-                <input type="hidden" value="version20" name="folder">
-                <button type="submit" class="govuk-button govuk-!-margin-top-5" data-module="govuk-button">Continue</button>
+                        <input type="hidden" value="version20" name="folder">
+                        <button type="submit" class="govuk-button govuk-!-margin-top-5" data-module="govuk-button">
+                            Continue</button>
+                    </div>
+                </div>
             </div>
-        </div>
-
-
-        </main>
+        }
     }
-}
