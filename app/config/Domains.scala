@@ -87,9 +87,13 @@ class DomainsImpl @Inject()(configuration: Configuration) extends Domains {
       Domain(
         code = config.getString("code"),
         description = config.getString("description"),
-        subDomains = config.getConfig("subdomains").entrySet.asScala.map(
-          e => SubDomain(e.getKey, e.getValue.unwrapped().toString)
-        ).toSeq
+        subDomains = config.getConfigList("subdomains").asScala.map { subConfig =>
+          SubDomain(
+            code = subConfig.getString("code"),
+            description = subConfig.getString("name"),
+            basePath = subConfig.getString("basePath")
+          )
+        }.toSeq
       )
     }
   }

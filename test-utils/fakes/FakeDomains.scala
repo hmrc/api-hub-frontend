@@ -52,7 +52,8 @@ object FakeDomains extends Domains {
     private def buildSubDomain(domainIndex: Int, subDomainIndex: Int): SubDomain = {
       SubDomain(
         code = s"test-code-$domainIndex-$subDomainIndex",
-        description = s"Test Description $domainIndex $subDomainIndex"
+        description = s"Test Description $domainIndex $subDomainIndex",
+        basePath = s"/test/$domainIndex/$subDomainIndex"
       )
     }
   }
