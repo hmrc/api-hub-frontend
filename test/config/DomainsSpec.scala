@@ -156,7 +156,8 @@ object DomainsSpec extends TableDrivenPropertyChecks {
 
   val uglySubDomain: SubDomain = SubDomain(
     code = uglySubDomainCode,
-    description =  s"Description of $uglySubDomainCode"
+    description =  s"Description of $uglySubDomainCode",
+    basePath = s"/test/$uglyDomainCode/$uglySubDomainCode"
   )
 
   val uglyDomain: Domain = Domain(

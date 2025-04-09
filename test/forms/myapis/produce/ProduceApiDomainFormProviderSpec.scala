@@ -26,7 +26,7 @@ import play.api.data.FormError
 class ProduceApiDomainFormProviderSpec extends OptionFieldBehaviours with MockitoSugar {
 
   private val validDomains = (1 to 5).map(d =>
-    Domain(s"code$d", s"domain$d", (1 to 5).map(s =>SubDomain(s"code$d$s", s"subdomain$d$s")))
+    Domain(s"code$d", s"domain$d", (1 to 5).map(s =>SubDomain(s"code$d$s", s"subdomain$d$s", s"/$d/$s")))
   )
   private val domains = mock[Domains]
   when(domains.domains).thenReturn(validDomains)

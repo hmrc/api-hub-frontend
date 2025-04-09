@@ -17,4 +17,4 @@
 package models.api
 
 case class Domain(code: String, description: String, subDomains: Seq[SubDomain])
-case class SubDomain(code: String, description: String)
+case class SubDomain(code: String, description: String, basePath: String)
