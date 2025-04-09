@@ -87,8 +87,8 @@ class NavigatorSpec extends SpecBase with TryValues {
           navigator.nextPage(CreateTeamStartPage, NormalMode, emptyUserAnswers) mustBe controllers.team.routes.CreateTeamNameController.onPageLoad(NormalMode)
         }
 
-        "must go from the Team Name page to the Team Members page" in {
-          navigator.nextPage(CreateTeamNamePage, NormalMode, emptyUserAnswers) mustBe controllers.team.routes.ManageTeamMembersController.onPageLoad()
+        "must go from the Team Name page to the api producer or consumer page" in {
+          navigator.nextPage(CreateTeamNamePage, NormalMode, emptyUserAnswers) mustBe controllers.team.routes.ManageTeamProducerConsumerController.onPageLoad(NormalMode)
         }
 
         "must go from the Team Members page to the Check Your Answers page" in {
