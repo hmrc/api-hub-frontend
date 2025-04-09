@@ -1,9 +1,3 @@
-GET     /generate                                           controllers.myapis.SimpleApiDeploymentController.onPageLoad()
-POST    /generate                                           controllers.myapis.SimpleApiDeploymentController.onSubmit()
-
-GET     /promote/:id                                        controllers.myapis.SimpleApiPromotionController.onPageLoad(id: String)
-POST    /promote/:id                                        controllers.myapis.SimpleApiPromotionController.onSubmit(id: String)
-
 GET     /all                                                controllers.myapis.MyApisController.onPageLoad()
 
 GET     /:id                                                controllers.myapis.MyApiDetailsController.onPageLoad(id: String)
@@ -216,6 +210,3 @@ GET     /update/api-status                                  controllers.myapis.u
 POST    /update/api-status                                  controllers.myapis.update.UpdateApiStatusController.onSubmit(mode: Mode = NormalMode)
 GET     /update/change-api-status                           controllers.myapis.update.UpdateApiStatusController.onPageLoad(mode: Mode = CheckMode)
 POST    /update/change-api-status                           controllers.myapis.update.UpdateApiStatusController.onSubmit(mode: Mode = CheckMode)
-
-GET     /update/:id                                         controllers.myapis.SimpleApiRedeploymentController.onPageLoad(id: String)
-POST    /update/:id                                         controllers.myapis.SimpleApiRedeploymentController.onSubmit(id: String)
