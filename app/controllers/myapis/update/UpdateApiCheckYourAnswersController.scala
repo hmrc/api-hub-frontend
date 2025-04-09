@@ -70,7 +70,7 @@ class UpdateApiCheckYourAnswersController @Inject()(
   private val form = formProvider("produceApiCheckYourAnswers.noEgress.confirmation.error")
 
   private def hasEgressSelected(userAnswers: UserAnswers) =
-    userAnswers.get(UpdateApiEgressSelectionPage).isDefined
+    userAnswers.get(UpdateApiSelectEgressPage).exists(!_.isBlank)
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
@@ -184,11 +184,9 @@ class UpdateApiCheckYourAnswersController @Inject()(
   }
   
   private def validateEgress(userAnswers: UserAnswers): Either[Call, Option[String]] = {
-    (userAnswers.get(UpdateApiEgressAvailabilityPage), userAnswers.get(UpdateApiEgressSelectionPage)) match {
-      case (Some(true), Some(egress)) => Right(Some(egress))
-      case (Some(true), None) => Left(routes.UpdateApiEgressSelectionController.onPageLoad(CheckMode))
-      case (Some(false), _) => Right(None)
-      case (None, _) => Left(routes.UpdateApiEgressAvailabilityController.onPageLoad(CheckMode))
+    userAnswers.get(UpdateApiSelectEgressPage) match {
+      case Some(egress) => Right(Option.when(!egress.isBlank)(egress))
+      case None => Left(routes.UpdateApiSelectEgressController.onPageLoad(CheckMode))
     }
   }
 
@@ -227,11 +225,10 @@ class UpdateApiCheckYourAnswersController @Inject()(
 
   private def summaryListRows(userAnswers: UserAnswers, userModel: UserModel)(implicit messages: Messages): Seq[SummaryListRow] =
     Seq(
+      UpdateApiEgressSummary.row(userAnswers),
       UpdateApiEnterOasSummary.row(userAnswers),
       UpdateApiNameSummary.row(userAnswers),
       UpdateApiShortDescriptionSummary.row(userAnswers),
-      UpdateApiEgressAvailabilitySummary.row(userAnswers),
-      UpdateApiEgressSummary.row(userAnswers),
       UpdateApiEgressPrefixesSummary.row(userAnswers),
       UpdateApiHodSummary.row(userAnswers, hods),
       UpdateApiDomainSummary.row(userAnswers, domains),

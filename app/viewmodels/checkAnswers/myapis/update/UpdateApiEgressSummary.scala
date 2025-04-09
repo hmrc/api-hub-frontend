@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.myapis.update
 
 import controllers.myapis.update.routes
 import models.{CheckMode, UserAnswers}
-import pages.myapis.update.UpdateApiEgressSelectionPage
+import pages.myapis.update.UpdateApiSelectEgressPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
@@ -29,16 +29,18 @@ import viewmodels.implicits.*
 object UpdateApiEgressSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(UpdateApiEgressSelectionPage).map(egress =>
-      SummaryListRowViewModel(
-        key = "myApis.produce.selectegress.cya.label",
-        value = ValueViewModel(
-          HtmlContent(HtmlFormat.escape(egress))
-        ),
-        actions = Seq(
-          ActionItemViewModel("site.change", routes.UpdateApiEgressSelectionController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("updateApiEgressSelection.change.hidden"))
-        )
+    val egressValue = answers.get(UpdateApiSelectEgressPage) match {
+      case Some(egress) if egress.nonEmpty => egress
+      case _ => messages("myApis.environment.noEgressSelected")
+    }
+    Some(SummaryListRowViewModel(
+      key = "myApis.produce.selectegress.cya.label",
+      value = ValueViewModel(
+        HtmlContent(HtmlFormat.escape(egressValue))
+      ),
+      actions = Seq(
+        ActionItemViewModel("site.change", routes.UpdateApiSelectEgressController.onPageLoad(CheckMode).url)
+          .withVisuallyHiddenText(messages("updateApiEgressSelection.change.hidden"))
       )
-    )
+    ))
 }

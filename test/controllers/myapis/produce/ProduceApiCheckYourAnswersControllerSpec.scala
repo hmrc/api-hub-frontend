@@ -72,12 +72,11 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
     .set(ProduceApiPassthroughPage, true).success.value
 
   private def summaryList(userAnswers: UserAnswers = fullyPopulatedUserAnswers)(implicit msg: Messages) = SummaryListViewModel(Seq(
+    ProduceApiEgressSummary.row(userAnswers),
     ProduceApiChooseTeamSummary.row(userAnswers),
     ProduceApiEnterOasSummary.row(userAnswers),
     ProduceApiNameSummary.row(userAnswers),
     ProduceApiShortDescriptionSummary.row(userAnswers),
-    ProduceApiEgressAvailabilitySummary.row(userAnswers),
-    ProduceApiEgressSummary.row(userAnswers),
     ProduceApiEgressPrefixesSummary.row(userAnswers),
     ProduceApiHodSummary.row(userAnswers, FakeHods),
     ProduceApiDomainSummary.row(userAnswers, FakeDomains),

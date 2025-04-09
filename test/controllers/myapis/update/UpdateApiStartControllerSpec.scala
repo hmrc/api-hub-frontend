@@ -114,7 +114,6 @@ class UpdateApiStartControllerSpec extends SpecBase with MockitoSugar with Table
           egressMappings = Some(Seq(EgressMapping("prefix", "egress-prefix"))),
         )
       val answersWithPrefixes = setAnswer(
-        setAnswer(
           setAnswer(
             initialUserAnswers(deploymentDetailsWithPrefixes),
             UpdateApiAddPrefixesPage,
@@ -125,9 +124,7 @@ class UpdateApiStartControllerSpec extends SpecBase with MockitoSugar with Table
               prefixes = Seq("test-prefix-1","test-prefix-2"),
               mappings = Seq("egress-prefix->prefix")
             )
-        ), UpdateApiEgressAvailabilityPage,
-        false
-      )
+        )
       val team = Team("test-team-id", "test-team-name", LocalDateTime.now(), Seq(TeamMember(FakeUser.email)))
 
       forAll(Table(
