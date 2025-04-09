@@ -793,12 +793,6 @@ myApis.usage.table.name = Name
 myApis.usage.table.status = Status
 myApis.usage.table.date = Registered
 
-myApis.promotion.title = Promote to production
-myApis.promotion.heading = You are about to promote your API to production
-myApis.promotion.description = Your API will be available in the production environment.
-myApis.promotion.finish = Finish and deploy your API to the production environment
-myApis.promotion.deploy = Deploy API
-
 myApis.all.title = Your APIs
 myApis.all.heading = Your APIs
 myApis.empty.heading = You have no APIs, or do not belong to any teams.
