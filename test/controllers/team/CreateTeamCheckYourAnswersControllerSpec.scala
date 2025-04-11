@@ -43,7 +43,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 import utils.HtmlValidation
 import viewmodels.checkAnswers.{CreateTeamAddTeamMemberSummary, CreateTeamApiProducerConsumerSummary, CreateTeamNameSummary}
 import viewmodels.govuk.SummaryListFluency
-import views.html.team.CreateTeamCheckYourAnswersView
+import views.html.team.{CreateTeamCheckYourAnswersView, CreateTeamSuccessView}
 
 import java.time.LocalDateTime
 import scala.concurrent.Future
@@ -113,9 +113,11 @@ class CreateTeamCheckYourAnswersControllerSpec extends SpecBase
         running(fixture.playApplication) {
           val request = FakeRequest(controllers.team.routes.CreateTeamCheckYourAnswersController.onSubmit())
           val result = route(fixture.playApplication, request).value
+          val view = fixture.playApplication.injector.instanceOf[CreateTeamSuccessView]
 
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result).value mustBe controllers.team.routes.TeamCreatedController.onPageLoad(team.id).url
+          status(result) mustBe OK
+          contentAsString(result) mustBe view(team, Some(FakeSupporter))(request, messages(fixture.playApplication)).toString
+          contentAsString(result) must validateAsHtml
         }
       }
 
@@ -129,9 +131,11 @@ class CreateTeamCheckYourAnswersControllerSpec extends SpecBase
           val request = FakeRequest(controllers.team.routes.CreateTeamCheckYourAnswersController.onSubmit())
             .withFormUrlEncodedBody("value" -> true.toString)
           val result = route(fixture.playApplication, request).value
+          val view = fixture.playApplication.injector.instanceOf[CreateTeamSuccessView]
 
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result).value mustBe controllers.team.routes.TeamCreatedController.onPageLoad(team.id).url
+          status(result) mustBe OK
+          contentAsString(result) mustBe view(team, Some(FakeSupporter))(request, messages(fixture.playApplication)).toString
+          contentAsString(result) must validateAsHtml
         }
       }
 
@@ -207,7 +211,7 @@ class CreateTeamCheckYourAnswersControllerSpec extends SpecBase
         }
       }
 
-      "must redirect to the journey recovery page if there is no team type answer" in {
+      "must redirect to the team type page if there is no team type answer" in {
         val answers = fullAnswers.remove(CreateTeamApiProducerConsumerPage).get
 
         val fixture = buildFixture(userAnswers = answers)
@@ -217,7 +221,7 @@ class CreateTeamCheckYourAnswersControllerSpec extends SpecBase
           val result = route(fixture.playApplication, request).value
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onPageLoad().url
+          redirectLocation(result).value mustBe controllers.team.routes.ManageTeamProducerConsumerController.onPageLoad(CheckMode).url
         }
       }
     }

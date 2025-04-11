@@ -25,7 +25,7 @@
         govukCheckboxes: GovukCheckboxes
 )
 
-@(teamName: SummaryList, teamMemberDetails: SummaryList, user: Some[UserModel], isProducerTeam: Boolean, form: Form[?])(implicit request: Request[?], messages: Messages)
+@(teamDetails: SummaryList, teamMemberDetails: SummaryList, user: Some[UserModel], isProducerTeam: Boolean, form: Form[?])(implicit request: Request[?], messages: Messages)
 
 @completeYourTeam = {
     <h2 class="govuk-heading-m govuk-!-margin-top-9">@messages("createTeamCheckYourAnswers.complete.heading")</h2>
@@ -64,7 +64,7 @@
 
     <h2 class="govuk-heading-m">@messages("createTeamCheckYourAnswers.teamDetails.heading")</h2>
 
-    @govukSummaryList(teamName)
+    @govukSummaryList(teamDetails)
 
     <div class="govuk-summary-list">
         <div class="govuk-grid-column-one-half govuk-!-padding-left-0">

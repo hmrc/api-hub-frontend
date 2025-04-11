@@ -34,7 +34,7 @@ import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.{CreateTeamAddTeamMemberSummary, CreateTeamApiProducerConsumerSummary, CreateTeamNameSummary}
 import viewmodels.govuk.summarylist.*
-import views.html.team.CreateTeamCheckYourAnswersView
+import views.html.team.{CreateTeamCheckYourAnswersView, CreateTeamSuccessView}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -45,6 +45,7 @@ class CreateTeamCheckYourAnswersController @Inject()(
                                                       requireData: DataRequiredAction,
                                                       val controllerComponents: MessagesControllerComponents,
                                                       view: CreateTeamCheckYourAnswersView,
+                                                      successView: CreateTeamSuccessView,
                                                       apiHubService: ApiHubService,
                                                       sessionRepository: CreateTeamSessionRepository,
                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -64,7 +65,7 @@ class CreateTeamCheckYourAnswersController @Inject()(
             case Right(team) =>
               for {
                 _ <- sessionRepository.clear(request.userAnswers.id)
-              } yield Redirect(controllers.team.routes.TeamCreatedController.onPageLoad(team.id))
+              } yield Ok(successView(team, Some(request.user)))
             case Left(_: TeamNameNotUniqueException) =>
               Future.successful(Redirect(controllers.team.routes.CreateTeamNameController.onPageLoad(CheckMode)))
             case Left(e) => throw e
@@ -106,14 +107,14 @@ class CreateTeamCheckYourAnswersController @Inject()(
       case Some(isProducerTeam) =>
         val teamType = if isProducerTeam then TeamType.ProducerTeam else TeamType.ConsumerTeam
         Right(teamType)
-      case _ => Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      case _ => Left(Redirect(controllers.team.routes.ManageTeamProducerConsumerController.onPageLoad(CheckMode)))
     }
 
   private def isProducerTeam(userAnswers: UserAnswers): Boolean =
     userAnswers.get(CreateTeamApiProducerConsumerPage).exists(identity)
 
   private def buildView(form: Form[?] = form)(implicit request: DataRequest[?]) = {
-    val teamName = SummaryListViewModel(
+    val teamDetails = SummaryListViewModel(
       rows = Seq(
         CreateTeamNameSummary.row(request.userAnswers),
         CreateTeamApiProducerConsumerSummary.row(request.userAnswers),
@@ -122,7 +123,7 @@ class CreateTeamCheckYourAnswersController @Inject()(
 
     val teamMemberDetails = CreateTeamAddTeamMemberSummary.summary(request.userAnswers)
     val isProducer = request.userAnswers.get(CreateTeamApiProducerConsumerPage).exists(identity)
-    view(teamName, teamMemberDetails, Some(request.user), isProducer, form)
+    view(teamDetails, teamMemberDetails, Some(request.user), isProducer, form)
   }
 
 }
