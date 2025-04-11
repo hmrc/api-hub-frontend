@@ -103,6 +103,7 @@ class Navigator @Inject()() {
     case AddAnApiSelectEndpointsPage => addAnApiSelectEndpointsNextPage(CheckMode)
     case ApiPolicyConditionsDeclarationPage => apiPolicyConditionsDeclarationNextPage(CheckMode)
     case CreateTeamNamePage => _ => controllers.team.routes.CreateTeamCheckYourAnswersController.onPageLoad()
+    case CreateTeamApiProducerConsumerPage => _ => controllers.team.routes.CreateTeamCheckYourAnswersController.onPageLoad()
     case RegisterApplicationNamePage => _ => controllers.application.register.routes.RegisterApplicationCheckYourAnswersController.onPageLoad()
     case RegisterApplicationTeamPage => _ => controllers.application.register.routes.RegisterApplicationCheckYourAnswersController.onPageLoad()
     case RequestProductionAccessSelectApisPage => _ => controllers.application.accessrequest.routes.ProvideSupportingInformationController.onPageLoad(CheckMode)

@@ -305,6 +305,9 @@ class NavigatorSpec extends SpecBase with TryValues {
         "must go from Team Name to Check Your Answers" in {
           navigator.nextPage(CreateTeamNamePage, CheckMode, emptyUserAnswers) mustBe controllers.team.routes.CreateTeamCheckYourAnswersController.onPageLoad()
         }
+        "must go from the Api Producer/Consumer page to Check Your Answers" in {
+          navigator.nextPage(CreateTeamApiProducerConsumerPage, CheckMode, emptyUserAnswers) mustBe controllers.team.routes.CreateTeamCheckYourAnswersController.onPageLoad()
+        }
       }
 
       "during the Register Application journey" - {
