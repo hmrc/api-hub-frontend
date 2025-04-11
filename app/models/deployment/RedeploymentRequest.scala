@@ -28,6 +28,7 @@ case class RedeploymentRequest(
   prefixesToRemove: Seq[String],
   egressMappings: Option[Seq[EgressMapping]],
   egress: Option[String],
+  basePath: String
 )
 
 object RedeploymentRequest {

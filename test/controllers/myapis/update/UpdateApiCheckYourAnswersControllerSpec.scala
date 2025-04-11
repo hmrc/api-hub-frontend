@@ -59,6 +59,11 @@ class UpdateApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar
   private lazy val errorViewModel = produce.ProduceApiDeploymentErrorViewModel(updateApiCancelRoute, updateApiCheckYourAnswersRoute)
   private lazy val form = YesNoFormProvider()("produceApiCheckYourAnswers.noEgress.confirmation.error")
 
+  private lazy val domainSubDomain = ProduceApiDomainSubdomain(
+    domain = FakeDomains.domains.head.code,
+    subDomain = FakeDomains.domains.head.subDomains.head.code
+  )
+
   private val fullyPopulatedUserAnswers = UserAnswers(userAnswersId)
     .set(UpdateApiApiPage, FakeApiDetail).success.value
     .set(UpdateApiEnterOasPage, "oas").success.value
@@ -67,7 +72,7 @@ class UpdateApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar
     .set(UpdateApiAddPrefixesPage, true).success.value
     .set(UpdateApiEgressPrefixesPage, ProduceApiEgressPrefixes(Seq("/prefix"), Seq("/existing->/replacement"))).success.value
     .set(UpdateApiHodPage, Set("hod1")).success.value
-    .set(UpdateApiDomainPage, ProduceApiDomainSubdomain("domain", "subdomain")).success.value
+    .set(UpdateApiDomainPage, domainSubDomain).success.value
     .set(UpdateApiStatusPage, Alpha).success.value
     .set(UpdateApiSelectEgressPage, "egress").success.value
 

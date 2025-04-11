@@ -43,8 +43,8 @@ import repositories.ProduceApiSessionRepository
 import services.ApiHubService
 import viewmodels.checkAnswers.myapis.produce.*
 import viewmodels.govuk.all.SummaryListViewModel
+import viewmodels.myapis.produce.ProduceApiCheckYourAnswersViewModel
 import viewmodels.myapis.{DeploymentSuccessViewModel, produce}
-import viewmodels.myapis.produce.{ProduceApiCheckYourAnswersViewModel, ProduceApiDeploymentErrorViewModel}
 import views.html.myapis.DeploymentSuccessView
 import views.html.myapis.produce.{ProduceApiCheckYourAnswersView, ProduceApiDeploymentErrorView}
 
@@ -58,6 +58,11 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
   private lazy val viewModel = produce.ProduceApiDeploymentErrorViewModel(produceApiCancelRoute, produceApiCheckYourAnswersRoute)
   private lazy val form = YesNoFormProvider()("produceApiCheckYourAnswers.noEgress.confirmation.error")
 
+  private lazy val domainSubDomain = ProduceApiDomainSubdomain(
+    domain = FakeDomains.domains.head.code,
+    subDomain = FakeDomains.domains.head.subDomains.head.code
+  )
+
   private val fullyPopulatedUserAnswers = UserAnswers(userAnswersId)
     .set(ProduceApiChooseTeamPage, Team("id", "name", LocalDateTime.now(), Seq.empty)).success.value
     .set(ProduceApiEnterOasPage, "oas").success.value
@@ -66,7 +71,7 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
     .set(ProduceApiAddPrefixesPage, true).success.value
     .set(ProduceApiEgressPrefixesPage, ProduceApiEgressPrefixes(Seq("/prefix"), Seq("/existing->/replacement"))).success.value
     .set(ProduceApiHodPage, Set("hod1")).success.value
-    .set(ProduceApiDomainPage, ProduceApiDomainSubdomain("domain", "subdomain")).success.value
+    .set(ProduceApiDomainPage, domainSubDomain).success.value
     .set(ProduceApiStatusPage, Alpha).success.value
     .set(ProduceApiSelectEgressPage, "egress").success.value
     .set(ProduceApiPassthroughPage, true).success.value
