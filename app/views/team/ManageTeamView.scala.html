@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import config.FrontendAppConfig
 @import models.application.{Application, TeamMember}
 @import models.team.Team
 @import models.user.UserModel
@@ -27,7 +28,8 @@
     govukButton: GovukButton,
     sideNav: views.html.templates.SideNav,
     manageTeamNavItems: ManageTeamNavItems,
-    iconsLink: IconsLink
+    iconsLink: IconsLink,
+    config: FrontendAppConfig
 )
 
 @(team: Team, application: Option[Application], user: UserModel, crypto: Encrypter & Decrypter)(implicit request: Request[?], messages: Messages)
@@ -44,7 +46,7 @@
 }
 
 @egressBanner = {
-    @if(team.isProducerTeam) {
+    @if(team.isProducerTeam && config.showApisOnDashboard) {
         <div class="call-out-panel call-out-panel__small">
             <p class="govuk-body govuk-!-margin-bottom-2">
                 <i class="fa-solid fa-circle-info" ></i>
