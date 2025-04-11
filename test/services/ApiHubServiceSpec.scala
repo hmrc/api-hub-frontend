@@ -928,7 +928,8 @@ class ApiHubServiceSpec
         subDomain = "test-sub-domain",
         hods = Seq("hod1"),
         prefixesToRemove = Seq.empty,
-        egressMappings = None
+        egressMappings = None,
+        basePath = "test-base-path"
       )
       val response = SuccessfulDeploymentsResponse("id", "version", 1, "uri.com")
 

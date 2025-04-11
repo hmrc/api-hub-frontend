@@ -20,14 +20,14 @@ import config.{Domains, Hods}
 import controllers.actions.*
 import controllers.helpers.ErrorResultBuilder
 import forms.YesNoFormProvider
-import models.api.{ApiDetail, ApiStatus}
+import models.api.{ApiDetail, ApiStatus, SubDomain}
 import models.deployment.*
-import models.myapis.produce.{ProduceApiChooseEgress, ProduceApiDomainSubdomain, ProduceApiEgressPrefixes}
+import models.myapis.produce.{ProduceApiDomainSubdomain, ProduceApiEgressPrefixes}
 import models.requests.DataRequest
-import models.team.Team
 import models.user.UserModel
 import models.{CheckMode, UserAnswers}
 import pages.myapis.update.*
+import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.*
@@ -60,8 +60,7 @@ class UpdateApiCheckYourAnswersController @Inject()(
                                                       apiHubService: ApiHubService,
                                                       errorResultBuilder: ErrorResultBuilder,
                                                       formProvider: YesNoFormProvider,
-                                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
-
+                                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   private lazy val errorViewModel = ProduceApiDeploymentErrorViewModel(
     controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onCancel(),
@@ -131,6 +130,7 @@ class UpdateApiCheckYourAnswersController @Inject()(
       oas <- validateOas(request.userAnswers)
       apiStatus <- validateApiStatus(request.userAnswers)
       domainSubdomain <- validateDomainSubdomain(request.userAnswers)
+      subDomain <- validateSubDomain(domainSubdomain)
       hods <- validateHods(request.userAnswers)
       addPrefixes <- validateAddPrefixes(request.userAnswers)
       egressPrefixes <- validateEgressPrefixes(request.userAnswers, addPrefixes)
@@ -146,6 +146,7 @@ class UpdateApiCheckYourAnswersController @Inject()(
         egressMappings = egressPrefixes.map(_.getMappings.map(m =>
           EgressMapping(m.existing, m.replacement)
         )),
+        basePath = subDomain.basePath
       )
     } yield (apiDetail.title, apiDetail.publisherReference, redeployment)
 
@@ -213,6 +214,15 @@ class UpdateApiCheckYourAnswersController @Inject()(
     userAnswers.get(UpdateApiDomainPage) match {
       case Some(domainSubdomain) => Right(domainSubdomain)
       case None => Left(routes.UpdateApiDomainController.onPageLoad(CheckMode))
+    }
+  }
+
+  private def validateSubDomain(domainSubdomain: ProduceApiDomainSubdomain): Either[Call, SubDomain] = {
+    domains.getSubDomain(domainSubdomain.domain, domainSubdomain.subDomain) match {
+      case Some(subDomain) => Right(subDomain)
+      case None =>
+        logger.error(s"Cannot find sub-domain; domain=${domainSubdomain.domain}, sub-domain=${domainSubdomain.subDomain}")
+        Left(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
   }
 
