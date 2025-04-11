@@ -16,7 +16,7 @@
 
 package generators
 
-import fakes.FakeDomains
+import fakes.{FakeDomains, FakePlatforms}
 import models.api.*
 import models.api.ApiGeneration.V2
 import org.scalacheck.rng.Seed
@@ -108,7 +108,7 @@ trait ApiDetailGenerators {
       Gen.nonEmptyListOf(arbitraryApiDetail.arbitrary)
     }
 
-  implicit lazy val arbitraryApiDetailSummary: Arbitrary[ApiDetailSummary] = Arbitrary(genApiDetail.map(_.toApiDetailSummary))
+  implicit lazy val arbitraryApiDetailSummary: Arbitrary[ApiDetailSummary] = Arbitrary(genApiDetail.map(_.toApiDetailSummary(FakePlatforms)))
 
   private val parameters = Gen.Parameters.default.withSize(50)
 
@@ -122,11 +122,11 @@ trait ApiDetailGenerators {
     IntegrationResponse(1, None, arbitraryApiDetails.arbitrary.pureApply(parameters, Seed.random()))
 
   def sampleApiDetailSummary(): ApiDetailSummary = {
-    sampleApiDetail().toApiDetailSummary
+    sampleApiDetail().toApiDetailSummary(FakePlatforms)
   }
 
   def sampleApiDetailSummaries(): Seq[ApiDetailSummary] = {
-    sampleApiDetails().map(_.toApiDetailSummary)
+    sampleApiDetails().map(_.toApiDetailSummary(FakePlatforms))
   }
 
   def sampleOas: String =

@@ -341,7 +341,7 @@ class ApiHubServiceSpec
 
   "getApis" - {
     "must call the integration catalogue connector and return API details if no filter specified" in {
-      val expected = Seq(sampleApiDetail())
+      val expected = Seq(sampleApiDetailSummary())
 
       val fixture = buildFixture()
 
@@ -355,7 +355,7 @@ class ApiHubServiceSpec
     }
 
     "must call the integration catalogue connector and return API details if a platform filter is specified" in {
-      val expected = Seq(sampleApiDetail())
+      val expected = Seq(sampleApiDetailSummary())
 
       val fixture = buildFixture()
       val platform = "test-platform"
@@ -1126,7 +1126,7 @@ class ApiHubServiceSpec
     val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
     val apimConnector = mock[ApimConnector]
     val dashboardStatisticsBuilder = new DashboardStatisticsBuilder(FakePlatforms)
-    val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector, apimConnector, dashboardStatisticsBuilder)
+    val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector, apimConnector, dashboardStatisticsBuilder, FakePlatforms)
 
     Fixture(applicationsConnector, integrationCatalogueConnector, apimConnector, service)
   }
@@ -1146,7 +1146,7 @@ trait ApplicationGetterBehaviours extends AsyncFreeSpec with Matchers with Mocki
 
       val integrationCatalogueConnector = mock[IntegrationCatalogueConnector]
       val dashboardStatisticsBuilder = new DashboardStatisticsBuilder(FakePlatforms)
-      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector, apimConnector, dashboardStatisticsBuilder)
+      val service = new ApiHubService(applicationsConnector, integrationCatalogueConnector, apimConnector, dashboardStatisticsBuilder, FakePlatforms)
 
       service.getApplication("id-1")(HeaderCarrier()) map {
         actual =>

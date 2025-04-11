@@ -16,27 +16,30 @@
 
 package models.api
 
+import config.Platforms
 import play.api.libs.json.{Format, Json}
 
 case class ApiDetailSummary(
-    id: String,
-    publisherReference: String,
-    title: String,
-    shortDescription: Option[String],
-    apiStatus: ApiStatus,
-    domain: Option[String],
-    subDomain: Option[String],
-    hods: Seq[String],
-    platform: String,
-    apiType: Option[ApiType],
-    teamId: Option[String],
-    apiNumber: Option[String],
-    apiGeneration: Option[ApiGeneration],
+                             id: String,
+                             publisherReference: String,
+                             title: String,
+                             shortDescription: Option[String],
+                             apiStatus: ApiStatus,
+                             domain: Option[String],
+                             subDomain: Option[String],
+                             hods: Seq[String],
+                             platform: String,
+                             apiType: Option[ApiType],
+                             teamId: Option[String],
+                             apiNumber: Option[String],
+                             apiGeneration: Option[ApiGeneration],
+                             isSelfServe: Option[Boolean],
+                             isEISManaged: Option[Boolean],
 )
 
 object ApiDetailSummary {
 
-  def apply(apiDetail: ApiDetail): ApiDetailSummary = {
+  def apply(apiDetail: ApiDetail, platforms: Platforms): ApiDetailSummary = {
     ApiDetailSummary(
       id = apiDetail.id,
       publisherReference = apiDetail.publisherReference,
@@ -51,6 +54,8 @@ object ApiDetailSummary {
       teamId = apiDetail.teamId,
       apiNumber = apiDetail.apiNumber,
       apiGeneration = apiDetail.apiGeneration,
+      isSelfServe = Some(apiDetail.isSelfServe(platforms)),
+      isEISManaged = Some(apiDetail.isEISManaged(platforms)),
     )
   }
 

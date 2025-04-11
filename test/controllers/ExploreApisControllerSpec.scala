@@ -95,10 +95,10 @@ class ExploreApisControllerSpec
 
         val platform = "HIP"
         val maintainer = Maintainer("name", "#slack", List.empty)
-        val zebras = ApiDetail("id1", "ref1", "zebras", "zebras api", "1.0.0", Seq.empty, None, "oas", Live, created = Instant.now().minusSeconds(10), reviewedDate = Instant.now(), platform = platform, maintainer = maintainer).toApiDetailSummary
-        val molluscs = ApiDetail("id2", "ref2", "MOLLUSCS", "molluscs api", "1.0.0", Seq.empty, None, "oas", Live, created = Instant.now().minusSeconds(20), reviewedDate = Instant.now(), platform = platform, maintainer = maintainer).toApiDetailSummary
-        val aardvarks = ApiDetail("id3", "ref3", "aardvarks", "aardvarks api", "1.0.0", Seq.empty, None, "oas", Live, created = Instant.now().minusSeconds(30), reviewedDate = Instant.now(), platform = platform, maintainer = maintainer).toApiDetailSummary
-        val pigeons = ApiDetail("id4", "ref4", "PIGEONS", "pigeons api", "1.0.0", Seq.empty, None, "oas", Live, created = Instant.now().minusSeconds(40), reviewedDate = Instant.now(), platform = platform, maintainer = maintainer).toApiDetailSummary
+        val zebras = ApiDetail("id1", "ref1", "zebras", "zebras api", "1.0.0", Seq.empty, None, "oas", Live, created = Instant.now().minusSeconds(10), reviewedDate = Instant.now(), platform = platform, maintainer = maintainer).toApiDetailSummary(FakePlatforms)
+        val molluscs = ApiDetail("id2", "ref2", "MOLLUSCS", "molluscs api", "1.0.0", Seq.empty, None, "oas", Live, created = Instant.now().minusSeconds(20), reviewedDate = Instant.now(), platform = platform, maintainer = maintainer).toApiDetailSummary(FakePlatforms)
+        val aardvarks = ApiDetail("id3", "ref3", "aardvarks", "aardvarks api", "1.0.0", Seq.empty, None, "oas", Live, created = Instant.now().minusSeconds(30), reviewedDate = Instant.now(), platform = platform, maintainer = maintainer).toApiDetailSummary(FakePlatforms)
+        val pigeons = ApiDetail("id4", "ref4", "PIGEONS", "pigeons api", "1.0.0", Seq.empty, None, "oas", Live, created = Instant.now().minusSeconds(40), reviewedDate = Instant.now(), platform = platform, maintainer = maintainer).toApiDetailSummary(FakePlatforms)
 
         when(fixture.apiHubService.getApis(any())(any()))
           .thenReturn(Future.successful(Seq(molluscs, zebras, aardvarks, pigeons)))
