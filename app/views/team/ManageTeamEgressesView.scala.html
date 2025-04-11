@@ -17,6 +17,7 @@
 @import models.api.EgressGateway
 @import models.team.Team
 @import models.user.UserModel
+@import views.html.components.IconsLink
 @import viewmodels.team.{ManageTeamNavItems, ManageTeamSideNavPages}
 
 @this(
@@ -24,16 +25,39 @@
     govukButton: GovukButton,
     govukTable: GovukTable,
     sideNav: views.html.templates.SideNav,
-    manageTeamNavItems: ManageTeamNavItems
+    manageTeamNavItems: ManageTeamNavItems,
+    iconsLink: IconsLink
 )
 
 @(team: Team, user: UserModel, egresses: Seq[EgressGateway])(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("manageTeamEgresses.title")), user = Some(user), fullWidth = true) {
+@egressLink = {
+    <a class="govuk-link" href="TODO">@messages("manageTeamEgresses.egressNotListed.body.link")</a>
+}
+
+@egressBanner = {
+    @if(team.isProducerTeam) {
+        <div class="call-out-panel call-out-panel__small govuk-!-margin-top-2">
+            <p class="govuk-body govuk-!-margin-bottom-2">
+                <i class="fa-solid fa-circle-info" ></i>
+                <span class="call-out-type">
+                    @Html(messages("manageTeamEgresses.egressNotListed.title", egressLink))
+                </span>
+            </p>
+            <p class="govuk-body additional-message govuk-!-margin-bottom-1 govuk-!-margin-top-1">
+                @Html(messages("manageTeamEgresses.egressNotListed.body", egressLink))
+            </p>
+        </div>
+    }
+}
+
+@layout(pageTitle = titleNoForm(messages("manageTeamEgresses.title")), user = Some(user), fullWidth = true, customScriptsBlock = Some(iconsLink())) {
 
     @sideNav(team.name, manageTeamNavItems(team, ManageTeamSideNavPages.EgressesPage)) {
         <h1 id="h1" class="govuk-heading-l govuk-!-margin-bottom-1">@messages("manageTeamEgresses.heading")</h1>
         <span class="govuk-caption-l">@team.name</span>
+
+        @egressBanner
 
         <div class="govuk-grid-row govuk-!-margin-top-5">
             <div class="govuk-grid-column-one-half">
