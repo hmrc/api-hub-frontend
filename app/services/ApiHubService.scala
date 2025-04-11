@@ -17,7 +17,7 @@
 package services
 
 import com.google.inject.{Inject, Singleton}
-import config.{HipEnvironment, ShareableHipConfig}
+import config.{HipEnvironment, Platforms, ShareableHipConfig}
 import connectors.{ApimConnector, ApplicationsConnector, IntegrationCatalogueConnector}
 import models.AvailableEndpoint
 import models.accessrequest.{AccessRequest, AccessRequestRequest, AccessRequestStatus}
@@ -40,7 +40,8 @@ class ApiHubService @Inject()(
   applicationsConnector: ApplicationsConnector,
   integrationCatalogueConnector: IntegrationCatalogueConnector,
   apimConnector: ApimConnector,
-  dashboardStatisticsBuilder: DashboardStatisticsBuilder
+  dashboardStatisticsBuilder: DashboardStatisticsBuilder,
+  platforms: Platforms
 )(implicit ec: ExecutionContext) extends Logging {
 
   def registerApplication(newApplication: NewApplication)(implicit hc: HeaderCarrier): Future[Application] = {
@@ -112,6 +113,10 @@ class ApiHubService @Inject()(
 
   def getApis(platform: Option[String] = None)(implicit hc: HeaderCarrier): Future[Seq[ApiDetailSummary]] = {
     integrationCatalogueConnector.getApis(platform)
+      .map(_.map(api => api.copy(
+        isEISManaged = Some(platforms.isEISManaged(api.platform)),
+        isSelfServe = Some(platforms.isSelfServe(api.platform)),
+      )))
   }
 
   def addCredential(id: String, hipEnvironment: HipEnvironment)(implicit hc: HeaderCarrier): Future[Either[ApplicationsException, Option[Credential]]] = {
