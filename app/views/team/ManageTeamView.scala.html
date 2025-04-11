@@ -14,9 +14,11 @@
  * limitations under the License.
  *@
 
+@import config.FrontendAppConfig
 @import models.application.{Application, TeamMember}
 @import models.team.Team
 @import models.user.UserModel
+@import views.html.components.IconsLink
 @import viewmodels.team.{ManageTeamNavItems, ManageTeamSideNavPages}
 @import uk.gov.hmrc.crypto.{Decrypter, Encrypter, PlainText}
 
@@ -25,7 +27,9 @@
     govukTable: GovukTable,
     govukButton: GovukButton,
     sideNav: views.html.templates.SideNav,
-    manageTeamNavItems: ManageTeamNavItems
+    manageTeamNavItems: ManageTeamNavItems,
+    iconsLink: IconsLink,
+    config: FrontendAppConfig
 )
 
 @(team: Team, application: Option[Application], user: UserModel, crypto: Encrypter & Decrypter)(implicit request: Request[?], messages: Messages)
@@ -37,10 +41,33 @@
     }
 }
 
-@layout(pageTitle = titleNoForm(messages("manageTeam.title", team.name)), user = Some(user), fullWidth = true) {
+@egressesLink = {
+    <a class="govuk-link" href=@controllers.team.routes.ManageTeamEgressesController.onPageLoad(team.id).url >@messages("manageTeam.egressRequired.link")</a>
+}
+
+@egressBanner = {
+    @if(team.isProducerTeam && config.showApisOnDashboard) {
+        <div class="call-out-panel call-out-panel__small">
+            <p class="govuk-body govuk-!-margin-bottom-2">
+                <i class="fa-solid fa-circle-info" ></i>
+                <span class="call-out-type">
+                    @messages("manageTeam.egressRequired.title")
+                    </span>
+            </p>
+            <p class="govuk-body additional-message govuk-!-margin-bottom-1 govuk-!-margin-top-1">
+                @Html(messages("manageTeam.egressRequired.body", egressesLink))
+            </p>
+        </div>
+    }
+}
+
+@layout(pageTitle = titleNoForm(messages("manageTeam.title", team.name)), user = Some(user), fullWidth = true, customScriptsBlock = Some(iconsLink())) {
 
     @sideNav(team.name, manageTeamNavItems(team, ManageTeamSideNavPages.ManageTeamMembersPage)) {
         <h1 id="h1" class="govuk-heading-l">@messages("manageTeam.heading", team.name)</h1>
+
+        @egressBanner
+
         <div class="hip-flex-container govuk-!-margin-bottom-2">
             <h2 class="govuk-heading-m">@messages("manageTeam.teamMembers", team.teamMembers.size)</h2>
             @govukButton(

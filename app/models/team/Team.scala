@@ -28,7 +28,9 @@ case class Team(
   teamMembers: Seq[TeamMember],
   teamType: TeamType = TeamType.ConsumerTeam,
   egresses: Seq[String] = Seq.empty
-)
+) {
+  val isProducerTeam = teamType == TeamType.ProducerTeam
+}
 
 object Team {
 
