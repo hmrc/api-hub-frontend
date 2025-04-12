@@ -9,11 +9,18 @@ describe('exploreApis', () => {
         const dom = new JSDOM(`
             <!DOCTYPE html>
             <input id="filterPlatformSelfServe" type="checkbox">
+            <label for="filterPlatformSelfServe"><span data-count="0"></span></label>
             <input id="filterPlatformNonSelfServe" type="checkbox">
+            <label for="filterPlatformNonSelfServe"><span data-count="0"></span></label>
             <details id="viewPlatformFilters">
-                <input class="platformFilter" value="sdes" type="checkbox">
-                <input class="platformFilter" value="hip" type="checkbox" data-selfserve="true">
-                <input class="platformFilter" value="digi" type="checkbox">
+                <div id="eisFilters"></div>
+                <input class="platformFilter" value="sdes" id="filter_SDES" type="checkbox">
+                <label for="filter_SDES"><span data-count></span></label>
+                <input class="platformFilter" value="hip" id="filter_HIP" type="checkbox" data-selfserve="true">
+                <label for="filter_HIP"><span data-count></span></label>
+                <input class="platformFilter" value="digi" id="filter_DIGI" type="checkbox">
+                <label for="filter_DIGI"><span data-count></span></label>
+                <div id="nonEISFilters"></div>
             </details>
             <fieldset id="domainFilters">
                 <details id="viewDomainFilters">
@@ -112,7 +119,9 @@ describe('exploreApis', () => {
                 data-subdomain="${panel.subdomain || ''}" 
                 data-id="${i}" 
                 data-hods="${panel.hods || ''}" 
-                data-platform="${panel.platform || ''}"></div>`;
+                data-platform="${panel.platform || ''}"
+                data-is-self-serve="${panel.isSelfServe || ''}"
+                data-is-eis-managed="${panel.isEISManaged || ''}"></div>`;
         }).join('');
     }
 
@@ -134,14 +143,17 @@ describe('exploreApis', () => {
                 ['d3', ''],
             ],
             hodsValues = ['', 'ems', 'internal', 'apim', 'ems,internal,apim'],
-            platformValues = ['hip', 'sdes', 'digi'];
+            platformValues = ['hip', 'sdes', 'digi'],
+            booleanValues = ['true', 'false'];
         let i= 0;
         while (i < count) {
             const apistatus = statuses[i % statuses.length],
                 [domain, subdomain] = domainValues[i % domainValues.length],
                 hods = hodsValues[i % hodsValues.length],
-                platform = platformValues[i % platformValues.length];
-            panels.push({apistatus, domain, subdomain, hods, platform});
+                platform = platformValues[i % platformValues.length],
+                isSelfServe = platform === 'hip',
+                isEISManaged = booleanValues[i % booleanValues.length];
+            panels.push({apistatus, domain, subdomain, hods, platform, isSelfServe, isEISManaged});
             i++;
         }
         buildApiPanels(...panels);

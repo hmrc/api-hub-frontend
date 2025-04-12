@@ -21,7 +21,7 @@ import models.user.UserModel
 import play.api.i18n.Messages
 import viewmodels.{SideNavItem, SideNavPage}
 import SideNavItem.{SideNavItemBranch, SideNavItemLeaf}
-import config.{HipEnvironment, HipEnvironments}
+import config.{HipEnvironment, HipEnvironments, Platforms}
 
 import javax.inject.{Inject, Singleton}
 
@@ -39,7 +39,7 @@ object MyApisNavPages {
 }
 
 @Singleton
-class MyApisNavItems @Inject()(hipEnvironments: HipEnvironments) {
+class MyApisNavItems @Inject()(hipEnvironments: HipEnvironments, platforms: Platforms) {
 
   import MyApisNavPages._
   
@@ -48,7 +48,7 @@ class MyApisNavItems @Inject()(hipEnvironments: HipEnvironments) {
       case ApiDeploymentStatus.Deployed(environmentId, _) if environmentId == hipEnvironments.deployTo.id => true
     }.getOrElse(false)
 
-    val isHipApi = apiDetail.isSelfServe
+    val isHipApi = apiDetail.isSelfServe(platforms)
     isHipApi && isDeployedToTest && apiDetail.isHubMaintainable
   }
 

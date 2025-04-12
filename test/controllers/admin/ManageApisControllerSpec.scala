@@ -18,6 +18,7 @@ package controllers.admin
 
 import base.SpecBase
 import controllers.routes
+import fakes.FakePlatforms
 import generators.ApiDetailGenerators
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.{any, isNull}
@@ -44,7 +45,7 @@ class ManageApisControllerSpec
     "must return the list of apis to a user with the support role" in {
       forAll(usersWhoCanSupport) { (user: UserModel) =>
         val fixture = buildFixture(user)
-        val apis = Seq(sampleApiDetail().toApiDetailSummary)
+        val apis = Seq(sampleApiDetail().toApiDetailSummary(FakePlatforms))
 
         when(fixture.apiHubService.getApis(any)(any)).thenReturn(Future.successful(apis))
 

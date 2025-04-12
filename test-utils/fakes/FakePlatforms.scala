@@ -23,9 +23,9 @@ object FakePlatforms extends Platforms {
 
   override val platforms: Seq[Platform] = {
     Seq(
-      Platform("HIP", "HIP Platform", true),
-      Platform("SDES", "SDES Platform"),
-      Platform("CDS", "CDS Platform"),
+      Platform("HIP", "HIP Platform", false, true),
+      Platform("SDES", "SDES Platform", true),
+      Platform("CDS", "CDS Platform", true),
     )
   }
 

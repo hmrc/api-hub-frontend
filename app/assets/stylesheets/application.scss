@@ -680,6 +680,7 @@ nav.hip-pagination--centered {
 .hip-platform-filters {
     .govuk-tag, .govuk-hint {
         @include govuk-font($size: 16);
+        max-width: none;
     }
     summary {
         display: none;
@@ -1094,4 +1095,8 @@ header {
 
 .hero .app-stats strong {
     font-size: 1.5rem;
+}
+
+[data-count]::after {
+    content: " ("attr(data-count)")";
 }

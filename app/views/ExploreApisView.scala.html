@@ -83,7 +83,9 @@
             data-domain='@normalise(apiDetail.domain.getOrElse(""))'
             data-subdomain='@normalise(apiDetail.subDomain.getOrElse(""))'
             data-hods='@apiDetail.hods.map(normalise).mkString(",")'
-            data-platform='@normalise(apiDetail.platform)'>
+            data-platform='@normalise(apiDetail.platform)'
+            data-is-self-serve='@apiDetail.isSelfServe'
+            data-is-eis-managed='@apiDetail.isEISManaged'>
 
         <div class="api-panel-top">
             <span class="call-out-type information govuk-!-margin-bottom-0">
@@ -166,12 +168,20 @@
 
 @platformsFilters() = {
     <div id="platformFilters" class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
-    @for(platform <- platforms.platforms) {
-        <div class="govuk-checkboxes__item">
-            <input class="govuk-checkboxes__input platformFilter" id="filter_@platform.code" name="filter_@platform.code" type="checkbox" value="@normalise(platform.code)" @if(platforms.isSelfServe(platform.code)){data-selfserve="true"}>
-            <label class="govuk-label govuk-checkboxes__label" for="filter_@platform.code">@platform.description</label>
-        </div>
-    }
+        <div class="govuk-hint govuk-checkboxes__hint govuk-!-padding-left-0" id="eisFilters">@messages("exploreApis.filter.eisManaged")</div>
+        @for(platform <- platforms.eisManagedPlatforms) {
+            <div class="govuk-checkboxes__item">
+                <input class="govuk-checkboxes__input platformFilter" id="filter_@platform.code" name="filter_@platform.code" type="checkbox" value="@normalise(platform.code)" @if(platforms.isSelfServe(platform.code)){data-selfserve="true"} data-eis-managed="true">
+                <label class="govuk-label govuk-checkboxes__label" for="filter_@platform.code">@platform.code<span data-count="0"></span></label>
+            </div>
+        }
+        <div class="govuk-hint govuk-checkboxes__hint govuk-!-padding-left-0 govuk-!-margin-top-2" id="nonEISFilters">@messages("exploreApis.filter.nonEISManaged")</div>
+        @for(platform <- platforms.nonEISManagedPlatforms) {
+            <div class="govuk-checkboxes__item">
+                <input class="govuk-checkboxes__input platformFilter" id="filter_@platform.code" name="filter_@platform.code" type="checkbox" value="@normalise(platform.code)" @if(platforms.isSelfServe(platform.code)){data-selfserve="true"} data-eis-managed="false">
+                <label class="govuk-label govuk-checkboxes__label" for="filter_@platform.code">@platform.code<span data-count="0"></span></label>
+            </div>
+        }
     </div>
 }
 
@@ -202,7 +212,7 @@
                         <div class="govuk-checkboxes__item">
                             <input class="govuk-checkboxes__input" id="filterPlatformSelfServe" name="filter-platform" type="checkbox" checked="checked">
                             <label class="govuk-label govuk-checkboxes__label" for="filterPlatformSelfServe">
-                                <strong class="govuk-tag govuk-tag--green">@messages("exploreApis.filter.selfServe")</strong>
+                                <strong class="govuk-tag govuk-tag--green" data-count="0">@messages("exploreApis.filter.selfServe")</strong>
                             </label>
                             <div class="govuk-hint govuk-checkboxes__hint">
                                 @messages("exploreApis.filter.selfServe.info")
@@ -211,7 +221,7 @@
                         <div class="govuk-checkboxes__item">
                             <input class="govuk-checkboxes__input" id="filterPlatformNonSelfServe" name="filter-platform" type="checkbox">
                             <label class="govuk-label govuk-checkboxes__label" for="filterPlatformNonSelfServe">
-                                <strong class="govuk-tag govuk-tag--grey">@messages("exploreApis.filter.nonSelfServe")</strong>
+                                <strong class="govuk-tag govuk-tag--grey" data-count="0">@messages("exploreApis.filter.nonSelfServe")</strong>
                             </label>
                             <div class="govuk-hint govuk-checkboxes__hint">
                                 @messages("exploreApis.filter.nonSelfServe.info")
@@ -220,7 +230,7 @@
                     </div>
                     @govukDetails(Details(
                         id = Some("viewPlatformFilters"),
-                        classes = "govuk-!-margin-bottom-1",
+                        classes = "govuk-!-margin-bottom-1  govuk-!-margin-top-2",
                         content = HtmlContent(platformsFilters())
                     ))
                 </fieldset>
