@@ -36,38 +36,36 @@
             }
 
             <div class="govuk-grid-row">
-                <div class="govuk-grid-column-two-thirds">
-                    <div class="govuk-form-group">
+                <div class="govuk-form-group">
 
-                        @govukRadios(
-                            RadiosViewModel(
-                                field = form("value"),
-                                items = Seq(
-                                    RadioItem(
-                                        content = HtmlContent(messages("manageTeam.apiConsumer", <b>No</b>)),
-                                        value = Some("false"),
-                                        attributes = Map()
-                                    ),
-                                    RadioItem(
-                                        content = HtmlContent(messages("manageTeam.apiProducer", <b>Yes</b>)),
-                                        value = Some("true"),
-                                        attributes = Map(),
-                                        hint = Some(Hint(content = messages("manageTeam.apiProducer.hint")))
-                                    )
+                    @govukRadios(
+                        RadiosViewModel(
+                            field = form("value"),
+                            items = Seq(
+                                RadioItem(
+                                    content = HtmlContent(messages("manageTeam.apiConsumer", <b>No</b>)),
+                                    value = Some("false"),
+                                    attributes = Map()
                                 ),
-                                fieldset = Fieldset(
-                                    legend = Some(Legend(
-                                        content = messages("manageTeam.apiProducer.title"),
-                                        classes = "govuk-fieldset__legend--l",
-                                        isPageHeading = true
-                                    ))
+                                RadioItem(
+                                    content = HtmlContent(messages("manageTeam.apiProducer", <b>Yes</b>)),
+                                    value = Some("true"),
+                                    attributes = Map(),
+                                    hint = Some(Hint(content = messages("manageTeam.apiProducer.hint")))
                                 )
-                            ).copy(hint = Some(Hint(content = messages("manageTeam.apiProducer.content"))))
-                        )
-                        @govukButton(
-                            ButtonViewModel(messages("site.continue")).withCssClass("govuk-!-margin-top-5").withId("continueButton").preventingDoubleClick()
-                        )
-                    </div>
+                            ),
+                            fieldset = Fieldset(
+                                legend = Some(Legend(
+                                    content = messages("manageTeam.apiProducer.title"),
+                                    classes = "govuk-fieldset__legend--l",
+                                    isPageHeading = true
+                                ))
+                            )
+                        ).copy(hint = Some(Hint(content = messages("manageTeam.apiProducer.content"))))
+                    )
+                    @govukButton(
+                        ButtonViewModel(messages("site.continue")).withCssClass("govuk-!-margin-top-5").withId("continueButton").preventingDoubleClick()
+                    )
                 </div>
             </div>
         }
