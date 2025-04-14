@@ -39,7 +39,7 @@
 
 @egressBanner = {
     @if(team.isProducerTeam && config.showApisOnDashboard) {
-        <div class="call-out-panel call-out-panel__small govuk-!-margin-top-2">
+        <div class="call-out-panel call-out-panel__small">
             <p class="govuk-body govuk-!-margin-bottom-2">
                 <i class="fa-solid fa-circle-info" ></i>
                 <span class="call-out-type">
@@ -57,7 +57,7 @@
 
     @sideNav(team.name, manageTeamNavItems(team, ManageTeamSideNavPages.EgressesPage)) {
         <h1 id="h1" class="govuk-heading-l govuk-!-margin-bottom-1">@messages("manageTeamEgresses.heading")</h1>
-        <span class="govuk-caption-l">@team.name</span>
+        <span class="govuk-caption-l govuk-!-margin-bottom-4">@team.name</span>
 
         @egressBanner
 
