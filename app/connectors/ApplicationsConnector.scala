@@ -17,7 +17,7 @@
 package connectors
 
 import com.google.inject.{Inject, Singleton}
-import config.{FrontendAppConfig, HipEnvironment, HipEnvironments, ShareableHipConfig}
+import config.{FrontendAppConfig, HipEnvironment, ShareableHipConfig}
 import models.UserEmail
 import models.accessrequest.*
 import models.api.ApiDeploymentStatuses.readApiDeploymentStatuses
@@ -25,7 +25,7 @@ import models.api.{ApiDeploymentStatus, ApiDeploymentStatuses, ApiDetailSummary,
 import models.application.*
 import models.deployment.*
 import models.exception.{ApplicationCredentialLimitException, ApplicationsException, TeamNameNotUniqueException}
-import models.requests.{AddApiRequest, AddEgressesRequest, ChangeTeamNameRequest, PromotionRequest, TeamMemberRequest}
+import models.requests.*
 import models.stats.ApisInProductionStatistic
 import models.team.{NewTeam, Team}
 import models.user.UserContactDetails
@@ -693,4 +693,16 @@ class ApplicationsConnector @Inject()(
         case Left(e) => Future.failed(e)
       }
   }
+
+  def removeEgressFromTeam(teamId: String, egressId: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    httpClient.delete(url"$applicationsBaseUrl/api-hub-applications/teams/$teamId/egresses/$egressId")
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .execute[Either[UpstreamErrorResponse, Unit]]
+      .flatMap {
+        case Right(_) => Future.successful(Some(()))
+        case Left(e) if e.statusCode == NOT_FOUND => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
+  }
+
 }

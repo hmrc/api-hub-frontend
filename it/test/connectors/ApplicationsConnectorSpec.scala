@@ -2020,6 +2020,46 @@ class ApplicationsConnectorSpec
       }
     }
   }
+
+  "removeEgressFromTeam" - {
+    "must place the correct request and return Some(Unit) on success" in {
+      val teamId = "test-team-id"
+      val egressId = "test-egress-id"
+
+      stubFor(
+        delete(urlEqualTo(s"/api-hub-applications/teams/$teamId/egresses/$egressId"))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withStatus(NO_CONTENT)
+          )
+      )
+
+      buildConnector(this).removeEgressFromTeam(teamId, egressId)(HeaderCarrier()).map {
+        result =>
+          result mustBe Some(())
+      }
+    }
+
+    "must return None when the team or egress does not exist" in {
+      val teamId = "test-team-id"
+      val egressId = "test-egress-id"
+
+      stubFor(
+        delete(urlEqualTo(s"/api-hub-applications/teams/$teamId/egresses/$egressId"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+          )
+      )
+
+      buildConnector(this).removeEgressFromTeam(teamId, egressId)(HeaderCarrier()).map {
+        result =>
+          result mustBe None
+      }
+    }
+  }
+
 }
 
 object ApplicationsConnectorSpec extends HttpClientV2Support {
