@@ -125,6 +125,13 @@ class ErrorResultBuilder @Inject()(
       message = Messages("site.environmentNotFoundMessage", environment)
     )
 
+  def egressNotFound(egressId: String)(implicit request: BaseRequest[?]): Result = {
+    notFound(
+      heading = Messages("site.egressNotFoundHeading"),
+      message = Messages("site.egressNotFoundMessage", egressId)
+    )
+  }
+
   def notFound(title: String, heading: String, message: String)(implicit request: BaseRequest[?]): Result = {
     notFound(Some(title), Some(heading), Some(message))
   }

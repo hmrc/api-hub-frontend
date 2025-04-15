@@ -284,4 +284,9 @@ class ApiHubService @Inject()(
   def addEgressesToTeam(teamId: String, egresses: Set[String]) (implicit hc: HeaderCarrier): Future[Option[Unit]] = {
     applicationsConnector.addEgressesToTeam(teamId, egresses)
   }
+
+  def removeEgressFromTeam(teamId: String, egressId: String)(implicit hc: HeaderCarrier): Future[Option[Unit]] = {
+    applicationsConnector.removeEgressFromTeam(teamId, egressId)
+  }
+
 }

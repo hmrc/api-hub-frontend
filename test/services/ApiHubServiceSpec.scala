@@ -1115,6 +1115,31 @@ class ApiHubServiceSpec
     }
   }
 
+  "removeEgressFromTeam" - {
+    "must make the correct request to the connector and return the response" in {
+      val teamId = "test-team-id"
+      val egressId = "test-egress-id"
+
+      val scenarios = Table(
+        "expected",
+        Some(()),
+        None
+      )
+
+      forAll(scenarios) {expected =>
+        val fixture = buildFixture()
+
+        when(fixture.applicationsConnector.removeEgressFromTeam(any, any)(any)).thenReturn(Future.successful(expected))
+
+        fixture.service.removeEgressFromTeam(teamId, egressId)(HeaderCarrier()).map {
+          result =>
+            verify(fixture.applicationsConnector).removeEgressFromTeam(eqTo(teamId), eqTo(egressId))(any)
+            result mustBe expected
+        }
+      }
+    }
+  }
+
   private case class Fixture(
     applicationsConnector: ApplicationsConnector,
     integrationCatalogueConnector: IntegrationCatalogueConnector,

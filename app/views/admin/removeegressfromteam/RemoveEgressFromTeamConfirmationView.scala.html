@@ -1,0 +1,56 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import viewmodels.admin.removeegressfromteam.RemoveEgressFromTeamConfirmationViewModel
+
+@this(
+    layout: templates.Layout,
+    govukSummaryList : GovukSummaryList,
+    formHelper: FormWithCSRF,
+    govukButton : GovukButton
+)
+
+@(viewModel: RemoveEgressFromTeamConfirmationViewModel)(implicit request: Request[?], messages: Messages)
+
+@layout(pageTitle = titleNoForm(messages("removeEgressFromTeamConfirmation.title")), user = Some(viewModel.user)) {
+
+    <h1 id="h1" class="govuk-heading-l">@messages("removeEgressFromTeamConfirmation.heading")</h1>
+
+    @govukSummaryList(SummaryList(rows = viewModel.summaries))
+
+    <p class="govuk-body govuk-!-margin-top-7">@messages("removeEgressFromTeamConfirmation.guidance.text")</p>
+
+    @formHelper(action = viewModel.submitRoute) {
+        <div class="govuk-button-group govuk-!-margin-top-7">
+            @govukButton(
+                ButtonViewModel(messages("removeEgressFromTeamConfirmation.submit.text"))
+                    .withId("submitButton")
+                    .asWarningButton()
+                    .preventingDoubleClick()
+            )
+
+            @govukButton(
+                ButtonViewModel(messages("site.cancel"))
+                    .withId("cancelButton")
+                    .asLink(viewModel.cancelUrl)
+                    .asSecondaryButton()
+                    .preventingDoubleClick()
+            )
+        </div>
+    }
+
+}
