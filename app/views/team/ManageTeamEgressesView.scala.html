@@ -37,6 +37,10 @@
     <a class="govuk-link" href="TODO">@messages("manageTeamEgresses.egressNotListed.body.link")</a>
 }
 
+@removeEgressLink(egress: EgressGateway) = {
+    <a class="govuk-link" href="@controllers.admin.removeegressfromteam.routes.RemoveEgressFromTeamConfirmationController.onPageLoad(team.id, egress.id)">@messages("site.remove")</a>
+}
+
 @egressBanner = {
     @if(team.isProducerTeam && config.showApisOnDashboard) {
         <div class="call-out-panel call-out-panel__small govuk-!-margin-top-2">
@@ -84,11 +88,13 @@
             head = Some(Seq(
                 HeadCell(Text(messages("site.id"))),
                 HeadCell(Text(messages("site.friendlyName"))),
+                HeadCell(Empty)
             )),
             rows = egresses.map { egress =>
                 Seq(
                     TableRow(Text(egress.id)),
-                    TableRow(Text(egress.friendlyName))
+                    TableRow(Text(egress.friendlyName)),
+                    TableRow(HtmlContent(removeEgressLink(egress)))
                 )
             },
         ))

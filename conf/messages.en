@@ -28,6 +28,8 @@ site.accessRequestNotFound.heading = Access request not found
 site.accessRequestNotFound.message = Cannot find an access request with ID {0}.
 site.teamNotFoundHeading = Team not found
 site.teamNotFoundMessage = Cannot find a team with ID {0}.
+site.egressNotFoundHeading = Egress not found
+site.egressNotFoundMessage = Cannot find an egress with ID {0}.
 site.opensInNewTab = opens in new tab
 site.displayCount = Showing {0} of {1}
 site.deleted = Deleted
@@ -708,6 +710,19 @@ teamEgressSuccess.whatnow.heading = What you can do now
 teamEgressSuccess.whatnow.content = View and manage other {0}, or return to the {1} page.
 teamEgressSuccess.whatnow.content.0 = teams
 teamEgressSuccess.whatnow.content.1 = egress
+
+removeEgressFromTeamConfirmation.title = Remove egress from team
+removeEgressFromTeamConfirmation.heading = You are about to remove access to the following egress
+removeEgressFromTeamConfirmation.summary.egress.friendlyName = Egress friendly name
+removeEgressFromTeamConfirmation.summary.egress.id = Egress Id
+removeEgressFromTeamConfirmation.summary.team.name = Team name
+removeEgressFromTeamConfirmation.guidance.text = The team will no longer have access to this egress and will be unable to promote or update APIs that use this egress.
+removeEgressFromTeamConfirmation.submit.text = Confirm and remove egress
+
+removeEgressFromTeamSuccess.title = Egress successfully removed
+removeEgressFromTeamSuccess.heading = Egress successfully removed
+removeEgressFromTeamSuccess.whatNow.heading = What you can do now
+removeEgressFromTeamSuccess.whatNow.content = Return and manage {0} egresses.
 
 createTeam.title = Team registered successfully
 createTeam.successMessage = Team registered successfully

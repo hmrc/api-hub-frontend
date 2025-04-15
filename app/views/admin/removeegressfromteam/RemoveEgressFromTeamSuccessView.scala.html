@@ -1,0 +1,46 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import viewmodels.admin.removeegressfromteam.RemoveEgressFromTeamSuccessViewModel
+
+@this(
+    layout: templates.Layout,
+    govukPanel: GovukPanel
+)
+
+@(viewModel: RemoveEgressFromTeamSuccessViewModel)(implicit request: Request[?], messages: Messages)
+
+@manageTeamEgressesLink() = {
+
+    <a class="govuk-link" href="@viewModel.returnUrl">@{viewModel.team.name}</a>
+
+}
+
+@layout(pageTitle = titleNoForm(messages("removeEgressFromTeamSuccess.title")), user = Some(viewModel.user), showBackLink = false) {
+
+    @govukPanel(
+        Panel(title = Text(messages("removeEgressFromTeamSuccess.heading")))
+    )
+
+    <h2 class="govuk-heading-m">
+        @messages("removeEgressFromTeamSuccess.whatNow.heading")
+    </h2>
+
+    <p class="govuk-body">
+        @Html(messages("removeEgressFromTeamSuccess.whatNow.content", manageTeamEgressesLink()))
+    </p>
+
+}

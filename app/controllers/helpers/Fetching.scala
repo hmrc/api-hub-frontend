@@ -16,7 +16,9 @@
 
 package controllers.helpers
 
+import config.HipEnvironments
 import models.accessrequest.AccessRequest
+import models.api.EgressGateway
 import models.application.Application
 import models.requests.BaseRequest
 import models.team.Team
@@ -51,6 +53,16 @@ trait Fetching {
       case Some(team) => Right(team)
       case None => Left(errorResultBuilder.teamNotFound(teamId))
     }
+  }
+
+  def fetchEgressOrNotFound(egressId: String, hipEnvironments: HipEnvironments)(implicit request: BaseRequest[?], ec: ExecutionContext): Future[Either[Result, EgressGateway]] = {
+    apiHubService.listEgressGateways(hipEnvironments.deployTo).map(
+      egresses =>
+        egresses
+          .find(_.id == egressId)
+          .map(Right(_))
+          .getOrElse(Left(errorResultBuilder.egressNotFound(egressId)))
+    )
   }
 
 }

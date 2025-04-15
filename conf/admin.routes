@@ -31,3 +31,6 @@ POST        /add-egress-to-team/change-egress                                   
 GET         /add-egress-to-team/check-your-answers                                  controllers.admin.addegresstoteam.TeamEgressCheckYourAnswersController.onPageLoad()
 POST        /add-egress-to-team/check-your-answers                                  controllers.admin.addegresstoteam.TeamEgressCheckYourAnswersController.onSubmit()
 GET         /add-egress-to-team/success                                             controllers.admin.addegresstoteam.TeamEgressSuccessController.onPageLoad()
+
+GET         /remove-egress-from-team/:teamId/:egressId                              controllers.admin.removeegressfromteam.RemoveEgressFromTeamConfirmationController.onPageLoad(teamId: String, egressId: String)
+POST        /remove-egress-from-team/:teamId/:egressId                              controllers.admin.removeegressfromteam.RemoveEgressFromTeamConfirmationController.onSubmit(teamId: String, egressId: String)
