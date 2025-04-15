@@ -62,9 +62,9 @@
     @applications.map( application =>
         <div class="hip-application">
             <div class="hip-inner-card flex">
-                <h3 class="govuk-heading-s align-left hip-inner-card-title">
+                <h2 class="govuk-heading-s align-left hip-inner-card-title">
                     <a class="govuk-link govuk-link--no-visited-state" href={controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url} data-application-id={application.id}>{application.name}</a>
-                </h3>
+                </h2>
                 <p class="govuk-body align-left">{messages("applications.teamMembers", application.teamMembers.size)}</p>
                 <p class="govuk-body align-left ">{messages("applications.created")} <span class="utcDateShort">{ViewUtils.formatLocalDateTimeContainingUtc(application.created)}</span></p>
             </div>

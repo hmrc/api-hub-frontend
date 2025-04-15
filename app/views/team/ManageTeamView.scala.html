@@ -61,6 +61,17 @@
     }
 }
 
+@teamMemberRow(teamMember: TeamMember) = {
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            @teamMember.email
+        </div>
+        <div class="govuk-grid-column-one-third govuk-!-text-align-right">
+            @teamMemberRemoveLink(team.id, teamMember, team.teamMembers.size)
+        </div>
+    </div>
+}
+
 @layout(pageTitle = titleNoForm(messages("manageTeam.title", team.name)), user = Some(user), fullWidth = true, customScriptsBlock = Some(iconsLink())) {
 
     @sideNav(team.name, manageTeamNavItems(team, ManageTeamSideNavPages.ManageTeamMembersPage)) {
@@ -84,15 +95,11 @@
             Table(
                 caption = None,
                 head = Some(Seq(
-                        HeadCell(messages("manageTeam.teamMembers.emailAddress")),
-                        HeadCell()
+                        HeadCell(messages("manageTeam.teamMembers.emailAddress"))
                     )),
                 rows = team.teamMembers.map(teamMember =>
                         Seq(
-                            TableRow(content = teamMember.email, attributes = Map("data-team-member-email" -> teamMember.email)),
-                            TableRow(content = HtmlContent(
-                                    teamMemberRemoveLink(team.id, teamMember, team.teamMembers.size))
-                                )
+                            TableRow(content = HtmlContent(teamMemberRow(teamMember)), attributes = Map("data-team-member-email" -> teamMember.email))
                         )
                 )
             )
