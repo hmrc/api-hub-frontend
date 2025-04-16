@@ -68,9 +68,9 @@
                 <div>
                     @for(application <- viewModel.myApplications) {
                         <div class="hip-inner-card flex">
-                            <h3 class="govuk-heading-s align-left hip-inner-card-title">
+                            <h2 class="govuk-heading-s align-left hip-inner-card-title">
                                 <a class="govuk-link govuk-link--no-visited-state" href="@controllers.application.routes.ApplicationDetailsController.onPageLoad(application.id).url">@application.name</a>
-                            </h3>
+                            </h2>
                             <p class="govuk-body align-left">@messages("dashboard.applications.teamMembers", application.teamMembers.length)</p>
                             <p class="govuk-body align-left">@messages("dashboard.applications.created") <span class="utcDateShort">@ViewUtils.formatLocalDateTimeContainingUtc(application.created)</span></p>
                         </div>
@@ -108,9 +108,9 @@
                 <div>
                     @for(team <- viewModel.myTeams) {
                         <div class="hip-inner-card flex">
-                            <h3 class="govuk-heading-s align-left hip-inner-card-title">
+                            <h2 class="govuk-heading-s align-left hip-inner-card-title">
                                 <a class="govuk-link govuk-link--no-visited-state" href="@controllers.team.routes.ManageTeamController.onPageLoad(team.id).url">@team.name</a>
-                            </h3>
+                            </h2>
                             <p class="govuk-body align-left">@messages("dashboard.teams.teamMembers", team.teamMembers.length)</p>
                             <p class="govuk-body align-left">@messages("dashboard.teams.created") <span class="utcDateShort">@ViewUtils.formatLocalDateTimeContainingUtc(team.created)</span></p>
                         </div>
@@ -149,9 +149,9 @@
                     <div>
                         @for(api <- viewModel.myApis) {
                             <div class="hip-inner-card flex">
-                                <h3 class="govuk-heading-s align-left hip-inner-card-title">
+                                <h2 class="govuk-heading-s align-left hip-inner-card-title">
                                     <a class="govuk-link govuk-link--no-visited-state" href="@controllers.myapis.routes.MyApiDetailsController.onPageLoad(api.id).url">@api.title</a>
-                                </h3>
+                                </h2>
                             </div>
                         }
                     </div>
