@@ -16,6 +16,7 @@
 
 package models.api
 
+import config.Platforms
 import models.api.ApiGeneration.V2
 import models.{Enumerable, WithName}
 import play.api.libs.functional.syntax.*
@@ -90,11 +91,13 @@ case class ApiDetail(
   apiGeneration: Option[ApiGeneration] = None,
 ) {
 
-  def isSelfServe: Boolean = platform == "HIP"
+  def isSelfServe(platforms: Platforms): Boolean = platforms.isSelfServe(platform)
+  
+  def isEISManaged(platforms: Platforms): Boolean = platforms.isEISManaged(platform)
   
   def isHubMaintainable: Boolean = apiGeneration.contains(V2)
 
-  def toApiDetailSummary: ApiDetailSummary = ApiDetailSummary(this)
+  def toApiDetailSummary(platforms: Platforms): ApiDetailSummary = ApiDetailSummary(this, platforms)
   
 }
 

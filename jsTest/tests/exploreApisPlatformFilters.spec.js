@@ -9,19 +9,31 @@ describe('exploreApisPlatformFilters', () => {
         const dom = new JSDOM(`
             <!DOCTYPE html>
             <input id="filterPlatformSelfServe" type="checkbox" checked="checked">
+            <label for="filterPlatformSelfServe"><span data-count="0"></span></label>
             <input id="filterPlatformNonSelfServe" type="checkbox">
+            <label for="filterPlatformNonSelfServe"><span data-count="0"></span></label>
             <details id="viewPlatformFilters">
+                <div id="eisFilters"></div>
                 <div>
-                    <input class="platformFilter" type="checkbox" value="hip" data-selfserve="true">
+                    <input class="platformFilter" type="checkbox" id="filter_HIP" value="hip" data-selfserve="true">
+                    <label for="filter_HIP"><span data-count></span></label>
                 </div>
                 <div>
-                    <input class="platformFilter" type="checkbox" value="api_platform">
+                    <input class="platformFilter" type="checkbox" id="filter_API_PLATFORM" value="api_platform">
+                    <label for="filter_API_PLATFORM"><span data-count></span></label>
                 </div>
                 <div>
-                    <input class="platformFilter" type="checkbox" value="sdes">
+                    <input class="platformFilter" type="checkbox" id="filter_SDES" value="sdes">
+                    <label for="filter_SDES"><span data-count></span></label>
                 </div>
                 <div>
-                    <input class="platformFilter" type="checkbox" value="cma">
+                    <input class="platformFilter" type="checkbox" id="filter_CMA" value="cma">
+                    <label for="filter_CMA"><span data-count></span></label>
+                </div>
+                <div id="nonEISFilters"></div>
+                <div>
+                    <input class="platformFilter" type="checkbox" id="filter_CIP" value="cip">
+                    <label for="filter_CIP"><span data-count></span></label>
                 </div>
             </details>
         `);
@@ -53,15 +65,33 @@ describe('exploreApisPlatformFilters', () => {
     function listOfPlatformFiltersIsVisible() {
         return document.getElementById('viewPlatformFilters').open;
     }
+    function eisFiltersTitle() {
+        return document.getElementById('eisFilters');
+    }
+    function nonEISFiltersTitle() {
+        return document.getElementById('nonEISFilters');
+    }
+    function filterCount(elementId){
+        return document.querySelector(`[for=${elementId}]`).querySelector('[data-count]').dataset.count;
+    }
+    function selfServeCount(){
+        return filterCount("filterPlatformSelfServe");
+    }
+    function nonSelfServeCount(){
+        return filterCount("filterPlatformNonSelfServe");
+    }
+    function platformCount(platform){
+        return filterCount(`filter_${platform.toUpperCase()}`);
+    }
 
     describe("initialise", () => {
         it("removes checkboxes for platforms not in use by any APIs, and for self-serve APIs",  () => {
-            expect(getNonSelfServeCheckboxValues()).toEqual(['hip', 'api_platform', 'sdes', 'cma']);
+            expect(getNonSelfServeCheckboxValues()).toEqual(['hip', 'api_platform', 'sdes', 'cma', 'cip']);
 
-            const apis = buildApisWithPlatforms('sdes', 'sdes', 'cma', 'hip');
+            const apis = buildApisWithPlatforms('sdes', 'sdes', 'cma', 'hip', 'cip');
             platformFilters.initialise(apis);
 
-            expect(getNonSelfServeCheckboxValues()).toEqual(['sdes', 'cma']);
+            expect(getNonSelfServeCheckboxValues()).toEqual(['sdes', 'cma', 'cip']);
         });
 
         it("after initialisation clicking any of the checkboxes triggers the onChange handler",  () => {
@@ -125,16 +155,53 @@ describe('exploreApisPlatformFilters', () => {
     describe('syncWithApis', () => {
         let apis;
         beforeEach(() => {
-            apis = buildApisWithPlatforms('sdes', 'sdes', 'hip');
+            apis = buildApisWithPlatforms('sdes', 'sdes', 'hip', 'cip');
         });
 
         it("when new APIs are added, hidden checkboxes are shown",  () => {
             platformFilters.initialise(apis);
             expect(isVisible(platformCheckbox('cma').parentElement)).toBe(false);
 
-            platformFilters.syncWithApis([...apis, {data: {platform: 'cma'}}]);
+            platformFilters.syncWithApis([...apis, {data: {platform: 'cma', isSelfServe: 'true'}}]);
 
             expect(isVisible(platformCheckbox('cma').parentElement)).toBe(true);
+            expect(selfServeCount()).toEqual('1');
+            expect(nonSelfServeCount()).toEqual('4');
+            expect(platformCount('sdes')).toEqual('2');
+            expect(platformCount('cma')).toEqual('1');
+            expect(platformCount('cip')).toEqual('1');
+        });
+
+        it("when there is only EIS managed APIs, only EIS checkboxes are shown",  () => {
+            platformFilters.initialise(apis);
+            expect(isVisible(platformCheckbox('cma').parentElement)).toBe(false);
+
+            platformFilters.syncWithApis([{data: {platform: 'cma', isEISManaged: true}}]);
+
+            expect(isVisible(platformCheckbox('cma').parentElement)).toBe(true);
+            expect(isVisible(eisFiltersTitle())).toBe(true);
+            expect(isVisible(nonEISFiltersTitle())).toBe(false);
+            expect(selfServeCount()).toEqual('0');
+            expect(nonSelfServeCount()).toEqual('1');
+            expect(platformCount('cma')).toEqual('1');
+            expect(platformCount('sdes')).toEqual('0');
+            expect(platformCount('cip')).toEqual('0');
+        });
+
+        it("when there is only non EIS managed APIs, only non EIS checkboxes are shown",  () => {
+            platformFilters.initialise(apis);
+            expect(isVisible(platformCheckbox('cma').parentElement)).toBe(false);
+
+            platformFilters.syncWithApis([{data: {platform: 'cma'}}]);
+
+            expect(isVisible(platformCheckbox('cma').parentElement)).toBe(true);
+            expect(isVisible(eisFiltersTitle())).toBe(false);
+            expect(isVisible(nonEISFiltersTitle())).toBe(true);
+            expect(selfServeCount()).toEqual('0');
+            expect(nonSelfServeCount()).toEqual('1');
+            expect(platformCount('cma')).toEqual('1');
+            expect(platformCount('sdes')).toEqual('0');
+            expect(platformCount('cip')).toEqual('0');
         });
 
         it("when old APIs are removed, visible checkboxes are hidden",  () => {

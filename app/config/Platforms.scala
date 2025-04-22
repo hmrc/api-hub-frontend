@@ -35,6 +35,12 @@ trait Platforms {
       .getOrElse(false)
   }
 
+  def isEISManaged(platformCode: String): Boolean = {
+    platforms.find(platform => codesMatch(platform.code, platformCode))
+      .map(_.isEISManaged)
+      .getOrElse(false)
+  }
+
   private def normalise(s: String): String = {
     s.trim.toLowerCase()
   }
@@ -43,17 +49,20 @@ trait Platforms {
     normalise(platformCode1) == normalise(platformCode2)
   }
 
+  val (eisManagedPlatforms, nonEISManagedPlatforms) = platforms.partition(_.isEISManaged)
+
 }
 
 @Singleton
 class PlatformsImpl @Inject()(configuration: Configuration) extends Platforms {
-  private val selfServePlatforms = configuration.get[Seq[String]]("selfServePlatforms").map(_.toLowerCase).toSet
+  private lazy val selfServePlatforms = configuration.get[Seq[String]]("selfServePlatforms").map(_.toLowerCase).toSet
 
-  override val platforms: Seq[Platform] = configuration.get[Map[String,String]]("platforms")
-    .map{
-      case (code, description) => Platform(
+  override lazy val platforms: Seq[Platform] = configuration.get[Map[String, Configuration]]("platforms")
+    .map {
+      case (code, platformConfiguration) => Platform(
         code,
-        description,
+        platformConfiguration.get[String]("description"),
+        platformConfiguration.get[Boolean]("eisManaged"),
         selfServePlatforms.find(selfServePlatformCode => codesMatch(selfServePlatformCode, code)).isDefined)
     }
     .toSeq

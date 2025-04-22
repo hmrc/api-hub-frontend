@@ -50,7 +50,7 @@ class ApiDetailsController @Inject()(
       for {
         maybeApiDetail <- apiHubService.getApiDetail(id)
         result <- maybeApiDetail match {
-          case Some(apiDetail) if apiDetail.isSelfServe => processSelfServeApiDetail(apiDetail)
+          case Some(apiDetail) if apiDetail.isSelfServe(platforms) => processSelfServeApiDetail(apiDetail)
           case Some(apiDetail) => processNonSelfServeApiDetail(apiDetail)
           case None =>
             Future.successful(errorResultBuilder.notFound(

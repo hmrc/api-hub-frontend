@@ -16,4 +16,4 @@
 
 package models.api
 
-case class Platform(code: String, description: String, isSelfServe: Boolean = false)
+case class Platform(code: String, description: String, isEISManaged: Boolean, isSelfServe: Boolean = false)

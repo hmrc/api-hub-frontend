@@ -7,6 +7,8 @@ export function buildPlatformFilters() {
         elViewNonSelfServePlatformFilters = document.getElementById('viewPlatformFilters'),
         elShowSelfServe = document.getElementById('filterPlatformSelfServe'),
         elShowNonSelfServe = document.getElementById('filterPlatformNonSelfServe'),
+        elEISFilters = document.getElementById('eisFilters'),
+        elNonEISFilters = document.getElementById('nonEISFilters'),
         selfServePlatformsInUseByApis = new Set(),
         nonSelfServePlatformsInUseByApis = new Set();
 
@@ -63,6 +65,28 @@ export function buildPlatformFilters() {
         return new Set(selections);
     }
 
+    function setCount(elementId, count){
+        document.querySelector(`[for=${elementId}]`).querySelector("[data-count]").dataset.count = count;
+    }
+
+    function setCounts(apis, allNonSelfServePlatforms){
+        const selfServeAPIs = apis.filter(api => api.data.isSelfServe);
+        const nonSelfServeAPIs = apis.filter(api => !api.data.isSelfServe);
+        setCount(elShowSelfServe.id, selfServeAPIs.length);
+        setCount(elShowNonSelfServe.id, nonSelfServeAPIs.length);
+
+        allNonSelfServePlatforms.forEach(platform => {
+            const elementId = `filter_${platform.toUpperCase()}`;
+            const platformAPIs = apis.filter(api => api.data.platform === platform);
+            setCount(elementId, platformAPIs.length);
+        });
+
+        const eisManagedAPIs = nonSelfServeAPIs.filter(api => api.data.isEISManaged);
+        const nonEISManagedAPIs = nonSelfServeAPIs.filter(api => !api.data.isEISManaged);
+        setVisible(elEISFilters, eisManagedAPIs.length > 0);
+        setVisible(elNonEISFilters, nonEISManagedAPIs.length > 0);
+    }
+
     return {
         initialise(apis) {
             document.querySelectorAll('input.platformFilter').forEach(el => {
@@ -108,6 +132,8 @@ export function buildPlatformFilters() {
 
             elShowSelfServe.disabled = selfServePlatformsInUseByApis.size === 0;
             elShowNonSelfServe.disabled = nonSelfServePlatformsInUseByApis.size === 0;
+
+            setCounts(apis, allNonSelfServePlatforms);
         },
         onChange(handler) {
             onFiltersChangedHandler = () => {

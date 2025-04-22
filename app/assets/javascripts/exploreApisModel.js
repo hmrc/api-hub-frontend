@@ -7,6 +7,8 @@ export function buildModel(apiDetailPanels) {
                 hods: new Set(el.dataset.hods.split(',').filter(h => h)),
                 platform: el.dataset.platform,
                 id: el.dataset.id,
+                isSelfServe: el.dataset.isSelfServe === 'true',
+                isEISManaged: el.dataset.isEisManaged === 'true',
             },
             el,
             originalIndex: index,
