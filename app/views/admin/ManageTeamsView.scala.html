@@ -46,7 +46,7 @@
     activeLink = Some("apiHubAdmin"),
     customScriptsBlock = Some(scripts()),
 ) {
-    @sideNav(messages("manageTeams.admin"), AdminNavItems(user, AdminSideNavPages.ManageTeamsPage)) {
+    @sideNav(messages("site.admin"), AdminNavItems(user, AdminSideNavPages.ManageTeamsPage)) {
 
         <h1 class="govuk-heading-m govuk-!-margin-bottom-7">
             @Html(messages("manageTeams.heading", <span id="teamCount">{teams.size}</span>))

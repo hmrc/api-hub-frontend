@@ -43,7 +43,7 @@
     activeLink = Some("apiHubAdmin"),
     customScriptsBlock = Some(scripts()),
 ) {
-    @sideNav(messages("accessRequests.admin"), AdminNavItems(user, AdminSideNavPages.AccessRequestsPage)) {
+    @sideNav(messages("site.admin"), AdminNavItems(user, AdminSideNavPages.AccessRequestsPage)) {
 
         <h1 class="govuk-heading-m govuk-!-margin-bottom-7">
             @Html(messages("accessRequests.heading", <span id="requestCount">{accessRequests.size}</span>))
