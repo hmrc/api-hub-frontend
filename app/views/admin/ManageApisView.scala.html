@@ -46,7 +46,7 @@
     activeLink = Some("apiHubAdmin"),
     customScriptsBlock = Some(scripts()),
 ) {
-    @sideNav(messages("manageApis.admin"), AdminNavItems(user, AdminSideNavPages.ManageApisPage)) {
+    @sideNav(messages("site.admin"), AdminNavItems(user, AdminSideNavPages.ManageApisPage)) {
 
         <h1 class="govuk-heading-m">
             @Html(messages("manageApis.heading", <span id="apiCount"></span>))

@@ -113,13 +113,6 @@
                     @messages("site.dashboard")
                 </a>
             </li>
-            @if(user.map(user => user.permissions.canApprove || user.permissions.canSupport).getOrElse(false)) {
-                <li>
-                    <a id="apiHubAdminLink" data-header-link-name="apiHubAdmin" class="govuk-link govuk-link--no-visited-state @active("apiHubAdmin")" href="@controllers.admin.routes.AccessRequestsController.onPageLoad().url">
-                        @messages("site.approvals")
-                    </a>
-                </li>
-            }
             <li>
                 <a id="exploreApisLink" data-header-link-name="exploreApis" class="govuk-link govuk-link--no-visited-state @active("exploreApis")" href="@routes.ExploreApisController.onPageLoad().url">
                     @messages("exploreApis.link.text")
@@ -140,6 +133,13 @@
                 @messages("support.link.text")
                 </a>
             </li>
+            @if(user.map(user => user.permissions.canApprove || user.permissions.canSupport).getOrElse(false)) {
+                <li>
+                    <a id="apiHubAdminLink" data-header-link-name="apiHubAdmin" class="govuk-link govuk-link--no-visited-state @active("apiHubAdmin")" href="@controllers.admin.routes.AccessRequestsController.onPageLoad().url">
+                    @messages("site.admin")
+                    </a>
+                </li>
+            }
         </ul>
     </nav>
 

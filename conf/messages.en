@@ -13,7 +13,7 @@ site.startAgain = Start again
 site.signIn = Sign in
 site.govuk = GOV.UK
 site.dashboard = Dashboard
-site.approvals = Integration Hub Admin
+site.admin = Admin
 site.applicationNotFoundHeading = Application not found
 site.applicationNotFoundMessage = Cannot find an application with ID {0}.
 site.environmentNotFoundHeading = Environment not found
@@ -471,7 +471,6 @@ requestProductionAccess.declaration.accept = I confirm that I have read and meet
 
 accessRequests.title = API requests
 accessRequests.heading = API access requests ({0})
-accessRequests.admin = Integration Hub admin
 accessRequests.headings.environment = Environment
 accessRequests.headings.requestedOn = Requested on
 accessRequests.headings.requestedBy = Requested by
@@ -751,7 +750,6 @@ createTeamCheckYourAnswers.createTeam = Register team
 
 manageApplications.title = Manage applications
 manageApplications.heading = Manage applications ({0})
-manageApplications.admin = Integration Hub admin
 manageApplications.application.id = ID
 manageApplications.application.created = Registered
 manageApplications.search.label = Search for an application
@@ -761,7 +759,6 @@ manageApplications.create = Register application
 
 manageApis.title = Manage APIs
 manageApis.heading = Manage APIs ({0})
-manageApis.admin = Integration Hub admin
 manageApis.search.label = Search APIs
 manageApis.search.hint = You can search by API name, API number or publisher reference
 manageApis.noResults.title = No APIs found
@@ -770,7 +767,6 @@ manageApis.create = Create API
 
 manageTeams.title = Manage teams
 manageTeams.heading = Manage teams ({0})
-manageTeams.admin = Integration Hub admin
 manageTeams.teams.teamName = Team name
 manageTeams.teams.id = ID
 manageTeams.teams.created = Registered
@@ -954,7 +950,6 @@ removeApiSuccess.link = View and manage your {0}.
 getUsers.title = View users
 getUsers.heading = View users
 getUsers.copy = Copy to clipboard
-getUsers.admin = Integration Hub admin
 
 teamMigration.pageTitle = Global team migration
 teamMigration.title = Team migration

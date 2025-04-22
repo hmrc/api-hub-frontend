@@ -52,7 +52,7 @@
     activeLink = Some("apiHubAdmin"),
     customScriptsBlock = Some(scripts()),
 ) {
-    @sideNav(messages("manageApplications.admin"), AdminNavItems(user, AdminSideNavPages.ManageApplicationsPage)) {
+    @sideNav(messages("site.admin"), AdminNavItems(user, AdminSideNavPages.ManageApplicationsPage)) {
 
         <h1 class="govuk-heading-m">
             @Html(messages("manageApplications.heading", <span id="appCount">{applications.size}</span>))

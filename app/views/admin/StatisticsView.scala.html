@@ -47,7 +47,7 @@
 
 @layout(pageTitle = titleNoForm(messages("statistics.title")), fullWidth = true, user = Some(user), customScriptsBlock = Some(scripts())) {
 
-    @sideNav(messages("manageApplications.admin"), AdminNavItems(user, AdminSideNavPages.StatisticsPage)) {
+    @sideNav(messages("site.admin"), AdminNavItems(user, AdminSideNavPages.StatisticsPage)) {
 
         <h1 class="govuk-heading-m govuk-!-margin-bottom-4">@messages("statistics.heading")</h1>
 
