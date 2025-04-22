@@ -20,6 +20,7 @@
 @import models.myapis.produce.ProduceApiHowToCreate
 @import viewmodels.myapis.produce.ProduceApiDomainViewModel
 @import models.myapis.produce.ProduceApiDomainSubdomain
+@import views.html.helper.CSPNonce
 
 @this(
     layout: templates.Layout,
@@ -30,6 +31,10 @@
 )
 
 @(form: Form[ProduceApiDomainSubdomain], viewModel: ProduceApiDomainViewModel, userModel: UserModel, domains: Domains)(implicit request: Request[?], messages: Messages)
+
+@scripts() = {
+    <script src='@routes.Assets.versioned("javascripts/produceApiDomain.js")' type="module" @{CSPNonce.attr}></script>
+}
 
 @radioDomains = @{
     domains.domains.map(domain =>
@@ -54,12 +59,13 @@
             RadioItem(
                 id = Some(s"subDomain-${subDomain.code.replace(".","_")}"),
                 content = Text(subDomain.description),
-                value = Some(subDomain.code)
+                value = Some(subDomain.code),
+                attributes = Map("data-basepath" -> subDomain.basePath, "data-domain" -> domain.code)
             )
         )
 }
 
-@layout(pageTitle = titleNoForm(messages("produceApiDomain.title")), user = Some(userModel)) {
+@layout(pageTitle = titleNoForm(messages("produceApiDomain.title")), user = Some(userModel), customScriptsBlock = Some(scripts())) {
     @formHelper(action = viewModel.formAction) {
 
         <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">@messages(viewModel.headingMessageKey)</h1>
@@ -76,6 +82,14 @@
                 items  = radioDomains
             )
         )
+
+        <div id="basePathContainer" class="govuk-!-display-none govuk-!-margin-bottom-6">
+            <p class="govuk-body govuk-!-margin-bottom-2">
+                @messages("produceApiDomain.basePath")
+            </p>
+            <p id="basePathValue" class="govuk-body govuk-!-font-weight-bold"></p>
+        </div>
+
         @govukButton(
             ButtonViewModel(messages("site.continue")).preventingDoubleClick()
         )

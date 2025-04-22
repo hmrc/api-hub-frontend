@@ -1099,7 +1099,7 @@ produceApiReviewNameDescription.changeName = Change name (in the OAS)
 
 produceApiDomain.title = Which domain and subdomain does your API belong to?
 produceApiDomain.heading = Which domain and subdomain does your API belong to?
-produceApiDomain.description = Help users find and identify the API by setting which domain and subdomain the API belongs to.
+produceApiDomain.description = The domain and subdomain will be used to form part of the base path for all of the API's endpoints, as well as being used to help users identify the API.
 produceApiDomain.checkYourAnswersLabel = Domain and subdomain
 produceApiDomain.error.domainRequired = Select a domain
 produceApiDomain.error.subDomainRequired = Select a subdomain
@@ -1108,6 +1108,7 @@ produceApiDomain.error.invalidSubDomain = Select a valid subdomain
 produceApiDomain.change.hidden = ProduceApiDomain
 produceApiDomain.checkYourAnswersLabel.1 = Domain
 produceApiDomain.checkYourAnswersLabel.2 = Subdomain
+produceApiDomain.basePath = The base path for this API will be:
 
 updateApiDomain.heading = Review domain and subdomain for the API
 
