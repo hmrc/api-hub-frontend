@@ -41,7 +41,7 @@ class ServiceStartViewModelSpec extends AnyFreeSpec with Matchers {
       val expected = ServiceStartViewModel(
         user = Some(FakeUser),
         dashboardStatistics = dashboardStatistics,
-        exploreApisUrl = controllers.routes.ExploreApisController.onPageLoad().url,
+        exploreApisUrl = controllers.apis.routes.ExploreApisController.onPageLoad().url,
         exploreFileTransfersUrl = "/sdes-catalogue/file-types",
         documentationLinks = links
       )

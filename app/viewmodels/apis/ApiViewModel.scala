@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package viewmodels
+package viewmodels.apis
 
 import models.api.ApiDeploymentStatuses
 

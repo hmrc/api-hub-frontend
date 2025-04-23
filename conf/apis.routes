@@ -1,0 +1,11 @@
+GET         /                                                                   controllers.apis.ExploreApisController.onPageLoad()
+POST        /                                                                   controllers.apis.ExploreApisController.onSubmit()
+
+GET         /deep-search/:text                                                  controllers.apis.DeepSearchApisController.doSearch(text: String)
+
+GET         /details/:id                                                        controllers.apis.ApiDetailsController.onPageLoad(id: String)
+
+GET         /support/:id                                                        controllers.apis.ApiSupportController.onPageLoad(id: String)
+
+GET         /view-specification/:apiId                                          controllers.apis.OasRedocController.onPageLoad(apiId: String)
+GET         /oas/:apiId                                                         controllers.apis.OasRedocController.getOas(apiId: String)

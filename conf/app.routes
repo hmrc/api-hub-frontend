@@ -5,6 +5,7 @@
 ->          /admin                                                             admin.Routes
 ->          /team                                                              team.Routes
 ->          /my-apis                                                           myapis.Routes
+->          /apis                                                              apis.Routes
 
 GET         /                                                                  controllers.ServiceStartController.onPageLoad
 GET         /dashboard                                                         controllers.IndexController.onPageLoad
@@ -33,9 +34,6 @@ GET         /sign-in                                                           c
 
 GET         /test-connectivity                                                 controllers.TestConnectivityController.onPageLoad()
 
-GET         /apis/details/:id                                                  controllers.ApiDetailsController.onPageLoad(id: String)
-GET         /apis/support/:id                                                  controllers.ApiSupportController.onPageLoad(id: String)
-
 GET         /apis/add-an-api/start/:id                                         controllers.AddAnApiStartController.addAnApi(id: String)
 GET         /apis/add-endpoints/start/:applicationId/:apiId                    controllers.AddAnApiStartController.addEndpoints(applicationId: String, apiId: String)
 
@@ -43,11 +41,6 @@ GET         /apis/add-an-api/select-application                                c
 POST        /apis/add-an-api/select-application                                controllers.AddAnApiSelectApplicationController.onSubmit(mode: Mode = NormalMode)
 GET         /apis/add-an-api/change-select-application                         controllers.AddAnApiSelectApplicationController.onPageLoad(mode: Mode = CheckMode)
 POST        /apis/add-an-api/change-select-application                         controllers.AddAnApiSelectApplicationController.onSubmit(mode: Mode = CheckMode)
-
-GET         /apis                                                              controllers.ExploreApisController.onPageLoad()
-POST        /apis                                                              controllers.ExploreApisController.onSubmit()
-
-GET         /apis/deep-search/:text                                            controllers.DeepSearchApisController.doSearch(text: String)
 
 GET         /apis/add-an-api/review-policy                                     controllers.ApiPolicyConditionsDeclarationPageController.onPageLoad(mode: Mode = NormalMode, context: AddAnApiContext = AddAnApi)
 POST        /apis/add-an-api/review-policy                                     controllers.ApiPolicyConditionsDeclarationPageController.onSubmit(mode: Mode = NormalMode, context: AddAnApiContext = AddAnApi)
@@ -76,6 +69,3 @@ GET         /apis/add-endpoints/check-your-answers                             c
 
 POST        /apis/add-an-api/add-api                                           controllers.AddAnApiCompleteController.addApi(context: AddAnApiContext = AddAnApi)
 POST        /apis/add-endpoints/add-endpoints                                  controllers.AddAnApiCompleteController.addApi(context: AddAnApiContext = AddEndpoints)
-
-GET         /apis/view-specification/:apiId                                    controllers.OasRedocController.onPageLoad(apiId: String)
-GET         /apis/oas/:apiId                                                   controllers.OasRedocController.getOas(apiId: String)

@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.apis
 
 import base.OptionallyAuthenticatedSpecBase
-import config.{BaseHipEnvironment, FrontendAppConfig, ShareableHipConfig}
+import config.FrontendAppConfig
 import controllers.actions.FakeUser
 import fakes.{FakeDomains, FakeHipEnvironments, FakeHods, FakePlatforms}
 import generators.ApiDetailGenerators
+import models.api.*
 import models.api.ApiDeploymentStatus.*
 import models.api.ApiGeneration.V2
-import models.api.{ApiDeploymentStatuses, ApiDetail, ContactInfo, ContactInformation, PlatformContact}
 import models.team.Team
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -37,8 +37,9 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import services.ApiHubService
 import utils.HtmlValidation
-import viewmodels.{ApiTeamContactEmail, HubSupportContactEmail, NonSelfServeApiViewModel, SelfServeApiViewModel}
-import views.html.{ApiDetailsView, ErrorTemplate}
+import viewmodels.apis.{ApiTeamContactEmail, HubSupportContactEmail, NonSelfServeApiViewModel, SelfServeApiViewModel}
+import views.html.ErrorTemplate
+import views.html.apis.ApiDetailsView
 
 import java.time.LocalDateTime
 import scala.concurrent.Future

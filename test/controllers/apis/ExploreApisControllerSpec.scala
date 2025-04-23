@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.apis
 
 import base.OptionallyAuthenticatedSpecBase
 import controllers.actions.FakeUser
@@ -25,15 +25,15 @@ import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatest.OptionValues
-import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import play.api.Application
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import services.ApiHubService
 import utils.HtmlValidation
-import views.html.ExploreApisView
+import views.html.apis.ExploreApisView
 
 import java.time.Instant
 import scala.concurrent.Future
@@ -57,7 +57,7 @@ class ExploreApisControllerSpec
           when(fixture.apiHubService.getApis(any())(any()))
             .thenReturn(Future.successful(Seq(apiDetail)))
 
-          val request = FakeRequest(GET, routes.ExploreApisController.onPageLoad().url)
+          val request = FakeRequest(GET, controllers.apis.routes.ExploreApisController.onPageLoad().url)
           val result = route(fixture.application, request).value
 
           status(result) mustBe OK
@@ -77,7 +77,7 @@ class ExploreApisControllerSpec
           when(fixture.apiHubService.getApis(any())(any()))
             .thenReturn(Future.successful(Seq(apiDetail)))
 
-          val request = FakeRequest(GET, routes.ExploreApisController.onPageLoad().url)
+          val request = FakeRequest(GET, controllers.apis.routes.ExploreApisController.onPageLoad().url)
           val result = route(fixture.application, request).value
 
           status(result) mustBe OK
@@ -103,7 +103,7 @@ class ExploreApisControllerSpec
         when(fixture.apiHubService.getApis(any())(any()))
           .thenReturn(Future.successful(Seq(molluscs, zebras, aardvarks, pigeons)))
 
-        val request = FakeRequest(GET, routes.ExploreApisController.onPageLoad().url)
+        val request = FakeRequest(GET, controllers.apis.routes.ExploreApisController.onPageLoad().url)
         val result = route(fixture.application, request).value
 
         status(result) mustBe OK

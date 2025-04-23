@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.apis
 
 import com.google.inject.{Inject, Singleton}
 import config.{Domains, Hods, Platforms}
@@ -24,7 +24,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.ExploreApisView
+import views.html.apis.ExploreApisView
 
 import scala.concurrent.{ExecutionContext, Future}
 

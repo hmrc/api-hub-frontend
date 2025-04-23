@@ -90,7 +90,7 @@
 
                 @govukButton(
                     Button(
-                        href = Some(routes.ApiDetailsController.onPageLoad(apiDetail.id).url),
+                        href = Some(controllers.apis.routes.ApiDetailsController.onPageLoad(apiDetail.id).url),
                         content = Text(messages("addAnApiSelectApplication.returnTo", apiDetail.title)),
                         preventDoubleClick = Some(true)
                     )

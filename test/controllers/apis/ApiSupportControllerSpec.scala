@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.apis
 
 import base.SpecBase
 import generators.ApiDetailGenerators
 import models.user.UserModel
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.Application as PlayApplication
 import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import play.api.{Application => PlayApplication}
+import play.api.test.Helpers.*
 import services.ApiHubService
 import utils.TestHelpers
 
@@ -48,11 +48,11 @@ class ApiSupportControllerSpec
         when(fixture.apiHubService.getApiDetail(eqTo(apiDetail.id))(any)).thenReturn(Future.successful(Some(apiDetail)))
 
         running(fixture.playApplication) {
-          val request = FakeRequest(controllers.routes.ApiSupportController.onPageLoad(apiDetail.id))
+          val request = FakeRequest(routes.ApiSupportController.onPageLoad(apiDetail.id))
           val result = route(fixture.playApplication, request).value
 
           val expected = apiDetail.copy(
-            openApiSpecification = controllers.routes.OasRedocController.getOas(apiDetail.id).absoluteURL()(request)
+            openApiSpecification = routes.OasRedocController.getOas(apiDetail.id).absoluteURL()(request)
           )
 
           status(result) mustBe OK
@@ -66,11 +66,11 @@ class ApiSupportControllerSpec
         val fixture = buildFixture(user)
 
         running(fixture.playApplication) {
-          val request = FakeRequest(controllers.routes.ApiSupportController.onPageLoad("test-id"))
+          val request = FakeRequest(routes.ApiSupportController.onPageLoad("test-id"))
           val result = route(fixture.playApplication, request).value
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad.url)
+          redirectLocation(result) mustBe Some(controllers.routes.UnauthorisedController.onPageLoad.url)
         }
       }
     }

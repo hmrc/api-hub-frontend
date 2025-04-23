@@ -37,7 +37,7 @@ object ServiceStartViewModel {
     ServiceStartViewModel(
       user = user,
       dashboardStatistics = dashboardStatistics,
-      exploreApisUrl = controllers.routes.ExploreApisController.onPageLoad().url,
+      exploreApisUrl = controllers.apis.routes.ExploreApisController.onPageLoad().url,
       exploreFileTransfersUrl = "/sdes-catalogue/file-types",
       documentationLinks = documentationLinks
     )

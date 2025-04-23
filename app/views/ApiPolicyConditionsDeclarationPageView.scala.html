@@ -74,7 +74,7 @@
             @govukButton(
                 ButtonViewModel(content = messages("apiPolicyConditionsDeclarationPage.button.cancel"))
                     .asSecondaryButton()
-                    .asLink(routes.ApiDetailsController.onPageLoad(apiDetail.id).url)
+                    .asLink(controllers.apis.routes.ApiDetailsController.onPageLoad(apiDetail.id).url)
                     .preventingDoubleClick()
             )
         </div>

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.apis
 
 import com.google.inject.{Inject, Singleton}
 import controllers.actions.OptionalIdentifierAction

@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.apis
 
 import base.OptionallyAuthenticatedSpecBase
+import controllers.routes
 import generators.ApiDetailGenerators
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.any
@@ -28,7 +29,7 @@ import play.api.Application
 import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import services.ApiHubService
 import utils.HtmlValidation
 
@@ -52,7 +53,7 @@ class DeepSearchApisControllerSpec
           when(fixture.apiHubService.deepSearchApis(any())(any()))
             .thenReturn(Future.successful(results))
 
-          val request = FakeRequest(GET, routes.DeepSearchApisController.doSearch(searchTerm).url)
+          val request = FakeRequest(GET, controllers.apis.routes.DeepSearchApisController.doSearch(searchTerm).url)
           val result = route(fixture.application, request).value
 
           status(result) mustBe OK
