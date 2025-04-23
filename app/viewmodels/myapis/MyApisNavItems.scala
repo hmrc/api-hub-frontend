@@ -98,7 +98,7 @@ class MyApisNavItems @Inject()(hipEnvironments: HipEnvironments, platforms: Plat
         SideNavItemLeaf(
           page = ViewApiAsConsumerPage,
           title = messages("myApis.viewApiAsConsumer.title"),
-          link = controllers.routes.ApiDetailsController.onPageLoad(apiDetail.id),
+          link = controllers.apis.routes.ApiDetailsController.onPageLoad(apiDetail.id),
           isCurrentPage = currentPage == ViewApiAsConsumerPage,
           opensInNewTab = true
         )

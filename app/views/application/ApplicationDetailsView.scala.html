@@ -36,7 +36,7 @@
 @(viewModel: ApplicationDetailsViewModel)(implicit request: Request[?], messages: Messages)
 
 @exploreApisLink(messageId: String) = {
-    <a id="addExploreApisLink" href="@{routes.ExploreApisController.onPageLoad().url}" class="govuk-link govuk-link--no-visited-state">
+    <a id="addExploreApisLink" href="@{controllers.apis.routes.ExploreApisController.onPageLoad().url}" class="govuk-link govuk-link--no-visited-state">
         @messages(messageId)
     </a>
 }
@@ -166,7 +166,7 @@
     <div class="call-out-panel call-out-panel__small govuk-!-margin-top-2">
         <div class="govuk-grid-row govuk-!-margin-bottom-2">
             <div class="govuk-grid-column-two-thirds govuk-heading-s govuk-!-margin-bottom-0">
-                <a class="govuk-link" href=@controllers.routes.ApiDetailsController.onPageLoad(applicationApi.apiId)>@applicationApi.apiTitle</a>
+                <a class="govuk-link" href=@controllers.apis.routes.ApiDetailsController.onPageLoad(applicationApi.apiId)>@applicationApi.apiTitle</a>
             </div>
             @if(applicationApi.apiNumber.isDefined) {
                 <div class="govuk-grid-column-one-third govuk-!-text-align-right">

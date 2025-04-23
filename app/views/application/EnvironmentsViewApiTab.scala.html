@@ -171,7 +171,7 @@
 }
 
 @exploreApisLink(messageId: String) = {
-    <a href="@{routes.ExploreApisController.onPageLoad().url}" class="govuk-link govuk-link--no-visited-state">
+    <a href="@{controllers.apis.routes.ExploreApisController.onPageLoad().url}" class="govuk-link govuk-link--no-visited-state">
         @messages(messageId)
     </a>
 }

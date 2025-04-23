@@ -89,7 +89,7 @@
 
         <div class="api-panel-top">
             <span class="call-out-type information govuk-!-margin-bottom-0">
-                <a class="govuk-link govuk-link--no-visited-state" href="@routes.ApiDetailsController.onPageLoad(apiDetail.id)" data-api-id="@apiDetail.id">@apiDetail.title</a>
+                <a class="govuk-link govuk-link--no-visited-state" href="@controllers.apis.routes.ApiDetailsController.onPageLoad(apiDetail.id)" data-api-id="@apiDetail.id">@apiDetail.title</a>
             </span>
             @if(platforms.isSelfServe(apiDetail.platform)){
                 <strong class="hip-tag--platform__self-serve">@messages("exploreApis.filter.selfServe")</strong>

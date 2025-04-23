@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.apis
 
 import com.google.inject.{Inject, Singleton}
 import controllers.actions.OptionalIdentifierAction
@@ -25,7 +25,7 @@ import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.RedocView
+import views.html.apis.RedocView
 
 import scala.concurrent.ExecutionContext
 

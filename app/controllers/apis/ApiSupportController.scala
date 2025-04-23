@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.apis
 
 import com.google.inject.{Inject, Singleton}
 import controllers.actions.{AuthorisedSupportAction, IdentifierAction}
@@ -47,7 +47,7 @@ class ApiSupportController @Inject()(
 
   private def buildApiDetail(apiDetail: ApiDetail)(implicit request: Request[?]): ApiDetail = {
     apiDetail.copy(
-      openApiSpecification = controllers.routes.OasRedocController.getOas(apiDetail.id).absoluteURL()
+      openApiSpecification = controllers.apis.routes.OasRedocController.getOas(apiDetail.id).absoluteURL()
     )
   }
 

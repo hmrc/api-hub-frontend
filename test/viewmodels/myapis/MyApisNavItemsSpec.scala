@@ -204,7 +204,7 @@ object MyApisNavItemsSpec {
     SideNavItemLeaf(
       page = ViewApiAsConsumerPage,
       title = "View API as consumer",
-      link = controllers.routes.ApiDetailsController.onPageLoad(apiDetail.id),
+      link = controllers.apis.routes.ApiDetailsController.onPageLoad(apiDetail.id),
       isCurrentPage = false,
       opensInNewTab = true
     )

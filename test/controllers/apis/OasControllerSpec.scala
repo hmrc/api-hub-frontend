@@ -14,25 +14,26 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.apis
 
 import base.OptionallyAuthenticatedSpecBase
 import controllers.actions.FakeUser
 import generators.ApiDetailGenerators
 import models.api.{ApiDetail, Live, Maintainer}
 import models.user.UserModel
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
 import org.scalatest.OptionValues
-import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import play.api.Application
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import services.ApiHubService
 import utils.HtmlValidation
-import views.html.{ErrorTemplate, RedocView}
+import views.html.ErrorTemplate
+import views.html.apis.RedocView
 
 import java.time.Instant
 import scala.concurrent.Future

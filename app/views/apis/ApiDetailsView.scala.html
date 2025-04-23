@@ -122,7 +122,7 @@
 
                     <li class="side-nav__list">
                         @newTabLink(
-                            routes.OasRedocController.onPageLoad(apiDetail.id).url,
+                            controllers.apis.routes.OasRedocController.onPageLoad(apiDetail.id).url,
                             messages("apiDetails.leftNav.viewApiSpec"),
                             "side-nav__link",
                             false
@@ -268,7 +268,7 @@
                     @Html(messages(
                         "apiDetails.viewApiSpec.message",
                         newTabLink(
-                            routes.OasRedocController.onPageLoad(apiDetail.id).url,
+                            controllers.apis.routes.OasRedocController.onPageLoad(apiDetail.id).url,
                             messages("apiDetails.viewApiSpec.link"),
                             "govuk-link govuk-link--no-visited-state"
                         )

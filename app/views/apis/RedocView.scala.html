@@ -18,7 +18,6 @@
 @import models.user.UserModel
 @import views.html.helper.CSPNonce
 
-
 @this(layout: templates.Layout)
 
 @(apiDetail: ApiDetail, user: Option[UserModel])(implicit request: Request[?], messages: Messages)
@@ -42,5 +41,5 @@
     customStyles = Some(styles()),
     customScriptsBlock = Some(scripts())
 ) {
-    <div id="redocContainer" data-oasurl="@routes.OasRedocController.getOas(apiDetail.id).url"></div>
+    <div id="redocContainer" data-oasurl="@controllers.apis.routes.OasRedocController.getOas(apiDetail.id).url"></div>
 }

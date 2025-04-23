@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.apis
 
 import com.google.inject.{Inject, Singleton}
-import config.{Domains, FrontendAppConfig, HipEnvironments, Hods, Platforms}
+import config.*
 import controllers.actions.OptionalIdentifierAction
 import controllers.helpers.ErrorResultBuilder
 import models.api.ApiDetail
@@ -26,8 +26,8 @@ import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels._
-import views.html.ApiDetailsView
+import viewmodels.*
+import views.html.apis.ApiDetailsView
 
 import scala.concurrent.{ExecutionContext, Future}
 
