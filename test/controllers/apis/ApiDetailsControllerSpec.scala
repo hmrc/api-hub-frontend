@@ -37,7 +37,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import services.ApiHubService
 import utils.HtmlValidation
-import viewmodels.{ApiTeamContactEmail, HubSupportContactEmail, NonSelfServeApiViewModel, SelfServeApiViewModel}
+import viewmodels.apis.{ApiTeamContactEmail, HubSupportContactEmail, NonSelfServeApiViewModel, SelfServeApiViewModel}
 import views.html.ErrorTemplate
 import views.html.apis.ApiDetailsView
 

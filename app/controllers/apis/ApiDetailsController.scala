@@ -27,6 +27,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ApiHubService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.*
+import viewmodels.apis.{ApiContactEmail, ApiTeamContactEmail, HubSupportContactEmail, NonSelfServeApiViewModel, SelfServeApiViewModel}
 import views.html.apis.ApiDetailsView
 
 import scala.concurrent.{ExecutionContext, Future}
