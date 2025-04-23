@@ -372,7 +372,6 @@ exploreApis.filter.byStatus = Filter by status
 exploreApis.filter.byStatus.view = View status filters
 exploreApis.filter.byApiType = Filter by API type
 exploreApis.filter.selfServe = EIS self service APIs
-exploreApis.filter.selfServe.info = APIs that you can use and consume now.
 exploreApis.filter.nonSelfServe = APIs on other platforms
 exploreApis.filter.nonSelfServe.info = APIs that cannot be consumed via the Integration Hub, such as IF and DES.
 exploreApis.filter.active = Your results are being filtered. Showing {0}
