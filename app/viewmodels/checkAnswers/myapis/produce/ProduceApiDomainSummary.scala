@@ -21,7 +21,6 @@ import controllers.myapis.produce.routes
 import models.{CheckMode, UserAnswers}
 import pages.myapis.produce.ProduceApiDomainPage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
@@ -32,10 +31,19 @@ object ProduceApiDomainSummary  {
   def row(answers: UserAnswers, domains: Domains)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(ProduceApiDomainPage).map {
       answer =>
+        val domainLabel = messages("produceApiDomain.checkYourAnswersLabel.1")
+        val domainDescription = domains.getDomainDescription(answer.domain)
+        val subDomain = domains.getSubDomain(answer.domain, answer.subDomain)
+        val subDomainLabel = messages("produceApiDomain.checkYourAnswersLabel.2")
+        val subDomainDescription = subDomain.map(_.description).getOrElse(answer.subDomain)
+        val basePathLabel = messages("produceApiDomain.checkYourAnswersLabel.3")
+        val basePath = subDomain.map(_.basePath).getOrElse("")
 
         val value = ValueViewModel(
           HtmlContent(
-            domains.getDomainDescription(answer.domain)
+            s"$domainLabel: ${domainDescription}<br>" +
+            s"$subDomainLabel: ${subDomainDescription}<br>" +
+            s"$basePathLabel: ${basePath}"
           )
         )
 
@@ -46,6 +54,6 @@ object ProduceApiDomainSummary  {
             ActionItemViewModel("site.change", routes.ProduceApiDomainController.onPageLoad(CheckMode).url)
               .withVisuallyHiddenText(messages("produceApiDomain.change.hidden"))
           )
-        ).withCssClass("hip-summary-list__row--no-border")
+        )
     }
 }
