@@ -17,7 +17,7 @@
 package controllers.myapis.update
 
 import base.SpecBase
-import config.Domains
+import config.{Domains, FrontendAppConfig}
 import controllers.actions.FakeUser
 import controllers.myapis.update.routes as updateApiRoutes
 import controllers.routes
@@ -59,12 +59,13 @@ class UpdateApiDomainControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[ProduceApiDomainView]
-        val viewModel = ProduceApiDomainViewModel("updateApiDomain.heading", updateApiRoutes.UpdateApiDomainController.onSubmit(NormalMode))
+        val viewModel = ProduceApiDomainViewModel("updateApiDomain.heading", "updateApiDomain.description", true, updateApiRoutes.UpdateApiDomainController.onSubmit(NormalMode))
         val domains = application.injector.instanceOf[Domains]
         val boundForm = form(domains)
+        val config =  application.injector.instanceOf[FrontendAppConfig]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(boundForm, viewModel, FakeUser, domains)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, viewModel, FakeUser, domains, config)(request, messages(application)).toString
       }
     }
 
@@ -79,15 +80,15 @@ class UpdateApiDomainControllerSpec extends SpecBase with MockitoSugar {
         val request = FakeRequest(GET, updateApiDomainRoute)
 
         val view = application.injector.instanceOf[ProduceApiDomainView]
-        val viewModel = ProduceApiDomainViewModel("updateApiDomain.heading", updateApiRoutes.UpdateApiDomainController.onSubmit(NormalMode))
+        val viewModel = ProduceApiDomainViewModel("updateApiDomain.heading", "updateApiDomain.description", true, updateApiRoutes.UpdateApiDomainController.onSubmit(NormalMode))
         val domains = application.injector.instanceOf[Domains]
-        val boundForm = form(domains)
-          .fill(ProduceApiDomainSubdomain("domain", "subdomain"))
+        val boundForm = form(domains).fill(ProduceApiDomainSubdomain("domain", "subdomain"))
+        val config =  application.injector.instanceOf[FrontendAppConfig]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(boundForm, viewModel, FakeUser, domains)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, viewModel, FakeUser, domains, config)(request, messages(application)).toString
       }
     }
 
@@ -134,14 +135,15 @@ class UpdateApiDomainControllerSpec extends SpecBase with MockitoSugar {
 
         val domains = application.injector.instanceOf[Domains]
         val boundForm = form(domains).bind(Map("value" -> "invalid value"))
+        val config = application.injector.instanceOf[FrontendAppConfig]
 
         val view = application.injector.instanceOf[ProduceApiDomainView]
-        val viewModel = ProduceApiDomainViewModel("updateApiDomain.heading", updateApiRoutes.UpdateApiDomainController.onSubmit(NormalMode))
+        val viewModel = ProduceApiDomainViewModel("updateApiDomain.heading", "updateApiDomain.description", true, updateApiRoutes.UpdateApiDomainController.onSubmit(NormalMode))
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, viewModel, FakeUser, domains)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, viewModel, FakeUser, domains, config)(request, messages(application)).toString
       }
     }
 

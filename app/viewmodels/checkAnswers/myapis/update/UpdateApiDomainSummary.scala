@@ -33,9 +33,19 @@ object UpdateApiDomainSummary  {
     answers.get(UpdateApiDomainPage).map {
       answer =>
 
+        val domainLabel = messages("produceApiDomain.checkYourAnswersLabel.1")
+        val domainDescription = domains.getDomainDescription(answer.domain)
+        val subDomain = domains.getSubDomain(answer.domain, answer.subDomain)
+        val subDomainLabel = messages("produceApiDomain.checkYourAnswersLabel.2")
+        val subDomainDescription = subDomain.map(_.description).getOrElse(answer.subDomain)
+        val basePathLabel = messages("produceApiDomain.checkYourAnswersLabel.3")
+        val basePath = subDomain.map(_.basePath).getOrElse("")
+
         val value = ValueViewModel(
           HtmlContent(
-            domains.getDomainDescription(answer.domain)
+            s"$domainLabel: ${domainDescription}<br>" +
+              s"$subDomainLabel: ${subDomainDescription}<br>" +
+              s"$basePathLabel: ${basePath}"
           )
         )
 
@@ -46,6 +56,6 @@ object UpdateApiDomainSummary  {
             ActionItemViewModel("site.change", routes.UpdateApiDomainController.onPageLoad(CheckMode).url)
               .withVisuallyHiddenText(messages("produceApiDomain.change.hidden"))
           )
-        ).withCssClass("hip-summary-list__row--no-border")
+        )
     }
 }

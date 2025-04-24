@@ -257,7 +257,6 @@ class ProduceApiCheckYourAnswersController @Inject()(
       ProduceApiEgressPrefixesSummary.row(userAnswers),
       ProduceApiHodSummary.row(userAnswers, hods),
       ProduceApiDomainSummary.row(userAnswers, domains),
-      ProduceApiSubDomainSummary.row(userAnswers, domains),
       ProduceApiStatusSummary.row(userAnswers),
       ProduceApiPassthroughSummary.row(userAnswers),
     ).flatten

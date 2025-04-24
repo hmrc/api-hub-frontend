@@ -18,4 +18,4 @@ package viewmodels.myapis.produce
 
 import play.api.mvc.Call
 
-case class ProduceApiDomainViewModel(headingMessageKey: String, formAction: Call)
+case class ProduceApiDomainViewModel(headingMessageKey: String, descriptionMessageKey: String, showUpdateWarning: Boolean, formAction: Call)

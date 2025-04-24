@@ -85,7 +85,6 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
     ProduceApiEgressPrefixesSummary.row(userAnswers),
     ProduceApiHodSummary.row(userAnswers, FakeHods),
     ProduceApiDomainSummary.row(userAnswers, FakeDomains),
-    ProduceApiSubDomainSummary.row(userAnswers, FakeDomains),
     ProduceApiStatusSummary.row(userAnswers),
     ProduceApiPassthroughSummary.row(userAnswers)
   ).flatten)

@@ -84,7 +84,6 @@ class UpdateApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar
     UpdateApiEgressPrefixesSummary.row(userAnswers),
     UpdateApiHodSummary.row(userAnswers, FakeHods),
     UpdateApiDomainSummary.row(userAnswers, FakeDomains),
-    UpdateApiSubDomainSummary.row(userAnswers, FakeDomains),
   ).flatten)
 
   "UpdateApiCheckYourAnswersController" - {
