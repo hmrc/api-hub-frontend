@@ -242,7 +242,6 @@ class UpdateApiCheckYourAnswersController @Inject()(
       UpdateApiEgressPrefixesSummary.row(userAnswers),
       UpdateApiHodSummary.row(userAnswers, hods),
       UpdateApiDomainSummary.row(userAnswers, domains),
-      UpdateApiSubDomainSummary.row(userAnswers, domains),
       UpdateApiStatusSummary.row(userAnswers, userModel),
     ).flatten
   

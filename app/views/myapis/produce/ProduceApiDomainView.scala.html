@@ -21,6 +21,8 @@
 @import viewmodels.myapis.produce.ProduceApiDomainViewModel
 @import models.myapis.produce.ProduceApiDomainSubdomain
 @import views.html.helper.CSPNonce
+@import views.html.components.IconsLink
+@import config.FrontendAppConfig
 
 @this(
     layout: templates.Layout,
@@ -28,11 +30,13 @@
     govukButton: GovukButton,
     govukErrorSummary: GovukErrorSummary,
     govukRadios: GovukRadios,
+    iconsLink: IconsLink
 )
 
-@(form: Form[ProduceApiDomainSubdomain], viewModel: ProduceApiDomainViewModel, userModel: UserModel, domains: Domains)(implicit request: Request[?], messages: Messages)
+@(form: Form[ProduceApiDomainSubdomain], viewModel: ProduceApiDomainViewModel, userModel: UserModel, domains: Domains, config: FrontendAppConfig)(implicit request: Request[?], messages: Messages)
 
 @scripts() = {
+    @iconsLink()
     <script src='@routes.Assets.versioned("javascripts/produceApiDomain.js")' type="module" @{CSPNonce.attr}></script>
 }
 
@@ -64,12 +68,36 @@
             )
         )
 }
+@versioningGuidelinesLink  = {
+    <a href="@config.helpDocsPath/documentation/how-do-i-produce.apis.html#versioning" class="govuk-link">@messages("updateApiDomain.warning.info.linkText")</a>
+}
+
+@updateWarning() = {
+    <div class="call-out-panel call-out-panel__small">
+        <p class="govuk-body information--general-tag">
+            <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+            <span class="call-out-type">
+                @messages("updateApiDomain.warning.heading")
+            </span>
+        </p>
+        <p class="govuk-body additional-message">
+            @messages("updateApiDomain.warning.info.1")
+        </p>
+        <p class="govuk-body additional-message govuk-!-margin-bottom-0 govuk-!-padding-bottom-2">
+            @Html(messages("updateApiDomain.warning.info.2", versioningGuidelinesLink))
+        </p>
+    </div>
+}
 
 @layout(pageTitle = titleNoForm(messages("produceApiDomain.title")), user = Some(userModel), customScriptsBlock = Some(scripts())) {
     @formHelper(action = viewModel.formAction) {
 
         <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">@messages(viewModel.headingMessageKey)</h1>
-        <span class="govuk-caption-m govuk-!-margin-top-0 govuk-!-margin-bottom-4">@messages("produceApiDomain.description")</span>
+        <span class="govuk-caption-m govuk-!-margin-top-0 govuk-!-margin-bottom-4">@messages(viewModel.descriptionMessageKey)</span>
+
+        @if(viewModel.showUpdateWarning) {
+            @updateWarning()
+        }
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))

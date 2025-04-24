@@ -124,7 +124,6 @@ export function onDomLoaded() {
 
             function setState(newState) {
                 if (newState !== currentState) {
-                    console.debug("State changed: ", currentState, " -> ", newState);
                     currentState = newState;
                     onStateChanged(currentState);
                 }

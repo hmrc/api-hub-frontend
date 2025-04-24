@@ -16,7 +16,7 @@
 
 package controllers.myapis.update
 
-import config.Domains
+import config.{Domains, FrontendAppConfig}
 import controllers.actions.*
 import controllers.myapis.update.routes
 import models.Mode
@@ -47,6 +47,7 @@ class UpdateApiDomainController @Inject()(
                                val controllerComponents: MessagesControllerComponents,
                                view: ProduceApiDomainView,
                                domains: Domains,
+                               config: FrontendAppConfig
                         )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form = formProvider()
@@ -78,6 +79,6 @@ class UpdateApiDomainController @Inject()(
   }
 
   private def buildView(form: Form[ProduceApiDomainSubdomain], mode: Mode)(implicit request: DataRequest[AnyContent]) = {
-    view(form, ProduceApiDomainViewModel("updateApiDomain.heading", routes.UpdateApiDomainController.onSubmit(mode)), request.user, domains)
+    view(form, ProduceApiDomainViewModel("updateApiDomain.heading", "updateApiDomain.description", true, routes.UpdateApiDomainController.onSubmit(mode)), request.user, domains, config)
   }
 }

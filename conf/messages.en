@@ -1112,6 +1112,11 @@ produceApiDomain.checkYourAnswersLabel.3 = Base path
 produceApiDomain.basePath = The base path for this API will be:
 
 updateApiDomain.heading = Review domain and subdomain for the API
+updateApiDomain.description = Help users find and identify the API by setting which domains and sub domains the API belongs to.
+updateApiDomain.warning.heading = Changing the domain or subdomain will be a breaking change to your API
+updateApiDomain.warning.info.1 = Changing the domain or subdomain will change the base path and urls of all the endpoints in your API. This will break any existing consumers or applications using your API.
+updateApiDomain.warning.info.2 = If you wish to change the domain or subdomain in a non-breaking way, you should follow our guidance on making a new API version. See the {0} for more information.
+updateApiDomain.warning.info.linkText = API versioning guidelines
 
 produceApiAddPrefixes.title = Do you want to configure prefixes for your API?
 produceApiAddPrefixes.heading = Do you want to configure prefixes for your API?

@@ -17,9 +17,9 @@
 package controllers.myapis.produce
 
 import base.SpecBase
-import config.Domains
+import config.{Domains, FrontendAppConfig}
 import controllers.actions.FakeUser
-import controllers.myapis.produce.{routes => produceApiRoutes}
+import controllers.myapis.produce.routes as produceApiRoutes
 import controllers.routes
 import forms.myapis.produce.ProduceApiDomainFormProvider
 import models.myapis.produce.ProduceApiDomainSubdomain
@@ -32,10 +32,11 @@ import pages.myapis.produce.ProduceApiDomainPage
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.SessionRepository
 import views.html.myapis.produce.ProduceApiDomainView
 import viewmodels.myapis.produce.ProduceApiDomainViewModel
+
 import scala.concurrent.Future
 
 class ProduceApiDomainControllerSpec extends SpecBase with MockitoSugar {
@@ -58,12 +59,13 @@ class ProduceApiDomainControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[ProduceApiDomainView]
-        val viewModel = ProduceApiDomainViewModel("produceApiDomain.heading", produceApiRoutes.ProduceApiDomainController.onSubmit(NormalMode))
+        val viewModel = ProduceApiDomainViewModel("produceApiDomain.heading", "produceApiDomain.description", false, produceApiRoutes.ProduceApiDomainController.onSubmit(NormalMode))
         val domains = application.injector.instanceOf[Domains]
         val boundForm = form(domains)
+        val config =  application.injector.instanceOf[FrontendAppConfig]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(boundForm, viewModel, FakeUser, domains)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, viewModel, FakeUser, domains, config)(request, messages(application)).toString
       }
     }
 
@@ -78,15 +80,15 @@ class ProduceApiDomainControllerSpec extends SpecBase with MockitoSugar {
         val request = FakeRequest(GET, produceApiDomainRoute)
 
         val view = application.injector.instanceOf[ProduceApiDomainView]
-        val viewModel = ProduceApiDomainViewModel("produceApiDomain.heading", produceApiRoutes.ProduceApiDomainController.onSubmit(NormalMode))
+        val viewModel = ProduceApiDomainViewModel("produceApiDomain.heading", "produceApiDomain.description", false, produceApiRoutes.ProduceApiDomainController.onSubmit(NormalMode))
         val domains = application.injector.instanceOf[Domains]
-        val boundForm = form(domains)
-          .fill(ProduceApiDomainSubdomain("domain", "subdomain"))
+        val boundForm = form(domains).fill(ProduceApiDomainSubdomain("domain", "subdomain"))
+        val config =  application.injector.instanceOf[FrontendAppConfig]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(boundForm, viewModel, FakeUser, domains)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, viewModel, FakeUser, domains, config)(request, messages(application)).toString
       }
     }
 
@@ -133,14 +135,15 @@ class ProduceApiDomainControllerSpec extends SpecBase with MockitoSugar {
 
         val domains = application.injector.instanceOf[Domains]
         val boundForm = form(domains).bind(Map("value" -> "invalid value"))
+        val config =  application.injector.instanceOf[FrontendAppConfig]
 
         val view = application.injector.instanceOf[ProduceApiDomainView]
-        val viewModel = ProduceApiDomainViewModel("produceApiDomain.heading", produceApiRoutes.ProduceApiDomainController.onSubmit(NormalMode))
+        val viewModel = ProduceApiDomainViewModel("produceApiDomain.heading", "produceApiDomain.description", false, produceApiRoutes.ProduceApiDomainController.onSubmit(NormalMode))
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, viewModel, FakeUser, domains)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, viewModel, FakeUser, domains, config)(request, messages(application)).toString
       }
     }
 

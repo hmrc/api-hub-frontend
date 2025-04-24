@@ -41,9 +41,7 @@ export function onPageShow() {
     }
 
     elForm.addEventListener('click', e => {
-        console.log(`Clicked on ${e.target.tagName} with name ${e.target.name} and value ${e.target.value}`);
         if (e.target.type === 'radio') {
-            console.log(`Radio button clicked: ${e.target.name} = ${e.target.value}`);
             showBasePathIfApplicable();
         }
     });

@@ -16,7 +16,7 @@
 
 package controllers.myapis.produce
 
-import config.Domains
+import config.{Domains, FrontendAppConfig}
 import controllers.actions.*
 import forms.myapis.produce.ProduceApiDomainFormProvider
 
@@ -32,6 +32,7 @@ import repositories.ProduceApiSessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.myapis.produce.ProduceApiDomainView
 import models.requests.DataRequest
+
 import scala.concurrent.{ExecutionContext, Future}
 import viewmodels.myapis.produce.ProduceApiDomainViewModel
 
@@ -46,6 +47,7 @@ class ProduceApiDomainController @Inject()(
                                             val controllerComponents: MessagesControllerComponents,
                                             view: ProduceApiDomainView,
                                             domains: Domains,
+                                            config: FrontendAppConfig
                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form = formProvider()
@@ -77,7 +79,7 @@ class ProduceApiDomainController @Inject()(
   }
 
   private def buildView(form: Form[ProduceApiDomainSubdomain], mode: Mode)(implicit request: DataRequest[AnyContent]) = {
-    view(form, ProduceApiDomainViewModel("produceApiDomain.heading", routes.ProduceApiDomainController.onSubmit(mode)), request.user, domains)
+    view(form, ProduceApiDomainViewModel("produceApiDomain.heading", "produceApiDomain.description", false, routes.ProduceApiDomainController.onSubmit(mode)), request.user, domains, config)
   }
 
 }
