@@ -1100,3 +1100,7 @@ header {
 [data-count]::after {
     content: " ("attr(data-count)")";
 }
+
+.hip-subdomain-list {
+    list-style-type: disc;
+}
