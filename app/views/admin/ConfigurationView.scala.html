@@ -29,9 +29,12 @@
 @(domains: Seq[Domain], hods: Seq[Hod], emailDomains: Seq[String], user: UserModel)(implicit request: Request[?], messages: Messages)
 
 @subDomainsHtml(domain: Domain) = {
-    <ul class="govuk-list govuk-list-bullet">
+    <ul class="govuk-list govuk-list-bullet hip-subdomain-list">
     @for(subDomain <- domain.subDomains) {
-        <li>@subDomain.code: @subDomain.description</li>
+        <li>
+            <div>@subDomain.code: @subDomain.description</div>
+            <div class="govuk-body-s govuk-!-margin-bottom-2">@subDomain.basePath</div>
+        </li>
     }
     </ul>
 }
