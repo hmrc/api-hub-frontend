@@ -42,6 +42,7 @@ class IndexController @Inject()(
 
     val maxApplicationsToShow = 5
     val maxTeamsToShow = 5
+
     for {
       userApps <- apiHubService.getApplications(Some(request.user.email), false)
       userTeams <- apiHubService.findTeams(Some(request.user.email))
