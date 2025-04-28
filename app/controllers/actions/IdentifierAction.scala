@@ -19,6 +19,7 @@ package controllers.actions
 import com.google.inject.Inject
 import config.FrontendAppConfig
 import handlers.ErrorHandler
+import models.application.Api
 import models.hubstatus.{FeatureStatus, FrontendShutter}
 import models.requests.IdentifierRequest
 import models.user.{LdapUser, StrideUser, UserModel, UserType}
@@ -28,6 +29,9 @@ import play.api.mvc.Results.*
 import play.api.mvc.*
 import play.twirl.api.Html
 import services.HubStatusService
+import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import views.html.ShutteredView
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -39,6 +43,7 @@ class AuthenticatedIdentifierAction @Inject()(
   override val messagesApi: MessagesApi,
   ldapAuthenticator: LdapAuthenticator,
   strideAuthenticator: StrideAuthenticator,
+  crypto: ApplicationCrypto,
   hubStatusService: HubStatusService,
   errorHandler: ErrorHandler,
   shutteredView: ShutteredView,
@@ -69,7 +74,9 @@ class AuthenticatedIdentifierAction @Inject()(
     featureStatus: FeatureStatus
   ): Future[Result] = {
     if (featureStatus.available || user.permissions.canSupport) {
-      block(IdentifierRequest(request, user))
+      val encryptedEmail = crypto.QueryParameterCrypto.encrypt(PlainText(user.email)).value
+      val hc: HeaderCarrier = HeaderCarrierConverter.fromRequest(request).withExtraHeaders(("Encrypted-User-Email", encryptedEmail))
+      block(IdentifierRequest(request, user, hc))
     }
     else {
       shuttered(featureStatus, Some(user))(request)
