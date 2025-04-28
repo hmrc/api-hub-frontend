@@ -38,6 +38,8 @@ class IndexController @Inject()(
                                )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   def onPageLoad: Action[AnyContent] = identify.async { implicit request =>
+    implicit val hc = request.headerCarrierWithEncryptedUserEmail
+
     val maxApplicationsToShow = 5
     val maxTeamsToShow = 5
 
