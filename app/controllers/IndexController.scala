@@ -38,17 +38,18 @@ class IndexController @Inject()(
                                )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   def onPageLoad: Action[AnyContent] = identify.async { implicit request =>
+    implicit val hc = request.headerCarrierWithEncryptedUserEmail
+
     val maxApplicationsToShow = 5
     val maxTeamsToShow = 5
-    implicit val hc2 = request.hc
-    for {
-      userApps <- apiHubService.getApplications(Some(request.user.email), false)
-      userTeams <- apiHubService.findTeams(Some(request.user.email))
-      userApis <- apiHubService.getUserApis(request.user)
-      sortedUserApis = userApis.sortWith((a, b) => a.created.isAfter(b.created))
-    } yield Ok(view(
-          DashboardViewModel(frontendAppConfig, userApps, userTeams, sortedUserApis, request.user)
-    ))
+      for {
+        userApps <- apiHubService.getApplications(Some(request.user.email), false)
+        userTeams <- apiHubService.findTeams(Some(request.user.email))
+        userApis <- apiHubService.getUserApis(request.user)
+        sortedUserApis = userApis.sortWith((a, b) => a.created.isAfter(b.created))
+      } yield Ok(view(
+            DashboardViewModel(frontendAppConfig, userApps, userTeams, sortedUserApis, request.user)
+      ))
   }
 
 }

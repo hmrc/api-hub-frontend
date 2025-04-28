@@ -19,7 +19,6 @@ package controllers.actions
 import com.google.inject.Inject
 import config.FrontendAppConfig
 import handlers.ErrorHandler
-import models.application.Api
 import models.hubstatus.{FeatureStatus, FrontendShutter}
 import models.requests.IdentifierRequest
 import models.user.{LdapUser, StrideUser, UserModel, UserType}
