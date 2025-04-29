@@ -189,6 +189,10 @@ body, input {
                 margin-right: govuk-spacing(6);
             }
         }
+
+        li:last-child a {
+            margin-right: 0;
+        }
     }
 
     height: govuk-spacing(4);
