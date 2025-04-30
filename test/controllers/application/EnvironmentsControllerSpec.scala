@@ -21,8 +21,10 @@ import config.FrontendAppConfig
 import controllers.actions.*
 import controllers.routes
 import fakes.FakeHipEnvironments
+import models.api.ApiDeploymentStatus.Deployed
+import models.api.ApiDetail
 import models.application.ApplicationLenses.*
-import models.application.Credential
+import models.application.{Api, Credential}
 import models.exception.ApplicationCredentialLimitException
 import models.user.UserModel
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -59,21 +61,40 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
                 FakeHipEnvironments.test.id
               )
           )
+          val api1 = Api("apiId1", "API 1")
+          val api2 = Api("apiId2", "API 2")
+          val application = FakeApplication.copy(apis = Seq(api1, api2))
 
-          when(fixture.apiHubService.getApplication(eqTo(FakeApplication.id), eqTo(false))(any()))
-            .thenReturn(Future.successful(Some(FakeApplication)))
+          when(fixture.apiHubService.getApplication(eqTo(application.id), eqTo(false))(any()))
+            .thenReturn(Future.successful(Some(application)))
 
-          when(fixture.apiHubService.fetchCredentials(eqTo(FakeApplication.id), eqTo(FakeHipEnvironments.test))(any()))
+          when(fixture.apiHubService.fetchCredentials(eqTo(application.id), eqTo(FakeHipEnvironments.test))(any()))
             .thenReturn(Future.successful(Some(credentials)))
 
+          when(fixture.apiHubService.getAccessRequests(eqTo(Some(application.id)), any())(any()))
+            .thenReturn(Future.successful(Seq.empty))
+
+          when(fixture.apiHubService.getApiDetail(eqTo(api1.id))(any()))
+            .thenReturn(Future.successful(Some(FakeApiDetail.copy(id = api1.id, title = api1.title))))
+
+          when(fixture.apiHubService.getApiDetail(eqTo(api2.id))(any()))
+            .thenReturn(Future.successful(Some(FakeApiDetail.copy(id = api2.id, title = api2.title))))
+
+          when(fixture.apiHubService.getApiDeploymentStatus(eqTo(FakeHipEnvironments.test), any())(any()))
+            .thenReturn(Future.successful(Deployed(FakeHipEnvironments.test.id, "1.0")))
+
           running(fixture.playApplication) {
-            implicit val request = FakeRequest(GET, controllers.application.routes.EnvironmentsController.onPageLoad(FakeApplication.id, "test").url)
+            implicit val request = FakeRequest(GET, controllers.application.routes.EnvironmentsController.onPageLoad(application.id, "test").url)
             implicit val msgs: Messages = messages(fixture.playApplication)
             val result = route(fixture.playApplication, request).value
             val view = fixture.playApplication.injector.instanceOf[EnvironmentsView]
             val config: FrontendAppConfig = fixture.playApplication.injector.instanceOf[FrontendAppConfig]
-            val applicationApis = FakeApplication.apis.map(api => ApplicationApi(api, Seq.empty))
-            val viewModel = EnvironmentsViewModel(FakeApplication, applicationApis, user, FakeHipEnvironments.test, credentials, config.helpDocsPath, false)
+            val applicationApis = application.apis.map(api => ApplicationApi(api, Seq.empty).copy(isMissing = false))
+            val statuses = Map(
+              ("apiId1", Deployed(FakeHipEnvironments.test.id, "1.0")),
+              ("apiId2", Deployed(FakeHipEnvironments.test.id, "1.0"))
+            )
+            val viewModel = EnvironmentsViewModel(application, applicationApis, user, FakeHipEnvironments.test, credentials, config.helpDocsPath, false, statuses)
 
             status(result) mustEqual OK
             contentAsString(result) mustBe view(viewModel).toString
@@ -149,7 +170,7 @@ class EnvironmentsControllerSpec extends SpecBase with MockitoSugar with TestHel
             val view = fixture.playApplication.injector.instanceOf[EnvironmentsView]
             val config: FrontendAppConfig = fixture.playApplication.injector.instanceOf[FrontendAppConfig]
             val applicationApis = FakeApplication.apis.map(api => ApplicationApi(api, Seq.empty))
-            val viewModel = EnvironmentsViewModel(FakeApplication, applicationApis, user, FakeHipEnvironments.test, FakeApplication.getCredentials(FakeHipEnvironments.test), config.helpDocsPath, true)
+            val viewModel = EnvironmentsViewModel(FakeApplication, applicationApis, user, FakeHipEnvironments.test, FakeApplication.getCredentials(FakeHipEnvironments.test), config.helpDocsPath, true, Map.empty)
 
             status(result) mustEqual OK
             contentAsString(result) mustBe view(viewModel).toString
