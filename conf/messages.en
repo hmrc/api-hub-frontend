@@ -1276,6 +1276,7 @@ environment.credentials.heading = Credentials
 
 environment.apis.heading = APIs in {0} environment
 environment.apis.endpoints = Available endpoints
+environment.apis.version = API version deployed in this environment: {0}
 environment.apis.noAvailableInProd.heading = APIs not available for use in this environment
 environment.apis.noAvailableInProd.message1 = This application has APIs that are not currently available for use in this environment.
 environment.apis.noAvailableInProd.message2 = To make use of these APIs you will need to request access.

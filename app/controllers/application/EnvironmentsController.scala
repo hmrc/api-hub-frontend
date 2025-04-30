@@ -20,6 +20,7 @@ import com.google.inject.Inject
 import config.{FrontendAppConfig, HipEnvironment, HipEnvironments}
 import controllers.actions.{ApplicationAuthActionProvider, IdentifierAction}
 import controllers.helpers.{ApplicationApiBuilder, ErrorResultBuilder}
+import models.api.ApiDeploymentStatus
 import models.application.*
 import models.application.ApplicationLenses.*
 import models.exception.ApplicationCredentialLimitException
@@ -53,11 +54,26 @@ class EnvironmentsController @Inject()(
         .map(hipEnvironment =>
           for {
             (credentials, hasFailedRetrieval) <- retrieveCredentials(request.application, hipEnvironment)
-            applicationApis <- applicationApiBuilder.build(request.application)  
-          } yield Ok(view(EnvironmentsViewModel(request.application, applicationApis, request.identifierRequest.user, hipEnvironment, credentials, config.helpDocsPath, hasFailedRetrieval)))
+            applicationApis <- applicationApiBuilder.build(request.application)
+            deployedApiVersions <- getDeployedApiVersions(hipEnvironment, applicationApis.map(_.apiId))
+          } yield Ok(view(EnvironmentsViewModel(request.application, applicationApis, request.identifierRequest.user, hipEnvironment, credentials, config.helpDocsPath, hasFailedRetrieval, deployedApiVersions)))
         ).getOrElse(
           Future.successful(errorResultBuilder.environmentNotFound(environment))
         )
+  }
+
+  private def getDeployedApiVersions(hipEnvironment: HipEnvironment, apiIds: Seq[String])(implicit hc: HeaderCarrier): Future[Map[String, ApiDeploymentStatus]] = {
+    Future.sequence(apiIds.map(apiId => getDeployedApiVersion(hipEnvironment, apiId).map(status => (apiId, status)))).map(_.toMap)
+  }
+
+  private def getDeployedApiVersion(hipEnvironment: HipEnvironment, apiId: String)(implicit hc: HeaderCarrier) = {
+    for {
+      maybeApiDetail <- apiHubService.getApiDetail(apiId)
+      deploymentStatus <- maybeApiDetail match {
+        case Some(apiDetail) => apiHubService.getApiDeploymentStatus(hipEnvironment, apiDetail.publisherReference)
+        case None => Future.successful(ApiDeploymentStatus.Unknown(hipEnvironment.id))
+      }
+    } yield deploymentStatus
   }
 
   def onDeleteCredential(id: String, clientId: String, environmentId: String): Action[AnyContent] = (identify andThen applicationAuth(id)).async {

@@ -20,6 +20,7 @@ import config.HipEnvironment
 import controllers.actions.{FakeApiDetail, FakeApplication, FakePrivilegedUser, FakeUser}
 import fakes.FakeHipEnvironments
 import models.accessrequest.{AccessRequest, Pending}
+import models.api.ApiDeploymentStatus
 import models.application.Credential
 import models.user.UserModel
 import org.scalatest.freespec.AnyFreeSpec
@@ -51,7 +52,13 @@ class EnvironmentsViewModelSpec extends AnyFreeSpec with Matchers with ScalaChec
     }
 
     def buildViewModelWithApplicationApis(applicationApis: Seq[ApplicationApi], hipEnvironment: HipEnvironment, prodAccess: ApplicationEndpointAccess) = {
-      EnvironmentsViewModel(FakeApplication, applicationApis, FakeUser, hipEnvironment, List.empty, "apiHubGuideUrl").apiTabViewModel
+      val deploymentStatuses = Seq(
+        ApiDeploymentStatus.Deployed(hipEnvironment.id, "1.0"),
+        ApiDeploymentStatus.NotDeployed(hipEnvironment.id),
+        ApiDeploymentStatus.Unknown(hipEnvironment.id)
+      )
+      val apiStatuses = applicationApis.zipWithIndex.map((appApi, i) => (appApi.apiId, deploymentStatuses(i % deploymentStatuses.size))).toMap
+      EnvironmentsViewModel(FakeApplication, applicationApis, FakeUser, hipEnvironment, List.empty, "apiHubGuideUrl",false, apiStatuses).apiTabViewModel
     }
 
     def buildAccessRequests(count: Int): Seq[AccessRequest] = {
@@ -107,6 +114,28 @@ class EnvironmentsViewModelSpec extends AnyFreeSpec with Matchers with ScalaChec
         buildViewModel(FakeHipEnvironments.production, Inaccessible, 0).showPendingAccessRequestsBanner mustBe false
       }
     }
+
+    "getApiVersion" - {
+      val apiVersion = "1.0"
+      val applicationApis = Seq(
+        ApplicationApi(FakeApiDetail.copy(id = "apiId1"), Seq.empty, Seq.empty),
+        ApplicationApi(FakeApiDetail.copy(id = "apiId2"), Seq.empty, Seq.empty),
+        ApplicationApi(FakeApiDetail.copy(id = "apiId3"), Seq.empty, Seq.empty),
+      )
+
+      "must return api version if api is known and status is Deployed" in {
+        buildViewModelWithApplicationApis(applicationApis, FakeHipEnvironments.production, Accessible).getApiVersion("apiId1") mustBe Some(apiVersion)
+      }
+
+      "must return None if api is known and status is not Deployed" in {
+        buildViewModelWithApplicationApis(applicationApis, FakeHipEnvironments.production, Accessible).getApiVersion("apiId2") mustBe None
+      }
+
+      "must return None if api is not known" in {
+        buildViewModelWithApplicationApis(applicationApis, FakeHipEnvironments.production, Accessible).getApiVersion("another apiId") mustBe None
+      }
+
+    }
   }
 
   "EnvironmentsViewModel" - {
@@ -114,7 +143,7 @@ class EnvironmentsViewModelSpec extends AnyFreeSpec with Matchers with ScalaChec
       val credentials = Range(0, credentialCount) map { index =>
         Credential(s"id$index", LocalDateTime.now(), None, None, hipEnvironment.id)
       }
-      EnvironmentsViewModel(FakeApplication, Seq.empty, user, hipEnvironment, credentials, "apiHubGuideUrl").credentialsTabViewModel
+      EnvironmentsViewModel(FakeApplication, Seq.empty, user, hipEnvironment, credentials, "apiHubGuideUrl", false, Map.empty).credentialsTabViewModel
     }
     "userCanAddCredentials" - {
       "must return true if the environment is not production like" in {

@@ -17,6 +17,7 @@
 package viewmodels.application
 
 import config.HipEnvironment
+import models.api.ApiDeploymentStatus
 import models.application.{Application, Credential}
 import models.user.UserModel
 
@@ -35,13 +36,18 @@ case class CredentialsTabViewModel(credentials: Seq[Credential], applicationId: 
   val showNoProductionCredentialsMessage = hipEnvironment.isProductionLike && credentials.isEmpty
 }
 
-case class ApiTabViewModel(applicationApis: Seq[ApplicationApi], applicationId: String, hipEnvironment: HipEnvironment, noApis: Boolean) {
+case class ApiTabViewModel(applicationApis: Seq[ApplicationApi], applicationId: String, hipEnvironment: HipEnvironment, noApis: Boolean, deployedApiVersions: Map[String, ApiDeploymentStatus]) {
   val showRequestProdAccessBanner = hipEnvironment.isProductionLike && applicationApis.exists(_.needsAccessRequest(hipEnvironment))
   val pendingAccessRequestsCount = applicationApis.count(_.hasPendingAccessRequest(hipEnvironment))
   val showPendingAccessRequestsBanner = hipEnvironment.isProductionLike && pendingAccessRequestsCount > 0
+  def getApiVersion(apiId: String): Option[String] = {
+    deployedApiVersions.get(apiId) match {
+      case Some(ApiDeploymentStatus.Deployed(_, version)) => Some(version)
+      case _ => None
+    }}
 }
 
-case class EnvironmentsViewModel(application: Application, applicationApis: Seq[ApplicationApi], user: UserModel, hipEnvironment: HipEnvironment, credentials: Seq[Credential], apiHubGuideUrl: String, errorRetrievingCredentials: Boolean = false) {
+case class EnvironmentsViewModel(application: Application, applicationApis: Seq[ApplicationApi], user: UserModel, hipEnvironment: HipEnvironment, credentials: Seq[Credential], apiHubGuideUrl: String, errorRetrievingCredentials: Boolean = false, deployedApiVersions: Map[String, ApiDeploymentStatus]) {
   val credentialsTabViewModel = CredentialsTabViewModel(credentials, application.id, hipEnvironment, user, errorRetrievingCredentials, applicationApis.isEmpty, apiHubGuideUrl)
-  val apiTabViewModel = ApiTabViewModel(applicationApis, application.id, hipEnvironment, applicationApis.isEmpty)
+  val apiTabViewModel = ApiTabViewModel(applicationApis, application.id, hipEnvironment, applicationApis.isEmpty, deployedApiVersions)
 }
