@@ -23,6 +23,7 @@ import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import repositories.AccessRequestSessionRepository
+import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -43,7 +44,7 @@ class AccessRequestDataRetrievalActionSpec extends SpecBase with MockitoSugar {
         when(sessionRepository.get("id")).thenReturn(Future(None))
         val action = new Harness(sessionRepository)
 
-        val result = action.callTransform(IdentifierRequest(FakeRequest(), FakeUser)).futureValue
+        val result = action.callTransform(IdentifierRequest(FakeRequest(), FakeUser, HeaderCarrier())).futureValue
 
         result.userAnswers must not be defined
       }
@@ -57,7 +58,7 @@ class AccessRequestDataRetrievalActionSpec extends SpecBase with MockitoSugar {
         when(sessionRepository.get("id")).thenReturn(Future(Some(UserAnswers("id"))))
         val action = new Harness(sessionRepository)
 
-        val result = action.callTransform(IdentifierRequest(FakeRequest(), FakeUser)).futureValue
+        val result = action.callTransform(IdentifierRequest(FakeRequest(), FakeUser, HeaderCarrier())).futureValue
 
         result.userAnswers mustBe defined
       }

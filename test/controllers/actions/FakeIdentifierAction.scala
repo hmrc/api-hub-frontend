@@ -18,7 +18,8 @@ package controllers.actions
 
 import models.requests.IdentifierRequest
 import models.user.UserModel
-import play.api.mvc._
+import play.api.mvc.*
+import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -26,7 +27,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class FakeIdentifierAction @Inject()(user: UserModel, bodyParsers: PlayBodyParsers) extends IdentifierAction {
 
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] =
-    block(IdentifierRequest(request, user))
+    block(IdentifierRequest(request, user, HeaderCarrier()))
 
   override def parser: BodyParser[AnyContent] =
     bodyParsers.default
