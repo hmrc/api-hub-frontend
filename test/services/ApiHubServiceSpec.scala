@@ -1147,16 +1147,7 @@ class ApiHubServiceSpec
     "must make the correct request to the applications connector" in {
       val fixture = buildFixture()
 
-      val event = Event(
-        id = UUID.randomUUID().toString,
-        entityId = UUID.randomUUID().toString,
-        entityType = models.event.Application,
-        eventType = Created,
-        user = "test-email",
-        timestamp = LocalDateTime.now(),
-        description = "an application",
-        detail = "some detail",
-        parameters = Json.toJson("{}"))
+      val event = mock[Event]
 
       when(fixture.applicationsConnector.findEventById(any)(any)).thenReturn(Future.successful(Some(event)))
 
@@ -1172,18 +1163,8 @@ class ApiHubServiceSpec
     "must make the correct request to the applications connector" in {
       val fixture = buildFixture()
 
-      val event1 = Event(
-        id = UUID.randomUUID().toString,
-        entityId = UUID.randomUUID().toString,
-        entityType = models.event.Application,
-        eventType = Created,
-        user = "test-email",
-        timestamp = LocalDateTime.now(),
-        description = "an application",
-        detail = "some detail",
-        parameters = Json.toJson("{}"))
-
-      val event2 = event1.copy(eventType = models.event.Deleted)
+      val event1 = mock[Event]
+      val event2 = mock[Event]
 
       when(fixture.applicationsConnector.findEventsByUser(any)(any)).thenReturn(Future.successful(Seq(event1, event2)))
 
@@ -1199,18 +1180,8 @@ class ApiHubServiceSpec
     "must make the correct request to the applications connector" in {
       val fixture = buildFixture()
 
-      val event1 = Event(
-        id = UUID.randomUUID().toString,
-        entityId = UUID.randomUUID().toString,
-        entityType = models.event.Application,
-        eventType = Created,
-        user = "test-email",
-        timestamp = LocalDateTime.now(),
-        description = "an application",
-        detail = "some detail",
-        parameters = Json.toJson("{}"))
-
-      val event2 = event1.copy(eventType = models.event.Deleted)
+      val event1 = mock[Event]
+      val event2 = mock[Event]
 
       when(fixture.applicationsConnector.findEventsByEntity(any, any)(any)).thenReturn(Future.successful(Seq(event1, event2)))
 
