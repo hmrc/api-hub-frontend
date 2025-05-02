@@ -29,6 +29,7 @@ import models.api.{ApiDeploymentStatuses, ApiDetail, ContactInfo, EndpointMethod
 import models.application.*
 import models.application.ApplicationLenses.*
 import models.deployment.{DeploymentDetails, DeploymentsRequest, EgressMapping, SuccessfulDeploymentsResponse}
+import models.event.{Created, Event}
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
 import models.stats.{ApisInProductionStatistic, DashboardStatistics, DashboardStatisticsBuilder}
 import models.team.{NewTeam, Team}
@@ -40,10 +41,12 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.{EitherValues, OptionValues}
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.admin.ApimRequest
 
 import java.time.LocalDateTime
+import java.util.UUID
 import scala.concurrent.Future
 
 class ApiHubServiceSpec
@@ -1136,6 +1139,85 @@ class ApiHubServiceSpec
             verify(fixture.applicationsConnector).removeEgressFromTeam(eqTo(teamId), eqTo(egressId))(any)
             result mustBe expected
         }
+      }
+    }
+  }
+
+  "getEventById" - {
+    "must make the correct request to the applications connector" in {
+      val fixture = buildFixture()
+
+      val event = Event(
+        id = UUID.randomUUID().toString,
+        entityId = UUID.randomUUID().toString,
+        entityType = models.event.Application,
+        eventType = Created,
+        user = "test-email",
+        timestamp = LocalDateTime.now(),
+        description = "an application",
+        detail = "some detail",
+        parameters = Json.toJson("{}"))
+
+      when(fixture.applicationsConnector.findEventById(any)(any)).thenReturn(Future.successful(Some(event)))
+
+      fixture.service.getEventById("some id")(HeaderCarrier()).map {
+        result =>
+          verify(fixture.applicationsConnector).findEventById(eqTo("some id"))(any)
+          result mustBe Some(event)
+      }
+    }
+  }
+
+  "getEventsByUser" - {
+    "must make the correct request to the applications connector" in {
+      val fixture = buildFixture()
+
+      val event1 = Event(
+        id = UUID.randomUUID().toString,
+        entityId = UUID.randomUUID().toString,
+        entityType = models.event.Application,
+        eventType = Created,
+        user = "test-email",
+        timestamp = LocalDateTime.now(),
+        description = "an application",
+        detail = "some detail",
+        parameters = Json.toJson("{}"))
+
+      val event2 = event1.copy(eventType = models.event.Deleted)
+
+      when(fixture.applicationsConnector.findEventsByUser(any)(any)).thenReturn(Future.successful(Seq(event1, event2)))
+
+      fixture.service.getEventsByUser("test-email")(HeaderCarrier()).map {
+        result =>
+          verify(fixture.applicationsConnector).findEventsByUser(eqTo("test-email"))(any)
+          result mustBe Seq(event1,event2)
+      }
+    }
+  }
+
+  "getEventsByEntity" - {
+    "must make the correct request to the applications connector" in {
+      val fixture = buildFixture()
+
+      val event1 = Event(
+        id = UUID.randomUUID().toString,
+        entityId = UUID.randomUUID().toString,
+        entityType = models.event.Application,
+        eventType = Created,
+        user = "test-email",
+        timestamp = LocalDateTime.now(),
+        description = "an application",
+        detail = "some detail",
+        parameters = Json.toJson("{}"))
+
+      val event2 = event1.copy(eventType = models.event.Deleted)
+
+      when(fixture.applicationsConnector.findEventsByEntity(any, any)(any)).thenReturn(Future.successful(Seq(event1, event2)))
+
+      fixture.service.getEventsByEntity(models.event.Application, "some id")(HeaderCarrier()).map {
+        result =>
+          verify(fixture.applicationsConnector).findEventsByEntity(eqTo(models.event.Application), eqTo("some id"))(any)
+          result mustBe Seq(event1, event2)
       }
     }
   }

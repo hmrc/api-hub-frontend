@@ -24,6 +24,7 @@ import models.accessrequest.{AccessRequest, AccessRequestRequest, AccessRequestS
 import models.api.{ApiDeploymentStatus, ApiDeploymentStatuses, ApiDetail, ApiDetailSummary, EgressGateway, PlatformContact}
 import models.application.*
 import models.deployment.{DeploymentDetails, DeploymentsRequest, DeploymentsResponse, RedeploymentRequest}
+import models.event.{EntityType, Event}
 import models.exception.ApplicationsException
 import models.requests.{AddApiRequest, AddApiRequestEndpoint}
 import models.stats.{ApisInProductionStatistic, DashboardStatistics, DashboardStatisticsBuilder}
@@ -294,4 +295,15 @@ class ApiHubService @Inject()(
     applicationsConnector.removeEgressFromTeam(teamId, egressId)
   }
 
+  def getEventById(eventId: String)(implicit hc:HeaderCarrier): Future[Option[Event]] = {
+    applicationsConnector.findEventById(eventId)
+  }
+  
+  def getEventsByUser(userEmail: String)(implicit hc:HeaderCarrier): Future[Seq[Event]] = {
+    applicationsConnector.findEventsByUser(userEmail)
+  }
+
+  def getEventsByEntity(entityType: EntityType, entityId: String)(implicit hc: HeaderCarrier): Future[Seq[Event]] = {
+    applicationsConnector.findEventsByEntity(entityType, entityId)
+  }
 }

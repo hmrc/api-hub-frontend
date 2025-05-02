@@ -30,6 +30,7 @@ import models.api.{ApiDeploymentStatus, ApiDeploymentStatuses}
 import models.application.*
 import models.application.ApplicationLenses.*
 import models.deployment.{DeploymentDetails, DeploymentsRequest, EgressMapping, Error, FailuresResponse, InvalidOasResponse, RedeploymentRequest, SuccessfulDeploymentsResponse}
+import models.event.{Created, Event}
 import models.exception.{ApplicationCredentialLimitException, TeamNameNotUniqueException}
 import models.requests.{AddApiRequest, AddApiRequestEndpoint, ChangeTeamNameRequest, TeamMemberRequest}
 import models.stats.ApisInProductionStatistic
@@ -56,6 +57,7 @@ import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
+import java.util.UUID
 import java.net.URLEncoder
 import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext
@@ -73,6 +75,7 @@ class ApplicationsConnectorSpec
   private val errorMessage = "Error message"
   when(messagesProvider.messages).thenReturn(messages)
   when(messages.apply(anyString, any)).thenReturn(errorMessage)
+  private lazy val crypto = new ApplicationCrypto(ConfigFactory.parseResources("application.conf"))
 
   import ApplicationsConnectorSpec.*
 
@@ -152,7 +155,6 @@ class ApplicationsConnectorSpec
       val application2 = Application("id-2", "test-name-2", Creator("test-creator-email-2"), Seq(TeamMember("test-creator-email-2")))
         .copy(teamMembers = Seq(TeamMember(testEmail), TeamMember("test-user-email-3")))
       val expected = Seq(application1, application2)
-      val crypto = new ApplicationCrypto(ConfigFactory.parseResources("application.conf"))
 
       val userEmailEncrypted = crypto.QueryParameterCrypto.encrypt(PlainText(testEmail)).value
       val userEmailEncoded = URLEncoder.encode(userEmailEncrypted, "UTF-8")
@@ -1454,7 +1456,6 @@ class ApplicationsConnectorSpec
   }
 
   "ApplicationsConnector.removeTeamMemberFromTeam" - {
-    val crypto = new ApplicationCrypto(ConfigFactory.parseResources("application.conf"))
     "must place the correct request" in {
       val teamId = "test-id"
       val teamMember = TeamMember("test-email")
@@ -2014,7 +2015,7 @@ class ApplicationsConnectorSpec
           )
       )
 
-      buildConnector(this).addEgressesToTeam(teamId, Set("egress1","egress2"))(HeaderCarrier()).map {
+      buildConnector(this).addEgressesToTeam(teamId, Set("egress1", "egress2"))(HeaderCarrier()).map {
         result =>
           result mustBe Some(())
       }
@@ -2060,6 +2061,140 @@ class ApplicationsConnectorSpec
     }
   }
 
+  "find event by id" - {
+    "must place the correct request and return Some(Event) on success" in {
+
+      val event1 = Event(
+        id = UUID.randomUUID().toString,
+        entityId = UUID.randomUUID().toString,
+        entityType = models.event.Application,
+        eventType = Created,
+        user = "test-email",
+        timestamp = LocalDateTime.now(),
+        description = "an application",
+        detail = "some detail",
+        parameters = Json.toJson(
+          """
+               {
+                "someKey": {
+                  "a": "x",
+                  "b": 1
+                  }
+               }
+          """))
+
+      stubFor(
+        get(urlEqualTo(s"/api-hub-applications/events/${event1.id}"))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withBody(Json.toJson(event1).toString)
+          )
+      )
+
+      buildConnector(this).findEventById (event1.id)(HeaderCarrier()).map {
+        result =>
+          result mustBe Some(event1)
+      }
+    }
+    "must place the correct request and return None when not found" in {
+
+      var id = UUID.randomUUID().toString
+      stubFor(
+        get(urlEqualTo(s"/api-hub-applications/events/$id"))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+          )
+      )
+
+      buildConnector(this).findEventById(id)(HeaderCarrier()).map {
+        result =>
+          result mustBe None
+      }
+    }
+  }
+
+  "find events by user" - {
+    "must place the correct request and return some events on success" in {
+      val event1 = Event(
+        id = UUID.randomUUID().toString,
+        entityId = UUID.randomUUID().toString,
+        entityType = models.event.Application,
+        eventType = Created,
+        user = "test-email",
+        timestamp = LocalDateTime.now(),
+        description = "an application",
+        detail = "some detail",
+        parameters = Json.toJson(
+          """
+                    {
+                     "someKey": {
+                       "a": "x",
+                       "b": 1
+                       }
+                    }
+               """))
+
+      val event2 = event1.copy(eventType = models.event.Deleted)
+
+      val userEmailEncrypted = crypto.QueryParameterCrypto.encrypt(PlainText(event1.user)).value
+
+      stubFor(
+        get(urlEqualTo(s"/api-hub-applications/events/user/${userEmailEncrypted}"))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withBody(Json.toJson(Seq(event1,event2)).toString)
+          )
+      )
+
+      buildConnector(this).findEventsByUser(event1.user)(HeaderCarrier()).map {
+        result =>
+          result mustBe Seq(event1,event2)
+      }
+    }
+  }
+
+  "find events by entity" - {
+    "must place the correct request and return some events on success" in {
+      val event1 = Event(
+        id = UUID.randomUUID().toString,
+        entityId = UUID.randomUUID().toString,
+        entityType = models.event.Application,
+        eventType = Created,
+        user = "test-email",
+        timestamp = LocalDateTime.now(),
+        description = "an application",
+        detail = "some detail",
+        parameters = Json.toJson(
+          """
+                      {
+                       "someKey": {
+                         "a": "x",
+                         "b": 1
+                         }
+                      }
+                 """))
+
+      val event2 = event1.copy(eventType = models.event.Deleted)
+
+      stubFor(
+        get(urlEqualTo(s"/api-hub-applications/events/entity-type/${event1.entityType}/entity/${event1.entityId}"))
+          .withHeader(AUTHORIZATION, equalTo("An authentication token"))
+          .willReturn(
+            aResponse()
+              .withBody(Json.toJson(Seq(event1, event2)).toString)
+          )
+      )
+
+      buildConnector(this).findEventsByEntity(event1.entityType, event1.entityId)(HeaderCarrier()).map {
+        result =>
+          result mustBe Seq(event1, event2)
+      }
+    }
+  }
 }
 
 object ApplicationsConnectorSpec extends HttpClientV2Support {

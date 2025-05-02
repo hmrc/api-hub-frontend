@@ -24,6 +24,7 @@ import models.api.ApiDeploymentStatuses.readApiDeploymentStatuses
 import models.api.{ApiDeploymentStatus, ApiDeploymentStatuses, ApiDetailSummary, EgressGateway}
 import models.application.*
 import models.deployment.*
+import models.event.{EntityType, Event}
 import models.exception.{ApplicationCredentialLimitException, ApplicationsException, TeamNameNotUniqueException}
 import models.requests.*
 import models.stats.ApisInProductionStatistic
@@ -43,6 +44,7 @@ import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpErrorFunctions, HttpResponse, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
+import java.net.URLEncoder
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -701,6 +703,41 @@ class ApplicationsConnector @Inject()(
       .flatMap {
         case Right(_) => Future.successful(Some(()))
         case Left(e) if e.statusCode == NOT_FOUND => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
+  }
+  
+  def findEventById(eventId: String)(implicit hc: HeaderCarrier): Future[Option[Event]] = {
+    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/events/$eventId")
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .setHeader(ACCEPT -> JSON)
+      .execute[Either[UpstreamErrorResponse, Event]]
+      .flatMap {
+        case Right(event) => Future.successful(Some(event))
+        case Left(e) if e.statusCode == NOT_FOUND => Future.successful(None)
+        case Left(e) => Future.failed(e)
+      }
+  }
+
+  def findEventsByUser(userEmail: String)(implicit hc: HeaderCarrier): Future[Seq[Event]] = {
+    val encryptedUserEmail = crypto.QueryParameterCrypto.encrypt(PlainText(userEmail)).value
+    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/events/user/${encryptedUserEmail}")
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .setHeader(ACCEPT -> JSON)
+      .execute[Either[UpstreamErrorResponse, Seq[Event]]]
+      .flatMap {
+        case Right(events) => Future.successful(events)
+        case Left(e) => Future.failed(e)
+      }
+  }
+
+  def findEventsByEntity(entityType: EntityType, entityId: String)(implicit hc: HeaderCarrier): Future[Seq[Event]] = {
+    httpClient.get(url"$applicationsBaseUrl/api-hub-applications/events/entity-type/${entityType}/entity/${entityId}")
+      .setHeader(AUTHORIZATION -> clientAuthToken)
+      .setHeader(ACCEPT -> JSON)
+      .execute[Either[UpstreamErrorResponse, Seq[Event]]]
+      .flatMap {
+        case Right(events) => Future.successful(events)
         case Left(e) => Future.failed(e)
       }
   }
