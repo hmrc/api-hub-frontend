@@ -17,6 +17,7 @@
 package controllers.actions
 
 import models.hubstatus.{FeatureStatus, FrontendShutter}
+import models.requests.IdentifierRequest
 import models.user.{LdapUser, Permissions, StrideUser, UserModel}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -41,7 +42,12 @@ class AuthActionSpec extends AnyFreeSpec with Matchers with MockitoSugar with Op
   import AuthActionSpec.*
 
   class Harness(authAction: IdentifierAction) {
-    def onPageLoad(): Action[AnyContent] = authAction { _ => Results.Ok }
+    var identifierRequest: IdentifierRequest[AnyContent] = _
+    def onPageLoad(): Action[AnyContent] = authAction { identifierRequest => {
+        this.identifierRequest = identifierRequest
+        Results.Ok
+      }
+    }
   }
 
   "Auth Action" - {
@@ -151,6 +157,41 @@ class AuthActionSpec extends AnyFreeSpec with Matchers with MockitoSugar with Op
         content must include("You are not authorised to access this service")
         content must include("Your account does not have a linked email account.")
         status(result) mustBe OK
+      }
+    }
+
+    "must add the encrypted email address to the request when the user is authenticated via Stride" in {
+      val fixture = buildFixture()
+
+      when(fixture.ldapAuthenticator.authenticate()(any())).thenReturn(Future.successful(UserUnauthenticated))
+      when(fixture.strideAuthenticator.authenticate()(any())).thenReturn(Future.successful(UserAuthenticated(user)))
+      when(fixture.hubStatusService.status(any)).thenReturn(Future.successful(notShuttered))
+
+      running(fixture.application) {
+        val authAction = fixture.application.injector.instanceOf[AuthenticatedIdentifierAction]
+        val controller = new Harness(authAction)
+
+        val result = controller.onPageLoad()(FakeRequest())
+
+        status(result) mustBe OK
+        controller.identifierRequest.headerCarrierWithEncryptedUserEmail.extraHeaders must contain("Encrypted-User-Email" -> "z2y0wqM9NOko/nAMBcRqkA==")
+      }
+    }
+
+    "must add the encrypted email address to the request when the user is authenticated via LDAP" in {
+      val fixture = buildFixture()
+      when(fixture.strideAuthenticator.authenticate()(any())).thenReturn(Future.successful(UserUnauthenticated))
+      when(fixture.ldapAuthenticator.authenticate()(any())).thenReturn(Future.successful(UserAuthenticated(user)))
+      when(fixture.hubStatusService.status(any)).thenReturn(Future.successful(notShuttered))
+
+      running(fixture.application) {
+        val authAction = fixture.application.injector.instanceOf[AuthenticatedIdentifierAction]
+        val controller = new Harness(authAction)
+
+        val result = controller.onPageLoad()(FakeRequest())
+
+        status(result) mustBe OK
+        controller.identifierRequest.headerCarrierWithEncryptedUserEmail.extraHeaders must contain("Encrypted-User-Email" -> "z2y0wqM9NOko/nAMBcRqkA==")
       }
     }
 

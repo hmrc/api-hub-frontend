@@ -22,7 +22,8 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.mvc.Results
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
+import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -31,7 +32,7 @@ class AuthorisedPrivilegedUserActionSpec extends AnyFreeSpec with Matchers {
 
   "AuthorisedPrivilegedUser" - {
     "must return the block's result when the user is a privileged user" in {
-      val request = IdentifierRequest(FakeRequest(), FakePrivilegedUser)
+      val request = IdentifierRequest(FakeRequest(), FakePrivilegedUser, HeaderCarrier())
       val action = new AuthorisedPrivilegedUserAction()
       val block = (_: IdentifierRequest[?]) => Future.successful(Results.Ok)
 
@@ -40,7 +41,7 @@ class AuthorisedPrivilegedUserActionSpec extends AnyFreeSpec with Matchers {
     }
 
     "must return a redirection to the unauthorised page if the user is not a privileged user" in {
-      val request = IdentifierRequest(FakeRequest(), FakeUser)
+      val request = IdentifierRequest(FakeRequest(), FakeUser, HeaderCarrier())
       val action = new AuthorisedPrivilegedUserAction()
       val block = (_: IdentifierRequest[?]) => Future.successful(Results.Ok)
 

@@ -24,7 +24,8 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.mvc.Results
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
+import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -40,7 +41,7 @@ class AuthorisedApproverOrSupportActionSpec extends AnyFreeSpec with Matchers wi
       )
 
       forAll(users) {(user: UserModel) =>
-        val request = IdentifierRequest(FakeRequest(), user)
+        val request = IdentifierRequest(FakeRequest(), user, HeaderCarrier())
         val action = new AuthorisedApproverOrSupportAction()
         val block = (_: IdentifierRequest[?]) => Future.successful(Results.Ok)
 
@@ -57,7 +58,7 @@ class AuthorisedApproverOrSupportActionSpec extends AnyFreeSpec with Matchers wi
       )
 
       forAll(users) {(user: UserModel) =>
-        val request = IdentifierRequest(FakeRequest(), user)
+        val request = IdentifierRequest(FakeRequest(), user, HeaderCarrier())
         val action = new AuthorisedApproverOrSupportAction()
         val block = (_: IdentifierRequest[?]) => Future.successful(Results.Ok)
 

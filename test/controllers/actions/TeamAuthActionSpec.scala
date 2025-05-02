@@ -21,7 +21,7 @@ import models.application.TeamMember
 import models.requests.{IdentifierRequest, TeamRequest}
 import models.team.Team
 import models.user.UserModel
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
@@ -29,8 +29,9 @@ import play.api.Application
 import play.api.inject.bind
 import play.api.mvc.{AnyContentAsEmpty, Result, Results}
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import services.ApiHubService
+import uk.gov.hmrc.http.HeaderCarrier
 import views.html.ErrorTemplate
 
 import java.time.LocalDateTime
@@ -120,7 +121,7 @@ class TeamAuthActionSpec extends SpecBase with Matchers with MockitoSugar {
   }
 
   private def buildRequest(user: UserModel = FakeUser): IdentifierRequest[AnyContentAsEmpty.type] = {
-    IdentifierRequest(FakeRequest(), user)
+    IdentifierRequest(FakeRequest(), user, HeaderCarrier())
   }
 
 }

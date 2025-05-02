@@ -23,7 +23,8 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.mvc.Results
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
+import uk.gov.hmrc.http.HeaderCarrier
 import utils.TestHelpers
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -33,7 +34,7 @@ class AuthorisedSupportActionSpec extends AnyFreeSpec with Matchers with TestHel
 
   "must return the block's result when the user is support" in {
     forAll(usersWhoCanSupport) { (user: UserModel) =>
-      val request = IdentifierRequest(FakeRequest(), user)
+      val request = IdentifierRequest(FakeRequest(), user, HeaderCarrier())
       val action = new AuthorisedSupportAction()
       val block = (_: IdentifierRequest[?]) => Future.successful(Results.Ok)
 
@@ -44,7 +45,7 @@ class AuthorisedSupportActionSpec extends AnyFreeSpec with Matchers with TestHel
 
   "must return a redirection to the unauthorised page if the user is not support" in {
     forAll(usersWhoCannotSupport) { (user: UserModel) =>
-      val request = IdentifierRequest(FakeRequest(), user)
+      val request = IdentifierRequest(FakeRequest(), user, HeaderCarrier())
       val action = new AuthorisedSupportAction()
       val block = (_: IdentifierRequest[?]) => Future.successful(Results.Ok)
 
