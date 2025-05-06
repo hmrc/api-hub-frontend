@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import config.ApiStatuses
 @import models.api._
 @import models.user.UserModel
 @import views.html.components.ApiDeployments
@@ -27,7 +28,8 @@
     govukButton: GovukButton,
     apiDeployments: ApiDeployments,
     newTabLink: components.NewTabLink,
-    iconsLink: IconsLink
+    iconsLink: IconsLink,
+    apiStatuses: ApiStatuses
 )
 
 @(apiDetail: ApiDetail, user: Option[UserModel], apiViewModel: ApiViewModel)(implicit request: Request[?], messages: Messages)
@@ -165,7 +167,7 @@
                     </dt>
                     <dd class="govuk-summary-list__value">
                         <strong class="hip-tag--api-status" data-status="@apiDetail.apiStatus">
-                            @apiDetail.apiStatus.toString.toLowerCase
+                            @apiStatuses.description(apiDetail.apiStatus)
                         </strong>
                     </dd>
                 </div>
