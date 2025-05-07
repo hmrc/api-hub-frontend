@@ -663,22 +663,6 @@ nav.hip-pagination--centered {
 .hip-tag--api-status {
     @extend .hip-tag;
     text-transform: capitalize;
-
-    &[data-status="ALPHA" i] {
-        @extend .govuk-tag--light-blue;
-    }
-
-    &[data-status="BETA" i] {
-        @extend .govuk-tag--blue;
-    }
-
-    &[data-status="LIVE" i] {
-        @extend .govuk-tag--green;
-    }
-
-    &[data-status="DEPRECATED" i] {
-        @extend .govuk-tag--grey;
-    }
 }
 
 .hip-platform-filters {

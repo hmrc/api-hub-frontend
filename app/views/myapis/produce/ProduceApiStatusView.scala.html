@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import config.ApiStatuses
 @import models.api.ApiStatus
 @import models.user.UserModel
 @import viewmodels.myapis.produce.ProduceApiStatusViewModel
@@ -23,7 +24,8 @@
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukRadios: GovukRadios,
-    govukButton: GovukButton
+    govukButton: GovukButton,
+    apiStatuses: ApiStatuses
 )
 
 @(form: Form[?], userModel: UserModel, viewModel: ProduceApiStatusViewModel)(implicit request: Request[?], messages: Messages)
@@ -31,7 +33,7 @@
 @apiStatusOptions = @{
     ApiStatus.values.zipWithIndex.map { case (apiStatus, index) =>
         RadioItem(
-            content = HtmlContent(s"""<strong class="govuk-!-font-weight-bold">${apiStatus.toString}</strong>"""),
+            content = HtmlContent(s"""<strong class="govuk-tag ${apiStatuses.cssClasses(apiStatus)}">${apiStatuses.description(apiStatus)}</strong>"""),
             value   = Some(apiStatus.toString),
             id      = Some(s"value_$index"),
             hint    = Some(Hint(content = Text(messages(s"produceApiStatus.hint.$index"))))

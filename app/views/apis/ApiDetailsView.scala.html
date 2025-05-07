@@ -166,7 +166,7 @@
                         @messages("apiDetails.details.status")
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        <strong class="hip-tag--api-status" data-status="@apiDetail.apiStatus">
+                        <strong class="hip-tag--api-status @apiStatuses.cssClasses(apiDetail.apiStatus)" data-status="@apiDetail.apiStatus">
                             @apiStatuses.description(apiDetail.apiStatus)
                         </strong>
                     </dd>

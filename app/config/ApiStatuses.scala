@@ -17,11 +17,16 @@
 package config
 
 import com.google.inject.{Inject, Singleton}
-import com.typesafe.config.{Config, ConfigException}
+import com.typesafe.config.Config
 import models.api.ApiStatus
 import play.api.{ConfigLoader, Configuration}
 
-case class ApiStatusConfig(apiStatus: ApiStatus, description: String)
+case class ApiStatusConfig(
+  apiStatus: ApiStatus,
+  description: String,
+  cssClasses: String,
+  order: Int
+)
 
 object ApiStatusConfig {
 
@@ -29,41 +34,65 @@ object ApiStatusConfig {
     (rootConfig: Config, path: String) => {
       val config = rootConfig.getConfig(path)
 
-      val name = config.getString("apiStatus").toUpperCase
-      val description = config.getString("description")
+      val apiStatus = config.getString("apiStatus").toUpperCase
 
-      ApiStatus.values.find(_.toString.equals(name)) match {
-        case Some(apiStatus) => ApiStatusConfig(
-          apiStatus = apiStatus,
-          description = description
-        )
+      ApiStatus.values.find(_.toString.equals(apiStatus)) match {
+        case Some(apiStatus) =>
+          ApiStatusConfig(
+            apiStatus = apiStatus,
+            description = config.getString("description"),
+            cssClasses = config.getString("cssClasses"),
+            order = config.getInt("order")
+          )
         case _ =>
-          throw new ConfigException.BadValue(path, s"$name is not a known ApiStatus")
+          throw new IllegalArgumentException(s"$apiStatus is not a known ApiStatus")
       }
     }
 }
 
 trait ApiStatuses {
 
-  protected def apiStatuses: Seq[ApiStatusConfig]
+  def apiStatuses: Seq[ApiStatusConfig]
 
   def description(apiStatus: ApiStatus): String = {
+    findStatus(apiStatus).description
+  }
+
+  def cssClasses(apiStatus: ApiStatus): String = {
+    findStatus(apiStatus).cssClasses
+  }
+
+  private def findStatus(apiStatus: ApiStatus): ApiStatusConfig = {
     apiStatuses.find(_.apiStatus.equals(apiStatus)) match {
-      case Some(apiStatus) => apiStatus.description
+      case Some(apiStatus) => apiStatus
       case _ => throw new IllegalArgumentException(s"No API status configuration found for API status $apiStatus")
     }
   }
-
 }
 
 @Singleton
 class ApiStatusesImpl @Inject(configuration: Configuration)() extends ApiStatuses {
 
-  override protected val apiStatuses: Seq[ApiStatusConfig] = {
-    configuration
+  override val apiStatuses: Seq[ApiStatusConfig] = {
+    val statuses = configuration
       .get[Map[String, ApiStatusConfig]]("apiStatuses")
       .values
       .toSeq
+      .sortBy(_.order)
+
+    validate(statuses)
+
+    statuses
+  }
+
+  private def validate(apiStatuses: Seq[ApiStatusConfig]): Unit = {
+    if (!apiStatuses.map(_.apiStatus).toSet.equals(ApiStatus.values.toSet)) {
+      throw new IllegalArgumentException("The API status configuration does not match the elements in ApiStatus")
+    }
+
+    if (!apiStatuses.map(_.order).equals(1 to apiStatuses.size)) {
+      throw new IllegalArgumentException("The API status configuration does not have correct ordering")
+    }
   }
 
 }
