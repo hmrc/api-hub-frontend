@@ -16,6 +16,10 @@
 
 package pages.myapis.produce
 
-import pages.Page
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-case object ProduceApiTeamWithNoEgressPage extends Page
+case object ProduceApiTeamWithNoEgressPage extends QuestionPage[Boolean] {
+  override def path: JsPath = JsPath \ toString
+  override def toString: String = "produceApiTeamWithNoEgressPage"
+}

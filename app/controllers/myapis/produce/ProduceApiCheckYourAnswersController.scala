@@ -186,9 +186,10 @@ class ProduceApiCheckYourAnswersController @Inject()(
   }
 
   private def validateEgress(userAnswers: UserAnswers): Either[Call, Option[String]] = {
-    userAnswers.get(ProduceApiSelectEgressPage) match {
-      case Some(egress) => Right(Option.when(!egress.isBlank)(egress))
-      case None => Left(routes.ProduceApiSelectEgressController.onPageLoad(CheckMode))
+    (userAnswers.get(ProduceApiSelectEgressPage), userAnswers.get(ProduceApiTeamWithNoEgressPage)) match {
+      case (Some(egress), _) => Right(Option.when(!egress.isBlank)(egress))
+      case (_, Some(true)) => Right(None)
+      case _ => Left(routes.ProduceApiSelectEgressController.onPageLoad(CheckMode))
     }
   }
 

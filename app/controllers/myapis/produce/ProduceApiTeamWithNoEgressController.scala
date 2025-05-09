@@ -29,7 +29,7 @@ import viewmodels.myapis.produce.ProduceApiTeamWithNoEgressViewModel
 import views.html.myapis.produce.ProduceApiTeamWithNoEgressView
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class ProduceApiTeamWithNoEgressController @Inject()(
                                        override val messagesApi: MessagesApi,
@@ -57,8 +57,11 @@ class ProduceApiTeamWithNoEgressController @Inject()(
       )))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      Redirect(navigator.nextPage(ProduceApiTeamWithNoEgressPage, mode, request.userAnswers))
+      for {
+        updatedAnswers <- Future.fromTry(request.userAnswers.set(ProduceApiTeamWithNoEgressPage, true))
+        _              <- sessionRepository.set(updatedAnswers)
+      } yield Redirect(navigator.nextPage(ProduceApiTeamWithNoEgressPage, mode, updatedAnswers))
   }
 }
