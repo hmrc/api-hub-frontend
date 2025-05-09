@@ -25,14 +25,14 @@ import models.team.Team
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.myapis.produce.ProduceApiChooseTeamPage
+import pages.myapis.produce.{ProduceApiChooseTeamPage, ProduceApiTeamWithNoEgressPage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import repositories.SessionRepository
+import repositories.ProduceApiSessionRepository
 import viewmodels.myapis.produce.ProduceApiTeamWithNoEgressViewModel
 import views.html.myapis.produce.ProduceApiTeamWithNoEgressView
 
@@ -73,15 +73,15 @@ class ProduceApiTeamWithNoEgressControllerSpec extends SpecBase with MockitoSuga
 
     "must redirect to the next page when valid data is submitted" in {
 
-      val mockSessionRepository = mock[SessionRepository]
+      val mockSessionRepository = mock[ProduceApiSessionRepository]
 
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
-
+      val userAnswers = emptyUserAnswers.set(ProduceApiTeamWithNoEgressPage, true).success.value
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[ProduceApiSessionRepository].toInstance(mockSessionRepository)
           )
           .build()
 
@@ -93,6 +93,7 @@ class ProduceApiTeamWithNoEgressControllerSpec extends SpecBase with MockitoSuga
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual onwardRoute.url
+        verify(mockSessionRepository).set(userAnswers)
       }
     }
 

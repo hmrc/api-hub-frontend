@@ -122,7 +122,7 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       }
     }
 
-    "must return 200 and the deployment success view on a successful POST" in {
+    "must return 200 and the deployment success view on a successful POST when team has an egress" in {
       val fixture = buildFixture(Some(fullyPopulatedUserAnswers))
       val response: DeploymentsResponse = SuccessfulDeploymentsResponse("id", "1.0.0", 1, "uri.com")
       val view = fixture.application.injector.instanceOf[DeploymentSuccessView]
@@ -145,6 +145,46 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
         val successPageRequest = FakeRequest(GET, successRoute)
 
         val successResult =  route(fixture.application, successPageRequest).value
+        val viewModel = DeploymentSuccessViewModel(
+          FakeUser,
+          "id",
+          "api name",
+          "api.deployment.success.feedback.create.heading",
+          "api.deployment.success.feedback.create.message"
+        )
+
+        contentAsString(successResult) mustEqual view(viewModel)(successPageRequest, messages(fixture.application)).toString
+        verify(fixture.sessionRepository).clear(FakeUser.userId)
+      }
+    }
+
+    "must return 200 and the deployment success view on a successful POST when team does not have an egress" in {
+      val userAnswersForNoTeamEgress = fullyPopulatedUserAnswers
+        .remove(ProduceApiSelectEgressPage).success.value
+        .set(ProduceApiTeamWithNoEgressPage, true).success.value
+      val fixture = buildFixture(Some(userAnswersForNoTeamEgress))
+      val response: DeploymentsResponse = SuccessfulDeploymentsResponse("id", "1.0.0", 1, "uri.com")
+      val view = fixture.application.injector.instanceOf[DeploymentSuccessView]
+
+      when(fixture.apiHubService.generateDeployment(any)(any))
+        .thenReturn(Future.successful(response))
+
+      when(fixture.sessionRepository.clear(FakeUser.userId)).thenReturn(Future.successful(true))
+
+      running(fixture.application) {
+        val request = FakeRequest(POST, produceApiCheckYourAnswersRoute.url)
+          .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(fixture.application, request).value
+
+        val successRoute = controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onSuccess("api name", "id").url
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result) mustBe Some(successRoute)
+
+        val successPageRequest = FakeRequest(GET, successRoute)
+
+        val successResult = route(fixture.application, successPageRequest).value
         val viewModel = DeploymentSuccessViewModel(
           FakeUser,
           "id",
