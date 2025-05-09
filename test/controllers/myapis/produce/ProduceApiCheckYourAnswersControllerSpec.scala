@@ -17,6 +17,7 @@
 package controllers.myapis.produce
 
 import base.SpecBase
+import config.ApiStatuses
 import controllers.actions.FakeUser
 import controllers.myapis.produce.routes as produceApiRoutes
 import controllers.routes
@@ -76,7 +77,7 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
     .set(ProduceApiSelectEgressPage, "egress").success.value
     .set(ProduceApiPassthroughPage, true).success.value
 
-  private def summaryList(userAnswers: UserAnswers = fullyPopulatedUserAnswers)(implicit msg: Messages) = SummaryListViewModel(Seq(
+  private def summaryList(apiStatuses: ApiStatuses, userAnswers: UserAnswers = fullyPopulatedUserAnswers)(implicit msg: Messages) = SummaryListViewModel(Seq(
     ProduceApiEgressSummary.row(userAnswers),
     ProduceApiChooseTeamSummary.row(userAnswers),
     ProduceApiEnterOasSummary.row(userAnswers),
@@ -85,7 +86,7 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
     ProduceApiEgressPrefixesSummary.row(userAnswers),
     ProduceApiHodSummary.row(userAnswers, FakeHods),
     ProduceApiDomainSummary.row(userAnswers, FakeDomains),
-    ProduceApiStatusSummary.row(userAnswers),
+    ProduceApiStatusSummary.row(userAnswers, apiStatuses),
     ProduceApiPassthroughSummary.row(userAnswers)
   ).flatten)
 
@@ -101,7 +102,7 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
           controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onSubmit()
         )
         val view = fixture.application.injector.instanceOf[ProduceApiCheckYourAnswersView]
-        val expectedSummaryList = summaryList()
+        val expectedSummaryList = summaryList(fixture.apiStatuses)
         
         status(result) mustEqual OK
 
@@ -311,7 +312,7 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
         val viewModel = ProduceApiCheckYourAnswersViewModel(
           controllers.myapis.produce.routes.ProduceApiCheckYourAnswersController.onSubmit()
         )
-        val expectedSummaryList = summaryList(userAnswers)
+        val expectedSummaryList = summaryList(fixture.apiStatuses, userAnswers)
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(expectedSummaryList, FakeUser, viewModel, Some(form.bind(Map.empty)))(request, messages(fixture.application)).toString
@@ -338,7 +339,8 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
   private case class Fixture(
                               application: PlayApplication,
                               apiHubService: ApiHubService,
-                              sessionRepository: ProduceApiSessionRepository
+                              sessionRepository: ProduceApiSessionRepository,
+                              apiStatuses: ApiStatuses
                             )
 
   private def buildFixture(userAnswers: Option[UserAnswers], userModel: Option[UserModel] = None): Fixture = {
@@ -350,6 +352,7 @@ class ProduceApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
         bind[ProduceApiSessionRepository].toInstance(sessionRepository)
       )
       .build()
-    Fixture(playApplication, apiHubService, sessionRepository)
+    val apiStatuses = playApplication.injector.instanceOf[ApiStatuses]
+    Fixture(playApplication, apiHubService, sessionRepository, apiStatuses)
   }
 }

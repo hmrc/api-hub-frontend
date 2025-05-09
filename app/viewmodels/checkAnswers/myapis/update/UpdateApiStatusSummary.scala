@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.myapis.update
 
+import config.ApiStatuses
 import controllers.myapis.update.routes
 import models.user.UserModel
 import models.{CheckMode, UserAnswers}
@@ -28,11 +29,11 @@ import viewmodels.implicits.*
 
 object UpdateApiStatusSummary  {
 
-  def row(answers: UserAnswers, user: UserModel)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, user: UserModel, apiStatuses: ApiStatuses)(implicit messages: Messages): Option[SummaryListRow] =
       answers.get(UpdateApiStatusPage).filter(_ => user.permissions.canSupport).map {
-        answer =>
+        apiStatus =>
           val value = ValueViewModel(
-            HtmlContent(answer.toString)
+            HtmlContent(apiStatuses.description(apiStatus))
           )
 
           SummaryListRowViewModel(
