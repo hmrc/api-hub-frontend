@@ -16,7 +16,7 @@
 
 package controllers.myapis.produce
 
-import config.{Domains, Hods}
+import config.{ApiStatuses, Domains, Hods}
 import controllers.actions.*
 import forms.YesNoFormProvider
 import models.api.{ApiStatus, SubDomain}
@@ -58,6 +58,7 @@ class ProduceApiCheckYourAnswersController @Inject()(
                                                       domains: Domains,
                                                       apiHubService: ApiHubService,
                                                       formProvider: YesNoFormProvider,
+                                                      apiStatuses: ApiStatuses
                                            )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   private lazy val failureViewModel = ProduceApiDeploymentErrorViewModel(
@@ -257,7 +258,7 @@ class ProduceApiCheckYourAnswersController @Inject()(
       ProduceApiEgressPrefixesSummary.row(userAnswers),
       ProduceApiHodSummary.row(userAnswers, hods),
       ProduceApiDomainSummary.row(userAnswers, domains),
-      ProduceApiStatusSummary.row(userAnswers),
+      ProduceApiStatusSummary.row(userAnswers, apiStatuses),
       ProduceApiPassthroughSummary.row(userAnswers),
     ).flatten
 

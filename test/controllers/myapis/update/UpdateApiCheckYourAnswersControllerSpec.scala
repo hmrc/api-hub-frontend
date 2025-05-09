@@ -17,6 +17,7 @@
 package controllers.myapis.update
 
 import base.SpecBase
+import config.ApiStatuses
 import controllers.actions.{FakeApiDetail, FakeSupporter, FakeUser}
 import controllers.myapis.update.routes as updateApiRoutes
 import controllers.routes
@@ -25,7 +26,6 @@ import forms.YesNoFormProvider
 import models.api.Alpha
 import models.deployment.*
 import models.myapis.produce.*
-import models.team.Team
 import models.user.{Permissions, UserModel}
 import models.{CheckMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
@@ -39,17 +39,16 @@ import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import repositories.{SessionRepository, UpdateApiSessionRepository}
+import repositories.UpdateApiSessionRepository
 import services.ApiHubService
 import viewmodels.checkAnswers.myapis.update.*
 import viewmodels.govuk.all.SummaryListViewModel
 import viewmodels.myapis.{DeploymentSuccessViewModel, produce}
-import viewmodels.myapis.produce.{ProduceApiCheckYourAnswersViewModel, ProduceApiDeploymentErrorViewModel}
+import viewmodels.myapis.produce.ProduceApiCheckYourAnswersViewModel
 import views.html.ErrorTemplate
 import views.html.myapis.DeploymentSuccessView
 import views.html.myapis.produce.{ProduceApiCheckYourAnswersView, ProduceApiDeploymentErrorView}
 
-import java.time.LocalDateTime
 import scala.concurrent.Future
 
 class UpdateApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with TableDrivenPropertyChecks {
@@ -117,7 +116,7 @@ class UpdateApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar
           controllers.myapis.update.routes.UpdateApiCheckYourAnswersController.onSubmit()
         )
         val view = fixture.application.injector.instanceOf[ProduceApiCheckYourAnswersView]
-        val expectedSummaryList = summaryList().copy(rows = summaryList().rows :+ UpdateApiStatusSummary.row(fullyPopulatedUserAnswers, FakeSupporter).get)
+        val expectedSummaryList = summaryList().copy(rows = summaryList().rows :+ UpdateApiStatusSummary.row(fullyPopulatedUserAnswers, FakeSupporter, fixture.apiStatuses).get)
         
         status(result) mustEqual OK
 
@@ -315,7 +314,8 @@ class UpdateApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar
   private case class Fixture(
                               application: PlayApplication,
                               apiHubService: ApiHubService,
-                              sessionRepository: UpdateApiSessionRepository
+                              sessionRepository: UpdateApiSessionRepository,
+                              apiStatuses: ApiStatuses
                             )
 
   private def buildFixture(userAnswers: Option[UserAnswers], userModel: Option[UserModel] = None): Fixture = {
@@ -327,6 +327,7 @@ class UpdateApiCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar
         bind[UpdateApiSessionRepository].toInstance(sessionRepository)
       )
       .build()
-    Fixture(playApplication, apiHubService, sessionRepository)
+    val apiStatuses = playApplication.injector.instanceOf[ApiStatuses]
+    Fixture(playApplication, apiHubService, sessionRepository, apiStatuses)
   }
 }

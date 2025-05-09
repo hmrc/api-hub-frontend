@@ -16,11 +16,11 @@
 
 package viewmodels.checkAnswers.myapis.produce
 
+import config.ApiStatuses
 import controllers.myapis.produce.routes
 import models.{CheckMode, UserAnswers}
 import pages.myapis.produce.ProduceApiStatusPage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
@@ -28,12 +28,11 @@ import viewmodels.implicits._
 
 object ProduceApiStatusSummary  {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, apiStatuses: ApiStatuses)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(ProduceApiStatusPage).map {
-      answer =>
-
+      apiStatus =>
         val value = ValueViewModel(
-          HtmlContent(answer.toString)
+          HtmlContent(apiStatuses.description(apiStatus))
         )
 
         SummaryListRowViewModel(

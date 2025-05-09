@@ -16,7 +16,7 @@
 
 package controllers.myapis.update
 
-import config.{Domains, Hods}
+import config.{ApiStatuses, Domains, Hods}
 import controllers.actions.*
 import controllers.helpers.ErrorResultBuilder
 import forms.YesNoFormProvider
@@ -60,6 +60,7 @@ class UpdateApiCheckYourAnswersController @Inject()(
                                                       apiHubService: ApiHubService,
                                                       errorResultBuilder: ErrorResultBuilder,
                                                       formProvider: YesNoFormProvider,
+                                                      apiStatuses: ApiStatuses
                                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   private lazy val errorViewModel = ProduceApiDeploymentErrorViewModel(
@@ -242,7 +243,7 @@ class UpdateApiCheckYourAnswersController @Inject()(
       UpdateApiEgressPrefixesSummary.row(userAnswers),
       UpdateApiHodSummary.row(userAnswers, hods),
       UpdateApiDomainSummary.row(userAnswers, domains),
-      UpdateApiStatusSummary.row(userAnswers, userModel),
+      UpdateApiStatusSummary.row(userAnswers, userModel, apiStatuses),
     ).flatten
   
   private def buildView(form: Form[?])(implicit request: DataRequest[AnyContent]) = {
