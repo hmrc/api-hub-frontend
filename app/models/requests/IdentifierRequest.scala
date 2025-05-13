@@ -20,6 +20,6 @@ import models.user.UserModel
 import play.api.mvc.Request
 import uk.gov.hmrc.http.HeaderCarrier
 
-case class IdentifierRequest[A] (request: Request[A], user: UserModel, headerCarrierWithEncryptedUserEmail: HeaderCarrier) extends BaseRequest[A](request) {
+case class IdentifierRequest[A] (request: Request[A], user: UserModel) extends BaseRequest[A](request) {
   override def maybeUser: Option[UserModel] = Some(user)
 }
