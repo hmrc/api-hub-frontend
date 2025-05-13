@@ -32,7 +32,7 @@ class AuthorisedApproverActionSpec extends AnyFreeSpec with Matchers{
 
   "AuthorisedApproverAction" - {
     "must return the block's result when the user is an approver" in {
-      val request = IdentifierRequest(FakeRequest(), FakeApprover, HeaderCarrier())
+      val request = IdentifierRequest(FakeRequest(), FakeApprover)
       val action = new AuthorisedApproverAction()
       val block = (_: IdentifierRequest[?]) => Future.successful(Results.Ok)
 
@@ -41,7 +41,7 @@ class AuthorisedApproverActionSpec extends AnyFreeSpec with Matchers{
     }
 
     "must return a redirection to the unauthorised page if the user is not an approver" in {
-      val request = IdentifierRequest(FakeRequest(), FakeUser, HeaderCarrier())
+      val request = IdentifierRequest(FakeRequest(), FakeUser)
       val action = new AuthorisedApproverAction()
       val block = (_: IdentifierRequest[?]) => Future.successful(Results.Ok)
 

@@ -34,7 +34,7 @@ class AuthorisedSupportActionSpec extends AnyFreeSpec with Matchers with TestHel
 
   "must return the block's result when the user is support" in {
     forAll(usersWhoCanSupport) { (user: UserModel) =>
-      val request = IdentifierRequest(FakeRequest(), user, HeaderCarrier())
+      val request = IdentifierRequest(FakeRequest(), user)
       val action = new AuthorisedSupportAction()
       val block = (_: IdentifierRequest[?]) => Future.successful(Results.Ok)
 
@@ -45,7 +45,7 @@ class AuthorisedSupportActionSpec extends AnyFreeSpec with Matchers with TestHel
 
   "must return a redirection to the unauthorised page if the user is not support" in {
     forAll(usersWhoCannotSupport) { (user: UserModel) =>
-      val request = IdentifierRequest(FakeRequest(), user, HeaderCarrier())
+      val request = IdentifierRequest(FakeRequest(), user)
       val action = new AuthorisedSupportAction()
       val block = (_: IdentifierRequest[?]) => Future.successful(Results.Ok)
 

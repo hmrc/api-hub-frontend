@@ -41,7 +41,7 @@ class AuthorisedApproverOrSupportActionSpec extends AnyFreeSpec with Matchers wi
       )
 
       forAll(users) {(user: UserModel) =>
-        val request = IdentifierRequest(FakeRequest(), user, HeaderCarrier())
+        val request = IdentifierRequest(FakeRequest(), user)
         val action = new AuthorisedApproverOrSupportAction()
         val block = (_: IdentifierRequest[?]) => Future.successful(Results.Ok)
 
@@ -58,7 +58,7 @@ class AuthorisedApproverOrSupportActionSpec extends AnyFreeSpec with Matchers wi
       )
 
       forAll(users) {(user: UserModel) =>
-        val request = IdentifierRequest(FakeRequest(), user, HeaderCarrier())
+        val request = IdentifierRequest(FakeRequest(), user)
         val action = new AuthorisedApproverOrSupportAction()
         val block = (_: IdentifierRequest[?]) => Future.successful(Results.Ok)
 

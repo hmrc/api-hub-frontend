@@ -74,8 +74,8 @@ class AuthenticatedIdentifierAction @Inject()(
   ): Future[Result] = {
     if (featureStatus.available || user.permissions.canSupport) {
       val encryptedEmail = crypto.QueryParameterCrypto.encrypt(PlainText(user.email)).value
-      val hc: HeaderCarrier = HeaderCarrierConverter.fromRequest(request).withExtraHeaders(("Encrypted-User-Email", encryptedEmail))
-      block(IdentifierRequest(request, user, hc))
+      val requestWithUserEmailHeader = request.withHeaders(Headers(("Encrypted-User-Email", encryptedEmail)))
+      block(IdentifierRequest(requestWithUserEmailHeader, user))
     }
     else {
       shuttered(featureStatus, Some(user))(request)

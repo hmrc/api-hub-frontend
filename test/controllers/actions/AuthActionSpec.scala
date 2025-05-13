@@ -35,6 +35,7 @@ import play.api.test.Helpers.*
 import services.HubStatusService
 import views.html.ShutteredView
 
+import scala.compiletime.uninitialized
 import scala.concurrent.Future
 
 class AuthActionSpec extends AnyFreeSpec with Matchers with MockitoSugar with OptionValues  {
@@ -42,7 +43,7 @@ class AuthActionSpec extends AnyFreeSpec with Matchers with MockitoSugar with Op
   import AuthActionSpec.*
 
   class Harness(authAction: IdentifierAction) {
-    var identifierRequest: IdentifierRequest[AnyContent] = _
+    var identifierRequest: IdentifierRequest[AnyContent] = uninitialized
     def onPageLoad(): Action[AnyContent] = authAction { identifierRequest => {
         this.identifierRequest = identifierRequest
         Results.Ok
@@ -174,7 +175,7 @@ class AuthActionSpec extends AnyFreeSpec with Matchers with MockitoSugar with Op
         val result = controller.onPageLoad()(FakeRequest())
 
         status(result) mustBe OK
-        controller.identifierRequest.headerCarrierWithEncryptedUserEmail.extraHeaders must contain("Encrypted-User-Email" -> "z2y0wqM9NOko/nAMBcRqkA==")
+        controller.identifierRequest.headers.get("Encrypted-User-Email").value mustBe "z2y0wqM9NOko/nAMBcRqkA=="
       }
     }
 
@@ -191,7 +192,7 @@ class AuthActionSpec extends AnyFreeSpec with Matchers with MockitoSugar with Op
         val result = controller.onPageLoad()(FakeRequest())
 
         status(result) mustBe OK
-        controller.identifierRequest.headerCarrierWithEncryptedUserEmail.extraHeaders must contain("Encrypted-User-Email" -> "z2y0wqM9NOko/nAMBcRqkA==")
+        controller.identifierRequest.headers.get("Encrypted-User-Email").value mustBe "z2y0wqM9NOko/nAMBcRqkA=="
       }
     }
 

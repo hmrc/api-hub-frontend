@@ -157,7 +157,7 @@ class ApiAuthActionSpec extends SpecBase with Matchers with MockitoSugar {
   }
 
   def buildRequest(user: UserModel = FakeUser): IdentifierRequest[AnyContentAsEmpty.type] = {
-    IdentifierRequest(FakeRequest(), user, HeaderCarrier())
+    IdentifierRequest(FakeRequest(), user)
   }
 
 }
