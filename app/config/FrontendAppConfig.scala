@@ -77,6 +77,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val dashboardApisToShow: Int = configuration.get[Int]("dashboardApisToShow")
 
   val showApisOnDashboard: Boolean = configuration.getOptional[Boolean]("features.showApisOnDashboard").getOrElse(false)
+  val v2EnabledTeams: Set[String] = configuration.get[Seq[String]]("features.v2EnabledTeams").toSet
 
   val hipEnvironmentsLookupTimeoutSeconds: Int = configuration.get[Int]("hipEnvironmentsLookupTimeoutSeconds")
   val hubStatusTimeoutSeconds: Int = configuration.get[Int]("hubStatusTimeoutSeconds")

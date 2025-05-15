@@ -20,7 +20,7 @@ import models.team.Team
 import play.api.i18n.Messages
 import viewmodels.{SideNavItem, SideNavPage}
 import SideNavItem.SideNavItemLeaf
-import config.FrontendAppConfig
+import config.{FrontendAppConfig, V2Features}
 import jakarta.inject.Singleton
 
 import javax.inject.Inject
@@ -68,7 +68,7 @@ class ManageTeamNavItems @Inject()(config: FrontendAppConfig) {
       isCurrentPage = currentPage == EgressesPage
     )
 
-    if (config.showApisOnDashboard) items.patch(1, Seq(teamEgressesItem), 0) else items
+    if (V2Features.teamAccess(team, config)) items.patch(1, Seq(teamEgressesItem), 0) else items
   }
 
 }

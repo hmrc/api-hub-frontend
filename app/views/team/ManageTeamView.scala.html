@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import config.FrontendAppConfig
+@import config.{FrontendAppConfig, V2Features}
 @import models.application.{Application, TeamMember}
 @import models.team.Team
 @import models.user.UserModel
@@ -46,7 +46,7 @@
 }
 
 @egressBanner = {
-    @if(team.isProducerTeam && config.showApisOnDashboard) {
+    @if(team.isProducerTeam && V2Features.teamAccess(team, config)) {
         <div class="call-out-panel call-out-panel__small">
             <p class="govuk-body govuk-!-margin-bottom-2">
                 <i class="fa-solid fa-circle-info" ></i>
