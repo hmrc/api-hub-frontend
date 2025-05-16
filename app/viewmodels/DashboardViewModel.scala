@@ -16,7 +16,7 @@
 
 package viewmodels
 
-import config.FrontendAppConfig
+import config.{FrontendAppConfig, V2Features}
 import models.api.ApiDetail
 import models.application.Application
 import models.team.Team
@@ -101,7 +101,7 @@ class DashboardViewModel(
 
   def showMyTeamsLink: Boolean = teams.size > frontendAppConfig.dashboardTeamsToShow
 
-  def showApisOnDashboard: Boolean = frontendAppConfig.showApisOnDashboard
+  def showApisOnDashboard: Boolean = V2Features.userAccess(teams, frontendAppConfig)
 
   def myApisTitle(implicit messages: Messages): String = {
     if (myApisCount == 0) {
